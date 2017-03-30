@@ -9,14 +9,19 @@ package org.mule.runtime.module.tooling.internal;
 import static com.google.common.base.Throwables.getCausalChain;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.FileUtils.deleteTree;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifact;
+import org.mule.runtime.deployment.model.api.DeploymentStartException;
+import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.module.repository.api.BundleNotFoundException;
+
+import org.eclipse.aether.transfer.ArtifactNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ConnectivityTestingService} for a temporary artifact.
@@ -26,15 +31,17 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifa
  */
 public class TemporaryArtifactConnectivityTestingService implements ConnectivityTestingService {
 
-  private TemporaryArtifact temporaryArtifact;
+  private static final Logger LOGGER = LoggerFactory.getLogger(TemporaryArtifactConnectivityTestingService.class);
+  private final ApplicationSupplier applicationSupplier;
+  private Application application;
 
   /**
    * Creates a {@code DefaultConnectivityTestingService}.
    *
-   * @param temporaryArtifact tooling artifact used to do connectivity testing
+   * @param applicationSupplier supplier of the application that will be used to do connectivity testing.
    */
-  public TemporaryArtifactConnectivityTestingService(TemporaryArtifact temporaryArtifact) {
-    this.temporaryArtifact = temporaryArtifact;
+  public TemporaryArtifactConnectivityTestingService(ApplicationSupplier applicationSupplier) {
+    this.applicationSupplier = applicationSupplier;
   }
 
   /**
@@ -46,24 +53,54 @@ public class TemporaryArtifactConnectivityTestingService implements Connectivity
   public ConnectionValidationResult testConnection(Location location) {
     checkArgument(location != null, "identifier cannot be null");
     try {
-      if (!temporaryArtifact.isStarted()) {
-        try {
-          temporaryArtifact.start();
-        } catch (InitialisationException | ConfigurationException e) {
-          return failure(e.getMessage(), e);
-        } catch (Exception e) {
-          return getCausalChain(e).stream()
-              .filter(exception -> exception.getClass().equals(ConnectionException.class)
-                  && ((ConnectionException) exception).getErrorType().isPresent())
-              .map(exception -> failure(exception.getMessage(), ((ConnectionException) exception).getErrorType().get(),
-                                        (Exception) exception))
-              .findFirst()
-              .orElse(failure(e.getMessage(), e));
-        }
-      }
-      return temporaryArtifact.getConnectivityTestingService().testConnection(location);
-    } finally {
-      temporaryArtifact.dispose();
+      application = applicationSupplier.get();
+    } catch (Exception e) {
+      throw getCausalChain(e).stream()
+          .filter(exception -> exception.getClass().equals(ArtifactNotFoundException.class))
+          .findFirst().map(exception -> (RuntimeException) new BundleNotFoundException(exception))
+          .orElse(new MuleRuntimeException(e));
     }
+    try {
+      try {
+        this.application.install();
+        this.application.init();
+        this.application.start();
+      } catch (DeploymentStartException e) {
+        return failure(e.getMessage(), e);
+      } catch (Exception e) {
+        return getCausalChain(e).stream()
+            .filter(exception -> exception.getClass().equals(ConnectionException.class)
+                && ((ConnectionException) exception).getErrorType().isPresent())
+            .map(exception -> failure(exception.getMessage(), ((ConnectionException) exception).getErrorType().get(),
+                                      (Exception) exception))
+            .findFirst()
+            .orElse(failure(e.getMessage(), e));
+      }
+      return application.getConnectivityTestingService().testConnection(location);
+    } finally {
+      if (application != null) {
+        doWithoutFail(() -> application.stop());
+        doWithoutFail(() -> application.dispose());
+        doWithoutFail(() -> deleteTree(application.getLocation()));
+      }
+    }
+  }
+
+  public void doWithoutFail(Runnable runnable) {
+    try {
+      runnable.run();
+    } catch (Exception e) {
+      LOGGER.warn(e.getMessage());
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(e.getMessage(), e);
+      }
+    }
+  }
+
+  @FunctionalInterface
+  public interface ApplicationSupplier {
+
+    Application get() throws Exception;
+
   }
 }

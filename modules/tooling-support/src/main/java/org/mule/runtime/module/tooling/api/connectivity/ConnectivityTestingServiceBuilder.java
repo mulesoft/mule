@@ -18,24 +18,20 @@ import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 public interface ConnectivityTestingServiceBuilder {
 
   /**
-   * Adds a dependency needed by the artifact that must be included in order to do connectivity testing
+   * Adds a dependency needed by the artifact that must be included in order to do connectivity testing.
+   * <p>
+   * If the dependency is a regular jar file, it will be made available to all extensions since the only possible jar dependency
+   * that may be added are specific clients jar for doing connectivity testing like jdbc drivers or JMS clients.
    *
    * @param groupId group id of the artifact
    * @param artifactId artifact id of the artifact
-   * @param artifactVersion verion of the artifact
+   * @param artifactVersion version of the artifact
+   * @param classifier classifier of the artifact
+   * @param type type of the artifact
    * @return the builder
    */
-  ConnectivityTestingServiceBuilder addDependency(String groupId, String artifactId, String artifactVersion);
-
-  /**
-   * Adds an extension that must be used to do connectivity testing
-   *
-   * @param groupId group id of the extension
-   * @param artifactId artifact id of the extension
-   * @param artifactVersion verion of the extension
-   * @return the builder
-   */
-  ConnectivityTestingServiceBuilder addExtension(String groupId, String artifactId, String artifactVersion);
+  ConnectivityTestingServiceBuilder addDependency(String groupId, String artifactId, String artifactVersion, String classifier,
+                                                  String type);
 
   /**
    * Configures the mule components required to do connectivity testing

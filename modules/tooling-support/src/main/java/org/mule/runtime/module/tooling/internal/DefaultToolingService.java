@@ -6,12 +6,8 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
-import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifact;
-import org.mule.runtime.module.deployment.impl.internal.artifact.TemporaryArtifactBuilderFactory;
-import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder;
 
@@ -25,20 +21,13 @@ import java.io.IOException;
  */
 public class DefaultToolingService implements ToolingService {
 
-  private final TemporaryArtifactBuilderFactory artifactBuilderFactory;
   private final DefaultApplicationFactory applicationFactory;
-  private RepositoryService repositoryService;
 
   /**
    * @param applicationFactory factory for creating the {@link Application}
-   * @param repositoryService a {@code RepositoryService} which will be used to find extensions required for the service.
-   * @param artifactBuilderFactory factory for building a {@link TemporaryArtifact} that will be used as context for the tooling
    */
-  public DefaultToolingService(DefaultApplicationFactory applicationFactory, RepositoryService repositoryService,
-                               TemporaryArtifactBuilderFactory artifactBuilderFactory) {
+  public DefaultToolingService(DefaultApplicationFactory applicationFactory) {
     this.applicationFactory = applicationFactory;
-    this.repositoryService = repositoryService;
-    this.artifactBuilderFactory = artifactBuilderFactory;
   }
 
   /**
@@ -46,7 +35,7 @@ public class DefaultToolingService implements ToolingService {
    */
   @Override
   public ConnectivityTestingServiceBuilder newConnectivityTestingServiceBuilder() {
-    return new DefaultConnectivityTestingServiceBuilder(repositoryService, artifactBuilderFactory, new SpiServiceRegistry());
+    return new DefaultConnectivityTestingServiceBuilder(applicationFactory);
   }
 
   /**
