@@ -9,6 +9,7 @@ package org.mule.config.spring.parsers.generic;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.util.StringUtils;
 
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -62,8 +63,12 @@ public class TextDefinitionParser extends ChildDefinitionParser
             String value = node.getNodeValue();
             if (!StringUtils.isBlank(value))
             {
-                assembler.getTarget().getPropertyValues().addPropertyValue(setterMethod, value);
+                addPropertyValue(value, assembler.getTarget().getPropertyValues());
             }
         }
+    }
+    
+    protected void addPropertyValue(String value, MutablePropertyValues tempPropertyValues) {
+           tempPropertyValues.addPropertyValue(setterMethod, value);
     }
 }
