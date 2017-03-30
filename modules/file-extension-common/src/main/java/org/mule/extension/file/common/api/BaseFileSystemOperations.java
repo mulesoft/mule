@@ -152,14 +152,15 @@ public abstract class BaseFileSystemOperations {
    * @param targetPath              the target directory where the file is going to be copied
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param overwrite               whether or not overwrite the file if the target destination already exists.
+   * @param renameTo                the new file name, {@code null} if the file doesn't need to be renamed
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   protected void doCopy(FileConnectorConfig config, FileSystem fileSystem, String sourcePath,
-                        String targetPath, boolean createParentDirectories, boolean overwrite) {
+                        String targetPath, boolean createParentDirectories, boolean overwrite, String renameTo) {
     fileSystem.changeToBaseDir();
     validatePath(targetPath, "target path");
     validatePath(sourcePath, "source path");
-    fileSystem.copy(config, sourcePath, targetPath, overwrite, createParentDirectories);
+    fileSystem.copy(config, sourcePath, targetPath, overwrite, createParentDirectories, renameTo);
   }
 
   /**
@@ -181,14 +182,15 @@ public abstract class BaseFileSystemOperations {
    * @param targetPath              the target directory
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param overwrite               whether or not overwrite the file if the target destination already exists.
+   * @param renameTo                the new file name, {@code null} if the file doesn't need to be renamed
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   protected void doMove(FileConnectorConfig config, FileSystem fileSystem, String sourcePath,
-                        String targetPath, boolean createParentDirectories, boolean overwrite) {
+                        String targetPath, boolean createParentDirectories, boolean overwrite, String renameTo) {
     fileSystem.changeToBaseDir();
     validatePath(targetPath, "target path");
     validatePath(sourcePath, "source path");
-    fileSystem.move(config, sourcePath, targetPath, overwrite, createParentDirectories);
+    fileSystem.move(config, sourcePath, targetPath, overwrite, createParentDirectories, renameTo);
   }
 
   /**

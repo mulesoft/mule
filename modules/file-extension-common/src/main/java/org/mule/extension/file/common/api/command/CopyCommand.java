@@ -18,14 +18,16 @@ public interface CopyCommand {
 
   /**
    * Performs a copy operation under the considerations of
-   * {@link FileSystem#copy(FileConnectorConfig, String, String, boolean, boolean)}
+   * {@link FileSystem#copy(FileConnectorConfig, String, String, boolean, boolean, String)}
    *
    * @param config the config that is parameterizing this operation
    * @param sourcePath the path to the file to be copied
    * @param targetPath the target directory
    * @param overwrite whether or not overwrite the file if the target destination already exists.
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
+   * @param renameTo the new file name, {@code null} if the file doesn't need to be renamed 
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
-  void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories);
+  void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories,
+            String renameTo);
 }

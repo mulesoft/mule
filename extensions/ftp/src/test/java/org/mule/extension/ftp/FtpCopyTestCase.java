@@ -26,6 +26,7 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
   private static final String SOURCE_DIRECTORY_NAME = "source";
   private static final String TARGET_DIRECTORY = "target";
   private static final String EXISTING_CONTENT = "I was here first!";
+  private static final String RENAMED = "renamed.txt";
 
   protected String sourcePath;
 
@@ -63,7 +64,7 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
     final String absoluteSourcePath = String.format("%s/%s", testHarness.getWorkingDirectory(), SOURCE_FILE_NAME);
     testHarness.makeDir(TARGET_DIRECTORY);
     final String path = getPath(TARGET_DIRECTORY);
-    doExecute(getFlowName(), absoluteSourcePath, path, false, false);
+    doExecute(getFlowName(), absoluteSourcePath, path, false, false, null);
 
     assertCopy(format("%s/%s", path, SOURCE_FILE_NAME));
   }
@@ -79,7 +80,7 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
   public void copyToItselfWithoutOverwrite() throws Exception {
     testHarness.expectedError().expectError(NAMESPACE, FILE_ALREADY_EXISTS.getType(), FileAlreadyExistsException.class,
                                             "already exists");
-    doExecute(getFlowName(), sourcePath, sourcePath, false, false);
+    doExecute(getFlowName(), sourcePath, sourcePath, false, false, null);
   }
 
   @Test
@@ -95,7 +96,7 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
   public void copyReadFile() throws Exception {
     testHarness.makeDir(TARGET_DIRECTORY);
     final String path = getPath(TARGET_DIRECTORY);
-    doExecute("readAndDo", path, false, false);
+    doExecute("readAndDo", path, false, false, null);
 
     assertCopy(format("%s/%s", path, SOURCE_FILE_NAME));
   }
@@ -103,7 +104,7 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
   @Test
   public void toNonExistingFolderWithoutCreateParent() throws Exception {
     testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class,
-                                            "destination path doesn't exists");
+                                            "doesn't exists");
     testHarness.makeDir(TARGET_DIRECTORY);
     String target = format("%s/%s", TARGET_DIRECTORY, "a/b/c");
     doExecute(target, false, false);
@@ -194,6 +195,37 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
 
   }
 
+  @Test
+  public void copyAndRenameInSameDirectory() throws Exception {
+    doExecute(testHarness.getWorkingDirectory(), true, false, RENAMED);
+    assertCopy(RENAMED);
+  }
+
+  @Test
+  public void copyAndRenameInSameDirectoryWithOverwrite() throws Exception {
+    testHarness.write(testHarness.getWorkingDirectory(), RENAMED, EXISTING_CONTENT);
+
+    doExecute(testHarness.getWorkingDirectory(), true, false, RENAMED);
+    assertCopy(RENAMED);
+  }
+
+  @Test
+  public void copyAndRenameInSameDirectoryWithoutOverwrite() throws Exception {
+    testHarness.expectedError().expectError(NAMESPACE, FILE_ALREADY_EXISTS, FileAlreadyExistsException.class, "already exists");
+    testHarness.write(testHarness.getWorkingDirectory(), RENAMED, EXISTING_CONTENT);
+
+    doExecute(testHarness.getWorkingDirectory(), false, false, RENAMED);
+  }
+
+  @Test
+  public void directoryToExistingDirectoryWithRename() throws Exception {
+    sourcePath = buildSourceDirectory();
+    final String target = "target";
+    testHarness.makeDir(target);
+    doExecute(target, false, false, "renamedSource");
+    assertCopy(format("%s/renamedSource/%s", target, SOURCE_FILE_NAME));
+  }
+
   private String buildSourceDirectory() throws Exception {
     testHarness.makeDir(SOURCE_DIRECTORY_NAME);
     testHarness.write(SOURCE_DIRECTORY_NAME, SOURCE_FILE_NAME, HELLO_WORLD);
@@ -201,18 +233,26 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
     return getPath(SOURCE_DIRECTORY_NAME);
   }
 
-  private void doExecute(String target, boolean overwrite, boolean createParentFolder) throws Exception {
-    doExecute(getFlowName(), target, overwrite, createParentFolder);
+  void doExecute(String target, boolean overwrite, boolean createParentFolder) throws Exception {
+    doExecute(getFlowName(), target, overwrite, createParentFolder, null);
   }
 
-  private void doExecute(String flowName, String target, boolean overwrite, boolean createParentFolder) throws Exception {
-    doExecute(flowName, sourcePath, target, overwrite, createParentFolder);
+  void doExecute(String target, boolean overwrite, boolean createParentFolder, String renameTo) throws Exception {
+    doExecute(getFlowName(), target, overwrite, createParentFolder, renameTo);
   }
 
-  private void doExecute(String flowName, String source, String target, boolean overwrite, boolean createParentFolder)
+  void doExecute(String flowName, String target, boolean overwrite, boolean createParentFolder, String renameTo)
+      throws Exception {
+    doExecute(flowName, sourcePath, target, overwrite, createParentFolder, renameTo);
+  }
+
+  void doExecute(String flowName, String source, String target, boolean overwrite, boolean createParentFolder,
+                 String renameTo)
       throws Exception {
     flowRunner(flowName).withVariable(SOURCE_DIRECTORY_NAME, source).withVariable("target", target)
-        .withVariable("overwrite", overwrite).withVariable("createParent", createParentFolder).run();
+        .withVariable("overwrite", overwrite).withVariable("createParent", createParentFolder).withVariable("renameTo", renameTo)
+        .run();
+
   }
 
   protected void assertCopy(String target) throws Exception {

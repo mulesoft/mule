@@ -25,6 +25,8 @@ public class FileCopyTestCase extends FileConnectorTestCase {
   private static final String SOURCE_FILE_NAME = "test.txt";
   private static final String SOURCE_DIRECTORY_NAME = "source";
   private static final String EXISTING_CONTENT = "I was here first!";
+  private static final String RENAMED = "renamed.txt";
+
 
   protected String sourcePath;
 
@@ -59,13 +61,13 @@ public class FileCopyTestCase extends FileConnectorTestCase {
   @Test
   public void copyToItselfWithoutOverwrite() throws Exception {
     expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS, FileAlreadyExistsException.class, "already exists");
-    doExecute(getFlowName(), sourcePath, sourcePath, false, false);
+    doExecute(getFlowName(), sourcePath, sourcePath, false, false, null);
   }
 
   @Test
   public void copyReadFile() throws Exception {
     String target = temporaryFolder.newFolder().getAbsolutePath();
-    doExecute("readAndDo", target, false, false);
+    doExecute("readAndDo", target, false, false, null);
 
     assertCopy(format("%s/%s", target, SOURCE_FILE_NAME));
   }
@@ -165,6 +167,40 @@ public class FileCopyTestCase extends FileConnectorTestCase {
     doExecute(format("%s/%s", targetDirectory.getAbsolutePath(), SOURCE_DIRECTORY_NAME), false, false);
   }
 
+  @Test
+  public void copyAndRenameInSameDirectory() throws Exception {
+    doExecute(temporaryFolder.getRoot().getAbsolutePath(), true, false, RENAMED);
+    assertCopy(RENAMED);
+  }
+
+  @Test
+  public void copyAndRenameInSameDirectoryWithOverwrite() throws Exception {
+    File existingFile = temporaryFolder.newFile(RENAMED);
+    write(existingFile, EXISTING_CONTENT);
+
+    doExecute(existingFile.getParent(), true, false, RENAMED);
+    assertCopy(RENAMED);
+  }
+
+  @Test
+  public void copyAndRenameInSameDirectoryWithoutOverwrite() throws Exception {
+    expectedError.expectError(NAMESPACE, FILE_ALREADY_EXISTS, FileAlreadyExistsException.class, "already exists");
+    File existingFile = temporaryFolder.newFile(RENAMED);
+    write(existingFile, EXISTING_CONTENT);
+    doExecute(existingFile.getParent(), false, false, RENAMED);
+  }
+
+  @Test
+  public void directoryToExistingDirectoryWithRename() throws Exception {
+    File sourceFolder = buildSourceDirectory();
+
+    sourcePath = sourceFolder.getAbsolutePath();
+
+    File targetFolder = temporaryFolder.newFolder("target");
+    doExecute(targetFolder.getAbsolutePath(), false, false, "renamedSource");
+    assertCopy(format("%s/renamedSource/%s", targetFolder.getAbsolutePath(), SOURCE_FILE_NAME));
+  }
+
   private File buildSourceDirectory() throws IOException {
     File sourceFolder = temporaryFolder.newFolder(SOURCE_DIRECTORY_NAME);
     File file = new File(sourceFolder, SOURCE_FILE_NAME);
@@ -172,18 +208,25 @@ public class FileCopyTestCase extends FileConnectorTestCase {
     return sourceFolder;
   }
 
-  private void doExecute(String target, boolean overwrite, boolean createParentFolder) throws Exception {
-    doExecute(getFlowName(), target, overwrite, createParentFolder);
+  void doExecute(String target, boolean overwrite, boolean createParentFolder) throws Exception {
+    doExecute(getFlowName(), target, overwrite, createParentFolder, null);
   }
 
-  private void doExecute(String flowName, String target, boolean overwrite, boolean createParentFolder) throws Exception {
-    doExecute(flowName, sourcePath, target, overwrite, createParentFolder);
+  void doExecute(String target, boolean overwrite, boolean createParentFolder, String renameTo) throws Exception {
+    doExecute(getFlowName(), target, overwrite, createParentFolder, renameTo);
   }
 
-  private void doExecute(String flowName, String source, String target, boolean overwrite, boolean createParentFolder)
+  void doExecute(String flowName, String target, boolean overwrite, boolean createParentFolder, String renameTo)
+      throws Exception {
+    doExecute(flowName, sourcePath, target, overwrite, createParentFolder, renameTo);
+  }
+
+  void doExecute(String flowName, String source, String target, boolean overwrite, boolean createParentFolder,
+                 String renameTo)
       throws Exception {
     flowRunner(flowName).withVariable(SOURCE_DIRECTORY_NAME, source).withVariable("target", target)
-        .withVariable("overwrite", overwrite).withVariable("createParent", createParentFolder).run();
+        .withVariable("overwrite", overwrite).withVariable("createParent", createParentFolder).withVariable("renameTo", renameTo)
+        .run();
 
   }
 

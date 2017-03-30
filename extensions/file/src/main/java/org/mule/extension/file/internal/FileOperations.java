@@ -162,14 +162,15 @@ public final class FileOperations extends BaseFileSystemOperations {
    * @param targetPath              the target directory where the file is going to be copied
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param overwrite               whether or not overwrite the file if the target destination already exists.
+   * @param renameTo                copied file's new name. If not provided, original file name will be kept.
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
-  @Summary("Copies a file in another directory")
+  @Summary("Copies a file")
   @Throws(FileCopyErrorTypeProvider.class)
   public void copy(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, String sourcePath,
                    String targetPath, @Optional(defaultValue = "true") boolean createParentDirectories,
-                   @Optional(defaultValue = "false") boolean overwrite) {
-    super.doCopy(config, fileSystem, sourcePath, targetPath, createParentDirectories, overwrite);
+                   @Optional(defaultValue = "false") boolean overwrite, @Optional String renameTo) {
+    super.doCopy(config, fileSystem, sourcePath, targetPath, createParentDirectories, overwrite, renameTo);
   }
 
   /**
@@ -191,14 +192,15 @@ public final class FileOperations extends BaseFileSystemOperations {
    * @param targetPath              the target directory
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param overwrite               whether or not overwrite the file if the target destination already exists.
+   * @param renameTo                moved file's new name. If not provided, original file name will be kept.
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
-  @Summary("Moves a file to another directory")
+  @Summary("Moves a file")
   @Throws(FileCopyErrorTypeProvider.class)
   public void move(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, String sourcePath,
                    String targetPath, @Optional(defaultValue = "true") boolean createParentDirectories,
-                   @Optional(defaultValue = "false") boolean overwrite) {
-    super.doMove(config, fileSystem, sourcePath, targetPath, createParentDirectories, overwrite);
+                   @Optional(defaultValue = "false") boolean overwrite, String renameTo) {
+    super.doMove(config, fileSystem, sourcePath, targetPath, createParentDirectories, overwrite, renameTo);
   }
 
 

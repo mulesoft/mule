@@ -7,7 +7,6 @@
 package org.mule.extension.ftp.internal;
 
 import static java.lang.String.format;
-
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileWriteMode;
@@ -15,6 +14,7 @@ import org.mule.extension.ftp.internal.ftp.command.FtpCommand;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.extension.api.exception.ModuleException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,6 +68,8 @@ public abstract class AbstractFtpCopyDelegate implements FtpCopyDelegate {
       } else {
         copyFile(config, source, targetPath, overwrite, writerConnection);
       }
+    } catch (ModuleException e) {
+      throw e;
     } catch (Exception e) {
       throw command.exception(format("Found exception copying file '%s' to '%s'", source, targetPath), e);
     } finally {
@@ -101,7 +103,7 @@ public abstract class AbstractFtpCopyDelegate implements FtpCopyDelegate {
       if (overwrite) {
         fileSystem.delete(targetFile.getPath());
       } else {
-        throw command.exception(format("Cannot copy file '%s' to path '%s' because it already exists", source.getPath(), target));
+        throw command.alreadyExistsException(target);
       }
     }
 

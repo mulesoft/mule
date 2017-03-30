@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+
 /**
  * A {@link ClassicFtpCommand} which implements the {@link CopyCommand} contract
  *
@@ -41,8 +44,9 @@ public final class FtpCopyCommand extends ClassicFtpCommand implements CopyComma
    */
   @Override
   public void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite,
-                   boolean createParentDirectories) {
-    copy(config, sourcePath, targetPath, overwrite, createParentDirectories, new RegularFtpCopyDelegate(this, fileSystem));
+                   boolean createParentDirectories, String renameTo) {
+    copy(config, sourcePath, targetPath, overwrite, createParentDirectories, renameTo,
+         new RegularFtpCopyDelegate(this, fileSystem));
   }
 
   private class RegularFtpCopyDelegate extends AbstractFtpCopyDelegate {

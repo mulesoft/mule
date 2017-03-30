@@ -7,7 +7,7 @@
 package org.mule.extension.file.internal.command;
 
 import static java.lang.String.format;
-
+import static org.apache.commons.lang.StringUtils.isBlank;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileSystem;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
@@ -23,7 +23,7 @@ import java.nio.file.StandardCopyOption;
  * Base class for commands that generates copies of a local file, either by copying or moving them.
  * <p>
  * This class contains the logic to determine the actual target path in a way which provides bash semantics, as described in the
- * {@link FileSystem#copy(FileConnectorConfig, String, String, boolean, boolean)} and
+ * {@link FileSystem#copy(FileConnectorConfig, String, String, boolean, boolean, String)} and
  * {@link FileSystem#move(FileConnectorConfig, String, String, boolean, boolean)} methods.
  * <p>
  * This command also handles the concern of the target path already existing and whether or not overwrite it.
@@ -47,10 +47,13 @@ abstract class AbstractLocalCopyCommand extends LocalFileCommand {
    * @param target the path to the target destination
    * @param overwrite whether to overwrite existing target paths
    * @param createParentDirectory whether to create the target's parent directory if it doesn't exists
+   * @param renameTo the new file name, {@code null} if the file doesn't need to be renamed
    */
-  protected final void execute(String sourcePath, String target, boolean overwrite, boolean createParentDirectory) {
+  protected final void execute(String sourcePath, String target, boolean overwrite, boolean createParentDirectory,
+                               String renameTo) {
     Path source = resolveExistingPath(sourcePath);
     Path targetPath = resolvePath(target);
+    String targetFileName = isBlank(renameTo) ? source.getFileName().toString() : renameTo;
 
     CopyOption copyOption = null;
     if (Files.exists(targetPath)) {
@@ -58,7 +61,7 @@ abstract class AbstractLocalCopyCommand extends LocalFileCommand {
         if (Files.isDirectory(source) && source.getFileName().equals(targetPath.getFileName()) && !overwrite) {
           throw alreadyExistsException(targetPath);
         } else {
-          targetPath = targetPath.resolve(source.getFileName());
+          targetPath = targetPath.resolve(targetFileName);
         }
       } else if (!overwrite) {
         throw alreadyExistsException(targetPath);
@@ -66,7 +69,7 @@ abstract class AbstractLocalCopyCommand extends LocalFileCommand {
     } else {
       if (createParentDirectory) {
         targetPath.toFile().mkdirs();
-        targetPath = targetPath.resolve(source.getFileName());
+        targetPath = targetPath.resolve(targetFileName);
       } else {
         throw new IllegalPathException(format("Can't copy '%s' to '%s' because the destination path " + "doesn't exists",
                                               source.toAbsolutePath(), targetPath.toAbsolutePath()));

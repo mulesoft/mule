@@ -37,8 +37,8 @@ public class SftpCopyCommand extends SftpCommand implements CopyCommand {
    */
   @Override
   public void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite,
-                   boolean createParentDirectories) {
-    copy(config, sourcePath, targetPath, overwrite, createParentDirectories, new SftpCopyDelegate(this, fileSystem));
+                   boolean createParentDirectories, String renameTo) {
+    copy(config, sourcePath, targetPath, overwrite, createParentDirectories, renameTo, new SftpCopyDelegate(this, fileSystem));
   }
 
   private class SftpCopyDelegate extends AbstractFtpCopyDelegate {

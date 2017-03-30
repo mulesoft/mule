@@ -34,8 +34,8 @@ public final class LocalCopyCommand extends AbstractLocalCopyCommand implements 
    */
   @Override
   public void copy(FileConnectorConfig config, String sourcePath, String targetDirectory, boolean overwrite,
-                   boolean createParentDirectories) {
-    execute(sourcePath, targetDirectory, overwrite, createParentDirectories);
+                   boolean createParentDirectories, String renameTo) {
+    execute(sourcePath, targetDirectory, overwrite, createParentDirectories, renameTo);
   }
 
   /**

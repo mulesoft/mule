@@ -13,13 +13,14 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import javax.activation.MimetypesFileTypeMap;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Predicate;
+
+import javax.activation.MimetypesFileTypeMap;
 
 /**
  * Represents an abstract file system and the operations which can be performed on it.
@@ -136,9 +137,11 @@ public interface FileSystem {
    * @param targetPath              the target directory
    * @param overwrite               whether or not overwrite the file if the target destination already exists.
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
+   * @param renameTo                the new file name, {@code null} if the file doesn't need to be renamed
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
-  void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories);
+  void copy(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories,
+            String renameTo);
 
   /**
    * Moves the file at the {@code sourcePath} into the {@code targetPath}.
@@ -162,9 +165,11 @@ public interface FileSystem {
    * @param targetPath              the target directory
    * @param overwrite               whether or not overwrite the file if the target destination already exists.
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
+   * @param renameTo                the new file name, {@code null} if the file doesn't need to be renamed
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
-  void move(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories);
+  void move(FileConnectorConfig config, String sourcePath, String targetPath, boolean overwrite, boolean createParentDirectories,
+            String renameTo);
 
   /**
    * Deletes the file pointed by {@code filePath}, provided that it's not locked
