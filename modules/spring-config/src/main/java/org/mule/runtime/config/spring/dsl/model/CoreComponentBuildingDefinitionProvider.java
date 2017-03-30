@@ -807,12 +807,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     componentBuildingDefinitions.add(
-            baseDefinition.copy().withIdentifier("expression-component")
-            .withTypeDefinition(fromType(ExpressionLanguageComponent.class))
-            .withSetterParameterDefinition("expression", fromTextContent().build())
-            .withSetterParameterDefinition("expressionFile", fromSimpleParameter("file").build())
-            .build()
-    );
+                                     baseDefinition.copy().withIdentifier("expression-component")
+                                         .withTypeDefinition(fromType(ExpressionLanguageComponent.class))
+                                         .withSetterParameterDefinition("expression", fromTextContent().build())
+                                         .withSetterParameterDefinition("expressionFile", fromSimpleParameter("file").build())
+                                         .build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("expression-component")
         .withTypeDefinition(fromType(ExpressionLanguageComponent.class))
