@@ -71,7 +71,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public final class MetadataMediator<T extends ComponentModel<T>> {
+public final class MetadataMediator<T extends ComponentModel> {
 
   protected final T component;
   private final List<ParameterModel> metadataKeyParts;
@@ -200,8 +200,8 @@ public final class MetadataMediator<T extends ComponentModel<T>> {
    * @param outputMetadataDescriptor {@link OutputMetadataDescriptor} describes the component output
    * @return model with its types resolved by the metadata resolution process
    */
-  private <T> T getTypedModel(InputMetadataDescriptor inputMetadataDescriptor,
-                              OutputMetadataDescriptor outputMetadataDescriptor) {
+  private T getTypedModel(InputMetadataDescriptor inputMetadataDescriptor,
+                          OutputMetadataDescriptor outputMetadataDescriptor) {
     OutputModel typedOutputModel = resolveOutputModelType(component.getOutput(), outputMetadataDescriptor.getPayloadMetadata());
     OutputModel typedAttributesModel =
         resolveOutputModelType(component.getOutputAttributes(), outputMetadataDescriptor.getAttributesMetadata());
@@ -294,10 +294,10 @@ public final class MetadataMediator<T extends ComponentModel<T>> {
     outputDelegate.getOutputResolver().ifPresent(r -> attributesBuilder.withOutputResolver(r.getResolverName()));
     outputDelegate.getOutputAttributesResolver()
         .ifPresent(r -> attributesBuilder.withOutputAttributesResolver(r.getResolverName()));
-    input.getAllParameters().entrySet()
-        .forEach(entry -> attributesBuilder.withParameterResolver(entry.getKey(),
-                                                                  inputDelegate.getParameterResolver(entry.getKey())
-                                                                      .getResolverName()));
+    input.getAllParameters()
+        .forEach((key, value) -> attributesBuilder
+            .withParameterResolver(key, inputDelegate.getParameterResolver(key)
+                .getResolverName()));
     return attributesBuilder.build();
   }
 
@@ -323,7 +323,7 @@ public final class MetadataMediator<T extends ComponentModel<T>> {
   private List<ParameterGroupModel> resolveParameterGroupModelType(List<ParameterGroupModel> untypedParameterGroups,
                                                                    Map<String, ParameterMetadataDescriptor> inputTypeDescriptors) {
     List<ParameterGroupModel> parameterGroups = new LinkedList<>();
-    untypedParameterGroups.stream().forEach(parameterGroup -> {
+    untypedParameterGroups.forEach(parameterGroup -> {
       List<ParameterModel> parameters = new LinkedList<>();
       parameterGroup.getParameterModels().forEach(parameterModel -> {
         ParameterMetadataDescriptor parameterMetadataDescriptor = inputTypeDescriptors.get(parameterModel.getName());

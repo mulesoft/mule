@@ -10,20 +10,21 @@ import static java.lang.String.format;
 import static java.util.Arrays.copyOf;
 import static org.mule.extension.socket.internal.SocketUtils.createPacket;
 import static org.mule.extension.socket.internal.SocketUtils.getUdpAllowedByteArray;
-
 import org.mule.extension.socket.api.ImmutableSocketAttributes;
 import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * One worker is created per received package. If the other end of the connection is awaiting for a response, one will be sent but
@@ -62,7 +63,8 @@ public final class UdpWorker extends SocketWorker {
       socket.send(sendPacket);
     } catch (IOException e) {
       callback.onSourceException(new IOException(format("An error occurred while sending UDP packet to address '%s'",
-                                                        packet.getSocketAddress().toString(), e)));
+                                                        packet.getSocketAddress().toString()),
+                                                 e));
     }
   }
 

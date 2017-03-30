@@ -60,13 +60,13 @@ import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigur
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Optional;
 import java.util.function.Function;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class that groups all the common behaviour between different extension's components, like {@link OperationMessageProcessor} and
@@ -76,7 +76,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public abstract class ExtensionComponent<T extends ComponentModel<T>> extends AbstractAnnotatedObject
+public abstract class ExtensionComponent<T extends ComponentModel> extends AbstractAnnotatedObject
     implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, FlowConstructAware, Lifecycle {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(ExtensionComponent.class);

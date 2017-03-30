@@ -7,8 +7,6 @@
 package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.command.CopyCommand;
@@ -16,6 +14,9 @@ import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.internal.AbstractFtpCopyDelegate;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
+
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -58,7 +59,7 @@ public final class FtpCopyCommand extends ClassicFtpCommand implements CopyComma
       try {
         files = client.listFiles();
       } catch (IOException e) {
-        throw exception(format("Could not list contents of directory '%s' while trying to copy it to ", sourcePath, target), e);
+        throw exception(format("Could not list contents of directory '%s' while trying to copy it to %s", sourcePath, target), e);
       }
 
       for (FTPFile file : files) {

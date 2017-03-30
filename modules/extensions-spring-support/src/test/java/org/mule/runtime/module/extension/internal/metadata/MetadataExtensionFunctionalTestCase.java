@@ -48,18 +48,18 @@ import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 @RunWith(Parameterized.class)
-public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentModel<T>> extends ExtensionFunctionalTestCase {
+public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentModel> extends ExtensionFunctionalTestCase {
 
   protected static final String METADATA_TEST = "metadata-tests.xml";
   protected static final String DSQL_QUERY = "dsql:SELECT id FROM Circle WHERE (diameter < 18)";
@@ -282,7 +282,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
     assertThat("Expecting failure but a success result found", result.isSuccess(), is(false));
   }
 
-  interface MetadataComponentDescriptorProvider<T extends ComponentModel<T>> {
+  interface MetadataComponentDescriptorProvider<T extends ComponentModel> {
 
     MetadataResult<ComponentMetadataDescriptor<T>> resolveDynamicMetadata(MetadataService metadataService,
                                                                           Location location, MetadataKey key);

@@ -15,7 +15,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
-import org.apache.commons.collections.CollectionUtils;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
@@ -47,13 +46,16 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
-import javax.inject.Inject;
+import org.apache.commons.collections.CollectionUtils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 /**
  * An adapter for {@link Source} which acts as a bridge with {@link ExtensionMessageSource}. It also propagates lifecycle and
@@ -262,7 +264,7 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
                                                 format("Message Source defined on class '%s' has more than one field annotated with '@%s'. "
                                                     + "Only one field in the class can bare such annotation",
                                                        source.getClass().getName(),
-                                                       annotation.getClass().getSimpleName()));
+                                                       annotation.getSimpleName()));
     }
 
     return Optional.of(new FieldSetter<>(fields.iterator().next()));

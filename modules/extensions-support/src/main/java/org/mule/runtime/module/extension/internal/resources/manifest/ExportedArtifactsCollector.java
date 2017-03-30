@@ -71,8 +71,6 @@ final public class ExportedArtifactsCollector {
   }
 
   /**
-   *    
-   *
    * @return The {@link Set} of default java package names that the extension should export
    */
   public Set<String> getExportedPackages() {

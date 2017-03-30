@@ -20,11 +20,9 @@ import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.runtime.api.message.Message;
 
-import java.io.InputStream;
-import java.io.File;
-import java.util.List;
-
 import org.junit.Test;
+
+import java.util.List;
 
 public class FtpListTestCase extends FtpConnectorTestCase {
 
@@ -80,7 +78,7 @@ public class FtpListTestCase extends FtpConnectorTestCase {
   @Test
   public void notExistingPath() throws Exception {
     testHarness.expectedError().expectError(NAMESPACE, ILLEGAL_PATH.getType(), IllegalPathException.class, "doesn't exists");
-    doList("list", format("whatever", 0), false);
+    doList("list", "whatever", false);
   }
 
   @Test

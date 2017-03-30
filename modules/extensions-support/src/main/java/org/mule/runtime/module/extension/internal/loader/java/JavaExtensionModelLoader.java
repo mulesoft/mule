@@ -120,7 +120,7 @@ public class JavaExtensionModelLoader extends ExtensionModelLoader {
     try {
       return loadClass(type, context.getExtensionClassLoader());
     } catch (ClassNotFoundException e) {
-      throw new RuntimeException(format("Class '%s' cannot be loaded '%s'", type), e);
+      throw new RuntimeException(format("Class '%s' cannot be loaded", type), e);
     }
   }
 }
