@@ -6,10 +6,7 @@
          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <custom-transaction-manager class="org.mule.tck.testmodels.mule.TestTransactionManagerFactory">
-        <environment>
-            <beans:entry key="property1" value="true"/>
-            <beans:entry key="property2" value="Test"/>
-        </environment>
+        <environment ref="managerEnvironment" />
     </custom-transaction-manager>
 
 </mule>

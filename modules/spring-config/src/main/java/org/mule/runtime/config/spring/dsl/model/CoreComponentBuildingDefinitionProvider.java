@@ -70,17 +70,7 @@ import org.mule.runtime.api.util.DataUnit;
 import org.mule.runtime.config.spring.MuleConfigurationConfigurator;
 import org.mule.runtime.config.spring.NotificationConfig;
 import org.mule.runtime.config.spring.ServerNotificationManagerConfigurator;
-import org.mule.runtime.config.spring.dsl.processor.AddVariablePropertyConfigurator;
-import org.mule.runtime.config.spring.dsl.processor.CustomSecurityFilterObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.EncryptionSecurityFilterObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.ExplicitMethodEntryPointResolverObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.MessageEnricherObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.MessageProcessorWrapperObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.MethodEntryPoint;
-import org.mule.runtime.config.spring.dsl.processor.NoArgumentsEntryPointResolverObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.RetryPolicyTemplateObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.TransformerConfigurator;
-import org.mule.runtime.config.spring.dsl.processor.UsernamePasswordFilterObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.*;
 import org.mule.runtime.config.spring.dsl.spring.ComponentObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableInstanceFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableObjectFactory;
@@ -1704,9 +1694,16 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     buildingDefinitions.add(baseDefinition.copy()
+            .withIdentifier("environment")
+            .withTypeDefinition(fromType(Map.class))
+            .withObjectFactoryType(EnvironmentPropertyObjectFactory.class)
+            .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build())
+            .build());
+
+    buildingDefinitions.add(baseDefinition.copy()
         .withIdentifier("custom-transaction-manager")
         .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .asPrototype()
+            .withSetterParameterDefinition("environment", fromChildConfiguration(Map.class).build())
         .build());
 
     return buildingDefinitions;
