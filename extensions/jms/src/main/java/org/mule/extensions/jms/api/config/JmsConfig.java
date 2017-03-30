@@ -6,7 +6,6 @@
  */
 package org.mule.extensions.jms.api.config;
 
-import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_CONTENT_TYPE;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extensions.jms.JmsExtension;
 import org.mule.extensions.jms.api.operation.JmsConsume;
@@ -21,7 +20,6 @@ import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import javax.jms.Message;
@@ -51,8 +49,7 @@ public class JmsConfig {
    */
   @Parameter
   @Expression(NOT_SUPPORTED)
-  @Example(EXAMPLE_CONTENT_TYPE)
-  @Optional
+  @Optional(defaultValue = "*/*")
   private String contentType;
 
   /**

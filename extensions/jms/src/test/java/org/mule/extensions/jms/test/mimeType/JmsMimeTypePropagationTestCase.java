@@ -11,11 +11,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasMediaType;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.extensions.jms.test.JmsAbstractTestCase;
 import org.mule.extensions.jms.test.JmsMessageStorage;
 import org.mule.functional.junit4.FlowRunner;
@@ -26,6 +21,12 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.runner.RunnerDelegateTo;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -65,16 +66,22 @@ public class JmsMimeTypePropagationTestCase extends JmsAbstractTestCase {
   public String publishConsumerFlow;
 
   @Parameter(5)
+  public String publisherFlow;
+
+  @Parameter(6)
   public String description;
 
   @Parameters(name = "{5} - Publish: {0} --> Expect: {1}")
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
         {APPLICATION_JSON_MEDIA_TYPE, APPLICATION_JSON_MEDIA_TYPE, CONSUMER_FLOW, LISTENER_FLOW, PUBLISH_CONSUMER_FLOW,
+            PUBLISHER_FLOW,
             "MimeType on Message"},
-        {null, DEFAULT_MEDIA_TYPE, CONSUMER_FLOW, LISTENER_FLOW, PUBLISH_CONSUMER_FLOW, "Default MimeType"},
+        {null, DEFAULT_MEDIA_TYPE, CONSUMER_FLOW, LISTENER_FLOW, PUBLISH_CONSUMER_FLOW, PUBLISHER_FLOW, "Default MimeType"},
         {null, TEXT_JSON_MEDIA_TYPE, CONSUMER_FLOW + WITH_OVERRIDE, LISTENER_FLOW + WITH_OVERRIDE,
-            PUBLISH_CONSUMER_FLOW + WITH_OVERRIDE, "MimeType on Component"}
+            PUBLISH_CONSUMER_FLOW + WITH_OVERRIDE, PUBLISHER_FLOW, "MimeType on Component"},
+        {null, DEFAULT_MEDIA_TYPE, CONSUMER_FLOW, LISTENER_FLOW, PUBLISH_CONSUMER_FLOW, "publisher-without-mimeType-propagation",
+            ""}
 
     });
   }
@@ -122,7 +129,7 @@ public class JmsMimeTypePropagationTestCase extends JmsAbstractTestCase {
   }
 
   private Event publish(String message, MediaType mediaType) throws Exception {
-    return runWithMediaType(PUBLISHER_FLOW, message, mediaType);
+    return runWithMediaType(publisherFlow, message, mediaType);
   }
 
   private Event runWithMediaType(String flowName, String payload, MediaType mediaType) throws Exception {
