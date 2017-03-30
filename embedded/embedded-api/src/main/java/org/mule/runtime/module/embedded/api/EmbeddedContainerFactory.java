@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactRequest;
@@ -39,12 +40,14 @@ final public class EmbeddedContainerFactory {
    * Creates a container by creating artifacts based on the {@code application} configuration.
    *
    * @param muleVersion the mule version of the runtime to use
+   * @param log4jConfigurationFile the absolute path to the log4j configuration file.
    * @param containerBaseFolder the base folder to use for the container to create the required files.
    * @param application the application data.
    * @return an {@link EmbeddedContainer} for the requested {@code muleVersion} and with the content provided by
    *         {@code application}
    */
-  public static EmbeddedContainer create(String muleVersion, URL containerBaseFolder, ArtifactInfo application) {
+  public static EmbeddedContainer create(String muleVersion, Optional<String> log4jConfigurationFile, URL containerBaseFolder,
+                                         ArtifactInfo application) {
     try {
       Repository repository = new Repository();
 
@@ -55,6 +58,7 @@ final public class EmbeddedContainerFactory {
 
       List<URL> services = classLoaderFactory.getServices(muleVersion);
       ContainerInfo containerInfo = new ContainerInfo(muleVersion, containerBaseFolder, services);
+      log4jConfigurationFile.ifPresent(containerInfo::setLog4jConfigurationFile);
 
       ClassLoader embeddedControllerBootstrapClassLoader =
           createEmbeddedImplClassLoader(containerModulesClassLoader, repository, muleVersion);

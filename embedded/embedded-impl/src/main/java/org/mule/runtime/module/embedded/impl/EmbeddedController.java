@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.maven.model.Model;
 
 /**
@@ -83,6 +84,11 @@ public class EmbeddedController {
     if (artifactInfo.isEnableArtifactTestDependencies()) {
       setProperty(ADD_TEST_DEPENDENCIES_KEY, "true");
     }
+
+    containerInfo.getLog4jConfigurationFile()
+        .ifPresent(log4jConfigurationFile -> System.setProperty("log4j.configurationFile", log4jConfigurationFile));
+
+    ((org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false)).reconfigure();
 
     MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
 

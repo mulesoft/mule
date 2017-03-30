@@ -9,6 +9,10 @@ package org.mule.runtime.module.embedded;
 
 import static com.mashape.unirest.http.Unirest.post;
 import static java.lang.String.valueOf;
+import static java.nio.file.Files.delete;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.module.embedded.api.ArtifactInfo;
@@ -23,9 +27,11 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.junit.Rule;
@@ -34,6 +40,7 @@ import org.junit.rules.TemporaryFolder;
 
 public class EmbeddedContainerFactoryTestCase {
 
+  public static final String LOGGING_FILE = "app.log";
   @Rule
   public TemporaryFolder containerFolder = new TemporaryFolder();
 
@@ -47,7 +54,27 @@ public class EmbeddedContainerFactoryTestCase {
       } catch (UnirestException e) {
         throw new RuntimeException(e);
       }
-    }, false);
+    }, false, empty());
+  }
+
+  @Test
+  public void applicationWithCustomLogger() throws Exception {
+    doWithinApplication("http-echo", port -> {
+      try {
+        String httpBody = "test-message";
+        HttpResponse<String> response = post(String.format("http://localhost:%s/", port)).body(httpBody).asString();
+        assertThat(response.getBody(), is(httpBody));
+      } catch (UnirestException e) {
+        throw new RuntimeException(e);
+      }
+    }, false, of(getClass().getClassLoader().getResource("log4j2-custom-file.xml").getFile()));
+    try {
+      File expectedLoggingFile = new File(LOGGING_FILE);
+      assertThat(expectedLoggingFile.exists(), is(true));
+      assertThat(expectedLoggingFile.length(), greaterThan(0l));
+    } finally {
+      delete(Paths.get(LOGGING_FILE));
+    }
   }
 
   @Test
@@ -60,10 +87,11 @@ public class EmbeddedContainerFactoryTestCase {
       } catch (UnirestException e) {
         throw new RuntimeException(e);
       }
-    }, true);
+    }, true, empty());
   }
 
-  public void doWithinApplication(String applicaitonFolder, Consumer<Integer> portConsumer, boolean enableTestDependencies)
+  public void doWithinApplication(String applicaitonFolder, Consumer<Integer> portConsumer, boolean enableTestDependencies,
+                                  Optional<String> log4JConfigurationFile)
       throws URISyntaxException, IOException {
     Map<String, String> applicationProperties = new HashMap<>();
     Integer httpListenerPort = new FreePortFinder(6000, 9000).find();
@@ -75,8 +103,12 @@ public class EmbeddedContainerFactoryTestCase {
                          getClasspathResourceAsUri(applicaitonFolder + File.separator + "mule-application.json").toURL(),
                          applicationProperties, enableTestDependencies);
 
+    log4JConfigurationFile = log4JConfigurationFile.isPresent() ? log4JConfigurationFile
+        : of(getClass().getClassLoader().getResource("log4j2-default.xml").getFile());
+
     EmbeddedContainer embeddedContainer =
-        EmbeddedContainerFactory.create("4.0.0-SNAPSHOT", containerFolder.newFolder().toURI().toURL(), application);
+        EmbeddedContainerFactory.create("4.0.0-SNAPSHOT", log4JConfigurationFile, containerFolder.newFolder().toURI().toURL(),
+                                        application);
 
     embeddedContainer.start();
 
