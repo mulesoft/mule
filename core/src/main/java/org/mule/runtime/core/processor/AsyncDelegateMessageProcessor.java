@@ -154,8 +154,6 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     Event newEvent = Event.builder(DefaultEventContext.child(event.getContext()), event)
         .replyToHandler(null)
         .session(new DefaultMuleSession(event.getSession())).build();
-    // Update RequestContext ThreadLocal for backwards compatibility
-    // setCurrentEvent(newEvent);
     return newEvent;
   }
 

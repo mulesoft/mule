@@ -6,27 +6,12 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
-import static org.mule.runtime.config.spring.util.ProcessingStrategyParserUtils.configureProcessingStrategy;
-
 import org.mule.runtime.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
-
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.w3c.dom.Element;
 
 public class AsyncMessageProcessorsDefinitionParser extends ChildDefinitionParser {
 
   public AsyncMessageProcessorsDefinitionParser() {
     super("messageProcessor", AsyncMessageProcessorsFactoryBean.class);
-    addIgnored(PROCESSING_STRATEGY_ATTRIBUTE);
   }
-
-  @Override
-  protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-    configureProcessingStrategy(element, builder, PROCESSING_STRATEGY_ATTRIBUTE);
-    super.parseChild(element, parserContext, builder);
-  }
-
 }
