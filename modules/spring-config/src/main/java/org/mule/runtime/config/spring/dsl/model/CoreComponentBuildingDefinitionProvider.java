@@ -70,7 +70,18 @@ import org.mule.runtime.api.util.DataUnit;
 import org.mule.runtime.config.spring.MuleConfigurationConfigurator;
 import org.mule.runtime.config.spring.NotificationConfig;
 import org.mule.runtime.config.spring.ServerNotificationManagerConfigurator;
-import org.mule.runtime.config.spring.dsl.processor.*;
+import org.mule.runtime.config.spring.dsl.processor.AddVariablePropertyConfigurator;
+import org.mule.runtime.config.spring.dsl.processor.CustomSecurityFilterObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.EncryptionSecurityFilterObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.ExplicitMethodEntryPointResolverObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.MessageEnricherObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.MessageProcessorWrapperObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.MethodEntryPoint;
+import org.mule.runtime.config.spring.dsl.processor.NoArgumentsEntryPointResolverObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.RetryPolicyTemplateObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.TransformerConfigurator;
+import org.mule.runtime.config.spring.dsl.processor.UsernamePasswordFilterObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.EnvironmentPropertyObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ComponentObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableInstanceFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableObjectFactory;
@@ -245,13 +256,13 @@ import org.mule.runtime.dsl.api.component.TypeConverter;
 
 import com.google.common.collect.ImmutableMap;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
