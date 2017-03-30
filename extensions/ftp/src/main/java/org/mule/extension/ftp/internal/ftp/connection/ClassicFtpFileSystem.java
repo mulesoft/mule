@@ -12,8 +12,6 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.extension.ftp.internal.FtpConnector.FTP_PROTOCOL;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.command.CopyCommand;
 import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
@@ -37,6 +35,9 @@ import org.mule.extension.ftp.internal.ftp.command.FtpRenameCommand;
 import org.mule.extension.ftp.internal.ftp.command.FtpWriteCommand;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
+
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.slf4j.Logger;
 
 import java.io.FileNotFoundException;

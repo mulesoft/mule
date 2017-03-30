@@ -14,11 +14,12 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.file.common.api.exceptions.FileError.ACCESS_DENIED;
 import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
-import org.junit.Test;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.runtime.api.message.Message;
+
+import org.junit.Test;
 
 import java.util.List;
 import java.util.stream.Collectors;

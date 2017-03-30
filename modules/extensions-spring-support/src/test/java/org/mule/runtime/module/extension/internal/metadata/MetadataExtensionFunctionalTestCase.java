@@ -48,15 +48,15 @@ import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.BiConsumer;
-
-import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentModel> extends ExtensionFunctionalTestCase {
