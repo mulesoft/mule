@@ -6,6 +6,8 @@
  */
 package org.mule.test.el;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
@@ -73,6 +75,13 @@ public class ExpressionLanguageConfigTestCase extends FunctionalTestCase
     {
         assertEquals("hi", el.evaluate("echo2('hi')"));
         assertEquals("hi", em.evaluate("echo2('hi')", (MuleMessage) null));
+    }
+
+    @Test
+    public void testExpressionLanguageGlobalFunctionNotOverriden()
+    {
+        assertThat((String) el.evaluate("helloNotOverriden()"), equalTo("Hello " + muleContext.getConfiguration().getId() + "!"));
+        assertThat((String) em.evaluate("helloNotOverriden()", (MuleMessage) null), equalTo("Hello " + muleContext.getConfiguration().getId() + "!"));
     }
 
     @Test
