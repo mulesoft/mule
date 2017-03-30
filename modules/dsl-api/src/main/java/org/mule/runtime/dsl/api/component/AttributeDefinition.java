@@ -28,6 +28,7 @@ public class AttributeDefinition {
   private boolean hasDefaultValue;
   private boolean undefinedSimpleParametersHolder;
   private Class<?> referenceObject;
+  private String referenceFixedParameter;
   private Class<?> childObjectType;
   private boolean undefinedComplexParametersHolder;
   private String referenceSimpleParameter;
@@ -57,6 +58,8 @@ public class AttributeDefinition {
       visitor.onUndefinedComplexParameters();
     } else if (referenceSimpleParameter != null) {
       visitor.onReferenceSimpleParameter(referenceSimpleParameter);
+    } else if (referenceFixedParameter != null) {
+      visitor.onReferenceFixedParameter(referenceFixedParameter);
     } else if (childObjectType != null && collection) {
       visitor.onComplexChildCollection(childObjectType, ofNullable(wrapperIdentifier));
     } else if (childObjectType != null && map) {
@@ -152,6 +155,18 @@ public class AttributeDefinition {
       Builder builder = new Builder();
       builder.attributeDefinition.hasDefaultValue = true;
       builder.attributeDefinition.defaultValue = value;
+      return builder;
+    }
+
+    /**
+     * Use when the reference is fixed (and not configurable), not the value.
+     *
+     * @param reference a fixed reference object which will be assigned to the attribute.
+     * @return the builder
+     */
+    public static Builder fromFixedReference(String reference) {
+      Builder builder = new Builder();
+      builder.attributeDefinition.referenceFixedParameter = reference;
       return builder;
     }
 

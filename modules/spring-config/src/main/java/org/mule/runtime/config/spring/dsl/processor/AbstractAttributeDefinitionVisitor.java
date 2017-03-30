@@ -26,6 +26,9 @@ public class AbstractAttributeDefinitionVisitor implements AttributeDefinitionVi
   public void onReferenceSimpleParameter(String reference) {}
 
   @Override
+  public void onReferenceFixedParameter(String reference) {}
+
+  @Override
   public void onFixedValue(Object value) {}
 
   @Override

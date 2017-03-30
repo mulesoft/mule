@@ -108,6 +108,7 @@ public class ApplicationModel {
   public static final String DESCRIPTION_ELEMENT = "description";
   public static final String PROPERTIES_ELEMENT = "properties";
   public static final String FLOW_ELEMENT = "flow";
+  public static final String FLOW_REF_ELEMENT = "flow-ref";
   public static final String SUBFLOW_ELEMENT = "sub-flow";
 
   public static final String REDELIVERY_POLICY_ELEMENT = "redelivery-policy";
@@ -195,10 +196,14 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(INTERCEPTOR_STACK_ELEMENT).build();
   public static final ComponentIdentifier FLOW_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(FLOW_ELEMENT).build();
+  public static final ComponentIdentifier FLOW_REF_IDENTIFIER =
+      builder().withNamespace(CORE_PREFIX).withName(FLOW_REF_ELEMENT).build();
   public static final ComponentIdentifier SUBFLOW_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(SUBFLOW_ELEMENT).build();
   public static final ComponentIdentifier REDELIVERY_POLICY_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(REDELIVERY_POLICY_ELEMENT).build();
+  public static final ComponentIdentifier GLOBAL_PROPERTY_IDENTIFIER =
+      builder().withNamespace(CORE_PREFIX).withName(GLOBAL_PROPERTY).build();
 
   private static ImmutableSet<ComponentIdentifier> ignoredNameValidationComponentList =
       ImmutableSet.<ComponentIdentifier>builder()

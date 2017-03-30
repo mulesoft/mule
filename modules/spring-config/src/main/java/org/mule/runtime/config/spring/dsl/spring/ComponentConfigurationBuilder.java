@@ -32,6 +32,7 @@ import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
@@ -164,6 +165,11 @@ class ComponentConfigurationBuilder {
     }
 
     @Override
+    public void onReferenceFixedParameter(String reference) {
+      valueConsumer.accept(new RuntimeBeanReference(reference));
+    }
+
+    @Override
     public void onFixedValue(Object value) {
       ValueExtractorAttributeDefinitionVisitor valueExtractor = new ValueExtractorAttributeDefinitionVisitor();
       valueExtractor.onFixedValue(value);
@@ -272,6 +278,11 @@ class ComponentConfigurationBuilder {
           return;
         }
       }
+    }
+
+    @Override
+    public void onReferenceFixedParameter(String reference) {
+      this.value = new RuntimeBeanReference(reference);
     }
 
     @Override

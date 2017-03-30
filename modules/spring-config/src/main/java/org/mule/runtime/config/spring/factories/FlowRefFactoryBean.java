@@ -98,6 +98,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
   private MuleContext muleContext;
   private Processor referencedMessageProcessor;
   private ConcurrentMap<String, Processor> referenceCache = new ConcurrentHashMap<>();
+  private boolean wasInitialized = false;
 
   public void setName(String name) {
     this.refName = name;
@@ -105,12 +106,17 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
   @Override
   public void initialise() throws InitialisationException {
+    // TODO remove this validation (and attribute) after MULE-12096 is fixed
+    if (wasInitialized) {
+      return;
+    }
     if (refName.isEmpty()) {
       throw new InitialisationException(CoreMessages.objectIsNull("flow reference is empty"), this);
     } else if (!muleContext.getExpressionManager().isExpression(refName)) {
       // No need to initialize because message processor will be injected into and managed by parent
       referencedMessageProcessor = lookupReferencedFlowInApplicationContext(refName);
     }
+    wasInitialized = true;
   }
 
   @Override
@@ -125,6 +131,8 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
   @Override
   public Processor getObject() throws Exception {
+    // TODO remove the call to initialise after MULE-12096 is fixed
+    initialise();
     Processor processor =
         referencedMessageProcessor != null ? referencedMessageProcessor : createDynamicReferenceMessageProcessor(refName);
     // Wrap in chain to ensure the flow-ref element always has a path element and lifecycle will be propgated to child sub-flows
@@ -260,7 +268,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
   @Override
   public boolean isSingleton() {
-    return false;
+    return true;
   }
 
   @Override

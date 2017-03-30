@@ -22,7 +22,6 @@ import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -39,7 +38,6 @@ import org.mule.runtime.core.util.TemplateParser.PatternInfo;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +47,8 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+
 /**
  * <code>InvokerMessageProcessor</code> invokes a specified method of an object. An array of argument expressions can be provided
  * to map the message to the method arguments. The method used is determined by the method name along with the number of argument
@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * argument type. Multiple methods with the same name and same number of arguments are not supported currently.
  */
 public class InvokerMessageProcessor extends AbstractAnnotatedObject
-    implements Processor, Initialisable, MuleContextAware, FlowConstructAware {
+    implements Processor, Initialisable, FlowConstructAware {
 
   protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -70,6 +70,8 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
 
   protected Method method;
   protected ExtendedExpressionManager expressionManager;
+
+  @Inject
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;
 
@@ -272,7 +274,6 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
                          object, methodName, arguments, argumentTypes);
   }
 
-  @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }

@@ -34,6 +34,13 @@ public interface AttributeDefinitionVisitor {
   void onReferenceSimpleParameter(String reference);
 
   /**
+   * Called when the attribute must be configured from another fixed object, from which we have a reference
+   *
+   * @param reference the identifier of an object.
+   */
+  void onReferenceFixedParameter(String reference);
+
+  /**
    * To be called when the value to be set when building the object is fixed and provided by the definition of the
    * {@link ComponentBuildingDefinition}.
    *

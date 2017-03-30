@@ -21,8 +21,8 @@ import org.junit.Test;
 public class CustomTransactionManagerTestCase extends AbstractIntegrationTestCase {
 
   @Override
-  public String getConfigFile() {
-    return "test-custom-transaction-manager.xml";
+  public String[] getConfigFiles() {
+    return new String[] {"test-custom-transaction-manager.xml", "test-custom-transaction-manager-beans.xml"};
   }
 
   @Test

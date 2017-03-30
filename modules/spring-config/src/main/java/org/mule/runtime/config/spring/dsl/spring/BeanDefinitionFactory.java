@@ -19,6 +19,7 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGUR
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DOC_DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.GLOBAL_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.INTERCEPTOR_STACK_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
@@ -99,6 +100,8 @@ public class BeanDefinitionFactory {
           .add(DESCRIPTION_IDENTIFIER)
           .add(ANNOTATIONS_ELEMENT_IDENTIFIER)
           .add(DOC_DESCRIPTION_IDENTIFIER)
+          //TODO MULE-9638: Uncomment this code when task is finished
+          //.add(GLOBAL_PROPERTY_IDENTIFIER)
           .build();
 
   /**
