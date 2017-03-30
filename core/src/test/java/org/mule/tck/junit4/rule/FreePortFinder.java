@@ -8,7 +8,10 @@ package org.mule.tck.junit4.rule;
 
 import static java.nio.channels.FileChannel.open;
 import static java.nio.file.Paths.get;
-import static java.nio.file.StandardOpenOption.*;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.DELETE_ON_CLOSE;
+import static java.nio.file.StandardOpenOption.WRITE;
+import static org.apache.commons.lang.SystemUtils.PATH_SEPARATOR;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,7 +55,7 @@ public class FreePortFinder
             String portFile = port + LOCK_FILE_EXTENSION;
             try
             {
-                FileChannel channel = open(get(basePath + "/" + portFile), CREATE, WRITE, DELETE_ON_CLOSE);
+                FileChannel channel = open(get(basePath + PATH_SEPARATOR + portFile), CREATE, WRITE, DELETE_ON_CLOSE);
                 FileLock lock = channel.tryLock();
                 if (lock == null)
                 {
