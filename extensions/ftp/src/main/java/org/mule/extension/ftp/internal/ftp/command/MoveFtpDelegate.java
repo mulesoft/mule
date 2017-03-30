@@ -7,11 +7,11 @@
 package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
-
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.ftp.internal.FtpCopyDelegate;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
+import org.mule.runtime.extension.api.exception.ModuleException;
 
 import java.nio.file.Path;
 
@@ -37,6 +37,8 @@ public class MoveFtpDelegate implements FtpCopyDelegate {
       }
 
       command.rename(source.getPath(), targetPath.toString(), overwrite);
+    } catch (ModuleException e) {
+      throw e;
     } catch (Exception e) {
       throw command.exception(format("Found exception copying file '%s' to '%s'", source, targetPath), e);
     }

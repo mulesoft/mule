@@ -21,13 +21,14 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import javax.activation.MimetypesFileTypeMap;
-import javax.inject.Inject;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Predicate;
+
+import javax.activation.MimetypesFileTypeMap;
+import javax.inject.Inject;
 
 /**
  * Base class for implementations of {@link FileSystem}
@@ -122,8 +123,8 @@ public abstract class AbstractFileSystem implements FileSystem {
    */
   @Override
   public void copy(FileConnectorConfig config, String sourcePath, String targetDirectory, boolean overwrite,
-                   boolean createParentDirectories) {
-    getCopyCommand().copy(config, sourcePath, targetDirectory, overwrite, createParentDirectories);
+                   boolean createParentDirectories, String renameTo) {
+    getCopyCommand().copy(config, sourcePath, targetDirectory, overwrite, createParentDirectories, renameTo);
   }
 
   /**
@@ -131,8 +132,8 @@ public abstract class AbstractFileSystem implements FileSystem {
    */
   @Override
   public void move(FileConnectorConfig config, String sourcePath, String targetDirectory, boolean overwrite,
-                   boolean createParentDirectories) {
-    getMoveCommand().move(config, sourcePath, targetDirectory, overwrite, createParentDirectories);
+                   boolean createParentDirectories, String renameTo) {
+    getMoveCommand().move(config, sourcePath, targetDirectory, overwrite, createParentDirectories, renameTo);
   }
 
   /**

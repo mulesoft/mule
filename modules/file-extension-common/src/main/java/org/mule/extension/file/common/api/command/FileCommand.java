@@ -160,50 +160,49 @@ public abstract class FileCommand<F extends FileSystem> {
     return ".".equals(fileName) || "..".equals(fileName);
   }
 
-
   /**
-   * Returns an {@link IllegalArgumentException} explaining that a
+   * Returns an {@link IllegalPathException} explaining that a
    * {@link FileSystem#read(FileConnectorConfig, Message, String, boolean)} operation was attempted on a {@code path} pointing to
    * a directory
    *
    * @param path the {@link Path} on which a read was attempted
-   * @return {@link RuntimeException}
+   * @return {@link IllegalPathException}
    */
-  protected RuntimeException cannotReadDirectoryException(Path path) {
+  protected IllegalPathException cannotReadDirectoryException(Path path) {
     return new IllegalPathException(format("Cannot read path '%s' since it's a directory", path));
   }
 
   /**
-   * Returns a {@link IllegalArgumentException} explaining that a
+   * Returns a {@link IllegalPathException} explaining that a
    * {@link FileSystem#list(FileConnectorConfig, String, boolean, Message, Predicate)} operation was attempted on a {@code path}
    * pointing to a file.
    *
    * @param path the {@link Path} on which a list was attempted
-   * @return {@link RuntimeException}
+   * @return {@link IllegalPathException}
    */
-  protected RuntimeException cannotListFileException(Path path) {
+  protected IllegalPathException cannotListFileException(Path path) {
     return new IllegalPathException(format("Cannot list path '%s' because it's a file. Only directories can be listed",
                                            path));
   }
 
   /**
-   * Returns a {@link IllegalArgumentException} explaining that a
+   * Returns a {@link IllegalPathException} explaining that a
    * {@link FileSystem#list(FileConnectorConfig, String, boolean, Message, Predicate)} operation was attempted on a {@code path}
    * pointing to a file.
    *
    * @param path the {@link Path} on which a list was attempted
    * @return {@link RuntimeException}
    */
-  protected RuntimeException pathNotFoundException(Path path) {
+  protected IllegalPathException pathNotFoundException(Path path) {
     return new IllegalPathException(format("Path '%s' doesn't exists", path));
   }
 
   /**
-   * Returns a {@link IllegalArgumentException} explaining that an operation is trying to write to the given {@code path} but it
+   * Returns a {@link IllegalPathException} explaining that an operation is trying to write to the given {@code path} but it
    * already exists and no overwrite instruction was provided.
    *
    * @param path the {@link Path} that the operation tried to modify
-   * @return {@link RuntimeException}
+   * @return {@link IllegalPathException}
    */
   public FileAlreadyExistsException alreadyExistsException(Path path) {
     return new FileAlreadyExistsException(format("'%s' already exists. Set the 'overwrite' parameter to 'true' to perform the operation anyway",
