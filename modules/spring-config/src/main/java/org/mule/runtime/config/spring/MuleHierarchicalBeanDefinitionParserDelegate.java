@@ -12,14 +12,7 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.config.spring.MuleArtifactContext.INNER_BEAN_PREFIX;
 import static org.mule.runtime.config.spring.MuleArtifactContext.postProcessBeanDefinition;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_ROOT_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROPERTIES_ELEMENT;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.*;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
@@ -161,6 +154,10 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                                                                   if (resolvedComponent.getIdentifier()
                                                                       .equals(CONFIGURATION_IDENTIFIER)) {
                                                                     name = OBJECT_MULE_CONFIGURATION;
+                                                                  } else if (resolvedComponent.getIdentifier()
+                                                                      .equals(FLOW_REF_IDENTIFIER)) {
+                                                                    name = AutoIdUtils.uniqueValue("flow-ref."
+                                                                        + resolvedComponent.getNameAttribute());
                                                                   } else {
                                                                     name = AutoIdUtils.uniqueValue(resolvedComponent
                                                                         .getIdentifier().toString());

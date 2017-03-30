@@ -1694,16 +1694,16 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     buildingDefinitions.add(baseDefinition.copy()
-            .withIdentifier("environment")
-            .withTypeDefinition(fromType(Map.class))
-            .withObjectFactoryType(EnvironmentPropertyObjectFactory.class)
-            .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build())
-            .build());
+        .withIdentifier("environment")
+        .withTypeDefinition(fromType(Map.class))
+        .withObjectFactoryType(EnvironmentPropertyObjectFactory.class)
+        .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build())
+        .build());
 
     buildingDefinitions.add(baseDefinition.copy()
         .withIdentifier("custom-transaction-manager")
         .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-            .withSetterParameterDefinition("environment", fromChildConfiguration(Map.class).build())
+        .withSetterParameterDefinition("environment", fromChildConfiguration(Map.class).build())
         .build());
 
     return buildingDefinitions;

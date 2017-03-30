@@ -12,15 +12,15 @@ import java.util.Map;
 
 public class EnvironmentPropertyObjectFactory extends AbstractAnnotatedObjectFactory<Map> {
 
-    private Map map;
+  private Map map;
 
-    public EnvironmentPropertyObjectFactory(Map map) {
-        this.map = map;
-    }
+  public EnvironmentPropertyObjectFactory(Map map) {
+    this.map = map;
+  }
 
 
-    @Override
-    public Map doGetObject() throws Exception {
-        return map;
-    }
+  @Override
+  public Map doGetObject() throws Exception {
+    return map;
+  }
 }
