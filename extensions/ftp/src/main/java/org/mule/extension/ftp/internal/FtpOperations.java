@@ -162,10 +162,10 @@ public final class FtpOperations extends BaseFileSystemOperations {
    * @param targetPath              the target directory where the file is going to be copied
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param overwrite               whether or not overwrite the file if the target destination already exists.
-   * @param renameTo                the new file name, {@code null} if the file doesn't need to be renamed
+   * @param renameTo                copied file's new name. If not provided, original file name will be kept.
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
-  @Summary("Copies a file in another directory")
+  @Summary("Copies a file")
   @Throws(FileCopyErrorTypeProvider.class)
   public void copy(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String sourcePath,
                    String targetPath, @Optional(defaultValue = "true") boolean createParentDirectories,
@@ -192,10 +192,10 @@ public final class FtpOperations extends BaseFileSystemOperations {
    * @param targetPath              the target directory
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param overwrite               whether or not overwrite the file if the target destination already exists.
-   * @param renameTo                the new file name, {@code null} if the file doesn't need to be renamed
+   * @param renameTo                moved file's new name. If not provided, original file name will be kept.
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
-  @Summary("Moves a file to another directory")
+  @Summary("Moves a file")
   @Throws(FileCopyErrorTypeProvider.class)
   public void move(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String sourcePath,
                    String targetPath, @Optional(defaultValue = "true") boolean createParentDirectories,
