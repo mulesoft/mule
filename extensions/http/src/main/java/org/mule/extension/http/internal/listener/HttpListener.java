@@ -50,6 +50,7 @@ import org.mule.runtime.core.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
@@ -93,6 +94,7 @@ import org.slf4j.Logger;
 @Alias("listener")
 @MetadataScope(outputResolver = HttpListenerMetadataResolver.class)
 @EmitsResponse
+@Streaming
 public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
   public static final String HTTP_NAMESPACE = "httpn";

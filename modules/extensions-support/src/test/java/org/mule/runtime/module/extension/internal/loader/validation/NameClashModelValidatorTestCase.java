@@ -346,7 +346,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
     SourceModel sourceModel = new ImmutableSourceModel(SOURCE_NAME, "", false, asList(group), null, null,
                                                        of(sourceCallbackModel), empty(), false, false,
-                                                       null, emptySet(), emptySet());
+                                                       false, null, emptySet(), emptySet());
 
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     validate();

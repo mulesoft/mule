@@ -8,13 +8,16 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isInputStream;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceReturnType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isLifecycle;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
+import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
@@ -106,7 +109,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
     processComponentConnectivity(source, sourceType, sourceType);
 
-    resolveOutputTypes(source, sourceGenerics);
+    resolveOutputTypes(source, sourceGenerics, sourceType);
 
     loader.addExceptionEnricher(sourceType, source);
 
@@ -116,9 +119,11 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
     sourceDeclarers.put(sourceType.getDeclaringClass(), source);
   }
 
-  private void resolveOutputTypes(SourceDeclarer source, List<Type> sourceGenerics) {
-    source.withOutput().ofType(getSourceReturnType(sourceGenerics.get(0), getTypeLoader()));
+  private void resolveOutputTypes(SourceDeclarer source, List<Type> sourceGenerics, SourceElement sourceType) {
+    final MetadataType outputTtype = getSourceReturnType(sourceGenerics.get(0), getTypeLoader());
+    source.withOutput().ofType(outputTtype);
     source.withOutputAttributes().ofType(getTypeLoader().load(sourceGenerics.get(1)));
+    source.supportsStreaming(isInputStream(outputTtype) || sourceType.getAnnotation(Streaming.class).isPresent());
   }
 
   /**

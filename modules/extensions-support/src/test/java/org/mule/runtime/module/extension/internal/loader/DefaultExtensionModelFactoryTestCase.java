@@ -154,7 +154,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void streamingHint() throws Exception {
+  public void streamingHintOnOperation() throws Exception {
     ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
     OperationModel operationModel = extensionModel.getConfigurationModels().get(0).getOperationModel("sayMyName").get();
     ParameterModel streamingParameter = operationModel.getAllParameterModels().stream()
@@ -162,6 +162,22 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
         .findFirst()
         .get();
 
+    assertStreamingStrategy(streamingParameter);
+  }
+
+  @Test
+  public void streamingHintOnSource() throws Exception {
+    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
+    SourceModel sourceModel = extensionModel.getConfigurationModels().get(0).getSourceModel("ListenPayments").get();
+    ParameterModel streamingParameter = sourceModel.getAllParameterModels().stream()
+        .filter(p -> p.getName().equals(STREAMING_STRATEGY_PARAMETER_NAME))
+        .findFirst()
+        .get();
+
+    assertStreamingStrategy(streamingParameter);
+  }
+
+  private void assertStreamingStrategy(ParameterModel streamingParameter) {
     assertThat(streamingParameter.getType(), equalTo(new StreamingStrategyTypeBuilder().getByteStreamingStrategyType()));
     assertThat(streamingParameter.isRequired(), is(false));
     assertThat(streamingParameter.getDefaultValue(), is(nullValue()));

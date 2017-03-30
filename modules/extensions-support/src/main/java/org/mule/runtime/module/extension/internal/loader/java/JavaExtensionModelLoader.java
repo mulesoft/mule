@@ -29,7 +29,6 @@ import org.mule.runtime.module.extension.internal.loader.enricher.JavaConfigurat
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaExportedTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaXmlDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterLayoutOrderDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.StreamingDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ConnectionProviderModelValidator;
@@ -70,7 +69,6 @@ public class JavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new ClassLoaderDeclarationEnricher(),
                                                                                                new JavaXmlDeclarationEnricher(),
                                                                                                new ConfigNameDeclarationEnricher(),
-                                                                                               new StreamingDeclarationEnricher(),
                                                                                                new ConnectionDeclarationEnricher(),
                                                                                                new ErrorsDeclarationEnricher(),
                                                                                                new ConnectionErrorsDeclarationEnricher(),
