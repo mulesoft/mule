@@ -54,7 +54,6 @@ public class HttpRequesterWsdlRetrieverStrategy implements WsdlRetrieverStrategy
     private TlsContextFactory tlsContextFactory = null;
     private ProxyConfig proxyConfig = null;
     private MuleContext context = null;
-    private GrizzlyHttpClient httpClient;
 
     public HttpRequesterWsdlRetrieverStrategy(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, MuleContext context)
     {
@@ -63,12 +62,42 @@ public class HttpRequesterWsdlRetrieverStrategy implements WsdlRetrieverStrategy
         this.context = context;
     }
 
-    /**
-     * Starts the grizzly client to retrieve the WSDL
-     * 
-     * @throws MuleException
-     */
-    public void startHttpClient() throws MuleException
+
+    @Override
+    public InputStream retrieveWsdlResource(String url) throws WSDLException
+    {
+        GrizzlyHttpClient client = null;
+        InputStream responseStream;
+        try
+        {
+            client = getHttpClient();
+            HttpRequest request = new DefaultHttpRequest(url, null, HTTP_METHOD_WSDL_RETRIEVAL, new ParameterMap(),
+                    new ParameterMap(), null);
+            responseStream = getHttpClient().sendAndReceiveInputStream(request, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_FOLLOW_REDIRECTS,
+                    basicAuthentication);
+
+            return responseStream;
+        }
+        catch (Exception e)
+        {
+            throw new WSDLException("Exception retrieving WSDL for URL: %s", url.toString(), e);
+        }
+        finally
+        {
+            stop(client);
+        }
+    }
+
+
+    private void stop(GrizzlyHttpClient client)
+    {
+        if (client != null)
+        {
+            client.stop();
+        }
+    }
+
+    private GrizzlyHttpClient getHttpClient() throws MuleException
     {
         String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, getPrefix(context), WSDL_RETRIEVER);
 
@@ -88,35 +117,9 @@ public class HttpRequesterWsdlRetrieverStrategy implements WsdlRetrieverStrategy
                                                                                      .build();
 
 
-        httpClient = new GrizzlyHttpClient(configuration);
+        GrizzlyHttpClient httpClient = new GrizzlyHttpClient(configuration);
         httpClient.start();
-    }
-
-    /**
-     * Stops the client that retrieved the WSDL
-     */
-    public void stopHttpClient()
-    {
-        httpClient.stop();
-    }
-
-    @Override
-    public InputStream retrieveWsdlResource(String url) throws WSDLException
-    {
-        try
-        {
-            InputStream responseStream = null;
-            HttpRequest request = new DefaultHttpRequest(url, null, HTTP_METHOD_WSDL_RETRIEVAL, new ParameterMap(),
-                    new ParameterMap(), null);
-            responseStream = httpClient.sendAndReceiveInputStream(request, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_FOLLOW_REDIRECTS,
-                    basicAuthentication);
-
-            return responseStream;
-        }
-        catch (Exception e)
-        {
-            throw new WSDLException("Exception retrieving WSDL for URL: %s", url.toString(), e);
-        }
+        return httpClient;
     }
 
 }

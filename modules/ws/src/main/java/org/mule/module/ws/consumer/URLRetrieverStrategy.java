@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import javax.wsdl.Definition;
 import javax.wsdl.WSDLException;
 
 
@@ -50,5 +49,4 @@ public class URLRetrieverStrategy implements WsdlRetrieverStrategy
             throw new WSDLException("Exception retrieving WSDL for URL: %s", url.toString(), e);
         }
     }
-
 }

@@ -6,10 +6,14 @@
  */
 package org.mule.module.ws.consumer;
 
+import static org.mule.transport.http.HttpConnector.HTTPS_URL_PROTOCOL;
+import static org.mule.transport.http.HttpConnector.HTTP_URL_PROTOCOL;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
-import org.mule.transport.http.HttpConnector;
+import org.mule.module.ws.consumer.wsdl.strategy.factory.HttpRequesterWsdlRetrieverStrategyFactory;
+import org.mule.module.ws.consumer.wsdl.strategy.factory.URLWSDLRetrieverStrategyFactory;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.util.IOUtils;
 
@@ -36,35 +40,19 @@ public class MuleWSDLLocator implements WSDLLocator
     private String baseURI;
     private String latestImportedURI;
     private boolean useConnectorToRetrieveWsdl;
-    private HttpRequesterWsdlRetrieverStrategy httpRetrieverStrategy;
-    private URLRetrieverStrategy urlRetrieverStrategy;
     private Collection<InputStream> streams = new ArrayList<InputStream>();
-    
+    private TlsContextFactory tlsContextFactory;
+    private ProxyConfig proxyConfig;
+    private MuleContext muleContext;
+
     public MuleWSDLLocator(MuleWSDLLocatorConfig config) throws MuleException
     {
         this.baseURI = config.getBaseURI();
         this.useConnectorToRetrieveWsdl = config.isUseConnectorToRetrieveWsdl();
-        createURLRetrieverStrategy();
-        if (useConnectorToRetrieveWsdl)
-        {
-            createHttpRequesterWsdlRetrieverStrategy(config.getTlsContextFactory(), config.getProxyConfig(), config.getContext());
-        }
+        this.tlsContextFactory = config.getTlsContextFactory();
+        this.muleContext = config.getContext();
+        this.proxyConfig = config.getProxyConfig();
     }
-
-
-    private void createURLRetrieverStrategy()
-    {
-        urlRetrieverStrategy = new URLRetrieverStrategy();
-
-    }
-
-
-    private void createHttpRequesterWsdlRetrieverStrategy(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, MuleContext context) throws MuleException
-    {
-        httpRetrieverStrategy = new HttpRequesterWsdlRetrieverStrategy(tlsContextFactory, proxyConfig, context);
-        httpRetrieverStrategy.startHttpClient();
-    }
-
 
     @Override
     public InputSource getBaseInputSource()
@@ -98,17 +86,18 @@ public class MuleWSDLLocator implements WSDLLocator
 
     private InputSource getInputSource(String url) throws WSDLException
     {
-        boolean isHttpRequester = verifyIsHttpRequester(url);
+        boolean isHttpRequester = isHttpAddress(url);
 
         InputStream resultStream = null;
 
         if (useConnectorToRetrieveWsdl && isHttpRequester)
         {
-            resultStream = httpRetrieverStrategy.retrieveWsdlResource(url);
+            resultStream = new HttpRequesterWsdlRetrieverStrategyFactory(tlsContextFactory, proxyConfig, muleContext)
+                                                                                                                     .createWSDLRetrieverStrategy().retrieveWsdlResource(url);
         }
         else
         {
-            resultStream = urlRetrieverStrategy.retrieveWsdlResource(url);
+            resultStream = new URLWSDLRetrieverStrategyFactory().createWSDLRetrieverStrategy().retrieveWsdlResource(url);
         }
 
         streams.add(resultStream);
@@ -131,11 +120,6 @@ public class MuleWSDLLocator implements WSDLLocator
     @Override
     public void close()
     {
-        if (useConnectorToRetrieveWsdl)
-        {
-            httpRetrieverStrategy.stopHttpClient();
-        }
-
         closeStreams();
     }
 
@@ -155,9 +139,9 @@ public class MuleWSDLLocator implements WSDLLocator
         }
     }
 
-    private boolean verifyIsHttpRequester(String url)
+    private boolean isHttpAddress(String url)
     {
-        return url.startsWith(HttpConnector.HTTP_URL_PROTOCOL) || url.startsWith(HttpConnector.HTTPS_URL_PROTOCOL);
+        return url.startsWith(HTTP_URL_PROTOCOL) || url.startsWith(HTTPS_URL_PROTOCOL);
     }
 
 }
