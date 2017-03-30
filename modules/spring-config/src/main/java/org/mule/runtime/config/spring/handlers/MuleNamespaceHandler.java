@@ -15,6 +15,7 @@ import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactor
 import org.mule.runtime.config.spring.factories.QueueProfileFactoryBean;
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SchedulingMessageSourceFactoryBean;
+import org.mule.runtime.config.spring.factories.SchedulingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.TryProcessorFactoryBean;
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
@@ -121,8 +122,6 @@ import org.mule.runtime.core.processor.simple.AddPropertyProcessor;
 import org.mule.runtime.core.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.runtime.core.processor.simple.RemovePropertyProcessor;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
-import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
 import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
 import org.mule.runtime.core.retry.policies.RetryForeverPolicyTemplate;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
@@ -424,12 +423,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerBeanDefinitionParser("flow-ref", new FlowRefDefinitionParser());
 
     // Processing Strategies
-    registerMuleBeanDefinitionParser("asynchronous-processing-strategy",
-                                     new OrphanDefinitionParser(LegacyAsynchronousProcessingStrategyFactory.class, false))
-                                         .addIgnored("name");
-    registerMuleBeanDefinitionParser("non-blocking-processing-strategy",
-                                     new OrphanDefinitionParser(LegacyNonBlockingProcessingStrategyFactory.class, false))
-                                         .addIgnored("name");
     registerMuleBeanDefinitionParser("custom-processing-strategy", new OrphanDefinitionParser(false)).addIgnored("name");
 
     // Components

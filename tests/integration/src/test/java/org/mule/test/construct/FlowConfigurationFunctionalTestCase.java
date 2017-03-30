@@ -9,6 +9,7 @@ package org.mule.test.construct;
 import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
@@ -18,7 +19,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 
@@ -27,7 +27,6 @@ import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.context.notification.MuleMessageAware;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
@@ -82,16 +81,6 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     Thread thread = (Thread) message.getPayload().getValue();
     assertNotNull(thread);
     assertEquals(currentThread(), thread);
-  }
-
-  @Test
-  public void testFlowAynchronous() throws Exception {
-    flowRunner("asynchronousFlow").withPayload("0").run();
-    InternalMessage message = muleContext.getClient().request("test://asynchronous-out", RECEIVE_TIMEOUT).getRight().get();
-    assertNotNull(message);
-    Thread thread = (Thread) message.getPayload().getValue();
-    assertNotNull(thread);
-    assertNotSame(currentThread(), thread);
   }
 
   @Test

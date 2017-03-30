@@ -699,38 +699,6 @@
                 <xsd:sequence>
                     <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                 <xsd:attribute name="processingStrategy" use="optional" default="asynchronous">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Strategy used to process the configured message processors when exchange pattern is 'one-way'.
-                            This attribute accepts either one of the enumerated strategies with default configuration options or a reference to a gloablly defined strategy.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                    <xsd:simpleType>
-                        <xsd:union>
-                            <xsd:simpleType>
-                                <xsd:restriction base="xsd:string">
-                                    <xsd:annotation>
-                                        <xsd:documentation>
-                                            The name of a globally configured processing strategy
-                                        </xsd:documentation>
-                                    </xsd:annotation>
-                                </xsd:restriction>
-                            </xsd:simpleType>
-                            <xsd:simpleType>
-                                <xsd:restriction base="xsd:NMTOKEN">
-                                    <xsd:enumeration value="asynchronous">
-                                        <xsd:annotation>
-                                            <xsd:documentation>
-                                                Uses a thread pool to process the pipeline of message processors asynchronously.
-                                            </xsd:documentation>
-                                        </xsd:annotation>
-                                    </xsd:enumeration>
-                                </xsd:restriction>
-                            </xsd:simpleType>
-                        </xsd:union>
-                    </xsd:simpleType>
-                </xsd:attribute>
                 <xsd:attribute name="name" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -2034,21 +2002,6 @@
                         <xsd:annotation>
                             <xsd:documentation>
                                 Processes all message processors in the calling thread, waiting for any IO operations (e.g. http request) before continuing processing.  This is also known as 'blocking'.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="non-blocking">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Processes message processors in the calling thread, but supported non components will release the calling thread once a request has been sent.  Once a response is available the Flow will continue processing a worker thread.  In order to configure the thread pool used you can configure a custom 'non-blocking-processing-strategy' global element and reference it by name.
-                                NOTE: This processing strategy is currently only supported with a  a single 'HTTP Listener’ or when there is no message source configured.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="asynchronous">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Uses a thread pool to process the pipeline of message processors asynchronously.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:enumeration>

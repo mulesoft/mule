@@ -6,18 +6,27 @@
  */
 package org.mule.tck.processor;
 
-import java.util.concurrent.Executor;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
+
+import java.util.concurrent.Executor;
 
 /**
  * Test non-blocking {@link Processor} implementation that simply uses a {@link Executor} to invoke the
  * {@link org.mule.runtime.core.api.connector.ReplyToHandler} in another thread.
  */
-public class TestNonBlockingProcessor implements NonBlockingMessageProcessor {
+public class TestNonBlockingProcessor implements Processor {
+
+  /**
+   * Force the proactor to change the thread.
+   */
+  @Override
+  public ProcessingType getProcessingType() {
+    return CPU_INTENSIVE;
+  }
 
   @Override
   public Event process(final Event event) throws MuleException {

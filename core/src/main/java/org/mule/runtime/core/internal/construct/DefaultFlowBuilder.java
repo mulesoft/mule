@@ -10,16 +10,14 @@ package org.mule.runtime.core.internal.construct;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
-import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.api.rx.Exceptions.newEventDroppedException;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
-import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
-import static org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory.LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultEventContext;
@@ -48,14 +46,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 /**
  * Creates instances of {@link Flow} with a default implementation
  * 
  * <p/>
- * Builder instance can be configured using the methods that follow the builder pattern until the flow is built. After that
- * point, builder methods will fail to update the builder state.
+ * Builder instance can be configured using the methods that follow the builder pattern until the flow is built. After that point,
+ * builder methods will fail to update the builder state.
  */
 public class DefaultFlowBuilder implements Builder {
 
@@ -87,6 +86,7 @@ public class DefaultFlowBuilder implements Builder {
    * @param messageSource message source to use. Non null.
    * @return same builder instance.
    */
+  @Override
   public Builder messageSource(MessageSource messageSource) {
     checkImmutable();
     checkArgument(messageSource != null, "messageSource cannot be null");
@@ -101,6 +101,7 @@ public class DefaultFlowBuilder implements Builder {
    * @param messageProcessors message processors to execute. Non null.
    * @return same builder instance.
    */
+  @Override
   public Builder messageProcessors(List<Processor> messageProcessors) {
     checkImmutable();
     checkArgument(messageProcessors != null, "messageProcessors cannot be null");
@@ -115,6 +116,7 @@ public class DefaultFlowBuilder implements Builder {
    * @param exceptionListener exception listener to use on the flow.
    * @return same builder instance
    */
+  @Override
   public Builder messagingExceptionHandler(MessagingExceptionHandler exceptionListener) {
     checkImmutable();
     this.exceptionListener = exceptionListener;
@@ -127,6 +129,7 @@ public class DefaultFlowBuilder implements Builder {
    * @param processingStrategyFactory factory to create processing strategies. Non null.
    * @return same builder instance.
    */
+  @Override
   public Builder processingStrategyFactory(ProcessingStrategyFactory processingStrategyFactory) {
     checkImmutable();
     checkArgument(processingStrategyFactory != null, "processingStrategyFactory cannot be null");
@@ -139,6 +142,7 @@ public class DefaultFlowBuilder implements Builder {
    *
    * @return a new flow instance.
    */
+  @Override
   public Flow build() {
     checkImmutable();
 
@@ -220,26 +224,22 @@ public class DefaultFlowBuilder implements Builder {
       return from(publisher)
           .doOnNext(assertStarted())
           .flatMap(event -> {
-            if (processingStrategy == LEGACY_SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE) {
-              return just(event).handle(nullSafeMap(checkedFunction(request -> processBlockingSynchronous(request))));
-            } else {
-              Event request = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
-              // Use sink and potentially shared stream in Flow by dispatching incoming event via sink and then using
-              // response publisher to operate of the result of flow processing before returning
-              sink.accept(request);
-              return Mono.from(request.getContext().getResponsePublisher())
-                  .map(r -> {
-                    Event result = createReturnEventForParentFlowConstruct(r, event);
-                    return result;
-                  })
-                  .mapError(MessagingException.class, me -> {
-                    me.setProcessedEvent(createReturnEventForParentFlowConstruct(me.getEvent(), event));
-                    return me;
-                  })
-                  .otherwiseIfEmpty(fromCallable(() -> {
-                    throw newEventDroppedException(event);
-                  }));
-            }
+            Event request = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
+            // Use sink and potentially shared stream in Flow by dispatching incoming event via sink and then using
+            // response publisher to operate of the result of flow processing before returning
+            sink.accept(request);
+            return Mono.from(request.getContext().getResponsePublisher())
+                .map(r -> {
+                  Event result = createReturnEventForParentFlowConstruct(r, event);
+                  return result;
+                })
+                .mapError(MessagingException.class, me -> {
+                  me.setProcessedEvent(createReturnEventForParentFlowConstruct(me.getEvent(), event));
+                  return me;
+                })
+                .otherwiseIfEmpty(fromCallable(() -> {
+                  throw newEventDroppedException(event);
+                }));
           });
     }
 

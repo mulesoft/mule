@@ -113,21 +113,4 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
       throw new DefaultMuleException(cannotCopyStreamPayload(message.getPayload().getDataType().getType().getName()));
     }
   }
-
-  public static InternalMessage cloneMessage(InternalMessage message) throws MuleException {
-    assertNonConsumableMessage(message);
-    return message;
-  }
-
-  /**
-   * Asserts that the {@link Message} in the {@link Event} doesn't carry a consumable payload. This method is useful for routers
-   * which need to clone the message before dispatching the message to multiple routes.
-   *
-   * @throws MuleException If the payload of the message is consumable.
-   */
-  protected static void assertNonConsumableMessage(InternalMessage message) throws MuleException {
-    if (message.getPayload().getDataType().isStreamType()) {
-      throw new DefaultMuleException(cannotCopyStreamPayload(message.getPayload().getDataType().getType().getName()));
-    }
-  }
 }

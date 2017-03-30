@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import static org.mule.runtime.core.routing.AbstractRoutingStrategy.validateMessageIsNotConsumable;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
@@ -17,7 +19,6 @@ import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.transport.LegacyOutboundEndpoint;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.message.GroupCorrelation;
-import org.mule.runtime.core.routing.AbstractRoutingStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,10 +49,8 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter {
         event = builder.build();
         builder = Event.builder(event);
         if (filterAccepted) {
-          AbstractRoutingStrategy.validateMessageIsNotConsumable(event, message);
-          InternalMessage clonedMessage = cloneMessage(event, message);
-
-          Event result = sendRequest(event, createEventToRoute(event, clonedMessage), mp, true);
+          validateMessageIsNotConsumable(event, message);
+          Event result = sendRequest(event, createEventToRoute(event, message), mp, true);
           if (result != null) {
             results.add(result);
           }

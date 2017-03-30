@@ -21,6 +21,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.withSettings;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -32,7 +33,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.AbstractFlowConstructTestCase;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
-import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -162,20 +162,6 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     flow.start();
 
     Event response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
-    assertThat(response, not(nullValue()));
-  }
-
-  @Test
-  public void restartWithAsynchronousProcessingStrategy() throws Exception {
-    flow.setProcessingStrategyFactory(new LegacyAsynchronousProcessingStrategyFactory());
-    flow.initialise();
-    flow.start();
-
-    flow.stop();
-    flow.start();
-
-    Event response = triggerFunction.apply(directInboundMessageSource.getListener(),
-                                           eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build());
     assertThat(response, not(nullValue()));
   }
 

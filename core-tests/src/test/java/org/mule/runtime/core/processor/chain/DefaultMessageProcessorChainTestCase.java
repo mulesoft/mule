@@ -22,13 +22,12 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
@@ -52,7 +51,6 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -60,14 +58,10 @@ import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.LegacyAsynchronousProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.LegacyDefaultFlowProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.LegacyNonBlockingProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.LegacySynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.ProactorProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.SynchronousStreamProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.routing.ChoiceRouter;
@@ -75,8 +69,6 @@ import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.runtime.core.routing.filters.AcceptAllFilter;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
-import org.mule.tck.probe.JUnitLambdaProbe;
-import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
@@ -117,20 +109,12 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         {new WorkQueueProcessingStrategyFactory(), BLOCKING},
         {new SynchronousStreamProcessingStrategyFactory(), BLOCKING},
         {new SynchronousProcessingStrategyFactory(), BLOCKING},
-        {new LegacySynchronousProcessingStrategyFactory(), BLOCKING},
-        {new LegacyDefaultFlowProcessingStrategyFactory(), BLOCKING},
-        {new LegacyNonBlockingProcessingStrategyFactory(), BLOCKING},
-        {new LegacyAsynchronousProcessingStrategyFactory(), BLOCKING},
         {new DefaultFlowProcessingStrategyFactory(), NON_BLOCKING},
         {new ReactorProcessingStrategyFactory(), NON_BLOCKING},
         {new ProactorProcessingStrategyFactory(), NON_BLOCKING},
         {new WorkQueueProcessingStrategyFactory(), NON_BLOCKING},
         {new SynchronousStreamProcessingStrategyFactory(), BLOCKING},
-        {new SynchronousProcessingStrategyFactory(), NON_BLOCKING},
-        {new LegacySynchronousProcessingStrategyFactory(), NON_BLOCKING},
-        {new LegacyDefaultFlowProcessingStrategyFactory(), NON_BLOCKING},
-        {new LegacyNonBlockingProcessingStrategyFactory(), NON_BLOCKING},
-        {new LegacyAsynchronousProcessingStrategyFactory(), NON_BLOCKING}});
+        {new SynchronousProcessingStrategyFactory(), NON_BLOCKING}});
   }
 
   private Flow flow;
@@ -774,13 +758,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
       return super.process(messageProcessor, event);
     } finally {
       final SchedulerService schedulerService = muleContext.getSchedulerService();
-      if (processingStrategyFactory instanceof LegacyNonBlockingProcessingStrategyFactory && mode == NON_BLOCKING) {
-        new PollingProber().check(new JUnitLambdaProbe(() -> {
-          verify(schedulerService.getSchedulers().get(0), atLeast(nonBlockingProcessorsExecuted.get()))
-              .submit(any(Runnable.class));
-          return true;
-        }));
-      }
     }
   }
 
@@ -818,7 +795,15 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     assertTrue(mp.disposed);
   }
 
-  class NonBlockingAppendingMP extends AppendingMP implements NonBlockingMessageProcessor {
+  class NonBlockingAppendingMP extends AppendingMP {
+
+    /**
+     * Force the proactor to change the thread.
+     */
+    @Override
+    public ProcessingType getProcessingType() {
+      return CPU_INTENSIVE;
+    }
 
     public NonBlockingAppendingMP(String append) {
       super(append);

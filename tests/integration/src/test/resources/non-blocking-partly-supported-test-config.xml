@@ -6,7 +6,7 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <configuration defaultProcessingStrategy="non-blocking">
+    <configuration>
         <expression-language>
             <global-functions>
                 def assertPayload(){payload == org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE}
@@ -33,7 +33,7 @@
         <test:assert expression="#[mel:assertPayload()]"/>
         <test:non-blocking-processor/>
     </flow>
-    <flow name="childDefaultFlowChild" processingStrategy="default">
+    <flow name="childDefaultFlowChild" processingStrategy="synchronous">
         <test:assert-intercepting responseSameTask="true" responseExpression="#[mel:assertPayload()]" message="2"/>
         <test:non-blocking-processor/>
         <test:assert expression="#[mel:assertPayload()]"/>

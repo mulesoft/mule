@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.routing;
 
-import static org.mule.runtime.core.config.i18n.CoreMessages.createStaticMessage;
-import org.mule.runtime.core.api.MuleContext;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 
@@ -85,7 +86,8 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
   }
 
   private Event cloneEventForRouting(Event event, Processor mp) throws MuleException {
-    return createEventToRoute(event, cloneMessage(event.getMessage()), mp);
+    validateMessageIsNotConsumable(event, event.getMessage());
+    return createEventToRoute(event, event.getMessage(), mp);
   }
 
   interface RouteProcessor {

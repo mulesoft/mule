@@ -10,18 +10,18 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.api.i18n.I18nMessage;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -157,6 +157,23 @@ public class LifecycleUtils {
       doApplyPhase(Initialisable.PHASE_NAME, objects, muleContext, null);
     } catch (MuleException e) {
       throw (InitialisationException) e;
+    }
+  }
+
+  /**
+   * For each item in the {@code objects} collection, it invokes {@link #initialiseIfNeeded(Object, MuleContext)}
+   * <p>
+   * Also depending on the value of the {@code inject} argument, it will perform dependency injection on the {@code objects}
+   *
+   * @param objects the list of objects to be initialised
+   * @param inject whether it should perform dependency injection on the {@code object} before actually initialising it
+   * @param muleContext a {@link MuleContext}
+   * @throws InitialisationException
+   */
+  public static void initialiseIfNeeded(Collection<? extends Object> objects, boolean inject, MuleContext muleContext)
+      throws InitialisationException {
+    for (Object object : objects) {
+      initialiseIfNeeded(object, inject, muleContext);
     }
   }
 
