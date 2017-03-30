@@ -53,7 +53,6 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
   private String ackExpression;
   private ExpressionFilter failureExpressionFilter;
   private String eventKeyPrefix;
-  protected Object deadLetterQueue;
   protected Processor dlqMP;
   private boolean synchronous = false;
   private UntilSuccessfulProcessingStrategy untilSuccessfulStrategy;
@@ -74,10 +73,6 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     setWaitTime();
 
     super.initialise();
-
-    if (deadLetterQueue != null) {
-      resolveDlqMessageProcessor();
-    }
 
     if (failureExpression != null) {
       failureExpressionFilter = new ExpressionFilter(failureExpression);
@@ -107,15 +102,6 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     String flowName = flowConstruct.getName();
     String clusterId = muleContext.getClusterId();
     eventKeyPrefix = flowName + "-" + clusterId + "-";
-  }
-
-  protected void resolveDlqMessageProcessor() throws InitialisationException {
-    if (deadLetterQueue instanceof Processor) {
-      dlqMP = (Processor) deadLetterQueue;
-    } else {
-      throw new InitialisationException(I18nMessageFactory
-          .createStaticMessage("deadLetterQueue-ref is not a valid mesage processor: " + deadLetterQueue), null, this);
-    }
   }
 
   private void setWaitTime() {
@@ -214,14 +200,6 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
 
   public void setAckExpression(final String ackExpression) {
     this.ackExpression = ackExpression;
-  }
-
-  public void setDeadLetterQueue(final Object deadLetterQueue) {
-    this.deadLetterQueue = deadLetterQueue;
-  }
-
-  public Object getDeadLetterQueue() {
-    return deadLetterQueue;
   }
 
   public String getEventKeyPrefix() {

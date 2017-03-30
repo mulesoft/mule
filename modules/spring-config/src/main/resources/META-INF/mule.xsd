@@ -4198,15 +4198,6 @@
     <xsd:complexType name="abstractRedeliveryPolicyType">
         <xsd:complexContent>
             <xsd:extension base="annotatedType">
-                <xsd:sequence>
-                    <xsd:element name="dead-letter-queue" type="singleTarget" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Message processor to call if a message exceeds its redelivery count without being processed successfully
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
                 <xsd:attribute name="maxRedeliveryCount" type="substitutableInt" default="5">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -4783,13 +4774,6 @@
                         <xsd:annotation>
                             <xsd:documentation>
                                 Specifies an expression that when evaluated determines the synchronous response of until-successful.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                    <xsd:attribute name="deadLetterQueue-ref" type="xsd:string" use="optional">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The message processor to which undeliverable messages are sent after all retries have been attempted.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>

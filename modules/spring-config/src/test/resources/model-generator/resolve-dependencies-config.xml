@@ -3,14 +3,12 @@
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <flow name="deadLetterQueueFlow">
+    <flow name="flowOne">
         <set-payload value="lalala"/>
     </flow>
 
-    <flow name="flow">
-        <until-successful deadLetterQueue-ref="deadLetterQueueFlow">
-            <set-payload value="lalala"/>
-        </until-successful>
+    <flow name="flowTwo">
+        <flow-ref name="flowOne"/>
     </flow>
 
     <flow name="flowWithSource">

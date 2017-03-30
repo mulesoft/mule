@@ -6,22 +6,17 @@
  */
 package org.mule.runtime.core.processor;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.routing.MessageProcessorFilterPair;
 
 /**
  * Implement a redelivery policy for Mule. This is similar to JMS retry policies that will redeliver a message a maximum number of
@@ -34,16 +29,12 @@ public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessa
 
   protected FlowConstruct flowConstruct;
   protected int maxRedeliveryCount;
-  protected Processor deadLetterQueue;
   public static final int REDELIVERY_FAIL_ON_FIRST = 0;
   private MessagingExceptionHandler messagingExceptionHandler;
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     this.flowConstruct = flowConstruct;
-    if (deadLetterQueue instanceof FlowConstructAware) {
-      ((FlowConstructAware) deadLetterQueue).setFlowConstruct(flowConstruct);
-    }
   }
 
   @Override
@@ -51,32 +42,16 @@ public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessa
     if (maxRedeliveryCount < 0) {
       throw new InitialisationException(CoreMessages.initialisationFailure("maxRedeliveryCount must be positive"), this);
     }
-
-    if (deadLetterQueue instanceof Initialisable) {
-      ((Initialisable) deadLetterQueue).initialise();
-    }
   }
 
   @Override
-  public void start() throws MuleException {
-    if (deadLetterQueue instanceof Startable) {
-      ((Startable) deadLetterQueue).start();
-    }
-  }
+  public void start() throws MuleException {}
 
   @Override
-  public void stop() throws MuleException {
-    if (deadLetterQueue instanceof Stoppable) {
-      ((Stoppable) deadLetterQueue).stop();
-    }
-  }
+  public void stop() throws MuleException {}
 
   @Override
-  public void dispose() {
-    if (deadLetterQueue instanceof Disposable) {
-      ((Disposable) deadLetterQueue).dispose();
-    }
-  }
+  public void dispose() {}
 
   public int getMaxRedeliveryCount() {
     return maxRedeliveryCount;
@@ -86,26 +61,12 @@ public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessa
     this.maxRedeliveryCount = maxRedeliveryCount;
   }
 
-  public Processor getTheFailedMessageProcessor() {
-    return deadLetterQueue;
-  }
-
-  public void setDeadLetterQueue(MessageProcessorFilterPair failedMessageProcessorPair) {
-    this.deadLetterQueue = failedMessageProcessorPair.getMessageProcessor();
-  }
-
   public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
     this.messagingExceptionHandler = messagingExceptionHandler;
-    if (deadLetterQueue instanceof MessagingExceptionHandlerAware) {
-      ((MessagingExceptionHandlerAware) deadLetterQueue).setMessagingExceptionHandler(messagingExceptionHandler);
-    }
   }
 
   @Override
   public void setMuleContext(MuleContext context) {
     super.setMuleContext(context);
-    if (deadLetterQueue instanceof MuleContextAware) {
-      ((MuleContextAware) deadLetterQueue).setMuleContext(context);
-    }
   }
 }

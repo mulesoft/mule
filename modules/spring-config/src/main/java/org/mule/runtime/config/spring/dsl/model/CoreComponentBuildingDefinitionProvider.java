@@ -73,7 +73,6 @@ import org.mule.runtime.config.spring.dsl.processor.CustomSecurityFilterObjectFa
 import org.mule.runtime.config.spring.dsl.processor.EncryptionSecurityFilterObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.ExplicitMethodEntryPointResolverObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.MessageEnricherObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.MessageProcessorWrapperObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.MethodEntryPoint;
 import org.mule.runtime.config.spring.dsl.processor.NoArgumentsEntryPointResolverObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.RetryPolicyTemplateObjectFactory;
@@ -528,7 +527,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions
         .add(baseDefinition.copy().withIdentifier(UNTIL_SUCCESSFUL).withTypeDefinition(fromType(UntilSuccessful.class))
             .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("objectStore-ref").build())
-            .withSetterParameterDefinition("deadLetterQueue", fromSimpleReferenceParameter("deadLetterQueue-ref").build())
             .withSetterParameterDefinition("maxRetries", fromSimpleParameter("maxRetries").withDefaultValue(5).build())
             .withSetterParameterDefinition("millisBetweenRetries", fromSimpleParameter("millisBetweenRetries").build())
             .withSetterParameterDefinition("secondsBetweenRetries", fromSimpleParameter("secondsBetweenRetries").build())
@@ -652,12 +650,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("maxRedeliveryCount", fromSimpleParameter("maxRedeliveryCount").build())
         .withSetterParameterDefinition("idExpression", fromSimpleParameter("idExpression").build())
         .withSetterParameterDefinition("idExpression", fromSimpleParameter("idExpression").build())
-        .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("object-store-ref").build())
-        .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(Processor.class).build()).build());
-
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("dead-letter-queue")
-        .withTypeDefinition(fromType(Processor.class)).withObjectFactoryType(MessageProcessorWrapperObjectFactory.class)
-        .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(Processor.class).build()).build());
+        .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("object-store-ref").build()).build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("composite-source")
         .withTypeDefinition(fromType(StartableCompositeMessageSource.class))
@@ -748,7 +741,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("redelivery-policy")
         .withTypeDefinition(fromType(IdempotentRedeliveryPolicy.class))
-        .withSetterParameterDefinition("deadLetterQueue", fromChildConfiguration(Processor.class).build())
         .withSetterParameterDefinition("maxRedeliveryCount", fromSimpleParameter("maxRedeliveryCount").build())
         .withSetterParameterDefinition("useSecureHash", fromSimpleParameter("useSecureHash").build())
         .withSetterParameterDefinition("messageDigestAlgorithm", fromSimpleParameter("messageDigestAlgorithm").build())

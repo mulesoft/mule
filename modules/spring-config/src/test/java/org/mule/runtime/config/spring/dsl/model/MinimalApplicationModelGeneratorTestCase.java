@@ -79,24 +79,24 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   @Test
   public void dependencyBetweenElements() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("element-dependency-config.xml");
-    ApplicationModel minimalModel = generator.getMinimalModel(builder().globalName("flow").build());
-    assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
-    assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").isPresent(), is(true));
+    ApplicationModel minimalModel = generator.getMinimalModel(builder().globalName("flowOne").build());
+    assertThat(minimalModel.findNamedComponent("flowOne").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowTwo").isPresent(), is(true));
   }
 
   @Test
   public void resolveDependencies() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("resolve-dependencies-config.xml");
     ApplicationModel minimalModel =
-        generator.getMinimalModel(builder().globalName("flow").addProcessorsPart().addIndexPart(0).build());
-    assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
-    assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").isPresent(), is(true));
+        generator.getMinimalModel(builder().globalName("flowTwo").addProcessorsPart().addIndexPart(0).build());
+    assertThat(minimalModel.findNamedComponent("flowTwo").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowOne").isPresent(), is(true));
 
     List<ComponentModel> componentModelList = generator.resolveComponentModelDependencies();
     assertThat(componentModelList, hasSize(2));
 
-    assertThat(componentModelList.get(0).getNameAttribute(), equalTo("flow"));
-    assertThat(componentModelList.get(1).getNameAttribute(), equalTo("deadLetterQueueFlow"));
+    assertThat(componentModelList.get(0).getNameAttribute(), equalTo("flowOne"));
+    assertThat(componentModelList.get(1).getNameAttribute(), equalTo("flowTwo"));
   }
 
   @Test
@@ -117,19 +117,19 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   public void dependencyBetweenElementsReferencingMp() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("element-dependency-config.xml");
     ApplicationModel minimalModel =
-        generator.getMinimalModel(builder().globalName("flow").addProcessorsPart().addIndexPart(0).build());
-    assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
-    assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").isPresent(), is(true));
+        generator.getMinimalModel(builder().globalName("flowOne").addProcessorsPart().addIndexPart(0).build());
+    assertThat(minimalModel.findNamedComponent("flowOne").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowTwo").isPresent(), is(true));
   }
 
   @Test
   public void noDependencyBetweenElementsReferencingMp() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("element-dependency-config.xml");
     ApplicationModel minimalModel =
-        generator.getMinimalModel(builder().globalName("deadLetterQueueFlow").addProcessorsPart().addIndexPart(0).build());
-    assertThat(minimalModel.findNamedComponent("flow").isPresent(), is(true));
-    assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").isPresent(), is(true));
-    assertThat(minimalModel.findNamedComponent("deadLetterQueueFlow").get().isEnabled(), is(true));
+        generator.getMinimalModel(builder().globalName("flowTwo").addProcessorsPart().addIndexPart(0).build());
+    assertThat(minimalModel.findNamedComponent("flowOne").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowTwo").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowTwo").get().isEnabled(), is(true));
   }
 
   @Test

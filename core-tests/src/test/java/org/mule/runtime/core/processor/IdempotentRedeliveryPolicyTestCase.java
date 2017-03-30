@@ -52,7 +52,7 @@ import org.mockito.Answers;
 public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
   public static final String STRING_MESSAGE = "message";
-  public static final int MAX_REDELIVERY_COUNT = 0;
+  public static final int MAX_REDELIVERY_COUNT = 5;
   private static final String UTF_8 = "utf-8";
   private static ObjectSerializer serializer;
 
@@ -95,8 +95,6 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     irp.setFlowConstruct(mock(FlowConstruct.class));
     irp.setMuleContext(mockMuleContext);
     irp.setListener(mockFailingMessageProcessor);
-    irp.setMessageProcessor(mockDlqMessageProcessor);
-
   }
 
   @Test
@@ -112,7 +110,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     when(message.getPayload()).thenReturn(new TypedValue<>(STRING_MESSAGE, STRING));
     irp.initialise();
     processUntilFailure();
-    verify(mockDlqMessageProcessor, times(1)).process(event);
+    verify(mockFailingMessageProcessor, times(MAX_REDELIVERY_COUNT + 1)).process(event);
   }
 
   @Test
@@ -124,7 +122,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
         .thenAnswer(invocation -> serializationObjectStore);
     irp.initialise();
     processUntilFailure();
-    verify(mockDlqMessageProcessor, times(1)).process(event);
+    verify(mockFailingMessageProcessor, times(MAX_REDELIVERY_COUNT + 1)).process(event);
   }
 
   @Test
@@ -140,7 +138,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     waitLatch.release();
     firstIrpExecutionThread.join();
     threadCausingRedeliveryException.join();
-    verify(mockDlqMessageProcessor, times(1)).process(event);
+    verify(mockFailingMessageProcessor, times(2)).process(event);
   }
 
   private void processUntilFailure() {
