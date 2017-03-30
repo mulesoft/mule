@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isInputStream;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getGenerics;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
@@ -21,6 +22,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.ExtensionOf;
+import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
@@ -117,15 +119,18 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
         operation.withOutputAttributes().ofType(getMethodReturnAttributesType(method, loader.getTypeLoader()));
 
         if (isAutoPaging(operationMethod)) {
-          operation.withOutput().ofType(new BaseTypeBuilder(JAVA).arrayType()
+          operation.supportsStreaming(true).withOutput().ofType(new BaseTypeBuilder(JAVA).arrayType()
               .id(Iterator.class.getName())
               .of(getMethodReturnType(method, loader.getTypeLoader()))
               .build());
 
           addPagedOperationModelProperty(operationMethod, operation, supportsConfig);
         } else {
-          operation.withOutput().ofType(getMethodReturnType(method, loader.getTypeLoader()));
+          final MetadataType outputType = getMethodReturnType(method, loader.getTypeLoader());
+          operation.withOutput().ofType(outputType);
           processInterceptingOperation(operationMethod, operation);
+
+          operation.supportsStreaming(isInputStream(outputType) || method.getAnnotation(Streaming.class) != null);
         }
       }
 
