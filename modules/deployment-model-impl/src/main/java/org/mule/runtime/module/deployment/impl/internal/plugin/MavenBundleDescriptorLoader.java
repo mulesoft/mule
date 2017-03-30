@@ -20,8 +20,8 @@ import java.util.Map;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.MavenUtils.getPomModelFolder;
-import static org.mule.runtime.module.deployment.impl.internal.plugin.MavenUtils.getPomModelFromJar;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFromJar;
 
 /**
  * Loads a {@link BundleDescriptor} using Maven to extract the relevant information from a Mule artifact's
