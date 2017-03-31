@@ -10,33 +10,32 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory.SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
+import static org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import org.hamcrest.Matchers;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features("Processing Strategies")
 @Stories("Synchronous Processing Strategy")
-public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
+public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
-  public SynchronousProcessingStrategyTestCase(Mode mode) {
+  public DirectProcessingStrategyTestCase(Mode mode) {
     super(mode);
   }
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
+    return DIRECT_PROCESSING_STRATEGY_INSTANCE;
   }
 
   @Override
-  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+  @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void singleCpuLight() throws Exception {
     super.singleCpuLight();
@@ -44,7 +43,7 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
   }
 
   @Override
-  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+  @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void singleCpuLightConcurrent() throws Exception {
     super.internalSingleCpuLightConcurrent(false);
@@ -52,7 +51,7 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
   }
 
   @Override
-  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+  @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void multipleCpuLight() throws Exception {
     super.multipleCpuLight();
@@ -60,7 +59,7 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
   }
 
   @Override
-  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+  @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void singleBlocking() throws Exception {
     super.singleBlocking();
@@ -68,7 +67,7 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
   }
 
   @Override
-  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+  @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void multipleBlocking() throws Exception {
     super.multipleBlocking();
@@ -76,7 +75,7 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
   }
 
   @Override
-  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+  @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void singleCpuIntensive() throws Exception {
     super.singleCpuIntensive();
@@ -84,7 +83,7 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
   }
 
   @Override
-  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+  @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void multipleCpuIntensive() throws Exception {
     super.multipleCpuIntensive();
@@ -92,7 +91,7 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
   }
 
   @Override
-  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+  @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void mix() throws Exception {
     super.mix();
@@ -100,7 +99,7 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
   }
 
   @Override
-  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+  @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void mix2() throws Exception {
     super.mix2();
@@ -108,7 +107,7 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
   }
 
   @Override
-  @Description("Regardless of processor type, when the SynchronousProcessingStrategy is configured, the pipeline is executed "
+  @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
       + "synchronously in a caller thread.")
   public void tx() throws Exception {
     flow.setMessageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor));
@@ -120,6 +119,18 @@ public class SynchronousProcessingStrategyTestCase extends AbstractProcessingStr
     process(flow, testEvent());
 
     assertSynchronous(1);
+  }
+
+  @Override
+  @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a caller thread but async processors will cause additional threads to be used.")
+  public void asyncCpuLight() throws Exception {
+    super.asyncCpuLight();
+    assertThat(threads, hasSize(2));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(0l));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
+    assertThat(threads.stream().filter(name -> name.startsWith(CUSTOM)).count(), equalTo(1l));
   }
 
   protected void assertSynchronous(int concurrency) {

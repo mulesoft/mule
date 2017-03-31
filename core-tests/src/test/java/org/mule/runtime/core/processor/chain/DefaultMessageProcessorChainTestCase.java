@@ -58,11 +58,11 @@ import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
+import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.ProactorProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.SynchronousStreamProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
@@ -107,14 +107,14 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         {new ReactorProcessingStrategyFactory(), BLOCKING},
         {new ProactorProcessingStrategyFactory(), BLOCKING},
         {new WorkQueueProcessingStrategyFactory(), BLOCKING},
-        {new SynchronousStreamProcessingStrategyFactory(), BLOCKING},
-        {new SynchronousProcessingStrategyFactory(), BLOCKING},
+        {new BlockingProcessingStrategyFactory(), BLOCKING},
+        {new DirectProcessingStrategyFactory(), BLOCKING},
         {new DefaultFlowProcessingStrategyFactory(), NON_BLOCKING},
         {new ReactorProcessingStrategyFactory(), NON_BLOCKING},
         {new ProactorProcessingStrategyFactory(), NON_BLOCKING},
         {new WorkQueueProcessingStrategyFactory(), NON_BLOCKING},
-        {new SynchronousStreamProcessingStrategyFactory(), BLOCKING},
-        {new SynchronousProcessingStrategyFactory(), NON_BLOCKING}});
+        {new BlockingProcessingStrategyFactory(), NON_BLOCKING},
+        {new DirectProcessingStrategyFactory(), NON_BLOCKING}});
   }
 
   private Flow flow;

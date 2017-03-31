@@ -46,7 +46,7 @@ import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
 import org.mule.runtime.core.streaming.StreamingManager;
@@ -116,10 +116,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    * {@link MuleConfiguration#getDefaultProcessingStrategyFactory()} or the
    * {@link MuleProperties#MULE_DEFAULT_PROCESSING_STRATEGY} system property
    *
-   * @return a {@link SynchronousProcessingStrategyFactory}
+   * @return a {@link DirectProcessingStrategyFactory}
    */
   protected ProcessingStrategyFactory createDefaultProcessingStrategyFactory() {
-    return new SynchronousProcessingStrategyFactory();
+    return new DirectProcessingStrategyFactory();
   }
 
   private void initialiseProcessingStrategy() {
@@ -136,16 +136,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       }
 
       processingStrategy = processingStrategyFactory.create(muleContext, getPrefix(muleContext) + getName());
-    }
-
-    boolean userConfiguredProcessingStrategy = !(getProcessingStrategyFactory() instanceof DefaultFlowProcessingStrategyFactory);
-    boolean redeliveryHandlerConfigured = isRedeliveryPolicyConfigured();
-    if (!userConfiguredProcessingStrategy && redeliveryHandlerConfigured) {
-      processingStrategy = new SynchronousProcessingStrategyFactory().create(muleContext, getPrefix(muleContext) + getName());
-      if (LOGGER.isWarnEnabled()) {
-        LOGGER
-            .warn("Using message redelivery and on-error-propagate requires synchronous processing strategy. Processing strategy re-configured to synchronous");
-      }
     }
   }
 
@@ -344,14 +334,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    * <ol>
    * <li>If a transaction is active and a processing strategy supporting transactions is configured. (synchronous or default
    * strategies)</li>
-   * <li>If {@link SynchronousProcessingStrategyFactory} is configured as the processing strategy.</li>
    * </ol>
    * 
    * @return true if blocking synchronous code path should be used, false otherwise.
    */
   protected boolean useBlockingCodePath() {
-    return (isTransactionActive() && processingStrategyFactory instanceof DefaultFlowProcessingStrategyFactory)
-        || processingStrategyFactory instanceof SynchronousProcessingStrategyFactory;
+    return isTransactionActive()
+        && (processingStrategy.isSynchronous() || processingStrategyFactory instanceof DefaultFlowProcessingStrategyFactory);
   }
 
   @Override

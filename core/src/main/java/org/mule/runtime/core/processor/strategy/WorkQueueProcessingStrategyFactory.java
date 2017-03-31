@@ -20,6 +20,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import java.util.function.Consumer;
@@ -30,9 +31,10 @@ import org.reactivestreams.Publisher;
 
 /**
  * Creates {@link WorkQueueProcessingStrategy} instances. This processing strategy dispatches incoming messages to a work queue
- * which is served by a pool of worker threads from the applications IO {@link Scheduler}. Processing of the flow is carried out
- * synchronously on the worker thread until completion.
- *
+ * which is served by a pool of worker threads from the applications IO {@link Scheduler}. While processing of the flow is carried
+ * out using a single worker thread when a {@link Processor} implements non-blocking behaviour (e.g. an outbound HTTP request)
+ * then processing will continue in a {@link Processor} thread.
+ * <p/>
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
  *
  * @since 4.0

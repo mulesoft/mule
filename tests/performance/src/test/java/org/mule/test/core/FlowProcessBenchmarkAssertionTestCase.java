@@ -12,8 +12,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.AbstractBenchmarkAssertionTestCase;
 import org.mule.FlowNullProcessorBenchmark;
+import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 
 import org.junit.Test;
 
@@ -30,10 +30,10 @@ public class FlowProcessBenchmarkAssertionTestCase extends AbstractBenchmarkAsse
   }
 
   @Test
-  public void processFlowSynchronous() {
+  public void processFlowBlocking() {
     runAndAssertBenchmark(FlowNullProcessorBenchmark.class, "processFlow", 1,
                           singletonMap(PROCESSING_STRATEGY_PARAM,
-                                       new String[] {SynchronousProcessingStrategyFactory.class.getCanonicalName()}),
+                                       new String[] {BlockingProcessingStrategyFactory.class.getCanonicalName()}),
                           8, MICROSECONDS, 8000);
   }
 
@@ -50,7 +50,7 @@ public class FlowProcessBenchmarkAssertionTestCase extends AbstractBenchmarkAsse
   public void processStreamOf1000FlowSynchronous() {
     runAndAssertBenchmark(FlowNullProcessorBenchmark.class, "processFlowStream", 1,
                           singletonMap(PROCESSING_STRATEGY_PARAM,
-                                       new String[] {SynchronousProcessingStrategyFactory.class.getCanonicalName()}),
+                                       new String[] {BlockingProcessingStrategyFactory.class.getCanonicalName()}),
                           9, MILLISECONDS, 7800000);
   }
 

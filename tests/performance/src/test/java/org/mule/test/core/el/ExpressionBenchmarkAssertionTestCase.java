@@ -11,7 +11,6 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 import org.mule.AbstractBenchmarkAssertionTestCase;
 import org.mule.el.SimpleExpressionBenchmark;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
 
 import org.junit.Test;
 

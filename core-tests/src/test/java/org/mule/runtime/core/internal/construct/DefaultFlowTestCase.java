@@ -33,7 +33,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.AbstractFlowConstructTestCase;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
-import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.test.core.lifecycle.LifecycleTrackerProcessor;
@@ -153,8 +153,8 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   }
 
   @Test
-  public void restartWithSynchronousProcessingStrategy() throws Exception {
-    flow.setProcessingStrategyFactory(new SynchronousProcessingStrategyFactory());
+  public void restartWithBlockingProcessingStrategy() throws Exception {
+    flow.setProcessingStrategyFactory(new BlockingProcessingStrategyFactory());
     flow.initialise();
     flow.start();
 
