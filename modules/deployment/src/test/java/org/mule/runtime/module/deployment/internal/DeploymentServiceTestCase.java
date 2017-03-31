@@ -3600,21 +3600,18 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     });
   }
 
-  private void assertAtLeastOneUndeploymentSuccess(final DeploymentListener listener, final String appName)
-  {
+  private void assertAtLeastOneUndeploymentSuccess(final DeploymentListener listener, final String appName) {
     Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
-    prober.check(new JUnitProbe()
-    {
+    prober.check(new JUnitProbe() {
+
       @Override
-      public boolean test()
-      {
+      public boolean test() {
         verify(listener, atLeastOnce()).onUndeploymentSuccess(appName);
         return true;
       }
 
       @Override
-      public String describeFailure()
-      {
+      public String describeFailure() {
         return "Failed to undeploy artifact: " + appName + System.lineSeparator() + super.describeFailure();
       }
     });
