@@ -199,7 +199,7 @@ public final class FileOperations extends BaseFileSystemOperations {
   @Throws(FileCopyErrorTypeProvider.class)
   public void move(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, String sourcePath,
                    String targetPath, @Optional(defaultValue = "true") boolean createParentDirectories,
-                   @Optional(defaultValue = "false") boolean overwrite, String renameTo) {
+                   @Optional(defaultValue = "false") boolean overwrite, @Optional String renameTo) {
     super.doMove(config, fileSystem, sourcePath, targetPath, createParentDirectories, overwrite, renameTo);
   }
 
