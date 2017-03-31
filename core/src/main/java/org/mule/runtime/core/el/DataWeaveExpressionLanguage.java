@@ -64,7 +64,7 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
     try {
       this.expressionExecutor = muleContext.getRegistry().lookupObject(ExpressionExecutor.class);
     } catch (RegistrationException e) {
-      throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Unable to obtain expression executor."),e);
+      throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Unable to obtain expression executor."), e);
     }
     this.muleContext = muleContext;
   }
