@@ -31,6 +31,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
@@ -58,7 +59,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 
@@ -232,7 +232,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   }
 
-  protected Function<Publisher<Event>, Publisher<Event>> processFlowFunction() {
+  protected ReactiveProcessor processFlowFunction() {
     return stream -> from(stream)
         .transform(processingStrategy.onPipeline(pipeline))
         // After flow processing complete EventContext with response event, null event or error (after error handing).

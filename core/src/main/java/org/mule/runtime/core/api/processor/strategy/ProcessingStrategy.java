@@ -15,10 +15,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 
-import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
-
 /**
  * Determines how a list of message processors should processed.
  */
@@ -29,10 +25,10 @@ public interface ProcessingStrategy {
    * independent streams that implement the {@link Pipeline}.
    *
    * @param flowConstruct pipeline instance.
-   * @param pipelineFunction function representing the pipeline.
+   * @param pipeline function representing the pipeline.
    * @return new sink instance
    */
-  Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> pipelineFunction);
+  Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline);
 
   /**
    * Enrich {@link Processor} function by adding pre/post operators to implement processing strategy behaviour.

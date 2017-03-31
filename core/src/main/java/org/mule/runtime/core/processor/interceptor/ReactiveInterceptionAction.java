@@ -12,13 +12,10 @@ import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.interception.DefaultInterceptionEvent;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Implementation of {@link InterceptionAction} that does the needed hooks with {@code Reactor} into the pipeline.
@@ -28,10 +25,10 @@ import org.reactivestreams.Publisher;
 class ReactiveInterceptionAction implements InterceptionAction {
 
   private DefaultInterceptionEvent interceptionEvent;
-  private Function<Publisher<Event>, Publisher<Event>> next;
+  private ReactiveProcessor next;
 
   public ReactiveInterceptionAction(DefaultInterceptionEvent interceptionEvent,
-                                    Function<Publisher<Event>, Publisher<Event>> next) {
+                                    ReactiveProcessor next) {
     this.interceptionEvent = interceptionEvent;
     this.next = next;
   }

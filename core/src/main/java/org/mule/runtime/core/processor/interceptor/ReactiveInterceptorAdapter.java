@@ -37,8 +37,6 @@ import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
-
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
  *
@@ -109,7 +107,7 @@ public class ReactiveInterceptorAdapter
 
   private CompletableFuture<Event> doAround(Event event, ProcessorInterceptor interceptor, Processor component,
                                             Map<String, String> dslParameters,
-                                            Function<Publisher<Event>, Publisher<Event>> next) {
+                                            ReactiveProcessor next) {
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
     final ReactiveInterceptionAction reactiveInterceptionAction = new ReactiveInterceptionAction(interceptionEvent, next);
     return interceptor.around(resolveParameters(event, component, dslParameters), interceptionEvent,

@@ -6,19 +6,15 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-
-import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Processing strategy that processes the {@link Pipeline} in the caller thread and does not schedule the processing of any
@@ -37,8 +33,8 @@ public class DirectProcessingStrategyFactory implements ProcessingStrategyFactor
         }
 
         @Override
-        public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
-          return new StreamPerEventSink(function, event -> {
+        public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
+          return new StreamPerEventSink(pipeline, event -> {
           });
         }
       };

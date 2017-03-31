@@ -13,10 +13,9 @@ import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
-
-import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -93,7 +92,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
    *
    * @return function that performs request processing
    */
-  protected Function<Publisher<Event>, Publisher<Event>> processRequest() {
+  protected ReactiveProcessor processRequest() {
     return stream -> from(stream).map(event -> {
       try {
         return processRequest(event);
@@ -119,7 +118,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
    *
    * @return function that performs request processing
    */
-  protected Function<Publisher<Event>, Publisher<Event>> processResponse() {
+  protected ReactiveProcessor processResponse() {
     return stream -> from(stream).handle(nullSafeMap(checkedFunction(response -> processResponse(response))));
   }
 
