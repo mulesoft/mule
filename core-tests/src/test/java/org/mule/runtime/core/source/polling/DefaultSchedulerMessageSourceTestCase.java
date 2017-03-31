@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.source.polling;
 
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.reset;
@@ -15,13 +13,14 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 
 import java.util.List;
 
@@ -38,9 +37,19 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
     SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
     schedulerMessageSource.setListener(flow);
 
-    schedulerMessageSource.poll();
+    schedulerMessageSource.trigger();
+    new PollingProber(RECEIVE_TIMEOUT, 100).check(new Probe() {
 
-    assertThat(flow.event, notNullValue());
+      @Override
+      public boolean isSatisfied() {
+        return flow.event != null;
+      }
+
+      @Override
+      public String describeFailure() {
+        return "flow event never set by the source flow";
+      }
+    });
   }
 
   @Test

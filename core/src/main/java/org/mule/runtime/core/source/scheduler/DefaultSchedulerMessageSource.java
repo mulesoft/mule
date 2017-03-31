@@ -102,7 +102,7 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
   }
 
   public void trigger() {
-    pollingExecutor.execute(() -> run());
+    pollingExecutor.execute(() -> poll());
   }
 
   @Override
@@ -113,7 +113,7 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
   /**
    * Checks whether polling should take place on this instance.
    */
-  public final void run() {
+  private final void run() {
     // Make sure we start with a clean state.
     setCurrentEvent(null);
 
@@ -129,7 +129,7 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
   /**
    * Triggers the forced execution of the polling message processor ignoring the configured scheduler.
    */
-  public void poll() {
+  private void poll() {
     Message request = NULL_MESSAGE;
     pollWith(request);
   }

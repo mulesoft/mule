@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.runtime.api.source.SchedulerMessageSource;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
@@ -61,7 +62,7 @@ public class StoppedCronSchedulerTestCase extends MuleArtifactFunctionalTestCase
     try {
       MessageSource flowSource = flow.getMessageSource();
       if (flowSource instanceof DefaultSchedulerMessageSource) {
-        ((DefaultSchedulerMessageSource) flowSource).run();
+        ((SchedulerMessageSource) flowSource).trigger();
       }
     } finally {
       flow.stop();

@@ -12,9 +12,9 @@ import static org.mule.runtime.api.component.location.Location.builder;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.source.SchedulerMessageSource;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.probe.PollingProber;
@@ -49,7 +49,7 @@ public class SchedulerManagementTestCase extends AbstractIntegrationTestCase {
       @Override
       public boolean isSatisfied() {
         try {
-          Either<Error, Optional<InternalMessage>> response =
+          Either<Error, Optional<Message>> response =
               muleContext.getClient().request("test://neverRunningSchedulerQueue", 100);
           return response.isRight() && response.getRight().isPresent();
         } catch (MuleException e) {
@@ -106,7 +106,7 @@ public class SchedulerManagementTestCase extends AbstractIntegrationTestCase {
     scheduler.start();
   }
 
-  @Description("scheduler start twice does not fail")
+  @Description("scheduler stop twice does not fail")
   @Test
   public void stopTwiceDoesNotFail() throws MuleException {
     SchedulerMessageSource scheduler = (DefaultSchedulerMessageSource) muleContext.getConfigurationComponentLocator()

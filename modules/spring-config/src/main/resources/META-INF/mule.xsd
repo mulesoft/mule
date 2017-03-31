@@ -2571,7 +2571,8 @@
     <xsd:element name="scheduler" type="schedulerMessageSourceType" substitutionGroup="abstract-message-source">
         <xsd:annotation>
             <xsd:documentation>
-                Polls the nested message processor for new messages
+                Source that schedules periodic execution of a flow. By default it will used a fixed frequency
+                scheduling of 1 second.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
