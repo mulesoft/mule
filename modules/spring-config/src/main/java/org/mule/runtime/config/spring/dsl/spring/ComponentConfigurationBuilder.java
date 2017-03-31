@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.dsl.spring;
 
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
@@ -331,7 +332,7 @@ class ComponentConfigurationBuilder {
     @Override
     public void onComplexChildMap(Class<?> keyType, Class<?> valueType, String wrapperIdentifier) {
       complexParameters.stream()
-          .filter(getTypeAndIdentifierPredicate(MapFactoryBean.class, of(wrapperIdentifier)))
+          .filter(getTypeAndIdentifierPredicate(MapFactoryBean.class, ofNullable(wrapperIdentifier)))
           .findFirst()
           .ifPresent(componentValue -> {
             complexParameters.remove(componentValue);
