@@ -10,6 +10,7 @@ package org.mule.runtime.core.el.context;
 import org.mule.runtime.core.el.datetime.DateTime;
 
 /**
+ * This is for compatibility mode only adds the missing functionality that 3.x supports.
  * <li><b>nanoSeconds</b> <i>Current system time in nanoseconds</i>
  * <li><b>dateTime</b> <i>Current system time via a DateTime utility object (see below)</i>
  *

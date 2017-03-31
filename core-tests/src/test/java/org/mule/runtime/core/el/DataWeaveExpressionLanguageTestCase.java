@@ -7,6 +7,7 @@
 package org.mule.runtime.core.el;
 
 import static java.util.Optional.empty;
+import static org.apache.commons.lang.SystemUtils.FILE_SEPARATOR;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
@@ -222,7 +223,7 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleContextTest
     Event event = testEvent();
     muleContext.getRegistry().registerObject("myBean", new MyBean("DataWeave"));
     TypedValue evaluate = expressionLanguage.evaluate("server.fileSeparator", event, BindingContext.builder().build());
-    assertThat(evaluate.getValue(), is(SystemUtils.FILE_SEPARATOR));
+    assertThat(evaluate.getValue(), is(FILE_SEPARATOR));
   }
 
   @Test

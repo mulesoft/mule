@@ -20,6 +20,7 @@ import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionExecutor;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -63,7 +64,7 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
     try {
       this.expressionExecutor = muleContext.getRegistry().lookupObject(ExpressionExecutor.class);
     } catch (RegistrationException e) {
-      throw new MuleRuntimeException(e);
+      throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Unable to obtain expression executor."),e);
     }
     this.muleContext = muleContext;
   }
