@@ -208,7 +208,7 @@ import org.mule.runtime.core.routing.filters.logic.OrFilter;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 import org.mule.runtime.core.routing.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.runtime.core.source.StartableCompositeMessageSource;
-import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
+import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.streaming.objects.CursorIteratorProviderFactory;
@@ -641,7 +641,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("storePrefix", fromSimpleParameter("storePrefix").build()).build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(SCHEDULER)
-        .withTypeDefinition(fromType(SchedulerMessageSource.class))
+        .withTypeDefinition(fromType(DefaultSchedulerMessageSource.class))
         .withObjectFactoryType(SchedulingMessageSourceFactoryBean.class)
         .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
         .withSetterParameterDefinition("scheduler", fromChildConfiguration(PeriodicScheduler.class).build()).build());

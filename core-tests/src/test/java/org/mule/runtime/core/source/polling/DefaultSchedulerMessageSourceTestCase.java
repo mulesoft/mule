@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.source.polling;
 
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.reset;
@@ -15,38 +13,49 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
+import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 
 import java.util.List;
 
 import org.junit.After;
 import org.junit.Test;
 
-public class SchedulerMessageSourceTestCase extends AbstractMuleContextTestCase {
+public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void simplePoll() throws Exception {
 
-    SchedulerMessageSource schedulerMessageSource = createMessageSource();
+    DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
 
     SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
     schedulerMessageSource.setListener(flow);
 
-    schedulerMessageSource.poll();
+    schedulerMessageSource.trigger();
+    new PollingProber(RECEIVE_TIMEOUT, 100).check(new Probe() {
 
-    assertThat(flow.event, notNullValue());
+      @Override
+      public boolean isSatisfied() {
+        return flow.event != null;
+      }
+
+      @Override
+      public String describeFailure() {
+        return "flow event never set by the source flow";
+      }
+    });
   }
 
   @Test
   public void disposeScheduler() throws Exception {
     reset(muleContext.getSchedulerService());
-    SchedulerMessageSource schedulerMessageSource = createMessageSource();
+    DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
 
     verify(muleContext.getSchedulerService()).cpuLightScheduler();
     List<Scheduler> createdSchedulers = muleContext.getSchedulerService().getSchedulers();
@@ -62,7 +71,7 @@ public class SchedulerMessageSourceTestCase extends AbstractMuleContextTestCase 
     verify(pollScheduler).stop(anyLong(), any());
   }
 
-  private SchedulerMessageSource schedulerMessageSource;
+  private DefaultSchedulerMessageSource schedulerMessageSource;
 
   @After
   public void after() throws MuleException {
@@ -70,9 +79,9 @@ public class SchedulerMessageSourceTestCase extends AbstractMuleContextTestCase 
     disposeIfNeeded(schedulerMessageSource, logger);
   }
 
-  private SchedulerMessageSource createMessageSource() throws Exception {
+  private DefaultSchedulerMessageSource createMessageSource() throws Exception {
     schedulerMessageSource =
-        new SchedulerMessageSource(muleContext, scheduler());
+        new DefaultSchedulerMessageSource(muleContext, scheduler());
     schedulerMessageSource.setFlowConstruct(getTestFlow(muleContext));
     schedulerMessageSource.initialise();
     return schedulerMessageSource;

@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.routing.AbstractSelectiveRouter;
-import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
+import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,7 +92,7 @@ public class ComponentModelHelper {
   }
 
   public static boolean isPoll(ComponentModel componentModel) {
-    return isOfType(componentModel, SchedulerMessageSource.class);
+    return isOfType(componentModel, DefaultSchedulerMessageSource.class);
   }
 
   public static boolean isTemplateOnErrorHandler(ComponentModel componentModel) {

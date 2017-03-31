@@ -18,11 +18,10 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.source.SchedulerMessageSource;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -44,13 +43,13 @@ import java.util.concurrent.ScheduledFuture;
  * Polling {@link org.mule.runtime.core.api.source.MessageSource}.
  * </p>
  * <p>
- * The {@link SchedulerMessageSource} is responsible of creating a {@link org.mule.runtime.api.scheduler.Scheduler} at the
+ * The {@link DefaultSchedulerMessageSource} is responsible of creating a {@link org.mule.runtime.api.scheduler.Scheduler} at the
  * initialization phase. This {@link org.mule.runtime.api.scheduler.Scheduler} can be stopped/started and executed by using the
  * {@link org.mule.runtime.core.api.registry.MuleRegistry} interface, this way users can manipulate poll from outside mule server.
  * </p>
  */
-public class SchedulerMessageSource extends AbstractAnnotatedObject
-    implements MessageSource, FlowConstructAware, Startable, Stoppable, MuleContextAware, Initialisable, Disposable {
+public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
+    implements MessageSource, FlowConstructAware, SchedulerMessageSource, MuleContextAware, Initialisable, Disposable {
 
   private final PeriodicScheduler scheduler;
 
@@ -59,21 +58,26 @@ public class SchedulerMessageSource extends AbstractAnnotatedObject
   private Processor listener;
   private FlowConstruct flowConstruct;
   private MuleContext muleContext;
+  private boolean started;
 
   /**
    * @param muleContext application's context
    * @param scheduler the scheduler
    */
-  public SchedulerMessageSource(MuleContext muleContext, PeriodicScheduler scheduler) {
+  public DefaultSchedulerMessageSource(MuleContext muleContext, PeriodicScheduler scheduler) {
     this.muleContext = muleContext;
     this.scheduler = scheduler;
   }
 
   @Override
-  public void start() throws MuleException {
+  public synchronized void start() throws MuleException {
+    if (started) {
+      return;
+    }
     try {
       // The initialization phase if handled by the scheduler
-      schedulingJob = scheduler.schedule(pollingExecutor, () -> performPoll());
+      schedulingJob = scheduler.schedule(pollingExecutor, () -> run());
+      this.started = true;
     } catch (Exception ex) {
       this.stop();
       throw new CreateException(failedToScheduleWork(), ex, this);
@@ -85,18 +89,31 @@ public class SchedulerMessageSource extends AbstractAnnotatedObject
   }
 
   @Override
-  public void stop() throws MuleException {
+  public synchronized void stop() throws MuleException {
+    if (!started) {
+      return;
+    }
     // Stop the scheduler to address the case when the flow is stop but not the application
     if (schedulingJob != null) {
       schedulingJob.cancel(false);
       schedulingJob = null;
     }
+    this.started = false;
+  }
+
+  public void trigger() {
+    pollingExecutor.execute(() -> poll());
+  }
+
+  @Override
+  public boolean isStarted() {
+    return started;
   }
 
   /**
    * Checks whether polling should take place on this instance.
    */
-  public final void performPoll() {
+  private final void run() {
     // Make sure we start with a clean state.
     setCurrentEvent(null);
 
@@ -112,7 +129,7 @@ public class SchedulerMessageSource extends AbstractAnnotatedObject
   /**
    * Triggers the forced execution of the polling message processor ignoring the configured scheduler.
    */
-  public void poll() {
+  private void poll() {
     Message request = NULL_MESSAGE;
     pollWith(request);
   }

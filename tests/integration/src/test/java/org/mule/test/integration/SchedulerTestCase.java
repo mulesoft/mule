@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
+import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -55,7 +55,7 @@ public class SchedulerTestCase extends AbstractIntegrationTestCase {
     for (FlowConstruct flowConstruct : muleContext.getRegistry().lookupFlowConstructs()) {
       Flow flow = (Flow) flowConstruct;
       MessageSource flowSource = flow.getMessageSource();
-      if (flowSource instanceof SchedulerMessageSource) {
+      if (flowSource instanceof DefaultSchedulerMessageSource) {
         schedulers++;
       }
     }
