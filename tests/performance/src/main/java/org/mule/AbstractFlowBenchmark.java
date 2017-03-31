@@ -81,7 +81,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   protected TriggerableMessageSource source;
 
   @Param({
-      "org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategyFactory",
+      "org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFactory"
   })

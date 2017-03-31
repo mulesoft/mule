@@ -9,7 +9,9 @@ package org.mule.runtime.core.processor.strategy;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
@@ -19,14 +21,14 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 
 /**
- * Processing strategy that processes all {@link Processor}'s in the caller thread. Unlike other, asynchronous, processing
- * strategies this processing strategy does not used a shared stream, given this would require serializing all requests and
- * limiting the effectiveness of multi-threaded sources and operations. Use {@link SynchronousStreamProcessingStrategyFactory} in
- * order to obtain stream semantics while doing all processing in the caller thread.
+ * Processing strategy that processes the {@link Pipeline} in the caller thread and does not schedule the processing of any
+ * {@link Processor} in a different thread pool regardless of their {@link ProcessingType}. Individual {@link Processor}'s may
+ * however execute non-blocking operations, e.g. an outbound HTTP request, which would result in the {@link Pipeline} effectively
+ * using multiple threads.
  */
-public class SynchronousProcessingStrategyFactory implements ProcessingStrategyFactory {
+public class DirectProcessingStrategyFactory implements ProcessingStrategyFactory {
 
-  public static final ProcessingStrategy SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE =
+  public static final ProcessingStrategy DIRECT_PROCESSING_STRATEGY_INSTANCE =
       new AbstractProcessingStrategy() {
 
         @Override
@@ -43,7 +45,7 @@ public class SynchronousProcessingStrategyFactory implements ProcessingStrategyF
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return SYNCHRONOUS_PROCESSING_STRATEGY_INSTANCE;
+    return DIRECT_PROCESSING_STRATEGY_INSTANCE;
   }
 
 }

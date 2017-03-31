@@ -15,6 +15,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -28,7 +30,9 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
+import org.mule.tck.processor.TestNonBlockingProcessor;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
@@ -45,12 +49,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiveProcessorTestCase {
 
   protected static final String CPU_LIGHT = "cpuLight";
   protected static final String IO = "I/O";
   protected static final String CPU_INTENSIVE = "cpuIntensive";
+  protected static final String CUSTOM = "custom";
 
   protected Flow flow;
   protected volatile Set<String> threads = new HashSet<>();
@@ -75,6 +83,14 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
       return BLOCKING;
     }
   };
+  protected Processor asyncProcessor = new ThreadTrackingProcessor() {
+
+    @Override
+    public Publisher<Event> apply(Publisher<Event> publisher) {
+      return from(publisher).transform(processorPublisher -> super.apply(processorPublisher))
+          .publishOn(fromExecutorService(custom));
+    }
+  };
 
   protected Scheduler cpuLight;
   protected Scheduler blocking;
@@ -94,7 +110,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     cpuLight = new TestScheduler(3, CPU_LIGHT);
     blocking = new TestScheduler(3, IO);
     cpuIntensive = new TestScheduler(3, CPU_INTENSIVE);
-    custom = new TestScheduler(10, CPU_LIGHT);
+    custom = new TestScheduler(10, CUSTOM);
     asyncExecutor = muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
 
     flow = builder("test", muleContext)
@@ -144,7 +160,6 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     if (blocks) {
       assertThat(latchedProcessor.getSecondCalledLatch().await(BLOCK_TIMEOUT, MILLISECONDS), is(true));
     }
-
   }
 
   @Test
@@ -205,6 +220,15 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
   public void mix2() throws Exception {
     flow.setMessageProcessors(asList(cpuLightProcessor, cpuLightProcessor, blockingProcessor, blockingProcessor,
                                      cpuLightProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor, cpuLightProcessor));
+    flow.initialise();
+    flow.start();
+
+    process(flow, testEvent());
+  }
+
+  @Test
+  public void asyncCpuLight() throws Exception {
+    flow.setMessageProcessors(asList(asyncProcessor, cpuLightProcessor));
     flow.initialise();
     flow.start();
 
