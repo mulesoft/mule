@@ -7,14 +7,13 @@
 package org.mule.runtime.core.source.scheduler;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.config.i18n.CoreMessages.failedToScheduleWork;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -114,7 +113,7 @@ public class SchedulerMessageSource extends AbstractAnnotatedObject
    * Triggers the forced execution of the polling message processor ignoring the configured scheduler.
    */
   public void poll() {
-    Message request = of(null);
+    Message request = NULL_MESSAGE;
     pollWith(request);
   }
 

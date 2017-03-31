@@ -8,6 +8,7 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
@@ -135,7 +136,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
   @Test
   public void testMatchOnNoArgs() throws Exception {
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(of(null)).build();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(NULL_MESSAGE).build();
     // This should fail because the Kiwi.bite() method has a void return type, and by default
     // void methods are ignorred
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);

@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
@@ -241,7 +242,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void nullPayload() {
-    Message message = of(null);
+    Message message = NULL_MESSAGE;
     assertThat(message.getPayload().getDataType().getType(), equalTo(Object.class));
   }
 

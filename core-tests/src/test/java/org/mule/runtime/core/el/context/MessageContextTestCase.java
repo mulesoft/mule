@@ -19,6 +19,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -49,7 +50,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
     event = mock(Event.class, RETURNS_DEEP_STUBS);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
-    message = spy(Message.of(null));
+    message = spy(NULL_MESSAGE);
     when(event.getGroupCorrelation()).thenReturn(mock(GroupCorrelation.class));
     when(event.getMessage()).thenAnswer(invocation -> message);
   }

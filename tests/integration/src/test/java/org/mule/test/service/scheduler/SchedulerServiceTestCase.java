@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import org.mule.functional.functional.SkeletonSource;
@@ -135,7 +135,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     Scheduler scheduler = muleContext.getSchedulerService().cpuLightScheduler();
     try {
       scheduler.submit(() -> ((SkeletonSource) messageSource).getListener()
-          .process(Event.builder(create(delayScheduleFlow, SchedulerServiceTestCase.class.getSimpleName())).message(of(null))
+          .process(Event.builder(create(delayScheduleFlow, SchedulerServiceTestCase.class.getSimpleName())).message(NULL_MESSAGE)
               .build()))
           .get();
     } catch (ExecutionException executionException) {

@@ -8,7 +8,7 @@ package org.mule.runtime.core.processor;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
 import static org.mule.runtime.core.api.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
 import static org.mule.runtime.core.config.i18n.CoreMessages.failedToInvoke;
 import static org.mule.runtime.core.config.i18n.CoreMessages.initialisationFailure;
@@ -45,10 +45,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
 
 /**
  * <code>InvokerMessageProcessor</code> invokes a specified method of an object. An array of argument expressions can be provided
@@ -252,7 +252,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
       eventBuilder
           .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, singletonList(template)));
     } else {
-      eventBuilder.message(of(null));
+      eventBuilder.message(NULL_MESSAGE);
     }
     return eventBuilder.build();
   }

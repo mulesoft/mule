@@ -8,6 +8,7 @@ package org.mule.tck.junit4;
 
 import static java.lang.System.getProperty;
 import static org.junit.Assume.assumeThat;
+import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
@@ -259,7 +260,7 @@ public abstract class AbstractMuleTestCase {
 
   protected Event nullPayloadEvent() throws MuleException {
     if (_nullPayloadEvent == null) {
-      _nullPayloadEvent = eventBuilder().message(of(null)).build();
+      _nullPayloadEvent = eventBuilder().message(NULL_MESSAGE).build();
     }
     return _nullPayloadEvent;
   }
