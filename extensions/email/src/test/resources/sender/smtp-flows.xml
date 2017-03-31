@@ -29,7 +29,7 @@
                     <email:content>Email Content</email:content>
                 </email:body>
                 <email:headers>
-                    #[mel:['CustomOperationHeader' : 'Dummy']]
+                    #[{'CustomOperationHeader' : 'Dummy'}]
                 </email:headers>
             </email:email-builder>
         </email:send>
@@ -46,8 +46,8 @@
                 <email:to-addresses>
                     <email:to-address value="pablo.musumeci@mulesoft.com"/>
                 </email:to-addresses>
-                <email:body encoding="#[mel:flowVars.encoding]">
-                    <email:content>#[mel:payload]</email:content>
+                <email:body encoding="#[variables.encoding]">
+                    <email:content>#[payload]</email:content>
                 </email:body>
             </email:email-builder>
         </email:send>

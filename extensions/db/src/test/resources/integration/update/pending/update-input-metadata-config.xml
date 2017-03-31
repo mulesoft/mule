@@ -21,14 +21,14 @@
 
     <flow name="updateMetadataBeanParams">
         <db:update config-ref="dbConfig">
-            <db:parameterized-query>update Planet set position = #[mel:payload.position] where name = #[payload.name]
+            <db:parameterized-query>update Planet set position = #[payload.position] where name = #[payload.name]
             </db:parameterized-query>
         </db:update>
     </flow>
 
     <flow name="updateMetadataMapParams">
         <db:update config-ref="dbConfig">
-            <db:parameterized-query>update Planet set position = #[mel:payload['position']] where name = #[payload.name]
+            <db:parameterized-query>update Planet set position = #[payload['position']] where name = #[payload.name]
             </db:parameterized-query>
         </db:update>
     </flow>

@@ -8,7 +8,7 @@
     <db:template-query name="testInsert">
         <db:parameterized-query>INSERT INTO Alien VALUES (:name, :description)</db:parameterized-query>
         <db:in-param name="name" defaultValue="#[mel:message.inboundProperties.name]" type="VARCHAR"/>
-        <db:in-param name="description" defaultValue="#[mel:payload]" type="XMLTYPE"/>
+        <db:in-param name="description" defaultValue="#[payload]" type="XMLTYPE"/>
     </db:template-query>
 
     <flow name="insertXmlType">

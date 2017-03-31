@@ -12,11 +12,11 @@
             <db:out-param name="resultSet2" type="CURSOR"/>
         </db:stored-procedure>
 
-        <set-variable variableName="records" value="#[mel:new ArrayList()]"/>
+        <set-variable variableName="records" value="#[[]]"/>
 
         <enricher target="mel:flowVars.unused">
             <processor-chain>
-                <set-payload value="#[mel:payload.get('resultSet1')]"/>
+                <set-payload value="#[payload.'resultSet1']"/>
 
                 <foreach>
                     <expression-component>mel:flowVars['records'].add(payload)</expression-component>
@@ -26,7 +26,7 @@
 
         <enricher target="mel:flowVars.unused">
             <processor-chain>
-                <set-payload value="#[mel:payload.get('resultSet2')]"/>
+                <set-payload value="#[payload.'resultSet2']"/>
 
                 <foreach>
                     <expression-component>mel:flowVars['records'].add(payload)</expression-component>

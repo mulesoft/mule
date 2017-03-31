@@ -16,10 +16,10 @@
     <flow name="client">
         <httpn:request path="/" config-ref="reqConfig" outputType="ANY">
             <httpn:headers>
-                #[mel:['X-Custom' : 'custom-value']]
+                #[{'X-Custom' : 'custom-value'}]
             </httpn:headers>
             <httpn:query-params>
-                #[mel:['query' : 'param']]
+                #[{'query' : 'param'}]
             </httpn:query-params>
         </httpn:request>
         <object-to-string-transformer />

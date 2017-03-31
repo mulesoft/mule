@@ -26,7 +26,7 @@
         <petstore:pets>
             <petstore:pet value="Dog"/>
         </petstore:pets>
-        <petstore:cage birds="#[mel:app.registry.birds]" ammenities="#[mel:app.registry.ammenities]"/>
+        <petstore:cage birds="#[app.registry.birds]" ammenities="#[app.registry.ammenities]"/>
     </petstore:config>
 
     <petstore:config name="configWithMELReferences" cashierName="jim" >

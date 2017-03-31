@@ -60,7 +60,6 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   private List<Processor> messageProcessors;
   private Processor ownedMessageProcessor;
   private AbstractMessageSequenceSplitter splitter;
-  private MessageFilter filter;
   private String collectionExpression;
   private ExpressionConfig expressionConfig = new ExpressionConfig();
   private int batchSize;
@@ -114,7 +113,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     try {
       return ownedMessageProcessor.process(event);
     } catch (MessagingException e) {
-      if (splitter.equals(e.getFailingMessageProcessor()) || filter.equals(e.getFailingMessageProcessor())) {
+      if (splitter.equals(e.getFailingMessageProcessor())) {
         // Make sure the context information for the exception is relative to the ForEach.
         e.getInfo().remove(INFO_LOCATION_KEY);
         throw new MessagingException(event, e, this);
