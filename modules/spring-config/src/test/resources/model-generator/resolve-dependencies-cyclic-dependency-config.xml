@@ -4,15 +4,11 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="flowA">
-        <until-successful deadLetterQueue-ref="flowB">
-            <set-payload value="lalala"/>
-        </until-successful>
+        <flow-ref name="flowB"/>
     </flow>
 
     <flow name="flowB">
-        <until-successful deadLetterQueue-ref="flowA">
-            <set-payload value="lalala"/>
-        </until-successful>
+        <flow-ref name="flowA"/>
     </flow>
 
 </mule>

@@ -25,10 +25,14 @@
                           ackExpression="#[mel:'ACK']"
                           failureExpression="#[mel:regex('(?i).*error')]"
                           maxRetries="2"
-                          secondsBetweenRetries="1"
-                          deadLetterQueue-ref="dlq-mp">
+                          secondsBetweenRetries="1">
             <flow-ref name="target-mp" />
         </until-successful>
+        <error-handler>
+            <on-error-continue>
+                <processor ref="dlq-mp"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="retry-endpoint-config">

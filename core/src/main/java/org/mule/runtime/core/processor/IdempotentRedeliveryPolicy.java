@@ -7,22 +7,20 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import org.mule.runtime.core.api.Event;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessageRedeliveredException;
-import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
+import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.util.store.ObjectStorePartition;
 import org.mule.runtime.core.util.store.ProvidedObjectStoreWrapper;
 
@@ -38,9 +36,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implement a retry policy for Mule. This is similar to JMS retry policies that will redeliver a message a maximum number of
- * times. If this maximum is exceeded, the message is sent to a dead letter queue, Here, if the processing of the messages fails
- * too often, the message is sent to the failedMessageProcessor MP, whence success is force to be returned, to allow the message
- * to be considered "consumed".
+ * times. If this maximum is exceeded, fails with an exception.
  */
 public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
@@ -120,18 +116,10 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       }
       store = null;
     }
-
-    if (deadLetterQueue instanceof Disposable) {
-      ((Disposable) deadLetterQueue).dispose();
-    }
   }
 
   @Override
-  public void start() throws MuleException {
-    if (deadLetterQueue instanceof Startable) {
-      ((Startable) deadLetterQueue).start();
-    }
-  }
+  public void start() throws MuleException {}
 
 
   @Override
@@ -161,19 +149,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       }
 
       if (tooMany || exceptionSeen) {
-        try {
-          if (deadLetterQueue != null) {
-            return deadLetterQueue.process(event);
-          } else {
-            throw new MessageRedeliveredException(messageId, counter.get(), maxRedeliveryCount, event,
-                                                  CoreMessages.createStaticMessage("Redelivery exhausted"), this);
-          }
-        } catch (MessageRedeliveredException ex) {
-          throw ex;
-        } catch (Exception ex) {
-          logger.info("Exception thrown from failed message processing for message " + messageId, ex);
-        }
-        return null;
+        throw new MessageRedeliveredException(messageId, counter.get(), maxRedeliveryCount, event,
+                                              CoreMessages.createStaticMessage("Redelivery exhausted"), this);
       }
 
       try {
@@ -263,10 +240,6 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
   public void setObjectStore(ObjectStore<AtomicInteger> store) {
     this.store = new ProvidedObjectStoreWrapper<>(store, internalObjectStoreFactory());
-  }
-
-  public void setMessageProcessor(Processor processor) {
-    this.deadLetterQueue = processor;
   }
 }
 
