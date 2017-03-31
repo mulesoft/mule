@@ -18,6 +18,7 @@ import org.mule.transport.ftp.AbstractFtpServerTestCase;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
