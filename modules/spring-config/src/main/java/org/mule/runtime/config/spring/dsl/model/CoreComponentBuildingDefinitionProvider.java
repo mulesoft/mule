@@ -103,6 +103,7 @@ import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
+import org.mule.runtime.core.routing.CollectionSplitter;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
@@ -256,6 +257,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String OTHERWISE = "otherwise";
   private static final String ALL = "all";
   private static final String POLL = "poll";
+  private static final String COLLECTION_SPLITTER = "collection-splitter";
   private static final String REQUEST_REPLY = "request-reply";
   private static final String ERROR_TYPE_MATCHER = "errorTypeMatcher";
   private static final String TYPE = "type";
@@ -524,6 +526,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .add(baseDefinition.copy().withIdentifier(ALL).withTypeDefinition(fromType(MulticastingRouter.class))
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .build());
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(COLLECTION_SPLITTER)
+        .withTypeDefinition(fromType(CollectionSplitter.class)).build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(REQUEST_REPLY)
         .withTypeDefinition(fromType(SimpleAsyncRequestReplyRequester.class))
         .withSetterParameterDefinition("messageProcessor", fromChildConfiguration(Processor.class).build())
