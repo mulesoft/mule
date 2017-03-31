@@ -17,9 +17,9 @@ import static org.mule.functional.functional.InvocationCountMessageProcessor.get
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
@@ -99,7 +99,7 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
 
     ponderUntilMessageCountReceivedByCustomMP(1);
 
-    Throwable error = CustomMP.getProcessedEvents().get(0).getMessage().getExceptionPayload().getException();
+    Throwable error = ((InternalMessage) CustomMP.getProcessedEvents().get(0).getMessage()).getExceptionPayload().getException();
     assertThat(error, is(notNullValue()));
     assertThat(error.getCause(), instanceOf(RetryPolicyExhaustedException.class));
     assertThat(error.getCause().getMessage(),
