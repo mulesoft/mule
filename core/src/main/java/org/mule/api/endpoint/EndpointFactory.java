@@ -30,6 +30,18 @@ public interface EndpointFactory extends MuleContextAware
      * MULE-2292
      * 
      * @param uri endpoint identifier or uri
+     * @param name name of the endpoint
+     * @throws MuleException
+     */
+    InboundEndpoint getInboundEndpoint(String uri, String name) throws MuleException;
+
+    /**
+     * Creates an endpoint with the "INBOUND" role. <br/><br/> The uri parameter can either be a uri, or a
+     * (global) endpoint identifier or name. <br/><br/> The {@link InboundEndpoint} interface is
+     * currently used as the return type but this will be replaces by and more specific interface. SEE
+     * MULE-2292
+     * 
+     * @param uri endpoint identifier or uri
      * @throws MuleException
      */
     InboundEndpoint getInboundEndpoint(String uri) throws MuleException;

@@ -34,9 +34,21 @@ public class DefaultEndpointFactory implements EndpointFactory
 
     protected MuleContext muleContext;
 
+    @Override
+    public InboundEndpoint getInboundEndpoint(String uri, String name) throws MuleException
+    {
+        EndpointBuilder endpointBuilder = getInboundEndpointBuilder(uri);
+        endpointBuilder.setName(name);
+        return getInboundEndpoint(endpointBuilder);
+    }
+
     public InboundEndpoint getInboundEndpoint(String uri)
             throws MuleException
     {
+        return getInboundEndpoint(getInboundEndpointBuilder(uri));
+    }
+
+    private EndpointBuilder getInboundEndpointBuilder(String uri) {
         logger.debug("DefaultEndpointFactory request for inbound endpoint for uri: " + uri);
         EndpointBuilder endpointBuilder = lookupEndpointBuilder(uri);
         if (endpointBuilder == null)
@@ -44,9 +56,8 @@ public class DefaultEndpointFactory implements EndpointFactory
             logger.debug("Named EndpointBuilder not found, creating endpoint from uri");
             endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
         }
-        return getInboundEndpoint(endpointBuilder);
+        return endpointBuilder;
     }
-
     public OutboundEndpoint getOutboundEndpoint(String uri)
             throws MuleException
     {
