@@ -41,6 +41,7 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -1067,7 +1068,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void removesZombieFilesAfterremovesZombieFilesAfterFailedAppIsDeletedFailedAppIsDeleted() throws Exception {
+  public void removesZombieFilesAfterremovesZombieFilesAfterFailedAppIsDeleted() throws Exception {
     final String appName = "bad-config-app";
 
     addPackedAppFromBuilder(badConfigAppFileBuilder);
@@ -1086,7 +1087,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     reset(applicationDeploymentListener);
     org.apache.commons.io.FileUtils.deleteDirectory(new File(appsDir, app.getArtifactName()));
     assertAppFolderIsDeleted(appName);
-    assertUndeploymentSuccess(applicationDeploymentListener, appName);
+    assertAtLeastOneUndeploymentSuccess(applicationDeploymentListener, appName);
 
     final Map<URL, Long> endZombieMap = deploymentService.getZombieApplications();
     assertEquals("Should not be any more zombie files present", 0, endZombieMap.size());
@@ -3594,6 +3595,26 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
       @Override
       public String describeFailure() {
+        return "Failed to undeploy artifact: " + appName + System.lineSeparator() + super.describeFailure();
+      }
+    });
+  }
+
+  private void assertAtLeastOneUndeploymentSuccess(final DeploymentListener listener, final String appName)
+  {
+    Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
+    prober.check(new JUnitProbe()
+    {
+      @Override
+      public boolean test()
+      {
+        verify(listener, atLeastOnce()).onUndeploymentSuccess(appName);
+        return true;
+      }
+
+      @Override
+      public String describeFailure()
+      {
         return "Failed to undeploy artifact: " + appName + System.lineSeparator() + super.describeFailure();
       }
     });
