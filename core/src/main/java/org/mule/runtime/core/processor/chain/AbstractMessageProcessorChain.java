@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.MessagingException;
@@ -101,13 +102,12 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    List<BiFunction<Processor, Function<Publisher<Event>, Publisher<Event>>, Function<Publisher<Event>, Publisher<Event>>>> interceptorsToBeExecuted =
-        resolveInterceptors();
+    List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptorsToBeExecuted = resolveInterceptors();
 
     Flux<Event> stream = from(publisher);
     for (Processor processor : getProcessorsToExecute()) {
-      Function<Publisher<Event>, Publisher<Event>> processorFunction = processor;
-      for (BiFunction<Processor, Function<Publisher<Event>, Publisher<Event>>, Function<Publisher<Event>, Publisher<Event>>> interceptor : interceptorsToBeExecuted) {
+      ReactiveProcessor processorFunction = processor;
+      for (BiFunction<Processor, ReactiveProcessor, ReactiveProcessor> interceptor : interceptorsToBeExecuted) {
         processorFunction = interceptor.apply(processor, processorFunction);
       }
       stream = stream.transform(processorFunction);
@@ -115,12 +115,12 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
     return stream;
   }
 
-  private List<BiFunction<Processor, Function<Publisher<Event>, Publisher<Event>>, Function<Publisher<Event>, Publisher<Event>>>> resolveInterceptors() {
-    List<BiFunction<Processor, Function<Publisher<Event>, Publisher<Event>>, Function<Publisher<Event>, Publisher<Event>>>> interceptors =
+  private List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> resolveInterceptors() {
+    List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptors =
         new ArrayList<>();
 
     if (flowConstruct instanceof Pipeline) {
-      interceptors.add((processor, next) -> ((Pipeline) flowConstruct).getProcessingStrategy().onProcessor(processor, next));
+      interceptors.add((processor, next) -> ((Pipeline) flowConstruct).getProcessingStrategy().onProcessor(next));
     }
 
     // Handle errors
@@ -139,8 +139,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
         .transform(next)
         .doOnNext(result -> setCurrentEvent(result)));
 
-    List<BiFunction<Processor, Function<Publisher<Event>, Publisher<Event>>, Function<Publisher<Event>, Publisher<Event>>>> interceptorsToBeExecuted =
-        new LinkedList<>();
+    List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptorsToBeExecuted = new LinkedList<>();
     // TODO MULE-11521 Review how interceptors are registered!
     muleContext.getProcessorInterceptorManager().getInterceptorFactories().stream()
         .forEach(interceptorFactory -> {

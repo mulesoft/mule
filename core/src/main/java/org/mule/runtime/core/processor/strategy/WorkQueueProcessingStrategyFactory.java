@@ -17,17 +17,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Creates {@link WorkQueueProcessingStrategy} instances. This processing strategy dispatches incoming messages to a work queue
@@ -100,11 +96,9 @@ public class WorkQueueProcessingStrategyFactory extends AbstractRingBufferProces
     }
 
     @Override
-    public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
-                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
+    public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
       return publisher -> from(publisher)
-          .flatMap(event -> just(event).transform(pipelineFunction).subscribeOn(fromExecutorService(ioScheduler)),
-                   concurrency);
+          .flatMap(event -> just(event).transform(pipeline).subscribeOn(fromExecutorService(ioScheduler)), concurrency);
     }
 
     @Override

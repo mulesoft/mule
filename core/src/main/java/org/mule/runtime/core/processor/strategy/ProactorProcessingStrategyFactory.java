@@ -6,37 +6,28 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.lang.Math.min;
-import static java.lang.Runtime.getRuntime;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.Sink;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 import org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory.ReactorProcessingStrategy;
 
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Creates {@link ProactorProcessingStrategyFactory} instances. This processing strategy dipatches incoming messages to
@@ -144,22 +135,19 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
     }
 
     @Override
-    public Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor messageProcessor,
-                                                                    Function<Publisher<Event>, Publisher<Event>> processorFunction) {
-      if (messageProcessor.getProcessingType() == BLOCKING) {
-        return proactor(processorFunction, blockingScheduler);
-      } else if (messageProcessor.getProcessingType() == CPU_INTENSIVE) {
-        return proactor(processorFunction, cpuIntensiveScheduler);
+    public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
+      if (processor.getProcessingType() == BLOCKING) {
+        return proactor(processor, blockingScheduler);
+      } else if (processor.getProcessingType() == CPU_INTENSIVE) {
+        return proactor(processor, cpuIntensiveScheduler);
       } else {
-        return publisher -> from(publisher).transform(processorFunction);
+        return publisher -> from(publisher).transform(processor);
       }
     }
 
-    private Function<Publisher<Event>, Publisher<Event>> proactor(Function<Publisher<Event>, Publisher<Event>> processorFunction,
-                                                                  Scheduler scheduler) {
-      // TODO MULE-11775 Potential race condition in ProactorProcessingStrategy.
+    private ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
       return publisher -> from(publisher).publishOn(fromExecutorService(getExecutorService(scheduler)))
-          .transform(processorFunction).publishOn(fromExecutorService(getExecutorService(getCpuLightScheduler())));
+          .transform(processor).publishOn(fromExecutorService(getExecutorService(getCpuLightScheduler())));
     }
 
     protected ExecutorService getExecutorService(Scheduler scheduler) {

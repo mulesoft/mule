@@ -12,6 +12,7 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 import java.util.function.Function;
 
@@ -43,7 +44,7 @@ public interface CachingStrategy {
    * @param processor the processor that will be executed when the response for the event is not in the cache.
    * @return publisher function
    */
-  default Function<Publisher<Event>, Publisher<Event>> getFunction(Processor processor) {
+  default ReactiveProcessor transformProcessor(Processor processor) {
     return publisher -> from(publisher).handle(nullSafeMap(checkedFunction(request -> process(request, processor))));
   }
 }

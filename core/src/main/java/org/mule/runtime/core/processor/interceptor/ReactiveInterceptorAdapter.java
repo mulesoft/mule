@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.HashMap;
@@ -36,16 +37,13 @@ import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
-
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
  *
  * @since 4.0
  */
 public class ReactiveInterceptorAdapter
-    implements BiFunction<Processor, Function<Publisher<Event>, Publisher<Event>>, Function<Publisher<Event>, Publisher<Event>>>,
-    FlowConstructAware {
+    implements BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>, FlowConstructAware {
 
   private static final String AROUND_METHOD_NAME = "around";
 
@@ -62,8 +60,7 @@ public class ReactiveInterceptorAdapter
   }
 
   @Override
-  public Function<Publisher<Event>, Publisher<Event>> apply(Processor component,
-                                                            Function<Publisher<Event>, Publisher<Event>> next) {
+  public ReactiveProcessor apply(Processor component, ReactiveProcessor next) {
     if (!isInterceptable(component) || !interceptorFactory.intercept(((AnnotatedObject) component).getLocation())) {
       return next;
     }
@@ -110,7 +107,7 @@ public class ReactiveInterceptorAdapter
 
   private CompletableFuture<Event> doAround(Event event, ProcessorInterceptor interceptor, Processor component,
                                             Map<String, String> dslParameters,
-                                            Function<Publisher<Event>, Publisher<Event>> next) {
+                                            ReactiveProcessor next) {
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
     final ReactiveInterceptionAction reactiveInterceptionAction = new ReactiveInterceptionAction(interceptionEvent, next);
     return interceptor.around(resolveParameters(event, component, dslParameters), interceptionEvent,

@@ -14,21 +14,16 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Creates {@link RingBufferProcessingStrategy} instance that implements the reactor pattern by de-multiplexes incoming messages
@@ -87,11 +82,9 @@ public class ReactorProcessingStrategyFactory extends AbstractRingBufferProcessi
     }
 
     @Override
-    public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
-                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-      // TODO MULE-11775 Potential race condition in ProactorProcessingStrategy.
+    public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
       return publisher -> from(publisher).publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)))
-          .transform(pipelineFunction);
+          .transform(pipeline);
     }
 
     protected ExecutorService getExecutorService(Scheduler scheduler) {

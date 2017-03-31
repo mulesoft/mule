@@ -7,7 +7,6 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.WaitStrategy.LITE_BLOCKING;
-import static reactor.core.publisher.WorkQueueProcessor.share;
 import static reactor.util.concurrent.QueueSupplier.SMALL_BUFFER_SIZE;
 import static reactor.util.concurrent.QueueSupplier.isPowerOfTwo;
 import static reactor.util.concurrent.WaitStrategy.blocking;
@@ -19,20 +18,14 @@ import static reactor.util.concurrent.WaitStrategy.sleeping;
 import static reactor.util.concurrent.WaitStrategy.yielding;
 
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.function.Supplier;
-
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.WorkQueueProcessor;
 
 /**
  * Creates ring-buffer based processing strategy instances. These processing strategy de-multiplex incoming messages using a
@@ -121,9 +114,8 @@ public abstract class AbstractRingBufferProcessingStrategyFactory implements Pro
     }
 
     @Override
-    public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
-      // TODO MULE-11775 Potential race condition in ProactorProcessingStrategy.
-      return new StreamPerEventSink(function, createOnEventConsumer());
+    public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
+      return new StreamPerEventSink(pipeline, createOnEventConsumer());
     }
 
     protected MuleContext getMuleContext() {

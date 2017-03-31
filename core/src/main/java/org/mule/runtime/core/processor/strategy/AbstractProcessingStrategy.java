@@ -14,14 +14,13 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.BlockingSink;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.FluxProcessor;
@@ -34,9 +33,9 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
   public static final String TRANSACTIONAL_ERROR_MESSAGE = "Unable to process a transactional flow asynchronously";
 
   @Override
-  public Sink createSink(FlowConstruct flowConstruct, Function<Publisher<Event>, Publisher<Event>> function) {
+  public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
     FluxProcessor<Event, Event> processor = EmitterProcessor.<Event>create(false).serialize();
-    return new ReactorSink(processor.connectSink(), processor.transform(function).retry().subscribe(),
+    return new ReactorSink(processor.connectSink(), processor.transform(pipeline).retry().subscribe(),
                            createOnEventConsumer());
   }
 
