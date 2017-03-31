@@ -8,14 +8,13 @@ package org.mule.test.integration.tck;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.FileNotFoundException;
 
@@ -31,7 +30,7 @@ public class MuleTestNamespaceFunctionalTestCase extends AbstractIntegrationTest
   @Test
   public void testService1() throws Exception {
     Event event = flowRunner("testService1").withPayload("foo").run();
-    InternalMessage message = event.getMessage();
+    Message message = event.getMessage();
 
     assertNotNull(message);
     assertThat(event.getError().isPresent(), is(false));
@@ -41,7 +40,7 @@ public class MuleTestNamespaceFunctionalTestCase extends AbstractIntegrationTest
   @Test
   public void testService2() throws Exception {
     Event event = flowRunner("testService2").withPayload("foo").run();
-    InternalMessage message = event.getMessage();
+    Message message = event.getMessage();
     assertNotNull(message);
     assertThat(event.getError().isPresent(), is(false));
     assertThat(getPayloadAsString(message), is(loadResourceAsString("org/mule/test/integration/tck/test-data.txt")));
@@ -50,7 +49,7 @@ public class MuleTestNamespaceFunctionalTestCase extends AbstractIntegrationTest
   @Test
   public void testService3() throws Exception {
     Event event = flowRunner("testService3").withPayload("foo").run();
-    InternalMessage message = event.getMessage();
+    Message message = event.getMessage();
     assertNotNull(message);
     assertThat(event.getError().isPresent(), is(false));
     assertThat(getPayloadAsString(message), is("foo received"));

@@ -7,14 +7,13 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.session.DefaultMuleSession;
@@ -92,7 +91,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
   }
 
   @Override
-  protected void ensureSerializable(InternalMessage message) throws NotSerializableException {
+  protected void ensureSerializable(Message message) throws NotSerializableException {
     // Message is not required to be Serializable because it is kept in memory
   }
 

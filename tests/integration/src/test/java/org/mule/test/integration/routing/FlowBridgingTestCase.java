@@ -8,8 +8,8 @@ package org.mule.test.integration.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import org.mule.runtime.api.message.Message;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ public class FlowBridgingTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testSynchronousBridging() throws Exception {
-    InternalMessage result = flowRunner("bridge").withPayload(TEST_PAYLOAD).run().getMessage();
+    Message result = flowRunner("bridge").withPayload(TEST_PAYLOAD).run().getMessage();
     assertNotNull(result);
     assertEquals("Received: test", getPayloadAsString(result));
   }

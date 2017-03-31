@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.message.InternalMessage.Builder;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.routing.correlation.CollectionCorrelatorCallback;
@@ -63,7 +62,7 @@ public class MessageChunkAggregator extends AbstractAggregator {
             baos.write(event.getMessageAsBytes(muleContext));
           }
 
-          final Builder builder = InternalMessage.builder(firstEvent.getMessage());
+          final Message.Builder builder = Message.builder(firstEvent.getMessage());
 
           // try to deserialize message, since ChunkingRouter might have serialized the object...
           try {

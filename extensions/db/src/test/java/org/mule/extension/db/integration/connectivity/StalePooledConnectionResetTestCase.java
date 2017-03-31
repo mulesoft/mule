@@ -11,7 +11,6 @@ import static java.sql.DriverManager.getConnection;
 import static java.sql.DriverManager.registerDriver;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.fail;
 import static org.mule.extension.db.integration.TestDbConfig.getDerbyResource;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
@@ -38,14 +37,14 @@ public class StalePooledConnectionResetTestCase extends AbstractDbIntegrationTes
   @Test
   public void resetsStalePooledConnection() throws Exception {
     Event response = runFlow("main");
-    assertThat(response.getMessage().getExceptionPayload(), is(nullValue()));
+    assertThat(response.getError().isPresent(), is(false));
 
     stopDatabase();
     startDatabase();
 
     // Must process the second request without errors
     response = runFlow("main");
-    assertThat(response.getMessage().getExceptionPayload(), is(nullValue()));
+    assertThat(response.getError().isPresent(), is(false));
   }
 
   private void startDatabase() throws SQLException {

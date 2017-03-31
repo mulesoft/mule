@@ -15,10 +15,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
@@ -117,7 +117,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
   public void testEmptySequence() throws Exception {
     Object payload = Collections.emptySet();
     MuleSession session = new DefaultMuleSession();
-    InternalMessage toSplit = InternalMessage.builder().payload(payload).build();
+    Message toSplit = Message.of(payload);
     CollectionSplitter splitter = new CollectionSplitter();
     splitter.setMuleContext(muleContext);
     Event event = eventBuilder().message(toSplit).session(session).build();
@@ -152,7 +152,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
       expectedSequences.add(i);
     }
 
-    InternalMessage toSplit =
+    Message toSplit =
         InternalMessage.builder().payload(payload).inboundProperties(inboundProps).outboundProperties(outboundProps).build();
     CollectionSplitter splitter = new CollectionSplitter();
     Grabber grabber = new Grabber();
@@ -178,7 +178,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
                                 Map<String, Serializable> outboundProps, Map<String, Object> invocationProps,
                                 List<Event> splits, Set<Object> actualSequences) {
     for (Event event : splits) {
-      InternalMessage msg = event.getMessage();
+      Message msg = event.getMessage();
       assertTrue(msg.getPayload().getValue() instanceof String);
       if (counted) {
         assertThat(event.getGroupCorrelation().getGroupSize().get(), is(count));
@@ -190,10 +190,10 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
       String str = (String) msg.getPayload().getValue();
       assertTrue(TEST_LIST_MULTIPLE.contains(str));
       for (String key : inboundProps.keySet()) {
-        assertEquals(msg.getInboundProperty(key), inboundProps.get(key));
+        assertEquals(((InternalMessage) msg).getInboundProperty(key), inboundProps.get(key));
       }
       for (String key : outboundProps.keySet()) {
-        assertEquals(msg.getOutboundProperty(key), outboundProps.get(key));
+        assertEquals(((InternalMessage) msg).getOutboundProperty(key), outboundProps.get(key));
       }
       for (String key : invocationProps.keySet()) {
         assertEquals(event.getVariable(key).getValue(), invocationProps.get(key));

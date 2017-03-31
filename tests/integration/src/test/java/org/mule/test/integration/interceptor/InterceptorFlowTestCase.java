@@ -8,9 +8,8 @@ package org.mule.test.integration.interceptor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
@@ -21,7 +20,7 @@ public class InterceptorFlowTestCase extends AbstractIntegrationTestCase {
   public void testDefaultJavaComponentShortcut() throws Exception {
     flowRunner("interceptorFlow").withPayload(TEST_PAYLOAD).run();
     MuleClient client = muleContext.getClient();
-    InternalMessage message = client.request("test://out", 3000).getRight().get();
+    Message message = client.request("test://out", 3000).getRight().get();
     assertNotNull(message);
     String payload = (String) message.getPayload().getValue();
     assertNotNull(payload);

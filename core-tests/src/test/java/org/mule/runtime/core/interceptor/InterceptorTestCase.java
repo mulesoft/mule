@@ -9,6 +9,7 @@ package org.mule.runtime.core.interceptor;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -52,9 +53,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     flow.initialise();
     flow.start();
 
-    Event result = component.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.of(""))
-        .build());
+    Event result = component.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(of("")).build());
 
     assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString(muleContext));
   }
@@ -73,7 +72,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     flow.start();
 
     Event result = component.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.of(""))
+        .message(of(""))
         .build());
 
     assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString(muleContext));
@@ -93,7 +92,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     flow.start();
 
     Event result = component.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.of(""))
+        .message(of(""))
         .build());
 
     assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString(muleContext));
@@ -115,7 +114,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     flow.start();
 
     Event result = process(component, Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.of(""))
+        .message(of(""))
         .build());
 
     assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString(muleContext));
@@ -140,7 +139,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     flow.start();
 
     Event result = process(component, Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.of(""))
+        .message(of(""))
         .build());
 
     assertEquals(INTERCEPTOR_ONE + BEFORE + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE + BEFORE + INTERCEPTOR_ONE + BEFORE

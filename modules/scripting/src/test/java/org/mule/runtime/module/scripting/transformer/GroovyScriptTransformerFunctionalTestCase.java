@@ -8,8 +8,8 @@ package org.mule.runtime.module.scripting.transformer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 
@@ -36,7 +36,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
   public void testInlineScript() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("inlineScript").withPayload("hello").run();
-    InternalMessage response = client.request("test://inlineScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
+    Message response = client.request("test://inlineScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("hexxo", response.getPayload().getValue());
   }
@@ -45,7 +45,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
   public void testFileBasedScript() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("fileBasedScript").withPayload("hello").run();
-    InternalMessage response = client.request("test://fileBasedScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
+    Message response = client.request("test://fileBasedScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("hexxo", response.getPayload().getValue());
   }
@@ -54,7 +54,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
   public void testReferencedTransformer() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("referencedTransformer").withPayload("hello").run();
-    InternalMessage response = client.request("test://referencedTransformerTestOut", RECEIVE_TIMEOUT).getRight().get();
+    Message response = client.request("test://referencedTransformerTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("hexxo", response.getPayload().getValue());
   }
@@ -63,7 +63,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
   public void testReferencedTransformerWithParameters() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("referencedTransformerWithParameters").withPayload("hello").run();
-    InternalMessage response =
+    Message response =
         client.request("test://referencedTransformerWithParametersTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("hexxo", response.getPayload().getValue());
@@ -71,18 +71,16 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
 
   @Test
   public void transformByAssigningPayload() throws Exception {
-    InternalMessage response = flowRunner("transformByAssigningPayload").withPayload("hello").run().getMessage();
+    Message response = flowRunner("transformByAssigningPayload").withPayload("hello").run().getMessage();
     assertNotNull(response);
     assertEquals("bar", response.getPayload().getValue());
   }
 
   @Test
   public void transformByAssigningHeader() throws Exception {
-    InternalMessage response = flowRunner("transformByAssigningProperty").withPayload("hello").run().getMessage();
+    Message response = flowRunner("transformByAssigningProperty").withPayload("hello").run().getMessage();
     assertNotNull(response);
     assertEquals("hello", response.getPayload().getValue());
-    assertEquals("bar", response.getOutboundProperty("foo"));
+    assertEquals("bar", ((InternalMessage) response).getOutboundProperty("foo"));
   }
-
-
 }

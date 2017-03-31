@@ -7,6 +7,7 @@
 package org.mule.runtime.core.routing.filters;
 
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -58,8 +59,8 @@ public class ExceptionTypeFilter extends PayloadTypeFilter {
    * @return <code>true</code> if the message matches the filter
    */
   @Override
-  public boolean accept(InternalMessage message, Event.Builder builder) {
-    ExceptionPayload epl = message.getExceptionPayload();
+  public boolean accept(Message message, Event.Builder builder) {
+    ExceptionPayload epl = ((InternalMessage) message).getExceptionPayload();
 
     if (getExpectedType() == null) {
       return epl != null;

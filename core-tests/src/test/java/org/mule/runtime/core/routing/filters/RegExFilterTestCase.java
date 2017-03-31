@@ -14,11 +14,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-
+import static org.mule.runtime.api.message.Message.of;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.regex.Pattern;
@@ -94,7 +94,7 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase {
     RegExFilter filter = new RegExFilter("The quick (.*)");
     filter.setMuleContext(muleContext);
     assertNotNull(filter.getPattern());
-    InternalMessage message = InternalMessage.builder().payload("The quick brown fox").build();
+    Message message = of("The quick brown fox");
     assertTrue(filter.accept(message, mock(Event.Builder.class)));
   }
 
@@ -166,7 +166,7 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase {
   public void matchesValueFromMelPayload() throws InitialisationException {
     regExWithValue.setValue("#[mel:payload]");
     regExWithValue.initialise();
-    InternalMessage muleMessage = InternalMessage.builder().payload("run with the mules").build();
+    Message muleMessage = of("run with the mules");
     assertThat(regExWithValue.accept(muleMessage, mock(Event.Builder.class)), is(true));
   }
 
@@ -174,7 +174,7 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase {
   public void notMatchesValueFromMelPayload() throws InitialisationException {
     regExWithValue.setValue("#[mel:payload]");
     regExWithValue.initialise();
-    InternalMessage muleMessage = InternalMessage.builder().payload("run with the zebras").build();
+    Message muleMessage = of("run with the zebras");
     assertThat(regExWithValue.accept(muleMessage, mock(Event.Builder.class)), is(false));
   }
 
@@ -182,7 +182,7 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase {
   public void matchesValueFromFlowVar() throws Exception {
     regExWithValue.setValue("#[mel:flowVars.value]");
     regExWithValue.initialise();
-    final Event event = eventBuilder().message(InternalMessage.of("")).addVariable("value", "code with the mules").build();
+    final Event event = eventBuilder().message(of("")).addVariable("value", "code with the mules").build();
     assertThat(regExWithValue.accept(event, mock(Event.Builder.class)), is(true));
   }
 
@@ -190,7 +190,7 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase {
   public void matchesPlainTextValue() throws InitialisationException {
     regExWithValue.setValue("run with the mules");
     regExWithValue.initialise();
-    InternalMessage muleMessage = InternalMessage.builder().payload("").build();
+    Message muleMessage = of("");
     assertThat(regExWithValue.accept(muleMessage, mock(Event.Builder.class)), is(true));
   }
 

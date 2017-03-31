@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
-
 import org.mule.functional.transformer.simple.AbstractRemoveVariablePropertyProcessorTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -29,17 +28,17 @@ public class RemovePropertyProcessorTestCase extends AbstractRemoveVariablePrope
 
   @Override
   protected void addMockedPropeerties(Event mockEvent, HashSet properties) {
-    InternalMessage mockMessage = mockEvent.getMessage();
+    InternalMessage mockMessage = (InternalMessage) mockEvent.getMessage();
     when(mockMessage.getOutboundPropertyNames()).thenReturn(properties);
   }
 
   @Override
   protected void verifyRemoved(Event mockEvent, String key) {
-    assertThat(mockEvent.getMessage().getOutboundProperty(key), is(nullValue()));
+    assertThat(((InternalMessage) mockEvent.getMessage()).getOutboundProperty(key), is(nullValue()));
   }
 
   @Override
   protected void verifyNotRemoved(Event mockEvent, String key) {
-    assertThat(mockEvent.getMessage().getOutboundProperty(key), not(nullValue()));
+    assertThat(((InternalMessage) mockEvent.getMessage()).getOutboundProperty(key), not(nullValue()));
   }
 }

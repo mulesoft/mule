@@ -11,7 +11,7 @@ import static org.mule.runtime.core.PropertyScope.INBOUND;
 import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
-
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -59,15 +59,15 @@ public class MessagePropertyFilter implements Filter {
   }
 
   @Override
-  public boolean accept(InternalMessage message, Event.Builder builder) {
+  public boolean accept(Message message, Event.Builder builder) {
     if (message == null) {
       return false;
     }
     Object value;
     if (scope.equals(INBOUND)) {
-      value = message.getInboundProperty(propertyName);
+      value = ((InternalMessage) message).getInboundProperty(propertyName);
     } else {
-      value = message.getOutboundProperty(propertyName);
+      value = ((InternalMessage) message).getOutboundProperty(propertyName);
     }
 
     boolean match;

@@ -14,16 +14,16 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
-
-import java.io.IOException;
-
-import org.junit.Test;
-
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.io.IOException;
+
+import org.junit.Test;
 
 public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase {
 
@@ -31,7 +31,7 @@ public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase {
   public void testExceptionTypeFilterMessage() {
     ExceptionTypeFilter filter = new ExceptionTypeFilter();
     assertThat(filter.getExpectedType(), nullValue());
-    InternalMessage m = InternalMessage.builder().payload("test").build();
+    Message m = Message.of("test");
     assertThat(filter.accept(m, mock(Event.Builder.class)), is(false));
 
     m = InternalMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test"))).build();
@@ -48,7 +48,7 @@ public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase {
     Event event = mock(Event.class);
     ExceptionTypeFilter filter = new ExceptionTypeFilter();
     assertThat(filter.getExpectedType(), nullValue());
-    InternalMessage m = InternalMessage.builder().payload("test").build();
+    Message m = Message.of("test");
     assertThat(filter.accept(m, mock(Event.Builder.class)), is(false));
 
     Exception exception = new IllegalArgumentException("test");

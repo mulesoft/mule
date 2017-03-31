@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.DSL_RESOLUTION;
@@ -41,7 +42,6 @@ import org.mule.runtime.api.metadata.resolving.MetadataComponent;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
@@ -151,7 +151,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
 
   @Before
   public void setup() throws Exception {
-    event = eventBuilder().message(InternalMessage.of("")).build();
+    event = eventBuilder().message(of("")).build();
     metadataService = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
     personType = getMetadata(PERSON_METADATA_KEY.getId());
   }

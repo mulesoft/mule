@@ -8,7 +8,6 @@ package org.mule.runtime.core.el;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.Optional.of;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -17,14 +16,12 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
-
-import com.mulesoft.weave.el.WeaveExpressionExecutor;
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.el.ExpressionExecutor;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
@@ -34,10 +31,11 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import com.mulesoft.weave.el.WeaveExpressionExecutor;
 
 import java.util.List;
 import java.util.Optional;
@@ -83,7 +81,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractMuleConte
 
       @Override
       public Optional<DataType> returnType() {
-        return of(dataType);
+        return Optional.of(dataType);
       }
 
       @Override
@@ -185,7 +183,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractMuleConte
   @Test
   @Description("Verifies that the payload can be modified under MVEL but not DW.")
   public void payloadMutation() throws Exception {
-    Event event = eventBuilder().message(InternalMessage.of(1)).build();
+    Event event = eventBuilder().message(of(1)).build();
     Event.Builder builder1 = builder(event);
     String expression = "payload = 3";
     TypedValue result = expressionLanguageAdapter.evaluate(melify(expression),

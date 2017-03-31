@@ -17,12 +17,13 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -48,7 +49,7 @@ public class CopyPropertiesProcessorTestCase extends AbstractMuleTestCase {
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleContext mockMuleContext;
 
-  private InternalMessage muleMessage;
+  private Message muleMessage;
 
   @Mock
   private ExtendedExpressionManager mockExpressionManager;
@@ -57,9 +58,9 @@ public class CopyPropertiesProcessorTestCase extends AbstractMuleTestCase {
   public void setUp() throws Exception {
     when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
     when(mockExpressionManager.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
-        .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
+        .thenAnswer(invocation -> invocation.getArguments()[0]);
 
-    muleMessage = InternalMessage.builder().payload("").mediaType(PROPERTY_DATA_TYPE.getMediaType()).build();
+    muleMessage = Message.builder().payload("").mediaType(PROPERTY_DATA_TYPE.getMediaType()).build();
   }
 
   @Test
@@ -68,7 +69,7 @@ public class CopyPropertiesProcessorTestCase extends AbstractMuleTestCase {
     muleMessage =
         InternalMessage.builder(muleMessage).addInboundProperty(INBOUND_PROPERTY_KEY, PROPERTY_VALUE, PROPERTY_DATA_TYPE).build();
     Event muleEvent = eventBuilder().message(muleMessage).build();
-    final InternalMessage transformed = copyPropertiesTransformer.process(muleEvent).getMessage();
+    final InternalMessage transformed = (InternalMessage) copyPropertiesTransformer.process(muleEvent).getMessage();
 
     assertThat(transformed.getOutboundProperty(INBOUND_PROPERTY_KEY), is(PROPERTY_VALUE));
     assertThat(transformed.getInboundPropertyNames(), hasSize(1));
@@ -78,7 +79,7 @@ public class CopyPropertiesProcessorTestCase extends AbstractMuleTestCase {
   public void testCopyNonExistentProperty() throws MuleException {
     CopyPropertiesProcessor copyPropertiesTransformer = createCopyPropertiesTransformer(INBOUND_PROPERTY_KEY);
     Event muleEvent = eventBuilder().message(muleMessage).build();
-    final InternalMessage transformed = copyPropertiesTransformer.process(muleEvent).getMessage();
+    final InternalMessage transformed = (InternalMessage) copyPropertiesTransformer.process(muleEvent).getMessage();
 
     assertThat(transformed.getInboundPropertyNames(), hasSize(0));
   }
@@ -91,7 +92,8 @@ public class CopyPropertiesProcessorTestCase extends AbstractMuleTestCase {
         .addInboundProperty("MULE_GROUP_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
         .addInboundProperty("SomeVar", PROPERTY_VALUE, PROPERTY_DATA_TYPE).build();
     Event muleEvent = eventBuilder().message(muleMessage).build();
-    final InternalMessage transformed = copyPropertiesTransformer.process(muleEvent).getMessage();
+
+    final InternalMessage transformed = (InternalMessage) copyPropertiesTransformer.process(muleEvent).getMessage();
 
     assertThat(transformed.getOutboundProperty("SomeVar"), is(nullValue()));
     assertThat(transformed.getOutboundProperty("MULE_ID"), is(PROPERTY_VALUE));

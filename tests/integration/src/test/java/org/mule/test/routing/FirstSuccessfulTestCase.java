@@ -10,9 +10,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -28,7 +27,7 @@ public class FirstSuccessfulTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testFirstSuccessful() throws Exception {
-    InternalMessage response = flowRunner("test-router").withPayload("XYZ").run().getMessage();
+    Message response = flowRunner("test-router").withPayload("XYZ").run().getMessage();
     assertThat(getPayloadAsString(response), is("XYZ is a string"));
 
     response = flowRunner("test-router").withPayload(Integer.valueOf(9)).run().getMessage();
@@ -46,7 +45,7 @@ public class FirstSuccessfulTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testFirstSuccessfulWithExpression() throws Exception {
-    InternalMessage response = flowRunner("test-router2").withPayload("XYZ").run().getMessage();
+    Message response = flowRunner("test-router2").withPayload("XYZ").run().getMessage();
     assertThat(getPayloadAsString(response), is("XYZ is a string"));
   }
 
@@ -61,7 +60,7 @@ public class FirstSuccessfulTestCase extends AbstractIntegrationTestCase {
     flowRunner("test-router4").withPayload(TEST_MESSAGE).run();
 
     MuleClient client = muleContext.getClient();
-    InternalMessage response = client.request("test://output4.out", RECEIVE_TIMEOUT).getRight().get();
+    Message response = client.request("test://output4.out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertThat(response.getPayload().getValue(), is(TEST_MESSAGE));
   }

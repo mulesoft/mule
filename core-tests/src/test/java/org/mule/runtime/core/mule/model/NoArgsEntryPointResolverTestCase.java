@@ -8,14 +8,14 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.api.model.resolvers.AbstractArgumentEntryPointResolver;
 import org.mule.runtime.core.api.model.resolvers.NoArgumentsEntryPointResolver;
@@ -40,7 +40,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     resolver.addMethod("bite");
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("blah"))
+        .message(of("blah"))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new InvalidSatsuma(), eventContext, Event.builder(eventContext.getEvent()));
@@ -52,7 +52,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     resolver.addMethod("wash");
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("blah"))
+        .message(of("blah"))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new Apple(), eventContext, Event.builder(eventContext.getEvent()));
@@ -62,9 +62,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
   @Test
   public void testDynamicMethodMatchFail() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("blah"))
-        .build();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(of("blah")).build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new Apple(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals("Apple service has a number of matching method, so should have failed", result.getState(),
@@ -74,9 +72,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
   @Test
   public void testDynamicMethodMatchPass() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("blah"))
-        .build();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(of("blah")).build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new InvalidSatsuma(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
@@ -86,9 +82,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
   public void testDynamicMethodMatchFailOnWildcardMatch() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     assertTrue(resolver.removeIgnoredMethod("is*"));
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("blah"))
-        .build();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(of("blah")).build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new InvalidSatsuma(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals("Satsuma service has a number of matching method, so should have failed", result.getState(),
@@ -100,9 +94,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
   public void testExplicitMethodMatchAndNullPayload() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     resolver.addMethod("wash");
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(null))
-        .build();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(NULL_MESSAGE).build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new Apple(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);

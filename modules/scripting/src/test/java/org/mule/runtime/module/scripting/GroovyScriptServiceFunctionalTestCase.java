@@ -8,10 +8,9 @@ package org.mule.runtime.module.scripting;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -32,7 +31,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase {
   public void testInlineScript() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("inlineScript").withPayload("Important Message").run();
-    InternalMessage response = client.request("test://inlineScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
+    Message response = client.request("test://inlineScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("Important Message Received", getPayloadAsString(response));
   }
@@ -42,7 +41,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase {
   public void testFileBasedScript() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("fileBasedScript").withPayload("Important Message").run();
-    InternalMessage response = client.request("test://fileBasedScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
+    Message response = client.request("test://fileBasedScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("Important Message Received", getPayloadAsString(response));
   }
@@ -51,7 +50,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase {
   public void testReferencedScript() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("referencedScript").withPayload("Important Message").run();
-    InternalMessage response = client.request("test://referencedScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
+    Message response = client.request("test://referencedScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("Important Message Received", getPayloadAsString(response));
   }
@@ -61,7 +60,7 @@ public class GroovyScriptServiceFunctionalTestCase extends FunctionalTestCase {
   public void testScriptVariables() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("scriptVariables").withPayload("Important Message").run();
-    InternalMessage response = client.request("test://scriptVariablesTestOut", RECEIVE_TIMEOUT).getRight().get();
+    Message response = client.request("test://scriptVariablesTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals("Important Message Received A-OK", getPayloadAsString(response));
   }

@@ -22,7 +22,7 @@ public class RemovePropertyProcessor extends AbstractRemoveVariablePropertyProce
 
   @Override
   protected Set<String> getPropertyNames(Event event) {
-    return event.getMessage().getOutboundPropertyNames();
+    return ((InternalMessage) event.getMessage()).getOutboundPropertyNames();
   }
 
   @Override

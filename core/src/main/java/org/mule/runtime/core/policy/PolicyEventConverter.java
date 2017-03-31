@@ -8,7 +8,6 @@ package org.mule.runtime.core.policy;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 
 /**
  * Helper class that creates an {@link Event} maintaining variables from different scopes.
@@ -26,7 +25,7 @@ public class PolicyEventConverter {
    * @return
    */
   public Event createEvent(Message message, Event variablesProviderEvent) {
-    Event.Builder eventBuilder = Event.builder(variablesProviderEvent.getContext()).message((InternalMessage) message);
+    Event.Builder eventBuilder = Event.builder(variablesProviderEvent.getContext()).message(message);
     for (String variableName : variablesProviderEvent.getVariableNames()) {
       eventBuilder.addVariable(variableName, variablesProviderEvent.getVariable(variableName));
     }

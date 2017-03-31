@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.functional.functional.FlowAssert;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
@@ -33,7 +33,7 @@ public class ExpressionSplitterSyncTestCase extends AbstractIntegrationTestCase 
     FruitBowl fruitBowl = new FruitBowl(new Apple(), new Banana());
     fruitBowl.addFruit(new Orange());
 
-    InternalMessage result = flowRunner("Distributor").withPayload(fruitBowl).run().getMessage();
+    Message result = flowRunner("Distributor").withPayload(fruitBowl).run().getMessage();
 
     assertNotNull(result);
     assertTrue(result.getPayload().getValue() instanceof List);

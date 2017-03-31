@@ -12,13 +12,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
@@ -29,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -77,8 +75,8 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
 
     TypedValue typedValue = expressionManager.evaluate(sourceExpressionArg, enrichmentEvent, flowConstruct);
 
-    if (typedValue.getValue() instanceof InternalMessage) {
-      InternalMessage muleMessage = (InternalMessage) typedValue.getValue();
+    if (typedValue.getValue() instanceof Message) {
+      Message muleMessage = (Message) typedValue.getValue();
       typedValue = new TypedValue(muleMessage.getPayload().getValue(), muleMessage.getPayload().getDataType());
     }
 
@@ -87,7 +85,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
       expressionManager.enrich(targetExpressionArg, currentEvent, eventBuilder, flowConstruct, typedValue);
       return eventBuilder.build();
     } else {
-      return Event.builder(currentEvent).message(InternalMessage.builder(currentEvent.getMessage())
+      return Event.builder(currentEvent).message(Message.builder(currentEvent.getMessage())
           .payload(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType()).build()).build();
     }
   }

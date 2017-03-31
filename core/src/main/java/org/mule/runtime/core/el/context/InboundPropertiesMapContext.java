@@ -7,6 +7,7 @@
 package org.mule.runtime.core.el.context;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.io.Serializable;
@@ -25,7 +26,7 @@ class InboundPropertiesMapContext extends AbstractMapContext<Serializable> {
 
   @Override
   public Serializable doGet(String key) {
-    return event.getMessage().getInboundProperty(key);
+    return ((InternalMessage) event.getMessage()).getInboundProperty(key);
   }
 
   @Override
@@ -40,7 +41,7 @@ class InboundPropertiesMapContext extends AbstractMapContext<Serializable> {
 
   @Override
   public Set<String> keySet() {
-    return event.getMessage().getInboundPropertyNames();
+    return ((InternalMessage) event.getMessage()).getInboundPropertyNames();
   }
 
   @Override
@@ -51,8 +52,8 @@ class InboundPropertiesMapContext extends AbstractMapContext<Serializable> {
   @Override
   public String toString() {
     Map<String, Object> map = new HashMap<String, Object>();
-    for (String key : event.getMessage().getInboundPropertyNames()) {
-      Object value = event.getMessage().getInboundProperty(key);
+    for (String key : ((InternalMessage) event.getMessage()).getInboundPropertyNames()) {
+      Object value = ((InternalMessage) event.getMessage()).getInboundProperty(key);
       map.put(key, value);
     }
     return map.toString();

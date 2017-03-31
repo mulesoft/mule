@@ -28,6 +28,7 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -101,7 +102,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     when(mockUntilSuccessfulConfiguration.getRoute()).thenReturn(mockRoute);
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
-    final InternalMessage mockMessage = InternalMessage.builder().payload("").build();
+    final Message mockMessage = Message.of("");
     event = Event.builder(DefaultEventContext.create(mockFlow, TEST_CONNECTOR)).message(mockMessage).build();
     when(mockUntilSuccessfulConfiguration.getObjectStore()).thenReturn(objectStore);
     objectStore.clear();
@@ -230,7 +231,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       public boolean matches(Object argument) {
         Event argEvent = (Event) argument;
 
-        assertThat(argEvent.getMessage().getExceptionPayload().getException().getMessage(),
+        assertThat(((InternalMessage) argEvent.getMessage()).getExceptionPayload().getException().getMessage(),
                    containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
 
         return true;
@@ -256,7 +257,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       public boolean matches(Object argument) {
         Event argEvent = (Event) argument;
         assertThat(argEvent.getMessage().getPayload().getValue(), sameInstance(event.getMessage().getPayload().getValue()));
-        assertThat(argEvent.getMessage().getExceptionPayload().getException().getMessage(),
+        assertThat(((InternalMessage) argEvent.getMessage()).getExceptionPayload().getException().getMessage(),
                    containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
 
         return true;
@@ -282,7 +283,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       public boolean matches(Object argument) {
         Event argEvent = (Event) argument;
 
-        assertThat(argEvent.getMessage().getExceptionPayload().getException().getMessage(),
+        assertThat(((InternalMessage) argEvent.getMessage()).getExceptionPayload().getException().getMessage(),
                    containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
 
         return true;

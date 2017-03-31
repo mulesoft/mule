@@ -12,10 +12,9 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
+import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionJournal;
 import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionRecoverer;
@@ -76,7 +75,7 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
   @Test
   public void pollAndFailThenRecoverWithTwoElements() throws Exception {
     final String MESSAGE_CONTENT_2 = TEST_PAYLOAD + "2";
-    Event testEvent2 = eventBuilder().message(InternalMessage.of(MESSAGE_CONTENT_2)).build();
+    Event testEvent2 = eventBuilder().message(of(MESSAGE_CONTENT_2)).build();
 
     inQueue.offer(testEvent(), 0, TIMEOUT);
     inQueue.offer(testEvent2, 0, TIMEOUT);

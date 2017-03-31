@@ -12,10 +12,10 @@ import static org.mule.runtime.module.scripting.component.Scriptable.BINDING_MES
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 import org.mule.runtime.module.scripting.component.Scriptable;
@@ -54,12 +54,12 @@ public class ScriptFilter extends AbstractFilteringMessageProcessor implements F
       // TODO MULE-9356 ScriptFilter should rethrow exceptions, or at least log, not ignore them
       return false;
     } finally {
-      builder.message((InternalMessage) bindings.get(BINDING_MESSAGE));
+      builder.message((Message) bindings.get(BINDING_MESSAGE));
     }
   }
 
   @Override
-  public boolean accept(InternalMessage message, Event.Builder builder) {
+  public boolean accept(Message message, Event.Builder builder) {
     Bindings bindings = script.getScriptEngine().createBindings();
 
     // TODO MULE-9341 Remove Filters.

@@ -8,14 +8,13 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.api.model.resolvers.ExplicitMethodEntryPointResolver;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -39,7 +38,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("someBusinessMethod");
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("blah"))
+        .message(of("blah"))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result =
@@ -53,7 +52,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
     resolver.addMethod("someBusinessMethod");
     resolver.addMethod("someSetter");
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("blah"))
+        .message(of("blah"))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result =
@@ -66,9 +65,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("noMethod");
     resolver.addMethod("noMethod2");
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("blah"))
-        .build();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(of("blah")).build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result =
         resolver.invoke(new MultiplePayloadsTestObject(), eventContext, Event.builder(eventContext.getEvent()));
@@ -80,7 +77,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     try {
       final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-          .message(InternalMessage.of("blah"))
+          .message(of("blah"))
           .build();
       MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
       InvocationResult result =
@@ -102,7 +99,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("wash");
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(new Apple()))
+        .message(of(new Apple()))
         .build();
     MuleEventContext ctx = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new TestFruitCleaner(), ctx, Event.builder(ctx.getEvent()));
@@ -120,7 +117,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("someOtherBusinessMethod");
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(new Object[] {null, "blah"}))
+        .message(of(new Object[] {null, "blah"}))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result =

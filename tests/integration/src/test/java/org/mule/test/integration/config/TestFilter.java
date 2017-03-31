@@ -6,8 +6,8 @@
  */
 package org.mule.test.integration.config;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
 /**
@@ -35,7 +35,7 @@ public class TestFilter implements Filter {
   }
 
   @Override
-  public boolean accept(InternalMessage message, Event.Builder builder) {
+  public boolean accept(Message message, Event.Builder builder) {
     return true;
   }
 }

@@ -9,14 +9,15 @@ package org.mule.runtime.core.routing;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.exception.LocatedMuleException.INFO_LOCATION_KEY;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
@@ -78,11 +79,11 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     if (event.getVariableNames().contains(parentMessageProp)) {
       previousRootMessageVar = event.getVariable(parentMessageProp).getValue();
     }
-    InternalMessage message = event.getMessage();
+    Message message = event.getMessage();
     final Builder requestBuilder = Event.builder(event);
     boolean transformed = false;
     if (xpathCollection) {
-      InternalMessage transformedMessage = transformPayloadIfNeeded(message);
+      Message transformedMessage = transformPayloadIfNeeded(message);
       if (transformedMessage != message) {
         transformed = true;
         message = transformedMessage;
@@ -123,7 +124,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     }
   }
 
-  private InternalMessage transformPayloadIfNeeded(InternalMessage message) throws TransformerException {
+  private Message transformPayloadIfNeeded(Message message) throws TransformerException {
     Object payload = message.getPayload().getValue();
     if (payload instanceof Document || payload.getClass().getName().startsWith("org.dom4j.")) {
       return message;
@@ -132,7 +133,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     }
   }
 
-  private InternalMessage transformBack(InternalMessage message) throws TransformerException {
+  private Message transformBack(Message message) throws TransformerException {
     return muleContext.getTransformationService().transform(message, DataType.STRING);
   }
 
@@ -212,7 +213,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         Set<Map.Entry<?, ?>> set = ((Map) payload).entrySet();
         for (Entry<?, ?> entry : set) {
           // TODO MULE-9502 Support "key" flowVar with MapSplitter in Mule 4
-          list.add(Event.builder(event).message(InternalMessage.builder().payload(entry.getValue()).build()).build());
+          list.add(Event.builder(event).message(of(entry.getValue())).build());
         }
         return new CollectionMessageSequence(list);
       }

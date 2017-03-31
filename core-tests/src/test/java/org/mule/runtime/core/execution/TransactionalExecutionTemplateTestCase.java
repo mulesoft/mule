@@ -12,11 +12,9 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
+import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
@@ -24,6 +22,7 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transaction.IllegalTransactionStateException;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.TransactionCoordination;
@@ -68,7 +67,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
 
   @Before
   public void prepareEvent() {
-    when(mockEvent.getMessage()).thenReturn(InternalMessage.builder().payload("").build());
+    when(mockEvent.getMessage()).thenReturn(of(""));
   }
 
   @Before

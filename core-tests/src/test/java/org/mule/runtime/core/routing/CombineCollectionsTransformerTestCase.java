@@ -9,6 +9,7 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.transformer.simple.CombineCollectionsTransformer;
@@ -34,10 +35,10 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
   @Test
   public void testMuleMessageCollectionMerge() throws Exception {
     List list = new ArrayList<>();
-    list.add(InternalMessage.builder().collectionPayload(new String[] {"1", "2", "3"}).build());
-    list.add(InternalMessage.builder().payload("4").build());
-    list.add(InternalMessage.builder().collectionPayload(new String[] {"5", "6", "7"}).build());
-    InternalMessage collection = InternalMessage.builder().collectionPayload(list, InternalMessage.class).build();
+    list.add(Message.builder().collectionPayload(new String[] {"1", "2", "3"}).build());
+    list.add(Message.of("4"));
+    list.add(Message.builder().collectionPayload(new String[] {"5", "6", "7"}).build());
+    Message collection = Message.builder().collectionPayload(list, InternalMessage.class).build();
 
     Event event = Event.builder(testEvent()).message(collection).build();
 

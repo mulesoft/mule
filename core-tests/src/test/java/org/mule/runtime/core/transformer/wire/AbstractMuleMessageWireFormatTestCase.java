@@ -25,7 +25,8 @@ public abstract class AbstractMuleMessageWireFormatTestCase extends AbstractWire
     // Create message to send over wire
     Map<String, Serializable> messageProerties = new HashMap<>();
     messageProerties.put("key1", "val1");
-    InternalMessage inMessage = InternalMessage.builder().payload("testMessage").outboundProperties(messageProerties).build();
+    InternalMessage inMessage =
+        (InternalMessage) InternalMessage.builder().payload("testMessage").outboundProperties(messageProerties).build();
 
     Object outMessage = readWrite(inMessage);
 

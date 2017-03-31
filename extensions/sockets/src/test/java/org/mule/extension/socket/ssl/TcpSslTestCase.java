@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.nullValue;
 import org.mule.extension.socket.SocketExtensionTestCase;
 import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -54,7 +53,7 @@ public class TcpSslTestCase extends SocketExtensionTestCase {
   }
 
   private Message sendStringAndAssertResponse(String flowName) throws Exception {
-    InternalMessage muleMessage = flowRunner(flowName).withPayload(TEST_STRING).run().getMessage();
+    Message muleMessage = flowRunner(flowName).withPayload(TEST_STRING).run().getMessage();
 
     String response = (String) muleMessage.getPayload().getValue();
     assertThat(RESPONSE_TEST_STRING, is(response));

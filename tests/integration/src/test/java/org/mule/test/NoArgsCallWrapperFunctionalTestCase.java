@@ -8,9 +8,8 @@ package org.mule.test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -31,7 +30,7 @@ public class NoArgsCallWrapperFunctionalTestCase extends AbstractIntegrationTest
   public void testNoArgsCallWrapper() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("WrapperUMO").withPayload("test").run();
-    InternalMessage reply = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
+    Message reply = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(reply);
     assertThat(reply.getPayload().getValue(), is("Just an apple."));
   }
@@ -40,7 +39,7 @@ public class NoArgsCallWrapperFunctionalTestCase extends AbstractIntegrationTest
   public void testWithInjectedDelegate() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("WrapperUMOInjected").withPayload("test").run();
-    InternalMessage reply = client.request("test://outWithInjected", RECEIVE_TIMEOUT).getRight().get();
+    Message reply = client.request("test://outWithInjected", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(reply);
     // same as original input
     assertThat(reply.getPayload().getValue(), is("test"));

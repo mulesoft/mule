@@ -7,6 +7,7 @@
 package org.mule.runtime.core.el.context;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.util.Set;
@@ -24,7 +25,7 @@ public class InboundAttachmentMapContext extends AbstractMapContext<DataHandler>
 
   @Override
   public DataHandler doGet(String key) {
-    return event.getMessage().getInboundAttachment(key);
+    return ((InternalMessage) event.getMessage()).getInboundAttachment(key);
   }
 
   @Override
@@ -39,7 +40,7 @@ public class InboundAttachmentMapContext extends AbstractMapContext<DataHandler>
 
   @Override
   public Set<String> keySet() {
-    return event.getMessage().getInboundAttachmentNames();
+    return ((InternalMessage) event.getMessage()).getInboundAttachmentNames();
   }
 
   @Override

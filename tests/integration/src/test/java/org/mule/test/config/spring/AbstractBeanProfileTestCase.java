@@ -8,9 +8,9 @@ package org.mule.test.config.spring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.test.AbstractIntegrationTestCase;
 
 public abstract class AbstractBeanProfileTestCase extends AbstractIntegrationTestCase {
 
@@ -22,7 +22,7 @@ public abstract class AbstractBeanProfileTestCase extends AbstractIntegrationTes
   public void profile(String appended) throws Exception {
     flowRunner("service").withPayload("Homero").run();
     MuleClient client = muleContext.getClient();
-    InternalMessage response = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
+    Message response = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull("Response is null", response);
     assertEquals("Homero" + appended, response.getPayload().getValue());
   }

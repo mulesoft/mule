@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.domain.ParameterMap;
@@ -48,9 +49,10 @@ public class HttpJmsBridgeTestCase extends AbstractIntegrationTestCase {
         .setEntity(new ByteArrayHttpEntity(payload.getBytes())).setHeaders(headersMap).setMethod(POST).build();
     httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 
-    InternalMessage msg = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
+    Message msg = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
+
     assertNotNull(msg);
     assertThat(getPayloadAsString(msg), is(payload));
-    assertThat(msg.getOutboundProperty(customHeader), is("value"));
+    assertThat(((InternalMessage) msg).getOutboundProperty(customHeader), is("value"));
   }
 }

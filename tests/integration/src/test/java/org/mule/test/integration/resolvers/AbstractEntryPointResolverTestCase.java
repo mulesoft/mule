@@ -8,7 +8,7 @@ package org.mule.test.integration.resolvers;
 
 import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.Map;
@@ -20,7 +20,7 @@ public abstract class AbstractEntryPointResolverTestCase extends AbstractIntegra
   }
 
   protected void doTest(String flowName, Object payload, String result, Map properties) throws Exception {
-    InternalMessage response = flowRunner(flowName).withPayload(payload).withInboundProperties(properties).run().getMessage();
+    Message response = flowRunner(flowName).withPayload(payload).withInboundProperties(properties).run().getMessage();
     assertEquals(result, getPayloadAsString(response));
   }
 }

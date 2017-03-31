@@ -14,7 +14,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -87,7 +86,7 @@ public interface Event extends Serializable {
    * 
    * @return the message payload for this event
    */
-  InternalMessage getMessage();
+  Message getMessage();
 
   /**
    * When a mule component throws an error then an {@code Error} object gets generated with all the data associated to the error.

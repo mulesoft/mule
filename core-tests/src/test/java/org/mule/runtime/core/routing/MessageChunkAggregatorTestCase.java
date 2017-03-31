@@ -9,13 +9,13 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
+import static org.mule.runtime.api.message.Message.of;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -40,9 +40,9 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     router.setFlowConstruct(flow);
     router.initialise();
 
-    InternalMessage message1 = InternalMessage.of("test event A");
-    InternalMessage message2 = InternalMessage.of("test event B");
-    InternalMessage message3 = InternalMessage.of("test event C");
+    Message message1 = of("test event A");
+    Message message2 = of("test event B");
+    Message message3 = of("test event C");
 
     EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
 
@@ -55,7 +55,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     assertNull(router.process(event2));
     Event resultEvent = router.process(event3);
     assertNotNull(resultEvent);
-    InternalMessage resultMessage = resultEvent.getMessage();
+    Message resultMessage = resultEvent.getMessage();
     assertNotNull(resultMessage);
     String payload = getPayloadAsString(resultMessage);
 

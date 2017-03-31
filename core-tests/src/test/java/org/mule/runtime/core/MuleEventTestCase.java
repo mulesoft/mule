@@ -15,14 +15,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
@@ -118,9 +117,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     for (int i = 0; i < 108; i++) {
       payload.append("1234567890");
     }
-    Event testEvent = eventBuilder()
-        .message(InternalMessage.of(new ByteArrayInputStream(payload.toString().getBytes())))
-        .build();
+    Event testEvent = eventBuilder().message(of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
     setCurrentEvent(testEvent);
     byte[] serializedEvent = muleContext.getObjectSerializer().getExternalProtocol().serialize(testEvent);
     testEvent = muleContext.getObjectSerializer().getExternalProtocol().deserialize(serializedEvent);
@@ -146,7 +143,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   @Test(expected = UnsupportedOperationException.class)
   public void testFlowVarNamesAddImmutable() throws Exception {
     Event event = eventBuilder()
-        .message(InternalMessage.of("whatever"))
+        .message(of("whatever"))
         .addVariable("test", "val")
         .build();
     event.getVariableNames().add("other");
@@ -154,7 +151,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   public void testFlowVarNamesRemoveMutable() throws Exception {
     Event event = eventBuilder()
-        .message(InternalMessage.of("whatever"))
+        .message(of("whatever"))
         .addVariable("test", "val")
         .build();
     event = Event.builder(event).addVariable("test", "val").build();
@@ -165,7 +162,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testFlowVarsNotShared() throws Exception {
     Event event = eventBuilder()
-        .message(InternalMessage.of("whatever"))
+        .message(of("whatever"))
         .addVariable("foo", "bar")
         .build();
     event = Event.builder(event).addVariable("foo", "bar").build();

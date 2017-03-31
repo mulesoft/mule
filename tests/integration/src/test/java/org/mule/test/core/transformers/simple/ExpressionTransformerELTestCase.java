@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import org.mule.runtime.api.message.Message;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
@@ -85,7 +86,7 @@ public class ExpressionTransformerELTestCase extends AbstractIntegrationTestCase
     props.put("foo", "moo");
     props.put("bar", "mar");
 
-    InternalMessage message =
+    Message message =
         InternalMessage.builder().payload(new FruitBowl(new Apple(), new Banana())).outboundProperties(props).build();
 
     Object result = transformer.transform(message);
@@ -108,7 +109,7 @@ public class ExpressionTransformerELTestCase extends AbstractIntegrationTestCase
     Map<String, Serializable> props = new HashMap<>();
     props.put("foo", "moo");
 
-    InternalMessage message =
+    Message message =
         InternalMessage.builder().payload(new FruitBowl(new Apple(), new Banana())).outboundProperties(props).build();
 
     Object result = transformer.transform(message);
@@ -131,7 +132,7 @@ public class ExpressionTransformerELTestCase extends AbstractIntegrationTestCase
     props.put("foo", "moo");
     props.put("bar", "mar");
 
-    InternalMessage message =
+    Message message =
         InternalMessage.builder().payload(new FruitBowl(new Apple(), new Banana())).outboundProperties(props).build();
 
     Object result = transformer.transform(message);
@@ -154,7 +155,7 @@ public class ExpressionTransformerELTestCase extends AbstractIntegrationTestCase
     props.put("foo", "moo");
     props.put("bar", "mar");
 
-    InternalMessage message =
+    Message message =
         InternalMessage.builder().payload(new FruitBowl(new Apple(), new Banana())).outboundProperties(props).build();
 
     Object result = transformer.transform(message);

@@ -24,7 +24,6 @@ import static org.mule.runtime.core.util.ObjectUtils.getInt;
 import static org.mule.runtime.core.util.ObjectUtils.getLong;
 import static org.mule.runtime.core.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.util.ObjectUtils.getString;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
@@ -198,8 +197,7 @@ public class DefaultMessageBuilder
 
   @Override
   public InternalMessage.Builder addOutboundProperty(String key, Serializable value, MediaType mediaType) {
-    outboundProperties.put(key,
-                           new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
+    outboundProperties.put(key, new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
     return this;
   }
 

@@ -9,6 +9,7 @@ package org.mule.test.integration.message;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -22,11 +23,10 @@ public abstract class AbstractPropertyScopeTestCase extends MuleArtifactFunction
 
   @Test
   public void testRequestResponse() throws Exception {
-    InternalMessage result =
-        flowRunner("foo").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").run().getMessage();
+    Message result = flowRunner("foo").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").run().getMessage();
 
     assertThat(result.getPayload().getValue(), is("test bar"));
-    assertThat(result.getOutboundProperty("foo"), is("fooValue"));
+    assertThat(((InternalMessage) result).getOutboundProperty("foo"), is("fooValue"));
   }
 
 }

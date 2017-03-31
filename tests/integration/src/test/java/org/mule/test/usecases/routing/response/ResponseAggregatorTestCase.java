@@ -10,10 +10,10 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.runtime.core.util.IOUtils;
@@ -63,7 +63,7 @@ public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
 
     try {
       Event event =
-          eventBuilder().message(InternalMessage.of("message1")).groupCorrelation(new GroupCorrelation(1, null)).build();
+          eventBuilder().message(of("message1")).groupCorrelation(new GroupCorrelation(1, null)).build();
 
       SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
       mp.setListener(listener);

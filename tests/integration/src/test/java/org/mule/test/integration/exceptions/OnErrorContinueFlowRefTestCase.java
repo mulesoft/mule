@@ -10,13 +10,13 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.integration.exceptions.OnErrorContinueTestCase.JSON_REQUEST;
 import static org.mule.test.integration.exceptions.OnErrorContinueTestCase.JSON_RESPONSE;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -35,7 +35,7 @@ public class OnErrorContinueFlowRefTestCase extends AbstractIntegrationTestCase 
 
   @Test
   public void testFlowRefHandlingException() throws Exception {
-    InternalMessage response = flowRunner("exceptionHandlingBlock").withPayload(JSON_REQUEST).run().getMessage();
+    Message response = flowRunner("exceptionHandlingBlock").withPayload(JSON_REQUEST).run().getMessage();
     // compare the structure and values but not the attributes' order
     ObjectMapper mapper = new ObjectMapper();
     JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
@@ -45,7 +45,7 @@ public class OnErrorContinueFlowRefTestCase extends AbstractIntegrationTestCase 
 
   @Test
   public void testFlowRefHandlingExceptionWithTransaction() throws Exception {
-    InternalMessage response = flowRunner("transactionNotResolvedAfterException").withPayload(JSON_REQUEST).run().getMessage();
+    Message response = flowRunner("transactionNotResolvedAfterException").withPayload(JSON_REQUEST).run().getMessage();
     // compare the structure and values but not the attributes' order
     ObjectMapper mapper = new ObjectMapper();
     JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));

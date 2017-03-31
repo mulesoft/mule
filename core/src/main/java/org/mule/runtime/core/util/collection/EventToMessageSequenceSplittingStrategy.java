@@ -7,8 +7,8 @@
 package org.mule.runtime.core.util.collection;
 
 import org.mule.runtime.api.streaming.objects.CursorIteratorProvider;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.util.Copiable;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.routing.MessageSequence;
@@ -28,7 +28,7 @@ public class EventToMessageSequenceSplittingStrategy implements SplittingStrateg
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public MessageSequence<?> split(Event event) {
-    InternalMessage msg = event.getMessage();
+    Message msg = event.getMessage();
     Object payload = msg.getPayload().getValue();
     if (payload instanceof MessageSequence<?>) {
       return ((MessageSequence<?>) payload);

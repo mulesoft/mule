@@ -7,8 +7,7 @@
 package org.mule.test.integration.config;
 
 import static org.junit.Assert.assertTrue;
-
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
@@ -25,7 +24,7 @@ public class GlobalTransformerTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testNormal() throws Exception {
-    InternalMessage msg = flowRunner("Test").withPayload("HELLO!").run().getMessage();
+    Message msg = flowRunner("Test").withPayload("HELLO!").run().getMessage();
     assertTrue(msg.getPayload().getValue() instanceof byte[]);
   }
 }

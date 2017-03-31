@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ public class ConnectorMessageNotification extends ServerNotification implements 
   private String endpoint;
   private FlowConstruct flowConstruct;
 
-  public ConnectorMessageNotification(Object component, InternalMessage resource, String endpoint, FlowConstruct flowConstruct,
+  public ConnectorMessageNotification(Object component, Message resource, String endpoint, FlowConstruct flowConstruct,
                                       int action) {
     super(resource, action, flowConstruct != null ? flowConstruct.getName() : null);
     this.component = component;
@@ -78,8 +78,8 @@ public class ConnectorMessageNotification extends ServerNotification implements 
   }
 
   @Override
-  public InternalMessage getSource() {
-    return (InternalMessage) super.getSource();
+  public Message getSource() {
+    return (Message) super.getSource();
   }
 
   /**

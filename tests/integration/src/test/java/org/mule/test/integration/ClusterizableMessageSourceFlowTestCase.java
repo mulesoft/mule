@@ -8,11 +8,11 @@ package org.mule.test.integration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.connector.SchedulerController;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.ClusterNodeNotification;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -35,7 +35,7 @@ public class ClusterizableMessageSourceFlowTestCase extends AbstractIntegrationT
     muleContext.start();
 
     MuleClient client = muleContext.getClient();
-    InternalMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
+    Message response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
     assertEquals("TEST", response.getPayload().getValue());
   }
 
@@ -67,7 +67,7 @@ public class ClusterizableMessageSourceFlowTestCase extends AbstractIntegrationT
     muleContext.fireNotification(new ClusterNodeNotification("primary", ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED));
 
     MuleClient client = muleContext.getClient();
-    InternalMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
+    Message response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
     assertEquals("TEST", response.getPayload().getValue());
   }
 

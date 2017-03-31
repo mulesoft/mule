@@ -12,12 +12,11 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionStrategyNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.tck.probe.JUnitProbe;
@@ -73,7 +72,7 @@ public class ExceptionListenerTestCase extends AbstractIntegrationTestCase {
 
     assertQueueIsEmpty("test://component.out");
 
-    InternalMessage message = client.request("test://error.queue", 2000).getRight().get();
+    Message message = client.request("test://error.queue", 2000).getRight().get();
     assertNotNull(message);
     Object payload = message.getPayload().getValue();
     assertTrue(payload instanceof ExceptionMessage);

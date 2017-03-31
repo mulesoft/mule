@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.model.resolvers.EntryPointNotFoundException;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -45,7 +45,7 @@ public class MethodEntryPointsTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testValidCallToReverse() throws Exception {
-    InternalMessage message =
+    Message message =
         flowRunner("Service").withPayload("hello").withInboundProperty("method", "reverseString").run().getMessage();
     assertNotNull(message);
     assertEquals("olleh", getPayloadAsString(message));
@@ -53,7 +53,7 @@ public class MethodEntryPointsTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testValidCallToUpperCase() throws Exception {
-    InternalMessage message =
+    Message message =
         flowRunner("Service").withPayload("hello").withInboundProperty("method", "upperCaseString").run().getMessage();
     assertNotNull(message);
     assertEquals("HELLO", getPayloadAsString(message));

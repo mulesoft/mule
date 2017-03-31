@@ -7,6 +7,7 @@
 package org.mule;
 
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
@@ -19,7 +20,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextFactory;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 
@@ -82,8 +82,7 @@ public class AbstractBenchmark {
 
   public Event createEvent(Flow flow, Object payload) {
     try {
-      return Event.builder(DefaultEventContext.create(flow, CONNECTOR_NAME))
-          .message(InternalMessage.builder().payload(payload).build()).build();
+      return Event.builder(DefaultEventContext.create(flow, CONNECTOR_NAME)).message(of(payload)).build();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

@@ -6,6 +6,7 @@
  */
 package org.mule;
 
+import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -30,7 +31,7 @@ public class MessageBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public Message createMessage() {
-    return Message.builder().payload(PAYLOAD).build();
+    return of(PAYLOAD);
   }
 
   @Benchmark
@@ -85,25 +86,25 @@ public class MessageBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public Message addRemoveMessageProperty() {
-    InternalMessage temp = InternalMessage.builder(message).addOutboundProperty(KEY, VALUE).build();
+    Message temp = InternalMessage.builder(message).addOutboundProperty(KEY, VALUE).build();
     return InternalMessage.builder(temp).removeOutboundProperty(KEY).build();
   }
 
   @Benchmark
   public Message addRemoveMessagePropertyMessageWith20Properties() {
-    InternalMessage temp = InternalMessage.builder(messageWith20Properties).addOutboundProperty(KEY, VALUE).build();
+    Message temp = InternalMessage.builder(messageWith20Properties).addOutboundProperty(KEY, VALUE).build();
     return InternalMessage.builder(temp).removeOutboundProperty(KEY).build();
   }
 
   @Benchmark
   public Message addRemoveMessagePropertyMessageWith100Properties() {
-    InternalMessage temp = InternalMessage.builder(messageWith100Properties).addOutboundProperty(KEY, VALUE).build();
+    Message temp = InternalMessage.builder(messageWith100Properties).addOutboundProperty(KEY, VALUE).build();
     return InternalMessage.builder(temp).removeOutboundProperty(KEY).build();
   }
 
   @Benchmark
   public Message addRemoveMessagePropertyWithDataType() {
-    InternalMessage temp = InternalMessage.builder(message).addOutboundProperty(KEY, VALUE, DataType.STRING).build();
+    Message temp = InternalMessage.builder(message).addOutboundProperty(KEY, VALUE, DataType.STRING).build();
     return InternalMessage.builder(temp).removeOutboundProperty(KEY).build();
   }
 
@@ -143,11 +144,11 @@ public class MessageBenchmark extends AbstractBenchmark {
     return builder.build();
   }
 
-  private InternalMessage createMuleMessage() {
-    return InternalMessage.builder().payload(PAYLOAD).build();
+  private Message createMuleMessage() {
+    return of(PAYLOAD);
   }
 
-  private InternalMessage createMuleMessageWithProperties(int numProperties) {
+  private Message createMuleMessageWithProperties(int numProperties) {
     Builder builder = InternalMessage.builder().payload(PAYLOAD);
     for (int i = 1; i <= numProperties; i++) {
       builder.addInboundProperty("InBoUnDpRoPeRtYkEy" + i, "val");

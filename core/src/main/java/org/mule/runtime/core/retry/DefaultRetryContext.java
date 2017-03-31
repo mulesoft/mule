@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.retry;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.retry.RetryContext;
 
@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public class DefaultRetryContext implements RetryContext, MuleContextAware {
 
-  private InternalMessage[] returnMessages;
+  private Message[] returnMessages;
   private Map<Object, Object> metaInfo = new HashMap<Object, Object>();
   private String description;
   private Throwable lastFailure;
@@ -47,23 +47,23 @@ public class DefaultRetryContext implements RetryContext, MuleContextAware {
     return Collections.unmodifiableMap(metaInfo);
   }
 
-  public InternalMessage[] getReturnMessages() {
+  public Message[] getReturnMessages() {
     return returnMessages;
   }
 
-  public InternalMessage getFirstReturnMessage() {
+  public Message getFirstReturnMessage() {
     return (returnMessages == null ? null : returnMessages[0]);
   }
 
-  public void setReturnMessages(InternalMessage[] returnMessages) {
+  public void setReturnMessages(Message[] returnMessages) {
     this.returnMessages = returnMessages;
   }
 
-  public void addReturnMessage(InternalMessage result) {
+  public void addReturnMessage(Message result) {
     if (returnMessages == null) {
-      returnMessages = new InternalMessage[] {result};
+      returnMessages = new Message[] {result};
     } else {
-      InternalMessage[] newReturnMessages = new InternalMessage[returnMessages.length + 1];
+      Message[] newReturnMessages = new Message[returnMessages.length + 1];
       System.arraycopy(newReturnMessages, 0, returnMessages, 0, 1);
       returnMessages = newReturnMessages;
     }

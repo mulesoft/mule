@@ -13,7 +13,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
+import static org.mule.runtime.api.message.Message.of;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
@@ -51,9 +52,9 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
 
     EventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
 
-    InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
-    InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
-    InternalMessage message3 = InternalMessage.builder().payload("test event C").build();
+    Message message1 = Message.of("test event A");
+    Message message2 = Message.of("test event B");
+    Message message3 = Message.of("test event C");
 
     Event event1 =
         Event.builder(executionContext).message(message1).groupCorrelation(new GroupCorrelation(3, null)).flow(flow).build();
@@ -68,7 +69,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     assertNotNull(sensingMessageProcessor.event);
     assertThat(resultEvent, equalTo(sensingMessageProcessor.event));
 
-    InternalMessage nextMessage = sensingMessageProcessor.event.getMessage();
+    Message nextMessage = sensingMessageProcessor.event.getMessage();
     assertNotNull(nextMessage);
     assertTrue(nextMessage.getPayload().getValue() instanceof List<?>);
     List<InternalMessage> list = (List<InternalMessage>) nextMessage.getPayload().getValue();
@@ -95,7 +96,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.initialise();
 
     EventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
-    InternalMessage message1 = InternalMessage.of("test event A");
+    Message message1 = of("test event A");
 
     Event event1 =
         Event.builder(executionContext).message(message1).groupCorrelation(new GroupCorrelation(1, null)).flow(flow).build();
@@ -105,7 +106,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     assertNotNull(sensingMessageProcessor.event);
     assertThat(resultEvent, equalTo(sensingMessageProcessor.event));
 
-    InternalMessage nextMessage = sensingMessageProcessor.event.getMessage();
+    Message nextMessage = sensingMessageProcessor.event.getMessage();
     assertNotNull(nextMessage);
     assertTrue(nextMessage.getPayload().getValue() instanceof List<?>);
     List<InternalMessage> payload = (List<InternalMessage>) nextMessage.getPayload().getValue();
@@ -125,18 +126,18 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
 
     EventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
 
-    InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
-    InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
-    InternalMessage message3 = InternalMessage.builder().payload("test event C").build();
-    InternalMessage message4 = InternalMessage.builder().payload("test event D").build();
-    List<InternalMessage> list = new ArrayList<>();
-    List<InternalMessage> list2 = new ArrayList<>();
+    Message message1 = of("test event A");
+    Message message2 = of("test event B");
+    Message message3 = of("test event C");
+    Message message4 = of("test event D");
+    List<Message> list = new ArrayList<>();
+    List<Message> list2 = new ArrayList<>();
     list.add(message1);
     list.add(message2);
     list2.add(message3);
     list2.add(message4);
-    InternalMessage messageCollection1 = InternalMessage.builder().payload(list).build();
-    InternalMessage messageCollection2 = InternalMessage.builder().payload(list2).build();
+    Message messageCollection1 = Message.of(list);
+    Message messageCollection2 = Message.of(list2);
 
     Event event1 =
         Event.builder(executionContext).message(messageCollection1).groupCorrelation(new GroupCorrelation(2, null)).flow(flow)
@@ -148,7 +149,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     assertNull(router.process(event1));
     Event resultEvent = router.process(event2);
     assertNotNull(resultEvent);
-    InternalMessage resultMessage = resultEvent.getMessage();
+    Message resultMessage = resultEvent.getMessage();
     assertNotNull(resultMessage);
     List<InternalMessage> payload = (List<InternalMessage>) resultMessage.getPayload().getValue();
     assertEquals(2, payload.size());

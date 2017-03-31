@@ -20,6 +20,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.api.message.Message.of;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -28,7 +29,6 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.AbstractFlowConstructTestCase;
@@ -117,7 +117,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     flow.initialise();
     flow.start();
     Event event = eventBuilder()
-        .message(InternalMessage.of(TEST_PAYLOAD))
+        .message(of(TEST_PAYLOAD))
         .build();
     Event response = triggerFunction.apply(directInboundMessageSource.getListener(), event);
 

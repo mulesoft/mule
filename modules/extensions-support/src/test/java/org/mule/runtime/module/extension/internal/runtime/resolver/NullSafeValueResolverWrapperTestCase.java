@@ -10,11 +10,11 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -46,7 +46,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
   public void setUp() {
     when(event.getFlowCallStack().clone()).thenReturn(mock(FlowCallStack.class));
     when(event.getError()).thenReturn(java.util.Optional.empty());
-    when(event.getMessage()).thenReturn(InternalMessage.builder().nullPayload().build());
+    when(event.getMessage()).thenReturn(NULL_MESSAGE);
   }
 
   @Test

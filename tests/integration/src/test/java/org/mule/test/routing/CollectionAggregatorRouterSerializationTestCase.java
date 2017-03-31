@@ -10,14 +10,15 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.routing.EventGroup;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -41,7 +42,7 @@ public class CollectionAggregatorRouterSerializationTestCase extends AbstractInt
     flowRunner("splitter").withPayload(list).run();
 
     MuleClient client = muleContext.getClient();
-    InternalMessage request = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
+    Message request = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(request);
     assertThat(request.getPayload().getValue(), instanceOf(List.class));
     assertThat(((List<InternalMessage>) request.getPayload().getValue()), hasSize(list.size()));

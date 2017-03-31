@@ -14,8 +14,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.message.InternalMessage.Builder;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
 /**
@@ -29,7 +27,7 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
   @Override
   public Event process(Event event) throws MuleException {
-    final Builder builder = InternalMessage.builder(event.getMessage());
+    final Message.Builder builder = Message.builder(event.getMessage());
     final org.mule.runtime.core.api.Event.Builder eventBuilder = Event.builder(event);
 
     if (dataType == null) {

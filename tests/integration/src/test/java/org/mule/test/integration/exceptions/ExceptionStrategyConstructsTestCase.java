@@ -12,12 +12,11 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
-
 import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.ExceptionMessage;
@@ -46,7 +45,7 @@ public class ExceptionStrategyConstructsTestCase extends AbstractIntegrationTest
     assertExceptionMessage(client.request("test://flow1out", RECEIVE_TIMEOUT).getRight().get());
   }
 
-  private void assertExceptionMessage(InternalMessage out) {
+  private void assertExceptionMessage(Message out) {
     assertThat(out, notNullValue());
     assertThat(out.getPayload().getValue(), instanceOf(ExceptionMessage.class));
     ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload().getValue();

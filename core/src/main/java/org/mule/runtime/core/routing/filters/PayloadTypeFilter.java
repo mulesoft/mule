@@ -9,8 +9,8 @@ package org.mule.runtime.core.routing.filters;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.util.ClassUtils;
 
@@ -35,7 +35,7 @@ public class PayloadTypeFilter implements Filter {
   }
 
   @Override
-  public boolean accept(InternalMessage message, Event.Builder builder) {
+  public boolean accept(Message message, Event.Builder builder) {
     return (expectedType != null ? expectedType.isAssignableFrom(message.getPayload().getDataType().getType()) : false);
   }
 

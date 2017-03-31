@@ -46,6 +46,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.el.ExpressionExecutor;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExecutionType;
 import org.mule.runtime.api.meta.model.OutputModel;
@@ -127,7 +128,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(operationExecutor.execute(any(ExecutionContext.class)))
         .thenReturn(just(builder().output(payload).mediaType(mediaType).attributes(attributes).build()));
 
-    InternalMessage message = messageProcessor.process(event).getMessage();
+    Message message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
@@ -164,9 +165,9 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
         .thenReturn(just(builder().output(payload).mediaType(mediaType).build()));
 
     event =
-        Event.builder(event).message(InternalMessage.builder().payload("").attributes(mock(Attributes.class)).build()).build();
+        Event.builder(event).message(Message.builder().payload("").attributes(mock(Attributes.class)).build()).build();
 
-    InternalMessage message = messageProcessor.process(event).getMessage();
+    Message message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
@@ -180,9 +181,9 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(just(builder().output(payload).build()));
     event =
-        Event.builder(event).message(InternalMessage.builder().payload("").attributes(mock(Attributes.class)).build()).build();
+        Event.builder(event).message(Message.builder().payload("").attributes(mock(Attributes.class)).build()).build();
 
-    InternalMessage message = messageProcessor.process(event).getMessage();
+    Message message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
@@ -198,7 +199,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(operationExecutor.execute(any(ExecutionContext.class)))
         .thenReturn(just(builder().output(payload).attributes(attributes).build()));
 
-    InternalMessage message = messageProcessor.process(event).getMessage();
+    Message message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
@@ -211,7 +212,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     Object value = new Object();
     when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(just(value));
 
-    InternalMessage message = messageProcessor.process(event).getMessage();
+    Message message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
     assertThat(message.getPayload().getValue(), is(sameInstance(value)));
   }

@@ -10,13 +10,15 @@ import static java.util.Collections.emptyMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
-
 import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -27,9 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
 
@@ -45,7 +44,8 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
     properties.put("boolean", "true");
     Apple apple = new Apple(true);
     properties.put("apple", apple);
-    InternalMessage message = InternalMessage.builder().payload(TEST_MESSAGE).outboundProperties(properties).build();
+    InternalMessage message =
+        (InternalMessage) InternalMessage.builder().payload(TEST_MESSAGE).outboundProperties(properties).build();
     assertTrue(message.getOutboundProperty("boolean", false));
     assertEquals(new Integer(24), message.getOutboundProperty("number", 0));
     assertEquals(new Byte((byte) 24), message.getOutboundProperty("number", (byte) 0));
@@ -75,12 +75,13 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testClearProperties() {
-    InternalMessage payload = InternalMessage.builder(createMuleMessage()).addOutboundProperty(FOO_PROPERTY, "fooValue").build();
+    InternalMessage payload =
+        (InternalMessage) InternalMessage.builder(createMuleMessage()).addOutboundProperty(FOO_PROPERTY, "fooValue").build();
 
     assertThat(payload.getOutboundPropertyNames(), hasSize(2));
     assertThat(payload.getInboundPropertyNames(), empty());
 
-    payload = InternalMessage.builder(payload).outboundProperties(emptyMap()).build();
+    payload = (InternalMessage) InternalMessage.builder(payload).outboundProperties(emptyMap()).build();
     assertThat(payload.getOutboundPropertyNames(), empty());
 
     // See http://www.mulesoft.org/jira/browse/MULE-4968 for additional test needed here
@@ -95,39 +96,34 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
     return map;
   }
 
-  private InternalMessage createMuleMessage() {
+  private Message createMuleMessage() {
     return InternalMessage.builder().payload(TEST_PAYLOAD).attributes(testAttributes)
         .addOutboundProperty("Message", "Message").build();
   }
 
-  private void assertOutboundMessageProperty(String key, InternalMessage message) {
-    // taking advantage of the fact here that key and value are the same
-    assertThat(message.getOutboundProperty(key), is(key));
-  }
-
   @Test(expected = UnsupportedOperationException.class)
   public void testPropertyNamesImmutable() throws Exception {
-    InternalMessage message = createMuleMessage();
+    InternalMessage message = (InternalMessage) createMuleMessage();
     message.getOutboundPropertyNames().add("other");
   }
 
   @Test(expected = UnsupportedOperationException.class)
   public void testInboundPropertyNamesAddImmutable() throws Exception {
-    InternalMessage message = createMuleMessage();
+    InternalMessage message = (InternalMessage) createMuleMessage();
     message.getOutboundPropertyNames().add("other");
   }
 
   @Test(expected = UnsupportedOperationException.class)
   public void testOutboundPropertyNamesImmutable() throws Exception {
-    InternalMessage message = createMuleMessage();
-    message.getOutboundPropertyNames().add("other");
+    Message message = createMuleMessage();
+    ((InternalMessage) message).getOutboundPropertyNames().add("other");
   }
 
   @Test
   public void usesNullPayloadAsNull() throws Exception {
-    InternalMessage message = InternalMessage.builder(createMuleMessage()).addOutboundProperty(FOO_PROPERTY, null).build();
+    Message message = InternalMessage.builder(createMuleMessage()).addOutboundProperty(FOO_PROPERTY, null).build();
 
-    assertThat(message.getOutboundProperty(FOO_PROPERTY), is(nullValue()));
+    assertThat(((InternalMessage) message).getOutboundProperty(FOO_PROPERTY), is(nullValue()));
   }
 
 }

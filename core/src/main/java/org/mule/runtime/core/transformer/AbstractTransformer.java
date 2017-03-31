@@ -8,20 +8,19 @@ package org.mule.runtime.core.transformer;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
-import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
@@ -212,8 +211,8 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
   }
 
   private Charset getEncoding(Object src) {
-    if (src instanceof InternalMessage) {
-      return ((InternalMessage) src).getPayload().getDataType().getMediaType().getCharset()
+    if (src instanceof Message) {
+      return ((Message) src).getPayload().getDataType().getMediaType().getCharset()
           .orElse(getDefaultEncoding(muleContext));
     } else {
       return getDefaultEncoding(muleContext);
@@ -223,10 +222,9 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
   @Override
   public Object transform(Object src, Charset enc) throws TransformerException {
     Object payload = src;
-    if (src instanceof InternalMessage) {
-      InternalMessage message = (InternalMessage) src;
+    if (src instanceof Message) {
+      Message message = (Message) src;
       if ((!isSourceDataTypeSupported(DataType.MULE_MESSAGE, true) && !(this instanceof AbstractMessageTransformer))) {
-        src = ((InternalMessage) src).getPayload().getValue();
         payload = message.getPayload().getValue();
       }
     }

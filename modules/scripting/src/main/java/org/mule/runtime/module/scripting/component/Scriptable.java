@@ -13,13 +13,13 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.propertiesNotSet;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsStream;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.context.FlowVariableMapContext;
 import org.mule.runtime.core.el.context.SessionVariableMapContext;
 import org.mule.runtime.core.util.CollectionUtils;
@@ -214,7 +214,7 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
   }
 
   protected void populateMessageBindings(Bindings bindings, Event event, Event.Builder eventBuilder) {
-    InternalMessage message = event.getMessage();
+    Message message = event.getMessage();
 
     populateVariablesInOrder(bindings, event);
 
@@ -223,7 +223,7 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
     // This will get overwritten if populateBindings(Bindings bindings, MuleEvent event) is called
     // and not this method directly.
     bindings.put(BINDING_PAYLOAD, message.getPayload().getValue());
-    // For backward compatability
+    // For backward compatibility 
     bindings.put(BINDING_SRC, message.getPayload().getValue());
 
     populateHeadersVariablesAndException(bindings, event, eventBuilder);

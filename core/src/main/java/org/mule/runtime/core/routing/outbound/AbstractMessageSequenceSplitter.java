@@ -7,11 +7,10 @@
 package org.mule.runtime.core.routing.outbound;
 
 import static java.util.Collections.emptySet;
-
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.message.GroupCorrelation;
@@ -122,10 +121,10 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
                               payloadAsEvent.getVariable(flowVarName).getDataType());
         }
       }
-    } else if (payload instanceof InternalMessage) {
-      builder.message((InternalMessage) payload);
+    } else if (payload instanceof Message) {
+      builder.message((Message) payload);
     } else {
-      builder.message(InternalMessage.builder(originalEvent.getMessage()).payload(payload).build());
+      builder.message(Message.builder(originalEvent.getMessage()).payload(payload).build());
     }
   }
 

@@ -9,6 +9,7 @@ package org.mule.runtime.core.el.mvel;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -72,7 +73,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
       } else if (PAYLOAD.equals(name)) {
         return new MuleVariableResolver<>(PAYLOAD, new MessageContext(event, eventBuilder, muleContext).getPayload(), null,
                                           (name1, value, newValue) -> eventBuilder
-                                              .message(InternalMessage.builder(event.getMessage()).payload(newValue).build()));
+                                              .message(Message.builder(event.getMessage()).payload(newValue).build()));
       } else if (ATTRIBUTES.equals(name)) {
         return new MuleImmutableVariableResolver<>(ATTRIBUTES, event.getMessage().getAttributes(), null);
       } else if (FLOW_VARS.equals(name)) {
@@ -82,11 +83,11 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
         if (event.getError().isPresent()) {
           Throwable exception = event.getError().get().getCause();
           return new MuleImmutableVariableResolver<>(EXCEPTION, wrapIfNecessary(event, exception), null);
-        } else if (event.getMessage().getExceptionPayload() != null) {
-          Throwable exception = event.getMessage().getExceptionPayload().getException();
+        } else if (((InternalMessage) event.getMessage()).getExceptionPayload() != null) {
+          Throwable exception = ((InternalMessage) event.getMessage()).getExceptionPayload().getException();
           return new MuleImmutableVariableResolver<>(EXCEPTION, wrapIfNecessary(event, exception), null);
         } else {
-          return new MuleImmutableVariableResolver<InternalMessage>(EXCEPTION, null, null);
+          return new MuleImmutableVariableResolver<Message>(EXCEPTION, null, null);
         }
       } else if (ERROR.equals(name)) {
         if (event.getError().isPresent()) {

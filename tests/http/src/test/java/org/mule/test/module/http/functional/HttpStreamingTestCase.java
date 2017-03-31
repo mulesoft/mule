@@ -9,17 +9,15 @@ package org.mule.test.module.http.functional;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasAttributes;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasAttributes;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -91,7 +89,7 @@ public class HttpStreamingTestCase extends AbstractHttpTestCase {
           }
         }
       };
-      return Event.builder(event).message((InternalMessage) Message.builder().payload(inputStream).build()).build();
+      return Event.builder(event).message(of(inputStream)).build();
     }
 
   }

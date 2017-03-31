@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.routing.filters;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.ObjectFilter;
 
@@ -27,7 +27,7 @@ public class EqualsFilter implements Filter, ObjectFilter {
   }
 
   @Override
-  public boolean accept(InternalMessage message, Event.Builder builder) {
+  public boolean accept(Message message, Event.Builder builder) {
     return accept(message.getPayload().getValue());
   }
 

@@ -9,12 +9,12 @@ package org.mule.runtime.core.context.notification;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
@@ -69,7 +69,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
       lastRootMessageId.set(sourceEvent.getCorrelationId());
       return sourceEvent;
     } else if (rootId != null && flowConstruct != null) {
-      final InternalMessage msg = InternalMessage.builder().nullPayload().build();
+      final Message msg = Message.NULL_MESSAGE;
       return Event.builder(create(flowConstruct, "MessageProcessorNotification", lastRootMessageId.get())).message(msg)
           .flow(flowConstruct).build();
     } else {

@@ -9,9 +9,8 @@ package org.mule.test.transformers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.compression.GZipCompression;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -40,13 +39,13 @@ public class GZipTransformerFunctionalTestCase extends AbstractIntegrationTestCa
 
     // Compress input.
     Event muleEvent = flowRunner("compressInput").withPayload(testDataByteArray).run();
-    InternalMessage compressedResponse = muleEvent.getMessage();
+    Message compressedResponse = muleEvent.getMessage();
     assertNotNull(compressedResponse);
     assertTrue(compressedResponse.getPayload().getValue() instanceof byte[]);
 
     // Decompress response.
     muleEvent = flowRunner("decompressInput").withPayload(compressedResponse.getPayload().getValue()).run();
-    InternalMessage uncompressedResponse = muleEvent.getMessage();
+    Message uncompressedResponse = muleEvent.getMessage();
     assertNotNull(uncompressedResponse);
     assertTrue(uncompressedResponse.getPayload().getValue() instanceof byte[]);
 
@@ -60,13 +59,13 @@ public class GZipTransformerFunctionalTestCase extends AbstractIntegrationTestCa
 
     // Compress input.
     Event muleEvent = flowRunner("compressInput").withPayload(bis).run();
-    InternalMessage compressedResponse = muleEvent.getMessage();
+    Message compressedResponse = muleEvent.getMessage();
     assertNotNull(compressedResponse);
     assertTrue(compressedResponse.getPayload().getValue() instanceof InputStream);
 
     // Decompress response.
     muleEvent = flowRunner("decompressInput").withPayload(compressedResponse.getPayload().getValue()).run();
-    InternalMessage uncompressedResponse = muleEvent.getMessage();
+    Message uncompressedResponse = muleEvent.getMessage();
     assertNotNull(uncompressedResponse);
     assertTrue(uncompressedResponse.getPayload().getValue() instanceof InputStream);
 
@@ -79,7 +78,7 @@ public class GZipTransformerFunctionalTestCase extends AbstractIntegrationTestCa
   public void testCompressDecompressString() throws Exception {
     // Compress input.
     Event muleEvent = flowRunner("compressInput").withPayload(TEST_DATA).run();
-    InternalMessage compressedResponse = muleEvent.getMessage();
+    Message compressedResponse = muleEvent.getMessage();
     assertNotNull(compressedResponse);
     assertTrue(compressedResponse.getPayload().getValue() instanceof byte[]);
     byte[] bytes = new GZipCompression().uncompressByteArray((byte[]) compressedResponse.getPayload().getValue());
@@ -88,7 +87,7 @@ public class GZipTransformerFunctionalTestCase extends AbstractIntegrationTestCa
 
     // Decompress response.
     muleEvent = flowRunner("decompressInputString").withPayload(compressedResponse.getPayload().getValue()).run();
-    InternalMessage uncompressedResponse = muleEvent.getMessage();
+    Message uncompressedResponse = muleEvent.getMessage();
     assertNotNull(uncompressedResponse);
     assertTrue(uncompressedResponse.getPayload().getValue() instanceof String);
     assertEquals(TEST_DATA, uncompressedResponse.getPayload().getValue());

@@ -7,6 +7,9 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -43,7 +46,7 @@ public class MulticastingRoutingStrategy extends AbstractRoutingStrategy {
 
   @Override
   public Event route(Event event, List<Processor> messageProcessors) throws MuleException {
-    InternalMessage message = event.getMessage();
+    Message message = event.getMessage();
 
     if (messageProcessors == null || messageProcessors.size() == 0) {
       throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), null);

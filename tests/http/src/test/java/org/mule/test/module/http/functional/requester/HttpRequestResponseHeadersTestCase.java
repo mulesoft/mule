@@ -11,7 +11,7 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class HttpRequestResponseHeadersTestCase extends AbstractHttpRequestTestC
   }
 
   private void testHeaders(String flowName, String expectedResponse) throws Exception {
-    InternalMessage response = flowRunner(flowName).run().getMessage();
+    Message response = flowRunner(flowName).run().getMessage();
     assertThat(response, hasPayload(equalTo(expectedResponse)));
   }
 }

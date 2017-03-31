@@ -12,10 +12,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.Base64;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -78,7 +77,7 @@ public class DefaultEntryPointResolverSetMultithreadingTestCase extends Abstract
       while (--requestCount >= 0) {
         try {
           Event event = flowRunner("flowTestSync").withPayload(payload).run();
-          final InternalMessage outbound = event.getMessage();
+          final Message outbound = event.getMessage();
           assertThat(event.getError().isPresent(), is(false));
           assertNotNull(outbound.getPayload().getValue());
           byte[] bytes = null;

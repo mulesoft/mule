@@ -8,14 +8,13 @@ package org.mule.shutdown;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.service.http.api.HttpConstants.Method.GET;
-
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.services.http.TestHttpClient;
@@ -126,8 +125,7 @@ public class ShutdownAppInDomainTestCase extends DomainFunctionalTestCase {
   public void jms() throws MuleException {
     final MuleContext muleContextForApp = getMuleContextForApp("app-with-flows");
 
-    muleContextForApp.getClient().dispatch("jms://in?connector=sharedJmsConnector",
-                                           InternalMessage.builder().payload("payload").build());
+    muleContextForApp.getClient().dispatch("jms://in?connector=sharedJmsConnector", of("payload"));
     muleContextForApp.getClient().request("jms://out?connector=sharedJmsConnector", MESSAGE_TIMEOUT);
 
     muleContextForApp.dispose();

@@ -11,9 +11,9 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -47,7 +47,6 @@ import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Rule;
 import org.junit.Test;
-
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -103,7 +102,7 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
     assertResponse(flowRunner("continueProcessingActualMessage").withPayload(JSON_REQUEST).run().getMessage());
   }
 
-  private void assertResponse(InternalMessage response) throws Exception {
+  private void assertResponse(Message response) throws Exception {
     assertThat(response, IsNull.<Object>notNullValue());
     // compare the structure and values but not the attributes' order
     JsonNode actualJsonNode = new ObjectMapper().readTree(getPayloadAsString(response));
@@ -133,14 +132,14 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testCatchWithComponent() throws Exception {
-    InternalMessage result = flowRunner("catchWithComponent").withPayload(MESSAGE).run().getMessage();
+    Message result = flowRunner("catchWithComponent").withPayload(MESSAGE).run().getMessage();
     assertThat(result, IsNull.<Object>notNullValue());
     assertThat(getPayloadAsString(result), Is.is(MESSAGE + " Caught"));
   }
 
   @Test
   public void testFullyDefinedCatchExceptionStrategyWithComponent() throws Exception {
-    InternalMessage result =
+    Message result =
         flowRunner("fullyDefinedCatchExceptionStrategyWithComponent").withPayload(MESSAGE).run().getMessage();
     assertThat(result, IsNull.<Object>notNullValue());
     assertThat(getPayloadAsString(result), Is.is(MESSAGE + " apt1 apt2 groovified"));
@@ -148,21 +147,21 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void onErrorTypeMatch() throws Exception {
-    InternalMessage result = flowRunner("onErrorTypeMatch").withPayload(MESSAGE).run().getMessage();
+    Message result = flowRunner("onErrorTypeMatch").withPayload(MESSAGE).run().getMessage();
     assertThat(result, is(notNullValue()));
     assertThat(getPayloadAsString(result), is(MESSAGE + " apt1 apt2"));
   }
 
   @Test
   public void onErrorTypeMatchAny() throws Exception {
-    InternalMessage result = flowRunner("onErrorTypeMatchAny").withPayload(MESSAGE).run().getMessage();
+    Message result = flowRunner("onErrorTypeMatchAny").withPayload(MESSAGE).run().getMessage();
     assertThat(result, is(notNullValue()));
     assertThat(getPayloadAsString(result), is(MESSAGE + " apt1 apt2"));
   }
 
   @Test
   public void onErrorTypeMatchSeveral() throws Exception {
-    InternalMessage result = flowRunner("onErrorTypeMatchSeveral").withPayload(true).run().getMessage();
+    Message result = flowRunner("onErrorTypeMatchSeveral").withPayload(true).run().getMessage();
     assertThat(result, is(notNullValue()));
     assertThat(getPayloadAsString(result), is("true apt1 apt2"));
 

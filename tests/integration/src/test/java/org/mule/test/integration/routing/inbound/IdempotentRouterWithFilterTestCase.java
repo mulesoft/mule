@@ -8,11 +8,10 @@ package org.mule.test.integration.routing.inbound;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -33,7 +32,7 @@ public class IdempotentRouterWithFilterTestCase extends AbstractIntegrationTestC
   public void testWithValidData() throws Exception {
     flowRunner("IdempotentPlaceHolder").withPayload("Mule is the best!").run();
     MuleClient myClient = muleContext.getClient();
-    InternalMessage response = myClient.request("test://ToTestCase", RECEIVE_TIMEOUT).getRight().get();
+    Message response = myClient.request("test://ToTestCase", RECEIVE_TIMEOUT).getRight().get();
 
     assertNotNull(response);
     assertNotNull(response.getPayload().getValue());

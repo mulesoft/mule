@@ -15,11 +15,10 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-
 import org.mule.functional.functional.FlowAssert;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -60,7 +59,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testCustomProcessorInFlow() throws Exception {
     final Event muleEvent = runFlow("customProcessorInFlow");
-    InternalMessage response = muleEvent.getMessage();
+    Message response = muleEvent.getMessage();
 
     assertNotNull(response);
     assertTrue((Boolean) muleEvent.getVariable("expectedHandler").getValue());
@@ -72,7 +71,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     flowRunner("asyncInFlow").withPayload(MESSAGE).dispatch();
 
     MuleClient client = muleContext.getClient();
-    InternalMessage response = client.request("test://outFlow4", 3000).getRight().get();
+    Message response = client.request("test://outFlow4", 3000).getRight().get();
     assertNotNull(response);
     assertThat(injectedMessagingExceptionHandler, is(instanceOf(ErrorHandler.class)));
   }
@@ -82,7 +81,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     flowRunner("untilSuccessfulInFlow").withPayload(MESSAGE).dispatch();
 
     MuleClient client = muleContext.getClient();
-    InternalMessage response = client.request("test://outFlow5", 3000).getRight().get();
+    Message response = client.request("test://outFlow5", 3000).getRight().get();
 
     assertNotNull(response);
     assertThat(injectedMessagingExceptionHandler, is(instanceOf(ErrorHandler.class)));
@@ -93,7 +92,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     LinkedList<String> list = new LinkedList<>();
     list.add(MESSAGE);
     final Event muleEvent = flowRunner("customProcessorInScope").withPayload(list).run();
-    InternalMessage response = muleEvent.getMessage();
+    Message response = muleEvent.getMessage();
 
     assertNotNull(response);
     assertTrue((Boolean) muleEvent.getVariable("expectedHandler").getValue());
@@ -105,7 +104,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     flowRunner("customProcessorInTransactionalScope").withPayload(MESSAGE).dispatch();
 
     MuleClient client = muleContext.getClient();
-    InternalMessage response = client.request("test://outTransactional1", 3000).getRight().get();
+    Message response = client.request("test://outTransactional1", 3000).getRight().get();
 
     assertNotNull(response);
 
@@ -130,7 +129,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     flowRunner("customProcessorInExceptionStrategy").withPayload(MESSAGE).dispatch();
 
     MuleClient client = muleContext.getClient();
-    InternalMessage response = client.request("test://outStrategy1", 3000).getRight().get();
+    Message response = client.request("test://outStrategy1", 3000).getRight().get();
 
     assertNotNull(response);
 
@@ -168,7 +167,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     flowRunner(flowName).withPayload(MESSAGE).withInboundProperties(messageProperties).dispatch();
 
     MuleClient client = muleContext.getClient();
-    InternalMessage response = client.request(expected, 3000).getRight().get();
+    Message response = client.request(expected, 3000).getRight().get();
 
     assertNotNull(response);
   }

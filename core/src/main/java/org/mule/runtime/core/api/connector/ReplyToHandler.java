@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.api.connector;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 
 /**
  * <code>ReplyToHandler</code> is used to handle routing where a replyTo endpointUri is set on the message
@@ -18,6 +18,6 @@ import org.mule.runtime.core.api.message.InternalMessage;
 @Deprecated
 public interface ReplyToHandler {
 
-  Event processReplyTo(Event event, InternalMessage returnMessage, Object replyTo) throws MuleException;
+  Event processReplyTo(Event event, Message returnMessage, Object replyTo) throws MuleException;
 
 }

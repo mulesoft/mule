@@ -9,7 +9,7 @@ package org.mule.test.construct;
 import static java.lang.Thread.currentThread;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase {
@@ -22,16 +22,19 @@ public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProces
   @Override
   public void oneWay() throws Exception {
     flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).run();
-    InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
-    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
+
+    Message message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
+
+    assertThat(((InternalMessage) message).getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
   }
 
   @Override
   public void requestResponse() throws Exception {
-    InternalMessage response = flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).run().getMessage();
+    Message response = flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).run().getMessage();
     assertThat(response.getPayload().getValue().toString(), is(TEST_PAYLOAD));
-    InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
-    assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(currentThread().getName()));
+
+    Message message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
+    assertThat(((InternalMessage) message).getOutboundProperty(PROCESSOR_THREAD), is(currentThread().getName()));
   }
 
 

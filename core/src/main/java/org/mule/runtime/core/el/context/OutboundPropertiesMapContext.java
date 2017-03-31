@@ -28,7 +28,7 @@ class OutboundPropertiesMapContext extends AbstractMapContext<Serializable> {
 
   @Override
   public Serializable doGet(String key) {
-    return event.getMessage().getOutboundProperty(key);
+    return ((InternalMessage) event.getMessage()).getOutboundProperty(key);
   }
 
   @Override
@@ -45,7 +45,7 @@ class OutboundPropertiesMapContext extends AbstractMapContext<Serializable> {
 
   @Override
   public Set<String> keySet() {
-    return event.getMessage().getOutboundPropertyNames();
+    return ((InternalMessage) event.getMessage()).getOutboundPropertyNames();
   }
 
   @Override
@@ -57,8 +57,8 @@ class OutboundPropertiesMapContext extends AbstractMapContext<Serializable> {
   @Override
   public String toString() {
     Map<String, Object> map = new HashMap<>();
-    for (String key : event.getMessage().getOutboundPropertyNames()) {
-      Object value = event.getMessage().getOutboundProperty(key);
+    for (String key : ((InternalMessage) event.getMessage()).getOutboundPropertyNames()) {
+      Object value = ((InternalMessage) event.getMessage()).getOutboundProperty(key);
       map.put(key, value);
     }
     return map.toString();

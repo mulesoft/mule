@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
@@ -89,7 +90,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
       if (resultEvent != null) {
         // If result has MULE_SESSION property then merge session properties returned with existing
         // session properties. See MULE-5852
-        if (resultEvent.getMessage().getInboundProperty(MULE_SESSION_PROPERTY) != null) {
+        if (((InternalMessage) resultEvent.getMessage()).getInboundProperty(MULE_SESSION_PROPERTY) != null) {
           event.getSession().merge(resultEvent.getSession());
         }
         resultEvent = Event.builder(event).message(resultEvent.getMessage()).build();

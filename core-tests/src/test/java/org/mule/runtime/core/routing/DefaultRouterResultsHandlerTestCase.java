@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -22,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -42,8 +43,6 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
@@ -72,11 +71,11 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void aggregateSingleEvent() {
 
-    InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
+    Message message1 = Message.of("test event A");
     Event event1 = Event.builder(context).message(message1).flow(flow).addVariable("key1", "value1").build();
     event1.getSession().setProperty("key", "value");
 
-    InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
+    Message message2 = Message.of("test event B");
     Event event2 = Event.builder(context).message(message2).flow(flow).addVariable("key2", "value2").build();
     event2.getSession().setProperty("key", "valueNEW");
     event2.getSession().setProperty("key1", "value1");
@@ -97,9 +96,9 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void aggregateMultipleEvents() throws Exception {
     DataType simpleDateType1 = DataType.builder().type(String.class).mediaType("text/plain").build();
-    InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
-    InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
-    InternalMessage message3 = InternalMessage.builder().payload("test event C").build();
+    Message message1 = Message.of("test event A");
+    Message message2 = Message.of("test event B");
+    Message message3 = Message.of("test event C");
     Event event1 =
         Event.builder(context).message(message1).flow(flow).addVariable("key1", "value1", simpleDateType1).build();
     MuleSession session = event1.getSession();
@@ -143,8 +142,8 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void aggregateMultipleEventsAllButOneNull() {
-    InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
-    InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
+    Message message1 = Message.of("test event A");
+    Message message2 = Message.of("test event B");
     Event event1 = Event.builder(context).message(message1).flow(flow).addVariable("key", "value").build();
     Event event2 = Event.builder(context).message(message2).flow(flow).addVariable("key2", "value2").build();
     List<Event> events = new ArrayList<>();
@@ -162,16 +161,16 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void aggregateSingleMuleMessageCollection() {
-    InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
+    Message message1 = Message.of("test event A");
     Event event1 = Event.builder(context).message(message1).flow(flow).addVariable("key1", "value1").build();
 
-    InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
-    InternalMessage message3 = InternalMessage.builder().payload("test event C").build();
+    Message message2 = Message.of("test event B");
+    Message message3 = Message.of("test event C");
 
-    List<InternalMessage> list = new ArrayList<>();
+    List<Message> list = new ArrayList<>();
     list.add(message2);
     list.add(message3);
-    InternalMessage messageCollection = InternalMessage.builder().payload(list).build();
+    Message messageCollection = Message.of(list);
     Event event2 = Event.builder(context).message(messageCollection).flow(flow).addVariable("key2", "value2").build();
 
     Event result = resultsHandler.aggregateResults(Collections.<Event>singletonList(event2), event1);
@@ -185,24 +184,24 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void aggregateMultipleMuleMessageCollections() {
-    InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
+    Message message1 = Message.of("test event A");
     Event event1 = Event.builder(context).message(message1).flow(flow).addVariable("key1", "value1").build();
 
-    InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
-    InternalMessage message3 = InternalMessage.builder().payload("test event C").build();
-    InternalMessage message4 = InternalMessage.builder().payload("test event D").build();
-    InternalMessage message5 = InternalMessage.builder().payload("test event E").build();
+    Message message2 = Message.of("test event B");
+    Message message3 = Message.of("test event C");
+    Message message4 = Message.of("test event D");
+    Message message5 = Message.of("test event E");
 
-    List<InternalMessage> list = new ArrayList<>();
+    List<Message> list = new ArrayList<>();
     list.add(message2);
     list.add(message3);
-    InternalMessage messageCollection = InternalMessage.builder().payload(list).build();
+    Message messageCollection = Message.of(list);
     Event event2 = Event.builder(context).message(messageCollection).flow(flow).addVariable("key2", "value2").build();
 
     List<InternalMessage> list2 = new ArrayList<>();
     list.add(message4);
     list.add(message5);
-    InternalMessage messageCollection2 = InternalMessage.builder().payload(list2).build();
+    Message messageCollection2 = Message.of(list2);
     Event event3 =
         Event.builder(context).message(messageCollection2).flow(flow).addVariable("key3", "value3").build();
 

@@ -9,9 +9,9 @@ package org.mule.runtime.core.routing.filters;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-
+import static org.mule.runtime.api.message.Message.of;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -32,13 +32,13 @@ public class ConsumableFilterTestCase extends AbstractMuleTestCase {
   @Test
   public void testRejectsConsumablePayload() throws Exception {
     InputStream is = new ByteArrayInputStream("TEST".getBytes());
-    InternalMessage message = InternalMessage.builder().payload(is).build();
+    Message message = of(is);
     assertThat("Should reject consumable payload", filter.accept(message, mock(Event.Builder.class)), is(false));
   }
 
   @Test
   public void testAcceptsNonConsumablePayload() throws Exception {
-    InternalMessage message = InternalMessage.builder().payload("TEST").build();
+    Message message = of("TEST");
     assertThat("Should accept non consumable payload", filter.accept(message, mock(Event.Builder.class)), is(true));
   }
 }

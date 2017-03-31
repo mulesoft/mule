@@ -7,11 +7,10 @@
 package org.mule.runtime.core.transformer.simple;
 
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION;
-
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.ArrayList;
@@ -31,13 +30,13 @@ public class CombineCollectionsTransformer extends AbstractAnnotatedObject imple
 
   @Override
   public Event process(Event event) throws MuleException {
-    InternalMessage msg = event.getMessage();
+    Message msg = event.getMessage();
 
     List<Object> payload = new ArrayList<>();
     Class<?> itemType = Object.class;
     if (MULE_MESSAGE_COLLECTION.isCompatibleWith(msg.getPayload().getDataType())) {
-      itemType = InternalMessage.class;
-      for (InternalMessage child : (Collection<InternalMessage>) msg.getPayload().getValue()) {
+      itemType = Message.class;
+      for (Message child : (Collection<Message>) msg.getPayload().getValue()) {
         Object childPayload = child.getPayload().getValue();
         if (childPayload instanceof Collection) {
           payload.addAll((Collection) childPayload);
@@ -52,7 +51,7 @@ public class CombineCollectionsTransformer extends AbstractAnnotatedObject imple
       payload.add(msg.getPayload().getValue());
     }
 
-    InternalMessage listMessage = InternalMessage.builder(msg).collectionPayload(payload, itemType).build();
+    Message listMessage = Message.builder(msg).collectionPayload(payload, itemType).build();
     return Event.builder(event).message(listMessage).build();
   }
 

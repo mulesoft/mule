@@ -8,16 +8,15 @@ package org.mule;
 
 import static java.lang.Class.forName;
 import static java.lang.Thread.sleep;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.openjdk.jmh.infra.Blackhole.consumeCPU;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -110,8 +109,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public Event processSource() throws MuleException {
-    return source.trigger(Event.builder(DefaultEventContext.create(flow, CONNECTOR_NAME))
-        .message(InternalMessage.of(PAYLOAD)).build());
+    return source.trigger(Event.builder(DefaultEventContext.create(flow, CONNECTOR_NAME)).message(of(PAYLOAD)).build());
   }
 
   @Benchmark
@@ -119,7 +117,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
     CountDownLatch latch = new CountDownLatch(getStreamIterations());
     for (int i = 0; i < getStreamIterations(); i++) {
       Mono.just(Event.builder(DefaultEventContext.create(flow, CONNECTOR_NAME))
-          .message(InternalMessage.of(PAYLOAD)).build()).transform(source.getListener()).doOnNext(event -> latch.countDown())
+          .message(of(PAYLOAD)).build()).transform(source.getListener()).doOnNext(event -> latch.countDown())
           .subscribe();
     }
     latch.await();
@@ -129,7 +127,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   @Benchmark
   public Event processFlow() throws MuleException {
     return flow.process(Event.builder(DefaultEventContext.create(flow, CONNECTOR_NAME))
-        .message(InternalMessage.of(PAYLOAD)).build());
+        .message(of(PAYLOAD)).build());
   }
 
   @Benchmark
@@ -137,7 +135,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
     CountDownLatch latch = new CountDownLatch(getStreamIterations());
     for (int i = 0; i < getStreamIterations(); i++) {
       Mono.just(Event.builder(DefaultEventContext.create(flow, CONNECTOR_NAME))
-          .message(InternalMessage.of(PAYLOAD)).build()).transform(flow).doOnNext(event -> latch.countDown()).subscribe();
+          .message(of(PAYLOAD)).build()).transform(flow).doOnNext(event -> latch.countDown()).subscribe();
     }
     latch.await();
     return latch;

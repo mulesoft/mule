@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.routing.filter;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 
 /**
  * The <code>Filter</code> interface allows Message filtering.
@@ -26,7 +26,7 @@ public interface Filter {
    *         will be removed when filters are cleaned up.
    */
   @Deprecated
-  boolean accept(InternalMessage message, Event.Builder builder);
+  boolean accept(Message message, Event.Builder builder);
 
   /**
    * Checks a given event against this filter.

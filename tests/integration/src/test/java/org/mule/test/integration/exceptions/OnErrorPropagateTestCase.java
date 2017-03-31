@@ -12,9 +12,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -39,23 +39,23 @@ public class OnErrorPropagateTestCase extends AbstractIntegrationTestCase {
   @Test
   public void typeMatch() throws Exception {
     verifyFlow("onErrorPropagateTypeMatch");
-    Optional<InternalMessage> customPath = muleContext.getClient().request("queue://custom1", RECEIVE_TIMEOUT).getRight();
+    Optional<Message> customPath = muleContext.getClient().request("queue://custom1", RECEIVE_TIMEOUT).getRight();
     assertThat(customPath.isPresent(), is(false));
-    Optional<InternalMessage> anyPath = muleContext.getClient().request("queue://any1", RECEIVE_TIMEOUT).getRight();
+    Optional<Message> anyPath = muleContext.getClient().request("queue://any1", RECEIVE_TIMEOUT).getRight();
     assertThat(anyPath.isPresent(), is(false));
   }
 
   @Test
   public void typeMatchAny() throws Exception {
     verifyFlow("onErrorPropagateTypeMatchAny");
-    Optional<InternalMessage> customPath = muleContext.getClient().request("queue://custom2", RECEIVE_TIMEOUT).getRight();
+    Optional<Message> customPath = muleContext.getClient().request("queue://custom2", RECEIVE_TIMEOUT).getRight();
     assertThat(customPath.isPresent(), is(false));
   }
 
   @Test
   public void typeMatchSeveral() throws Exception {
     verifyFlow("onErrorPropagateTypeMatchSeveral", true);
-    Optional<InternalMessage> anyPath = muleContext.getClient().request("queue://any", RECEIVE_TIMEOUT).getRight();
+    Optional<Message> anyPath = muleContext.getClient().request("queue://any", RECEIVE_TIMEOUT).getRight();
     assertThat(anyPath.isPresent(), is(false));
     verifyFlow("onErrorPropagateTypeMatchSeveral", false);
     anyPath = muleContext.getClient().request("queue://any", RECEIVE_TIMEOUT).getRight();

@@ -12,8 +12,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
-
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.HttpService;
@@ -63,7 +62,7 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testBinaryWithBridge() throws Exception {
     Object payload = Arrays.asList(42);
-    InternalMessage message = flowRunner("LocalService").withPayload(payload).run().getMessage();
+    Message message = flowRunner("LocalService").withPayload(payload).run().getMessage();
     assertNotNull(message);
     assertThat(message.getPayload().getValue(), equalTo(payload));
   }
