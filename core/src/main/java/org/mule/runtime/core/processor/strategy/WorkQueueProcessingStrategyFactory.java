@@ -31,10 +31,10 @@ import org.reactivestreams.Publisher;
 
 /**
  * Creates {@link WorkQueueProcessingStrategy} instances. This processing strategy dispatches incoming messages to a work queue
- * which is served by a pool of worker threads from the applications IO {@link Scheduler}. Processing of the flow is carried out
- * worker thread. If however, a {@link Processor} implements non-blocking behaviour such that processing continues in a different
- * thread then the effective number of thread used per request may be more than one.
- *
+ * which is served by a pool of worker threads from the applications IO {@link Scheduler}. While processing of the flow is carried
+ * out using a single worker thread when a {@link Processor} implements non-blocking behaviour then processing will continue in a
+ * {@link Processor} thread.
+ * <p/>
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
  *
  * @since 4.0

@@ -22,9 +22,9 @@ import org.reactivestreams.Publisher;
 
 /**
  * Processing strategy that processes the {@link Pipeline} in the caller thread and does not schedule the processing of any
- * {@link Processor} in a different thread pool regardless of their {@link ProcessingType}. Individual {@link Processor}'s may
- * however execute non-blocking operations, e.g. an outbound HTTP request, which would result in the {@link Pipeline} effectively
- * using multiple threads.
+ * {@link Processor} in a different thread pool regardless of their {@link ProcessingType}. While processing of the flow is
+ * carried out in the caller thread, when a {@link Processor} implements non-blocking behaviour then processing will continue in a
+ * {@link Processor} thread.
  */
 public class DirectProcessingStrategyFactory implements ProcessingStrategyFactory {
 
