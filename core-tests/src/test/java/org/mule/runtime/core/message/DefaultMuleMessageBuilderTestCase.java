@@ -152,8 +152,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void inboundPropertyMap() {
     Map<String, Serializable> inboundProperties = singletonMap(PROPERTY_KEY, PROPERTY_VALUE);
-    InternalMessage message =
-        (InternalMessage) new DefaultMessageBuilder().payload(TEST_PAYLOAD).inboundProperties(inboundProperties).build();
+    InternalMessage message = new DefaultMessageBuilder().payload(TEST_PAYLOAD).inboundProperties(inboundProperties).build();
 
     assertThat(message.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
     assertThat(message.getInboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
@@ -164,7 +163,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void inboundPropertyMapCopy() {
     Map<String, Serializable> inboundProperties = singletonMap(PROPERTY_KEY, PROPERTY_VALUE);
-    InternalMessage copy = (InternalMessage) new DefaultMessageBuilder(new DefaultMessageBuilder().payload(TEST_PAYLOAD)
+    InternalMessage copy = new DefaultMessageBuilder(new DefaultMessageBuilder().payload(TEST_PAYLOAD)
         .inboundProperties(inboundProperties).build()).build();
 
     assertThat(copy.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
@@ -176,8 +175,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void outboundPropertyMap() {
     Map<String, Serializable> outboundProperties = singletonMap(PROPERTY_KEY, PROPERTY_VALUE);
-    InternalMessage message =
-        (InternalMessage) new DefaultMessageBuilder().payload(TEST_PAYLOAD).outboundProperties(outboundProperties).build();
+    InternalMessage message = new DefaultMessageBuilder().payload(TEST_PAYLOAD).outboundProperties(outboundProperties).build();
 
     assertThat(message.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
     assertThat(message.getOutboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
@@ -188,7 +186,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void outboundPropertyMapCopy() {
     Map<String, Serializable> outboundProperties = singletonMap(PROPERTY_KEY, PROPERTY_VALUE);
-    InternalMessage copy = (InternalMessage) new DefaultMessageBuilder(new DefaultMessageBuilder().payload(TEST_PAYLOAD)
+    InternalMessage copy = new DefaultMessageBuilder(new DefaultMessageBuilder().payload(TEST_PAYLOAD)
         .outboundProperties(outboundProperties).build()).build();
 
     assertThat(copy.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
@@ -200,8 +198,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void inboundProperty() {
     InternalMessage message =
-        (InternalMessage) new DefaultMessageBuilder().payload(TEST_PAYLOAD).addInboundProperty(PROPERTY_KEY, PROPERTY_VALUE)
-            .build();
+        new DefaultMessageBuilder().payload(TEST_PAYLOAD).addInboundProperty(PROPERTY_KEY, PROPERTY_VALUE).build();
 
     assertThat(message.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
     assertThat(message.getInboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
@@ -211,8 +208,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void inboundPropertyDataType() {
-    InternalMessage message = (InternalMessage) new DefaultMessageBuilder().payload(TEST_PAYLOAD)
-        .addInboundProperty(PROPERTY_KEY, PROPERTY_VALUE, HTML_STRING).build();
+    InternalMessage message =
+        new DefaultMessageBuilder().payload(TEST_PAYLOAD).addInboundProperty(PROPERTY_KEY, PROPERTY_VALUE, HTML_STRING).build();
 
     assertThat(message.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
     assertThat(message.getInboundPropertyDataType(PROPERTY_KEY), equalTo(HTML_STRING));
@@ -222,9 +219,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void outboundProperty() {
-    InternalMessage message =
-        (InternalMessage) new DefaultMessageBuilder().payload(TEST_PAYLOAD).addOutboundProperty(PROPERTY_KEY, PROPERTY_VALUE)
-            .build();
+    InternalMessage message = new DefaultMessageBuilder().payload(TEST_PAYLOAD).addOutboundProperty(PROPERTY_KEY, PROPERTY_VALUE)
+        .build();
 
     assertThat(message.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
     assertThat(message.getOutboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
@@ -234,7 +230,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void outboundPropertyDataType() {
-    InternalMessage message = (InternalMessage) new DefaultMessageBuilder().payload(TEST_PAYLOAD)
+    InternalMessage message = new DefaultMessageBuilder().payload(TEST_PAYLOAD)
         .addOutboundProperty(PROPERTY_KEY, PROPERTY_VALUE, HTML_STRING).build();
 
     assertThat(message.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));

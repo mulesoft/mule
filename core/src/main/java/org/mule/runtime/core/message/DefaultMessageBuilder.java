@@ -26,7 +26,6 @@ import static org.mule.runtime.core.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.util.ObjectUtils.getString;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
@@ -275,7 +274,7 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public Message build() {
+  public InternalMessage build() {
     return new MessageImplementation(new TypedValue(payload, resolveDataType()), attributes,
                                      inboundProperties, outboundProperties, inboundAttachments,
                                      outboundAttachments, exceptionPayload);

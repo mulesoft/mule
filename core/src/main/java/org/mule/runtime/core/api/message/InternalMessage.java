@@ -225,7 +225,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     Builder outboundAttachments(Map<String, DataHandler> outbundAttachments);
 
     @Override
-    Message build();
+    InternalMessage build();
   }
 
   interface CollectionBuilder extends Message.CollectionBuilder, Builder {
