@@ -8,24 +8,25 @@ package org.mule.runtime.core.processor;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
 import static org.mule.runtime.core.config.i18n.CoreMessages.failedToInvoke;
 import static org.mule.runtime.core.config.i18n.CoreMessages.initialisationFailure;
 import static org.mule.runtime.core.config.i18n.CoreMessages.methodWithNumParamsNotFoundOnObject;
 import static org.mule.runtime.core.config.i18n.CoreMessages.methodWithParamsNotFoundOnObject;
-import static org.mule.runtime.core.api.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -206,8 +207,8 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
       }
 
       // If expression evaluates to a Message then use it's payload
-      if (arg instanceof InternalMessage) {
-        arg = ((InternalMessage) arg).getPayload().getValue();
+      if (arg instanceof Message) {
+        arg = ((Message) arg).getPayload().getValue();
       }
       return arg;
     } else {
@@ -243,15 +244,15 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
 
   protected Event createResultEvent(Event event, Object result) throws MuleException {
     Builder eventBuilder = Event.builder(event);
-    if (result instanceof InternalMessage) {
-      eventBuilder.message((InternalMessage) result);
+    if (result instanceof Message) {
+      eventBuilder.message((Message) result);
     } else if (result != null) {
       final TransformerTemplate template = new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result));
       template.setReturnDataType(DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build());
       eventBuilder
           .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, singletonList(template)));
     } else {
-      eventBuilder.message(InternalMessage.builder().nullPayload().build());
+      eventBuilder.message(of(null));
     }
     return eventBuilder.build();
   }

@@ -19,6 +19,7 @@ import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.DefaultEventContext;
@@ -495,22 +496,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * @param message message to get payload from
    * @return String representation of the message payload
    * @throws Exception if there is an unexpected error obtaining the payload representation
-   * @deprecated use {@link #getPayloadAsString(org.mule.runtime.api.message.Message)} instead
-   */
-  @Deprecated
-  protected String getPayloadAsString(InternalMessage message) throws Exception {
-    return (String) getPayload(message, DataType.STRING);
-  }
-
-  /**
-   * Uses {@link TransformationService} to get a {@link String} representation of a message.
-   *
-   * @param message message to get payload from
-   * @return String representation of the message payload
-   * @throws Exception if there is an unexpected error obtaining the payload representation
    */
   protected String getPayloadAsString(org.mule.runtime.api.message.Message message) throws Exception {
-    return getPayloadAsString((InternalMessage) message);
+    return (String) getPayload(message, DataType.STRING);
   }
 
   /**
@@ -520,7 +508,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * @return byte[] representation of the message payload
    * @throws Exception if there is an unexpected error obtaining the payload representation
    */
-  protected byte[] getPayloadAsBytes(InternalMessage message) throws Exception {
+  protected byte[] getPayloadAsBytes(Message message) throws Exception {
     return (byte[]) getPayload(message, DataType.BYTE_ARRAY);
   }
 
@@ -532,7 +520,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * @return representation of the message payload of the required dataType
    * @throws Exception if there is an unexpected error obtaining the payload representation
    */
-  protected Object getPayload(InternalMessage message, DataType dataType) throws Exception {
+  protected Object getPayload(Message message, DataType dataType) throws Exception {
     return muleContext.getTransformationService().transform(message, dataType).getPayload().getValue();
   }
 

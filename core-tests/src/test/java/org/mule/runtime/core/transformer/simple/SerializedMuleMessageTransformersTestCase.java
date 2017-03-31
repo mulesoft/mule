@@ -8,6 +8,7 @@ package org.mule.runtime.core.transformer.simple;
 
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.session.DefaultMuleSession;
@@ -26,7 +27,7 @@ import org.junit.Ignore;
 
 public class SerializedMuleMessageTransformersTestCase extends AbstractTransformerTestCase {
 
-  private InternalMessage testObject = null;
+  private Message testObject = null;
 
   @Override
   protected void doSetUp() throws Exception {

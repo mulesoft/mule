@@ -10,10 +10,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.functional.FlowAssert;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class MulticasterAsyncTestCase extends AbstractIntegrationTestCase {
     List<Apple> results = new ArrayList<>(3);
 
     MuleClient client = muleContext.getClient();
-    InternalMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
+    Message result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     results.add((Apple) result.getPayload().getValue());
 

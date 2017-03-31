@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -25,7 +26,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -116,7 +116,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setReplySource(target.getMessageSource());
     asyncReplyMP.setMuleContext(muleContext);
 
-    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
+    Event event = eventBuilder().message(of(TEST_MESSAGE)).build();
 
     try {
       asyncReplyMP.process(event);

@@ -8,16 +8,15 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.api.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -51,7 +50,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
   public void testExplicitMethodMatch() throws Exception {
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("blah"))
+        .message(of("blah"))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new WaterMelon(), eventContext, Event.builder(eventContext.getEvent()));
@@ -62,7 +61,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
   public void testExplicitMethodMatchComplexObject() throws Exception {
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(new FruitLover("Mmmm")))
+        .message(of(new FruitLover("Mmmm")))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new FruitBowl(), eventContext, Event.builder(eventContext.getEvent()));
@@ -74,7 +73,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
     MuleEventContext eventContext =
         new DefaultMuleEventContext(flowConstruct, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-            .message(InternalMessage.of(new Object[] {new Apple(), new Banana()}))
+            .message(of(new Object[] {new Apple(), new Banana()}))
             .build());
     InvocationResult result = resolver.invoke(new FruitBowl(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
@@ -85,7 +84,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
     assertEquals("addAppleAndBanana", result.getMethodCalled());
     eventContext =
         new DefaultMuleEventContext(flowConstruct, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-            .message(InternalMessage.of(new Object[] {new Banana(), new Apple()}))
+            .message(of(new Object[] {new Banana(), new Apple()}))
             .build());
     result = resolver.invoke(new FruitBowl(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
@@ -99,7 +98,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
   public void testExplicitMethodMatchSetArrayFail() throws Exception {
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(new Fruit[] {new Apple(), new Orange()}))
+        .message(of(new Fruit[] {new Apple(), new Orange()}))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new FruitBowl(), eventContext, Event.builder(eventContext.getEvent()));
@@ -111,7 +110,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
   public void testExplicitMethodMatchSetArrayPass() throws Exception {
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(new Object[] {new Fruit[] {new Apple(), new Orange()}}))
+        .message(of(new Object[] {new Fruit[] {new Apple(), new Orange()}}))
         .build();
     MuleEventContext eventContext =
         new DefaultMuleEventContext(flowConstruct, event);
@@ -125,9 +124,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
   @Test
   public void testFailEntryPointMultiplePayloadMatches() throws Exception {
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
-    final Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("Hello"))
-        .build();
+    final Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(of("Hello")).build();
     setCurrentEvent(testEvent);
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, getCurrentEvent());
     InvocationResult result =
@@ -138,9 +135,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
   @Test
   public void testMatchOnNoArgs() throws Exception {
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(null))
-        .build();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(of(null)).build();
     // This should fail because the Kiwi.bite() method has a void return type, and by default
     // void methods are ignorred
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
@@ -161,9 +156,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
     e.setSuperclass(WaterMelon.class);
     e.setCallback(new DummyMethodCallback());
     Object proxy = e.create();
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("Blah"))
-        .build();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(of("Blah")).build();
 
     MuleEventContext context = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(proxy, context, Event.builder(context.getEvent()));

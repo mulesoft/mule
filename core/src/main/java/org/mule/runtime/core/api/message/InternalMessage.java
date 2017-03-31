@@ -45,16 +45,6 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
   }
 
   /**
-   * Create a new {@link Message instance} with the given payload.
-   *
-   * @param payload the message payload
-   * @return new message instance
-   */
-  static InternalMessage of(Object payload) {
-    return builder().payload(payload).build();
-  }
-
-  /**
    * If an error occurred during the processing of this message this will return a ErrorPayload that contains the root exception
    * and Mule error code, plus any other related info
    *
@@ -235,7 +225,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     Builder outboundAttachments(Map<String, DataHandler> outbundAttachments);
 
     @Override
-    InternalMessage build();
+    Message build();
   }
 
   interface CollectionBuilder extends Message.CollectionBuilder, Builder {

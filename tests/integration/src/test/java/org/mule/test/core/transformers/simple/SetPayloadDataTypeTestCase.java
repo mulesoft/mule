@@ -10,8 +10,8 @@ package org.mule.test.core.transformers.simple;
 import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class SetPayloadDataTypeTestCase extends AbstractIntegrationTestCase {
   }
 
   private void doSetPayloadTest(String flowName) throws Exception {
-    InternalMessage response = flowRunner(flowName).withPayload(TEST_MESSAGE).run().getMessage();
+    Message response = flowRunner(flowName).withPayload(TEST_MESSAGE).run().getMessage();
 
     assertThat(response.getPayload().getDataType(), like(String.class, MediaType.XML, UTF_16));
   }

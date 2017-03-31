@@ -9,8 +9,12 @@ package org.mule.runtime.core.processor;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.store.ObjectStore;
@@ -204,7 +208,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       byte[] bytes = (byte[]) objectToByteArray.transform(payload);
       if (payload instanceof InputStream) {
         // We've consumed the stream.
-        event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(bytes).build()).build();
+        event = Event.builder(event).message(Message.builder(event.getMessage()).payload(bytes).build()).build();
       }
       MessageDigest md = MessageDigest.getInstance(messageDigestAlgorithm);
       byte[] digestedBytes = md.digest(bytes);

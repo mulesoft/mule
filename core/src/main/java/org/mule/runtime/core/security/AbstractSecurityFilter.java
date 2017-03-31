@@ -6,22 +6,19 @@
  */
 package org.mule.runtime.core.security;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.security.SecurityException;
+import org.mule.runtime.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
-import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
-import org.mule.runtime.api.security.SecurityProviderNotFoundException;
-import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.transformer.TransformerTemplate;
 import org.mule.runtime.core.util.StringUtils;
 
 import org.slf4j.Logger;
@@ -101,10 +98,4 @@ public abstract class AbstractSecurityFilter implements MuleContextAware, Securi
   public abstract Event doFilter(Event event) throws SecurityException, UnknownAuthenticationTypeException,
       CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 
-  protected Event updatePayload(InternalMessage message, final Object payload, Event event) throws MuleException {
-    TransformerTemplate trans = new TransformerTemplate(message1 -> payload);
-
-    return Event.builder(event)
-        .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, trans)).build();
-  }
 }

@@ -13,11 +13,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.functional.exceptions.FunctionalTestException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.message.ExceptionMessage;
@@ -73,8 +72,8 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
 
     flowRunner("testService2").withPayload(TEST_PAYLOAD).dispatch();
 
-    InternalMessage out2 = client.request("test://out2", RECEIVE_TIMEOUT).getRight().get();
-    InternalMessage out3 = client.request("test://out3", RECEIVE_TIMEOUT).getRight().get();
+    Message out2 = client.request("test://out2", RECEIVE_TIMEOUT).getRight().get();
+    Message out3 = client.request("test://out3", RECEIVE_TIMEOUT).getRight().get();
     assertExceptionMessage(out2);
     assertExceptionMessage(out3);
     assertThat(out2, equalTo(out3));
@@ -86,7 +85,7 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
 
     flowRunner("testService3").withPayload(TEST_PAYLOAD).dispatch();
 
-    InternalMessage out4 = mc.request("test://out4", RECEIVE_TIMEOUT).getRight().get();
+    Message out4 = mc.request("test://out4", RECEIVE_TIMEOUT).getRight().get();
     assertEquals("ERROR!", getPayloadAsString(out4));
   }
 
@@ -99,7 +98,7 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
     MuleClient client = muleContext.getClient();
     flowRunner("testService6").withPayload(map).dispatch();
 
-    InternalMessage message = client.request("test://out6", RECEIVE_TIMEOUT).getRight().get();
+    Message message = client.request("test://out6", RECEIVE_TIMEOUT).getRight().get();
 
     assertTrue(message.getPayload().getValue() instanceof ExceptionMessage);
     Object payload = ((ExceptionMessage) message.getPayload().getValue()).getPayload();
@@ -133,7 +132,7 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
     });
   }
 
-  private void assertExceptionMessage(InternalMessage out) {
+  private void assertExceptionMessage(Message out) {
     assertThat(out.getPayload().getValue(), is(instanceOf(ExceptionMessage.class)));
     ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload().getValue();
     assertThat(exceptionMessage.getException().getCause().getCause(), is(instanceOf(FunctionalTestException.class)));

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.routing;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.message.GroupCorrelation;
@@ -48,7 +48,7 @@ public class MessageChunkSplitter extends AbstractSplitter {
       throw new RoutingException(CoreMessages.failedToReadPayload(), next, e);
     }
 
-    InternalMessage message = event.getMessage();
+    Message message = event.getMessage();
     int parts = data.length / messageSize;
     if ((parts * messageSize) < data.length) {
       parts++;
@@ -64,7 +64,7 @@ public class MessageChunkSplitter extends AbstractSplitter {
       buffer = new byte[len];
       System.arraycopy(data, pos, buffer, 0, buffer.length);
       pos += len;
-      final Event childEvent = Event.builder(event).message(InternalMessage.builder(message).payload(buffer).build())
+      final Event childEvent = Event.builder(event).message(Message.builder(message).payload(buffer).build())
           .groupCorrelation(new GroupCorrelation(parts, count)).build();
 
       messageParts.add(childEvent);

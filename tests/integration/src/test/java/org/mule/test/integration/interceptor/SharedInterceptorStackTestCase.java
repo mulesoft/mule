@@ -9,6 +9,7 @@ package org.mule.test.integration.interceptor;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -26,13 +27,13 @@ public class SharedInterceptorStackTestCase extends AbstractIntegrationTestCase 
 
   @Test
   public void testSharedInterceptorOnServiceOne() throws Exception {
-    InternalMessage response = flowRunner("serviceOne").withPayload(TEST_MESSAGE).run().getMessage();
+    Message response = flowRunner("serviceOne").withPayload(TEST_MESSAGE).run().getMessage();
     assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentOne", response.getPayload().getValue());
   }
 
   @Test
   public void testSharedInterceptorOnServiceTwo() throws Exception {
-    InternalMessage response = flowRunner("serviceTwo").withPayload(TEST_MESSAGE).run().getMessage();
+    Message response = flowRunner("serviceTwo").withPayload(TEST_MESSAGE).run().getMessage();
     assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentTwo", response.getPayload().getValue());
   }
 

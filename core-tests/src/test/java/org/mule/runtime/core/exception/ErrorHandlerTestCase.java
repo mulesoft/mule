@@ -17,32 +17,25 @@ import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.core.exception.ErrorTypeRepository.CRITICAL_ERROR_TYPE;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -68,7 +61,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws MuleException {
-    when(mockMuleEvent.getMessage()).thenReturn(InternalMessage.builder().payload("").build());
+    when(mockMuleEvent.getMessage()).thenReturn(Message.of(""));
     when(mockMuleEvent.getMuleContext()).thenReturn(mockMuleContext);
     Error mockError = mock(Error.class);
     when(mockError.getErrorType()).thenReturn(mockErrorType);

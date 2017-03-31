@@ -282,7 +282,7 @@ public class TestEventBuilder {
     if (attributes != null) {
       messageBuilder.attributes(attributes);
     }
-    final InternalMessage muleMessage = messageBuilder.build();
+    final Message muleMessage = messageBuilder.build();
 
     EventContext eventContext;
     if (externalCompletionCallback != null) {
@@ -292,7 +292,7 @@ public class TestEventBuilder {
     }
 
     Event event = Event.builder(eventContext)
-        .message((InternalMessage) spyTransformer.transform(muleMessage)).variables(variables).groupCorrelation(correlation)
+        .message((Message) spyTransformer.transform(muleMessage)).variables(variables).groupCorrelation(correlation)
         .flow(flow).replyToHandler(replyToHandler).build();
 
     for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {

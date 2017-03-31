@@ -8,6 +8,7 @@ package org.mule.runtime.core.routing;
 
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -69,7 +70,7 @@ public class AbstractDynamicRoundRobinTestCase extends AbstractMuleContextTestCa
   }
 
   protected Event getEventWithId(String id) throws Exception {
-    return eventBuilder().message(InternalMessage.builder().payload(TEST_MESSAGE).build())
+    return eventBuilder().message(Message.of(TEST_MESSAGE))
         .addVariable(ID_PROPERTY_NAME, id).build();
   }
 

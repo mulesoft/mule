@@ -15,7 +15,7 @@ import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.api.message.JmsMessageProperties;
 import org.mule.extensions.jms.test.JmsAbstractTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 
 import org.junit.Test;
 
@@ -50,12 +50,12 @@ public abstract class JmsAbstractQueueBridge extends JmsAbstractTestCase {
 
     executeBridge();
 
-    InternalMessage message = receiveMessageFromBridgeTarget();
+    Message message = receiveMessageFromBridgeTarget();
 
     assertExpectedMessage(message);
   }
 
-  protected void assertExpectedMessage(InternalMessage message) {
+  protected void assertExpectedMessage(Message message) {
     assertThat(message, hasPayload(equalTo(BRIDGED_PREFIX + FIRST_MESSAGE)));
     assertThat(message.getAttributes(), not(nullValue()));
 
@@ -64,7 +64,7 @@ public abstract class JmsAbstractQueueBridge extends JmsAbstractTestCase {
     assertThat(properties.getUserProperties().get(PROPERTY_KEY_VALUE), is(equalTo(PROPERTY_VALUE_VALUE)));
   }
 
-  protected InternalMessage receiveMessageFromBridgeTarget() throws Exception {
+  protected Message receiveMessageFromBridgeTarget() throws Exception {
     return flowRunner(BRIDGE_RECEIVER_FLOW)
         .withVariable(FINAL_DESTINATION_VAR, FINAL_DESTINATION)
         .run()

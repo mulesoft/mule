@@ -6,14 +6,12 @@
  */
 package org.mule.test.integration.transformer;
 
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertThat;
-
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
-
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 
 public class TransformerTrackerLifecycleTestCase extends AbstractIntegrationTestCase {
 
@@ -24,7 +22,7 @@ public class TransformerTrackerLifecycleTestCase extends AbstractIntegrationTest
 
   @Test
   public void testLifecycle() throws Exception {
-    final InternalMessage result = flowRunner("EchoService").withPayload("foo").run().getMessage();
+    final Message result = flowRunner("EchoService").withPayload("foo").run().getMessage();
 
     final LifecycleTrackerTransformer ltt = (LifecycleTrackerTransformer) result.getPayload().getValue();
 

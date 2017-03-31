@@ -9,16 +9,15 @@ package org.mule.runtime.core.el.mvel.datatype;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.mvel2.MVEL.compileExpression;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -41,7 +40,7 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression("foo = 'unused'", new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    Event testEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).addVariable("foo", "bar").build();
+    Event testEvent = eventBuilder().message(of(TEST_MESSAGE)).addVariable("foo", "bar").build();
 
     final Builder builder = Event.builder(testEvent);
     dataTypePropagator.propagate(testEvent, builder, new TypedValue<>(TEST_MESSAGE, expectedDataType), compiledExpression);

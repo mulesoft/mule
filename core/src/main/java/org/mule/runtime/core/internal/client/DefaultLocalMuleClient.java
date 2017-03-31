@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.client;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
@@ -22,6 +23,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -70,13 +72,13 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   @Override
-  public Either<Error, InternalMessage> send(String url, Object payload, Map<String, Serializable> messageProperties)
+  public Either<Error, Message> send(String url, Object payload, Map<String, Serializable> messageProperties)
       throws MuleException {
     return send(url, createMessage(payload, messageProperties));
   }
 
   @Override
-  public Either<Error, InternalMessage> send(String url, InternalMessage message) throws MuleException {
+  public Either<Error, Message> send(String url, Message message) throws MuleException {
     final Processor connectorMessageProcessor = getConnectorMessageProcessLocator()
         .locateConnectorOperation(url, newOptions().outbound().build(), REQUEST_RESPONSE);
     if (connectorMessageProcessor != null) {
@@ -89,7 +91,7 @@ public class DefaultLocalMuleClient implements MuleClient {
     }
   }
 
-  private Either<Error, InternalMessage> createEitherResult(Event muleEvent) {
+  private Either<Error, Message> createEitherResult(Event muleEvent) {
     if (muleEvent == null) {
       // This should never return a null event. This happen because of mule 3.x behaviour with filters.
       // We will just return an error in this case.
@@ -104,7 +106,7 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   @Override
-  public Either<Error, InternalMessage> send(String url, InternalMessage message, OperationOptions operationOptions)
+  public Either<Error, Message> send(String url, Message message, OperationOptions operationOptions)
       throws MuleException {
     final Processor connectorMessageProcessor = getConnectorMessageProcessLocator()
         .locateConnectorOperation(url, operationOptions, REQUEST_RESPONSE);
@@ -123,19 +125,19 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   @Override
-  public Either<Error, InternalMessage> send(String url, Object payload, Map<String, Serializable> messageProperties,
-                                             long timeout)
+  public Either<Error, Message> send(String url, Object payload, Map<String, Serializable> messageProperties,
+                                     long timeout)
       throws MuleException {
     return send(url, createMessage(payload, messageProperties), timeout);
 
   }
 
   @Override
-  public Either<Error, InternalMessage> send(String url, InternalMessage message, long timeout) throws MuleException {
+  public Either<Error, Message> send(String url, Message message, long timeout) throws MuleException {
     return send(url, message, newOptions().outbound().responseTimeout(timeout).build());
   }
 
-  protected InternalMessage createMessage(Object payload, Map<String, Serializable> messageProperties) {
+  protected Message createMessage(Object payload, Map<String, Serializable> messageProperties) {
     final Builder builder = InternalMessage.builder().payload(payload);
     if (messageProperties != null) {
       builder.outboundProperties(messageProperties);
@@ -144,7 +146,7 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   @Override
-  public void dispatch(String url, InternalMessage message) throws MuleException {
+  public void dispatch(String url, Message message) throws MuleException {
     final Processor connectorMessageProcessor = getConnectorMessageProcessLocator()
         .locateConnectorOperation(url, newOptions().outbound().build(), ONE_WAY);
     if (connectorMessageProcessor != null) {
@@ -158,7 +160,7 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   @Override
-  public void dispatch(String url, InternalMessage message, OperationOptions operationOptions) throws MuleException {
+  public void dispatch(String url, Message message, OperationOptions operationOptions) throws MuleException {
     final Processor connectorMessageProcessor =
         getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, ONE_WAY);
     if (connectorMessageProcessor != null) {
@@ -172,7 +174,7 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   @Override
-  public Either<Error, Optional<InternalMessage>> request(String url, long timeout) throws MuleException {
+  public Either<Error, Optional<Message>> request(String url, long timeout) throws MuleException {
     final OperationOptions operationOptions = newOptions().responseTimeout(timeout).build();
     final Processor connectorMessageProcessor =
         getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, ONE_WAY);
@@ -181,7 +183,7 @@ public class DefaultLocalMuleClient implements MuleClient {
         ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
       }
       final Event event =
-          connectorMessageProcessor.process(createMuleEvent(InternalMessage.builder().nullPayload().build()));
+          connectorMessageProcessor.process(createMuleEvent(of(null)));
       if (event == null) {
         return right(empty());
       }
@@ -194,11 +196,11 @@ public class DefaultLocalMuleClient implements MuleClient {
     }
   }
 
-  protected Event createMuleEvent(InternalMessage message) throws MuleException {
+  protected Event createMuleEvent(Message message) throws MuleException {
     return baseEventBuilder(message).build();
   }
 
-  private org.mule.runtime.core.api.Event.Builder baseEventBuilder(InternalMessage message) {
+  private org.mule.runtime.core.api.Event.Builder baseEventBuilder(Message message) {
     return Event.builder(create(flowConstruct, "muleClient")).message(message).flow(flowConstruct);
   }
 

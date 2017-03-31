@@ -84,7 +84,6 @@ public class DefaultEventBuilder implements Event.Builder {
     this.flowCallStack = event.getFlowCallStack().clone();
     this.replyToHandler = event.getReplyToHandler();
     this.replyToDestination = event.getReplyToDestination();
-    this.message = event.getMessage();
     this.session = event.getSession();
     this.error = event.getError().orElse(null);
     this.notificationsEnabled = event.isNotificationsEnabled();
@@ -191,7 +190,7 @@ public class DefaultEventBuilder implements Event.Builder {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
-      return new EventImplementation(context, (InternalMessage) message, flowVariables, flow, session, replyToDestination,
+      return new EventImplementation(context, message, flowVariables, flow, session, replyToDestination,
                                      replyToHandler,
                                      flowCallStack, groupCorrelation, error, legacyCorrelationId, notificationsEnabled);
     }
@@ -213,7 +212,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
     private EventContext context;
     // TODO MULE-10013 make this final
-    private InternalMessage message;
+    private Message message;
     private final MuleSession session;
     // TODO MULE-10013 make this final
     private transient FlowConstruct flowConstruct;
@@ -235,7 +234,7 @@ public class DefaultEventBuilder implements Event.Builder {
     private String flowName;
 
     // Use this constructor from the builder
-    private EventImplementation(EventContext context, InternalMessage message, Map<String, TypedValue<Object>> variables,
+    private EventImplementation(EventContext context, Message message, Map<String, TypedValue<Object>> variables,
                                 FlowConstruct flowConstruct, MuleSession session,
                                 Object replyToDestination, ReplyToHandler replyToHandler,
                                 FlowCallStack flowCallStack, GroupCorrelation groupCorrelation, Error error,
@@ -267,7 +266,7 @@ public class DefaultEventBuilder implements Event.Builder {
     }
 
     @Override
-    public InternalMessage getMessage() {
+    public Message getMessage() {
       return message;
     }
 
@@ -298,7 +297,7 @@ public class DefaultEventBuilder implements Event.Builder {
         throw new TransformerException(CoreMessages.objectIsNull("outputType"));
       }
 
-      InternalMessage transformedMessage = muleContext.getTransformationService().transform(message, outputType);
+      Message transformedMessage = muleContext.getTransformationService().transform(message, outputType);
       if (message.getPayload().getDataType().isStreamType()) {
         setMessage(transformedMessage);
       }
@@ -336,7 +335,7 @@ public class DefaultEventBuilder implements Event.Builder {
     @Override
     public String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException {
       try {
-        InternalMessage transformedMessage = muleContext.getTransformationService()
+        Message transformedMessage = muleContext.getTransformationService()
             .transform(message, DataType.builder().type(String.class).charset(encoding).build());
         if (message.getPayload().getDataType().isStreamType()) {
           setMessage(transformedMessage);
@@ -444,7 +443,7 @@ public class DefaultEventBuilder implements Event.Builder {
       }
     }
 
-    private void setMessage(InternalMessage message) {
+    private void setMessage(Message message) {
       this.message = message;
     }
 

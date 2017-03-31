@@ -11,6 +11,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
@@ -44,7 +45,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
@@ -287,8 +287,7 @@ public class MuleExtensionUtils {
         return null;
       }
     };
-    return Event.builder(create(flowConstruct, "InitializerEvent")).message(InternalMessage.builder().nullPayload().build())
-        .flow(flowConstruct).build();
+    return Event.builder(create(flowConstruct, "InitializerEvent")).message(of(null)).flow(flowConstruct).build();
   }
 
   /**

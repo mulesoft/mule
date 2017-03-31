@@ -8,8 +8,8 @@ package org.mule.test.integration.transformer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import org.mule.runtime.api.message.Message;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class TransformerOnMessageCollectionTestCase extends AbstractIntegrationT
     values.add("One");
     values.add("Two");
 
-    InternalMessage response = flowRunner("test").withPayload(values).run().getMessage();
+    Message response = flowRunner("test").withPayload(values).run().getMessage();
     assertEquals("foo", response.getPayload().getValue());
     assertFalse(response.getPayload().getValue() instanceof List);
   }

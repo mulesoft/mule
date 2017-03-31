@@ -11,9 +11,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-
+import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
@@ -24,25 +23,25 @@ public class PayloadTypeFilterTestCase extends AbstractMuleTestCase {
   public void testPayloadTypeFilterNoExpectedType() {
     PayloadTypeFilter filter = new PayloadTypeFilter();
     assertNull(filter.getExpectedType());
-    assertFalse(filter.accept(InternalMessage.builder().payload("test").build(), mock(Event.Builder.class)));
+    assertFalse(filter.accept(of("test"), mock(Event.Builder.class)));
 
     filter.setExpectedType(String.class);
-    assertTrue(filter.accept(InternalMessage.builder().payload("test").build(), mock(Event.Builder.class)));
+    assertTrue(filter.accept(of("test"), mock(Event.Builder.class)));
 
     filter.setExpectedType(null);
-    assertFalse(filter.accept(InternalMessage.builder().payload("test").build(), mock(Event.Builder.class)));
+    assertFalse(filter.accept(of("test"), mock(Event.Builder.class)));
   }
 
   @Test
   public void testPayloadTypeFilter() {
     PayloadTypeFilter filter = new PayloadTypeFilter(Exception.class);
     assertNotNull(filter.getExpectedType());
-    assertTrue(filter.accept(InternalMessage.builder().payload(new Exception("test")).build(), mock(Event.Builder.class)));
-    assertTrue(!filter.accept(InternalMessage.builder().payload("test").build(), mock(Event.Builder.class)));
+    assertTrue(filter.accept(of((new Exception("test"))), mock(Event.Builder.class)));
+    assertTrue(!filter.accept(of("test"), mock(Event.Builder.class)));
 
     filter.setExpectedType(String.class);
-    assertTrue(filter.accept(InternalMessage.builder().payload("test").build(), mock(Event.Builder.class)));
-    assertTrue(!filter.accept(InternalMessage.builder().payload(new Exception("test")).build(), mock(Event.Builder.class)));
+    assertTrue(filter.accept(of("test"), mock(Event.Builder.class)));
+    assertTrue(!filter.accept(of(new Exception("test")), mock(Event.Builder.class)));
   }
 
 }

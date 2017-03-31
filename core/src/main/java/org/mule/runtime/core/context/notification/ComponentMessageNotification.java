@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
@@ -29,11 +29,7 @@ public class ComponentMessageNotification extends ServerNotification {
     registerAction("component post invoke", COMPONENT_POST_INVOKE);
   }
 
-  /**
-   * @param message
-   * @param action
-   */
-  public ComponentMessageNotification(InternalMessage message, Component component, FlowConstruct flowConstruct, int action) {
+  public ComponentMessageNotification(Message message, Component component, FlowConstruct flowConstruct, int action) {
     super(message, action);
     this.flowConstruct = flowConstruct;
     this.component = component;
@@ -60,8 +56,8 @@ public class ComponentMessageNotification extends ServerNotification {
   }
 
   @Override
-  public InternalMessage getSource() {
-    return (InternalMessage) super.getSource();
+  public Message getSource() {
+    return (Message) super.getSource();
   }
 
   public FlowConstruct getFlowConstruct() {

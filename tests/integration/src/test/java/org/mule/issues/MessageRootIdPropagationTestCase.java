@@ -7,13 +7,13 @@
 package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
-
 import org.mule.functional.junit4.FlowRunner;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -52,7 +52,7 @@ public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCas
   static class RootIDGatherer extends AbstractMessageTransformer {
 
     static int messageCount;
-    static Map<String, InternalMessage> idMap;
+    static Map<String, Message> idMap;
     static int counter;
 
 
@@ -61,9 +61,9 @@ public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCas
       messageCount = 0;
     }
 
-    public static synchronized void process(InternalMessage msg) {
+    public static synchronized void process(Message msg) {
       messageCount++;
-      String where = msg.<String>getOutboundProperty("where");
+      String where = ((InternalMessage) msg).getOutboundProperty("where");
       if (where == null) {
         where = "location_" + counter++;
       }
@@ -76,7 +76,7 @@ public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCas
       return event.getMessage().getPayload().getValue();
     }
 
-    public static Set<InternalMessage> getIds() {
+    public static Set<Message> getIds() {
       return new HashSet<>(idMap.values());
     }
 
@@ -84,7 +84,7 @@ public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCas
       return messageCount;
     }
 
-    public static Map<String, InternalMessage> getIdMap() {
+    public static Map<String, Message> getIdMap() {
       return idMap;
     }
   }

@@ -8,9 +8,9 @@ package org.mule.runtime.core.routing.outbound;
 
 import org.mule.runtime.api.el.ExpressionEvaluator;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
@@ -51,7 +51,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
   public Event route(Event event) throws RoutingException {
     Event result;
 
-    InternalMessage message = event.getMessage();
+    Message message = event.getMessage();
 
     if (routes == null || routes.size() == 0) {
       throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), null);
@@ -83,7 +83,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
       return true;
     }
 
-    InternalMessage message = muleContext.getTransformationService().applyTransformers(event.getMessage(), null, transformers);
+    Message message = muleContext.getTransformationService().applyTransformers(event.getMessage(), null, transformers);
     event = Event.builder(event).message(message).build();
     builder.message(message);
 

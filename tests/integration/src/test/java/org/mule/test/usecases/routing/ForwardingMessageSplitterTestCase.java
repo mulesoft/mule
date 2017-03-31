@@ -9,9 +9,9 @@ package org.mule.test.usecases.routing;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ public class ForwardingMessageSplitterTestCase extends AbstractIntegrationTestCa
     payload.add(new Integer(3));
     payload.add(new Exception());
     flowRunner("forwardingSplitter").withPayload(payload).run();
-    InternalMessage m = client.request("test://component.1", RECEIVE_TIMEOUT).getRight().get();
+    Message m = client.request("test://component.1", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(m);
     assertThat(m.getPayload().getValue(), instanceOf(String.class));
     m = client.request("test://component.2", RECEIVE_TIMEOUT).getRight().get();

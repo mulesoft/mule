@@ -7,13 +7,12 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.cannotCopyStreamPayload;
-
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.DispatchException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -51,7 +50,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
    * @return
    * @throws MuleException
    */
-  protected final Event sendRequest(final Event routedEvent, final InternalMessage message, final Processor route,
+  protected final Event sendRequest(final Event routedEvent, final Message message, final Processor route,
                                     boolean awaitResponse)
       throws MuleException {
     Event result;
@@ -64,7 +63,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
     }
 
     if (result != null) {
-      InternalMessage resultMessage = result.getMessage();
+      Message resultMessage = result.getMessage();
       if (logger.isTraceEnabled()) {
         if (resultMessage != null) {
           try {
@@ -79,7 +78,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
     return result;
   }
 
-  private Event sendRequestEvent(Event routedEvent, InternalMessage message, Processor route, boolean awaitResponse)
+  private Event sendRequestEvent(Event routedEvent, Message message, Processor route, boolean awaitResponse)
       throws MuleException {
     if (route == null) {
       throw new DispatchException(CoreMessages.objectIsNull("route"), null);
@@ -91,7 +90,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
   /**
    * Create a new event to be routed to the target MP
    */
-  protected Event createEventToRoute(Event routedEvent, InternalMessage message, Processor route) {
+  protected Event createEventToRoute(Event routedEvent, Message message, Processor route) {
     return Event.builder(routedEvent).message(message).build();
   }
 
@@ -108,7 +107,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
    * @param message
    * @throws MuleException if the payload is consumable
    */
-  public static void validateMessageIsNotConsumable(Event event, InternalMessage message) throws MuleException {
+  public static void validateMessageIsNotConsumable(Event event, Message message) throws MuleException {
     if (message.getPayload().getDataType().isStreamType()) {
       throw new DefaultMuleException(cannotCopyStreamPayload(message.getPayload().getDataType().getType().getName()));
     }

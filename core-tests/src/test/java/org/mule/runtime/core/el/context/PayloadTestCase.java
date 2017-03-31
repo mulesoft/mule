@@ -13,7 +13,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import static org.mule.runtime.api.message.Message.of;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
@@ -27,7 +28,7 @@ import org.mockito.ArgumentCaptor;
 public class PayloadTestCase extends AbstractELTestCase {
 
   private Event event;
-  private InternalMessage message;
+  private Message message;
   private Event.Builder eventBuilder;
 
   public PayloadTestCase(String mvelOptimizer) {
@@ -53,7 +54,7 @@ public class PayloadTestCase extends AbstractELTestCase {
 
   @Test
   public void assignPayload() throws Exception {
-    message = InternalMessage.builder().payload("").build();
+    message = of("");
     when(event.getMessage()).thenReturn(message);
     evaluate("payload = 'foo'", event, eventBuilder);
     ArgumentCaptor<InternalMessage> argument = ArgumentCaptor.forClass(InternalMessage.class);

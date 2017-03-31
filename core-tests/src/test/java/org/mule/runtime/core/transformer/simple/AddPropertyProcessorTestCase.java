@@ -8,15 +8,14 @@ package org.mule.runtime.core.transformer.simple;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
-
 import org.mule.functional.transformer.simple.AbstractAddVariablePropertyProcessorTestCase;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.processor.simple.AddPropertyProcessor;
 import org.mule.tck.size.SmallTest;
-
-import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 @SmallTest
 public class AddPropertyProcessorTestCase extends AbstractAddVariablePropertyProcessorTestCase {
@@ -27,22 +26,22 @@ public class AddPropertyProcessorTestCase extends AbstractAddVariablePropertyPro
 
   @Override
   protected void verifyAdded(Event event, String key, String value) {
-    assertThat(event.getMessage().getOutboundProperty(key), is(value));
+    assertThat(((InternalMessage) event.getMessage()).getOutboundProperty(key), is(value));
   }
 
   @Override
   protected void verifyNotAdded(Event event) {
-    assertThat(event.getMessage().getOutboundPropertyNames(), empty());
+    assertThat(((InternalMessage) event.getMessage()).getOutboundPropertyNames(), empty());
   }
 
   @Override
   protected void verifyRemoved(Event event, String key) {
-    assertThat(event.getMessage().getOutboundProperty(key), is(nullValue()));
+    assertThat(((InternalMessage) event.getMessage()).getOutboundProperty(key), is(nullValue()));
   }
 
   @Override
   protected DataType getVariableDataType(Event event, String key) {
-    return event.getMessage().getOutboundPropertyDataType(key);
+    return ((InternalMessage) event.getMessage()).getOutboundPropertyDataType(key);
   }
 
 }

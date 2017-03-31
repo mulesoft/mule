@@ -7,6 +7,7 @@
 package org.mule.test.integration.message;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
@@ -17,7 +18,7 @@ public class RetrievePropertyTransformer extends AbstractMessageTransformer {
 
   @Override
   public Object transformMessage(Event event, Charset encoding) {
-    Object storedProperty = event.getMessage().getOutboundProperty(property);
+    Object storedProperty = ((InternalMessage) event.getMessage()).getOutboundProperty(property);
     return storedProperty != null ? storedProperty.getClass().getName() : null;
   }
 

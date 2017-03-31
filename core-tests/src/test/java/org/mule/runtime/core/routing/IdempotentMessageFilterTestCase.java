@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
@@ -40,7 +41,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
 
     final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR);
 
-    InternalMessage okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
+    Message okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
     Event event = Event.builder(context).message(okMessage).flow(getTestFlow(muleContext)).session(session).build();
 
     // This one will process the event on the target endpoint

@@ -23,7 +23,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -65,8 +64,7 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
     firstPolicyProcessorResultEvent = createTestEvent();
     secondPolicyResultProcessorEvent = createTestEvent();
     nextProcessResultEvent = createTestEvent();
-    when(operationPolicyParametersTransformer.get().fromParametersToMessage(any()))
-        .thenReturn(Message.builder().nullPayload().build());
+    when(operationPolicyParametersTransformer.get().fromParametersToMessage(any())).thenReturn(Message.of(null));
     when(operationExecutionFunction.execute(any(), any())).thenReturn(nextProcessResultEvent);
     when(firstPolicy.getPolicyChain().process(any())).thenReturn(firstPolicyProcessorResultEvent);
     when(secondPolicy.getPolicyChain().process(any())).thenReturn(secondPolicyResultProcessorEvent);
@@ -148,8 +146,7 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
   }
 
   private Event createTestEvent() {
-    return Event.builder(DefaultEventContext.create(mockFlowConstruct, "http"))
-        .message((InternalMessage) Message.builder().nullPayload().build()).build();
+    return Event.builder(DefaultEventContext.create(mockFlowConstruct, "http")).message(Message.of(null)).build();
   }
 
 }

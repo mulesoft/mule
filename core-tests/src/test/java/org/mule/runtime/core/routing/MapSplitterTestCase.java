@@ -8,8 +8,7 @@ package org.mule.runtime.core.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.runtime.core.api.message.InternalMessage;
+import static org.mule.runtime.api.message.Message.of;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public class MapSplitterTestCase extends AbstractMuleContextTestCase {
     testMap.put("2", "two");
     testMap.put("3", "three");
 
-    mapSplitter.process(eventBuilder().message(InternalMessage.of(testMap)).build());
+    mapSplitter.process(eventBuilder().message(of(testMap)).build());
 
     assertEquals(3, splitPayloads.size());
     assertTrue(splitPayloads.contains("one"));

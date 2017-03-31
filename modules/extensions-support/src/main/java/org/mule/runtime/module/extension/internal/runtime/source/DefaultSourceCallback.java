@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -174,7 +175,7 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
     MessageProcessContext messageProcessContext = processContextSupplier.get();
 
     SourceResultAdapter resultAdapter = new SourceResultAdapter(result, cursorProviderFactory, returnsListOfMessages);
-    Message message = Message.builder().payload(resultAdapter).build();
+    Message message = of(resultAdapter);
 
     Optional<TransactionConfig> transactionConfig = messageProcessContext.getTransactionConfig();
 

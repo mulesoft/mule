@@ -8,14 +8,14 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.routing.AsynchronousUntilSuccessfulProcessingStrategy.buildQueueKey;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.session.DefaultMuleSession;
@@ -58,7 +58,7 @@ public class PersistentStore6007TestCase extends AbstractIntegrationTestCase {
     Component.latch = latch;
     PersistentObjectStore.addEvents();
     muleContext.start();
-    InternalMessage result = flowRunner("input").withPayload("Hello").run().getMessage();
+    Message result = flowRunner("input").withPayload("Hello").run().getMessage();
     assertEquals("Hello", result.getPayload().getValue());
     assertTrue(latch.await(5000, TimeUnit.MILLISECONDS));
   }
@@ -70,8 +70,7 @@ public class PersistentStore6007TestCase extends AbstractIntegrationTestCase {
 
     static void addEvents() throws Exception {
       for (String str : new String[] {"A", "B", "C"}) {
-        Event event = eventBuilder().message(InternalMessage.builder().payload(str).build())
-            .session(new DefaultMuleSession()).build();
+        Event event = eventBuilder().message(of(str)).session(new DefaultMuleSession()).build();
         events.put(buildQueueKey(event, getTestFlow(muleContext), muleContext), event);
       }
     }

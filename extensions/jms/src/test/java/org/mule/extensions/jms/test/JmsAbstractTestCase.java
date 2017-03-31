@@ -16,19 +16,20 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.mule.extensions.jms.test.JmsMessageStorage.cleanUpQueue;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.junit.Rule;
 import org.mule.extensions.jms.api.destination.JmsDestination;
 import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.api.message.JmsHeaders;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
-import org.slf4j.Logger;
-import ru.yandex.qatools.allure.annotations.Features;
 
 import java.util.Map;
+
+import org.junit.Rule;
+import org.slf4j.Logger;
+import ru.yandex.qatools.allure.annotations.Features;
 
 @Features("JMS Extension")
 @ArtifactClassLoaderRunnerConfig(testInclusions = {"org.apache.activemq:artemis-jms-client"})
@@ -83,19 +84,19 @@ public abstract class JmsAbstractTestCase extends MuleArtifactFunctionalTestCase
     publisher.run();
   }
 
-  protected InternalMessage consume() throws Exception {
+  protected Message consume() throws Exception {
     return consume(destination, emptyMap(), maximumWait);
   }
 
-  protected InternalMessage consume(String destination) throws Exception {
+  protected Message consume(String destination) throws Exception {
     return consume(destination, emptyMap(), maximumWait);
   }
 
-  protected InternalMessage consume(String destination, Map<String, Object> flowVars) throws Exception {
+  protected Message consume(String destination, Map<String, Object> flowVars) throws Exception {
     return consume(destination, flowVars, maximumWait);
   }
 
-  protected InternalMessage consume(String destination, Map<String, Object> flowVars, long maximumWait) throws Exception {
+  protected Message consume(String destination, Map<String, Object> flowVars, long maximumWait) throws Exception {
     FlowRunner consumer = flowRunner(CONSUMER_FLOW)
         .withVariable(DESTINATION_VAR, destination)
         .withVariable(MAXIMUM_WAIT_VAR, maximumWait);
@@ -131,7 +132,7 @@ public abstract class JmsAbstractTestCase extends MuleArtifactFunctionalTestCase
     assertThat(actual.getDestinationType(), equalTo(expected.getDestinationType()));
   }
 
-  protected String getReplyDestination(InternalMessage firstMessage) {
+  protected String getReplyDestination(Message firstMessage) {
     return ((JmsAttributes) firstMessage.getAttributes()).getHeaders().getJMSReplyTo().getDestination();
   }
 }

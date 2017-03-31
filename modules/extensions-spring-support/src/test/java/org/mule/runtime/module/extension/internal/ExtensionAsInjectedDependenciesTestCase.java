@@ -9,10 +9,9 @@ package org.mule.runtime.module.extension.internal;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.api.message.Message.of;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
@@ -59,7 +58,7 @@ public class ExtensionAsInjectedDependenciesTestCase extends ExtensionFunctional
     assertCorrectProviderInjected(DYNAMIC_AGE_HEISENBERG, dependent.getDynamicAgeHeisenberg());
 
     final int age = 52;
-    Event event = eventBuilder().message(InternalMessage.of("")).addVariable("age", age).build();
+    Event event = eventBuilder().message(of("")).addVariable("age", age).build();
 
     HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationFromRegistry(DYNAMIC_AGE_HEISENBERG, event, muleContext);
     assertThat(heisenberg.getPersonalInfo().getAge(), is(age));

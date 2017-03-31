@@ -12,12 +12,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.functional.extensions.UsesHttpExtensionFunctionalTestCase;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -52,7 +51,7 @@ public class SecureHttpPollingFunctionalTestCase extends UsesHttpExtensionFuncti
     });
 
     MuleClient client = muleContext.getClient();
-    InternalMessage result = client.request("test://toclient", 5000).getRight().get();
+    Message result = client.request("test://toclient", 5000).getRight().get();
     assertThat(result, not(nullValue()));
     assertThat(result.getPayload().getValue(), is("foo"));
 

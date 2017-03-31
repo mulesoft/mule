@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.message.InternalMessage.Builder;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage.Builder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.WildcardAttributeEvaluator;
@@ -40,22 +41,26 @@ public class CopyPropertiesProcessor extends AbstractAnnotatedObject implements 
   @Override
   public Event process(Event event) throws MuleException {
     final Event.Builder resultBuilder = Event.builder(event);
-    InternalMessage message = event.getMessage();
+    Message message = event.getMessage();
     if (wildcardPropertyNameEvaluator.hasWildcards()) {
       final Builder builder = InternalMessage.builder(message);
       wildcardPropertyNameEvaluator
-          .processValues(message.getInboundPropertyNames(),
-                         matchedValue -> builder.addOutboundProperty(matchedValue, message.getInboundProperty(matchedValue),
-                                                                     message.getInboundPropertyDataType(matchedValue)));
+          .processValues(((InternalMessage) message).getInboundPropertyNames(),
+                         matchedValue -> builder.addOutboundProperty(matchedValue,
+                                                                     ((InternalMessage) message).getInboundProperty(matchedValue),
+                                                                     ((InternalMessage) message)
+                                                                         .getInboundPropertyDataType(matchedValue)));
       resultBuilder.message(builder.build());
     } else {
       Object keyValue = propertyNameEvaluator.resolveValue(event);
       if (keyValue != null) {
         String propertyName = keyValue.toString();
-        Serializable propertyValue = message.getInboundProperty(propertyName);
+        Serializable propertyValue = ((InternalMessage) message).getInboundProperty(propertyName);
         if (propertyValue != null) {
           resultBuilder.message(InternalMessage.builder(message)
-              .addOutboundProperty(propertyName, propertyValue, message.getInboundPropertyDataType(propertyName)).build());
+              .addOutboundProperty(propertyName, propertyValue,
+                                   ((InternalMessage) message).getInboundPropertyDataType(propertyName))
+              .build());
         } else {
           logger.info("Property value for is null, no property will be copied");
         }

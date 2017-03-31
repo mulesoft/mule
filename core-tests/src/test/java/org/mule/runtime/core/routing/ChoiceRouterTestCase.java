@@ -9,13 +9,10 @@ package org.mule.runtime.core.routing;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
-
-import org.mule.runtime.core.api.Event;
+import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.management.stats.RouterStatistics;
 import org.mule.runtime.core.routing.filters.EqualsFilter;
@@ -105,11 +102,11 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   }
 
   protected Event fooEvent() throws MuleException {
-    return eventBuilder().message(InternalMessage.of("foo")).build();
+    return eventBuilder().message(of("foo")).build();
   }
 
   protected Event zapEvent() throws MuleException {
-    return eventBuilder().message(InternalMessage.of("zap")).build();
+    return eventBuilder().message(of("zap")).build();
   }
 
   @Test

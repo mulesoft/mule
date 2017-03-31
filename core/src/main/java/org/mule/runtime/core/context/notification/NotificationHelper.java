@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.context.notification;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
@@ -119,7 +119,7 @@ public class NotificationHelper {
     getNotificationHandler(muleContext).fireNotification(notification);
   }
 
-  private void doFireNotification(ServerNotificationHandler serverNotificationHandler, Object source, InternalMessage message,
+  private void doFireNotification(ServerNotificationHandler serverNotificationHandler, Object source, Message message,
                                   String uri, FlowConstruct flowConstruct, int action) {
     try {
       if (serverNotificationHandler.isNotificationEnabled(notificationClass)) {

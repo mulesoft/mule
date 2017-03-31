@@ -8,11 +8,10 @@ package org.mule.test.core;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.test.filters.FilterCounter;
 
 import org.junit.Test;
@@ -52,7 +51,7 @@ public class Mule4412TestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
     flowRunner("AsyncRequest").withPayload(TEST_MESSAGE).withInboundProperty("pass", "true").run();
 
-    InternalMessage reply = client.request("test://asyncResponse", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage reply = (InternalMessage) client.request("test://asyncResponse", RECEIVE_TIMEOUT).getRight().get();
     int times = FilterCounter.counter.get();
     assertThat("did not filter one time as expected", times, is(1));
     assertNotNull(reply);

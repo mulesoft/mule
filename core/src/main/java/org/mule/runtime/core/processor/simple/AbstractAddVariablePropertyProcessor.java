@@ -8,12 +8,12 @@ package org.mule.runtime.core.processor.simple;
 
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -67,8 +67,8 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
   }
 
   private Charset getEncoding(Object src) {
-    if (src instanceof InternalMessage) {
-      return ((InternalMessage) src).getPayload().getDataType().getMediaType().getCharset()
+    if (src instanceof Message) {
+      return ((Message) src).getPayload().getDataType().getMediaType().getCharset()
           .orElse(getDefaultEncoding(muleContext));
     } else {
       return getDefaultEncoding(muleContext);

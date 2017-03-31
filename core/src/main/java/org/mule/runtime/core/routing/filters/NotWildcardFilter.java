@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.routing.filters;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 
 /**
  * Negative version of {@link org.mule.runtime.core.routing.filters.WildcardFilter}
@@ -22,7 +22,7 @@ public class NotWildcardFilter extends WildcardFilter {
   }
 
   @Override
-  public boolean accept(InternalMessage message, Event.Builder builder) {
+  public boolean accept(Message message, Event.Builder builder) {
     return !super.accept(message, builder);
   }
 }

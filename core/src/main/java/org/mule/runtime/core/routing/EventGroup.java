@@ -9,14 +9,14 @@ package org.mule.runtime.core.routing;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.message.GroupCorrelation.NOT_SET;
 import static org.mule.runtime.core.util.StringUtils.DASH;
-
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.message.InternalMessage.CollectionBuilder;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage.CollectionBuilder;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.session.DefaultMuleSession;
@@ -321,11 +321,10 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         Event[] muleEvents = toArray(true);
         Event lastEvent = muleEvents[muleEvents.length - 1];
 
-        List<InternalMessage> messageList = Arrays.stream(muleEvents).map(event -> event.getMessage()).collect(toList());
+        List<Message> messageList = Arrays.stream(muleEvents).map(event -> event.getMessage()).collect(toList());
 
-        final CollectionBuilder builder = InternalMessage.builder().collectionPayload(messageList, InternalMessage.class);
-        Event muleEvent =
-            Event.builder(lastEvent).message(builder.build()).session(getMergedSession(muleEvents)).build();
+        final Message.Builder builder = Message.builder().collectionPayload(messageList, Message.class);
+        Event muleEvent = Event.builder(lastEvent).message(builder.build()).session(getMergedSession(muleEvents)).build();
         return muleEvent;
       } else {
         return null;

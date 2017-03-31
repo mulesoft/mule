@@ -9,12 +9,11 @@ package org.mule.runtime.core.el.mvel.datatype;
 
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.MESSAGE_PAYLOAD;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.PAYLOAD;
-
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.ast.Assignment;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 
 /**
  * Propagates data type when payload is used as enrichment target
@@ -27,7 +26,7 @@ public class PayloadEnricherDataTypePropagator extends AbstractEnricherDataTypeP
       String assignmentVar = ((Assignment) node).getAssignmentVar();
 
       if (PAYLOAD.equals(assignmentVar) || MESSAGE_PAYLOAD.equals(assignmentVar)) {
-        builder.message(InternalMessage.builder(event.getMessage()).payload(typedValue.getValue())
+        builder.message(Message.builder(event.getMessage()).payload(typedValue.getValue())
             .mediaType(typedValue.getDataType().getMediaType()).build());
         return true;
       }

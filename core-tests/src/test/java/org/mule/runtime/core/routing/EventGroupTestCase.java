@@ -12,9 +12,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
@@ -47,16 +46,16 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     eg.initEventsStore(objectStore);
     assertFalse(eg.iterator().hasNext());
 
-    eg.addEvent(eventBuilder().message(InternalMessage.of("foo1")).build());
-    eg.addEvent(eventBuilder().message(InternalMessage.of("foo2")).build());
+    eg.addEvent(eventBuilder().message(Message.of("foo1")).build());
+    eg.addEvent(eventBuilder().message(Message.of("foo2")).build());
     assertTrue(eg.iterator().hasNext());
 
     // now add events while we iterate over the group
     Iterator<Event> i = eg.iterator();
     assertNotNull(i.next());
-    eg.addEvent(eventBuilder().message(InternalMessage.of("foo3")).build());
+    eg.addEvent(eventBuilder().message(Message.of("foo3")).build());
     assertNotNull(i.next());
-    eg.addEvent(eventBuilder().message(InternalMessage.of("foo4")).build());
+    eg.addEvent(eventBuilder().message(Message.of("foo4")).build());
     assertFalse(i.hasNext());
 
     // the added events should be in there though
@@ -167,8 +166,8 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
   public void eventGroupConversionToArray() throws Exception {
     EventGroup eg = new EventGroup(UUID.getUUID(), muleContext);
     eg.initEventsStore(objectStore);
-    eg.addEvent(eventBuilder().message(InternalMessage.of("foo1")).build());
-    eg.addEvent(eventBuilder().message(InternalMessage.of("foo2")).build());
+    eg.addEvent(eventBuilder().message(Message.of("foo1")).build());
+    eg.addEvent(eventBuilder().message(Message.of("foo2")).build());
 
     Object[] array1 = IteratorUtils.toArray(eg.iterator(false));
     Event[] array2 = eg.toArray(false);
@@ -182,7 +181,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     String es = eg.toString();
     assertTrue(es.endsWith("events=0}"));
 
-    Event firstEvent = eventBuilder().message(InternalMessage.of("foo")).build();
+    Event firstEvent = eventBuilder().message(Message.of("foo")).build();
     String firstId = firstEvent.getCorrelationId();
     eg.addEvent(firstEvent);
     es = eg.toString();
@@ -190,7 +189,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     assertTrue(es.endsWith("[" + firstId + "]}"));
 
     Event secondEvent = eventBuilder()
-        .message(InternalMessage.of("foo2"))
+        .message(Message.of("foo2"))
         .build();
     String secondId = secondEvent.getCorrelationId();
     eg.addEvent(secondEvent);
@@ -206,9 +205,9 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     eg.initEventsStore(objectStore);
     assertFalse(eg.iterator().hasNext());
 
-    Event event1 = eventBuilder().message(InternalMessage.of("foo1")).build();
-    Event event2 = eventBuilder().message(InternalMessage.of("foo2")).build();
-    Event event3 = eventBuilder().message(InternalMessage.of("foo3")).build();
+    Event event1 = eventBuilder().message(Message.of("foo1")).build();
+    Event event2 = eventBuilder().message(Message.of("foo2")).build();
+    Event event3 = eventBuilder().message(Message.of("foo3")).build();
 
     event1.getSession().setProperty("key1", "value1");
     event1.getSession().setProperty("key2", "value2");

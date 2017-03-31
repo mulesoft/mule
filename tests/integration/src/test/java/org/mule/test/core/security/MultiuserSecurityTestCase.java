@@ -9,10 +9,10 @@ package org.mule.test.core.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.security.EncryptionStrategy;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
+import org.mule.runtime.core.api.security.EncryptionStrategy;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -37,7 +37,7 @@ public class MultiuserSecurityTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testMultipleAuthentications() throws Exception {
-    InternalMessage reply;
+    Message reply;
 
     reply = getResponse("Data1", "marie");
     assertNotNull(reply);
@@ -63,7 +63,7 @@ public class MultiuserSecurityTestCase extends AbstractIntegrationTestCase {
     assertEquals("user = stan, logins = 2, color = metallic blue", reply.getPayload().getValue());
   }
 
-  public InternalMessage getResponse(String data, String user) throws Exception {
+  public Message getResponse(String data, String user) throws Exception {
     EncryptionStrategy strategy = muleContext.getSecurityManager().getEncryptionStrategy("PBE");
 
     Map<String, Serializable> props = new HashMap<>();

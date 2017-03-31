@@ -8,13 +8,13 @@ package org.mule.test.transformers;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -32,38 +32,38 @@ public class ImplicitTransformationTestCase extends AbstractIntegrationTestCase 
   @Test
   public void testImplicitInputStreamToStringConversion() throws Exception {
     InputStream inputStream = new StringInputStream("TEST");
-    InternalMessage response = flowRunner("StringEchoService").withPayload(inputStream).run().getMessage();
+    Message response = flowRunner("StringEchoService").withPayload(inputStream).run().getMessage();
     assertThat(response.getPayload().getValue(), is("TSET"));
   }
 
   @Test
   public void testImplicitByteArrayToStringConversion() throws Exception {
-    InternalMessage response = flowRunner("StringEchoService").withPayload("TEST".getBytes()).run().getMessage();
+    Message response = flowRunner("StringEchoService").withPayload("TEST".getBytes()).run().getMessage();
     assertThat(response.getPayload().getValue(), is("TSET"));
   }
 
   @Test
   public void testImplicitInputStreamToByteArrayConversion() throws Exception {
     InputStream inputStream = new StringInputStream("TEST");
-    InternalMessage response = flowRunner("ByteArrayEchoService").withPayload(inputStream).run().getMessage();
+    Message response = flowRunner("ByteArrayEchoService").withPayload(inputStream).run().getMessage();
     assertThat(response.getPayload().getValue(), is("TSET"));
   }
 
   @Test
   public void testImplicitStringToByteArrayConversion() throws Exception {
-    InternalMessage response = flowRunner("ByteArrayEchoService").withPayload("TEST").run().getMessage();
+    Message response = flowRunner("ByteArrayEchoService").withPayload("TEST").run().getMessage();
     assertThat(response.getPayload().getValue(), is("TSET"));
   }
 
   @Test
   public void testImplicitStringToInputStreamConversion() throws Exception {
-    InternalMessage response = flowRunner("InputStreamEchoService").withPayload("TEST").run().getMessage();
+    Message response = flowRunner("InputStreamEchoService").withPayload("TEST").run().getMessage();
     assertThat(response.getPayload().getValue(), is("TSET"));
   }
 
   @Test
   public void testImplicitByteArrayToInputStreamConversion() throws Exception {
-    InternalMessage response = flowRunner("InputStreamEchoService").withPayload("TEST".getBytes()).run().getMessage();
+    Message response = flowRunner("InputStreamEchoService").withPayload("TEST".getBytes()).run().getMessage();
     assertThat(response.getPayload().getValue(), is("TSET"));
   }
 

@@ -9,7 +9,7 @@ package org.mule.runtime.core.routing;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
-
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -85,9 +85,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
   }
 
   private Event createMessageCollectionWithSingleMessage(Event event) {
-    final InternalMessage coll = InternalMessage.builder()
-        .collectionPayload(singletonList(event.getMessage()), InternalMessage.class)
-        .build();
+    final Message coll = Message.builder().collectionPayload(singletonList(event.getMessage()), Message.class).build();
     event = Event.builder(event).message(coll).build();
     setCurrentEvent(event);
     return event;
@@ -97,7 +95,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
                                         final Event previous) {
     final Builder resultBuilder = Event.builder(previous);
 
-    List<InternalMessage> list = new ArrayList<>();
+    List<Message> list = new ArrayList<>();
     for (Event event : nonNullResults) {
       for (String flowVarName : event.getVariableNames()) {
         resultBuilder.addVariable(flowVarName, event.getVariable(flowVarName).getValue(),
@@ -105,9 +103,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
       }
       list.add(event.getMessage());
     }
-    final InternalMessage coll = InternalMessage.builder()
-        .collectionPayload(list, InternalMessage.class)
-        .build();
+    final Message coll = Message.builder().collectionPayload(list, Message.class).build();
 
     Event resultEvent = resultBuilder.message(coll).build();
     setCurrentEvent(resultEvent);

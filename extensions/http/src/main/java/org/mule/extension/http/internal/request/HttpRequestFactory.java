@@ -9,6 +9,7 @@ package org.mule.extension.http.internal.request;
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
 import static org.mule.extension.http.api.error.HttpError.TRANSFORMATION;
 import static org.mule.extension.http.internal.multipart.HttpMultipartEncoder.createFrom;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
@@ -19,7 +20,6 @@ import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeString;
-
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
@@ -28,7 +28,6 @@ import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.TransformationService;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.extension.api.exception.ModuleException;
@@ -214,7 +213,7 @@ public class HttpRequestFactory {
   }
 
   private byte[] getMessageAsBytes(Object payload) throws TransformerException {
-    return (byte[]) transformationService.transform(InternalMessage.of(payload), BYTE_ARRAY).getPayload().getValue();
+    return (byte[]) transformationService.transform(of(payload), BYTE_ARRAY).getPayload().getValue();
   }
 
   private boolean doStreaming(HttpRequestBuilder requestBuilder, Object payload) {

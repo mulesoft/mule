@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
@@ -72,7 +73,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
 
     @Override
     public void run() {
-      InternalMessage okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
+      Message okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
       Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(okMessage).flow(flow)
           .session(session).build();
 

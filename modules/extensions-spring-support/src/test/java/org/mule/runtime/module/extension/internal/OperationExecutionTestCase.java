@@ -16,6 +16,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
@@ -25,10 +26,6 @@ import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
 import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
 import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
-import org.hamcrest.Matchers;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -64,6 +61,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.hamcrest.Matchers;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
@@ -110,7 +112,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void getInlineGroupDefinition() throws Exception {
-    InternalMessage message = flowRunner("getBarberPreferences").withPayload(EMPTY_STRING).run().getMessage();
+    Message message = flowRunner("getBarberPreferences").withPayload(EMPTY_STRING).run().getMessage();
 
     assertThat(message.getPayload().getValue(), is(notNullValue()));
 
@@ -121,7 +123,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void getInlineGroupDefinitionAsArgument() throws Exception {
-    InternalMessage message = flowRunner("getInlineInfo").withPayload(EMPTY_STRING).run().getMessage();
+    Message message = flowRunner("getInlineInfo").withPayload(EMPTY_STRING).run().getMessage();
 
     assertThat(message.getPayload().getValue(), is(notNullValue()));
 
@@ -132,7 +134,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void getInlineGroupPersonalInfoAsArgument() throws Exception {
-    InternalMessage message = flowRunner("getInlinePersonalInfo").withPayload(EMPTY_STRING).run().getMessage();
+    Message message = flowRunner("getInlinePersonalInfo").withPayload(EMPTY_STRING).run().getMessage();
 
     assertThat(message.getPayload().getValue(), is(notNullValue()));
     PersonalInfo value = (PersonalInfo) message.getPayload().getValue();
@@ -514,6 +516,6 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   private HeisenbergExtension getConfig(String name) throws Exception {
     return ExtensionsTestUtils
-        .getConfigurationFromRegistry(name, eventBuilder().message(InternalMessage.of(EMPTY_STRING)).build(), muleContext);
+        .getConfigurationFromRegistry(name, eventBuilder().message(of(EMPTY_STRING)).build(), muleContext);
   }
 }

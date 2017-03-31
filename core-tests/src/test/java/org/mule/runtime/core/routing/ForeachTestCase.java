@@ -8,7 +8,9 @@ package org.mule.runtime.core.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
@@ -75,7 +77,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     List<String> arrayList = new ArrayList<>();
     arrayList.add("bar");
     arrayList.add("zip");
-    simpleForeach.process(eventBuilder().message(InternalMessage.of(arrayList)).build());
+    simpleForeach.process(eventBuilder().message(of(arrayList)).build());
 
     assertSimpleProcessedMessages();
   }
@@ -85,17 +87,17 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     String[] array = new String[2];
     array[0] = "bar";
     array[1] = "zip";
-    simpleForeach.process(eventBuilder().message(InternalMessage.of(array)).build());
+    simpleForeach.process(eventBuilder().message(of(array)).build());
 
     assertSimpleProcessedMessages();
   }
 
   @Test
   public void muleMessageCollectionPayload() throws Exception {
-    List<InternalMessage> list = new ArrayList<>();
-    list.add(InternalMessage.builder().payload("bar").build());
-    list.add(InternalMessage.builder().payload("zip").build());
-    InternalMessage msgCollection = InternalMessage.builder().payload(list).build();
+    List<Message> list = new ArrayList<>();
+    list.add(of("bar"));
+    list.add(of("zip"));
+    Message msgCollection = of(list);
     simpleForeach.process(eventBuilder().message(msgCollection).build());
 
     assertSimpleProcessedMessages();
@@ -104,7 +106,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   @Test
   public void iterablePayload() throws Exception {
     Iterable<String> iterable = new DummySimpleIterableClass();
-    final Event testEvent = eventBuilder().message(InternalMessage.of(iterable)).build();
+    final Event testEvent = eventBuilder().message(of(iterable)).build();
     simpleForeach.process(testEvent);
 
     assertSimpleProcessedMessages();
@@ -113,7 +115,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   @Test
   public void iteratorPayload() throws Exception {
     Iterable<String> iterable = new DummySimpleIterableClass();
-    simpleForeach.process(eventBuilder().message(InternalMessage.of(iterable.iterator())).build());
+    simpleForeach.process(eventBuilder().message(of(iterable.iterator())).build());
 
     assertSimpleProcessedMessages();
   }
@@ -134,7 +136,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     payload.add(elem2);
     payload.add(elem3);
 
-    nestedForeach.process(eventBuilder().message(InternalMessage.of(payload)).build());
+    nestedForeach.process(eventBuilder().message(of(payload)).build());
     assertNestedProcessedMessages();
   }
 
@@ -148,28 +150,28 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     payload[2][0] = "b2";
     payload[2][1] = "c1";
 
-    nestedForeach.process(eventBuilder().message(InternalMessage.of(payload)).build());
+    nestedForeach.process(eventBuilder().message(of(payload)).build());
     assertNestedProcessedMessages();
   }
 
   @Test
   public void nestedMuleMessageCollectionPayload() throws Exception {
 
-    List<InternalMessage> parentList = new ArrayList<>();
-    List<InternalMessage> list1 = new ArrayList<>();
-    List<InternalMessage> list2 = new ArrayList<>();
+    List<Message> parentList = new ArrayList<>();
+    List<Message> list1 = new ArrayList<>();
+    List<Message> list2 = new ArrayList<>();
 
-    list1.add(InternalMessage.builder().payload("a1").build());
-    list1.add(InternalMessage.builder().payload("a2").build());
-    list1.add(InternalMessage.builder().payload("a3").build());
+    list1.add(of("a1"));
+    list1.add(of("a2"));
+    list1.add(of("a3"));
 
-    list2.add(InternalMessage.builder().payload("b1").build());
-    list2.add(InternalMessage.builder().payload("b2").build());
-    list2.add(InternalMessage.builder().payload("c1").build());
+    list2.add(of("b1"));
+    list2.add(of("b2"));
+    list2.add(of("c1"));
 
-    parentList.add(InternalMessage.builder().payload(list1).build());
-    parentList.add(InternalMessage.builder().payload(list2).build());
-    InternalMessage parentCollection = InternalMessage.builder().payload(parentList).build();
+    parentList.add(of(list1));
+    parentList.add(of(list2));
+    Message parentCollection = of(parentList);
 
     nestedForeach.process(eventBuilder().message(parentCollection).build());
     assertNestedProcessedMessages();
@@ -179,7 +181,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   public void nestedIterablePayload() throws Exception {
     Iterable iterable = new DummyNestedIterableClass();
 
-    nestedForeach.process(eventBuilder().message(InternalMessage.of(iterable)).build());
+    nestedForeach.process(eventBuilder().message(of(iterable)).build());
     assertNestedProcessedMessages();
   }
 
@@ -187,7 +189,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   public void nestedIteratorPayload() throws Exception {
     Iterable iterable = new DummyNestedIterableClass();
 
-    nestedForeach.process(eventBuilder().message(InternalMessage.of(iterable.iterator())).build());
+    nestedForeach.process(eventBuilder().message(of(iterable.iterator())).build());
     assertNestedProcessedMessages();
   }
 

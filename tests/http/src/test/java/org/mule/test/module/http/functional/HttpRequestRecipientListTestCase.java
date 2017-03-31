@@ -10,6 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -43,7 +44,7 @@ public class HttpRequestRecipientListTestCase extends FunctionalTestCase {
 
     assertThat(response, notNullValue());
     assertThat(response.getMessage().getPayload().getValue(), IsInstanceOf.instanceOf(List.class));
-    InternalMessage aggregatedResponse = response.getMessage();
+    Message aggregatedResponse = response.getMessage();
     assertThat(((List<InternalMessage>) aggregatedResponse.getPayload().getValue()).size(), is(3));
     final InternalMessage[] messages =
         (InternalMessage[]) ((List<InternalMessage>) aggregatedResponse.getPayload().getValue()).toArray();

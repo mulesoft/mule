@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.transformer;
 
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.DefaultEventContext.create;
 
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -45,7 +46,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   public boolean isSourceDataTypeSupported(DataType dataType, boolean exactMatch) {
     // TODO RM* This is a bit of hack since we could just register Message as a supportedType, but this has some
     // funny behaviour in certain ObjectToXml transformers
-    return (super.isSourceDataTypeSupported(dataType, exactMatch) || InternalMessage.class.isAssignableFrom(dataType.getType()));
+    return (super.isSourceDataTypeSupported(dataType, exactMatch) || Message.class.isAssignableFrom(dataType.getType()));
   }
 
   /**
@@ -100,16 +101,16 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
       logger.debug(String.format("Object before transform: %s", StringMessageUtils.toString(src)));
     }
 
-    InternalMessage message;
-    if (src instanceof InternalMessage) {
-      message = (InternalMessage) src;
+    Message message;
+    if (src instanceof Message) {
+      message = (Message) src;
     }
     // TODO MULE-9342 Clean up transformer vs message transformer confusion
     else if (src instanceof Event) {
       event = (Event) src;
       message = event.getMessage();
     } else if (muleContext.getConfiguration().isAutoWrapMessageAwareTransform()) {
-      message = InternalMessage.builder().payload(src).build();
+      message = of(src);
     } else {
       if (event == null) {
         throw new MessageTransformerException(CoreMessages.noCurrentEventForTransformer(), this);

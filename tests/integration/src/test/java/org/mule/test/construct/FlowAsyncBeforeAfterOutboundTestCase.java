@@ -11,11 +11,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -32,10 +32,10 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends AbstractIntegrationTes
   public void testAsyncBefore() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    InternalMessage msgSync = flowRunner("test-async-block-before-outbound").withPayload("message").run().getMessage();
+    Message msgSync = flowRunner("test-async-block-before-outbound").withPayload("message").run().getMessage();
 
-    InternalMessage msgAsync = client.request("test://test.before.async.out", RECEIVE_TIMEOUT).getRight().get();
-    InternalMessage msgOut = client.request("test://test.before.out", RECEIVE_TIMEOUT).getRight().get();
+    Message msgAsync = client.request("test://test.before.async.out", RECEIVE_TIMEOUT).getRight().get();
+    Message msgOut = client.request("test://test.before.out", RECEIVE_TIMEOUT).getRight().get();
 
     assertCorrectThreads(msgSync, msgAsync, msgOut);
 
@@ -45,24 +45,24 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends AbstractIntegrationTes
   public void testAsyncAfter() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    InternalMessage msgSync = flowRunner("test-async-block-after-outbound").withPayload("message").run().getMessage();
-
-    InternalMessage msgAsync = client.request("test://test.after.async.out", RECEIVE_TIMEOUT).getRight().get();
-    InternalMessage msgOut = client.request("test://test.after.out", RECEIVE_TIMEOUT).getRight().get();
+    Message msgSync = flowRunner("test-async-block-after-outbound").withPayload("message").run().getMessage();
+    Message msgAsync = client.request("test://test.after.async.out", RECEIVE_TIMEOUT).getRight().get();
+    Message msgOut = client.request("test://test.after.out", RECEIVE_TIMEOUT).getRight().get();
 
     assertCorrectThreads(msgSync, msgAsync, msgOut);
   }
 
-  private void assertCorrectThreads(InternalMessage msgSync, InternalMessage msgAsync, InternalMessage msgOut) throws Exception {
+  private void assertCorrectThreads(Message msgSync, Message msgAsync, Message msgOut) throws Exception {
     assertThat(msgSync, not(nullValue()));
     assertThat(msgAsync, not(nullValue()));
     assertThat(msgOut, not(nullValue()));
 
-    assertThat(msgOut.getInboundProperty("request-response-thread"),
-               equalTo(msgSync.getInboundProperty("request-response-thread")));
-    assertThat(msgSync.getOutboundProperty("request-response-thread"),
-               not(equalTo(msgAsync.getOutboundProperty("async-thread"))));
-    assertThat(msgOut.getOutboundProperty("request-response-thread"), not(equalTo(msgAsync.getOutboundProperty("async-thread"))));
+    assertThat(((InternalMessage) msgOut).getInboundProperty("request-response-thread"),
+               equalTo(((InternalMessage) msgSync).getInboundProperty("request-response-thread")));
+    assertThat(((InternalMessage) msgAsync).getOutboundProperty("request-response-thread"),
+               not(equalTo(((InternalMessage) msgAsync).getOutboundProperty("async-thread"))));
+    assertThat(((InternalMessage) msgAsync).getOutboundProperty("request-response-thread"),
+               not(equalTo(((InternalMessage) msgAsync).getOutboundProperty("async-thread"))));
   }
 
   public static class ThreadSensingMessageProcessor implements Processor {

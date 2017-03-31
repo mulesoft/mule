@@ -27,7 +27,7 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler
 
   @Override
   public DataHandler doGet(String key) {
-    return event.getMessage().getOutboundAttachment(key);
+    return ((InternalMessage) event.getMessage()).getOutboundAttachment(key);
   }
 
   @Override
@@ -44,7 +44,7 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler
 
   @Override
   public Set<String> keySet() {
-    return event.getMessage().getOutboundAttachmentNames();
+    return ((InternalMessage) event.getMessage()).getOutboundAttachmentNames();
   }
 
   @Override

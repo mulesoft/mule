@@ -6,11 +6,11 @@
  */
 package org.mule.functional.junit4;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -118,7 +118,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
    * @return String representation of the message payload
    * @throws Exception if there is an unexpected error obtaining the payload representation
    */
-  protected String getPayloadAsString(InternalMessage message, MuleContext muleContext) throws Exception {
+  protected String getPayloadAsString(Message message, MuleContext muleContext) throws Exception {
     return (String) muleContext.getTransformationService().transform(message, DataType.STRING).getPayload().getValue();
   }
 

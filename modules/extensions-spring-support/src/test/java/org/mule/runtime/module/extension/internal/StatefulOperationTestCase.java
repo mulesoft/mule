@@ -9,10 +9,9 @@ package org.mule.runtime.module.extension.internal;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.api.message.Message.of;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
@@ -64,7 +63,7 @@ public class StatefulOperationTestCase extends ExtensionFunctionalTestCase {
   }
 
   private void assertRemainingMoney(String configName, String name, long expectedAmount) throws Exception {
-    Event event = eventBuilder().message(InternalMessage.of("")).addVariable("myName", name).build();
+    Event event = eventBuilder().message(of("")).addVariable("myName", name).build();
 
     HeisenbergExtension heisenbergExtension = ExtensionsTestUtils.getConfigurationFromRegistry(configName, event, muleContext);
     assertThat(heisenbergExtension.getMoney(), equalTo(BigDecimal.valueOf(expectedAmount)));

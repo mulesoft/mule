@@ -6,8 +6,8 @@
  */
 package org.mule.test.integration.transaction.xa;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
@@ -21,7 +21,7 @@ public class QueueOutboundMessagesCounter implements TransactionScenarios.Outbou
   @Override
   public int numberOfMessagesThatArrived() throws Exception {
     while (true) {
-      Optional<InternalMessage> messageOptional = muleClient.request("outboundRequester", 100).getRight();
+      Optional<Message> messageOptional = muleClient.request("outboundRequester", 100).getRight();
       if (messageOptional.isPresent()) {
         numberOfMessagesArrived++;
       } else {

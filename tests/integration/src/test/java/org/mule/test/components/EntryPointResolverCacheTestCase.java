@@ -10,9 +10,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
@@ -30,8 +30,7 @@ public class EntryPointResolverCacheTestCase extends AbstractIntegrationTestCase
   public void testCache() throws Exception {
     Event responseEvent =
         flowRunner("refServiceOne").withPayload("a request").withInboundProperty("method", "retrieveReferenceData").run();
-    InternalMessage response = responseEvent
-        .getMessage();
+    Message response = responseEvent.getMessage();
     Object payload = response.getPayload().getValue();
 
     assertThat(payload, instanceOf(String.class));

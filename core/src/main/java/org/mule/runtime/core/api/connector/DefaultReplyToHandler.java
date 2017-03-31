@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.connector;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -48,7 +49,7 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
   }
 
   @Override
-  public Event processReplyTo(final Event event, final InternalMessage returnMessage, final Object replyTo)
+  public Event processReplyTo(final Event event, final Message returnMessage, final Object replyTo)
       throws MuleException {
     if (logger.isDebugEnabled()) {
       logger.debug("sending reply to: " + replyTo);

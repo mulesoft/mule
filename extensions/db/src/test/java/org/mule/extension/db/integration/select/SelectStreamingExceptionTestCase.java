@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.DerbyTestDatabase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.List;
@@ -59,7 +59,7 @@ public class SelectStreamingExceptionTestCase extends AbstractDbIntegrationTestC
 
   @Test
   public void selectExceptionClosesPreviousResultSets() throws Exception {
-    InternalMessage response = flowRunner("selectExceptionClosesPreviousResultSets").run().getMessage();
+    Message response = flowRunner("selectExceptionClosesPreviousResultSets").run().getMessage();
     assertThat(response.getPayload().getValue(), is(FALSE));
   }
 }

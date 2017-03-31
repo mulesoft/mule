@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static org.mule.extension.http.internal.multipart.HttpMultipartEncoder.createFrom;
 import static org.mule.extension.http.internal.multipart.HttpMultipartEncoder.createMultipartContent;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.UUID.getUUID;
@@ -23,7 +24,6 @@ import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FOR
 import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.service.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeString;
-
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -31,7 +31,6 @@ import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.TransformationService;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
@@ -193,7 +192,7 @@ public class HttpResponseFactory {
 
   private byte[] getMessageAsBytes(Object payload) {
     try {
-      return (byte[]) transformationService.transform(InternalMessage.of(payload), BYTE_ARRAY).getPayload().getValue();
+      return (byte[]) transformationService.transform(of(payload), BYTE_ARRAY).getPayload().getValue();
     } catch (TransformerException e) {
       throw new MuleRuntimeException(e);
     }

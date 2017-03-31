@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.policy;
 
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
@@ -82,7 +82,7 @@ public class CompositeSourcePolicy extends
       Message message = getParametersTransformer()
           .map(parametersTransformer -> parametersTransformer.fromSuccessResponseParametersToMessage(originalResponseParameters))
           .orElseGet(flowExecutionResponse::getMessage);
-      return Event.builder(event).message((InternalMessage) message).build();
+      return Event.builder(event).message(message).build();
     } catch (MessagingException messagingException) {
       originalFailureResponseParameters =
           getParametersProcessor().getFailedExecutionResponseParametersFunction().apply(messagingException.getEvent());
@@ -90,7 +90,7 @@ public class CompositeSourcePolicy extends
           .map(parametersTransformer -> parametersTransformer
               .fromFailureResponseParametersToMessage(originalFailureResponseParameters))
           .orElse(messagingException.getEvent().getMessage());
-      throw new FlowExecutionException(Event.builder(event).message((InternalMessage) message).build(),
+      throw new FlowExecutionException(Event.builder(event).message(message).build(),
                                        messagingException.getCause(),
                                        messagingException.getFailingMessageProcessor());
     }
@@ -140,7 +140,7 @@ public class CompositeSourcePolicy extends
       Map<String, Object> responseParameters =
           getParametersTransformer()
               .map(parametersTransformer -> concatMaps(originalFailureResponseParameters, parametersTransformer
-                  .fromMessageToErrorResponseParameters(Message.builder().nullPayload().build())))
+                  .fromMessageToErrorResponseParameters(of(null))))
               .orElse(originalFailureResponseParameters);
       return left(new FailureSourcePolicyResult(e, responseParameters));
     }

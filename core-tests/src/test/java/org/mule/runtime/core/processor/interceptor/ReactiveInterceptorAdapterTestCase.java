@@ -90,7 +90,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {});
     startFlowWithInterceptors(interceptor);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
 
     InOrder inOrder = inOrder(processor, interceptor);
@@ -106,7 +106,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = new ProcessorInterceptor() {};
     startFlowWithInterceptors(interceptor);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
   }
 
@@ -116,12 +116,12 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
       @Override
       public void before(Map<String, Object> parameters, InterceptionEvent event) {
-        event.message(Message.builder().payload(TEST_PAYLOAD).build());
+        event.message(Message.of(TEST_PAYLOAD));
       }
     });
     startFlowWithInterceptors(interceptor);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
 
     InOrder inOrder = inOrder(processor, interceptor);
@@ -139,12 +139,12 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
       @Override
       public void before(Map<String, Object> parameters, InterceptionEvent event) {
-        event.message(Message.builder().payload(TEST_PAYLOAD).build());
+        event.message(Message.of(TEST_PAYLOAD));
       }
     };
     startFlowWithInterceptors(interceptor);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
   }
 
@@ -154,12 +154,12 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
       @Override
       public void after(InterceptionEvent event, Optional<Throwable> thrown) {
-        event.message(Message.builder().payload(TEST_PAYLOAD).build());
+        event.message(Message.of(TEST_PAYLOAD));
       }
     });
     startFlowWithInterceptors(interceptor);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
 
     InOrder inOrder = inOrder(processor, interceptor);
@@ -176,12 +176,12 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
       @Override
       public void after(InterceptionEvent event, Optional<Throwable> thrown) {
-        event.message(Message.builder().payload(TEST_PAYLOAD).build());
+        event.message(Message.of(TEST_PAYLOAD));
       }
     };
     startFlowWithInterceptors(interceptor);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
   }
 
@@ -192,13 +192,13 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       @Override
       public CompletableFuture<InterceptionEvent> around(Map<String, Object> parameters, InterceptionEvent event,
                                                          InterceptionAction action) {
-        event.message(Message.builder().payload(TEST_PAYLOAD).build());
+        event.message(Message.of(TEST_PAYLOAD));
         return action.proceed();
       }
     });
     startFlowWithInterceptors(interceptor);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
 
     InOrder inOrder = inOrder(processor, interceptor);
@@ -218,14 +218,14 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
                                                          InterceptionAction action) {
         action.proceed();
         return supplyAsync(() -> {
-          event.message(Message.builder().payload(TEST_PAYLOAD).build());
+          event.message(Message.of(TEST_PAYLOAD));
           return event;
         });
       }
     });
     startFlowWithInterceptors(interceptor);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
 
     InOrder inOrder = inOrder(processor, interceptor);
@@ -243,13 +243,13 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       @Override
       public CompletableFuture<InterceptionEvent> around(Map<String, Object> parameters, InterceptionEvent event,
                                                          InterceptionAction action) {
-        event.message(Message.builder().payload(TEST_PAYLOAD).build());
+        event.message(Message.of(TEST_PAYLOAD));
         return action.skip();
       }
     });
     startFlowWithInterceptors(interceptor);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
 
     InOrder inOrder = inOrder(processor, interceptor);
@@ -269,14 +269,14 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
                                                          InterceptionAction action) {
         action.skip();
         return supplyAsync(() -> {
-          event.message(Message.builder().payload(TEST_PAYLOAD).build());
+          event.message(Message.of(TEST_PAYLOAD));
           return event;
         });
       }
     });
     startFlowWithInterceptors(interceptor);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
 
     InOrder inOrder = inOrder(processor, interceptor);
@@ -301,7 +301,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     expected.expectCause(sameInstance(expectedException));
     try {
-      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+      process(flow, eventBuilder().message(Message.of("")).build());
     } finally {
       InOrder inOrder = inOrder(processor, interceptor);
 
@@ -325,7 +325,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     startFlowWithInterceptors(interceptor);
 
     expected.expectCause(sameInstance(expectedException));
-    process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    process(flow, eventBuilder().message(Message.of("")).build());
   }
 
   @Test
@@ -342,7 +342,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     expected.expectCause(sameInstance(expectedException));
     try {
-      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+      process(flow, eventBuilder().message(Message.of("")).build());
     } finally {
       InOrder inOrder = inOrder(processor, interceptor);
 
@@ -366,7 +366,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     startFlowWithInterceptors(interceptor);
 
     expected.expectCause(sameInstance(expectedException));
-    process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    process(flow, eventBuilder().message(Message.of("")).build());
   }
 
   @Test
@@ -384,7 +384,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     expected.expectCause(sameInstance(expectedException));
     try {
-      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+      process(flow, eventBuilder().message(Message.of("")).build());
     } finally {
       InOrder inOrder = inOrder(processor, interceptor);
 
@@ -411,7 +411,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     expected.expectCause(sameInstance(expectedException));
     try {
-      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+      process(flow, eventBuilder().message(Message.of("")).build());
     } finally {
       InOrder inOrder = inOrder(processor, interceptor);
 
@@ -440,7 +440,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     expected.expectCause(sameInstance(expectedException));
     try {
-      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+      process(flow, eventBuilder().message(Message.of("")).build());
     } finally {
       InOrder inOrder = inOrder(processor, interceptor);
 
@@ -469,7 +469,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     expected.expectCause(sameInstance(expectedException));
     try {
-      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+      process(flow, eventBuilder().message(Message.of("")).build());
     } finally {
       InOrder inOrder = inOrder(processor, interceptor);
 
@@ -490,7 +490,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     expected.expectCause(sameInstance(expectedException));
     try {
-      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+      process(flow, eventBuilder().message(Message.of("")).build());
     } finally {
       InOrder inOrder = inOrder(processor, interceptor);
 
@@ -513,7 +513,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
 
     InOrder inOrder = inOrder(processor, interceptor);
@@ -530,13 +530,13 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
       @Override
       public void before(Map<String, Object> parameters, InterceptionEvent event) {
-        event.message(Message.builder().payload(TEST_PAYLOAD).build());
+        event.message(Message.of(TEST_PAYLOAD));
       }
     });
     ProcessorInterceptor interceptor2 = spy(new ProcessorInterceptor() {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
 
     InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
@@ -560,12 +560,12 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
       @Override
       public void before(Map<String, Object> parameters, InterceptionEvent event) {
-        event.message(Message.builder().payload(TEST_PAYLOAD).build());
+        event.message(Message.of(TEST_PAYLOAD));
       }
     });
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
 
     InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
@@ -586,13 +586,13 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
       @Override
       public void after(InterceptionEvent event, Optional<Throwable> thrown) {
-        event.message(Message.builder().payload(TEST_PAYLOAD).build());
+        event.message(Message.of(TEST_PAYLOAD));
       }
     });
     ProcessorInterceptor interceptor2 = spy(new ProcessorInterceptor() {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
 
     InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
@@ -613,12 +613,12 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
       @Override
       public void after(InterceptionEvent event, Optional<Throwable> thrown) {
-        event.message(Message.builder().payload(TEST_PAYLOAD).build());
+        event.message(Message.of(TEST_PAYLOAD));
       }
     });
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
 
     InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
@@ -639,14 +639,14 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       @Override
       public CompletableFuture<InterceptionEvent> around(Map<String, Object> parameters, InterceptionEvent event,
                                                          InterceptionAction action) {
-        event.message(Message.builder().payload(TEST_PAYLOAD).build());
+        event.message(Message.of(TEST_PAYLOAD));
         return action.proceed();
       }
     });
     ProcessorInterceptor interceptor2 = spy(new ProcessorInterceptor() {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
 
     InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
@@ -670,13 +670,13 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       @Override
       public CompletableFuture<InterceptionEvent> around(Map<String, Object> parameters, InterceptionEvent event,
                                                          InterceptionAction action) {
-        event.message(Message.builder().payload(TEST_PAYLOAD).build());
+        event.message(Message.of(TEST_PAYLOAD));
         return action.proceed();
       }
     });
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
 
     InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
@@ -699,7 +699,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
                                                          InterceptionAction action) {
         action.proceed();
         return supplyAsync(() -> {
-          event.message(Message.builder().payload(TEST_PAYLOAD).build());
+          event.message(Message.of(TEST_PAYLOAD));
           return event;
         });
       }
@@ -707,7 +707,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = spy(new ProcessorInterceptor() {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
 
     InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
@@ -731,14 +731,14 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
                                                          InterceptionAction action) {
         action.proceed();
         return supplyAsync(() -> {
-          event.message(Message.builder().payload(TEST_PAYLOAD).build());
+          event.message(Message.of(TEST_PAYLOAD));
           return event;
         });
       }
     });
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
 
     InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
@@ -767,7 +767,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     expected.expectCause(sameInstance(expectedException));
     try {
-      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+      process(flow, eventBuilder().message(Message.of("")).build());
     } finally {
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
@@ -796,7 +796,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     expected.expectCause(sameInstance(expectedException));
     try {
-      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+      process(flow, eventBuilder().message(Message.of("")).build());
     } finally {
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
@@ -825,7 +825,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     expected.expectCause(sameInstance(expectedException));
     try {
-      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+      process(flow, eventBuilder().message(Message.of("")).build());
     } finally {
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
@@ -854,7 +854,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     expected.expectCause(sameInstance(expectedException));
     try {
-      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+      process(flow, eventBuilder().message(Message.of("")).build());
     } finally {
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
@@ -884,7 +884,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     expected.expectCause(sameInstance(expectedException));
     try {
-      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+      process(flow, eventBuilder().message(Message.of("")).build());
     } finally {
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
@@ -914,7 +914,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     expected.expectCause(sameInstance(expectedException));
     try {
-      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+      process(flow, eventBuilder().message(Message.of("")).build());
     } finally {
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
@@ -945,7 +945,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     expected.expectCause(sameInstance(expectedException));
     try {
-      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+      process(flow, eventBuilder().message(Message.of("")).build());
     } finally {
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
@@ -976,7 +976,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     expected.expectCause(sameInstance(expectedException));
     try {
-      process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+      process(flow, eventBuilder().message(Message.of("")).build());
     } finally {
       InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
 
@@ -1003,7 +1003,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = spy(new ProcessorInterceptor() {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
 
     InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
@@ -1030,7 +1030,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
 
     InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
@@ -1061,7 +1061,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       };
     }, () -> interceptor2);
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
 
     InOrder inOrder = inOrder(processor, interceptor1, interceptor2);
@@ -1092,7 +1092,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       };
     });
 
-    Event result = process(flow, eventBuilder().message(Message.builder().payload("").build()).build());
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
 
     InOrder inOrder = inOrder(processor, interceptor1, interceptor2);

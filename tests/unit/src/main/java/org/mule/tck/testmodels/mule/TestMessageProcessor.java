@@ -6,11 +6,11 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.runtime.api.meta.NameableObject;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.NameableObject;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;
 
@@ -34,7 +34,7 @@ public class TestMessageProcessor extends AbstractAnnotatedObject implements Pro
   public Event process(Event event) throws MuleException {
     if (event != null && event.getMessage() != null) {
       return Event.builder(event)
-          .message(InternalMessage.builder(event.getMessage()).payload(event.getMessage().getPayload().getValue() + ":" + label)
+          .message(Message.builder(event.getMessage()).payload(event.getMessage().getPayload().getValue() + ":" + label)
               .build())
           .build();
     }

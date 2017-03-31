@@ -9,8 +9,8 @@ package org.mule.mvel;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import org.mule.runtime.api.message.Message;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ public class MvelCompiledExpressionCachingTestCase extends AbstractIntegrationTe
 
   @Test
   public void testIssue() throws Exception {
-    InternalMessage response = flowRunner("foo-flow").withPayload(TEST_MESSAGE).run().getMessage();
+    Message response = flowRunner("foo-flow").withPayload(TEST_MESSAGE).run().getMessage();
 
     assertThat(getPayloadAsString(response), equalTo("SUCCESS"));
   }

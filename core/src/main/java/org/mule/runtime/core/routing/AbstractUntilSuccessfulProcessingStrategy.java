@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.exception.MessagingException;
 
 import java.io.NotSerializableException;
@@ -52,7 +53,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
       return returnEvent;
     }
 
-    final InternalMessage msg = returnEvent.getMessage();
+    final Message msg = returnEvent.getMessage();
     if (msg == null) {
       throw new MuleRuntimeException(I18nMessageFactory
           .createStaticMessage("No message found in response to processing, which is therefore considered failed for event: "
@@ -81,7 +82,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
       return event;
     }
 
-    return Event.builder(event).message(InternalMessage.builder(event.getMessage())
+    return Event.builder(event).message(Message.builder(event.getMessage())
         .payload(getUntilSuccessfulConfiguration().getMuleContext().getExpressionManager().evaluate(ackExpression, event)
             .getValue())
         .build()).build();
@@ -104,7 +105,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
 
   private void prepareAndValidateEvent(final Event event) throws MessagingException {
     try {
-      final InternalMessage message = event.getMessage();
+      final Message message = event.getMessage();
       if (message instanceof InternalMessage) {
         if (message.getPayload().getDataType().isStreamType()) {
           event.getMessageAsBytes(muleContext);
@@ -120,7 +121,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
     }
   }
 
-  protected void ensureSerializable(InternalMessage message) throws NotSerializableException {
+  protected void ensureSerializable(Message message) throws NotSerializableException {
     if (!(message.getPayload().getValue() instanceof Serializable)) {
       throw new NotSerializableException(message.getPayload().getDataType().getType().getCanonicalName());
     }

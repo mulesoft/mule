@@ -11,11 +11,11 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.expression.ExpressionConfig;
 
@@ -70,7 +70,7 @@ public class ExpressionFilter implements Filter, MuleContextAware {
    * @return <code>true</code> if the message matches the filter
    */
   @Override
-  public boolean accept(InternalMessage message, Event.Builder builder) {
+  public boolean accept(Message message, Event.Builder builder) {
     String expr = getFullExpression();
     if (delegateFilter != null) {
       boolean result = delegateFilter.accept(message, builder);

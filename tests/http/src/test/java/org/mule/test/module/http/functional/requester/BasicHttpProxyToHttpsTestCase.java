@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.io.IOException;
 
@@ -95,7 +95,7 @@ public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase {
    */
   @Test
   public void validProxyHttpConnectToHttpsAuth() throws Exception {
-    InternalMessage response = runFlow("httpFlow").getMessage();
+    Message response = runFlow("httpFlow").getMessage();
 
     assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(SC_OK));
     assertThat(response.getPayload().getValue(), equalTo(AUTHORIZED));

@@ -9,10 +9,10 @@ package org.mule.runtime.core.routing.filters;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.ObjectFilter;
@@ -48,7 +48,7 @@ public class WildcardFilter implements Filter, ObjectFilter, MuleContextAware {
   }
 
   @Override
-  public boolean accept(InternalMessage message, Event.Builder builder) {
+  public boolean accept(Message message, Event.Builder builder) {
     try {
       return accept(muleContext.getTransformationService().transform(message, DataType.STRING).getPayload().getValue());
     } catch (Exception e) {

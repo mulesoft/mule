@@ -17,15 +17,13 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.core.transaction.TransactionTemplateTestUtils.getEmptyTransactionCallback;
 import static org.mule.runtime.core.transaction.TransactionTemplateTestUtils.getFailureTransactionCallback;
 import static org.mule.runtime.core.transaction.TransactionTemplateTestUtils.getFailureTransactionCallbackStartsTransaction;
-
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -33,6 +31,7 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -69,7 +68,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
 
   @Before
   public void unbindTransaction() throws Exception {
-    when(mockEvent.getMessage()).thenReturn(InternalMessage.builder().payload("").build());
+    when(mockEvent.getMessage()).thenReturn(of(""));
 
     Transaction currentTransaction = TransactionCoordination.getInstance().getTransaction();
     if (currentTransaction != null) {

@@ -14,12 +14,11 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.decodeUrlEncodedBody;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.error.HttpMessageParsingException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.IOUtils;
@@ -121,7 +120,7 @@ public class HttpRequestToResult {
         headers.get(headerName).addAll(httpPart.getHeaders(headerName));
       }
 
-      parts.add(InternalMessage.builder().payload(httpPart.getInputStream()).mediaType(MediaType.parse(httpPart.getContentType()))
+      parts.add(Message.builder().payload(httpPart.getInputStream()).mediaType(MediaType.parse(httpPart.getContentType()))
           .attributes(new PartAttributes(httpPart.getName() != null ? httpPart.getName() : "part_" + partNumber,
                                          httpPart.getFileName(), httpPart.getSize(), headers))
           .build());

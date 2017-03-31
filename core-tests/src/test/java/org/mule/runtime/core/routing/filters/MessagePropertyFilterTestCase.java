@@ -10,8 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -26,7 +28,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
   @Test
   public void testMessagePropertyFilter() throws Exception {
     MessagePropertyFilter filter = new MessagePropertyFilter("foo=bar");
-    InternalMessage message = InternalMessage.builder().payload("blah").build();
+    Message message = of("blah");
     assertTrue(!filter.accept(message, mock(Event.Builder.class)));
 
     message = InternalMessage.builder(message).addOutboundProperty("foo", "bar").build();
@@ -35,7 +37,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testMessagePropertyFilterInboundScope() throws Exception {
-    InternalMessage message = InternalMessage.builder().payload("blah").build();
+    Message message = of("blah");
     MessagePropertyFilter filter = new MessagePropertyFilter("inbound:foo=bar");
     assertEquals("inbound", filter.getScope());
 
@@ -46,7 +48,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testMessagePropertyFilterWithURL() throws Exception {
-    InternalMessage message = InternalMessage.builder().payload("blah").build();
+    Message message = of("blah");
     MessagePropertyFilter filter = new MessagePropertyFilter("inbound:foo=http://foo.com");
     assertEquals("inbound", filter.getScope());
 
@@ -70,7 +72,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
   @Test
   public void testMessagePropertyFilterWithNot() throws Exception {
     MessagePropertyFilter filter = new MessagePropertyFilter("foo!=bar");
-    InternalMessage message = InternalMessage.builder().payload("blah").build();
+    Message message = of("blah");
 
     assertTrue("Filter didn't accept the message", filter.accept(message, mock(Event.Builder.class)));
     message = InternalMessage.builder(message).addOutboundProperty("foo", "bar").build();
@@ -82,10 +84,10 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
   @Test
   public void testMessagePropertyFilterWithNotNull() throws Exception {
     MessagePropertyFilter filter = new MessagePropertyFilter("foo!=null");
-    InternalMessage message = InternalMessage.builder().payload("blah").build();
+    Message message = of("blah");
 
     assertFalse(filter.accept(message, mock(Event.Builder.class)));
-    message = removeProperty(message, "foo");
+    message = removeProperty((InternalMessage) message, "foo");
     assertFalse(filter.accept(message, mock(Event.Builder.class)));
     message = InternalMessage.builder(message).addOutboundProperty("foo", "car").build();
     assertTrue("Filter didn't accept the message", filter.accept(message, mock(Event.Builder.class)));
@@ -94,7 +96,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
   @Test
   public void testMessagePropertyFilterWithCaseSensitivity() throws Exception {
     MessagePropertyFilter filter = new MessagePropertyFilter("foo=Bar");
-    InternalMessage message = InternalMessage.builder().payload("blah").build();
+    Message message = of("blah");
     message = InternalMessage.builder(message).addOutboundProperty("foo", "bar").build();
     assertFalse(filter.accept(message, mock(Event.Builder.class)));
     filter.setCaseSensitive(false);
@@ -104,7 +106,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
   @Test
   public void testMessagePropertyFilterWithWildcard() throws Exception {
     MessagePropertyFilter filter = new MessagePropertyFilter("foo=B*");
-    InternalMessage message = InternalMessage.builder().payload("blah").build();
+    Message message = of("blah");
     message = InternalMessage.builder(message).addOutboundProperty("foo", "bar").build();
     assertFalse(filter.accept(message, mock(Event.Builder.class)));
     filter.setCaseSensitive(false);
@@ -119,31 +121,31 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
     assertFalse(filter.accept((InternalMessage) null, mock(Event.Builder.class)));
 
     filter = new MessagePropertyFilter("foo = bar");
-    InternalMessage message = InternalMessage.builder().payload("blah").build();
+    Message message = of("blah");
     message = InternalMessage.builder(message).addOutboundProperty("foo", "bar").build();
     assertTrue("Filter didn't accept the message", filter.accept(message, mock(Event.Builder.class)));
     filter.setCaseSensitive(false);
 
     filter = new MessagePropertyFilter("foo2 =null");
-    message = removeProperty(message, "foo2");
+    message = removeProperty((InternalMessage) message, "foo2");
     assertTrue("Filter didn't accept the message", filter.accept(message, mock(Event.Builder.class)));
 
     filter = new MessagePropertyFilter("foo2 =");
     message = InternalMessage.builder(message).addOutboundProperty("foo2", "").build();
     assertTrue("Filter didn't accept the message", filter.accept(message, mock(Event.Builder.class)));
 
-    message = removeProperty(message, "foo2");
+    message = removeProperty((InternalMessage) message, "foo2");
     assertFalse(filter.accept(message, mock(Event.Builder.class)));
   }
 
-  private InternalMessage removeProperty(InternalMessage message, String property) {
+  private Message removeProperty(InternalMessage message, String property) {
     return InternalMessage.builder(message).removeOutboundProperty(property).build();
   }
 
   @Test
   public void testMessagePropertyFilterPropertyExists() throws Exception {
     MessagePropertyFilter filter = new MessagePropertyFilter("foo!=null");
-    InternalMessage message = InternalMessage.builder().payload("blah").build();
+    Message message = of("blah");
 
     assertFalse(filter.accept(message, mock(Event.Builder.class)));
     message = InternalMessage.builder(message).addOutboundProperty("foo", "car").build();
@@ -153,7 +155,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
   @Test
   public void testMessagePropertyWithEnum() throws Exception {
     MessagePropertyFilter filter = new MessagePropertyFilter("foo=ONE_WAY");
-    InternalMessage message = InternalMessage.builder().payload("").build();
+    Message message = of("");
     assertFalse(filter.accept(message, mock(Event.Builder.class)));
     message = InternalMessage.builder(message).addOutboundProperty("foo", ONE_WAY).build();
     assertTrue(filter.accept(message, mock(Event.Builder.class)));

@@ -9,18 +9,17 @@ package org.mule.runtime.core.exception;
 import static java.text.MessageFormat.format;
 import static org.apache.commons.lang.StringUtils.defaultString;
 import static org.mule.runtime.core.context.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
 import org.mule.runtime.core.context.notification.SecurityNotification;
@@ -180,7 +179,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         ExceptionMessage msg =
             new ExceptionMessage(event, t, flowConstruct.getName(), event.getContext().getOriginatingConnectorName());
 
-        InternalMessage exceptionMessage = InternalMessage.builder(event.getMessage()).payload(msg).build();
+        Message exceptionMessage = Message.builder(event.getMessage()).payload(msg).build();
 
         MulticastingRouter router = buildRouter();
         router.setRoutes(getMessageProcessors());
@@ -202,7 +201,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     return router;
   }
 
-  protected void closeStream(InternalMessage message) {
+  protected void closeStream(Message message) {
     if (muleContext == null || muleContext.isDisposing() || muleContext.isDisposed()) {
       return;
     }

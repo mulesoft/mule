@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.processor.chain;
 
+import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -59,7 +59,7 @@ public class NestedProcessorChain implements NestedProcessor {
 
   @Override
   public Object process(Object payload) throws Exception {
-    Event muleEvent = Event.builder(event).message(InternalMessage.builder().payload(payload).build()).build();
+    Event muleEvent = Event.builder(event).message(of(payload)).build();
     return chain.process(muleEvent).getMessage().getPayload().getValue();
   }
 
@@ -71,8 +71,7 @@ public class NestedProcessorChain implements NestedProcessor {
 
   @Override
   public Object process(Object payload, Map<String, Object> properties) throws Exception {
-    Event muleEvent =
-        Event.builder(event).message(InternalMessage.builder().payload(payload).build()).variables(properties).build();
+    Event muleEvent = Event.builder(event).message(of(payload)).variables(properties).build();
     return chain.process(muleEvent).getMessage().getPayload().getValue();
   }
 }

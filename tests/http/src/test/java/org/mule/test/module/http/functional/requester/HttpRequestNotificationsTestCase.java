@@ -17,8 +17,8 @@ import static org.mule.test.module.http.functional.TestConnectorMessageNotificat
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasReasonPhrase;
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.test.module.http.functional.TestConnectorMessageNotificationListener;
 
@@ -50,7 +50,7 @@ public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCas
         new TestConnectorMessageNotificationListener(latch, "http://localhost:" + httpPort.getValue() + "/basePath/requestPath");
     muleContext.getNotificationManager().addListener(listener);
 
-    InternalMessage response = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run().getMessage();
+    Message response = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run().getMessage();
 
     latch.await(1000, TimeUnit.MILLISECONDS);
 
@@ -58,12 +58,12 @@ public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCas
                contains(getActionName(MESSAGE_REQUEST_BEGIN), getActionName(MESSAGE_REQUEST_END)));
 
     // End event should have appended http.status and http.reason as inbound properties
-    InternalMessage message = listener.getNotifications(getActionName(MESSAGE_REQUEST_END)).get(0).getSource();
+    Message message = listener.getNotifications(getActionName(MESSAGE_REQUEST_END)).get(0).getSource();
     // For now, check the response, since we no longer have control over the MuleEvent generated, only the Message
     assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(OK.getStatusCode()));
     assertThat((HttpResponseAttributes) response.getAttributes(), hasReasonPhrase(OK.getReasonPhrase()));
 
-    InternalMessage requestMessage = listener.getNotifications(getActionName(MESSAGE_REQUEST_BEGIN)).get(0).getSource();
+    Message requestMessage = listener.getNotifications(getActionName(MESSAGE_REQUEST_BEGIN)).get(0).getSource();
     assertThat(requestMessage, equalTo(message));
   }
 

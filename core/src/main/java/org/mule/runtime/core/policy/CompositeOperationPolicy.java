@@ -10,7 +10,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -106,6 +105,6 @@ public class CompositeOperationPolicy extends
     Message message = getParametersTransformer().isPresent()
         ? getParametersTransformer().get().fromParametersToMessage(getParametersProcessor().getOperationParameters())
         : operationEvent.getMessage();
-    return processPolicies(Event.builder(operationEvent).message((InternalMessage) message).build());
+    return processPolicies(Event.builder(operationEvent).message(message).build());
   }
 }

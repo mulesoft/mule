@@ -12,12 +12,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import static org.mule.runtime.api.message.Message.of;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.TransformationService;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -45,8 +45,7 @@ public class TransformationServiceNullTransformationTestCase extends AbstractMul
     when(transformer2.isSourceDataTypeSupported(any(DataType.class))).thenReturn(true);
     when(transformer2.getReturnDataType()).thenReturn(DataType.OBJECT);
 
-    InternalMessage message = InternalMessage.builder().payload("").build();
-    message = transformationService.applyTransformers(message, null, transformer1, transformer2);
+    Message message = transformationService.applyTransformers(of(""), null, transformer1, transformer2);
 
     assertEquals("foo", message.getPayload().getValue());
     verify(transformer1, never()).transform(null);

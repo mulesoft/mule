@@ -16,11 +16,11 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.internal.VoidResult;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -29,12 +29,12 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.interceptor.Interceptor;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.ComponentMessageNotification;
 import org.mule.runtime.core.context.notification.OptimisedNotificationHandler;
+import org.mule.runtime.core.internal.VoidResult;
 import org.mule.runtime.core.management.stats.ComponentStatistics;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.transformer.TransformerTemplate;
@@ -138,8 +138,8 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
 
   protected Event createResultEvent(Event event, Event.Builder resultEventBuilder, Object result)
       throws MuleException {
-    if (result instanceof InternalMessage) {
-      return resultEventBuilder.message((InternalMessage) result).build();
+    if (result instanceof Message) {
+      return resultEventBuilder.message((Message) result).build();
     } else if (result instanceof VoidResult) {
       return event;
     } else {
@@ -253,7 +253,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
     // Default implementation is no-op
   }
 
-  protected void fireComponentNotification(InternalMessage message, int action) {
+  protected void fireComponentNotification(Message message, int action) {
     if (notificationHandler != null
         && notificationHandler.isNotificationEnabled(ComponentMessageNotification.class)) {
       notificationHandler.fireNotification(new ComponentMessageNotification(message, this,

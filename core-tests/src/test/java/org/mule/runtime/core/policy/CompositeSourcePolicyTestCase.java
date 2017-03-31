@@ -23,10 +23,9 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.functional.Either;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;
@@ -149,8 +148,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
   }
 
   private Event createTestEvent() {
-    return Event.builder(DefaultEventContext.create(mockFlowConstruct, "http"))
-        .message((InternalMessage) Message.builder().nullPayload().build()).build();
+    return Event.builder(DefaultEventContext.create(mockFlowConstruct, "http")).message(Message.of(null)).build();
   }
 
 }

@@ -15,6 +15,7 @@ import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -81,7 +82,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   public void previousInboundPropertiesAreCleared() throws Exception {
     Event event =
         flowRunner("requestFlow").withPayload(TEST_MESSAGE).withInboundProperty("TestInboundProperty", "TestValue").run();
-    assertThat(event.getMessage().getInboundProperty("TestInboundProperty"), nullValue());
+    assertThat(((InternalMessage) event.getMessage()).getInboundProperty("TestInboundProperty"), nullValue());
   }
 
   @Override

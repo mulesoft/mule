@@ -8,12 +8,12 @@
 package org.mule.runtime.module.artifact.serializer;
 
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.core.api.Event;
@@ -30,6 +30,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.Optional;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -79,14 +80,14 @@ public class CustomJavaSerializationProtocolTestCase extends AbstractSerializerP
     final MuleArtifactClassLoader artifactClassLoader =
         new MuleArtifactClassLoader(ARTIFACT_ID, new ArtifactDescriptor(ARTIFACT_NAME), urls, getClass().getClassLoader(),
                                     lookupPolicy);
-    when(classLoaderRepository.getId(artifactClassLoader)).thenReturn(of(ARTIFACT_ID));
-    when(classLoaderRepository.find(ARTIFACT_ID)).thenReturn(of(artifactClassLoader));
+    when(classLoaderRepository.getId(artifactClassLoader)).thenReturn(Optional.of(ARTIFACT_ID));
+    when(classLoaderRepository.find(ARTIFACT_ID)).thenReturn(Optional.of(artifactClassLoader));
 
     final Class<?> echoTestClass = artifactClassLoader.loadClass(SERIALIZABLE_CLASS);
     final Object payload = echoTestClass.newInstance();
     setObjectName(payload);
 
-    Event event = eventBuilder().message(InternalMessage.of(payload)).build();
+    Event event = eventBuilder().message(of(payload)).build();
     byte[] bytes = serializationProtocol.serialize(event.getMessage());
 
     InternalMessage message = serializationProtocol.deserialize(bytes);

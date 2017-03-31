@@ -18,7 +18,7 @@ import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import org.mule.extensions.jms.api.destination.JmsDestination;
 import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.test.JmsAbstractTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.List;
 
@@ -64,7 +64,7 @@ public abstract class JmsBaseQueuePublishAndConsumeTestCase extends JmsAbstractT
       assertThat(consume(), hasPayload(equalTo(m)));
     }
 
-    InternalMessage nullPayload = consume(destination, emptyMap(), 0);
+    Message nullPayload = consume(destination, emptyMap(), 0);
     assertThat(format("Expected no more messages available but consumption did not fail: %s",
                       nullPayload.getPayload().getValue()),
                nullPayload.getPayload().getValue(), nullValue());
@@ -88,7 +88,7 @@ public abstract class JmsBaseQueuePublishAndConsumeTestCase extends JmsAbstractT
     destination = newDestination("expectedHeadersOnlyDefaultParameters");
     final String payload = "My Message";
     publish(payload);
-    InternalMessage message = consume();
+    Message message = consume();
     assertThat(message, hasPayload(equalTo(payload)));
     assertHeaders((JmsAttributes) message.getAttributes(),
                   new JmsDestination(destination, QUEUE), PERSISTENT,

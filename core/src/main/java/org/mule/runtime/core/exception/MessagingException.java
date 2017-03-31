@@ -9,14 +9,13 @@ package org.mule.runtime.core.exception;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.abbreviate;
-
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.routing.filters.RegExFilter;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
@@ -44,7 +43,7 @@ public class MessagingException extends MuleException {
   /**
    * The Message being processed when the error occurred
    */
-  protected transient InternalMessage muleMessage;
+  protected transient Message muleMessage;
 
   /**
    * The MuleEvent being processed when the error occurred
@@ -61,7 +60,7 @@ public class MessagingException extends MuleException {
    * @deprecated use MessagingException(Message, MuleEvent)
    */
   @Deprecated
-  public MessagingException(I18nMessage message, InternalMessage muleMessage, MuleContext context) {
+  public MessagingException(I18nMessage message, Message muleMessage, MuleContext context) {
     super(message);
     this.muleMessage = muleMessage;
     this.event = null;
@@ -87,7 +86,7 @@ public class MessagingException extends MuleException {
    * @deprecated use MessagingException(Message, MuleEvent, Throwable)
    */
   @Deprecated
-  public MessagingException(I18nMessage message, InternalMessage muleMessage, MuleContext context, Throwable cause) {
+  public MessagingException(I18nMessage message, Message muleMessage, MuleContext context, Throwable cause) {
     super(message, cause);
     this.muleMessage = muleMessage;
     this.event = null;
@@ -178,7 +177,7 @@ public class MessagingException extends MuleException {
    * @deprecated use {@link #getEvent().getMessage()} instead
    */
   @Deprecated
-  public InternalMessage getMuleMessage() {
+  public Message getMuleMessage() {
     if ((getEvent() != null)) {
       return getEvent().getMessage();
     }

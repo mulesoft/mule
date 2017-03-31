@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.routing.correlation;
 
-import org.mule.runtime.core.api.MuleContext;
+import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.routing.AggregationException;
 import org.mule.runtime.core.routing.EventGroup;
@@ -56,7 +56,7 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
     for (int i = 0; i < results.length; i++) {
       results[i] = Event.builder(results[i]).build();
     }
-    return Event.builder(results[0]).message(InternalMessage.builder().payload(results).build()).build();
+    return Event.builder(results[0]).message(of(results)).build();
   }
 
 }

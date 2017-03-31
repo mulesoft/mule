@@ -8,12 +8,11 @@ package org.mule.test.core.context.notification.processors;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertNotNull;
-
+import static org.mule.runtime.api.message.Message.of;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -265,13 +264,9 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     final Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("composite-source");
     CompositeMessageSource composite = (CompositeMessageSource) flow.getMessageSource();
     assertNotNull(((TestMessageSource) composite.getSources().get(0))
-        .fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-            .message(InternalMessage.of(TEST_PAYLOAD))
-            .build()));
+        .fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(of(TEST_PAYLOAD)).build()));
     assertNotNull(((TestMessageSource) composite.getSources().get(1))
-        .fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-            .message(InternalMessage.of(TEST_PAYLOAD))
-            .build()));
+        .fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(of(TEST_PAYLOAD)).build()));
 
     assertNotifications();
   }

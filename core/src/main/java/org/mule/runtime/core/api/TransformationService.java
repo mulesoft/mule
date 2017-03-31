@@ -10,16 +10,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
-
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.TransformerUtils;
 
@@ -49,6 +48,8 @@ public class TransformationService {
    * Applies a list of transformers returning the result of the transformation as a new message instance. If the list of
    * transformers is empty or transformation would be redundant then the same message instances will be returned.
    * 
+   *
+   * @param message
    * @param event the event being processed
    * @param transformers the transformers to apply to the message payload
    *
@@ -56,8 +57,8 @@ public class TransformationService {
    * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
    *         with the message payload
    */
-  public InternalMessage applyTransformers(final InternalMessage message, final Event event,
-                                           final List<? extends Transformer> transformers)
+  public Message applyTransformers(final Message message, final Event event,
+                                   final List<? extends Transformer> transformers)
       throws MuleException {
     return applyAllTransformers(message, event, transformers);
   }
@@ -66,6 +67,8 @@ public class TransformationService {
    * Applies a list of transformers returning the result of the transformation as a new message instance. If the list of
    * transformers is empty or transformation would be redundant then the same message instances will be returned.
    * 
+   *
+   * @param message
    * @param event the event being processed
    * @param transformers the transformers to apply to the message payload
    *
@@ -73,7 +76,7 @@ public class TransformationService {
    * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
    *         with the message payload
    */
-  public InternalMessage applyTransformers(final InternalMessage message, final Event event, final Transformer... transformers)
+  public Message applyTransformers(final Message message, final Event event, final Transformer... transformers)
       throws MuleException {
     return applyAllTransformers(message, event, asList(transformers));
   }
@@ -87,16 +90,18 @@ public class TransformationService {
    * with a byte[] representation as part of this operations.
    * <p/>
    *
+   *
+   * @param message
    * @param outputDataType the desired return type
    * @return The converted payload of this message. Note that this method will not alter the payload of this message *unless* the
    *         payload is an InputStream in which case the stream will be read and the payload will become the fully read stream.
    * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the payload
    */
-  public InternalMessage transform(InternalMessage message, DataType outputDataType) throws TransformerException {
+  public Message transform(Message message, DataType outputDataType) throws TransformerException {
     checkNotNull(message, "Message cannot be null");
     checkNotNull(outputDataType, "DataType cannot be null");
 
-    return InternalMessage.builder(message).payload(getPayload(message, outputDataType, resolveEncoding(message))).build();
+    return Message.builder(message).payload(getPayload(message, outputDataType, resolveEncoding(message))).build();
   }
 
   /**
@@ -106,12 +111,13 @@ public class TransformationService {
    * with a byte[] representation as part of this operations.
    *
    * @return message payload as object
+   * @param message
    */
-  public String getPayloadForLogging(InternalMessage message) {
+  public String getPayloadForLogging(Message message) {
     return getPayloadForLogging(message, resolveEncoding(message));
   }
 
-  protected Charset resolveEncoding(InternalMessage message) {
+  protected Charset resolveEncoding(Message message) {
     return message.getPayload().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext));
   }
 
@@ -120,11 +126,11 @@ public class TransformationService {
    * required it will use the encoding set on the message.
    * <p>
    * If the existing payload is consumable (i.e. can't be read twice) or an exception occurs during transformation then the an
-   * exeption won't be thrown but rather a description of the payload type will be returned.
+   * exception won't be thrown but rather a description of the payload type will be returned.
    *
    * @return message payload as a String or message with the payload type if payload can't be converted to a String
    */
-  public String getPayloadForLogging(InternalMessage message, Charset encoding) {
+  public String getPayloadForLogging(Message message, Charset encoding) {
     DataType dataType = message.getPayload().getDataType();
     if (!dataType.isStreamType()) {
       try {
@@ -136,10 +142,10 @@ public class TransformationService {
     return "Payload is a stream of type: " + dataType.getType();
   }
 
-  private InternalMessage applyAllTransformers(final InternalMessage message, final Event event,
-                                               final List<? extends Transformer> transformers)
+  private Message applyAllTransformers(final Message message, final Event event,
+                                       final List<? extends Transformer> transformers)
       throws MuleException {
-    InternalMessage result = message;
+    Message result = message;
     if (!transformers.isEmpty()) {
       for (int index = 0; index < transformers.size(); index++) {
         Transformer transformer = transformers.get(index);
@@ -180,7 +186,7 @@ public class TransformationService {
     return result;
   }
 
-  private boolean canSkipTransformer(InternalMessage message, List<? extends Transformer> transformers, int index) {
+  private boolean canSkipTransformer(Message message, List<? extends Transformer> transformers, int index) {
     Transformer transformer = transformers.get(index);
 
     boolean skipConverter = false;
@@ -205,7 +211,7 @@ public class TransformationService {
     return skipConverter;
   }
 
-  private InternalMessage transformMessage(final InternalMessage message, final Event event, final Transformer transformer)
+  private Message transformMessage(final Message message, final Event event, final Transformer transformer)
       throws MessageTransformerException, TransformerException {
     Object result;
 
@@ -215,19 +221,19 @@ public class TransformationService {
       result = transformer.transform(message);
     }
 
-    if (result instanceof InternalMessage) {
-      return (InternalMessage) result;
+    if (result instanceof Message) {
+      return (Message) result;
     } else {
       // We need to use message from event if it's available in case the transformer mutated the message by creating
       // a new message instance. This issue goes away once transformers are cleaned up and always return event or
       // message. See MULE-9342
-      InternalMessage messagePostTransform = (event != null && event.getMessage() != null) ? event.getMessage() : message;
-      return InternalMessage.builder(messagePostTransform).payload(result)
+      Message messagePostTransform = (event != null && event.getMessage() != null) ? event.getMessage() : message;
+      return Message.builder(messagePostTransform).payload(result)
           .mediaType(mergeMediaType(messagePostTransform, transformer.getReturnDataType())).build();
     }
   }
 
-  private MediaType mergeMediaType(InternalMessage message, DataType transformed) {
+  private MediaType mergeMediaType(Message message, DataType transformed) {
     DataType original = message.getPayload().getDataType();
     MediaType mimeType = ANY.matches(transformed.getMediaType()) ? original.getMediaType() : transformed.getMediaType();
     Charset encoding = transformed.getMediaType().getCharset()
@@ -249,7 +255,7 @@ public class TransformationService {
    * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the payload.
    */
   @SuppressWarnings("unchecked")
-  private <T> T getPayload(InternalMessage message, DataType resultType, Charset encoding) throws TransformerException {
+  private <T> T getPayload(Message message, DataType resultType, Charset encoding) throws TransformerException {
     // Handle null by ignoring the request
     if (resultType == null) {
       throw new IllegalArgumentException(CoreMessages.objectIsNull("resultType").getMessage());

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import static org.mule.runtime.core.routing.AbstractRoutingStrategy.validateMessageIsNotConsumable;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -32,7 +34,7 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter {
 
   @Override
   public Event route(Event event) throws RoutingException {
-    InternalMessage message = event.getMessage();
+    Message message = event.getMessage();
 
     if (routes == null || routes.size() == 0) {
       throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), null);

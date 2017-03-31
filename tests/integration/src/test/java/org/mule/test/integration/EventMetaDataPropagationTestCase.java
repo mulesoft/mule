@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
-
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
@@ -60,9 +60,9 @@ public class EventMetaDataPropagationTestCase extends AbstractIntegrationTestCas
         props.put("booleanParam", Boolean.TRUE);
 
         return InternalMessage.builder()
-            .payload(new DefaultMultiPartPayload(InternalMessage.builder().payload(context.getMessageAsString(muleContext))
+            .payload(new DefaultMultiPartPayload(Message.builder().payload(context.getMessageAsString(muleContext))
                 .attributes(BODY_ATTRIBUTES).build(),
-                                                 InternalMessage.builder().nullPayload().mediaType(MediaType.TEXT)
+                                                 Message.builder().nullPayload().mediaType(MediaType.TEXT)
                                                      .attributes(new PartAttributes("test1")).build()))
             .outboundProperties(props).build();
       } else {
@@ -89,13 +89,13 @@ public class EventMetaDataPropagationTestCase extends AbstractIntegrationTestCas
 
     @Override
     public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
-      InternalMessage msg = event.getMessage();
-      assertEquals("param1", event.getMessage().getOutboundProperty("stringParam"));
+      InternalMessage msg = (InternalMessage) event.getMessage();
+      assertEquals("param1", msg.getOutboundProperty("stringParam"));
       final Object o = msg.getOutboundProperty("objectParam");
       assertTrue(o instanceof Apple);
-      assertEquals(12345.6, 12345.6, msg.<Double>getOutboundProperty("doubleParam", 0d));
-      assertEquals(12345, msg.<Integer>getOutboundProperty("integerParam", 0).intValue());
-      assertEquals(123456789, msg.<Long>getOutboundProperty("longParam", 0L).longValue());
+      assertEquals(12345.6, 12345.6, msg.getOutboundProperty("doubleParam", 0d));
+      assertEquals(12345, msg.getOutboundProperty("integerParam", 0).intValue());
+      assertEquals(123456789, msg.getOutboundProperty("longParam", 0L).longValue());
       assertEquals(Boolean.TRUE, msg.getOutboundProperty("booleanParam", Boolean.FALSE));
       return msg;
     }

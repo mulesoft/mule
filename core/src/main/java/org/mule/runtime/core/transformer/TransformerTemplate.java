@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.transformer;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.nio.charset.Charset;
@@ -34,7 +34,7 @@ public class TransformerTemplate extends AbstractMessageTransformer {
 
   public interface TransformerCallback {
 
-    public Object doTransform(InternalMessage message) throws Exception;
+    Object doTransform(Message message) throws Exception;
   }
 
   public static class OverwitePayloadCallback implements TransformerCallback {
@@ -46,7 +46,7 @@ public class TransformerTemplate extends AbstractMessageTransformer {
     }
 
     @Override
-    public Object doTransform(InternalMessage message) throws Exception {
+    public Object doTransform(Message message) throws Exception {
       return payload;
     }
   }

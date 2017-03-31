@@ -9,15 +9,13 @@ package org.mule.test.construct;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -45,7 +43,7 @@ public class FlowNestingTestCase extends AbstractIntegrationTestCase {
     flowRunner("NestedFilters").withPayload(new Orange()).withInboundProperties(inboundProperties).run();
 
     MuleClient client = muleContext.getClient();
-    InternalMessage result = client.request("test://outFilter", RECEIVE_TIMEOUT).getRight().get();
+    Message result = client.request("test://outFilter", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
   }
 
@@ -69,7 +67,7 @@ public class FlowNestingTestCase extends AbstractIntegrationTestCase {
     flowRunner("NestedChoice").withPayload(new Apple()).withInboundProperties(inboundProperties).run();
 
     MuleClient client = muleContext.getClient();
-    InternalMessage result = client.request("test://outChoice", RECEIVE_TIMEOUT).getRight().get();
+    Message result = client.request("test://outChoice", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals("ABC", getPayloadAsString(result));
   }
@@ -82,7 +80,7 @@ public class FlowNestingTestCase extends AbstractIntegrationTestCase {
     flowRunner("NestedChoice").withPayload(new Apple()).withInboundProperties(inboundProperties).run();
 
     MuleClient client = muleContext.getClient();
-    InternalMessage result = client.request("test://outChoice", RECEIVE_TIMEOUT).getRight().get();
+    Message result = client.request("test://outChoice", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals("AB", getPayloadAsString(result));
   }

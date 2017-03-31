@@ -8,7 +8,7 @@ package org.mule.test.module.http.functional.listener;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -58,7 +58,7 @@ public class HttpListenerEncodingTestCase extends AbstractHttpTestCase {
     final String url = String.format("http://localhost:%s/test", port.getNumber());
     Request request = Request.Post(url).bodyString(testMessage, ContentType.create("text/plain", Charset.forName(encoding)));
     request.execute();
-    InternalMessage result = muleContext.getClient().request("test://out", 2000).getRight().get();
+    Message result = muleContext.getClient().request("test://out", 2000).getRight().get();
     assertThat(getPayloadAsString(result), is(testMessage));
   }
 

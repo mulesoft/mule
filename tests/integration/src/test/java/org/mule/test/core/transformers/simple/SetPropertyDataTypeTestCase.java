@@ -30,7 +30,7 @@ public class SetPropertyDataTypeTestCase extends AbstractIntegrationTestCase {
   public void setsPropertyDataType() throws Exception {
     final Event muleEvent = flowRunner("main").withPayload(TEST_MESSAGE).run();
 
-    InternalMessage response = muleEvent.getMessage();
+    InternalMessage response = (InternalMessage) muleEvent.getMessage();
     DataType dataType = response.getOutboundPropertyDataType("testProperty");
 
     assertThat(dataType, like(String.class, MediaType.XML, UTF_16));

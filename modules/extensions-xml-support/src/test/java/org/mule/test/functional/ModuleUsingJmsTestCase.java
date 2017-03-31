@@ -9,8 +9,9 @@ package org.mule.test.functional;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import org.mule.runtime.api.message.Message;
+
 import org.junit.Test;
-import org.mule.runtime.core.api.message.InternalMessage;
 
 public class ModuleUsingJmsTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
@@ -32,9 +33,7 @@ public class ModuleUsingJmsTestCase extends AbstractXmlExtensionMuleArtifactFunc
         .withVariable("content", content)
         .run();
     //consume the message from the queue
-    final InternalMessage consumedMessage = flowRunner("consumer-flow")
-        .run()
-        .getMessage();
+    final Message consumedMessage = flowRunner("consumer-flow").run().getMessage();
     assertThat(consumedMessage, hasPayload(equalTo(content)));
   }
 

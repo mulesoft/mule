@@ -16,7 +16,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import org.mule.extensions.jms.api.destination.QueueConsumer;
 import org.mule.extensions.jms.test.JmsAbstractTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.message.Message;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -73,7 +73,7 @@ public abstract class JmsBaseTopicListenResponseTestCase extends JmsAbstractTest
                 .put(REPLY_TO_DESTINATION_TYPE_VAR, "QUEUE")
                 .build());
 
-    InternalMessage reply = consume(REPLY_TO_DESTINATION, of(REPLY_CONSUMER_TYPE_VAR, new QueueConsumer()), -1);
+    Message reply = consume(REPLY_TO_DESTINATION, of(REPLY_CONSUMER_TYPE_VAR, new QueueConsumer()), -1);
     assertThat(reply, hasPayload(equalTo(READ_MESSAGE_PREFIX + payload)));
   }
 
@@ -83,7 +83,7 @@ public abstract class JmsBaseTopicListenResponseTestCase extends JmsAbstractTest
     destination = newDestination("first_requestReplyExplicitReplyDestination");
 
     // Publish initial requests and wait for responses in the same reply queue
-    Future<InternalMessage> firstRequestReply = executor
+    Future<Message> firstRequestReply = executor
         .submit(() -> flowRunner(REQUEST_REPLY_EXPLICIT_DEST_FLOW)
             .withVariable(DESTINATION_VAR, destination)
             .withVariable(REPLY_TO_DESTINATION_VAR, REPLY_TO_DESTINATION)
@@ -92,7 +92,7 @@ public abstract class JmsBaseTopicListenResponseTestCase extends JmsAbstractTest
             .getMessage());
 
     // Consume the published messages
-    InternalMessage firstMessage = consume(destination, of(REPLY_CONSUMER_TYPE_VAR, new QueueConsumer()), -1);
+    Message firstMessage = consume(destination, of(REPLY_CONSUMER_TYPE_VAR, new QueueConsumer()), -1);
     assertThat(firstMessage, hasPayload(equalTo(FIRST_MESSAGE)));
     String firstReplyDestination = getReplyDestination(firstMessage);
     assertThat(firstReplyDestination, is(equalTo(REPLY_TO_DESTINATION)));
@@ -105,7 +105,7 @@ public abstract class JmsBaseTopicListenResponseTestCase extends JmsAbstractTest
         .run();
 
     // Read the reply result
-    InternalMessage firstReply = firstRequestReply.get();
+    Message firstReply = firstRequestReply.get();
     assertThat(firstReply, hasPayload(equalTo(FIRST_RESPONSE)));
     assertThat(firstReply.getAttributes(), not(nullValue()));
   }
