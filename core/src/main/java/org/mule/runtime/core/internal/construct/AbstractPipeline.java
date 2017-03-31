@@ -48,7 +48,7 @@ import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
-import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
+import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.streaming.StreamingManager;
 
 import com.google.common.cache.Cache;
@@ -244,7 +244,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   private Consumer<MessagingException> handleError() {
-    if (messageSource instanceof LegacyInboundEndpoint || messageSource instanceof SchedulerMessageSource) {
+    if (messageSource instanceof LegacyInboundEndpoint || messageSource instanceof DefaultSchedulerMessageSource) {
       return me -> me.getEvent().getContext().error(me);
     } else {
       return me -> Mono.defer(() -> Mono.from(getExceptionListener().apply(me)))

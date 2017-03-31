@@ -9,11 +9,11 @@ package org.mule.runtime.config.spring.factories;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
-import org.mule.runtime.core.source.scheduler.SchedulerMessageSource;
+import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 
-public class SchedulingMessageSourceFactoryBean extends AbstractAnnotatedObjectFactory<SchedulerMessageSource>
+public class SchedulingMessageSourceFactoryBean extends AbstractAnnotatedObjectFactory<DefaultSchedulerMessageSource>
     implements MuleContextAware {
 
   private static final long DEFAULT_FREQUENCY = 1000l;
@@ -32,9 +32,9 @@ public class SchedulingMessageSourceFactoryBean extends AbstractAnnotatedObjectF
 
 
   @Override
-  public SchedulerMessageSource doGetObject() throws Exception {
+  public DefaultSchedulerMessageSource doGetObject() throws Exception {
     scheduler = scheduler == null ? defaultScheduler() : scheduler;
-    return new SchedulerMessageSource(muleContext, scheduler);
+    return new DefaultSchedulerMessageSource(muleContext, scheduler);
   }
 
   @Override

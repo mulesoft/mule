@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.core.api.locator;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.meta.AnnotatedObject;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -39,6 +42,14 @@ public interface ConfigurationComponentLocator {
    * @param location the location of the component.
    * @return the found component or empty if there's no such component.
    */
-  Optional<Object> find(Location location);
+  Optional<AnnotatedObject> find(Location location);
+
+  /**
+   * Finds all the components with the given identifier within the artifact.
+   * 
+   * @param componentIdentifier the component identifier
+   * @return the list of found components. If no component is found an empty list will be returned.
+   */
+  List<AnnotatedObject> find(ComponentIdentifier componentIdentifier);
 
 }

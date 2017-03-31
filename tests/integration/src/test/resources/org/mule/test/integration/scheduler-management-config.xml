@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <flow name="neverRunningScheduler">
+        <scheduler>
+            <fixed-frequency-scheduler startDelay="999999" frequency="999999"/>
+        </scheduler>
+        <test:queue name="neverRunningSchedulerQueue"/>
+    </flow>
+
+    <flow name="schedulerControlledFromSameFlow">
+        <scheduler>
+            <fixed-frequency-scheduler startDelay="0" frequency="200"/>
+        </scheduler>
+        <test:component />
+    </flow>
+
+</mule>

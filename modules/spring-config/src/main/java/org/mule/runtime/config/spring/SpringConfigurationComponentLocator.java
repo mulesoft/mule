@@ -7,10 +7,13 @@
 package org.mule.runtime.config.spring;
 
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.locator.ConfigurationComponentLocator;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -38,7 +41,17 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
    * {@inheritDoc}
    */
   @Override
-  public Optional<Object> find(Location location) {
+  public Optional<AnnotatedObject> find(Location location) {
     return ofNullable(componentsMap.get(location.toString()));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<AnnotatedObject> find(ComponentIdentifier componentIdentifier) {
+    return componentsMap.values().stream()
+        .filter(component -> component.getLocation().getComponentIdentifier().getIdentifier().equals(componentIdentifier))
+        .collect(toList());
   }
 }

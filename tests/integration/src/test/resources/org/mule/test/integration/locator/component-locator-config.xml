@@ -14,5 +14,10 @@
         </async>
     </flow>
 
+    <flow name="anotherFlow">
+        <scheduler/>
+        <logger/>
+    </flow>
+
 </mule>
 
