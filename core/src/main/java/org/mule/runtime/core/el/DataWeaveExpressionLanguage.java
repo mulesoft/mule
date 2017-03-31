@@ -19,12 +19,14 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionExecutor;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -34,6 +36,10 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.el.context.AppContext;
+import org.mule.runtime.core.el.context.MuleInstanceContext;
+import org.mule.runtime.core.el.context.ServerContext;
 import org.slf4j.Logger;
 
 public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
@@ -45,13 +51,23 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
   public static final String ERROR = "error";
   public static final String VARIABLES = "variables";
   public static final String FLOW = "flow";
+  public static final String SERVER = "server";
+  public static final String MULE = "mule";
+  public static final String APP = "app";
 
   private ExpressionExecutor expressionExecutor;
+  private MuleContext muleContext;
 
   @Inject
-  public DataWeaveExpressionLanguage(ExpressionExecutor expressionExecutor) {
-    this.expressionExecutor = expressionExecutor;
+  public DataWeaveExpressionLanguage(MuleContext muleContext) {
+    try {
+      this.expressionExecutor = muleContext.getRegistry().lookupObject(ExpressionExecutor.class);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
+    this.muleContext = muleContext;
   }
+
 
   /**
    * Registers the given {@link BindingContext} as global.
@@ -108,8 +124,8 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
 
   private BindingContext.Builder addFlowBindings(FlowConstruct flow, BindingContext.Builder contextBuilder) {
     if (flow != null) {
-      contextBuilder.addBinding(FLOW, new TypedValue(new FlowVariablesAccessor(flow.getName()),
-                                                     fromType(FlowVariablesAccessor.class)));
+      contextBuilder.addBinding(FLOW, new TypedValue<>(new FlowVariablesAccessor(flow.getName()),
+                                                       fromType(FlowVariablesAccessor.class)));
     }
     return contextBuilder;
   }
@@ -123,14 +139,19 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
         contextBuilder.addBinding(name, value);
       });
       contextBuilder.addBinding(VARIABLES,
-                                new TypedValue(unmodifiableMap(flowVars), fromType(flowVars.getClass())));
+                                new TypedValue<>(unmodifiableMap(flowVars), fromType(flowVars.getClass())));
       Message message = event.getMessage();
       Attributes attributes = message.getAttributes();
-      contextBuilder.addBinding(ATTRIBUTES, new TypedValue(attributes, fromType(attributes.getClass())));
+      contextBuilder.addBinding(ATTRIBUTES, new TypedValue<>(attributes, fromType(attributes.getClass())));
       contextBuilder.addBinding(PAYLOAD, message.getPayload());
-      contextBuilder.addBinding(DATA_TYPE, new TypedValue(message.getPayload().getDataType(), fromType(DataType.class)));
+      contextBuilder.addBinding(DATA_TYPE, new TypedValue<>(message.getPayload().getDataType(), fromType(DataType.class)));
+      contextBuilder.addBinding(MULE,
+                                new TypedValue<>(new MuleInstanceContext(muleContext), fromType(MuleInstanceContext.class)));
+      contextBuilder.addBinding(SERVER, new TypedValue<>(new ServerContext(), fromType(ServerContext.class)));
+      contextBuilder.addBinding(APP, new TypedValue<>(new AppContext(muleContext), fromType(AppContext.class)));
+
       Error error = event.getError().isPresent() ? event.getError().get() : null;
-      contextBuilder.addBinding(ERROR, new TypedValue(error, fromType(Error.class)));
+      contextBuilder.addBinding(ERROR, new TypedValue<>(error, fromType(Error.class)));
     }
   }
 

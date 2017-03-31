@@ -21,7 +21,7 @@
                 <db:sql>select description from Planet where name = 'Venus'</db:sql>
             </db:select>
             <!-- Get the CLOB field value -->
-            <set-payload value="#[mel:payload.get(0).get('DESCRIPTION')]"/>
+            <set-payload value="#[payload[0].'DESCRIPTION']"/>
             <component class="org.mule.extension.db.integration.ClobToString"/>
         </try>
     </flow>

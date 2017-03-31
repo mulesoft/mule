@@ -30,7 +30,7 @@ public class ParameterResolverOnPojoTestCase extends AbstractParameterResolverTe
     DifferedKnockableDoor door = getPayload("operationWithChildElement");
 
     ParameterResolver<String> someExpression = door.getVictim();
-    assertParameterResolver(someExpression, of("#[mel:payload]"), is("this is the payload"));
+    assertParameterResolver(someExpression, of("#[payload]"), is("this is the payload"));
   }
 
   @Test
@@ -38,7 +38,7 @@ public class ParameterResolverOnPojoTestCase extends AbstractParameterResolverTe
     DifferedKnockableDoor door = getPayload("operationWithDynamicReferenceElement");
 
     ParameterResolver<String> someExpression = door.getVictim();
-    assertParameterResolver(someExpression, of("#[mel:payload]"), is("this is the payload"));
+    assertParameterResolver(someExpression, of("#[payload]"), is("this is the payload"));
   }
 
   @Test

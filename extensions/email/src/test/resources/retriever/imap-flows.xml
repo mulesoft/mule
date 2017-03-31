@@ -12,14 +12,14 @@
     <flow name="retrieveAndMarkRead">
         <email:list-imap config-ref="config"/>
         <foreach>
-            <email:mark-as-read config-ref="config" emailId="#[mel:payload.attributes.get().id]"/>
+            <email:mark-as-read config-ref="config" emailId="#[payload.attributes.id]"/>
         </foreach>
     </flow>
 
     <flow name="retrieveAndThenExpungeDelete">
         <email:list-imap config-ref="config"/>
         <foreach>
-            <email:mark-as-deleted config-ref="config" emailId="#[mel:payload.attributes.get().id]"/>
+            <email:mark-as-deleted config-ref="config" emailId="#[payload.attributes.id]"/>
         </foreach>
         <email:expunge-folder config-ref="config"/>
     </flow>
@@ -27,7 +27,7 @@
     <flow name="retrieveAndMarkDelete">
         <email:list-imap config-ref="config"/>
         <foreach>
-            <email:mark-as-deleted config-ref="config" emailId="#[mel:payload.attributes.get().id]"/>
+            <email:mark-as-deleted config-ref="config" emailId="#[payload.attributes.id]"/>
         </foreach>
     </flow>
 
@@ -68,7 +68,7 @@
     <flow name="storeMessages">
         <email:list-imap config-ref="config"/>
         <foreach>
-            <email:store config-ref="config" localDirectory="${storePath}" emailId="#[mel:payload.attributes.get().id]"/>
+            <email:store config-ref="config" localDirectory="${storePath}" emailId="#[payload.attributes.id]"/>
         </foreach>
     </flow>
 
@@ -80,8 +80,8 @@
         <email:list-imap config-ref="config"/>
         <foreach>
             <choice>
-                <when expression="#[mel:payload.attributes.get().id > 5]">
-                    <email:delete config-ref="config" emailId="#[mel:payload.attributes.get().id]"/>
+                <when expression="#[payload.attributes.id > 5]">
+                    <email:delete config-ref="config" emailId="#[payload.attributes.id]"/>
                 </when>
                 <otherwise>
                     <logger/>

@@ -8,7 +8,7 @@
     <flow name="defaultQueryRequestResponse">
         <db:stored-procedure config-ref="dbConfig">
             <db:parameterized-query>call updateParamTestType1(:type, :updateCount1)</db:parameterized-query>
-            <db:in-param name="type" value="#[mel:payload]"/>
+            <db:in-param name="type" value="#[payload]"/>
             <db:out-param name="updateCount1" type="INTEGER"/>
         </db:stored-procedure>
     </flow>

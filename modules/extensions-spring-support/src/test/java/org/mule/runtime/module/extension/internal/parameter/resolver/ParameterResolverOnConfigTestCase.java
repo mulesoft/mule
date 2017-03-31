@@ -34,8 +34,8 @@ public class ParameterResolverOnConfigTestCase extends AbstractParameterResolver
     ParameterResolver<KnockeableDoor> doorResolver = config.getDoorResolver();
     ParameterResolver<String> stringResolver = config.getStringResolver();
 
-    assertParameterResolver(doorResolver, of("#[mel:app.registry.staticDoor]"), is(instanceOf(KnockeableDoor.class)));
-    assertParameterResolver(stringResolver, of("#[mel:payload]"), is("this is the payload"));
+    assertParameterResolver(doorResolver, of("#[app.registry.staticDoor]"), is(instanceOf(KnockeableDoor.class)));
+    assertParameterResolver(stringResolver, of("#[payload]"), is("this is the payload"));
   }
 
   @Test
@@ -46,8 +46,8 @@ public class ParameterResolverOnConfigTestCase extends AbstractParameterResolver
     ParameterResolver<String> stringResolver = config.getStringResolver();
     doorResolver.resolve();
 
-    assertParameterResolver(doorResolver, of("#[mel:app.registry.dynamicDoor]"), is(instanceOf(KnockeableDoor.class)));
-    assertParameterResolver(stringResolver, of("#[mel:payload]"), is("this is the payload"));
+    assertParameterResolver(doorResolver, of("#[app.registry.dynamicDoor]"), is(instanceOf(KnockeableDoor.class)));
+    assertParameterResolver(stringResolver, of("#[payload]"), is("this is the payload"));
   }
 
   @Test

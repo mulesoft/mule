@@ -8,6 +8,7 @@ package org.mule.runtime.core.el.mvel;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.el.context.AppContext;
+import org.mule.runtime.core.el.context.ExtendedServerContext;
 import org.mule.runtime.core.el.context.MuleInstanceContext;
 import org.mule.runtime.core.el.context.ServerContext;
 import org.mule.runtime.core.el.function.DateTimeExpressionLanguageFuntion;
@@ -21,7 +22,7 @@ public class StaticVariableResolverFactory extends MVELExpressionLanguageContext
 
   public StaticVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext) {
     super(parserConfiguration, muleContext);
-    addFinalVariable("server", new ServerContext());
+    addFinalVariable("server", new ExtendedServerContext());
     addFinalVariable("mule", new MuleInstanceContext(muleContext));
     addFinalVariable("app", new AppContext(muleContext));
     addFinalVariable(MVELExpressionLanguageContext.MULE_CONTEXT_INTERNAL_VARIABLE, muleContext);

@@ -50,19 +50,6 @@ public interface ExpressionManager extends ExpressionEvaluator {
    */
   TypedValue evaluate(String expression, Event event) throws ExpressionRuntimeException;
 
-  /**
-   * Execute the expression returning the result. The expression will be executed by the expression language implementation
-   * without making any event or message context available. A Map of variables can be provided that will be able to the expression
-   * when executed. Variable provided in the map will only be available if there are no conflicts with context variables provided
-   * by the expression language implementation.
-   *
-   * @param expression the expression to be executed
-   * @param context the bindings to be considered
-   * @return the result of execution of the expression.
-   * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
-   */
-  @Override
-  TypedValue evaluate(String expression, BindingContext context) throws ExpressionRuntimeException;
 
   /**
    * Execute the expression returning the result. The expression will be executed with MuleEvent context, meaning the expression
@@ -126,17 +113,6 @@ public interface ExpressionManager extends ExpressionEvaluator {
    */
   TypedValue evaluate(String expression, DataType expectedOutputType) throws ExpressionRuntimeException;
 
-  /**
-   * Evaluates an expression according to a given {@link BindingContext}, the global one and the {@link DataType} of the expected result.
-   *
-   * @param expression the EL expression
-   * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value type.
-   * @param context an expression binding context to consider
-   * @return the result of the expression plus its type
-   * @throws ExpressionRuntimeException or during transformation or during transformation
-   */
-  @Override
-  TypedValue evaluate(String expression, DataType expectedOutputType, BindingContext context) throws ExpressionRuntimeException;
 
   /**
    * Evaluates an expression according to a given {@link BindingContext}, the global one, the {@link DataType} of the expected
@@ -180,31 +156,4 @@ public interface ExpressionManager extends ExpressionEvaluator {
                           boolean nonBooleanReturnsTrue)
       throws ExpressionRuntimeException;
 
-  /**
-   * Determines if the string is an expression.
-   *
-   * @param expression is this string an expression string
-   * @return true if the string contains an expression
-   */
-  @Override
-  boolean isExpression(String expression);
-
-  /**
-   * Validates the expression returning true is the expression is valid, false otherwise.. All implementors should should validate
-   * expression syntactically. Semantic validation is optional.
-   *
-   * @param expression
-   * @return true if the expression is valid.
-   */
-  @Override
-  boolean isValid(String expression);
-
-  /**
-   * Validates the expression syntactically.
-   *
-   * @param expression the expression to validate
-   * @return a {@link ValidationResult} indicating whether the validation was successful or not.
-   */
-  @Override
-  ValidationResult validate(String expression);
 }

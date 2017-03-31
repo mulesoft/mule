@@ -24,17 +24,17 @@
                 <email:attachments>
                     <email:email-attachment id="text-attachment" contentType="text/plain">
                         <email:content>
-                            #[mel:'This is the email text attachment']
+                            #['This is the email text attachment']
                         </email:content>
                     </email:email-attachment>
                     <email:email-attachment id="json-attachment">
                         <email:content>
-                            #[mel:app.registry.jsonAttachmentResource.getURL()]
+                            #[app.registry.jsonAttachmentResource.url]
                         </email:content>
                     </email:email-attachment>
                     <email:email-attachment id="stream-attachment" contentType="application/octet-stream">
                         <email:content>
-                            #[mel:new java.io.ByteArrayInputStream("This is the email text attachment".getBytes());]
+                            #["This is the email text attachment" as Binary]
                         </email:content>
                     </email:email-attachment>
                 </email:attachments>

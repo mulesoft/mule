@@ -30,6 +30,7 @@ import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.FLOW;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.PAYLOAD;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.VARIABLES;
 
+import org.junit.Before;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
@@ -42,10 +43,10 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.message.BaseAttributes;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import com.mulesoft.weave.el.WeaveExpressionExecutor;
+import org.mule.runtime.core.util.SystemUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.common.collect.Sets;
 
@@ -62,13 +63,17 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features("Expression Language")
 @Stories("Support DW")
-public class DataWeaveExpressionLanguageTestCase extends AbstractMuleTestCase {
+public class DataWeaveExpressionLanguageTestCase extends AbstractMuleContextTestCase {
 
-  private DataWeaveExpressionLanguage expressionLanguage =
-      new DataWeaveExpressionLanguage(new WeaveExpressionExecutor());
+  private DataWeaveExpressionLanguage expressionLanguage;
 
   @Rule
   public ExpectedException expectedEx = ExpectedException.none();
+
+  @Before
+  public void setUp() {
+    expressionLanguage = new DataWeaveExpressionLanguage(muleContext);
+  }
 
   @Test
   public void stringExpression() throws Exception {
@@ -99,7 +104,7 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleTestCase {
   @Test
   public void errorBinding() throws Exception {
     Error error = mock(Error.class);
-    Optional opt = Optional.of(error);
+    Optional<Error> opt = Optional.of(error);
     Event event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
 
@@ -108,9 +113,9 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void errorMessageContainsDataweaveExceptionCauseMessage() throws Exception {
+  public void errorMessageContainsDataWeaveExceptionCauseMessage() throws Exception {
     Error error = mock(Error.class);
-    Optional opt = Optional.of(error);
+    Optional<Error> opt = Optional.of(error);
     Event event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
     String expressionThatThrowsException = "payload + 'foo'";
@@ -127,7 +132,7 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleTestCase {
     Event event = getEventWithError(empty());
     InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
     when(event.getMessage()).thenReturn(message);
-    TypedValue payload = new TypedValue("hey", STRING);
+    TypedValue payload = new TypedValue<>("hey", STRING);
     when(message.getPayload()).thenReturn(payload);
 
     TypedValue result = expressionLanguage.evaluate(PAYLOAD, event, BindingContext.builder().build());
@@ -140,7 +145,7 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleTestCase {
     Event event = getEventWithError(empty());
     InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
     when(event.getMessage()).thenReturn(message);
-    TypedValue payload = new TypedValue("hey", STRING);
+    TypedValue payload = new TypedValue<>("hey", STRING);
     when(message.getPayload()).thenReturn(payload);
 
     TypedValue result = expressionLanguage.evaluate(DATA_TYPE, event, BindingContext.builder().build());
@@ -154,7 +159,7 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleTestCase {
     String var1 = "var1";
     String var2 = "var2";
     when(event.getVariableNames()).thenReturn(Sets.newHashSet(var1, var2));
-    TypedValue varValue = new TypedValue(null, OBJECT);
+    TypedValue varValue = new TypedValue<>(null, OBJECT);
     when(event.getVariable(var1)).thenReturn(varValue);
     when(event.getVariable(var2)).thenReturn(varValue);
 
@@ -171,7 +176,7 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleTestCase {
     String var2 = "var2";
     when(event.getVariableNames()).thenReturn(Sets.newHashSet(var1, var2));
     String varValue = "mangoose";
-    TypedValue var = new TypedValue(varValue, STRING);
+    TypedValue var = new TypedValue<>(varValue, STRING);
     when(event.getVariable(var1)).thenReturn(var);
     when(event.getVariable(var2)).thenReturn(var);
 
@@ -205,6 +210,30 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void accessRegistryBean() throws MuleException {
+    Event event = testEvent();
+    muleContext.getRegistry().registerObject("myBean", new MyBean("DataWeave"));
+    TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean.name", event, BindingContext.builder().build());
+    assertThat(evaluate.getValue(), is("DataWeave"));
+  }
+
+  @Test
+  public void accessServerFileSeparator() throws MuleException {
+    Event event = testEvent();
+    muleContext.getRegistry().registerObject("myBean", new MyBean("DataWeave"));
+    TypedValue evaluate = expressionLanguage.evaluate("server.fileSeparator", event, BindingContext.builder().build());
+    assertThat(evaluate.getValue(), is(SystemUtils.FILE_SEPARATOR));
+  }
+
+  @Test
+  public void accessMuleVersion() throws MuleException {
+    Event event = testEvent();
+    muleContext.getRegistry().registerObject("myBean", new MyBean("DataWeave"));
+    TypedValue evaluate = expressionLanguage.evaluate("mule.version", event, BindingContext.builder().build());
+    assertThat(evaluate.getValue(), is(MuleManifest.getProductVersion()));
+  }
+
+  @Test
   public void flowNameBinding() {
     Event event = getEventWithError(empty());
     FlowConstruct mockFlowConstruct = mock(FlowConstruct.class);
@@ -225,5 +254,18 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleTestCase {
 
   private class SomeAttributes extends BaseAttributes {
 
+  }
+
+  private class MyBean {
+
+    private String name;
+
+    public MyBean(String name) {
+      this.name = name;
+    }
+
+    public String getName() {
+      return name;
+    }
   }
 }
