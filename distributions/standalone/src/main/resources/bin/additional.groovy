@@ -48,7 +48,7 @@ wrapperAdditionalConfFile.withWriter() {
                     break
             }
         }
-        paramIndex++
+        paramIndex += getNumberOfAdditionalJavaProperties(args)
 
         if (debugEnabled) {
             writeJpdaOpts(w)
@@ -158,4 +158,28 @@ def String getArchitecture() {
             println "ERROR: Architecture $arch is not supported by profiler"
             return
     }
+}
+
+/**
+ *
+ * @param args
+ * @return the value of -additionalJavaProperties argument command line if It was set, DEFAULT_NUMBER_OF_ADDITIONAL_JAVA_ARGUMENTS otherwise.
+ */
+
+def int getNumberOfAdditionalJavaProperties(String[] args) {
+    int DEFAULT_NUMBER_OF_ADDITIONAL_JAVA_ARGUMENTS = 20;
+
+    //find the item in the list
+    def additionalJavaArguments = args.find { it ==~ /-additionalJavaProperties=(\d+)+/ }
+
+    //get the number of JavaArguments
+    additionalJavaArgumentsMatcher = additionalJavaArguments =~ /-additionalJavaProperties=(\d+)+/
+    additionalJavaArgumentsMatcher.find()
+
+    if(additionalJavaArgumentsMatcher.matches())
+    {
+        return additionalJavaArgumentsMatcher[0][1].toInteger() + 1
+    }
+
+    return DEFAULT_NUMBER_OF_ADDITIONAL_JAVA_ARGUMENTS + 1
 }
