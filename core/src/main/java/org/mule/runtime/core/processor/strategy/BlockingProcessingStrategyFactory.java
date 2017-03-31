@@ -28,8 +28,8 @@ import org.reactivestreams.Publisher;
  * Processing strategy that processes the {@link Pipeline} in the caller thread and does not schedule the processing of any
  * {@link Processor} in a different thread pool regardless of their {@link ProcessingType}.
  * <p/>
- * When individual {@link Processor}'s execute non-blocking operations using additional threads internally, e.g. an outbound HTTP
- * request, the {@link Pipeline} will block until the operation response is available before continuing processing in the same
+ * When individual {@link Processor}'s execute non-blocking operations using additional threads internally (e.g. an outbound HTTP
+ * request) the {@link Pipeline} will block until the operation response is available before continuing processing in the same
  * thread.
  */
 public class BlockingProcessingStrategyFactory implements ProcessingStrategyFactory {
