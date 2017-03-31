@@ -234,7 +234,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   protected Function<Publisher<Event>, Publisher<Event>> processFlowFunction() {
     return stream -> from(stream)
-        .transform(processingStrategy.onPipeline(this, pipeline))
+        .transform(processingStrategy.onPipeline(pipeline))
         // After flow processing complete EventContext with response event, null event or error (after error handing).
         .doOnNext(response -> response.getContext().success(response))
         .doOnError(MessagingException.class, handleError())

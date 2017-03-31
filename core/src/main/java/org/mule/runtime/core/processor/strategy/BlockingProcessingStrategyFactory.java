@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -49,8 +50,7 @@ public class BlockingProcessingStrategyFactory implements ProcessingStrategyFact
         }
 
         @Override
-        public Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor processor,
-                                                                        Function<Publisher<Event>, Publisher<Event>> processorFunction) {
+        public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
           return publisher -> from(publisher).handle((event, sink) -> {
             try {
               sink.next(just(event).transform(processor).block());
@@ -59,6 +59,7 @@ public class BlockingProcessingStrategyFactory implements ProcessingStrategyFact
             }
           });
         }
+
       };
 
   @Override

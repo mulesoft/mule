@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
@@ -87,11 +88,9 @@ public class ReactorProcessingStrategyFactory extends AbstractRingBufferProcessi
     }
 
     @Override
-    public Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
-                                                                   Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-      // TODO MULE-11775 Potential race condition in ProactorProcessingStrategy.
+    public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
       return publisher -> from(publisher).publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)))
-          .transform(pipelineFunction);
+          .transform(pipeline);
     }
 
     protected ExecutorService getExecutorService(Scheduler scheduler) {

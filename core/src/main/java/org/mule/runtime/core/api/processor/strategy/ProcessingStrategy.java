@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 
 import java.util.function.Function;
@@ -36,25 +37,21 @@ public interface ProcessingStrategy {
   /**
    * Enrich {@link Processor} function by adding pre/post operators to implement processing strategy behaviour.
    *
-   * @param flowConstruct pipeline instance.
-   * @param pipelineFunction pipeline function.
+   * @param pipeline processor representing the the pipeline.
    * @return enriched pipeline function/
    */
-  default Function<Publisher<Event>, Publisher<Event>> onPipeline(FlowConstruct flowConstruct,
-                                                                  Function<Publisher<Event>, Publisher<Event>> pipelineFunction) {
-    return publisher -> from(publisher).transform(pipelineFunction);
+  default ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
+    return publisher -> from(publisher).transform(pipeline);
   }
 
   /**
    * Enrich {@link Processor} function by adding pre/post operators to implement processing strategy behaviour.
    *
    * @param processor processor instance.
-   * @param processorFunction processor function
    * @return enriched processor function
    */
-  default Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor processor,
-                                                                   Function<Publisher<Event>, Publisher<Event>> processorFunction) {
-    return publisher -> from(publisher).transform(processorFunction);
+  default ReactiveProcessor onProcessor(ReactiveProcessor processor) {
+    return publisher -> from(publisher).transform(processor);
   }
 
   /**

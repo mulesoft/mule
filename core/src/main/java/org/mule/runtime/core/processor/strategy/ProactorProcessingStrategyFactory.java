@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
@@ -144,22 +145,19 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
     }
 
     @Override
-    public Function<Publisher<Event>, Publisher<Event>> onProcessor(Processor messageProcessor,
-                                                                    Function<Publisher<Event>, Publisher<Event>> processorFunction) {
-      if (messageProcessor.getProcessingType() == BLOCKING) {
-        return proactor(processorFunction, blockingScheduler);
-      } else if (messageProcessor.getProcessingType() == CPU_INTENSIVE) {
-        return proactor(processorFunction, cpuIntensiveScheduler);
+    public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
+      if (processor.getProcessingType() == BLOCKING) {
+        return proactor(processor, blockingScheduler);
+      } else if (processor.getProcessingType() == CPU_INTENSIVE) {
+        return proactor(processor, cpuIntensiveScheduler);
       } else {
-        return publisher -> from(publisher).transform(processorFunction);
+        return publisher -> from(publisher).transform(processor);
       }
     }
 
-    private Function<Publisher<Event>, Publisher<Event>> proactor(Function<Publisher<Event>, Publisher<Event>> processorFunction,
-                                                                  Scheduler scheduler) {
-      // TODO MULE-11775 Potential race condition in ProactorProcessingStrategy.
+    private ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
       return publisher -> from(publisher).publishOn(fromExecutorService(getExecutorService(scheduler)))
-          .transform(processorFunction).publishOn(fromExecutorService(getExecutorService(getCpuLightScheduler())));
+          .transform(processor).publishOn(fromExecutorService(getExecutorService(getCpuLightScheduler())));
     }
 
     protected ExecutorService getExecutorService(Scheduler scheduler) {
