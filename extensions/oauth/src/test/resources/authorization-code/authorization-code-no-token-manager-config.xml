@@ -8,19 +8,18 @@
        http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
        http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd">
 
+    <oauth:authorization-code-grant-type
+            name="authCode"
+            clientId="${client.id}"
+            clientSecret="${client.secret}"
+            localCallbackUrl="${local.callback.url}"
+            externalCallbackUrl="${local.callback.url}"
+            localAuthorizationUrl="${local.authorization.url}"
+            authorizationUrl="${authorization.url}"
+            tokenUrl="${token.url}">
+    </oauth:authorization-code-grant-type>
+
     <httpn:request-config name="requestConfig">
-        <httpn:request-connection>
-            <httpn:authentication>
-                <oauth:authorization-code-grant-type
-                        clientId="${client.id}"
-                        clientSecret="${client.secret}"
-                        localCallbackUrl="${local.callback.url}"
-                        externalCallbackUrl="${local.callback.url}"
-                        localAuthorizationUrl="${local.authorization.url}"
-                        authorizationUrl="${authorization.url}"
-                        tokenUrl="${token.url}">
-                </oauth:authorization-code-grant-type>
-            </httpn:authentication>
-        </httpn:request-connection>
+        <httpn:request-connection authentication="authCode"/>
     </httpn:request-config>
 </mule>
