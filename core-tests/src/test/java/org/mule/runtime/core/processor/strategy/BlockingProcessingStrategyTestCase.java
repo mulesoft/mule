@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 
 import org.mule.runtime.core.api.MuleContext;
@@ -33,9 +30,14 @@ public class BlockingProcessingStrategyTestCase extends DirectProcessingStrategy
 
   @Override
   @Description("Regardless of processor type, when the BlockingProcessingStrategy is configured, the pipeline is executed "
-      + "synchronously in a caller thread and the pipeline will block caller thread until any async processors complete before continuing in the caller thread.")
+               + "synchronously in a caller thread and the pipeline will block caller thread until any async processors complete " +
+               "before continuing in the caller thread.")
   public void asyncCpuLight() throws Exception {
     super.asyncCpuLight();
+  }
+
+  @Override
+  protected void assertAsyncCpuLight() {
     assertSynchronous(1);
   }
 
