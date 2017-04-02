@@ -37,6 +37,8 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.beans.ExceptionListener;
@@ -94,8 +96,12 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     // Block until async completes, not just target processor.
     from(target.sensedEvent.getContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
     assertThat(target.sensedEvent, notNullValue());
-    assertCompletionDone(target.sensedEvent.getContext());
-    assertCompletionDone(request.getContext());
+
+    new PollingProber().check(new JUnitLambdaProbe(() -> {
+      assertCompletionDone(target.sensedEvent.getContext());
+      assertCompletionDone(request.getContext());
+      return true;
+    }));
 
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
