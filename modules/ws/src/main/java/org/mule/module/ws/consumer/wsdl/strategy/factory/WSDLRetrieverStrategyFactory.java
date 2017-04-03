@@ -4,17 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+package org.mule.module.ws.consumer.wsdl.strategy.factory;
 
-package org.mule.module.ws.consumer;
-
-import java.io.InputStream;
+import org.mule.module.ws.consumer.WsdlRetrieverStrategy;
 
 import javax.wsdl.WSDLException;
 
 /**
- * A strategy to retrieve the wsdl from the url defined
+ * Interface to build WSDL retriever strategies
  */
-public interface WsdlRetrieverStrategy 
+public interface WSDLRetrieverStrategyFactory
 {
-	InputStream retrieveWsdlResource(String url) throws WSDLException;	
+    WsdlRetrieverStrategy createWSDLRetrieverStrategy() throws WSDLException;
 }
