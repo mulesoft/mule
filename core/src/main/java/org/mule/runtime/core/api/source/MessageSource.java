@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.source;
 
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.processor.Processor;
 
 /**
@@ -13,7 +14,7 @@ import org.mule.runtime.core.api.processor.Processor;
  *
  * @since 3.0
  */
-public interface MessageSource {
+public interface MessageSource extends AnnotatedObject {
 
   /**
    * Set the MessageProcessor listener on a message source which will be invoked when a message is received or generated.

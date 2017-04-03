@@ -11,6 +11,7 @@ import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -21,7 +22,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
-import com.google.common.collect.ImmutableMap;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -46,13 +46,15 @@ import org.mule.runtime.config.spring.dsl.model.extension.xml.OperationComponent
 import org.mule.runtime.config.spring.dsl.model.extension.xml.XmlExtensionModelProperty;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
+import org.mule.runtime.core.config.artifact.DefaultArtifactProperties;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
 import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
-import org.w3c.dom.Document;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 import java.net.URL;
@@ -62,8 +64,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.stream.Collectors;
+
+import org.w3c.dom.Document;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -103,6 +106,7 @@ final class XmlExtensionLoaderDelegate {
 
   /**
    * ENUM used to discriminate which type of {@link ParameterDeclarer} has to be created (required or not).
+   * 
    * @see #getParameterDeclarer(ParameterizedDeclarer, Map)
    */
   private enum UseEnum {
@@ -182,7 +186,8 @@ final class XmlExtensionLoaderDelegate {
       // This happens in org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser.configLineFromElement()
       throw new IllegalArgumentException(format("There was an issue trying to read the stream of '%s'", resource.getFile()));
     }
-    ComponentModelReader componentModelReader = new ComponentModelReader(new Properties());
+    ComponentModelReader componentModelReader =
+        new ComponentModelReader(new DefaultArtifactProperties(emptyMap(), emptyMap(), emptyMap()));
     ComponentModel componentModel =
         componentModelReader.extractComponentDefinitionModel(parseModule.get(), resource.getFile());
 
@@ -344,16 +349,16 @@ final class XmlExtensionLoaderDelegate {
   }
 
   /**
-   * Giving a {@link ParameterDeclarer} for the parameter and the attributes in the {@code parameters}, this method will verify the
-   * rules for the {@link #ATTRIBUTE_USE} where:
+   * Giving a {@link ParameterDeclarer} for the parameter and the attributes in the {@code parameters}, this method will verify
+   * the rules for the {@link #ATTRIBUTE_USE} where:
    * <ul>
-   *   <li>{@link UseEnum#REQUIRED} marks the attribute as required in the XSD, failing if leaved empty when consuming the
-   *   parameter/property. It can not be {@link UseEnum#REQUIRED} if the parameter/property has a {@link #PARAMETER_DEFAULT_VALUE}
-   *   attribute</li>
-   *   <li>{@link UseEnum#OPTIONAL} marks the attribute as optional in the XSD. Can be {@link UseEnum#OPTIONAL} if the
-   *   parameter/property has a {@link #PARAMETER_DEFAULT_VALUE} attribute</li>
-   *   <li>{@link UseEnum#AUTO} will default at runtime to {@link UseEnum#REQUIRED} if {@link #PARAMETER_DEFAULT_VALUE} attribute
-   *   is absent, otherwise it will be marked as {@link UseEnum#OPTIONAL}</li>
+   * <li>{@link UseEnum#REQUIRED} marks the attribute as required in the XSD, failing if leaved empty when consuming the
+   * parameter/property. It can not be {@link UseEnum#REQUIRED} if the parameter/property has a {@link #PARAMETER_DEFAULT_VALUE}
+   * attribute</li>
+   * <li>{@link UseEnum#OPTIONAL} marks the attribute as optional in the XSD. Can be {@link UseEnum#OPTIONAL} if the
+   * parameter/property has a {@link #PARAMETER_DEFAULT_VALUE} attribute</li>
+   * <li>{@link UseEnum#AUTO} will default at runtime to {@link UseEnum#REQUIRED} if {@link #PARAMETER_DEFAULT_VALUE} attribute is
+   * absent, otherwise it will be marked as {@link UseEnum#OPTIONAL}</li>
    * </ul>
    *
    * @param parameterizedDeclarer builder to declare the {@link ParameterDeclarer}

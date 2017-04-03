@@ -9,11 +9,11 @@ package org.mule.runtime.core.source;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.util.ObjectUtils;
@@ -141,7 +141,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
     assertNull(listener.event);
   }
 
-  protected class NullMessageSource implements MessageSource, Startable, Stoppable {
+  protected class NullMessageSource extends AbstractAnnotatedObject implements MessageSource, Startable, Stoppable {
 
     Event event;
     Processor listener;

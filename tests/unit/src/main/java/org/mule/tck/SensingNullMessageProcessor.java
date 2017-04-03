@@ -10,6 +10,7 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -90,7 +91,7 @@ public class SensingNullMessageProcessor implements Processor, Disposable {
     this.waitTime = waitTime;
   }
 
-  class InternalMessageSource implements MessageSource {
+  class InternalMessageSource extends AbstractAnnotatedObject implements MessageSource {
 
     Processor listener;
 

@@ -11,21 +11,18 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class describes the artifact assets to execute it within the embedded container.
  * 
  * @since 4.0
  */
-public class ArtifactInfo implements Serializable {
+public class Application implements Serializable {
 
   private final List<URI> configs;
   private final URL classesFolder;
   private final URL pomFile;
   private final URL descriptorFile;
-  private final boolean enableArtifactTestDependencies;
-  private final Map<String, String> artifactProperties;
 
   /**
    * Creates a new instance.
@@ -34,32 +31,12 @@ public class ArtifactInfo implements Serializable {
    * @param classesFolder the classes folder of the artifact
    * @param pomFile the pom file of the artifact
    * @param descriptorFile the descriptor location of the artifact
-   * @param artifactProperties the artifact configuration properties
-   * @param enableArtifactTestDependencies if true, it adds the test dependencies of the artifact into the artifact classpath.
-   *        This is useful when using configuration files for testing that may make use of testing libraries.
    */
-  public ArtifactInfo(List<URI> configs, URL classesFolder, URL pomFile, URL descriptorFile,
-                      Map<String, String> artifactProperties, boolean enableArtifactTestDependencies) {
+  public Application(List<URI> configs, URL classesFolder, URL pomFile, URL descriptorFile) {
     this.configs = configs;
     this.classesFolder = classesFolder;
     this.pomFile = pomFile;
     this.descriptorFile = descriptorFile;
-    this.artifactProperties = artifactProperties;
-    this.enableArtifactTestDependencies = enableArtifactTestDependencies;
-  }
-
-  /**
-   * @return true if the test dependencies must be used as part the artifact class loader.
-   */
-  public boolean isEnableArtifactTestDependencies() {
-    return enableArtifactTestDependencies;
-  }
-
-  /**
-   * @return the configuration properties for the artifact
-   */
-  public Map<String, String> getArtifactProperties() {
-    return artifactProperties;
   }
 
   /**

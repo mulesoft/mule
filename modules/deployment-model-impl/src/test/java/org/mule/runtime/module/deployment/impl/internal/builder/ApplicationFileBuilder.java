@@ -15,7 +15,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.io.FilenameUtils.getName;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppSharedLibsFolderPath;
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_APPLICATION_JSON_LOCATION;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
@@ -175,8 +175,8 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
     final List<ZipResource> customResources = new LinkedList<>();
 
     final ZipResource appProperties =
-        createPropertiesFile(this.properties, DEFAULT_APP_PROPERTIES_RESOURCE,
-                             "classes" + File.separator + DEFAULT_APP_PROPERTIES_RESOURCE);
+        createPropertiesFile(this.properties, DEFAULT_ARTIFACT_PROPERTIES_RESOURCE,
+                             "classes" + File.separator + DEFAULT_ARTIFACT_PROPERTIES_RESOURCE);
 
     if (appProperties != null) {
       customResources.add(appProperties);

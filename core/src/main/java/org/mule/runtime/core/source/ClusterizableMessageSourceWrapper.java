@@ -6,21 +6,22 @@
  */
 package org.mule.runtime.core.source;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,8 @@ import org.slf4j.LoggerFactory;
  * Wraps a {@link ClusterizableMessageSource} in order to manage the lifecycle of the wrapped instance differently depending if
  * the node is primary or not inside a cluster. Non clustered nodes are always primary.
  */
-public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecycle, MuleContextAware, FlowConstructAware {
+public class ClusterizableMessageSourceWrapper extends AbstractAnnotatedObject
+    implements MessageSource, Lifecycle, MuleContextAware, FlowConstructAware {
 
   protected static final Logger logger = LoggerFactory.getLogger(ClusterizableMessageSourceWrapper.class);
 

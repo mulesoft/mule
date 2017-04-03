@@ -539,8 +539,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
     final MuleRegistry registry = getMuleRegistry(app);
 
-    // mule-app.properties from the zip archive must have loaded properly
-    assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
+    // mule-artifact.properties from the zip archive must have loaded properly
+    assertEquals("mule-artifact.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
 
     // Checks that the configuration's ID was properly configured
     assertThat(app.getMuleContext().getConfiguration().getId(), equalTo(dummyAppDescriptorFileBuilder.getId()));
@@ -4054,8 +4054,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     final Application app = findApp(applicationFileBuilder.getId(), 1);
     final MuleRegistry registry = getMuleRegistry(app);
 
-    // mule-app.properties from the zip archive must have loaded properly
-    assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
+    // mule-artifact.properties from the zip archive must have loaded properly
+    assertEquals("mule-artifact.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
   }
 
   private PolicyFileBuilder createPolicyIncludingHelloPluginV2FileBuilder() {

@@ -7,6 +7,8 @@
 package org.mule.runtime.core.api.config;
 
 
+import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
+
 /**
  * <code>MuleProperties</code> is a set of constants pertaining to Mule properties.
  */
@@ -168,6 +170,7 @@ public class MuleProperties {
   public static final String OBJECT_POLICY_MANAGER_STATE_HANDLER = "_mulePolicyStateHandler";
   public static final String OBJECT_PROCESSOR_INTERCEPTOR_MANAGER = "_muleProcessorInterceptorManager";
   public static final String OBJECT_STREAMING_MANAGER = "_muleStreamingManager";
+  public static final String OBJECT_COMPONENT_INITIAL_STATE_MANAGER = ComponentInitialStateManager.SERVICE_ID;
   public static final String DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY = "_muleDefaultTlsContextFactory";
 
   // Not currently used as these need to be instance variables of the MuleContext.

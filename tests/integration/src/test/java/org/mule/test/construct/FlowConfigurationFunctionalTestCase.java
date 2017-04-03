@@ -24,6 +24,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -552,7 +553,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     assertEquals("abcd", result.getMessageAsString(muleContext));
   }
 
-  public static class TestMessageSource implements MessageSource {
+  public static class TestMessageSource extends AbstractAnnotatedObject implements MessageSource {
 
     private Processor listener;
     private String appendBefore;
@@ -581,7 +582,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
 
   }
 
-  public static class TestSimpleMessageSource implements MessageSource {
+  public static class TestSimpleMessageSource extends AbstractAnnotatedObject implements MessageSource {
 
     private Processor listener;
 

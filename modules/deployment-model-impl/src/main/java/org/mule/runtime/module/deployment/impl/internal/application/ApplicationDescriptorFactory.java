@@ -15,7 +15,7 @@ import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_APPLICATION_JSON;
@@ -185,7 +185,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     });
     File appClassesFolder = getAppClassesFolder(descriptor);
     // get a ref to an optional app props file (right next to the descriptor)
-    setApplicationProperties(descriptor, new File(appClassesFolder, DEFAULT_APP_PROPERTIES_RESOURCE));
+    setApplicationProperties(descriptor, new File(appClassesFolder, DEFAULT_ARTIFACT_PROPERTIES_RESOURCE));
     return descriptor;
   }
 
@@ -245,7 +245,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
       URL[] sharedLibraries = findSharedLibraries(desc);
 
       // get a ref to an optional app props file (right next to the descriptor)
-      setApplicationProperties(desc, new File(appClassesFolder, DEFAULT_APP_PROPERTIES_RESOURCE));
+      setApplicationProperties(desc, new File(appClassesFolder, DEFAULT_ARTIFACT_PROPERTIES_RESOURCE));
 
       List<URL> urls = getApplicationResourceUrls(appClassesFolder.toURI().toURL(), libraries, sharedLibraries);
       if (!urls.isEmpty() && logger.isInfoEnabled()) {

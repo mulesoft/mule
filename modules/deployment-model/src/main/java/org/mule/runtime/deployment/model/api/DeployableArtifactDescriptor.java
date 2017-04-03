@@ -16,6 +16,7 @@ import java.io.File;
 public class DeployableArtifactDescriptor extends ArtifactDescriptor {
 
   public static final String DEFAULT_DEPLOY_PROPERTIES_RESOURCE = "mule-deploy.properties";
+  public static final String DEFAULT_ARTIFACT_PROPERTIES_RESOURCE = "mule-artifact.properties";
 
   private boolean redeploymentEnabled = true;
   private File location;

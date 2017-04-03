@@ -25,7 +25,7 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
-import org.mule.runtime.module.embedded.api.ArtifactInfo;
+import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
 import org.mule.runtime.module.embedded.api.ContainerInfo;
 
 import java.io.File;
@@ -51,14 +51,15 @@ import org.apache.maven.model.Model;
  */
 public class EmbeddedController {
 
-  private ArtifactInfo artifactInfo;
+  private ApplicationConfiguration applicationConfiguration;
   private ContainerInfo containerInfo;
   private Application application;
   private ArtifactClassLoader containerClassLoader;
 
-  public EmbeddedController(byte[] serializedContainerInfo, byte[] serializedAppInfo) throws IOException, ClassNotFoundException {
+  public EmbeddedController(byte[] serializedContainerInfo, byte[] serializedAppConfiguration)
+      throws IOException, ClassNotFoundException {
     containerInfo = deserialize(serializedContainerInfo);
-    artifactInfo = deserialize(serializedAppInfo);
+    applicationConfiguration = deserialize(serializedAppConfiguration);
   }
 
   /**
@@ -74,14 +75,15 @@ public class EmbeddedController {
 
   private void createApplication() throws IOException, URISyntaxException {
 
-    for (Map.Entry<String, String> applicationPropertiesEntry : artifactInfo.getArtifactProperties().entrySet()) {
+    for (Map.Entry<String, String> applicationPropertiesEntry : applicationConfiguration.getDeploymentConfiguration()
+        .getArtifactProperties().entrySet()) {
       setProperty(applicationPropertiesEntry.getKey(), applicationPropertiesEntry.getValue());
     }
 
     // this is used to signal that we are running in embedded mode.
     // Class loader model loader will not use try to use the container repository.
     setProperty("mule.mode.embedded", "true");
-    if (artifactInfo.isEnableArtifactTestDependencies()) {
+    if (applicationConfiguration.getDeploymentConfiguration().enableTestDependencies()) {
       setProperty(ADD_TEST_DEPENDENCIES_KEY, "true");
     }
 
@@ -96,7 +98,8 @@ public class EmbeddedController {
         new ContainerClassLoaderFactory().createContainerClassLoader(Thread.currentThread().getContextClassLoader());
 
     List<String> configResources = new ArrayList<>();
-    for (URI uri : artifactInfo.getConfigs()) {
+    org.mule.runtime.module.embedded.api.Application application = applicationConfiguration.getApplication();
+    for (URI uri : application.getConfigs()) {
       configResources.add(uri.toURL().toString());
     }
 
@@ -124,7 +127,7 @@ public class EmbeddedController {
 
       artifactResourcesRegistry.getDomainFactory().createArtifact(createDefaultDomainDir());
 
-      application = artifactResourcesRegistry.getApplicationFactory().createAppFrom(applicationDescriptor);
+      this.application = artifactResourcesRegistry.getApplicationFactory().createAppFrom(applicationDescriptor);
     });
   }
 
@@ -147,12 +150,12 @@ public class EmbeddedController {
     muleArtifactFolder.mkdirs();
     File descriptorFile = new File(muleArtifactFolder, "mule-application.json");
 
-    File pomFile = new File(artifactInfo.getPomFile().getFile());
+    File pomFile = new File(applicationConfiguration.getApplication().getPomFile().getFile());
     Model pomModel = createModelFromPom(pomFile);
     String pomLocation = format("META-INF%smaven%s%s%s%s%spom.xml", separator, separator, pomModel.getGroupId(), separator,
                                 pomModel.getArtifactId(), separator);
     File appPomFileLocation = new File(applicationFolder, pomLocation);
-    copyFile(new File(artifactInfo.getDescriptorFile().getFile()), descriptorFile);
+    copyFile(new File(applicationConfiguration.getApplication().getDescriptorFile().getFile()), descriptorFile);
     copyFile(pomFile, appPomFileLocation);
     return applicationFolder;
   }

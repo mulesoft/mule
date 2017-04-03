@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.builders;
 
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.util.BeanUtils;
@@ -33,7 +33,7 @@ public class PropertiesMuleConfigurationFactory {
 
   public static String getMuleAppConfiguration(String muleConfig) {
     String directory = FilenameUtils.getFullPath(muleConfig);
-    String muleAppConfiguration = directory + DEFAULT_APP_PROPERTIES_RESOURCE;
+    String muleAppConfiguration = directory + DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
     return muleAppConfiguration;
   }
 

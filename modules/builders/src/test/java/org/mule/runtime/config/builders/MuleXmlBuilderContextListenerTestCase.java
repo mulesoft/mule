@@ -68,7 +68,7 @@ public class MuleXmlBuilderContextListenerTestCase extends AbstractMuleTestCase 
     verify(context).getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
     verify(context).getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
 
-    // TODO don't like this convention, the whole mule-app.properties WAR support in Mule 3 is redundant
+    // TODO don't like this convention, the whole mule-artifact.properties WAR support in Mule 3 is redundant
     // and should go away
     assertWorkingDirectoryEndsWith("target/.appTmp/testWeb");
   }
@@ -78,7 +78,7 @@ public class MuleXmlBuilderContextListenerTestCase extends AbstractMuleTestCase 
     when(context.getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG))
         .thenReturn("org/mule/config/builders/mule-config.xml");
     when(context.getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_APP_CONFIG))
-        .thenReturn("org/mule/config/builders/mule-app-ppp.properties");
+        .thenReturn("org/mule/config/builders/mule-artifact-ppp.properties");
     when(context.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE)).thenReturn(null);
     when(context.getAttribute(MuleXmlBuilderContextListener.ATTR_JAVAX_SERVLET_CONTEXT_TEMPDIR))
         .thenReturn(new File(".mule/testWeb"));
@@ -88,7 +88,7 @@ public class MuleXmlBuilderContextListenerTestCase extends AbstractMuleTestCase 
     verify(context).getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
     verify(context).getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
 
-    // TODO don't like this convention, the whole mule-app.properties WAR support in Mule 3 is redundant
+    // TODO don't like this convention, the whole mule-artifact.properties WAR support in Mule 3 is redundant
     // and should go away
     assertWorkingDirectoryEndsWith("target/.appTmp2/testWeb");
   }

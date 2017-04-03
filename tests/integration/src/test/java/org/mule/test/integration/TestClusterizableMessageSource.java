@@ -11,6 +11,7 @@ import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -18,7 +19,7 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 
-public class TestClusterizableMessageSource
+public class TestClusterizableMessageSource extends AbstractAnnotatedObject
     implements ClusterizableMessageSource, Startable, FlowConstructAware {
 
   private Processor listener;

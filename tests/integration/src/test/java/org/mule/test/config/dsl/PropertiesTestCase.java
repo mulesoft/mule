@@ -35,7 +35,7 @@ public class PropertiesTestCase extends AbstractIntegrationTestCase {
     ParsersTestObject parsersTestObject = muleContext.getRegistry().get("testObject");
     assertThat(parsersTestObject.getSimpleParameters().get("firstname"), is("testPropertyValue"));
     assertThat(parsersTestObject.getSimpleParameters().get("lastname"), is(SYSTEM_PROPERTY_VALUE));
-    assertThat(parsersTestObject.getSimpleParameters().get("age"), is("12"));
+    assertThat(parsersTestObject.getSimpleParameters().get("age"), is("10"));
   }
 
 }

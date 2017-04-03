@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -23,7 +24,7 @@ import org.junit.Test;
 
 public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextTestCase {
 
-  protected static class DirectInboundMessageSource implements MessageSource {
+  protected static class DirectInboundMessageSource extends AbstractAnnotatedObject implements MessageSource {
 
     private Processor listener;
 

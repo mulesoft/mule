@@ -41,6 +41,7 @@ import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.unwrap;
 
+import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -50,6 +51,8 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.internal.config.DefaultCustomizationService;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.Event;
@@ -125,6 +128,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
@@ -235,6 +239,9 @@ public class DefaultMuleContext implements MuleContext {
 
   private BootstrapServiceDiscoverer bootstrapServiceDiscoverer;
 
+  @Inject
+  private ComponentInitialStateManager componentInitialStateManager;
+
   /**
    * The {@link ArtifactType} indicating if this configuration object is for an application or a domain.
    */
@@ -335,6 +342,7 @@ public class DefaultMuleContext implements MuleContext {
       throw new MuleRuntimeException(objectIsNull("queueManager"));
     }
 
+    componentInitialStateManager = muleRegistryHelper.get(MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER);
     startDate = System.currentTimeMillis();
 
     startIfNeeded(extensionManager);
@@ -362,8 +370,9 @@ public class DefaultMuleContext implements MuleContext {
     for (Pipeline pipeline : this.getRegistry().lookupObjects(Pipeline.class)) {
       if (pipeline.getLifecycleState().isStarted()) {
         MessageSource messageSource = pipeline.getMessageSource();
-
-        startMessageSource(messageSource);
+        if (messageSource != null && componentInitialStateManager.mustStartMessageSource((AnnotatedObject) messageSource)) {
+          startMessageSource(messageSource);
+        }
       }
     }
   }
