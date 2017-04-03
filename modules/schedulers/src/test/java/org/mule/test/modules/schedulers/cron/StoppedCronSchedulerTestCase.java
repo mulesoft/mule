@@ -8,17 +8,16 @@ package org.mule.test.modules.schedulers.cron;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
-
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.source.SchedulerMessageSource;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.junit.Test;
 
@@ -34,12 +33,13 @@ public class StoppedCronSchedulerTestCase extends MuleArtifactFunctionalTestCase
 
   @Test
   public void test() throws Exception {
-    runSchedulersOnce();
-
-    new PollingProber().check(new JUnitLambdaProbe(() -> {
-      assertThat(foo.size(), greaterThanOrEqualTo(1));
-      return true;
-    }));
+    runSchedulersOnce(() -> {
+      new PollingProber().check(new JUnitLambdaProbe(() -> {
+        assertThat(foo.size(), greaterThanOrEqualTo(1));
+        return true;
+      }));
+      return null;
+    });
   }
 
 
@@ -47,23 +47,21 @@ public class StoppedCronSchedulerTestCase extends MuleArtifactFunctionalTestCase
 
     public boolean process(String s) {
       synchronized (foo) {
-
         foo.add(s);
-
       }
-
       return false;
     }
   }
 
-  private void runSchedulersOnce() throws Exception {
+  private void runSchedulersOnce(Supplier<Void> assertionSupplier) throws Exception {
     Flow flow = (Flow) (muleContext.getRegistry().lookupFlowConstruct("pollfoo"));
     flow.start();
     try {
       MessageSource flowSource = flow.getMessageSource();
-      if (flowSource instanceof DefaultSchedulerMessageSource) {
+      if (flowSource instanceof SchedulerMessageSource) {
         ((SchedulerMessageSource) flowSource).trigger();
       }
+      assertionSupplier.get();
     } finally {
       flow.stop();
     }
