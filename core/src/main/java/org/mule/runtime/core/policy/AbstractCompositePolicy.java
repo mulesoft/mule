@@ -8,6 +8,7 @@ package org.mule.runtime.core.policy;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -57,8 +58,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
    * execution.
    */
   public final Event processPolicies(Event operationEvent) throws Exception {
-    return new AbstractCompositePolicy.NextOperationCall(operationEvent)
-        .process(operationEvent);
+    return new AbstractCompositePolicy.NextOperationCall().process(operationEvent);
   }
 
   /**
@@ -102,12 +102,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
    */
   public class NextOperationCall extends AbstractAnnotatedObject implements Processor {
 
-    private final Event originalEvent;
     private int index = 0;
-
-    public NextOperationCall(Event originalEvent) {
-      this.originalEvent = originalEvent;
-    }
 
     @Override
     public Event process(Event event) throws MuleException {
@@ -118,7 +113,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
       Policy policy = parameterizedPolicies.get(index);
       index++;
       try {
-        return processPolicy(policy, this, originalEvent);
+        return processPolicy(policy, this, event);
       } catch (MuleException e) {
         throw e;
       } catch (Exception e) {

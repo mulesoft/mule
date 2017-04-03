@@ -18,8 +18,9 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -51,6 +52,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
   private Policy firstPolicy = mock(Policy.class, RETURNS_DEEP_STUBS);
   private Policy secondPolicy = mock(Policy.class, RETURNS_DEEP_STUBS);
   private Event initialEvent;
+  private Event modifiedEvent;
   private Event firstPolicyResultEvent;
   private Event secondPolicyResultEvent;
   private Processor flowExecutionProcessor = mock(Processor.class);
@@ -63,6 +65,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() throws Exception {
     initialEvent = createTestEvent();
+    modifiedEvent = createTestEvent();
     firstPolicyResultEvent = createTestEvent();
     secondPolicyResultEvent = createTestEvent();
 
@@ -72,14 +75,14 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
 
     when(sourcePolicyProcessorFactory.createSourcePolicy(same(firstPolicy), any())).thenAnswer(policyFactoryInvocation -> {
       when(firstPolicySourcePolicyProcessor.process(any())).thenAnswer(policyProcessorInvocation -> {
-        ((Processor) policyFactoryInvocation.getArguments()[1]).process(initialEvent);
+        ((Processor) policyFactoryInvocation.getArguments()[1]).process(modifiedEvent);
         return firstPolicyResultEvent;
       });
       return firstPolicySourcePolicyProcessor;
     });
     when(sourcePolicyProcessorFactory.createSourcePolicy(same(secondPolicy), any())).thenAnswer(policyFactoryInvocation -> {
       when(secondPolicySourcePolicyProcessor.process(any())).thenAnswer(policyProcessorInvocation -> {
-        ((Processor) policyFactoryInvocation.getArguments()[1]).process(initialEvent);
+        ((Processor) policyFactoryInvocation.getArguments()[1]).process(modifiedEvent);
         return secondPolicyResultEvent;
       });
       return secondPolicySourcePolicyProcessor;
@@ -95,7 +98,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
     Either<FailureSourcePolicyResult, SuccessSourcePolicyResult> sourcePolicyResult = compositeSourcePolicy.process(initialEvent);
     assertThat(sourcePolicyResult.isRight(), is(true));
     assertThat(sourcePolicyResult.getRight().getFlowExecutionResult(), is(firstPolicyResultEvent));
-    verify(flowExecutionProcessor).process(initialEvent);
+    verify(flowExecutionProcessor).process(modifiedEvent);
     verify(sourcePolicyProcessorFactory).createSourcePolicy(same(firstPolicy), any());
     verify(firstPolicySourcePolicyProcessor).process(same(initialEvent));
   }
@@ -109,11 +112,11 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
     Either<FailureSourcePolicyResult, SuccessSourcePolicyResult> sourcePolicyResult = compositeSourcePolicy.process(initialEvent);
     assertThat(sourcePolicyResult.isRight(), is(true));
     assertThat(sourcePolicyResult.getRight().getFlowExecutionResult(), is(firstPolicyResultEvent));
-    verify(flowExecutionProcessor).process(initialEvent);
+    verify(flowExecutionProcessor).process(modifiedEvent);
     verify(sourcePolicyProcessorFactory).createSourcePolicy(same(firstPolicy), any());
     verify(sourcePolicyProcessorFactory).createSourcePolicy(same(secondPolicy), any());
     verify(firstPolicySourcePolicyProcessor).process(initialEvent);
-    verify(secondPolicySourcePolicyProcessor).process(initialEvent);
+    verify(secondPolicySourcePolicyProcessor).process(modifiedEvent);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -148,7 +151,8 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
   }
 
   private Event createTestEvent() {
-    return Event.builder(DefaultEventContext.create(mockFlowConstruct, "http")).message(NULL_MESSAGE).build();
+    return Event.builder(DefaultEventContext.create(mockFlowConstruct, "http"))
+        .message(Message.builder().nullPayload().build()).build();
   }
 
 }
