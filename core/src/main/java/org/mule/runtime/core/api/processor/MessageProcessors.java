@@ -97,7 +97,7 @@ public class MessageProcessors {
   public static Event processToApply(Event event, Processor processor) throws MuleException {
     try {
       return just(event).transform(processor).otherwise(Exceptions.EventDroppedException.class, ede -> empty()).block();
-    } catch (Exception e) {
+    } catch (Throwable e) {
       throw rxExceptionToMuleException(e);
     }
   }
