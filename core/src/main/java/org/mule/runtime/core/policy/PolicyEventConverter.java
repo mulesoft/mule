@@ -27,7 +27,8 @@ public class PolicyEventConverter {
     Event.Builder eventBuilder =
         Event.builder(variablesProviderEvent.getContext()).message(event.getMessage()).session(event.getSession());
     for (String variableName : variablesProviderEvent.getVariableNames()) {
-      eventBuilder.addVariable(variableName, variablesProviderEvent.getVariable(variableName).getValue());
+      eventBuilder.addVariable(variableName, variablesProviderEvent.getVariable(variableName).getValue(),
+                               variablesProviderEvent.getVariable(variableName).getDataType());
     }
     return eventBuilder.build();
   }
