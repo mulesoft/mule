@@ -249,15 +249,12 @@ class DeclarationBasedElementModelFactory {
     DslElementModel.Builder<? extends ComponentModel> element =
         createParameterizedElementModel(model, configDsl, scopeDeclaration, configuration);
 
-    RouteElementDeclaration routeDeclaration = scopeDeclaration.getRoute();
-    if (routeDeclaration != null) {
-      routeDeclaration.getComponents()
-          .forEach(componentDeclaration -> create(componentDeclaration)
-              .ifPresent(componentElement -> {
-                componentElement.getConfiguration().ifPresent(configuration::withNestedComponent);
-                element.containing(componentElement);
-              }));
-    }
+    scopeDeclaration.getComponents()
+        .forEach(componentDeclaration -> create(componentDeclaration)
+            .ifPresent(componentElement -> {
+              componentElement.getConfiguration().ifPresent(configuration::withNestedComponent);
+              element.containing(componentElement);
+            }));
 
     return element.withConfig(configuration.build()).build();
   }
@@ -353,7 +350,7 @@ class DeclarationBasedElementModelFactory {
 
     addCustomParameters(declaration, parentConfig, parentElement);
 
-    declaration.getProperties().forEach(parentConfig::withProperty);
+    declaration.getMetadataProperties().forEach(parentConfig::withProperty);
 
     return parentElement;
   }
@@ -361,7 +358,7 @@ class DeclarationBasedElementModelFactory {
   private <T extends ParameterizedModel> void addCustomParameters(ParameterizedElementDeclaration declaration,
                                                                   ComponentConfiguration.Builder parentConfig,
                                                                   DslElementModel.Builder<T> parentElement) {
-    declaration.getCustomParameters()
+    declaration.getCustomConfigurationParameters()
         .forEach(p -> {
           parentConfig.withParameter(p.getName(), p.getValue().toString());
           parentElement.containing(DslElementModel.builder()

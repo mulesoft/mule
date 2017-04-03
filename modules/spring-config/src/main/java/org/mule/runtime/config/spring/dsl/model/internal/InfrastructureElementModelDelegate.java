@@ -174,15 +174,15 @@ class InfrastructureElementModelDelegate {
                                          ComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement,
                                          ParameterObjectValue objectValue, String elementName) {
 
-    ComponentConfiguration.Builder redeliveryConfig = ComponentConfiguration.builder()
+    ComponentConfiguration.Builder config = ComponentConfiguration.builder()
         .withIdentifier(builder()
             .withNamespace(CORE_PREFIX)
             .withName(elementName)
             .build());
 
-    cloneParameters(objectValue, redeliveryConfig);
+    cloneParameters(objectValue, config);
 
-    addParameterElement(parameterModel, paramDsl, parentConfig, parentElement, redeliveryConfig.build());
+    addParameterElement(parameterModel, paramDsl, parentConfig, parentElement, config.build());
   }
 
   private void addParameterElement(ParameterModel parameterModel, DslElementSyntax paramDsl,

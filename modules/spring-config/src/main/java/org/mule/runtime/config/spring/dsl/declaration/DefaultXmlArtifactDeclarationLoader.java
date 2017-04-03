@@ -183,7 +183,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
 
           declareParameterizedComponent(model, elementDsl, configurationDeclarer, attributes, configComplexParameters);
-          artifactDeclarer.withConfig(configurationDeclarer.getDeclaration());
+          artifactDeclarer.withGlobalElement(configurationDeclarer.getDeclaration());
           alreadyDeclared.set(true);
           stop();
         }
@@ -230,7 +230,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
             type.accept(getParameterDeclarerVisitor(configLine, dsl.resolve(type).get(),
                                                     value -> topLevelParameter.withValue((ParameterObjectValue) value)));
 
-            artifactDeclarer.withGlobalParameter(topLevelParameter.getDeclaration());
+            artifactDeclarer.withGlobalElement(topLevelParameter.getDeclaration());
           });
     }
 
@@ -252,7 +252,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
       getComponentDeclaringWalker(flow::withComponent, line, extensionElementsDeclarer, dsl).walk(ownerExtension);
     });
 
-    artifactDeclarer.withFlow(flow.getDeclaration());
+    artifactDeclarer.withGlobalElement(flow.getDeclaration());
   }
 
   private ExtensionModel getExtensionModel(ConfigLine line) {
@@ -295,15 +295,11 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
           declareParameterizedComponent(model, elementDsl, scope, line.getConfigAttributes(), line.getChildren());
 
-          RouteModel routeModel = model.getRouteModel();
-          RouteElementDeclarer route = extensionElementsDeclarer.newRoute(routeModel.getName());
           line.getChildren().forEach(child -> {
             ExtensionModel extensionModel = getExtensionModel(child);
-            getComponentDeclaringWalker(route::withComponent, child, forExtension(extensionModel.getName()), dsl)
+            getComponentDeclaringWalker(scope::withComponent, child, forExtension(extensionModel.getName()), dsl)
                 .walk(extensionModel);
           });
-
-          scope.withRoute(route.getDeclaration());
 
           declarationConsumer.accept(scope.getDeclaration());
           stop();
@@ -579,7 +575,8 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                                  REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS, REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS,
                                  NON_REPEATABLE_BYTE_STREAM_ALIAS)
                                      .ifPresent(config -> {
-                                       ParameterObjectValue.Builder streaming = newObjectValue().ofType(config.getIdentifier());
+                                       ParameterObjectValue.Builder streaming = newObjectValue()
+                                           .ofType(config.getIdentifier());
                                        cloneAsDeclaration(config, streaming);
                                        declarer.withParameter(STREAMING_STRATEGY_PARAMETER_NAME, streaming.build());
                                      });
