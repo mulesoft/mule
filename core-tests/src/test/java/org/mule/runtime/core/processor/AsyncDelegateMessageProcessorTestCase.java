@@ -97,11 +97,11 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     from(target.sensedEvent.getContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
     assertThat(target.sensedEvent, notNullValue());
 
-    new PollingProber().check(new JUnitLambdaProbe(() -> {
-      assertCompletionDone(target.sensedEvent.getContext());
-      assertCompletionDone(request.getContext());
-      return true;
-    }));
+    // Block to ensure async fully completes before testing state
+    from(request.getContext().getCompletionPublisher()).blockMillis(BLOCK_TIMEOUT);
+
+    assertCompletionDone(target.sensedEvent.getContext());
+    assertCompletionDone(request.getContext());
 
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
