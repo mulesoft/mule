@@ -27,6 +27,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -309,7 +310,7 @@ public class ApplicationModel {
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     configurePropertyPlaceholderResolver(artifactConfig);
     convertConfigFileToComponentModel(artifactConfig);
-    convertArtifactConfigurationToComponentModel(extensionManager, artifactDeclaration);
+    convertArtifactDeclarationToComponentModel(extensionManager, artifactDeclaration);
     validateModel(componentBuildingDefinitionRegistry);
     createEffectiveModel();
     expandModules(extensionManager);
@@ -359,18 +360,18 @@ public class ApplicationModel {
     });
   }
 
-  private void convertArtifactConfigurationToComponentModel(Optional<ExtensionManager> extensionManager,
-                                                            ArtifactDeclaration artifactDeclaration) {
+  private void convertArtifactDeclarationToComponentModel(Optional<ExtensionManager> extensionManager,
+                                                          ArtifactDeclaration artifactDeclaration) {
     if (artifactDeclaration != null && extensionManager.isPresent()) {
       DslElementModelFactory elementFactory = DslElementModelFactory
           .getDefault(DslResolvingContext.getDefault(extensionManager.get().getExtensions()));
 
       ComponentModel rootComponent = new ComponentModel.Builder()
-          .setIdentifier(ComponentIdentifier.builder().withNamespace("mule").withName("mule").build()).build();
+          .setIdentifier(ComponentIdentifier.builder().withNamespace(CORE_PREFIX).withName(CORE_PREFIX).build()).build();
       this.muleComponentModels.add(rootComponent);
 
-      artifactDeclaration.getConfigs().stream()
-          .map(elementFactory::create)
+      artifactDeclaration.getGlobalElements().stream()
+          .map(e -> elementFactory.create((ElementDeclaration) e))
           .filter(Optional::isPresent)
           .map(e -> e.get().getConfiguration())
           .forEach(config -> config

@@ -14,7 +14,11 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.app.declaration.ConfigurationElementDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
+import org.mule.runtime.api.app.declaration.FlowElementDeclaration;
+import org.mule.runtime.api.app.declaration.GlobalElementDeclarationVisitor;
+import org.mule.runtime.api.app.declaration.TopLevelParameterDeclaration;
 import org.mule.runtime.api.app.declaration.fluent.ParameterSimpleValue;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -74,27 +78,35 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
       XmlDslElementModelConverter toXmlConverter = XmlDslElementModelConverter.getDefault(doc);
       DslElementModelFactory modelResolver = DslElementModelFactory.getDefault(context);
 
-      //TODO MULE-11837: when everything is a parameter, honour the order i which they were declared
-      artifact.getGlobalParameters()
-          .forEach(declaration -> appendChildElement(toXmlConverter, doc.getDocumentElement(), modelResolver, declaration));
+      final GlobalElementDeclarationVisitor declarationVisitor = new GlobalElementDeclarationVisitor() {
 
-      artifact.getConfigs()
-          .forEach(declaration -> appendChildElement(toXmlConverter, doc.getDocumentElement(), modelResolver, declaration));
+        @Override
+        public void visit(ConfigurationElementDeclaration declaration) {
+          appendChildElement(toXmlConverter, doc.getDocumentElement(), modelResolver, declaration);
+        }
 
-      artifact.getFlows()
-          .forEach(flowDeclaration -> {
-            Element flow = doc.createElement(FLOW_ELEMENT_IDENTIFIER);
-            flow.setAttribute(NAME_ATTRIBUTE_NAME, flowDeclaration.getName());
+        @Override
+        public void visit(TopLevelParameterDeclaration declaration) {
+          appendChildElement(toXmlConverter, doc.getDocumentElement(), modelResolver, declaration);
+        }
 
-            flowDeclaration.getParameters()
-                .stream().filter(p -> p.getValue() instanceof ParameterSimpleValue)
-                .forEach(p -> flow.setAttribute(p.getName(), ((ParameterSimpleValue) p.getValue()).getValue()));
+        @Override
+        public void visit(FlowElementDeclaration flowDeclaration) {
+          Element flow = doc.createElement(FLOW_ELEMENT_IDENTIFIER);
+          flow.setAttribute(NAME_ATTRIBUTE_NAME, flowDeclaration.getName());
 
-            flowDeclaration.getComponents()
-                .forEach(declaration -> appendChildElement(toXmlConverter, flow, modelResolver, declaration));
+          flowDeclaration.getParameters()
+              .stream().filter(p -> p.getValue() instanceof ParameterSimpleValue)
+              .forEach(p -> flow.setAttribute(p.getName(), ((ParameterSimpleValue) p.getValue()).getValue()));
 
-            doc.getDocumentElement().appendChild(flow);
-          });
+          flowDeclaration.getComponents()
+              .forEach(declaration -> appendChildElement(toXmlConverter, flow, modelResolver, declaration));
+
+          doc.getDocumentElement().appendChild(flow);
+        }
+      };
+
+      artifact.getGlobalElements().forEach(declaration -> declaration.accept(declarationVisitor));
 
       // write the content into xml file
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -125,7 +137,7 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
     Element mule = doc.createElement(CORE_PREFIX);
     doc.appendChild(mule);
 
-    artifact.getCustomParameters().forEach(p -> mule.setAttribute(p.getName(), p.getValue().toString()));
+    artifact.getCustomConfigurationParameters().forEach(p -> mule.setAttribute(p.getName(), p.getValue().toString()));
 
     mule.setAttributeNS("http://www.w3.org/2000/xmlns/", XMLNS, MULE_SCHEMA_LOCATION);
 
