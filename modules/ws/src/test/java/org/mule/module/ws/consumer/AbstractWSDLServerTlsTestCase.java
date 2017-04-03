@@ -44,16 +44,24 @@ public class AbstractWSDLServerTlsTestCase extends FunctionalTestCase
     {
         private Server server;
         private DynamicPort port;
+        private String wsdlLocation;
 
         ServerResource(DynamicPort port)
         {
             this.port = port;
+            this.wsdlLocation = WSDL_FILE_LOCATION;
+        }
+        
+        ServerResource(DynamicPort port, String wsdlLocation)
+        {
+            this.port = port;
+            this.wsdlLocation = wsdlLocation;
         }
 
         @Override
         protected void before() throws Throwable
         {
-            server = new Server(port.getNumber());
+            server = new Server(port.getNumber(), wsdlLocation);
             server.start();
         }
 
@@ -78,12 +86,14 @@ public class AbstractWSDLServerTlsTestCase extends FunctionalTestCase
     {
         HttpServer webServer;
         int port;
+        String wsdlFileLocation;
 
         SSLEngineConfigurator sslServerEngineConfig;
 
-        public Server(int port)
+        public Server(int port, String wsdlFileLocation)
         {
             this.port = port;
+            this.wsdlFileLocation = wsdlFileLocation;
         }
 
         protected void start() throws IOException
@@ -101,10 +111,25 @@ public class AbstractWSDLServerTlsTestCase extends FunctionalTestCase
                 public void service(Request request, Response response) throws Exception
                 {
                     response.setContentType(APPLICATION_XML_UTF_8.toString());
-                    final InputStream wsdlStream = this.getClass().getResourceAsStream(WSDL_FILE_LOCATION);
+                    final InputStream wsdlStream = this.getClass().getResourceAsStream(getContentSourceToReturn(request));
                     final String contents = IOUtils.toString(wsdlStream, UTF_8.name());
                     response.setContentLength(contents.length());
                     response.getWriter().write(contents);
+                }
+
+                private String getContentSourceToReturn(Request request)
+                {
+                    if (request.getParameter("wsdl") != null)
+                    {
+                        return wsdlFileLocation;
+                    }
+
+                    return getResourceNameFrom(request.getRequestURL());
+                }
+
+                private String getResourceNameFrom(StringBuilder requestURL)
+                {
+                    return "/Schema.xsd";
                 }
             });
 
@@ -142,4 +167,8 @@ public class AbstractWSDLServerTlsTestCase extends FunctionalTestCase
 
     }
 
+    protected String getWsdlFileLocation()
+    {
+        return WSDL_FILE_LOCATION;
+    }
 }
