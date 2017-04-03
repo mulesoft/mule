@@ -37,6 +37,8 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.beans.ExceptionListener;
@@ -94,6 +96,10 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     // Block until async completes, not just target processor.
     from(target.sensedEvent.getContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
     assertThat(target.sensedEvent, notNullValue());
+
+    // Block to ensure async fully completes before testing state
+    from(request.getContext().getCompletionPublisher()).blockMillis(BLOCK_TIMEOUT);
+
     assertCompletionDone(target.sensedEvent.getContext());
     assertCompletionDone(request.getContext());
 
