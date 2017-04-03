@@ -123,7 +123,7 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
 
   @Override
   @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
-               + "synchronously in a caller thread but async processors will cause additional threads to be used.")
+      + "synchronously in a caller thread but async processors will cause additional threads to be used.")
   public void asyncCpuLight() throws Exception {
     super.asyncCpuLight();
     assertAsyncCpuLight();
