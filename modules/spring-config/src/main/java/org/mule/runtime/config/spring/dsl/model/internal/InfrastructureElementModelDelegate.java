@@ -17,7 +17,9 @@ import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLIC
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder.RECONNECT_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
@@ -61,13 +63,13 @@ class InfrastructureElementModelDelegate {
       case REDELIVERY_POLICY_PARAMETER_NAME:
         cloneDeclarationToElement(parameterModel, paramDsl, parentConfig, parentElement,
                                   (ParameterObjectValue) declaration.getValue(),
-                                  REDELIVERY_POLICY_ELEMENT_IDENTIFIER);
+                                  REDELIVERY_POLICY_ELEMENT_IDENTIFIER, paramDsl.getNamespace());
         return;
 
       case POOLING_PROFILE_PARAMETER_NAME:
         cloneDeclarationToElement(parameterModel, paramDsl, parentConfig, parentElement,
                                   (ParameterObjectValue) declaration.getValue(),
-                                  POOLING_PROFILE_ELEMENT_IDENTIFIER);
+                                  POOLING_PROFILE_ELEMENT_IDENTIFIER, paramDsl.getNamespace());
         return;
 
       case TLS_PARAMETER_NAME:
@@ -155,7 +157,8 @@ class InfrastructureElementModelDelegate {
     String elementName = objectValue.getTypeId().equals(RECONNECT_ALIAS)
         ? RECONNECT_ELEMENT_IDENTIFIER : RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 
-    cloneDeclarationToElement(parameterModel, paramDsl, parentConfig, parentElement, objectValue, elementName);
+    cloneDeclarationToElement(parameterModel, paramDsl, parentConfig, parentElement, objectValue, elementName,
+                              paramDsl.getNamespace());
   }
 
   private void createStreamingStrategy(ParameterElementDeclaration declaration,
@@ -167,16 +170,18 @@ class InfrastructureElementModelDelegate {
     ParameterObjectValue objectValue = (ParameterObjectValue) declaration.getValue();
     checkArgument(!isBlank(objectValue.getTypeId()), "Missing declaration of which streaming strategy to use");
 
-    cloneDeclarationToElement(parameterModel, paramDsl, parentConfig, parentElement, objectValue, objectValue.getTypeId());
+    String namespace = objectValue.getTypeId().equals(REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS) ? EE_PREFIX : CORE_PREFIX;
+    cloneDeclarationToElement(parameterModel, paramDsl, parentConfig, parentElement, objectValue, objectValue.getTypeId(),
+                              namespace);
   }
 
   private void cloneDeclarationToElement(ParameterModel parameterModel, DslElementSyntax paramDsl,
                                          ComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement,
-                                         ParameterObjectValue objectValue, String elementName) {
+                                         ParameterObjectValue objectValue, String elementName, String customNamespace) {
 
     ComponentConfiguration.Builder config = ComponentConfiguration.builder()
         .withIdentifier(builder()
-            .withNamespace(CORE_PREFIX)
+            .withNamespace(isBlank(customNamespace) ? CORE_PREFIX : customNamespace)
             .withName(elementName)
             .build());
 
