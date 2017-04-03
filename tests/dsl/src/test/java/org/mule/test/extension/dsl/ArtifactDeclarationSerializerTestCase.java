@@ -30,21 +30,13 @@ import org.mule.extension.db.api.param.QueryDefinition;
 import org.mule.extensions.jms.api.connection.caching.NoCachingConfiguration;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.fluent.ElementDeclarer;
-import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.spring.dsl.api.ArtifactDeclarationXmlSerializer;
-import org.mule.runtime.config.spring.dsl.model.DslElementModelFactory;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 import org.mule.test.runner.RunnerDelegateTo;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -73,18 +65,6 @@ public class ArtifactDeclarationSerializerTestCase extends AbstractElementModelT
   @Before
   public void loadExpectedResult() throws IOException {
     expectedAppXml = getResourceAsString(configFile, getClass());
-  }
-
-  @Before
-  public void setup() throws Exception {
-    Set<ExtensionModel> extensions = muleContext.getExtensionManager().getExtensions();
-    String core = IOUtils
-        .toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/core-extension-model.json"));
-    ExtensionModel coreModel = new ExtensionModelJsonSerializer().deserialize(core);
-
-    dslContext = DslResolvingContext.getDefault(ImmutableSet.<ExtensionModel>builder()
-        .addAll(extensions).add(coreModel).build());
-    modelResolver = DslElementModelFactory.getDefault(dslContext);
   }
 
   @Test

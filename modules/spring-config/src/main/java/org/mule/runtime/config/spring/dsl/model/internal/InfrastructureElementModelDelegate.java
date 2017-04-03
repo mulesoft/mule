@@ -18,6 +18,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATE
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder.RECONNECT_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
@@ -34,6 +35,10 @@ import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
+import com.google.common.collect.ImmutableSet;
+
+import java.util.Set;
+
 /**
  * Delegate to be used by a {@link DeclarationBasedElementModelFactory} in order to
  * resolve the {@link DslElementModel} of an infrastructure parameter.
@@ -41,6 +46,9 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
  * @since 4.0
  */
 class InfrastructureElementModelDelegate {
+
+  private final Set<String> eeStreamingStrategies =
+      ImmutableSet.of(REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS, REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS);
 
   public void addParameter(ParameterElementDeclaration declaration,
                            ParameterModel parameterModel,
@@ -170,7 +178,7 @@ class InfrastructureElementModelDelegate {
     ParameterObjectValue objectValue = (ParameterObjectValue) declaration.getValue();
     checkArgument(!isBlank(objectValue.getTypeId()), "Missing declaration of which streaming strategy to use");
 
-    String namespace = objectValue.getTypeId().equals(REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS) ? EE_PREFIX : CORE_PREFIX;
+    String namespace = eeStreamingStrategies.contains(objectValue.getTypeId()) ? EE_PREFIX : CORE_PREFIX;
     cloneDeclarationToElement(parameterModel, paramDsl, parentConfig, parentElement, objectValue, objectValue.getTypeId(),
                               namespace);
   }

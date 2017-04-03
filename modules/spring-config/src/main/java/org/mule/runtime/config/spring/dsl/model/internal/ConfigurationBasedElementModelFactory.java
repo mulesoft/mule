@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.model.internal;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -20,8 +21,11 @@ import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLIC
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_BYTE_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
@@ -58,8 +62,6 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
-
-import com.google.common.collect.Sets;
 
 import java.util.List;
 import java.util.Map;
@@ -598,9 +600,12 @@ class ConfigurationBasedElementModelFactory {
 
       case STREAMING_STRATEGY_PARAMETER_NAME:
         Set<ComponentIdentifier> streaming =
-            Sets.newHashSet(newIdentifier(NON_REPEATABLE_BYTE_STREAM_ALIAS, CORE_PREFIX),
-                            newIdentifier(REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS, CORE_PREFIX),
-                            newIdentifier(REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS, EE_PREFIX));
+            newHashSet(newIdentifier(NON_REPEATABLE_BYTE_STREAM_ALIAS, CORE_PREFIX),
+                       newIdentifier(REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS, CORE_PREFIX),
+                       newIdentifier(REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS, EE_PREFIX),
+                       newIdentifier(REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS, CORE_PREFIX),
+                       newIdentifier(REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS, EE_PREFIX),
+                       newIdentifier(NON_REPEATABLE_OBJECTS_STREAM_ALIAS, CORE_PREFIX));
 
         streaming.stream().filter(nested::containsKey).findFirst()
             .ifPresent(s -> groupElementBuilder.containing(newElementModel(paramModel, paramDsl, nested.get(s))));

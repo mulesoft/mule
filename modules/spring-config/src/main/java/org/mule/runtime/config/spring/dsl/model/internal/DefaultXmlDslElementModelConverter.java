@@ -21,6 +21,7 @@ import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocat
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
@@ -234,8 +235,8 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
   }
 
   private Element createEE(ComponentConfiguration config) {
-    String namespaceURI = "http://www.mulesoft.org/schema/mule/ee/core";
-    String eeSchemaLocation = "http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd";
+    String namespaceURI = EE_NAMESPACE;
+    String eeSchemaLocation = buildSchemaLocation(EE_PREFIX, EE_NAMESPACE);
 
     addSchemaLocationIfNeeded(EE_PREFIX, namespaceURI, eeSchemaLocation);
 
@@ -245,14 +246,14 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
     return nested;
   }
 
-  private void addSchemaLocationIfNeeded(String prefix, String namespaceURI, String tlsSchemaLocation) {
-    Attr schemaLocation = doc.getDocumentElement().getAttributeNode("xsi:schemaLocation");
-    if (schemaLocation != null && !schemaLocation.getValue().contains(namespaceURI)) {
+  private void addSchemaLocationIfNeeded(String prefix, String namespaceURI, String schemaLocation) {
+    Attr schemaLocationAttribute = doc.getDocumentElement().getAttributeNode("xsi:schemaLocation");
+    if (schemaLocationAttribute != null && !schemaLocationAttribute.getValue().contains(namespaceURI)) {
       doc.getDocumentElement().setAttributeNS("http://www.w3.org/2000/xmlns/",
                                               "xmlns:" + prefix, namespaceURI);
       doc.getDocumentElement().setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
                                               "xsi:schemaLocation",
-                                              schemaLocation.getValue() + " " + namespaceURI + " " + tlsSchemaLocation);
+                                              schemaLocationAttribute.getValue() + " " + namespaceURI + " " + schemaLocation);
     }
   }
 
