@@ -164,7 +164,6 @@ def String getArchitecture() {
  * @param args : arguments passed to the mule.bat script
  * @return the value of -additionalJavaProperties argument command line if it was set, DEFAULT_NUMBER_OF_ADDITIONAL_JAVA_ARGUMENTS otherwise.
  */
-
 def int getNumberOfAdditionalJavaProperties(String[] args)
 {
     int DEFAULT_NUMBER_OF_ADDITIONAL_JAVA_ARGUMENTS = 20;
