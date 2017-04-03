@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
@@ -52,7 +53,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     assertNotifications();
   }
 
-  @Ignore //TODO remove ignore with final commit for MULE-11482
+  @Ignore // TODO remove ignore with final commit for MULE-11482
   @Test
   public void chain() throws Exception {
     specificationFactory = () -> new Node()
@@ -93,7 +94,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     assertNotifications();
   }
 
-  @Ignore //TODO remove ignore with final commit for MULE-11482
+  @Ignore // TODO remove ignore with final commit for MULE-11482
   @Test
   public void scatterGather() throws Exception {
     specificationFactory = () -> new Node()
@@ -129,7 +130,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     assertNotifications();
   }
 
-  @Ignore //TODO remove ignore with final commit for MULE-11482
+  @Ignore // TODO remove ignore with final commit for MULE-11482
   @Test
   public void enricher() throws Exception {
     specificationFactory = () -> new Node()
@@ -161,7 +162,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     assertNotifications();
   }
 
-  @Ignore //TODO remove ignore with final commit for MULE-11482
+  @Ignore // TODO remove ignore with final commit for MULE-11482
   @Test
   public void filter() throws Exception {
     specificationFactory = () -> new Node()
@@ -174,7 +175,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     assertNotifications();
   }
 
-  @Ignore //TODO remove ignore with final commit for MULE-11482
+  @Ignore // TODO remove ignore with final commit for MULE-11482
   @Test
   public void idempotentMessageFilter() throws Exception {
     specificationFactory = () -> new Node()
@@ -188,7 +189,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     assertNotifications();
   }
 
-  @Ignore //TODO remove ignore with final commit for MULE-11482
+  @Ignore // TODO remove ignore with final commit for MULE-11482
   @Test
   public void idempotentSecureHashMessageFilter() throws Exception {
     specificationFactory = () -> new Node()
@@ -202,7 +203,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     assertNotifications();
   }
 
-  @Ignore //TODO remove ignore with final commit for MULE-11482
+  @Ignore // TODO remove ignore with final commit for MULE-11482
   @Test
   public void subFlow() throws Exception {
     specificationFactory = () -> new Node()
@@ -367,7 +368,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     assertNotifications();
   }
 
-  @Ignore //TODO remove ignore with final commit for MULE-11482
+  @Ignore // TODO remove ignore with final commit for MULE-11482
   @Test
   public void untilSuccesfulWithProcessorChain() throws Exception {
     specificationFactory = () -> new Node()
@@ -382,7 +383,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     assertNotifications();
   }
 
-  @Ignore //TODO remove ignore with final commit for MULE-11482
+  @Ignore // TODO remove ignore with final commit for MULE-11482
   @Test
   public void untilSuccesfulWithEnricher() throws Exception {
     specificationFactory = () -> new Node()
@@ -405,7 +406,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
   @Override
   public void validateSpecification(RestrictedNode spec) throws Exception {}
 
-  public static class TestMessageSource implements MessageSource {
+  public static class TestMessageSource extends AbstractAnnotatedObject implements MessageSource {
 
     private Processor listener;
 

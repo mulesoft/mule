@@ -8,6 +8,7 @@ package org.mule.runtime.config.spring;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.join;
@@ -21,11 +22,13 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVIT
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.artifact.ArtifactProperties;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -42,6 +45,7 @@ import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationServiceRegistry;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.editors.MulePropertyEditorRegistrar;
+import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.config.spring.processors.ComponentLocatorCreatePostProcessor;
 import org.mule.runtime.config.spring.processors.ContextExclusiveInjectorProcessor;
 import org.mule.runtime.config.spring.processors.DiscardedOptionalBeanPostProcessor;
@@ -57,6 +61,7 @@ import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.config.ConfigResource;
+import org.mule.runtime.core.config.artifact.DefaultArtifactProperties;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
@@ -302,6 +307,9 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
       logger
           .info("Using mixed mechanism to load configuration since there are some components that were not yet migrated to the new mechanism: "
               + getOldParsingMechanismComponentIdentifiers());
+      if (!beanFactory.containsBeanDefinition(DEFAULT_ARTIFACT_PROPERTIES_RESOURCE)) {
+        registerApplicationPropertiesAsBean(beanFactory, new DefaultArtifactProperties(emptyMap(), emptyMap(), emptyMap()));
+      }
       beanDefinitionReader.loadBeanDefinitions(getConfigResources());
     }
   }
@@ -309,6 +317,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   protected List<String> createApplicationComponents(DefaultListableBeanFactory beanFactory, ApplicationModel applicationModel,
                                                      boolean mustBeRoot) {
     List<String> createdComponentModels = new ArrayList<>();
+    registerApplicationPropertiesAsBean(beanFactory, applicationModel.getArtifactProperties());
     applicationModel.executeOnEveryMuleComponentTree(componentModel -> {
       if (!mustBeRoot || componentModel.isRoot()) {
         if (componentModel.getIdentifier().equals(MULE_IDENTIFIER) || !componentModel.isEnabled()) {
@@ -342,6 +351,14 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
       }
     });
     return createdComponentModels;
+  }
+
+  private void registerApplicationPropertiesAsBean(DefaultListableBeanFactory beanFactory,
+                                                   ArtifactProperties applicationProperties) {
+    beanFactory.registerBeanDefinition(DEFAULT_ARTIFACT_PROPERTIES_RESOURCE,
+                                       genericBeanDefinition(ConstantFactoryBean.class)
+                                           .addConstructorArgValue(applicationProperties)
+                                           .getBeanDefinition());
   }
 
   protected String getOldParsingMechanismComponentIdentifiers() {

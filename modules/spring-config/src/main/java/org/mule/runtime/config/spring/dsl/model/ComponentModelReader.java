@@ -7,7 +7,6 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_ROOT_ELEMENT;
@@ -15,6 +14,8 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_P
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.VALUE_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import org.mule.runtime.api.artifact.ArtifactProperties;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
 
@@ -35,8 +36,9 @@ public class ComponentModelReader {
   private PropertyPlaceholderHelper propertyPlaceholderHelper = new PropertyPlaceholderHelper("${", "}");
   private Properties applicationProperties;
 
-  public ComponentModelReader(Properties applicationProperties) {
-    this.applicationProperties = applicationProperties;
+  public ComponentModelReader(ArtifactProperties artifactProperties) {
+    this.applicationProperties = new Properties();
+    this.applicationProperties.putAll(artifactProperties.toImmutableMap());
   }
 
   public ComponentModel extractComponentDefinitionModel(ConfigLine configLine, String configFileName) {

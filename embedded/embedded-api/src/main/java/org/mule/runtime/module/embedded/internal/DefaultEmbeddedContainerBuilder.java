@@ -4,13 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+package org.mule.runtime.module.embedded.internal;
 
-package org.mule.runtime.module.embedded.api;
-
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.module.embedded.internal.MavenUtils.loadUrls;
 import static org.mule.runtime.module.embedded.internal.Serializer.serialize;
-import org.mule.runtime.module.embedded.internal.MavenContainerClassLoaderFactory;
-import org.mule.runtime.module.embedded.internal.Repository;
+import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
+import org.mule.runtime.module.embedded.api.ContainerInfo;
+import org.mule.runtime.module.embedded.api.EmbeddedContainer;
 import org.mule.runtime.module.embedded.internal.classloading.JdkOnlyClassLoader;
 
 import java.io.ByteArrayOutputStream;
@@ -21,7 +23,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactRequest;
@@ -29,25 +30,42 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
-/**
- * Factory for creating an embedded container.
- */
-final public class EmbeddedContainerFactory {
+public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.EmbeddedContainerBuilder {
 
-  private EmbeddedContainerFactory() {}
+  private String muleVersion;
+  private URL containerBaseFolder;
+  private ApplicationConfiguration applicationConfigruation;
+  private String log4jConfigurationFile;
 
-  /**
-   * Creates a container by creating artifacts based on the {@code application} configuration.
-   *
-   * @param muleVersion the mule version of the runtime to use
-   * @param log4jConfigurationFile the absolute path to the log4j configuration file.
-   * @param containerBaseFolder the base folder to use for the container to create the required files.
-   * @param application the application data.
-   * @return an {@link EmbeddedContainer} for the requested {@code muleVersion} and with the content provided by
-   *         {@code application}
-   */
-  public static EmbeddedContainer create(String muleVersion, Optional<String> log4jConfigurationFile, URL containerBaseFolder,
-                                         ArtifactInfo application) {
+  @Override
+  public EmbeddedContainer.EmbeddedContainerBuilder withMuleVersion(String muleVersion) {
+    this.muleVersion = muleVersion;
+    return this;
+  }
+
+  @Override
+  public EmbeddedContainer.EmbeddedContainerBuilder withContainerBaseFolder(URL containerBaseFolder) {
+    this.containerBaseFolder = containerBaseFolder;
+    return this;
+  }
+
+  @Override
+  public EmbeddedContainer.EmbeddedContainerBuilder withApplicationConfiguration(ApplicationConfiguration applicationConfigruation) {
+    this.applicationConfigruation = applicationConfigruation;
+    return this;
+  }
+
+  @Override
+  public EmbeddedContainer.EmbeddedContainerBuilder withLog4jConfigurationFile(String log4JConfigurationFile) {
+    this.log4jConfigurationFile = log4JConfigurationFile;
+    return this;
+  }
+
+  @Override
+  public EmbeddedContainer build() {
+    checkState(muleVersion != null, "muleVersion cannot be null");
+    checkState(containerBaseFolder != null, "containerBaseFolder cannot be null");
+    checkState(applicationConfigruation != null, "application cannot be null");
     try {
       Repository repository = new Repository();
 
@@ -58,7 +76,7 @@ final public class EmbeddedContainerFactory {
 
       List<URL> services = classLoaderFactory.getServices(muleVersion);
       ContainerInfo containerInfo = new ContainerInfo(muleVersion, containerBaseFolder, services);
-      log4jConfigurationFile.ifPresent(containerInfo::setLog4jConfigurationFile);
+      ofNullable(log4jConfigurationFile).ifPresent(containerInfo::setLog4jConfigurationFile);
 
       ClassLoader embeddedControllerBootstrapClassLoader =
           createEmbeddedImplClassLoader(containerModulesClassLoader, repository, muleVersion);
@@ -71,9 +89,9 @@ final public class EmbeddedContainerFactory {
         ByteArrayOutputStream containerOutputStream = new ByteArrayOutputStream(512);
         serialize(containerInfo, containerOutputStream);
 
-        ByteArrayOutputStream appOutputStream = new ByteArrayOutputStream(512);
-        serialize(application, appOutputStream);
-        Object o = constructor.newInstance(containerOutputStream.toByteArray(), appOutputStream.toByteArray());
+        ByteArrayOutputStream appConfigOutputStream = new ByteArrayOutputStream(512);
+        serialize(applicationConfigruation, appConfigOutputStream);
+        Object o = constructor.newInstance(containerOutputStream.toByteArray(), appConfigOutputStream.toByteArray());
 
         return new EmbeddedContainer() {
 
@@ -119,7 +137,8 @@ final public class EmbeddedContainerFactory {
     }
   }
 
-  static ClassLoader createEmbeddedImplClassLoader(ClassLoader parentClassLoader, Repository repository, String muleVersion)
+  private static ClassLoader createEmbeddedImplClassLoader(ClassLoader parentClassLoader, Repository repository,
+                                                           String muleVersion)
       throws ArtifactResolutionException, MalformedURLException {
     ArtifactRequest embeddedImplArtifactRequest =
         new ArtifactRequest()

@@ -10,6 +10,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -56,7 +57,7 @@ public class FlowStateTestCase extends AbstractIntegrationTestCase {
     assertTrue(((TestMessageSource) flow.getMessageSource()).isStarted());
   }
 
-  public static class TestMessageSource implements MessageSource, Startable {
+  public static class TestMessageSource extends AbstractAnnotatedObject implements MessageSource, Startable {
 
     private boolean started;
 

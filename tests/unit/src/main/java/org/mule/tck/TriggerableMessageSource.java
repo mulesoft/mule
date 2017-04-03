@@ -7,8 +7,8 @@
 package org.mule.tck;
 
 import static reactor.core.publisher.Flux.just;
-
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -16,7 +16,7 @@ import org.mule.runtime.core.util.ObjectUtils;
 
 import org.reactivestreams.Publisher;
 
-public class TriggerableMessageSource implements MessageSource {
+public class TriggerableMessageSource extends AbstractAnnotatedObject implements MessageSource {
 
   protected Processor listener;
 

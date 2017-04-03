@@ -9,9 +9,9 @@ package org.mule.runtime.config.spring.dsl.model;
 import static com.google.common.base.Joiner.on;
 import static java.lang.String.format;
 import static java.lang.System.getProperties;
-import static java.lang.System.getenv;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -28,6 +28,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
+import org.mule.runtime.api.artifact.ArtifactProperties;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -37,10 +38,12 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.config.artifact.DefaultArtifactProperties;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
@@ -275,7 +278,7 @@ public class ApplicationModel {
   private List<ComponentModel> muleComponentModels = new LinkedList<>();
   private List<ComponentModel> springComponentModels = new LinkedList<>();
   private PropertyPlaceholderHelper propertyPlaceholderHelper = new PropertyPlaceholderHelper("${", "}");
-  private Properties applicationProperties;
+  private ArtifactProperties artifactProperties;
 
   /**
    * Creates an {code ApplicationModel} from a {@link ArtifactConfig}.
@@ -423,24 +426,20 @@ public class ApplicationModel {
         }
       });
     });
-    applicationProperties = new Properties();
-    applicationProperties.putAll(getenv());
-    applicationProperties.putAll(getProperties());
-    // TODO MULE-9638: This check should not be required once we don't use the old mechanism.
-    if (artifactConfig.getApplicationProperties() != null) {
-      applicationProperties.putAll(artifactConfig.getApplicationProperties());
-    }
-    applicationProperties.putAll(globalProperties);
+    ImmutableMap.Builder<Object, Object> springProperties = ImmutableMap.builder();
     for (String propertyFileLocation : locations) {
       Properties properties = new Properties();
       try (InputStream propertiesFileInputStream =
           currentThread().getContextClassLoader().getResourceAsStream(propertyFileLocation)) {
         properties.load(propertiesFileInputStream);
-        applicationProperties.putAll(properties);
+        springProperties.putAll(properties);
       } catch (IOException e) {
         throw new MuleRuntimeException(e);
       }
     }
+    Map<String, String> applicationProperties = artifactConfig.getApplicationProperties();
+    artifactProperties = new DefaultArtifactProperties(ImmutableMap.builder().putAll(globalProperties).build(), springProperties
+        .build(), applicationProperties != null ? ImmutableMap.builder().putAll(applicationProperties).build() : emptyMap());
   }
 
   /**
@@ -462,7 +461,7 @@ public class ApplicationModel {
 
   private void convertConfigFileToComponentModel(ArtifactConfig artifactConfig) {
     List<ConfigFile> configFiles = artifactConfig.getConfigFiles();
-    ComponentModelReader componentModelReader = new ComponentModelReader(applicationProperties);
+    ComponentModelReader componentModelReader = new ComponentModelReader(artifactProperties);
     configFiles.stream().forEach(configFile -> {
       ComponentModel componentModel =
           componentModelReader.extractComponentDefinitionModel(configFile.getConfigLines().get(0), configFile.getFilename());
@@ -793,4 +792,12 @@ public class ApplicationModel {
   private void expandModules(Optional<ExtensionManager> extensionManager) {
     extensionManager.ifPresent(manager -> new MacroExpansionModuleModel(this, manager.getExtensions()).expand());
   }
+
+  /**
+   * @return the configured properties for the artifact.
+   */
+  public ArtifactProperties getArtifactProperties() {
+    return artifactProperties;
+  }
 }
+
