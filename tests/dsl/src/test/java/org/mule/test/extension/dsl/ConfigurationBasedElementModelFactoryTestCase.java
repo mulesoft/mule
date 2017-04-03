@@ -8,7 +8,7 @@ package org.mule.test.extension.dsl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
@@ -25,12 +25,11 @@ import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
+import java.util.Optional;
 
 public class ConfigurationBasedElementModelFactoryTestCase extends AbstractElementModelTestCase {
 
@@ -272,85 +271,85 @@ public class ConfigurationBasedElementModelFactoryTestCase extends AbstractEleme
   private void assertSendPayloadLoaded(OperationModel publishModel,
                                        DslSyntaxResolver jmsDslResolver) {
     List<ComponentConfiguration> sendOperations = getAppElement(applicationModel, "send-payload").getNestedComponents();
-    assertThat(sendOperations.size(), Is.is(1));
+    assertThat(sendOperations.size(), is(1));
 
     DslElementModel<OperationModel> publishElement = resolve(sendOperations.get(0));
-    assertThat(publishElement.getModel(), Is.is(publishModel));
-    assertThat(publishElement.getDsl(), Is.is(jmsDslResolver.resolve(publishModel)));
+    assertThat(publishElement.getModel(), is(publishModel));
+    assertThat(publishElement.getDsl(), is(jmsDslResolver.resolve(publishModel)));
 
     // attributes are present in the parent and its model is reachable, but no componentConfiguration is required
-    assertThat(publishElement.getConfiguration().get().getParameters().get("destination"), Is.is("#[initialDestination]"));
-    assertThat(publishElement.findElement("destination").get().getConfiguration().isPresent(), Is.is(false));
-    assertThat(publishElement.findElement("destination").get().getModel(), Is.is(findParameter("destination", publishModel)));
+    assertThat(publishElement.getConfiguration().get().getParameters().get("destination"), is("#[initialDestination]"));
+    assertThat(publishElement.findElement("destination").get().getConfiguration().isPresent(), is(false));
+    assertThat(publishElement.findElement("destination").get().getModel(), is(findParameter("destination", publishModel)));
 
     // child element contains its configuration element along with its content
     DslElementModel<Object> builderElement = publishElement.findElement("messageBuilder").get();
-    assertThat(builderElement.getModel(), Is.is(findParameter("messageBuilder", publishModel)));
+    assertThat(builderElement.getModel(), is(findParameter("messageBuilder", publishModel)));
     Optional<ComponentConfiguration> messageBuilder = builderElement.getConfiguration();
-    assertThat(messageBuilder.isPresent(), Is.is(true));
+    assertThat(messageBuilder.isPresent(), is(true));
 
-    assertThat(messageBuilder.get().getNestedComponents().size(), Is.is(2));
+    assertThat(messageBuilder.get().getNestedComponents().size(), is(2));
     assertThat(messageBuilder.get().getNestedComponents().get(1).getValue().get().trim(),
-               Is.is("#[{(initialProperty): propertyValue}]"));
+               is("#[{(initialProperty): propertyValue}]"));
   }
 
   private void assertBridgeLoaded(OperationModel publishModel, OperationModel consumeModel,
                                   DslSyntaxResolver jmsDslResolver) {
     List<ComponentConfiguration> bridgeOperation = getAppElement(applicationModel, "bridge").getNestedComponents();
-    assertThat(bridgeOperation.size(), Is.is(2));
+    assertThat(bridgeOperation.size(), is(2));
 
     DslElementModel<OperationModel> consumeElement = resolve(bridgeOperation.get(0));
     DslElementModel<OperationModel> publishElement = resolve(bridgeOperation.get(1).getNestedComponents().get(0));
-    assertThat(consumeElement.getModel(), Is.is(consumeModel));
-    assertThat(consumeElement.getDsl(), Is.is(jmsDslResolver.resolve(consumeModel)));
+    assertThat(consumeElement.getModel(), is(consumeModel));
+    assertThat(consumeElement.getDsl(), is(jmsDslResolver.resolve(consumeModel)));
 
-    assertThat(consumeElement.getConfiguration().get().getParameters().get("destination"), Is.is("#[initialDestination]"));
-    assertThat(consumeElement.findElement("destination").get().getConfiguration().isPresent(), Is.is(false));
-    assertThat(consumeElement.findElement("destination").get().getModel(), Is.is(findParameter("destination", consumeModel)));
+    assertThat(consumeElement.getConfiguration().get().getParameters().get("destination"), is("#[initialDestination]"));
+    assertThat(consumeElement.findElement("destination").get().getConfiguration().isPresent(), is(false));
+    assertThat(consumeElement.findElement("destination").get().getModel(), is(findParameter("destination", consumeModel)));
 
 
-    assertThat(publishElement.getModel(), Is.is(publishModel));
-    assertThat(publishElement.getDsl(), Is.is(jmsDslResolver.resolve(publishModel)));
+    assertThat(publishElement.getModel(), is(publishModel));
+    assertThat(publishElement.getDsl(), is(jmsDslResolver.resolve(publishModel)));
 
-    assertThat(publishElement.findElement("destination").get().getModel(), Is.is(findParameter("destination", publishModel)));
-    assertThat(publishElement.findElement("destination").get().getConfiguration().isPresent(), Is.is(false));
-    assertThat(publishElement.getConfiguration().get().getParameters().get("destination"), Is.is("#[finalDestination]"));
+    assertThat(publishElement.findElement("destination").get().getModel(), is(findParameter("destination", publishModel)));
+    assertThat(publishElement.findElement("destination").get().getConfiguration().isPresent(), is(false));
+    assertThat(publishElement.getConfiguration().get().getParameters().get("destination"), is("#[finalDestination]"));
 
     DslElementModel<Object> builderElement = publishElement.findElement("messageBuilder").get();
-    assertThat(builderElement.getModel(), Is.is(findParameter("messageBuilder", publishModel)));
+    assertThat(builderElement.getModel(), is(findParameter("messageBuilder", publishModel)));
     Optional<ComponentConfiguration> messageBuilder = builderElement.getConfiguration();
-    assertThat(messageBuilder.isPresent(), Is.is(true));
+    assertThat(messageBuilder.isPresent(), is(true));
 
   }
 
   private void assertBridgeReceiverLoaded(OperationModel consumeModel,
                                           DslSyntaxResolver jmsDslResolver) {
     List<ComponentConfiguration> consumeOperation = getAppElement(applicationModel, "bridge-receiver").getNestedComponents();
-    assertThat(consumeOperation.size(), Is.is(1));
+    assertThat(consumeOperation.size(), is(1));
 
     DslElementModel<OperationModel> consumeElement = resolve(consumeOperation.get(0));
-    assertThat(consumeElement.getModel(), Is.is(consumeModel));
-    assertThat(consumeElement.getDsl(), Is.is(jmsDslResolver.resolve(consumeModel)));
+    assertThat(consumeElement.getModel(), is(consumeModel));
+    assertThat(consumeElement.getDsl(), is(jmsDslResolver.resolve(consumeModel)));
 
-    assertThat(consumeElement.findElement("destination").get().getModel(), Is.is(findParameter("destination", consumeModel)));
-    assertThat(consumeElement.findElement("destination").get().getConfiguration().isPresent(), Is.is(false));
-    assertThat(consumeElement.getConfiguration().get().getParameters().get("destination"), Is.is("#[finalDestination]"));
+    assertThat(consumeElement.findElement("destination").get().getModel(), is(findParameter("destination", consumeModel)));
+    assertThat(consumeElement.findElement("destination").get().getConfiguration().isPresent(), is(false));
+    assertThat(consumeElement.getConfiguration().get().getParameters().get("destination"), is("#[finalDestination]"));
 
-    assertThat(consumeElement.findElement("ackMode").isPresent(), Is.is(false));
+    assertThat(consumeElement.findElement("ackMode").isPresent(), is(false));
   }
 
   private void assertConfigLoaded(DslElementModel<ConfigurationModel> config, ConfigurationModel jmsConfigModel,
                                   DslSyntaxResolver jmsDslResolver) {
-    assertThat(config.getModel(), Is.is(jmsConfigModel));
-    assertThat(config.getDsl(), Is.is(jmsDslResolver.resolve(jmsConfigModel)));
+    assertThat(config.getModel(), is(jmsConfigModel));
+    assertThat(config.getDsl(), is(jmsDslResolver.resolve(jmsConfigModel)));
   }
 
   private void assertConnectionLoaded(DslElementModel<ConfigurationModel> config) {
-    assertThat(config.getContainedElements().size(), Is.is(1));
-    assertThat(config.findElement("active-mq-connection").isPresent(), Is.is(true));
-    assertThat(config.findElement("active-mq-connection").get().getContainedElements().size(), Is.is(3));
+    assertThat(config.getContainedElements().size(), is(2));
+    assertThat(config.findElement("active-mq-connection").isPresent(), is(true));
+    assertThat(config.findElement("active-mq-connection").get().getContainedElements().size(), is(3));
 
-    assertThat(config.findElement(newIdentifier("no-caching", "jms")).isPresent(), Is.is(true));
+    assertThat(config.findElement(newIdentifier("no-caching", "jms")).isPresent(), is(true));
   }
 
   private ParameterModel findParameter(String name, ParameterizedModel model) {

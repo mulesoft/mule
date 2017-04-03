@@ -9,9 +9,6 @@ package org.mule.runtime.module.extension.internal.transaction;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.construct.Flow;
@@ -21,6 +18,10 @@ import org.mule.test.transactional.TransactionalExtension;
 import org.mule.test.transactional.TransactionalSource;
 import org.mule.test.transactional.connection.MessageStorage;
 import org.mule.test.transactional.connection.TestTransactionalConnection;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.function.BooleanSupplier;
 
@@ -51,7 +52,7 @@ public class TransactionalSourceTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void sourceStartsALocalTxAndGetsCommitted() throws Exception {
     startFlow("sourceStartsALocalTxAndGetsCommitted");
-    validate(() -> !MessageStorage.messages.isEmpty(), 1000, 100);
+    validate(() -> !MessageStorage.messages.isEmpty());
 
     validateSuccessFlow();
     validateCommittedTransaction(MessageStorage.messages.poll());
@@ -60,7 +61,7 @@ public class TransactionalSourceTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void sourceStartsALocalTxAndGetsRollBacked() throws Exception {
     startFlow("sourceStartsALocalTxAndGetsRollBacked");
-    validate(() -> !MessageStorage.messages.isEmpty(), 1000, 100);
+    validate(() -> !MessageStorage.messages.isEmpty());
 
     validateErrorFlow();
     validateRolledBackedTransaction(MessageStorage.messages.poll());
@@ -69,7 +70,7 @@ public class TransactionalSourceTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void sourceStartsALocalTxAndOperationsCanJointIt() throws Exception {
     startFlow("sourceStartsALocalTxAndOperationsCanJointIt");
-    validate(() -> MessageStorage.messages.size() == 2, 3000, 100);
+    validate(() -> MessageStorage.messages.size() == 2);
 
     validateSuccessFlow();
     validateCommittedTransaction(MessageStorage.messages.peek());
@@ -78,7 +79,7 @@ public class TransactionalSourceTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void sourceStartsALocalTxAndOperationsWithDifferentConnectionCanTJoinIt() throws Exception {
     startFlow("sourceStartsALocalTxAndOperationsWithDifferentConnectionCanTJoinIt");
-    validate(() -> MessageStorage.exception != null, 1000, 100);
+    validate(() -> MessageStorage.exception != null);
     assertThat(MessageStorage.exception, is(instanceOf(TransactionException.class)));
 
     validateErrorFlow();
@@ -88,7 +89,7 @@ public class TransactionalSourceTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void nonTxSourceDoesntBeginTx() throws Exception {
     startFlow("nonTxSourceDoesntBeginTx");
-    validate(() -> !MessageStorage.messages.isEmpty(), 1000, 100);
+    validate(() -> !MessageStorage.messages.isEmpty());
 
     validateSuccessFlow();
     validateNonTxConnection(MessageStorage.messages.poll());
@@ -97,7 +98,7 @@ public class TransactionalSourceTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void nonTxSourceWithNonTxOperation() throws Exception {
     startFlow("nonTxSourceWithNonTxOperation");
-    validate(() -> !MessageStorage.messages.isEmpty(), 1000, 100);
+    validate(() -> !MessageStorage.messages.isEmpty());
 
     validateSuccessFlow();
     validateNonTxConnection(MessageStorage.messages.poll());
@@ -106,7 +107,7 @@ public class TransactionalSourceTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void nonTxSourceWithTxInside() throws Exception {
     startFlow("nonTxSourceWithTxInside");
-    validate(() -> !MessageStorage.messages.isEmpty(), 1000, 100);
+    validate(() -> !MessageStorage.messages.isEmpty());
 
     validateSuccessFlow();
     validateNonTxConnection(MessageStorage.messages.poll());
@@ -116,8 +117,8 @@ public class TransactionalSourceTestCase extends ExtensionFunctionalTestCase {
     ((Flow) getFlowConstruct(flowName)).start();
   }
 
-  private void validate(BooleanSupplier validation, long validationTimeout, long validationDelay) {
-    new PollingProber(validationTimeout, validationDelay).check(new JUnitLambdaProbe(validation));
+  private void validate(BooleanSupplier validation) {
+    new PollingProber(10000, 100).check(new JUnitLambdaProbe(validation));
   }
 
   private void validateCommittedTransaction(TestTransactionalConnection connection) {
@@ -139,12 +140,12 @@ public class TransactionalSourceTestCase extends ExtensionFunctionalTestCase {
   }
 
   private void validateSuccessFlow() {
-    validate(() -> TransactionalSource.isSuccess != null, 1000, 100);
+    validate(() -> TransactionalSource.isSuccess != null);
     assertThat(TransactionalSource.isSuccess, is(true));
   }
 
   private void validateErrorFlow() {
-    validate(() -> TransactionalSource.isSuccess != null, 1000, 100);
+    validate(() -> TransactionalSource.isSuccess != null);
     assertThat(TransactionalSource.isSuccess, is(false));
   }
 }
