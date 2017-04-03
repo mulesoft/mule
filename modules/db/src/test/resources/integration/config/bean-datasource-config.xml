@@ -10,7 +10,7 @@
 
     <spring:bean id="jdbcDataSource" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
         <spring:property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
-        <spring:property name="url" value="jdbc:derby:muleEmbeddedDB;sql.enforce_strict_size=true"/>
+        <spring:property name="url" value="jdbc:derby:target/muleEmbeddedDB;sql.enforce_strict_size=true"/>
     </spring:bean>
 
     <db:derby-config name="beanJdbcConfig" dataSource-ref="jdbcDataSource"/>
