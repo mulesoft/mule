@@ -7,7 +7,7 @@
 
     <db:generic-config name="dbConfig"
                        driverClassName="org.apache.derby.jdbc.EmbeddedDriver"
-                       url="jdbc:derby:muleEmbeddedDB;create=true">
+                       url="jdbc:derby:target/muleEmbeddedDB;create=true">
         <db:data-types>
             <db:data-type name="CUSTOM_TYPE1" id="3001"/>
             <db:data-type name="CUSTOM_TYPE2" id="3002"/>

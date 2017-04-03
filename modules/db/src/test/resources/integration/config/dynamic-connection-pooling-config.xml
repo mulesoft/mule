@@ -10,7 +10,7 @@
     <flow name="defaultQueryRequestResponse">
         <vm:inbound-endpoint path="testIn" exchange-pattern="one-way"/>
 
-        <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
+        <set-variable variableName="dataSourceUrl" value="jdbc:derby:target/muleEmbeddedDB;create=true"/>
 
         <transactional>
             <db:delete config-ref="pooledJdbcConfig">
