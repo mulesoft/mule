@@ -14,7 +14,7 @@
             <xa-transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
 
-        <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
+        <set-variable variableName="dataSourceUrl" value="jdbc:derby:target/muleEmbeddedDB;create=true"/>
 
         <db:update config-ref="dbConfig">
             <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
@@ -27,7 +27,7 @@
             <xa-transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
 
-        <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
+        <set-variable variableName="dataSourceUrl" value="jdbc:derby:target/muleEmbeddedDB;create=true"/>
 
         <db:update config-ref="dbConfig">
             <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
@@ -39,7 +39,7 @@
             <xa-transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
 
-        <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
+        <set-variable variableName="dataSourceUrl" value="jdbc:derby:target/muleEmbeddedDB;create=true"/>
 
         <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
             <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
@@ -53,7 +53,7 @@
             <xa-transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
 
-        <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
+        <set-variable variableName="dataSourceUrl" value="jdbc:derby:target/muleEmbeddedDB;create=true"/>
 
         <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
             <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
