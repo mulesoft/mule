@@ -30,11 +30,12 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 
 /**
- * An extension for sending and receiving connections through both TCP and UDP protocols.
+ * The Sockets Extension is used for sending and receiving connections through both TCP and UDP protocols.
  *
  * @since 4.0
  */
-@Extension(name = "Sockets")
+@Extension(name = "Sockets",
+    description = "Sockets Extension used to send and receive connections through both TCP and UDP protocols.")
 @Configurations({ListenerConfig.class, RequesterConfig.class})
 @SubTypeMapping(baseType = TcpProtocol.class, subTypes = {SafeProtocol.class, DirectProtocol.class, LengthProtocol.class,
     StreamingProtocol.class, XmlMessageProtocol.class, XmlMessageEOFProtocol.class, CustomProtocol.class, EOFProtocol.class,

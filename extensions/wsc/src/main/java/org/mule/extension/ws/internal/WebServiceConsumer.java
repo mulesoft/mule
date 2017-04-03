@@ -15,6 +15,7 @@ import org.mule.extension.ws.internal.security.WssTimestampSecurityStrategy;
 import org.mule.extension.ws.internal.security.WssUsernameTokenSecurityStrategy;
 import org.mule.extension.ws.internal.security.WssVerifySignatureSecurityStrategy;
 import org.mule.extension.ws.internal.connection.WscConnectionProvider;
+import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
@@ -25,7 +26,9 @@ import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 /**
- * Web Service Consumer extension used to consume SOAP web services.
+ * The Web Service Consumer extension used to consume SOAP web services.
+ * <p>
+ * This class represents the only {@link Configuration} for the Web Service Consumer.
  *
  * @since 4.0
  */
@@ -35,7 +38,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 @SubTypeMapping(baseType = SecurityStrategyAdapter.class,
     subTypes = {WssDecryptSecurityStrategy.class, WssEncryptSecurityStrategy.class, WssSignSecurityStrategy.class,
         WssUsernameTokenSecurityStrategy.class, WssTimestampSecurityStrategy.class, WssVerifySignatureSecurityStrategy.class})
-@Extension(name = "Web Service Consumer")
+@Extension(name = "Web Service Consumer", description = "Web Service Consumer extension used to consume SOAP web services")
 @Xml(prefix = "wsc")
 public class WebServiceConsumer {
 

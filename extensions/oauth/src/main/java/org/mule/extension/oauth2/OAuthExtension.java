@@ -22,11 +22,13 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 
 /**
- * An extension to hook oauth2 to http extension connectors.
+ * The {@link OAuthExtension} used to hook oauth2 to the http extension.
+ * <p>
+ * This class represents the only parameterless configuration and entry point for the extension.
  *
  * @since 4.0
  */
-@Extension(name = "OAuth")
+@Extension(name = "OAuth", description = "OAuth Extension used to hook oauth2 to the http extension")
 @Import(type = HttpAuthentication.class, from = "HTTP")
 @Operations(OAuthOperations.class)
 @SubTypeMapping(baseType = HttpAuthentication.class,
