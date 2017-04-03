@@ -63,8 +63,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractMuleConte
   public void setUp() {
     MVELExpressionLanguage mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
     expressionLanguageAdapter =
-        new ExtendedExpressionLanguageAdapter(new DataWeaveExpressionLanguage(new WeaveExpressionExecutor()),
-                                              mvelExpressionLanguage);
+        new ExtendedExpressionLanguageAdapter(new DataWeaveExpressionLanguage(muleContext), mvelExpressionLanguage);
   }
 
   @Test

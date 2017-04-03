@@ -12,7 +12,7 @@
             </db:select>
 
             <!-- Sets the SQL array as payload-->
-            <set-payload value="#[mel:payload.get(0)['ZIPS']]"/>
+            <set-payload value="#[payload[0]['ZIPS']]"/>
 
             <db:update>
                 <db:sql>update REGIONS set ZIPS = :zip where REGION_NAME = 'Southwest'</db:sql>
@@ -26,7 +26,7 @@
             </db:select>
 
             <!--Obtains the java array from the array field-->
-            <set-payload value="#[mel:payload.get(0)['ZIPS'].getArray()]"/>
+            <set-payload value="#[payload[0]['ZIPS'].array]"/>
         </try>
     </flow>
 
@@ -37,7 +37,7 @@
             </db:select>
 
             <!-- Sets the SQL array as payload-->
-            <set-payload value="#[mel:payload.get(0)['DETAILS']]"/>
+            <set-payload value="#[payload[0]['DETAILS']]"/>
 
             <db:update>
                 <db:sql>update contacts set DETAILS = :detail where CONTACT_NAME = 'Contact1'</db:sql>
@@ -51,7 +51,7 @@
             </db:select>
 
             <!--Obtains the java array from the array field-->
-            <set-payload value="#[mel:payload.get(0)['DETAILS'].getArray()]"/>
+            <set-payload value="#[payload[0]['DETAILS'].array]"/>
         </try>
     </flow>
 </mule>

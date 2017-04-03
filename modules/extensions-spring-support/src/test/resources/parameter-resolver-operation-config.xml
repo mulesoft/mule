@@ -55,7 +55,7 @@
     </flow>
 
     <flow name="processWrongWeapon">
-        <set-payload value="#[mel:app.registry['door']]"/>
+        <set-payload value="#[app.registry['door']]"/>
         <heisenberg:process-weapon weapon="#[payload]"/>
     </flow>
 
