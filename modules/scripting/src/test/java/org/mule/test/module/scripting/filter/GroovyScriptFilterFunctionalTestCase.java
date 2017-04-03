@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.scripting.filter;
+package org.mule.test.module.scripting.filter;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
 
-public class GroovyScriptFilterFunctionalTestCase extends FunctionalTestCase {
+public class GroovyScriptFilterFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 
   public GroovyScriptFilterFunctionalTestCase() {
     // Groovy really hammers the startup time since it needs to create the

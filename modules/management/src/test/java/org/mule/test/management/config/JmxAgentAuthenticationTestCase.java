@@ -7,8 +7,7 @@
 package org.mule.test.management.config;
 
 import static org.junit.Assert.assertNotNull;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ import javax.management.remote.JMXServiceURL;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class JmxAgentAuthenticationTestCase extends FunctionalTestCase {
+public class JmxAgentAuthenticationTestCase extends MuleArtifactFunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");

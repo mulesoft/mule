@@ -15,8 +15,8 @@ import static org.mule.runtime.core.api.security.DefaultMuleCredentials.createHe
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.service.http.api.HttpConstants.Method.GET;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
@@ -28,13 +28,13 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("See MULE-9202")
-public class PlainTextFunctionalTestCase extends FunctionalTestCase {
+public class PlainTextFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");
 
   @Rule
-  public TestHttpClient httpClient = new TestHttpClient.Builder().build();
+  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
 
   @Override
   protected String getConfigFile() {

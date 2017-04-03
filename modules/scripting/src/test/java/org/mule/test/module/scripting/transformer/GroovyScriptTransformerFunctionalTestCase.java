@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.scripting.transformer;
+package org.mule.test.module.scripting.transformer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
-public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCase {
+public class GroovyScriptTransformerFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 
   public GroovyScriptTransformerFunctionalTestCase() {
     // Groovy really hammers the startup time since it needs to create the interpreter on every start

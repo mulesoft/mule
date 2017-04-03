@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.components.script.refreshable;
+package org.mule.test.module.scripting;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -16,7 +16,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 
-public abstract class AbstractRefreshableBeanTestCase extends FunctionalTestCase {
+public abstract class AbstractRefreshableBeanTestCase extends MuleArtifactFunctionalTestCase {
 
   protected static final int WAIT_TIME = 1000;
 

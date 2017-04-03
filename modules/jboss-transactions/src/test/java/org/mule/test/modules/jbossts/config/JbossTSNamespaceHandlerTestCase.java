@@ -4,16 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.jboss.config;
+package org.mule.test.modules.jbossts.config;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 
 import org.junit.Test;
 
-public class JbossTSNamespaceHandlerTestCase extends FunctionalTestCase {
+public class JbossTSNamespaceHandlerTestCase extends MuleArtifactFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
