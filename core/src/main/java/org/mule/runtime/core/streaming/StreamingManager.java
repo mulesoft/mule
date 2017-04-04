@@ -7,7 +7,7 @@
 package org.mule.runtime.core.streaming;
 
 import org.mule.runtime.core.streaming.bytes.ByteStreamingManager;
-import org.mule.runtime.core.streaming.objects.ObjectStreamingManager;
+import org.mule.runtime.core.streaming.object.ObjectStreamingManager;
 
 /**
  * Manages resources dedicated to perform streaming of bytes or objects, so that the runtime can keep track of them,

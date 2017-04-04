@@ -9,24 +9,19 @@ package org.mule.runtime.core.internal.streaming.bytes;
 import static java.lang.Math.min;
 import static java.lang.Math.toIntExact;
 import static java.nio.channels.Channels.newChannel;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.util.ConcurrencyUtils.safeUnlock;
-import static org.mule.runtime.core.util.FunctionalUtils.safely;
-import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.util.func.CheckedRunnable;
+import org.mule.runtime.core.internal.streaming.AbstractStreamingBuffer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.ReadableByteChannel;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.slf4j.Logger;
+import java.util.Optional;
 
 /**
  * Base class for implementations of {@link InputStreamBuffer}.
@@ -35,12 +30,8 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
+public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer implements InputStreamBuffer {
 
-  private static Logger LOGGER = getLogger(AbstractInputStreamBuffer.class);
-
-  private final Lock bufferLock = new ReentrantLock();
-  private final AtomicBoolean closed = new AtomicBoolean(false);
   private final ByteBufferManager bufferManager;
 
   private InputStream stream;
@@ -139,21 +130,22 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
   @Override
   public final void close() {
     if (closed.compareAndSet(false, true)) {
-      acquireBufferLock();
-      try {
-        doClose();
-      } finally {
-        if (streamChannel != null) {
-          closeSafely(streamChannel::close);
-        }
+      withWriteLock(() -> {
+        try {
+          doClose();
+          return null;
+        } finally {
+          if (streamChannel != null) {
+            closeSafely(streamChannel::close);
+          }
 
-        if (stream != null) {
-          closeSafely(stream::close);
-        }
+          if (stream != null) {
+            closeSafely(stream::close);
+          }
 
-        deallocate(buffer);
-        releaseBufferLock();
-      }
+          deallocate(buffer);
+        }
+      });
     }
   }
 
@@ -161,17 +153,6 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
    * Template method to support the {@link #close()} operation
    */
   public abstract void doClose();
-
-  /**
-   * Looses the reference to the {@link #stream}, {@link #streamChannel} and {@link #buffer} so that invoking
-   * the {@link #close()} method does not close them. This is useful when the stream is going to continue
-   * buffering through a different instance.
-   */
-  public void yield() {
-    streamChannel = null;
-    stream = null;
-    buffer = null;
-  }
 
   /**
    * {@inheritDoc}
@@ -185,51 +166,64 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
     return doGet(destination, position, length, true);
   }
 
+  private Optional<Integer> getFromCurrentData(Range requiredRange, ByteBuffer dest, int length) {
+    if (streamFullyConsumed && requiredRange.startsAfter(bufferRange)) {
+      return of(-1);
+    }
+
+    if (bufferRange.contains(requiredRange)) {
+      return of(copy(dest, requiredRange));
+    }
+
+    if (bufferRange.isAhead(requiredRange)) {
+      return of(getBackwardsData(dest, requiredRange, length));
+    }
+
+    int overlap = handlePartialOverlap(dest, requiredRange);
+    if (overlap > 0) {
+      return of(overlap);
+    }
+
+    return empty();
+  }
+
   private int doGet(ByteBuffer dest, long position, int length, boolean consumeStreamIfNecessary) {
     Range requiredRange = new Range(position, position + length);
 
-    acquireBufferLock();
+    return withReadLock(() -> {
 
-    try {
-
-      if (streamFullyConsumed && requiredRange.startsAfter(bufferRange)) {
-        return -1;
-      }
-
-      if (bufferRange.contains(requiredRange)) {
-        return copy(dest, requiredRange);
-      }
-
-      if (bufferRange.isAhead(requiredRange)) {
-        return getBackwardsData(dest, requiredRange, length);
-      }
-
-      int overlap = handlePartialOverlap(dest, requiredRange);
-      if (overlap > 0) {
-        return overlap;
+      Optional<Integer> presentRead = getFromCurrentData(requiredRange, dest, length);
+      if (presentRead.isPresent()) {
+        return presentRead.get();
       }
 
       if (consumeStreamIfNecessary) {
-        while (!streamFullyConsumed && bufferRange.isBehind(requiredRange)) {
-          try {
-            if (reloadBuffer() > 0) {
-              overlap = handlePartialOverlap(dest, requiredRange);
-              if (overlap > 0) {
-                return overlap;
-              }
-            }
-          } catch (IOException e) {
-            throw new MuleRuntimeException(createStaticMessage("Could not read stream"), e);
+        releaseReadLock();
+        return withWriteLock(() -> {
+          Optional<Integer> refetch = getFromCurrentData(requiredRange, dest, length);
+          if (refetch.isPresent()) {
+            return refetch.get();
           }
-        }
 
-        return doGet(dest, position, length, false);
+          while (!streamFullyConsumed && bufferRange.isBehind(requiredRange)) {
+            try {
+              if (reloadBuffer() > 0) {
+                int overlap = handlePartialOverlap(dest, requiredRange);
+                if (overlap > 0) {
+                  return overlap;
+                }
+              }
+            } catch (IOException e) {
+              throw new MuleRuntimeException(createStaticMessage("Could not read stream"), e);
+            }
+          }
+
+          return doGet(dest, position, length, false);
+        });
       } else {
         return handlePartialOverlap(dest, requiredRange);
       }
-    } finally {
-      releaseBufferLock();
-    }
+    });
   }
 
   protected void consume(ByteBuffer data) {
@@ -238,20 +232,6 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
       buffer.put(data);
       bufferRange = bufferRange.advance(read);
     }
-  }
-
-  /**
-   * Releases the lock obtained through {@link #acquireBufferLock()}
-   */
-  public void releaseBufferLock() {
-    safeUnlock(bufferLock);
-  }
-
-  /**
-   * Acquires an exclusive lock to the {@link #buffer}
-   */
-  public void acquireBufferLock() {
-    bufferLock.lock();
   }
 
   /**
@@ -317,13 +297,6 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
     return stream;
   }
 
-  /**
-   * @return the {@link #streamChannel}
-   */
-  protected ReadableByteChannel getStreamChannel() {
-    return streamChannel;
-  }
-
   protected int getExpandedBufferSize(int bytesIncrement) {
     return buffer.capacity() + bytesIncrement;
   }
@@ -358,9 +331,5 @@ public abstract class AbstractInputStreamBuffer implements InputStreamBuffer {
     } else {
       return -1;
     }
-  }
-
-  private void closeSafely(CheckedRunnable task) {
-    safely(task, e -> LOGGER.debug("Found exception closing buffer", e));
   }
 }

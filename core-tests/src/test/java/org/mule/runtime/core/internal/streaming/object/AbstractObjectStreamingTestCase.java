@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.streaming.objects;
+package org.mule.runtime.core.internal.streaming.object;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.api.streaming.objects.CursorIterator;
+import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.core.internal.streaming.object.iterator.Consumer;
 import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -24,13 +24,17 @@ import java.util.NoSuchElementException;
 
 public abstract class AbstractObjectStreamingTestCase extends AbstractMuleTestCase {
 
-  protected final List<String> data;
+  protected final List<Object> data;
 
   public AbstractObjectStreamingTestCase(int dataSize) {
     data = new ArrayList<>(dataSize);
     for (int i = 0; i < dataSize; i++) {
-      data.add(randomAlphabetic(10));
+      data.add(createDataInstance());
     }
+  }
+
+  protected Object createDataInstance() {
+    return randomAlphabetic(10);
   }
 
   protected <T> StreamingIterator<T> toStreamingIterator(List<T> data) {

@@ -7,10 +7,12 @@
 package org.mule.runtime.core.internal.streaming;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager;
 import org.mule.runtime.core.internal.streaming.bytes.PoolingByteBufferManager;
@@ -18,7 +20,9 @@ import org.mule.runtime.core.internal.streaming.object.DefaultObjectStreamingMan
 import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.streaming.StreamingStatistics;
 import org.mule.runtime.core.streaming.bytes.ByteStreamingManager;
-import org.mule.runtime.core.streaming.objects.ObjectStreamingManager;
+import org.mule.runtime.core.streaming.object.ObjectStreamingManager;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -33,6 +37,9 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   private MutableStreamingStatistics statistics;
   private boolean initialised = false;
 
+  @Inject
+  private MuleContext muleContext;
+
   /**
    * {@inheritDoc}
    */
@@ -44,6 +51,9 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
       bufferManager = new PoolingByteBufferManager();
       byteStreamingManager = createByteStreamingManager();
       objectStreamingManager = createObjectStreamingManager();
+
+      initialiseIfNeeded(byteStreamingManager, true, muleContext);
+      initialiseIfNeeded(objectStreamingManager, true, muleContext);
       initialised = true;
     }
   }
