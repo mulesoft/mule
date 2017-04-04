@@ -37,8 +37,8 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @RunWith(Parameterized.class)
 public class ExpressionLanguagePrefixTestCase extends AbstractMuleTestCase {
 
-  private ExtendedExpressionLanguageAdapter elAdapter;
-  private DataWeaveExpressionLanguage dwLanguage;
+  private ExpressionLanguageAdaptorHandler elAdapter;
+  private DataWeaveExpressionLanguageAdaptor dwLanguage;
   private MVELExpressionLanguage melLanguage;
 
   @Rule
@@ -66,9 +66,9 @@ public class ExpressionLanguagePrefixTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() {
-    dwLanguage = mock(DataWeaveExpressionLanguage.class);
+    dwLanguage = mock(DataWeaveExpressionLanguageAdaptor.class);
     melLanguage = mock(MVELExpressionLanguage.class);
-    elAdapter = new ExtendedExpressionLanguageAdapter(dwLanguage, melLanguage);
+    elAdapter = new ExpressionLanguageAdaptorHandler(dwLanguage, melLanguage);
   }
 
   @Test

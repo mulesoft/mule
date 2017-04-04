@@ -16,36 +16,38 @@ import static org.mule.runtime.core.el.DefaultExpressionManager.MEL_PREFIX;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
+import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Implementation of an {@link ExtendedExpressionLanguage} which adapts MVEL and DW together, deciding via a prefix whether one or
+ * Implementation of an {@link ExtendedExpressionLanguageAdaptor} which adapts MVEL and DW together, deciding via a prefix whether one or
  * the other should be call. It will allow MVEL and DW to be used together in compatibility mode.
  *
  * @since 4.0
  */
-public class ExtendedExpressionLanguageAdapter implements ExtendedExpressionLanguage {
+public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLanguageAdaptor {
 
   private final Pattern EXPR_PREFIX_PATTERN = compile("^\\s*(?:(?:#\\[)?\\s*(\\w+):|\\%(\\w+) \\d).*");
 
-  private Map<String, ExtendedExpressionLanguage> expressionLanguages;
+  private Map<String, ExtendedExpressionLanguageAdaptor> expressionLanguages;
 
   private boolean melDefault = false;
 
-  public ExtendedExpressionLanguageAdapter(DataWeaveExpressionLanguage dataWeaveExpressionLanguage,
-                                           MVELExpressionLanguage mvelExpressionLanguage) {
+  public ExpressionLanguageAdaptorHandler(DataWeaveExpressionLanguageAdaptor defaultExtendedExpressionLanguage,
+                                          MVELExpressionLanguage mvelExpressionLanguage) {
     expressionLanguages = new HashMap<>();
-    expressionLanguages.put(DW_PREFIX, dataWeaveExpressionLanguage);
+    expressionLanguages.put(DW_PREFIX, defaultExtendedExpressionLanguage);
     expressionLanguages.put(MEL_PREFIX, mvelExpressionLanguage);
     melDefault = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
   }
@@ -55,14 +57,27 @@ public class ExtendedExpressionLanguageAdapter implements ExtendedExpressionLang
   }
 
   @Override
-  public void registerGlobalContext(BindingContext bindingContext) {
-    expressionLanguages.get(DW_PREFIX).registerGlobalContext(bindingContext);
+  public void addGlobalBindings(BindingContext bindingContext) {
+    expressionLanguages.get(DW_PREFIX).addGlobalBindings(bindingContext);
   }
 
   @Override
   public TypedValue evaluate(String expression, Event event, BindingContext context)
       throws ExpressionRuntimeException {
     return selectExpressionLanguage(expression).evaluate(expression, event, context);
+  }
+
+  @Override
+  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, BindingContext context)
+      throws ExpressionRuntimeException {
+    return selectExpressionLanguage(expression).evaluate(expression, expectedOutputType, event, context);
+  }
+
+  @Override
+  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, FlowConstruct flowConstruct,
+                             BindingContext context)
+      throws ExpressionRuntimeException {
+    return selectExpressionLanguage(expression).evaluate(expression, expectedOutputType, event, flowConstruct, context);
   }
 
   @Override
@@ -94,7 +109,20 @@ public class ExtendedExpressionLanguageAdapter implements ExtendedExpressionLang
     selectExpressionLanguage(expression).enrich(expression, event, eventBuilder, flowConstruct, value);
   }
 
-  private ExtendedExpressionLanguage selectExpressionLanguage(String expression) {
+  @Override
+  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, FlowConstruct flowConstruct,
+                                       BindingContext bindingContext)
+      throws ExpressionRuntimeException {
+    return selectExpressionLanguage(expression).split(expression, bachSize, event, flowConstruct, bindingContext);
+  }
+
+  @Override
+  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, BindingContext bindingContext)
+      throws ExpressionRuntimeException {
+    return selectExpressionLanguage(expression).split(expression, bachSize, event, bindingContext);
+  }
+
+  private ExtendedExpressionLanguageAdaptor selectExpressionLanguage(String expression) {
     final String languagePrefix = getLanguagePrefix(expression);
     if (isEmpty(languagePrefix)) {
       if (melDefault) {

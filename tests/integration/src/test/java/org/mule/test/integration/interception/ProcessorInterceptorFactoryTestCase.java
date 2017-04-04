@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
@@ -70,7 +70,7 @@ public class ProcessorInterceptorFactoryTestCase extends AbstractIntegrationTest
   public static class HasInjectedAttributesInterceptorFactory implements ProcessorInterceptorFactory {
 
     @Inject
-    private ExpressionEvaluator expressionEvaluator;
+    private MuleExpressionLanguage expressionEvaluator;
 
     @Inject
     private LockFactory lockFactory;
@@ -88,11 +88,11 @@ public class ProcessorInterceptorFactoryTestCase extends AbstractIntegrationTest
 
     public static final AtomicBoolean intercepted = new AtomicBoolean(false);
 
-    private ExpressionEvaluator expressionEvaluator;
+    private MuleExpressionLanguage expressionEvaluator;
     private LockFactory lockFactory;
     private HttpService httpService;
 
-    public HasInjectedAttributesInterceptor(ExpressionEvaluator expressionEvaluator, LockFactory lockFactory,
+    public HasInjectedAttributesInterceptor(MuleExpressionLanguage expressionEvaluator, LockFactory lockFactory,
                                             HttpService httpService) {
       this.expressionEvaluator = expressionEvaluator;
       this.lockFactory = lockFactory;

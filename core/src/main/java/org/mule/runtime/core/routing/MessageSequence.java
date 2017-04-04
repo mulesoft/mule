@@ -26,7 +26,7 @@ public interface MessageSequence<T> extends Iterator<T> {
   boolean isEmpty();
 
   /**
-   * The number of members of the sequence. If this is unknown, return UNKNOWN_ELEMENTS_COUNT.
+   * The number of members of the sequence. If this is unknown, return UNKNOWN_SIZE.
    * 
    * @return The estimated size of the sequence, or {@link #UNKNOWN_SIZE}, if it is unknown
    */

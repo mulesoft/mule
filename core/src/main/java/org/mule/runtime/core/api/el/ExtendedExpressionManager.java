@@ -13,8 +13,10 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
 
+import java.util.Iterator;
+
 /**
- * Extends the {@link ExpressionEvaluator} supporting mutating operations and the propagation of more variables.
+ * Extends the {@link ExpressionManager} supporting mutating operations and the propagation of more variables.
  * Only meant to distinguish the Mule 3 inherited behaviour from the current approach.
  *
  * @since 4.0
@@ -143,5 +145,6 @@ public interface ExtendedExpressionManager extends ExpressionManager {
   @Deprecated
   String parse(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct)
       throws ExpressionRuntimeException;
+
 
 }

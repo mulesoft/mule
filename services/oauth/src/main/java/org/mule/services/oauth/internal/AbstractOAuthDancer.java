@@ -20,7 +20,7 @@ import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.decodeUrlE
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeString;
 
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -76,13 +76,13 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
   private final LockFactory lockProvider;
   private final Map<String, ResourceOwnerOAuthContext> tokensStore;
   private final HttpClient httpClient;
-  private final ExpressionEvaluator expressionEvaluator;
+  private final MuleExpressionLanguage expressionEvaluator;
 
   protected AbstractOAuthDancer(String clientId, String clientSecret, String tokenUrl, Charset encoding, String scopes,
                                 String responseAccessTokenExpr, String responseRefreshTokenExpr, String responseExpiresInExpr,
                                 Map<String, String> customParametersExtractorsExprs, LockFactory lockProvider,
                                 Map<String, ResourceOwnerOAuthContext> tokensStore,
-                                HttpClient httpClient, ExpressionEvaluator expressionEvaluator) {
+                                HttpClient httpClient, MuleExpressionLanguage expressionEvaluator) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.tokenUrl = tokenUrl;

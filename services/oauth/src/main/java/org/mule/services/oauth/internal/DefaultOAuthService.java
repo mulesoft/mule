@@ -6,7 +6,7 @@
  */
 package org.mule.services.oauth.internal;
 
-import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.oauth.api.OAuthService;
@@ -40,7 +40,7 @@ public final class DefaultOAuthService implements OAuthService {
   @Override
   public <T> OAuthClientCredentialsDancerBuilder clientCredentialsGrantTypeDancerBuilder(LockFactory lockProvider,
                                                                                          Map<String, T> tokensStore,
-                                                                                         ExpressionEvaluator expressionEvaluator) {
+                                                                                         MuleExpressionLanguage expressionEvaluator) {
     return new DefaultOAuthClientCredentialsDancerBuilder(lockProvider, (Map<String, ResourceOwnerOAuthContext>) tokensStore,
                                                           httpService, expressionEvaluator);
   }
@@ -48,7 +48,7 @@ public final class DefaultOAuthService implements OAuthService {
   @Override
   public <T> OAuthAuthorizationCodeDancerBuilder authorizationCodeGrantTypeDancerBuilder(LockFactory lockProvider,
                                                                                          Map<String, T> tokensStore,
-                                                                                         ExpressionEvaluator expressionEvaluator) {
+                                                                                         MuleExpressionLanguage expressionEvaluator) {
     return new DefaultOAuthAuthorizationCodeDancerBuilder(httpServersManager, schedulerService, lockProvider,
                                                           (Map<String, ResourceOwnerOAuthContext>) tokensStore,
                                                           httpService, expressionEvaluator);

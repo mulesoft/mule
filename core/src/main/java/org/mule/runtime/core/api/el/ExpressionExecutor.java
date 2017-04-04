@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.el;
 
 /**
  * Wraps an expression language engine. Implementations should not wrap expression language engine exceptions, but rather the
- * {@link ExtendedExpressionLanguage} implementation should handle them.
+ * {@link ExtendedExpressionLanguageAdaptor} implementation should handle them.
  * 
  * @since 3.3
  */

@@ -72,7 +72,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     int correlationSequence = 0;
     MessageSequence<?> messageSequence = seq;
     if (batchSize > 1) {
-      messageSequence = new PartitionedMessageSequence(seq, batchSize);
+      messageSequence = new PartitionedMessageSequence<>(seq, batchSize);
     }
     Integer count = messageSequence.size();
     Event lastResult = null;

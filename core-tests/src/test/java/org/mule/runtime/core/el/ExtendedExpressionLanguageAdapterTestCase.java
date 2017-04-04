@@ -33,9 +33,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import com.mulesoft.weave.el.WeaveExpressionExecutor;
 
 import java.util.List;
 import java.util.Optional;
@@ -51,19 +48,19 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @Features("Expression Language")
 @Stories("Support both MVEL and DW")
 @Description("Test cases verifying the differences between MVEL and DW ELs.")
-public class ExtendedExpressionLanguageAdapterTestCase extends AbstractMuleContextTestCase {
+public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpressionLanguageTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private ExtendedExpressionLanguageAdapter expressionLanguageAdapter;
+  private ExpressionLanguageAdaptorHandler expressionLanguageAdapter;
   private BindingContext emptyBindingContext = BindingContext.builder().build();
 
   @Before
   public void setUp() {
+    super.setUp();
     MVELExpressionLanguage mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
-    expressionLanguageAdapter =
-        new ExtendedExpressionLanguageAdapter(new DataWeaveExpressionLanguage(muleContext), mvelExpressionLanguage);
+    expressionLanguageAdapter = new ExpressionLanguageAdaptorHandler(expressionLanguage, mvelExpressionLanguage);
   }
 
   @Test
@@ -94,7 +91,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractMuleConte
         .addBinding(global, new TypedValue(value, STRING))
         .addBinding("upper", new TypedValue(expressionFunction, fromFunction(expressionFunction)))
         .build();
-    expressionLanguageAdapter.registerGlobalContext(context);
+    expressionLanguageAdapter.addGlobalBindings(context);
 
     assertThat(expressionLanguageAdapter.evaluate(global, testEvent(), emptyBindingContext).getValue(), is(value));
     assertThat(expressionLanguageAdapter.evaluate("upper('hey')", testEvent(), emptyBindingContext).getValue(),

@@ -48,7 +48,7 @@ public class ExpressionSplitterIteratorTestCase extends AbstractMuleTestCase {
   public void setUp() throws Exception {
     expressionSplitter.setMuleContext(muleContext);
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
-    when(expressionConfig.getFullExpression(any(ExpressionManager.class))).thenReturn("fullExpression");
+    when(expressionConfig.getFullExpression()).thenReturn("fullExpression");
     when(expressionManager.evaluate(any(String.class), any(Event.class), any(FlowConstruct.class))).thenReturn(typedValue);
     when(muleEvent.getFlowCallStack()).thenReturn(flowCallStack);
     when(muleEvent.getError()).thenReturn(Optional.empty());

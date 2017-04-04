@@ -53,7 +53,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
   private static final String TEMP_DIR_SYSTEM_PROPERTY = "java.io.tmpdir";
   private static final File TEMP_DIR = new File(getProperty(TEMP_DIR_SYSTEM_PROPERTY));
   private static final AtomicLong TEMP_FILE_INDEX = new AtomicLong(-1);
-  
+
   public static String DEFAULT_ENCODING = "UTF-8";
 
   public static synchronized void copyStreamToFile(InputStream input, File destination) throws IOException {
@@ -335,7 +335,9 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
       return new File(parent, child).getCanonicalFile();
     } catch (IOException e) {
       throw new MuleRuntimeException(
-          createStaticMessage("Unable to create a canonical file for parent: " + parent + " and child: " + child), e);
+                                     createStaticMessage("Unable to create a canonical file for parent: " + parent
+                                         + " and child: " + child),
+                                     e);
     }
   }
 
@@ -352,7 +354,9 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
       return new File(parent, child).getCanonicalFile();
     } catch (IOException e) {
       throw new MuleRuntimeException(
-          createStaticMessage("Unable to create a canonical file for parent: " + parent + " and child: " + child), e);
+                                     createStaticMessage("Unable to create a canonical file for parent: " + parent
+                                         + " and child: " + child),
+                                     e);
     }
   }
 

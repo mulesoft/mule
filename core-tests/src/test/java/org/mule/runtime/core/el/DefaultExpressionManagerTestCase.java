@@ -92,12 +92,12 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
         .addBinding("times", new TypedValue(multiply, fromFunction(multiply)))
         .build();
 
-    expressionManager.addGlobalContext(globalContext);
+    expressionManager.addGlobalBindings(globalContext);
 
     TypedValue result = expressionManager.evaluate("aNum times 5");
     assertThat(result.getValue(), is(20));
 
-    expressionManager.addGlobalContext(builder().addBinding("otherNum", new TypedValue(3, integerType)).build());
+    expressionManager.addGlobalBindings(builder().addBinding("otherNum", new TypedValue(3, integerType)).build());
 
     result = expressionManager.evaluate("(times(7, 3) + otherNum) / aNum");
     assertThat(result.getValue(), is(6));

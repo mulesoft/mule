@@ -16,8 +16,9 @@ import static org.mule.runtime.core.el.DefaultExpressionManager.PREFIX_EXPR_SEPA
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionExecutionException;
-import org.mule.runtime.api.el.ExpressionExecutor;
+import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -29,10 +30,11 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
+import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -43,9 +45,9 @@ import org.mule.runtime.core.el.context.MuleInstanceContext;
 import org.mule.runtime.core.el.context.ServerContext;
 import org.slf4j.Logger;
 
-public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
+public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor {
 
-  private static final Logger logger = getLogger(DataWeaveExpressionLanguage.class);
+  private static final Logger logger = getLogger(DataWeaveExpressionLanguageAdaptor.class);
   public static final String PAYLOAD = "payload";
   public static final String DATA_TYPE = "dataType";
   public static final String ATTRIBUTES = "attributes";
@@ -56,17 +58,28 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
   public static final String MULE = "mule";
   public static final String APP = "app";
 
-  private ExpressionExecutor expressionExecutor;
+  private ExpressionLanguage expressionExecutor;
   private MuleContext muleContext;
 
   @Inject
-  public DataWeaveExpressionLanguage(MuleContext muleContext) {
+  public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext) {
     try {
-      this.expressionExecutor = muleContext.getRegistry().lookupObject(ExpressionExecutor.class);
+      this.expressionExecutor = muleContext.getRegistry().lookupObject(DefaultExpressionLanguageFactoryService.class).create();
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Unable to obtain expression executor."), e);
     }
     this.muleContext = muleContext;
+
+    registerGlobalBindings();
+  }
+
+  private void registerGlobalBindings() {
+    BindingContext.Builder contextBuilder = BindingContext.builder();
+    contextBuilder.addBinding(MULE,
+                              new TypedValue<>(new MuleInstanceContext(muleContext), fromType(MuleInstanceContext.class)));
+    contextBuilder.addBinding(SERVER, new TypedValue<>(new ServerContext(), fromType(ServerContext.class)));
+    contextBuilder.addBinding(APP, new TypedValue<>(new AppContext(muleContext), fromType(AppContext.class)));
+    addGlobalBindings(contextBuilder.build());
   }
 
 
@@ -76,7 +89,7 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
    * @param bindingContext the context to register
    */
   @Override
-  public synchronized void registerGlobalContext(BindingContext bindingContext) {
+  public void addGlobalBindings(BindingContext bindingContext) {
     expressionExecutor.addGlobalBindings(bindingContext);
   }
 
@@ -84,6 +97,22 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
   public TypedValue evaluate(String expression, Event event, BindingContext context) {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
     return evaluate(expression, contextBuilder.build());
+  }
+
+  @Override
+  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, BindingContext context)
+      throws ExpressionRuntimeException {
+    BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
+    return expressionExecutor.evaluate(expression, expectedOutputType, contextBuilder.build());
+  }
+
+  @Override
+  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, FlowConstruct flowConstruct,
+                             BindingContext context)
+      throws ExpressionRuntimeException {
+    BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
+    addFlowBindings(flowConstruct, contextBuilder);
+    return expressionExecutor.evaluate(expression, expectedOutputType, contextBuilder.build());
   }
 
   @Override
@@ -102,6 +131,22 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
   @Override
   public ValidationResult validate(String expression) {
     return expressionExecutor.validate(sanitize(expression));
+  }
+
+  @Override
+  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, FlowConstruct flowConstruct,
+                                       BindingContext bindingContext)
+      throws ExpressionRuntimeException {
+    BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, bindingContext);
+    addFlowBindings(flowConstruct, contextBuilder);
+    return expressionExecutor.split(expression, bachSize, contextBuilder.build());
+  }
+
+  @Override
+  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, BindingContext bindingContext)
+      throws ExpressionRuntimeException {
+    BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, bindingContext);
+    return expressionExecutor.split(expression, bachSize, contextBuilder.build());
   }
 
   @Override
@@ -146,11 +191,6 @@ public class DataWeaveExpressionLanguage implements ExtendedExpressionLanguage {
       contextBuilder.addBinding(ATTRIBUTES, new TypedValue<>(attributes, fromType(attributes.getClass())));
       contextBuilder.addBinding(PAYLOAD, message.getPayload());
       contextBuilder.addBinding(DATA_TYPE, new TypedValue<>(message.getPayload().getDataType(), fromType(DataType.class)));
-      contextBuilder.addBinding(MULE,
-                                new TypedValue<>(new MuleInstanceContext(muleContext), fromType(MuleInstanceContext.class)));
-      contextBuilder.addBinding(SERVER, new TypedValue<>(new ServerContext(), fromType(ServerContext.class)));
-      contextBuilder.addBinding(APP, new TypedValue<>(new AppContext(muleContext), fromType(AppContext.class)));
-
       Error error = event.getError().isPresent() ? event.getError().get() : null;
       contextBuilder.addBinding(ERROR, new TypedValue<>(error, fromType(Error.class)));
     }

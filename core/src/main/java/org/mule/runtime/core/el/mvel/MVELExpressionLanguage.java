@@ -34,7 +34,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
+import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.el.mvel.datatype.MvelDataTypeResolver;
@@ -46,6 +46,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
@@ -57,7 +58,7 @@ import javax.inject.Inject;
 /**
  * Expression language that uses MVEL (http://mvel.codehaus.org/).
  */
-public class MVELExpressionLanguage implements ExtendedExpressionLanguage, Initialisable {
+public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor, Initialisable {
 
   public static final String OBJECT_FOR_ENRICHMENT = "__object_for_enrichment";
 
@@ -168,13 +169,43 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguage, Initi
   }
 
   @Override
-  public void registerGlobalContext(BindingContext bindingContext) {
+  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, FlowConstruct flowConstruct,
+                                       BindingContext bindingContext)
+      throws ExpressionRuntimeException {
+    TypedValue evaluate = evaluate(expression, event, flowConstruct, bindingContext);
+    return MVELSplitDataIterator.createFrom(evaluate.getValue(), bachSize);
+
+  }
+
+  @Override
+  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, BindingContext bindingContext)
+      throws ExpressionRuntimeException {
+    TypedValue evaluate = evaluate(expression, event, bindingContext);
+    return MVELSplitDataIterator.createFrom(evaluate.getValue(), bachSize);
+  }
+
+
+  @Override
+  public void addGlobalBindings(BindingContext bindingContext) {
     // Do nothing
   }
 
   @Override
   public TypedValue evaluate(String expression, Event event, BindingContext context) {
     return evaluate(expression, event, Event.builder(event), null, context);
+  }
+
+  @Override
+  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, BindingContext context)
+      throws ExpressionRuntimeException {
+    return evaluate(expression, expectedOutputType, event, null, context);
+  }
+
+  @Override
+  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, FlowConstruct flowConstruct,
+                             BindingContext context)
+      throws ExpressionRuntimeException {
+    return evaluate(expression, event, flowConstruct, context);
   }
 
   @Override
@@ -230,6 +261,7 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguage, Initi
     }
     return success();
   }
+
 
   protected MVELExpressionLanguageContext createExpressionLanguageContext() {
     return new MVELExpressionLanguageContext(parserConfiguration, muleContext);

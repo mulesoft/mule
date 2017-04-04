@@ -10,14 +10,14 @@ import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
+import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Flow variables wrapper {@link Map} for exposing Flow variables via an {@link ExtendedExpressionLanguage}
+ * Flow variables wrapper {@link Map} for exposing Flow variables via an {@link ExtendedExpressionLanguageAdaptor}
  */
 public class FlowVariableMapContext extends AbstractMapContext<Object> {
 

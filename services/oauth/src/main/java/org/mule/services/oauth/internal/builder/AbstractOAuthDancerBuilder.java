@@ -9,7 +9,7 @@ package org.mule.services.oauth.internal.builder;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.oauth.api.OAuthDancer;
@@ -35,7 +35,7 @@ public abstract class AbstractOAuthDancerBuilder<D extends OAuthDancer> implemen
   protected final LockFactory lockProvider;
   protected final Map<String, ResourceOwnerOAuthContext> tokensStore;
   protected final HttpService httpService;
-  protected final ExpressionEvaluator expressionEvaluator;
+  protected final MuleExpressionLanguage expressionEvaluator;
 
   protected String clientId;
   protected String clientSecret;
@@ -50,7 +50,7 @@ public abstract class AbstractOAuthDancerBuilder<D extends OAuthDancer> implemen
   protected Map<String, String> customParametersExtractorsExprs;
 
   public AbstractOAuthDancerBuilder(LockFactory lockProvider, Map<String, ResourceOwnerOAuthContext> tokensStore,
-                                    HttpService httpService, ExpressionEvaluator expressionEvaluator) {
+                                    HttpService httpService, MuleExpressionLanguage expressionEvaluator) {
     this.lockProvider = lockProvider;
     this.tokensStore = tokensStore;
     this.httpService = httpService;
