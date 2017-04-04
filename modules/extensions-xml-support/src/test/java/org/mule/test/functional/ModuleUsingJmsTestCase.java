@@ -17,12 +17,12 @@ public class ModuleUsingJmsTestCase extends AbstractXmlExtensionMuleArtifactFunc
 
   @Override
   protected String getModulePath() {
-    return "module-using-jms/module-using-jms.xml";
+    return "modules/module-using-jms.xml";
   }
 
   @Override
   protected String getConfigFile() {
-    return "functional/flows-with-module-using-jms.xml";
+    return "flows/flows-with-module-using-jms.xml";
   }
 
   @Test

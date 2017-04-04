@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.extension.internal.loader;
 
+import static java.util.Collections.emptySet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.CONFIG_NAME;
@@ -36,7 +38,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testModuleSimple() {
-    String modulePath = "module-simple/module-simple.xml";
+    String modulePath = "modules/module-simple.xml";
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-simple"));
@@ -60,7 +62,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testModuleProperties() {
-    String modulePath = "module-properties/module-properties.xml";
+    String modulePath = "modules/module-properties.xml";
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-properties"));
@@ -94,7 +96,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testModuleGlobalElement() {
-    String modulePath = "module-global-element/module-global-element.xml";
+    String modulePath = "modules/module-global-element.xml";
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-global-element"));
@@ -130,7 +132,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testModuleCustomTypes() throws IOException {
-    String modulePath = "module-custom-types/module-custom-types.xml";
+    String modulePath = "modules/module-custom-types.xml";
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-custom-types"));
@@ -162,7 +164,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testModuleDocumentation() throws IOException {
-    String modulePath = "module-documentation/module-documentation.xml";
+    String modulePath = "modules/module-documentation.xml";
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-documentation"));
@@ -213,6 +215,6 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put(RESOURCE_XML, modulePath);
 
-    return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), parameters);
+    return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), getDefault(emptySet()), parameters);
   }
 }

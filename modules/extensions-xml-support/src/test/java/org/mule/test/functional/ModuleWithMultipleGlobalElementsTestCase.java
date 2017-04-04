@@ -49,12 +49,12 @@ public class ModuleWithMultipleGlobalElementsTestCase extends AbstractXmlExtensi
 
   @Override
   protected String getModulePath() {
-    return "module-multiple-global-elements/module-multiple-global-elements.xml";
+    return "modules/module-multiple-global-elements.xml";
   }
 
   @Override
   protected String getConfigFile() {
-    return "functional/flows-using-module-multiple-global-elements.xml";
+    return "flows/flows-using-module-multiple-global-elements.xml";
   }
 
   @Test

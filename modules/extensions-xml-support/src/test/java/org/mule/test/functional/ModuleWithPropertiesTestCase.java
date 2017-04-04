@@ -16,12 +16,12 @@ public class ModuleWithPropertiesTestCase extends AbstractXmlExtensionMuleArtifa
 
   @Override
   protected String getModulePath() {
-    return "module-properties/module-properties.xml";
+    return "modules/module-properties.xml";
   }
 
   @Override
   protected String getConfigFile() {
-    return "functional/flows-using-module-properties.xml";
+    return "flows/flows-using-module-properties.xml";
   }
 
   @Test

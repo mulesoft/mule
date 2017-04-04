@@ -8,6 +8,7 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactExtensionManagerConfigurationBuilder.META_INF_FOLDER;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
@@ -24,13 +25,14 @@ import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
+import org.slf4j.Logger;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
+import java.util.Set;
 
 /**
  * Creates {@link ExtensionManager} for mule artifacts that own a {@link MuleContext}
@@ -61,7 +63,8 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
   @Override
   public ExtensionManager create(MuleContext muleContext) {
     final ExtensionManager extensionManager = extensionManagerFactory.create(muleContext);
-
+    final Set<ExtensionModel> extensions = new HashSet<>();
+    //TODO MULE-10355: generating the ExtensionModels *must* be done in an ordered way, sorting them by dependencies.
     for (ArtifactPlugin artifactPlugin : artifactPlugins) {
       URL manifestUrl =
           artifactPlugin.getArtifactClassLoader().findResource(META_INF_FOLDER + "/" + EXTENSION_MANIFEST_FILE_NAME);
@@ -75,15 +78,18 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
         params.put(TYPE_PROPERTY_NAME, extensionManifest.getDescriberManifest().getProperties().get("type"));
         params.put(VERSION, extensionManifest.getVersion());
 
-        extensionManager.registerExtension(
-                                           new JavaExtensionModelLoader()
-                                               .loadExtensionModel(artifactPlugin.getArtifactClassLoader().getClassLoader(),
-                                                                   params));
+        extensions.add(new JavaExtensionModelLoader()
+            .loadExtensionModel(artifactPlugin.getArtifactClassLoader().getClassLoader(),
+                                getDefault(extensions),
+                                params));
       } else {
-        discoverExtensionThroughJsonDescriber(artifactPlugin, extensionManager);
+        discoverExtensionThroughJsonDescriber(artifactPlugin, extensions);
       }
     }
 
+    for (ExtensionModel extension : extensions) {
+      extensionManager.registerExtension(extension);
+    }
     return extensionManager;
   }
 
@@ -92,12 +98,13 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
    * using the {@link ExtensionModelLoader} which {@link ExtensionModelLoader#getId() ID} matches the plugin's
    * descriptor ID.
    *
-   * @param artifactPlugin   to introspect for the {@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} and further resources from its {@link ClassLoader}
-   * @param extensionManager object to store the generated {@link ExtensionModel} if exists
+   * @param artifactPlugin   to introspect for the {@link ArtifactPluginDescriptor#MULE_PLUGIN_JSON} and further resources from its {@link ClassLoader}.
+   * @param extensions with the previously generated {@link ExtensionModel}s that will be used to generate the current {@link ExtensionModel}
+   *                   and store it in {@code extensions} once generated.
    * @throws IllegalArgumentException if the {@link MulePluginModel#getExtensionModelLoaderDescriptor()} is present, and
    *                                  the ID in it wasn't discovered through SPI.
    */
-  private void discoverExtensionThroughJsonDescriber(ArtifactPlugin artifactPlugin, ExtensionManager extensionManager) {
+  private void discoverExtensionThroughJsonDescriber(ArtifactPlugin artifactPlugin, Set<ExtensionModel> extensions) {
     artifactPlugin.getDescriptor().getExtensionModelDescriptorProperty().ifPresent(descriptorProperty -> {
       final ExtensionModelLoader extensionModelLoader = extensionModelLoaderRepository.getExtensionModelLoader(descriptorProperty)
           .orElseThrow(() -> new IllegalArgumentException(format(
@@ -105,8 +112,9 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
                                                                  descriptorProperty.getId(),
                                                                  artifactPlugin.getDescriptor().getName())));
       final ExtensionModel extensionModel = extensionModelLoader
-          .loadExtensionModel(artifactPlugin.getArtifactClassLoader().getClassLoader(), descriptorProperty.getAttributes());
-      extensionManager.registerExtension(extensionModel);
+          .loadExtensionModel(artifactPlugin.getArtifactClassLoader().getClassLoader(), getDefault(extensions),
+                              descriptorProperty.getAttributes());
+      extensions.add(extensionModel);
     });
   }
 }

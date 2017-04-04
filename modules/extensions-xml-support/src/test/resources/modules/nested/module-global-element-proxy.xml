@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-global-element-proxy"
+        minMuleVersion="4.0.0"
+
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:module-global-element="http://www.mulesoft.org/schema/mule/module-global-element"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+            http://www.mulesoft.org/schema/mule/module-global-element http://www.mulesoft.org/schema/mule/module-global-element/module-global-element.xsd">
+
+    <property name="someUserConfig" type="string" defaultValue="some-username"/>
+    <property name="somePassConfig" type="string" defaultValue="some-password"/>
+    <property name="port" type="string"/>
+
+    <module-global-element:config name="proxy-config" someUserConfig="#[property.someUserConfig]" somePassConfig="#[property.somePassConfig]" port="#[property.port]"/>
+
+    <operation name="do-login">
+        <parameters>
+            <parameter name="someUser" type="string" defaultValue="usernameX"/>
+            <parameter name="somePass" type="string" defaultValue="passwordX"/>
+        </parameters>
+        <body>
+            <module-global-element:do-login config-ref="proxy-config" someUser="#[param.someUser]" somePass="#[param.somePass]" />
+        </body>
+        <output type="string"/>
+    </operation>
+</module>

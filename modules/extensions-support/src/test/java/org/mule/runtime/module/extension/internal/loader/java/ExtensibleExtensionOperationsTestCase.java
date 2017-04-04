@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
@@ -49,7 +51,8 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractJavaExtension
 
   private void assertOperationExtensionOf(String operationName, Class propertyType) {
     ExtensionDeclaration extensionDeclaration =
-        getLoader().declare(new DefaultExtensionLoadingContext(getClass().getClassLoader())).getDeclaration();
+        getLoader().declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())))
+            .getDeclaration();
     OperationDeclaration operation = getOperation(extensionDeclaration, operationName);
 
     ExtendingOperationModelProperty<ExtensibleExtension> modelProperty =

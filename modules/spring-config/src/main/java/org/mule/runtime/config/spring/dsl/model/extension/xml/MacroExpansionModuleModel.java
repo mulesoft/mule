@@ -11,14 +11,13 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.REFERENCE_ATTRIBUTE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -84,22 +83,28 @@ public class MacroExpansionModuleModel {
    * Goes through the entire xml mule application looking for the message processors that can be expanded, and then takes care of
    * the global elements.
    * <p/>
-   * TODO(fernandezlautaro) MULE-10355: current implementation does not plays at all with <module/> within <module/>
+   * TODO(fernandezlautaro) MULE-10355: current implementation works for <module/> within <module/>, but it has BigO(N^N). This one will be solved when the {@link ExtensionModel}s for the XML scenario will be queried asking for its dependencies thru a {@link ModelProperty} to sort them properly
    */
   public void expand() {
-    for (ExtensionModel extensionModel : extensions) {
-      final List<ComponentModel> moduleGlobalElements = getModuleGlobalElements(extensionModel);
-      final Set<String> moduleGlobalElementsNames =
-          moduleGlobalElements.stream().map(ComponentModel::getNameAttribute).collect(toSet());
-      createOperationRefEffectiveModel(extensionModel, moduleGlobalElementsNames);
-      createConfigRefEffectiveModel(extensionModel, moduleGlobalElements, moduleGlobalElementsNames);
+    //TODO MULE-10355: this for that works N^N will be deleted once is implemented
+    for (int i = 0; i < extensions.size(); i++) {
+      for (ExtensionModel extensionModel : extensions) {
+        expand(extensionModel);
+      }
     }
+  }
+
+  private void expand(ExtensionModel extensionModel) {
+    final List<ComponentModel> moduleGlobalElements = getModuleGlobalElements(extensionModel);
+    final Set<String> moduleGlobalElementsNames =
+        moduleGlobalElements.stream().map(ComponentModel::getNameAttribute).collect(toSet());
+    createOperationRefEffectiveModel(extensionModel, moduleGlobalElementsNames);
+    createConfigRefEffectiveModel(extensionModel, moduleGlobalElements, moduleGlobalElementsNames);
   }
 
   private void createOperationRefEffectiveModel(ExtensionModel extensionModel, Set<String> moduleGlobalElementsNames) {
     HashMap<Integer, ComponentModel> componentModelsToReplaceByIndex = new HashMap<>();
-
-    applicationModel.executeOnEveryFlow(flowComponentModel -> {
+    applicationModel.executeOnEveryMuleComponentTree(flowComponentModel -> {
       for (int i = 0; i < flowComponentModel.getInnerComponents().size(); i++) {
         ComponentModel operationRefModel = flowComponentModel.getInnerComponents().get(i);
         ComponentIdentifier identifier = operationRefModel.getIdentifier();

@@ -9,10 +9,11 @@ package org.mule.test.extension.dsl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import com.google.common.collect.ImmutableSet;
+import org.junit.Before;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
@@ -35,13 +36,8 @@ import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
-
-import com.google.common.collect.ImmutableSet;
-
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.util.Optional;
-import java.util.Set;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -51,10 +47,10 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import org.junit.Before;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.Optional;
+import java.util.Set;
 
 @ArtifactClassLoaderRunnerConfig(
     sharedRuntimeLibs = {"org.apache.derby:derby"},
@@ -174,7 +170,7 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
     checkArgument(appIs != null, "The given application was not found as resource");
 
     Document document = new XmlConfigurationDocumentLoader()
-        .loadDocument(of(muleContext.getExtensionManager()), configFile, appIs);
+        .loadDocument(muleContext.getExtensionManager().getExtensions(), configFile, appIs);
 
     XmlApplicationServiceRegistry customRegistry = new XmlApplicationServiceRegistry(new SpiServiceRegistry(), dslContext);
     ConfigLine configLine = new XmlApplicationParser(customRegistry)

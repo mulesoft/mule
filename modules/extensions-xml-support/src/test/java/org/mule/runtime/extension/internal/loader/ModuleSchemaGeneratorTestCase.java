@@ -8,11 +8,13 @@ package org.mule.runtime.extension.internal.loader;
 
 import static java.io.File.separator;
 import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.custommonkey.xmlunit.XMLUnit.setIgnoreAttributeOrder;
 import static org.custommonkey.xmlunit.XMLUnit.setIgnoreComments;
 import static org.custommonkey.xmlunit.XMLUnit.setIgnoreWhitespace;
 import static org.custommonkey.xmlunit.XMLUnit.setNormalizeWhitespace;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.XSD_SUFFIX;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
 import org.custommonkey.xmlunit.DetailedDiff;
@@ -76,13 +78,14 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
     };
 
     Function<String, Object[]> stringFunction = moduleName -> {
-      String moduleNamePrefix = "modules" + separator + moduleName;
+      String moduleNamePrefix = "modules" + separator + "schema" + separator + moduleName;
       String modulePath = moduleNamePrefix + ".xml";
 
       ClassLoader contextClassLoader = currentThread().getContextClassLoader();
       Map<String, Object> parameters = new HashMap<>();
       parameters.put(RESOURCE_XML, modulePath);
-      ExtensionModel extensionModel = new XmlExtensionModelLoader().loadExtensionModel(contextClassLoader, parameters);
+      ExtensionModel extensionModel =
+          new XmlExtensionModelLoader().loadExtensionModel(contextClassLoader, getDefault(emptySet()), parameters);
 
       try {
         return new Object[] {extensionModel,

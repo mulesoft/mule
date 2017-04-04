@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal;
 
+import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.EXTENSION_DESCRIPTION;
 import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.EXTENSION_NAME;
 import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.LISTENER_CONFIG_DESCRIPTION;
@@ -29,6 +31,8 @@ import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STR
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
+import org.junit.Before;
+import org.junit.Test;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.NumberType;
@@ -54,9 +58,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-
 @SmallTest
 public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDeclarationTestCase {
 
@@ -75,7 +76,7 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
       protected void declareExtension(ExtensionLoadingContext context) {
         new TestHttpConnectorDeclarer().declareOn(context.getExtensionDeclarer());
       }
-    }.loadExtensionModel(getClass().getClassLoader(), new HashMap<>());
+    }.loadExtensionModel(getClass().getClassLoader(), getDefault(emptySet()), new HashMap<>());
   }
 
 

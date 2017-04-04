@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static java.util.Collections.emptySet;
 import static org.apache.commons.collections.CollectionUtils.find;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
+import javafx.util.Pair;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -20,8 +23,6 @@ import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;
-
-import javafx.util.Pair;
 
 public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractMuleTestCase {
 
@@ -40,7 +41,7 @@ public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractM
   }
 
   protected ExtensionDeclarer declareExtension() {
-    return getLoader().declare(new DefaultExtensionLoadingContext(getClass().getClassLoader()));
+    return getLoader().declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
   }
 
   protected ConfigurationDeclaration getConfiguration(ExtensionDeclaration extensionDeclaration, final String configurationName) {
