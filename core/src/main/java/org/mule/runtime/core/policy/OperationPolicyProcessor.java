@@ -60,7 +60,7 @@ public class OperationPolicyProcessor implements Processor {
       Optional<Event> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
       Event variablesProviderEvent = latestPolicyState.orElseGet(() -> Event.builder(operationEvent.getContext()).build());
       policyStateHandler.updateState(policyStateId, variablesProviderEvent);
-      Event policyEvent = policyEventConverter.createEvent(operationEvent.getMessage(), variablesProviderEvent);
+      Event policyEvent = policyEventConverter.createEvent(operationEvent, variablesProviderEvent);
       Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent);
       policyStateHandler.updateNextOperation(policyStateId.getExecutionIndentifier(), operationCall);
       return executePolicyChain(operationEvent, policyStateId, policyEvent);
@@ -74,7 +74,7 @@ public class OperationPolicyProcessor implements Processor {
   private Event executePolicyChain(Event operationEvent, PolicyStateId policyStateId, Event policyEvent) throws MuleException {
     Event policyChainResult = policy.getPolicyChain().process(policyEvent);
     policyStateHandler.updateState(policyStateId, policyChainResult);
-    return policyEventConverter.createEvent(policyChainResult.getMessage(), operationEvent);
+    return policyEventConverter.createEvent(policyChainResult, operationEvent);
   }
 
   private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, Event operationEvent)
@@ -84,8 +84,8 @@ public class OperationPolicyProcessor implements Processor {
         PolicyStateId policyStateId = new PolicyStateId(policyExecuteNextEvent.getContext().getId(), policy.getPolicyId());
         policyStateHandler.updateState(policyStateId, policyExecuteNextEvent);
         Event operationResult =
-            nextOperation.process(policyEventConverter.createEvent(policyExecuteNextEvent.getMessage(), operationEvent));
-        return policyEventConverter.createEvent(operationResult.getMessage(), policyExecuteNextEvent);
+            nextOperation.process(policyEventConverter.createEvent(policyExecuteNextEvent, operationEvent));
+        return policyEventConverter.createEvent(operationResult, policyExecuteNextEvent);
       } catch (MuleException e) {
         throw new MuleRuntimeException(e);
       }

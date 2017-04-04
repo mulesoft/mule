@@ -7,6 +7,7 @@
 package org.mule.runtime.core.policy;
 
 import static org.mule.runtime.core.api.Event.builder;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
@@ -63,13 +64,12 @@ public class SourcePolicyProcessor implements Processor {
     String executionIdentifier = sourceEvent.getContext().getId();
     policyStateHandler.updateNextOperation(executionIdentifier, nextProcessorEvent -> {
       policyStateHandler.updateState(new PolicyStateId(executionIdentifier, policy.getPolicyId()), nextProcessorEvent);
-      Event nextProcessorResult = nextProcessor
-          .process(policyEventConverter.createEvent(nextProcessorEvent.getMessage(), sourceEvent));
-      return policyEventConverter.createEvent(nextProcessorResult.getMessage(), nextProcessorEvent);
+      Event nextProcessorResult = nextProcessor.process(policyEventConverter.createEvent(nextProcessorEvent, sourceEvent));
+      return policyEventConverter.createEvent(nextProcessorResult, nextProcessorEvent);
     });
-    Event sourcePolicyResult = policy.getPolicyChain()
-        .process(policyEventConverter.createEvent(sourceEvent.getMessage(), builder(sourceEvent.getContext()).build()));
-    return policyEventConverter.createEvent(sourcePolicyResult.getMessage(), sourceEvent);
+    Event sourcePolicyResult =
+        policy.getPolicyChain().process(policyEventConverter.createEvent(sourceEvent, builder(sourceEvent.getContext()).build()));
+    return policyEventConverter.createEvent(sourcePolicyResult, sourceEvent);
   }
 
 }

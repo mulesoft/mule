@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.policy;
 
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 
 /**
@@ -17,17 +16,19 @@ import org.mule.runtime.core.api.Event;
 public class PolicyEventConverter {
 
   /**
-   * Creates a new {@link Event} based on a message and another event which is used to get the variables
-   * and {@link org.mule.runtime.core.api.EventContext}
+   * Creates a new {@link Event} based on a message and another event which is used to get the variables and
+   * {@link org.mule.runtime.core.api.EventContext}
    *
-   * @param message message part of the event
+   * @param event provider of the message and session parts of the event
    * @param variablesProviderEvent provider of the variables part of the event
-   * @return
+   * @return the created event
    */
-  public Event createEvent(Message message, Event variablesProviderEvent) {
-    Event.Builder eventBuilder = Event.builder(variablesProviderEvent.getContext()).message(message);
+  public Event createEvent(Event event, Event variablesProviderEvent) {
+    Event.Builder eventBuilder =
+        Event.builder(variablesProviderEvent.getContext()).message(event.getMessage()).session(event.getSession());
     for (String variableName : variablesProviderEvent.getVariableNames()) {
-      eventBuilder.addVariable(variableName, variablesProviderEvent.getVariable(variableName));
+      eventBuilder.addVariable(variableName, variablesProviderEvent.getVariable(variableName).getValue(),
+                               variablesProviderEvent.getVariable(variableName).getDataType());
     }
     return eventBuilder.build();
   }
