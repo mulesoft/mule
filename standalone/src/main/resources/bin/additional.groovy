@@ -48,7 +48,7 @@ wrapperAdditionalConfFile.withWriter() {
                     break
             }
         }
-        paramIndex += getNumberOfAdditionalJavaProperties(args)
+        paramIndex++
 
         if (debugEnabled) {
             writeJpdaOpts(w)
@@ -160,23 +160,3 @@ def String getArchitecture() {
     }
 }
 
-/**
- * @param args : arguments passed to the mule.bat script
- * @return the value of -additionalJavaProperties argument command line if it was set, DEFAULT_NUMBER_OF_ADDITIONAL_JAVA_ARGUMENTS otherwise.
- */
-def int getNumberOfAdditionalJavaProperties(String[] args) {
-    int DEFAULT_NUMBER_OF_ADDITIONAL_JAVA_ARGUMENTS = 20;
-
-    // Finds the item in the list
-    def additionalJavaArguments = args.find { it ==~ /-additionalJavaProperties=(\d+)+/ }
-
-    // Gets the number of JavaArguments
-    additionalJavaArgumentsMatcher = additionalJavaArguments =~ /-additionalJavaProperties=(\d+)+/
-    additionalJavaArgumentsMatcher.find()
-
-    if (additionalJavaArgumentsMatcher.matches()){
-        return additionalJavaArgumentsMatcher[0][1].toInteger() + 1
-    }
-
-    return DEFAULT_NUMBER_OF_ADDITIONAL_JAVA_ARGUMENTS + 1
-}
