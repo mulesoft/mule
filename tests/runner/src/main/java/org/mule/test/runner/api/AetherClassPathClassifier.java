@@ -310,7 +310,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         throw new IllegalStateException("rootArtifact (" + context.getRootArtifact()
             + ") identified as MODULE but doesn't have an output");
       }
-      containerUrls.add(toUrl(rootArtifactOutputFile));
+      containerUrls.add(0, toUrl(rootArtifactOutputFile));
     }
 
     resolveSnapshotVersionsToTimestampedFromClassPath(containerUrls, context.getClassPathURLs());
