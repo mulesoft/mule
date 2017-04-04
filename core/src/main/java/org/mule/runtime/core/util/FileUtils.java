@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.util;
 
+import static java.lang.System.getProperty;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
@@ -29,6 +30,7 @@ import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
@@ -48,6 +50,10 @@ import org.slf4j.LoggerFactory;
 public class FileUtils extends org.apache.commons.io.FileUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
+  private static final String TEMP_DIR_SYSTEM_PROPERTY = "java.io.tmpdir";
+  private static final File TEMP_DIR = new File(getProperty(TEMP_DIR_SYSTEM_PROPERTY));
+  private static final AtomicLong TEMP_FILE_INDEX = new AtomicLong(-1);
+  
   public static String DEFAULT_ENCODING = "UTF-8";
 
   public static synchronized void copyStreamToFile(InputStream input, File destination) throws IOException {
@@ -295,7 +301,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
     try {
       return new File(pathName).getCanonicalFile();
     } catch (IOException e) {
-      throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Unable to create a canonical file for " + pathName),
+      throw new MuleRuntimeException(createStaticMessage("Unable to create a canonical file for " + pathName),
                                      e);
     }
   }
@@ -312,7 +318,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
     try {
       return new File(uri).getCanonicalFile();
     } catch (IOException e) {
-      throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Unable to create a canonical file for " + uri), e);
+      throw new MuleRuntimeException(createStaticMessage("Unable to create a canonical file for " + uri), e);
     }
   }
 
@@ -328,8 +334,8 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
     try {
       return new File(parent, child).getCanonicalFile();
     } catch (IOException e) {
-      throw new MuleRuntimeException(I18nMessageFactory
-          .createStaticMessage("Unable to create a canonical file for parent: " + parent + " and child: " + child), e);
+      throw new MuleRuntimeException(
+          createStaticMessage("Unable to create a canonical file for parent: " + parent + " and child: " + child), e);
     }
   }
 
@@ -345,8 +351,8 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
     try {
       return new File(parent, child).getCanonicalFile();
     } catch (IOException e) {
-      throw new MuleRuntimeException(I18nMessageFactory
-          .createStaticMessage("Unable to create a canonical file for parent: " + parent + " and child: " + child), e);
+      throw new MuleRuntimeException(
+          createStaticMessage("Unable to create a canonical file for parent: " + parent + " and child: " + child), e);
     }
   }
 
@@ -786,5 +792,25 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
     }, true);
 
     return CollectionUtils.isEmpty(files) ? null : files.iterator().next();
+  }
+
+  /**
+   * Creates a temporal file for buffering. The file is stored in the system temporal
+   * folder.
+   *
+   * @param prefix the file's prefix
+   * @param suffix the file's suffix
+   * @return a {@link File}
+   * @throws RuntimeException
+   */
+  public static File createTempFile(String prefix, String suffix) {
+    long n = TEMP_FILE_INDEX.addAndGet(1);
+
+    if (!TEMP_DIR.exists()) {
+      throw new MuleRuntimeException(createStaticMessage("Temp directory '" + TEMP_DIR.getAbsolutePath() + "' does not exist. "
+          + "Please check the value of the '" + TEMP_DIR_SYSTEM_PROPERTY
+          + "' system property."));
+    }
+    return new File(TEMP_DIR, prefix + n + suffix);
   }
 }
