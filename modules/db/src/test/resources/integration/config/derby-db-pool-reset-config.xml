@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <db:derby-config name = "pooledDbConfig" url="jdbc:derby:target/muleEmbeddedDB;create=true">
-        <db:pooling-profile maxPoolSize="1" minPoolSize="1" maxWaitMillis="1000"/>
+        <db:pooling-profile maxPoolSize="1" minPoolSize="1" />
     </db:derby-config>
 
     <flow name="main">
