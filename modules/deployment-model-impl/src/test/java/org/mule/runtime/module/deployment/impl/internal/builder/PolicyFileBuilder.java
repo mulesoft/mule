@@ -12,6 +12,7 @@ import static java.io.File.separator;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.DEFAULT_POLICY_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
+import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_ARTIFACT;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_POLICY_JSON;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
@@ -65,7 +66,8 @@ public class PolicyFileBuilder extends DeployableFileBuilder<PolicyFileBuilder> 
     final List<ZipResource> customResources = new LinkedList<>();
 
     if (mulePolicyModel != null) {
-      final File jsonDescriptorFile = new File(getTempFolder(), META_INF + separator + MULE_POLICY_JSON);
+      final File jsonDescriptorFile =
+          new File(getTempFolder(), META_INF + separator + MULE_ARTIFACT + separator + MULE_POLICY_JSON);
       jsonDescriptorFile.deleteOnExit();
 
       String jsonDescriber = new MulePolicyModelJsonSerializer().serialize(mulePolicyModel);
@@ -74,7 +76,8 @@ public class PolicyFileBuilder extends DeployableFileBuilder<PolicyFileBuilder> 
       } catch (IOException e) {
         throw new IllegalStateException("There was an issue generating the JSON file for " + this.getId(), e);
       }
-      customResources.add(new ZipResource(jsonDescriptorFile.getAbsolutePath(), META_INF + "/" + MULE_POLICY_JSON));
+      customResources
+          .add(new ZipResource(jsonDescriptorFile.getAbsolutePath(), META_INF + "/" + MULE_ARTIFACT + "/" + MULE_POLICY_JSON));
     }
     return customResources;
   }
