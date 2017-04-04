@@ -22,13 +22,14 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.message.DefaultMessageBuilder;
 import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.message.StringAttributes;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-public abstract class AbstractPolicyProcessorTestCase {
+public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCase {
 
   private static final String INIT_VAR_NAME = "initVarName";
   private static final String INIT_VAR_VALUE = "initVarValue";
@@ -39,7 +40,7 @@ public abstract class AbstractPolicyProcessorTestCase {
   private static final Message MESSAGE = new DefaultMessageBuilder().attributes(new StringAttributes()).payload(PAYLOAD).build();
 
   protected Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
-  protected Processor flowProcessor = mock(Processor.class);;
+  protected Processor flowProcessor = mock(Processor.class);
   protected PolicyStateHandler policyStateHandler;
   private ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
   private FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
