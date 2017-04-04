@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.model.internal;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -13,11 +14,6 @@ import static java.util.stream.Stream.concat;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
-import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
@@ -25,13 +21,23 @@ import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLIC
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_BYTE_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.extension.internal.dsl.syntax.DslSyntaxUtils.isFlattened;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -61,6 +67,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Implementation of {@link DslElementModelFactory} that creates a {@link DslElementModel} based on its
@@ -592,24 +599,16 @@ class ConfigurationBasedElementModelFactory {
         return;
 
       case STREAMING_STRATEGY_PARAMETER_NAME:
-        ComponentIdentifier inMemoryStream = newIdentifier(NON_REPEATABLE_BYTE_STREAM_ALIAS, paramDsl.getPrefix());
-        ComponentIdentifier repeatableMemoryStream =
-            newIdentifier(REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS, paramDsl.getPrefix());
-        ComponentIdentifier repeatableFileStream =
-            newIdentifier(REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS, paramDsl.getPrefix());
+        Set<ComponentIdentifier> streaming =
+            newHashSet(newIdentifier(NON_REPEATABLE_BYTE_STREAM_ALIAS, CORE_PREFIX),
+                       newIdentifier(REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS, CORE_PREFIX),
+                       newIdentifier(REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS, EE_PREFIX),
+                       newIdentifier(REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS, CORE_PREFIX),
+                       newIdentifier(REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS, EE_PREFIX),
+                       newIdentifier(NON_REPEATABLE_OBJECTS_STREAM_ALIAS, CORE_PREFIX));
 
-        ComponentConfiguration streaming = null;
-        if (nested.containsKey(inMemoryStream)) {
-          streaming = nested.get(inMemoryStream);
-        } else if (nested.containsKey(repeatableMemoryStream)) {
-          streaming = nested.get(repeatableMemoryStream);
-        } else if (nested.containsKey(repeatableFileStream)) {
-          streaming = nested.get(repeatableFileStream);
-        }
-
-        if (streaming != null) {
-          groupElementBuilder.containing(newElementModel(paramModel, paramDsl, streaming));
-        }
+        streaming.stream().filter(nested::containsKey).findFirst()
+            .ifPresent(s -> groupElementBuilder.containing(newElementModel(paramModel, paramDsl, nested.get(s))));
         return;
 
       case TLS_PARAMETER_NAME:
