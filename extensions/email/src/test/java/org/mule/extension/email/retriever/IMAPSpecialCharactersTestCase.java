@@ -7,24 +7,15 @@
 
 package org.mule.extension.email.retriever;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
+
 import org.mule.extension.email.EmailConnectorTestCase;
-import org.mule.extension.email.api.exception.EmailConnectionException;
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.util.TestConnectivityUtils;
 
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.mule.extension.email.api.exception.EmailError.INVALID_CREDENTIALS;
-import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
-import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
-import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 public class IMAPSpecialCharactersTestCase extends EmailConnectorTestCase {
 
@@ -59,12 +50,6 @@ public class IMAPSpecialCharactersTestCase extends EmailConnectorTestCase {
 
   @Test
   public void configSpecialCharacterCredentials() {
-    /*
-    Matcher<Exception> exceptionMatcher =
-        CoreMatchers.is(allOf(instanceOf(ConnectionException.class), hasCause(instanceOf(EmailConnectionException.class))));
-    connectivityUtils.assertFailedConnection("configSpecialCharacterCredentials", exceptionMatcher,
-                                             CoreMatchers.is(errorType(INVALID_CREDENTIALS)));
-    */
     connectivityUtils.assertSuccessConnection("configSpecialCharacterCredentials");
   }
 
