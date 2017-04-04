@@ -43,8 +43,9 @@
     <xsd:complexType name="sftpConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
-                <xsd:sequence minOccurs="0" maxOccurs="1">
-                    <xsd:element ref="file:abstract-filenameParser"/>
+                <xsd:sequence>
+                    <xsd:element ref="file:abstract-filenameParser" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="proxy-config" type="proxyConfigType" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="poolingAttributes"/>
                 <xsd:attributeGroup ref="inboundAttributes"/>
@@ -441,4 +442,39 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
+
+    <xsd:complexType name="proxyConfigType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:attribute name="host" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Proxy host name or internet address.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="port" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Proxy port number.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="username" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            User name for proxy authentication (optional).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="password" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Password for proxy authentication (optional).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 </xsd:schema>

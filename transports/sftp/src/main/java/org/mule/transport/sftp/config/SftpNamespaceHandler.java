@@ -22,6 +22,7 @@ public class SftpNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerBeanDefinitionParser("connector", new OrphanDefinitionParser(SftpConnector.class, true));
+        registerBeanDefinitionParser("proxy-config", new ChildDefinitionParser("proxyConfig", SftpProxyConfig.class));
         registerBeanDefinitionParser("expression-filename-parser", new ChildDefinitionParser(
             "filenameParser", ExpressionFilenameParser.class));
         registerStandardTransportEndpoints("sftp", URIBuilder.SOCKET_ATTRIBUTES);

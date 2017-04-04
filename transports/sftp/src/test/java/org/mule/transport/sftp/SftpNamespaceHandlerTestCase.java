@@ -35,6 +35,11 @@ public class SftpNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(1234, c.getFileAge());
         assertEquals("uploading", c.getTempDirOutbound());
         assertEquals(42, c.getMaxConnectionPoolSize());
+        assertEquals(c.getPreferredAuthenticationMethods(), "keyboard-interactive,password");
+        assertEquals(c.getProxyConfig().getHost(), "host");
+        assertEquals(c.getProxyConfig().getPort(), 8080);
+        assertEquals(c.getProxyConfig().getUsername(), "user");
+        assertEquals(c.getProxyConfig().getPassword(), "pass");
     }
 
     @Test

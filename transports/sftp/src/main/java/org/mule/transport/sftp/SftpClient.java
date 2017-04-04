@@ -14,6 +14,7 @@ import static org.mule.transport.sftp.notification.SftpTransportNotification.SFT
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.OutputHandler;
+import org.mule.transport.sftp.config.SftpProxyConfig;
 import org.mule.transport.sftp.notification.SftpNotifier;
 import org.mule.util.StringUtils;
 
@@ -22,6 +23,7 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.ProxyHTTP;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
@@ -79,6 +81,8 @@ public class SftpClient
     private String preferredAuthenticationMethods;
 
     private int connectionTimeoutMillis = 0; // No timeout by default
+
+    private SftpProxyConfig proxyConfig;
 
     public SftpClient(String host)
     {
@@ -148,6 +152,7 @@ public class SftpClient
             session.setPort(port);
             session.setPassword(password);
             session.setTimeout(connectionTimeoutMillis);
+            configureProxy(session);
             session.connect();
 
             Channel channel = session.openChannel(CHANNEL_SFTP);
@@ -196,6 +201,7 @@ public class SftpClient
             session.setConfig(hash);
             session.setPort(port);
             session.setTimeout(connectionTimeoutMillis);
+            configureProxy(session);
             session.connect();
 
             Channel channel = session.openChannel(CHANNEL_SFTP);
@@ -211,6 +217,19 @@ public class SftpClient
         catch (SftpException e)
         {
             logAndThrowLoginError(user, e);
+        }
+    }
+
+    private void configureProxy(Session session)
+    {
+        if (proxyConfig != null)
+        {
+            ProxyHTTP proxy = new ProxyHTTP(proxyConfig.getHost(), proxyConfig.getPort());
+            if (proxyConfig.getUsername() != null)
+            {
+                proxy.setUserPasswd(proxyConfig.getUsername(), proxyConfig.getPassword());
+            }
+            session.setProxy(proxy);
         }
     }
 
@@ -775,6 +794,11 @@ public class SftpClient
     public void setPreferredAuthenticationMethods(String preferredAuthenticationMethods)
     {
         this.preferredAuthenticationMethods = preferredAuthenticationMethods;
+    }
+
+    public void setProxyConfig(SftpProxyConfig proxyConfig)
+    {
+        this.proxyConfig = proxyConfig;
     }
 
     public enum WriteMode
