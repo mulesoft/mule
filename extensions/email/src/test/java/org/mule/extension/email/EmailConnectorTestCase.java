@@ -39,12 +39,23 @@ public abstract class EmailConnectorTestCase extends MuleArtifactFunctionalTestC
   protected GreenMail server;
   protected GreenMailUser user;
 
+  private String username = JUANI_EMAIL;
+  private String password = "password";
+
+  public EmailConnectorTestCase() {}
+
+  public EmailConnectorTestCase(String username, String password) {
+    super();
+    this.username = username;
+    this.password = password;
+  }
+
   @Override
   protected void doSetUpBeforeMuleContextCreation() throws Exception {
     ServerSetup serverSetup = setUpServer(PORT.getNumber(), getProtocol());
     server = new GreenMail(serverSetup);
     server.start();
-    user = server.setUser(JUANI_EMAIL, JUANI_EMAIL, "password");
+    user = server.setUser(username, username, password);
   }
 
   @Override
