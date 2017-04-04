@@ -7,7 +7,7 @@
 
     <db:config name="pooledDbConfig">
         <db:derby-connection database="target/muleEmbeddedDB" create="true">
-            <db:pooling-profile maxPoolSize="1" minPoolSize="1" maxWait="1" maxWaitUnit="SECONDS"/>
+            <db:pooling-profile maxPoolSize="1" minPoolSize="1" />
         </db:derby-connection>
     </db:config>
 
