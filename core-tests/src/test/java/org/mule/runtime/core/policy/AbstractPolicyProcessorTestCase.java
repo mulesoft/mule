@@ -20,7 +20,6 @@ import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.message.DefaultMessageBuilder;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.message.StringAttributes;
@@ -37,7 +36,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   private static final String ADDED_VAR_VALUE = "addedVarValue";
   private static final String PAYLOAD = "payload";
 
-  private static final Message MESSAGE = new DefaultMessageBuilder().attributes(new StringAttributes()).payload(PAYLOAD).build();
+  private static final Message MESSAGE = Message.builder().payload(PAYLOAD).attributes(new StringAttributes()).build();
 
   protected Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
   protected Processor flowProcessor = mock(Processor.class);
