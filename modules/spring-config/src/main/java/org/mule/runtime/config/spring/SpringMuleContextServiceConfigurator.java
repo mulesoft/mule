@@ -50,7 +50,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+import org.mule.runtime.api.artifact.ArtifactProperties;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.service.Service;
@@ -221,12 +223,16 @@ class SpringMuleContextServiceConfigurator {
       .build();
 
   private final SpringConfigurationComponentLocator componentLocator;
+  private final ArtifactProperties artifactProperties;
 
-  public SpringMuleContextServiceConfigurator(MuleContext muleContext, ArtifactType artifactType,
+  public SpringMuleContextServiceConfigurator(MuleContext muleContext,
+                                              ArtifactProperties artifactProperties,
+                                              ArtifactType artifactType,
                                               OptionalObjectsController optionalObjectsController,
                                               BeanDefinitionRegistry beanDefinitionRegistry,
                                               SpringConfigurationComponentLocator componentLocator) {
     this.muleContext = muleContext;
+    this.artifactProperties = artifactProperties;
     this.customServiceRegistry = (CustomServiceRegistry) muleContext.getCustomizationService();
     this.artifactType = artifactType;
     this.optionalObjectsController = optionalObjectsController;
@@ -235,6 +241,7 @@ class SpringMuleContextServiceConfigurator {
   }
 
   void createArtifactServices() {
+    registerBeanDefinition(DEFAULT_ARTIFACT_PROPERTIES_RESOURCE, getConstantObjectBeanDefinition(artifactProperties));
     registerBeanDefinition(OBJECT_CONFIGURATION_COMPONENT_LOCATOR, getConstantObjectBeanDefinition(componentLocator));
     loadServiceConfigurators();
 
