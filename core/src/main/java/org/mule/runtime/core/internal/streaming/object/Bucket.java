@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * An indexed group of items.
+ * A zero-based indexed group of items.
  * <p>
  * Buckets have a fixed capacity. Once reached, the bucket will accept no more items
  *
@@ -30,7 +30,7 @@ public class Bucket<T> {
   /**
    * Creates a new instance
    *
-   * @param index    the bucket's instance
+   * @param index    the bucket's index.
    * @param capacity the bucket's capacity.
    */
   public Bucket(int index, int capacity) {
@@ -40,7 +40,9 @@ public class Bucket<T> {
   }
 
   /**
-   * Obtains the value at the given index, if present
+   * Obtains the value that was added at the given {@code index} through the {@link #add(Object)} method.
+   * If no such value was added, it will return an empty value.
+   *
    * @param index the item's index
    * @return an {@link Optional} value
    */
@@ -68,7 +70,8 @@ public class Bucket<T> {
 
   /**
    * Adds the given {@code item} if the bucket still has capacity.
-   * @param item an item
+   *
+   * @param item the item to be added
    * @return whether the item was accepted or not
    */
   public boolean add(T item) {
