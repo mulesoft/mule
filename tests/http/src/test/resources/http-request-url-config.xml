@@ -6,10 +6,6 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-
-    <!--TODO: MULE-11762 - This should not be required but otherwise the wrong implicit config will be created. -->
-    <httpn:request-config name="zaraza"/>
-
     <flow name="simpleRequest">
         <httpn:request url="http://localhost:${httpPort}/test/test" method="POST">
             <httpn:headers>

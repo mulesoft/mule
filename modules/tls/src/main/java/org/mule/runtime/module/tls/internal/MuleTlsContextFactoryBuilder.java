@@ -6,44 +6,16 @@
  */
 package org.mule.runtime.module.tls.internal;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
-@DefaultTlsContextFactoryBuilder
-public class MuleTlsContextFactoryBuilder implements TlsContextFactoryBuilder, Initialisable, MuleContextAware {
+public class MuleTlsContextFactoryBuilder implements TlsContextFactoryBuilder {
 
   private TlsContextFactory defaultTlsContextFactory;
-  private MuleContext muleContext;
-  private final AtomicBoolean initialised = new AtomicBoolean(false);
 
-  /**
-   * Creates a default {@link TlsContextFactory} and registers it under key
-   * {@link MuleProperties#DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY}
-   *
-   * @throws InitialisationException if the {@link #defaultTlsContextFactory} could not be created or registered
-   */
-  @Override
-  public void initialise() throws InitialisationException {
-    if (!initialised.compareAndSet(false, true)) {
-      return;
-    }
-
-    try {
-      defaultTlsContextFactory = new DefaultTlsContextFactory();
-      muleContext.getRegistry().registerObject(MuleProperties.DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY, defaultTlsContextFactory);
-    } catch (Exception e) {
-      throw new InitialisationException(createStaticMessage("Failed to create default "
-          + TlsContextFactory.class.getSimpleName()), e, this);
-    }
+  public MuleTlsContextFactoryBuilder(TlsContextFactory defaultTlsContextFactory) {
+    this.defaultTlsContextFactory = defaultTlsContextFactory;
+    System.out.println("TLS CONTEXT is: " + defaultTlsContextFactory.toString());
   }
 
   /**
@@ -54,8 +26,4 @@ public class MuleTlsContextFactoryBuilder implements TlsContextFactoryBuilder, I
     return defaultTlsContextFactory;
   }
 
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
-  }
 }

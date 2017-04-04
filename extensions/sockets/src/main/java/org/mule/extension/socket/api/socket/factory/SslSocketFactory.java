@@ -25,7 +25,7 @@ public class SslSocketFactory implements SimpleSocketFactory {
   private final SSLSocketFactory sslSocketFactory;
 
   public SslSocketFactory(TlsContextFactory tlsContextFactory) throws NoSuchAlgorithmException, KeyManagementException {
-    sslSocketFactory = tlsContextFactory.createSslContext().getSocketFactory();
+    sslSocketFactory = tlsContextFactory.getSocketFactory();
   }
 
   /**

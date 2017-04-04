@@ -18,7 +18,6 @@ import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CON
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
-
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
@@ -43,7 +42,6 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.service.http.api.HttpConstants;
-import org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
 import org.mule.service.http.api.client.proxy.ProxyConfig;
@@ -104,11 +102,9 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   private HttpAuthentication authentication;
 
   @Inject
-  @DefaultTlsContextFactoryBuilder
-  private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
-
-  @Inject
   private HttpRequesterConnectionManager connectionManager;
+
+  private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder = TlsContextFactory.builder();
 
   @Override
   public ConnectionValidationResult validate(HttpExtensionClient httpClient) {
