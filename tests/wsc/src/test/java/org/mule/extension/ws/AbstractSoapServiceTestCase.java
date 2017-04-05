@@ -20,7 +20,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.services.soap.api.SoapVersion;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
@@ -39,9 +38,6 @@ import org.junit.Rule;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-@ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets", "org.mule.modules:mule-module-http-ext",
-    "org.mule.modules:mule-module-wsc"},
-    providedInclusions = {"org.mule.modules:mule-module-sockets"})
 public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctionalTestCase {
 
   @Rule

@@ -77,7 +77,7 @@
             <artifactId>mule-module-file-extension-common</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -124,28 +124,28 @@
             <artifactId>mule-module-file</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-ftp</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-http-ext</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-sockets</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <!-- Test dependencies -->
         <dependency>

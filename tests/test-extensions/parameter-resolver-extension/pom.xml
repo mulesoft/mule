@@ -27,7 +27,6 @@
             <artifactId>mule-heisenberg-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

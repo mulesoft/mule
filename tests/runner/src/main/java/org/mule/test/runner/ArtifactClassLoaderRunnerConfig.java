@@ -39,42 +39,11 @@ public @interface ArtifactClassLoaderRunnerConfig {
    * Maven artifacts to be excluded from the {@code provided} scope direct dependencies of the rootArtifact. In format
    * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * <p/>
-   * {@link #plugins()} Maven artifacts if declared will be considered to be excluded from being added as {@code provided} due to
-   * they are going to be added to its class loaders.
    *
    * @return Maven artifacts to be excluded {@code provided} scope direct dependencies of the rootArtifact. In format
    *         {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    */
   String[] providedExclusions() default {};
-
-  /**
-   * Maven artifacts to be included from the {@code provided} scope direct dependencies of the rootArtifact. In format
-   * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
-   * <p/>
-   * This artifacts have to be declared as {@code provided} scope in rootArtifact direct dependencies and no matter if they were
-   * excluded or not from {@link #providedExclusions()} and {@link #plugins()}. Meaning that the same artifact could ended up
-   * being added to the container class loader and as plugin.
-   *
-   * @return Maven artifacts to be explicitly included from the {@code provided} scope direct dependencies of the rootArtifact. In
-   *         format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
-   */
-  String[] providedInclusions() default {};
-
-  /**
-   * Plugins in the format of {@code <groupId>:<artifactId>} to be loaded and registered to Mule Container during the
-   * execution of the test. {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} will be created for each
-   * plugin.
-   * <p/>
-   * If the current artifact being tested is a plugin it would not need to be declared here the groupId and artifactId, its
-   * {@code /target/classes/} folder and Maven {@code compile} dependencies will be used to build the
-   * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}.
-   * <p/>
-   * Otherwise any plugin artifact declared on this list should be declared as Maven dependency with scope {@code provided}, the
-   * version of the plugin to be resolved will be the one defined in the Maven dependency.
-   *
-   * @return array of {@link String} to define plugins in order to create for each a plugin {@link ClassLoader}
-   */
-  String[] plugins() default {};
 
   /**
    * Runtime libraries in the format of {@code <groupId>:<artifactId>} to be added as shared libraries to

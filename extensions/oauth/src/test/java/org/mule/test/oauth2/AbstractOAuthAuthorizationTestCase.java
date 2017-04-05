@@ -37,21 +37,20 @@ import static org.mule.services.oauth.internal.OAuthConstants.GRANT_TYPE_PARAMET
 import static org.mule.services.oauth.internal.OAuthConstants.REDIRECT_URI_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.SCOPE_PARAMETER;
-import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.google.common.collect.ImmutableMap;
-import org.junit.Before;
-import org.junit.Rule;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
+
+import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.google.common.collect.ImmutableMap;
 
 import java.io.UnsupportedEncodingException;
 
-@ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets", "org.mule.modules:mule-module-http-ext"},
-    providedInclusions = "org.mule.modules:mule-module-sockets")
+import org.junit.Before;
+import org.junit.Rule;
+
 public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFunctionalTestCase {
 
   public static final int REQUEST_TIMEOUT = 5000;

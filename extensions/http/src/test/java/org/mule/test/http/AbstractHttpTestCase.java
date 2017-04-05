@@ -11,10 +11,7 @@ import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
-@ArtifactClassLoaderRunnerConfig(
-    plugins = {"org.mule.modules:mule-module-sockets"},
-    providedInclusions = "org.mule.modules:mule-module-sockets",
-    exportPluginClasses = {HttpRequesterProvider.class})
+@ArtifactClassLoaderRunnerConfig(exportPluginClasses = {HttpRequesterProvider.class})
 public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCase {
 
 }

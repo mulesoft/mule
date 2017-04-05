@@ -60,25 +60,26 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-jms</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
             <classifier>mule-plugin</classifier>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-wsc</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
             <classifier>mule-plugin</classifier>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-db</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
             <classifier>mule-plugin</classifier>
+            <scope>test</scope>
         </dependency>
+
         <!-- DB Drivers -->
         <dependency>
             <groupId>org.apache.derby</groupId>
@@ -104,15 +105,15 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-http-ext</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
             <classifier>mule-plugin</classifier>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-sockets</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
             <classifier>mule-plugin</classifier>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>

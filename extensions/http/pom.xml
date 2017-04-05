@@ -44,8 +44,8 @@
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-http</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
             <classifier>mule-service</classifier>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -53,7 +53,6 @@
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
         </dependency>
-
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>

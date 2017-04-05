@@ -15,13 +15,6 @@
     </description>
 
     <dependencies>
-        <!-- TODO(gfernandes) MULE-10509 migrate http to depend on sockets extension -->
-        <!--<dependency>-->
-            <!--<groupId>org.mule.runtime</groupId>-->
-            <!--<artifactId>mule-module-sockets</artifactId>-->
-            <!--<classifier>mule-plugin</classifier>-->
-            <!--<version>${project.version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-builders</artifactId>

@@ -8,8 +8,7 @@ package org.mule.test.module.spring.security;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.functional.extensions.UsesHttpExtensionFunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.module.spring.security.SpringProviderAdapter;
@@ -18,7 +17,7 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-public class SpringSecurityNamespaceHandlerTestCase extends UsesHttpExtensionFunctionalTestCase {
+public class SpringSecurityNamespaceHandlerTestCase extends MuleArtifactFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

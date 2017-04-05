@@ -28,20 +28,15 @@ public class RunnerConfiguration {
   private static final String TEST_EXCLUSIONS = "testExclusions";
   private static final String TEST_INCLUSIONS = "testInclusions";
   private static final String EXPORT_PLUGIN_CLASSES = "exportPluginClasses";
-  private static final String PLUGINS = "plugins";
   private static final String SHARED_RUNTIME_LIBS = "sharedRuntimeLibs";
 
-  private static final String CONFIG_FROM = "configFrom";
-
-  private String loadedFromTestClass;
-
   private List<String> providedExclusions;
-  private List<String> providedInclusions;
   private List<String> testExclusions;
   private List<String> testInclusions;
   private List<Class> exportPluginClasses;
-  private List<String> plugins;
   private List<String> sharedRuntimeLibs;
+
+  private String loadedFromTestClass;
 
   private RunnerConfiguration(Class loadedFromTestClass) {
     this.loadedFromTestClass = loadedFromTestClass.getName();
@@ -51,16 +46,8 @@ public class RunnerConfiguration {
     return exportPluginClasses;
   }
 
-  public List<String> getPlugins() {
-    return plugins;
-  }
-
   public List<String> getProvidedExclusions() {
     return providedExclusions;
-  }
-
-  public List<String> getProvidedInclusions() {
-    return providedInclusions;
   }
 
   public List<String> getSharedRuntimeLibs() {
@@ -86,13 +73,11 @@ public class RunnerConfiguration {
     Class testClass = klass;
 
     runnerConfiguration.providedExclusions = readAttribute(PROVIDED_EXCLUSIONS, testClass);
-    runnerConfiguration.providedInclusions = readAttribute(PROVIDED_INCLUSIONS, testClass);
     runnerConfiguration.testExclusions = readAttribute(TEST_EXCLUSIONS, testClass);
     runnerConfiguration.testInclusions = readAttribute(TEST_INCLUSIONS, testClass);
 
     runnerConfiguration.exportPluginClasses = readAttribute(EXPORT_PLUGIN_CLASSES, testClass);
 
-    runnerConfiguration.plugins = readAttribute(PLUGINS, testClass);
     runnerConfiguration.sharedRuntimeLibs = readAttribute(SHARED_RUNTIME_LIBS, testClass);
 
     return runnerConfiguration;
@@ -127,9 +112,6 @@ public class RunnerConfiguration {
     if (!providedExclusions.equals(that.providedExclusions)) {
       return false;
     }
-    if (!providedInclusions.equals(that.providedInclusions)) {
-      return false;
-    }
     if (!testExclusions.equals(that.testExclusions)) {
       return false;
     }
@@ -139,20 +121,15 @@ public class RunnerConfiguration {
     if (!exportPluginClasses.equals(that.exportPluginClasses)) {
       return false;
     }
-    if (!plugins.equals(that.plugins)) {
-      return false;
-    }
     return sharedRuntimeLibs.equals(that.sharedRuntimeLibs);
   }
 
   @Override
   public int hashCode() {
     int result = providedExclusions.hashCode();
-    result = 31 * result + providedInclusions.hashCode();
     result = 31 * result + testExclusions.hashCode();
     result = 31 * result + testInclusions.hashCode();
     result = 31 * result + exportPluginClasses.hashCode();
-    result = 31 * result + plugins.hashCode();
     result = 31 * result + sharedRuntimeLibs.hashCode();
     return result;
   }

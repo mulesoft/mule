@@ -17,7 +17,6 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,13 +31,6 @@ import java.util.Set;
  *
  * @since 4.0
  */
-@ArtifactClassLoaderRunnerConfig(
-    plugins = {"org.mule.modules:mule-module-http-ext",
-        "org.mule.modules:mule-module-sockets",
-        "org.mule.modules:mule-module-file",
-        "org.mule.modules:mule-module-file-extension-common",
-        "org.mule.modules:mule-module-jms"},
-    providedInclusions = "org.mule.modules:mule-module-sockets")
 public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 
   /**

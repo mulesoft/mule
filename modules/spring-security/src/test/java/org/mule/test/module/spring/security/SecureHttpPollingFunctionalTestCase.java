@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.functional.extensions.UsesHttpExtensionFunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
@@ -24,7 +24,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class SecureHttpPollingFunctionalTestCase extends UsesHttpExtensionFunctionalTestCase {
+public class SecureHttpPollingFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");

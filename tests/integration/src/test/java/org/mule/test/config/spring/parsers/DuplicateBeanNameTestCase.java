@@ -6,11 +6,9 @@
  */
 package org.mule.test.config.spring.parsers;
 
-import org.mule.test.IntegrationTestCaseRunnerConfig;
-
 import org.junit.Test;
 
-public class DuplicateBeanNameTestCase extends AbstractBadConfigTestCase implements IntegrationTestCaseRunnerConfig {
+public class DuplicateBeanNameTestCase extends AbstractBadConfigTestCase {
 
   @Override
   protected String getConfigFile() {

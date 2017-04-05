@@ -16,8 +16,7 @@ import static org.mule.service.http.api.HttpConstants.HttpStatus.FORBIDDEN;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.service.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
-
-import org.mule.functional.extensions.UsesHttpExtensionFunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -28,7 +27,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class AuthorizationFilterTestCase extends UsesHttpExtensionFunctionalTestCase {
+public class AuthorizationFilterTestCase extends MuleArtifactFunctionalTestCase {
 
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");
