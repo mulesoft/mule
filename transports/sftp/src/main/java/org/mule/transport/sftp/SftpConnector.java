@@ -21,6 +21,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.file.ExpressionFilenameParser;
 import org.mule.transport.file.FilenameParser;
+import org.mule.transport.sftp.config.SftpProxyConfig;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
 import java.util.HashMap;
@@ -103,6 +104,7 @@ public class SftpConnector extends AbstractConnector
     private String archiveTempReceivingDir = "";
     private String archiveTempSendingDir = "";
     private String preferredAuthenticationMethods;
+    private SftpProxyConfig proxyConfig;
 
     /**
      * Should the file be kept if an error occurs when writing the file on the
@@ -192,7 +194,10 @@ public class SftpConnector extends AbstractConnector
             }
             else
             {
-                client = SftpConnectionFactory.createClient(endpoint, preferredAuthenticationMethods);
+                SftpConnectionFactory factory = new SftpConnectionFactory(endpoint);
+                factory.setPreferredAuthenticationMethods(preferredAuthenticationMethods);
+                factory.setProxyConfig(proxyConfig);
+                client = factory.createClient();
             }
 
             // We have to set the working directory before returning
@@ -299,6 +304,7 @@ public class SftpConnector extends AbstractConnector
                     }
                     SftpConnectionFactory factory = new SftpConnectionFactory(endpoint);
                     factory.setPreferredAuthenticationMethods(preferredAuthenticationMethods);
+                    factory.setProxyConfig(proxyConfig);
                     pool = new GenericObjectPool(factory, getMaxConnectionPoolSize());
                     pool.setTestOnBorrow(isValidateConnections());
                     pools.put(endpoint.getEndpointURI(), pool);
@@ -621,6 +627,15 @@ public class SftpConnector extends AbstractConnector
         this.preferredAuthenticationMethods = preferredAuthenticationMethods;
     }
 
+    public SftpProxyConfig getProxyConfig()
+    {
+        return proxyConfig;
+    }
+
+    public void setProxyConfig(SftpProxyConfig proxyConfig)
+    {
+        this.proxyConfig = proxyConfig;
+    }
 
     //Since SFTP does not have any connection at the connector level and
     //since we need to fix SFTP connection at the inbound level we just let
