@@ -165,26 +165,44 @@ public final class IntrospectionUtils {
       }
     }
 
-    if (Collection.class.isAssignableFrom(returnType.getRawClass())) {
+    if (isPagingProvider(returnType)) {
+      ResolvableType itemType = returnType.getGenerics()[1];
+      if (Result.class.equals(itemType.getRawClass())) {
+        return returnListOfMessagesType(returnType, typeLoader, itemType);
+      } else {
+        return typeBuilder().arrayType().id(returnType.getRawClass().getName()).of(typeLoader.load(itemType.getType())).build();
+      }
+    }
+
+    if (isCollection(returnType)) {
       ResolvableType itemType = returnType.getGenerics()[0];
       if (Result.class.equals(itemType.getRawClass())) {
-        ResolvableType genericType = itemType.getGenerics()[0];
-        MetadataType outputType = genericType.getRawClass() != null
-            ? typeLoader.load(genericType.getType())
-            : typeBuilder().anyType().build();
-
-        genericType = itemType.getGenerics()[1];
-        MetadataType attributesType = genericType.getRawClass() != null
-            ? typeLoader.load(genericType.getType())
-            : typeBuilder().voidType().build();
-
-        return typeBuilder().arrayType().id(returnType.getRawClass().getName())
-            .of(new MessageMetadataTypeBuilder().payload(outputType).attributes(attributesType).build())
-            .build();
+        return returnListOfMessagesType(returnType, typeLoader, itemType);
       }
     }
 
     return type != null ? typeLoader.load(type) : typeBuilder().anyType().build();
+  }
+
+  private static MetadataType returnListOfMessagesType(ResolvableType returnType, ClassTypeLoader typeLoader,
+                                                       ResolvableType itemType) {
+    ResolvableType genericType = itemType.getGenerics()[0];
+    MetadataType outputType = genericType.getRawClass() != null
+        ? typeLoader.load(genericType.getType())
+        : typeBuilder().anyType().build();
+
+    genericType = itemType.getGenerics()[1];
+    MetadataType attributesType = genericType.getRawClass() != null
+        ? typeLoader.load(genericType.getType())
+        : typeBuilder().voidType().build();
+
+    return typeBuilder().arrayType().id(returnType.getRawClass().getName())
+        .of(new MessageMetadataTypeBuilder().payload(outputType).attributes(attributesType).build())
+        .build();
+  }
+
+  private static boolean isCollection(ResolvableType type) {
+    return Collection.class.isAssignableFrom(type.getRawClass());
   }
 
   /**
@@ -194,7 +212,7 @@ public final class IntrospectionUtils {
    * If the {@code method} returns a {@link Result}, then it returns the type of the {@code Attributes} generic. In any other case
    * (including raw uses of {@link Result}) it will return a {@link VoidType}
    * <p>
-   * If the {@code method} returns a collection of {@link Result}, then this will return {@link VoidType} since the messages in the
+   * If the {@code method} returns a collection or a {@link PagingProvider} of {@link Result}, then this will return {@link VoidType} since the messages in the
    * main output already contain an attributes for each item.
    *
    * @param method     the {@link Method} being introspected
@@ -213,7 +231,14 @@ public final class IntrospectionUtils {
       }
     }
 
-    if (Collection.class.isAssignableFrom(outputType.getRawClass())) {
+    if (isPagingProvider(outputType)) {
+      ResolvableType itemType = outputType.getGenerics()[1];
+      if (Result.class.equals(itemType.getRawClass())) {
+        type = null;
+      }
+    }
+
+    if (isCollection(outputType)) {
       ResolvableType itemType = outputType.getGenerics()[0];
       if (Result.class.equals(itemType.getRawClass())) {
         type = null;
@@ -237,8 +262,6 @@ public final class IntrospectionUtils {
     ResolvableType methodType = getMethodResolvableType(method);
     if (isInterceptingCallback(methodType)) {
       methodType = unwrapGenericFromClass(InterceptingCallback.class, methodType, 0);
-    } else if (isPagingProvider(methodType)) {
-      methodType = unwrapGenericFromClass(PagingProvider.class, methodType, 1);
     }
 
     return methodType;

@@ -20,6 +20,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.unwrapGenericFromClass;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.springframework.core.ResolvableType.forType;
@@ -27,6 +28,7 @@ import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.core.util.CollectionUtils;
@@ -79,13 +81,14 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getPagingProviderReturnType() throws Exception {
-    assertReturnType(PAGING_PROVIDER);
+    assertPagingProviderReturnType(PAGING_PROVIDER);
+    assertVoidAttributesType(PAGING_PROVIDER);
   }
 
   @Test
   public void getPagingProviderOperationResultReturnType() throws Exception {
-    assertReturnType(PAGING_PROVIDER_OPERATION_RESULT);
-    assertAttributesType(PAGING_PROVIDER_OPERATION_RESULT);
+    assertPagingProviderReturnResultType((PAGING_PROVIDER_OPERATION_RESULT));
+    assertVoidAttributesType(PAGING_PROVIDER_OPERATION_RESULT);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -246,10 +249,31 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     assertType(attributesType, Attributes.class);
   }
 
+  private void assertVoidAttributesType(String method) throws Exception {
+    MetadataType attributesType = IntrospectionUtils.getMethodReturnAttributesType(getMethod(method), TYPE_LOADER);
+    assertThat(attributesType, is(instanceOf(VoidType.class)));
+
+  }
+
   private void assertReturnType(String method) throws Exception {
     MetadataType returnType = IntrospectionUtils.getMethodReturnType(getMethod(method), TYPE_LOADER);
     assertThat(returnType, is(instanceOf(StringType.class)));
     assertType(returnType, String.class);
+  }
+
+  private void assertPagingProviderReturnType(String method) throws Exception {
+    MetadataType returnType = IntrospectionUtils.getMethodReturnType(getMethod(method), TYPE_LOADER);
+
+    assertThat(returnType, is(instanceOf(ArrayType.class)));
+    assertThat(((ArrayType) returnType).getType(), is(instanceOf(StringType.class)));
+    assertType(((ArrayType) returnType).getType(), String.class);
+  }
+
+  private void assertPagingProviderReturnResultType(String method) throws Exception {
+    MetadataType returnType = IntrospectionUtils.getMethodReturnType(getMethod(method), TYPE_LOADER);
+
+    assertThat(returnType, is(instanceOf(ArrayType.class)));
+    assertMessageType(((ArrayType) returnType).getType(), is(instanceOf(StringType.class)), is(instanceOf(ObjectType.class)));
   }
 
   private class InterceptingCallbackWithParent extends TestInterceptingCallback {
@@ -264,7 +288,6 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
       return new Banana();
     }
   }
-
 
   private class TestPagingProvider extends InterceptingCallbackWithParent implements PagingProvider<Object, Banana> {
 

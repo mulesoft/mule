@@ -10,6 +10,7 @@ import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollection;
+import static org.mule.runtime.core.util.message.MessageUtils.toMessageIterator;
 import static org.mule.runtime.core.util.message.MessageUtils.valueOrStreamProvider;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
@@ -28,6 +29,7 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Optional;
 
 /**
@@ -73,6 +75,8 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     } else {
       if (value instanceof Collection && returnsListOfMessages) {
         value = toMessageCollection((Collection<Result>) value, mediaType, cursorProviderFactory, event);
+      } else if (value instanceof Iterator && returnsListOfMessages) {
+        value = toMessageIterator((Iterator<Result>) value, mediaType, cursorProviderFactory, event);
       }
       return Message.builder()
           .payload(valueOrStreamProvider(value, cursorProviderFactory, event).getValue().orElse(null))

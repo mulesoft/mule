@@ -7,67 +7,27 @@
 
 package org.mule.runtime.core.internal.streaming.object.iterator;
 
-
 import org.mule.runtime.api.streaming.Sized;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * Implementation of {@link Iterator} that takes its elements from a {@link Consumer}.
- * <p>
- * This iterator also implements {@link Closeable}. Closing this iterator will cause the underlying consumer to be closed. If for
- * any reason the underlying consumer gets closed (either because this iterator closed it or some other reason), then this
- * iterator will consider that it has no more items.
- * <p>
- * The {@link Iterator#remove()} operation is not allowed on this instance
+ * {@link Iterator} that also extends {@link Closeable} and {@link Sized}.
  *
- * @since 3.5.0
+ * The {@link Iterator#remove()} operation is not allowed for this iterator.
+ * 
+ * @param <T> the type of elements returned by this iterator
  */
-public class StreamingIterator<T> implements Iterator<T>, Closeable, Sized {
-
-  private Consumer<T> consumer;
-
-  public StreamingIterator(Consumer<T> consumer) {
-    this.consumer = consumer;
-  }
-
-  /**
-   * Closes the underlying consumer
-   */
-  @Override
-  public void close() throws IOException {
-    this.consumer.close();
-  }
-
-  /**
-   * Returns true as long as the underlying consumer is not fully consumed nor closed
-   */
-  @Override
-  public boolean hasNext() {
-    return !this.consumer.isConsumed();
-  }
-
-  /**
-   * Gets an item from the consumer and returns it
-   */
-  @Override
-  public T next() {
-    return this.consumer.consume();
-  }
+public interface StreamingIterator<T> extends Iterator<T>, Closeable, Sized {
 
   /**
    * Not allowed on this implementations
    *
    * @throws UnsupportedOperationException
    */
-  public void remove() {
+  @Override
+  default void remove() {
     throw new UnsupportedOperationException();
   }
-
-  public int size() {
-    return this.consumer.size();
-  }
-
 }

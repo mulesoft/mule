@@ -36,7 +36,6 @@ import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.List;
@@ -83,7 +82,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   public void retrieveNothing() throws Exception {
     server.purgeEmailFromAllMailboxes();
     assertThat(server.getReceivedMessages(), arrayWithSize(0));
-    CursorIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
+    CursorIterator<Message> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
     assertThat(paginationSize(messages), is(0));
   }
 
@@ -95,7 +94,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
       user.deliver(mimeMessage);
     }
 
-    CursorIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
+    CursorIterator<Message> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
     assertThat(server.getReceivedMessages(), arrayWithSize(pageSize * 2));
     assertThat(paginationSize(messages), is(pageSize));
   }
@@ -114,16 +113,16 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   public void retrieveEmailWithAttachments() throws Exception {
     server.purgeEmailFromAllMailboxes();
     user.deliver(getMultipartTestMessage());
-    CursorIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
+    CursorIterator<Message> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
 
-    Result message = messages.next();
+    Message message = messages.next();
     assertThat(messages.hasNext(), is(false));
-    assertThat(message.getOutput(), instanceOf(MultiPartPayload.class));
-    List<Message> emailAttachments = ((MultiPartPayload) message.getOutput()).getParts();
+    assertThat(message.getPayload().getValue(), instanceOf(MultiPartPayload.class));
+    List<Message> emailAttachments = ((MultiPartPayload) message.getPayload().getValue()).getParts();
 
     assertThat(emailAttachments, hasSize(3));
-    assertThat(((DefaultMultiPartPayload) message.getOutput()).hasBodyPart(), is(true));
-    assertThat(((MultiPartPayload) message.getOutput()).getPartNames(),
+    assertThat(((DefaultMultiPartPayload) message.getPayload().getValue()).hasBodyPart(), is(true));
+    assertThat(((MultiPartPayload) message.getPayload().getValue()).getPartNames(),
                hasItems(EMAIL_JSON_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME));
     assertAttachmentContent(emailAttachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT.getBytes());
     assertAttachmentContent(emailAttachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT.getBytes());
@@ -132,7 +131,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   @Test
   public void retrieveAndDelete() throws Exception {
     assertThat(server.getReceivedMessages(), arrayWithSize(pageSize));
-    CursorIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_AND_DELETE);
+    CursorIterator<Message> messages = runFlowAndGetMessages(RETRIEVE_AND_DELETE);
     assertThat(paginationSize(messages), is(pageSize));
     assertThat(server.getReceivedMessages(), arrayWithSize(0));
   }
@@ -142,15 +141,15 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
     sendNonMatchingEmails(pageSize);
     sendEmails(pageSize);
 
-    CursorIterator<Result> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
+    CursorIterator<Message> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
     assertThat(server.getReceivedMessages(), arrayWithSize(pageSize * 3));
     assertThat(paginationSize(messages), is(pageSize * 2));
   }
 
-  protected CursorIterator<Result> runFlowAndGetMessages(String flowName) throws Exception {
+  protected CursorIterator<Message> runFlowAndGetMessages(String flowName) throws Exception {
     CursorIteratorProvider provider =
         (CursorIteratorProvider) flowRunner(flowName).keepStreamsOpen().run().getMessage().getPayload().getValue();
-    return (CursorIterator<Result>) provider.openCursor();
+    return (CursorIterator<Message>) provider.openCursor();
   }
 
   protected int paginationSize(CursorIterator<?> iterator) {
