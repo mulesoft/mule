@@ -15,7 +15,6 @@ public class MuleTlsContextFactoryBuilder implements TlsContextFactoryBuilder {
 
   public MuleTlsContextFactoryBuilder(TlsContextFactory defaultTlsContextFactory) {
     this.defaultTlsContextFactory = defaultTlsContextFactory;
-    System.out.println("TLS CONTEXT is: " + defaultTlsContextFactory.toString());
   }
 
   /**

@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.tls.internal;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.AbstractTlsContextFactoryBuilderFactory;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -28,7 +28,7 @@ public class DefaultTlsContextFactoryBuilderFactory extends AbstractTlsContextFa
     try {
       initialiseIfNeeded(defaultTlsContextFactory);
     } catch (InitialisationException e) {
-      throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Failed to initialise default TlsContextFactory"), e);
+      throw new MuleRuntimeException(createStaticMessage("Failed to initialise default TlsContextFactory"), e);
     }
   }
 
