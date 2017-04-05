@@ -8,16 +8,16 @@ package org.mule.test.management.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.module.management.agent.JmxApplicationAgent;
 import org.mule.runtime.module.management.agent.JmxServerNotificationAgent;
 import org.mule.runtime.module.management.agent.Mx4jAgent;
 import org.mule.runtime.module.management.support.SimplePasswordJmxAuthenticator;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
 
-public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCase {
+public class ManagementDefaultNamespaceHandlerTestCase extends MuleArtifactFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

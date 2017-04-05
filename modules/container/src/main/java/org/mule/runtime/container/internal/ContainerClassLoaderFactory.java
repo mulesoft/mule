@@ -80,8 +80,9 @@ public class ContainerClassLoaderFactory {
                       "javax.resource", "javax.servlet", "javax.ws", "javax.mail", "javax.inject", "org.apache.xerces",
                       "org.apache.logging.log4j", "org.slf4j", "org.apache.commons.logging", "org.apache.log4j", "org.dom4j",
                       "com.sun", "sun", "org.mule.mvel2",
-                      // TODO(gfernandes): MULE-10194: need to expose every package form groovy
+                      // TODO(gfernandes): MULE-10194: need to expose every package from groovy
                       "org.codehaus.groovy",
+                      "groovy.lang",
                       // TODO(gfernandes): MULE-10194: review why this is required as it is exported on scripting
                       // mule-module.properties (fails ClassInterceptorTestCase)
                       "org.aopalliance.aop",

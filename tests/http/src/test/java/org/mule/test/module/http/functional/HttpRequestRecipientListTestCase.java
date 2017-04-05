@@ -9,7 +9,6 @@ package org.mule.test.module.http.functional;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -23,7 +22,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore
-public class HttpRequestRecipientListTestCase extends FunctionalTestCase {
+public class HttpRequestRecipientListTestCase extends AbstractHttpTestCase {
 
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");

@@ -6,7 +6,7 @@
  */
 package org.mule.test.management;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.module.management.agent.FixedHostRmiClientSocketFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -16,7 +16,7 @@ import java.net.Socket;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class JmxAgentEmptyConfigurationTestCase extends FunctionalTestCase {
+public class JmxAgentEmptyConfigurationTestCase extends MuleArtifactFunctionalTestCase {
 
   @Rule
   public DynamicPort port = new DynamicPort("port");

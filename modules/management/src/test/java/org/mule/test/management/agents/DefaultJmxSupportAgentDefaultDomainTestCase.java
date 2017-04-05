@@ -7,12 +7,11 @@
 package org.mule.test.management.agents;
 
 import static org.mule.test.management.agents.DefaultJmxSupportAgentTestCase.doTestHostPropertyEnablesClientSocketFactory;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 
 import org.junit.Test;
 
-public class DefaultJmxSupportAgentDefaultDomainTestCase extends FunctionalTestCase {
+public class DefaultJmxSupportAgentDefaultDomainTestCase extends MuleArtifactFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
