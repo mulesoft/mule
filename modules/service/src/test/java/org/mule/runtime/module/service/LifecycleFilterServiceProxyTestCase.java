@@ -68,7 +68,7 @@ public class LifecycleFilterServiceProxyTestCase extends AbstractMuleTestCase {
     doThrow(uncheckedException).when(uncheckedExceptionService).execute();
 
     final UncheckedExceptionService uncheckedExceptionServiceProxy =
-            (UncheckedExceptionService) LifecycleFilterServiceProxy.createServiceProxy(uncheckedExceptionService);
+        (UncheckedExceptionService) LifecycleFilterServiceProxy.createServiceProxy(uncheckedExceptionService);
 
     expected.expect(is(uncheckedException));
     uncheckedExceptionServiceProxy.execute();
