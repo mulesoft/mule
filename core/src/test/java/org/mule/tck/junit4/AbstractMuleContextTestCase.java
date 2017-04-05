@@ -294,6 +294,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
 
         if (!isDisposeContextPerClass())
         {
+            if (isStartContext() && muleContext != null && muleContext.isStarted())
+            {
+                muleContext.stop();
+            }
             disposeContext();
             doTearDownAfterMuleContextDispose();
         }
