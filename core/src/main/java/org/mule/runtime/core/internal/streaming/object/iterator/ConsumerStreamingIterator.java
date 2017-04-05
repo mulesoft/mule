@@ -18,13 +18,13 @@ import java.io.IOException;
  * iterator will consider that it has no more items.
  * <p>
  *
- * @since 3.5.0
+ * @since 4.0
  */
-public class DefaultStreamingIterator<T> implements StreamingIterator<T> {
+public final class ConsumerStreamingIterator<T> implements StreamingIterator<T> {
 
   private Consumer<T> consumer;
 
-  public DefaultStreamingIterator(Consumer<T> consumer) {
+  public ConsumerStreamingIterator(Consumer<T> consumer) {
     this.consumer = consumer;
   }
 

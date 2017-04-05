@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.core.internal.streaming.object.iterator.Consumer;
 import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
-import org.mule.runtime.core.internal.streaming.object.iterator.DefaultStreamingIterator;
+import org.mule.runtime.core.internal.streaming.object.iterator.ConsumerStreamingIterator;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -40,7 +40,7 @@ public abstract class AbstractObjectStreamingTestCase extends AbstractMuleTestCa
   }
 
   protected <T> StreamingIterator<T> toStreamingIterator(List<T> data) {
-    return new DefaultStreamingIterator<>(new TestConsumer(data));
+    return new ConsumerStreamingIterator<>(new TestConsumer(data));
   }
 
   protected <T> void checkEquals(Collection<T> data, CursorIterator<T> cursor) {

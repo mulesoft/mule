@@ -13,8 +13,9 @@ import java.io.Closeable;
 import java.util.Iterator;
 
 /**
+ * {@link Iterator} that also extends {@link Closeable} and {@link Sized}.
  *
- * This iterator also implements {@link Closeable}. The {@link Iterator#remove()} operation is not allowed for this iterator.
+ * The {@link Iterator#remove()} operation is not allowed for this iterator.
  * 
  * @param <T> the type of elements returned by this iterator
  */

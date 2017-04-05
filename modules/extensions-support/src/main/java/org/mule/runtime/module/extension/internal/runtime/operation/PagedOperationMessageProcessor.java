@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.internal.streaming.object.iterator.Consumer;
 import org.mule.runtime.core.internal.streaming.object.iterator.ListConsumer;
 import org.mule.runtime.core.internal.streaming.object.iterator.Producer;
-import org.mule.runtime.core.internal.streaming.object.iterator.DefaultStreamingIterator;
+import org.mule.runtime.core.internal.streaming.object.iterator.ConsumerStreamingIterator;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -62,7 +62,7 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
                                      connectionManager);
       Consumer<?> consumer = new ListConsumer(producer);
 
-      return just(returnDelegate.asReturnValue(new DefaultStreamingIterator<>(consumer), operationContext));
+      return just(returnDelegate.asReturnValue(new ConsumerStreamingIterator<>(consumer), operationContext));
     } catch (Exception e) {
       return error(e);
     }

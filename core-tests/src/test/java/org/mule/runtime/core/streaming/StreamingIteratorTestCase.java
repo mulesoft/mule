@@ -11,7 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import org.mule.runtime.core.internal.streaming.object.iterator.Consumer;
-import org.mule.runtime.core.internal.streaming.object.iterator.DefaultStreamingIterator;
+import org.mule.runtime.core.internal.streaming.object.iterator.ConsumerStreamingIterator;
 import org.mule.runtime.core.internal.streaming.object.iterator.ListConsumer;
 import org.mule.runtime.core.internal.streaming.object.iterator.Producer;
 import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
@@ -90,7 +90,7 @@ public class StreamingIteratorTestCase {
   @Description("Iterator doesn't have next if consumer is closed")
   public void closedConsumer() throws Exception {
     Consumer<String> consumer = new ListConsumer<>(producer);
-    StreamingIterator<String> it = new DefaultStreamingIterator<>(consumer);
+    StreamingIterator<String> it = new ConsumerStreamingIterator<>(consumer);
     consumer.close();
     assertThat(it.hasNext(), is(false));
   }
@@ -104,7 +104,7 @@ public class StreamingIteratorTestCase {
 
   private StreamingIterator<String> newIterator() {
     Consumer<String> consumer = new ListConsumer<>(producer);
-    return new DefaultStreamingIterator<>(consumer);
+    return new ConsumerStreamingIterator<>(consumer);
   }
 
   public class TestPagingProvider implements PagingProvider<Object, String> {
