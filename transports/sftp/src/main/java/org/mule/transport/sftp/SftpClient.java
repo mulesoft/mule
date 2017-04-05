@@ -6,6 +6,7 @@
  */
 package org.mule.transport.sftp;
 
+import static java.lang.String.format;
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION;
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_GET_ACTION;
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_PUT_ACTION;
@@ -14,6 +15,7 @@ import static org.mule.transport.sftp.notification.SftpTransportNotification.SFT
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.OutputHandler;
+import org.mule.transport.sftp.config.SftpProxyConfig;
 import org.mule.transport.sftp.notification.SftpNotifier;
 import org.mule.util.StringUtils;
 
@@ -22,6 +24,10 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Proxy;
+import com.jcraft.jsch.ProxyHTTP;
+import com.jcraft.jsch.ProxySOCKS4;
+import com.jcraft.jsch.ProxySOCKS5;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
@@ -79,6 +85,8 @@ public class SftpClient
     private String preferredAuthenticationMethods;
 
     private int connectionTimeoutMillis = 0; // No timeout by default
+
+    private SftpProxyConfig proxyConfig;
 
     public SftpClient(String host)
     {
@@ -148,6 +156,7 @@ public class SftpClient
             session.setPort(port);
             session.setPassword(password);
             session.setTimeout(connectionTimeoutMillis);
+            configureProxy(session);
             session.connect();
 
             Channel channel = session.openChannel(CHANNEL_SFTP);
@@ -196,6 +205,7 @@ public class SftpClient
             session.setConfig(hash);
             session.setPort(port);
             session.setTimeout(connectionTimeoutMillis);
+            configureProxy(session);
             session.connect();
 
             Channel channel = session.openChannel(CHANNEL_SFTP);
@@ -211,6 +221,49 @@ public class SftpClient
         catch (SftpException e)
         {
             logAndThrowLoginError(user, e);
+        }
+    }
+
+    private void configureProxy(Session session)
+    {
+        if (proxyConfig != null)
+        {
+            Proxy proxy = null;
+            switch (proxyConfig.getProtocol())
+            {
+                case HTTP:
+                    ProxyHTTP proxyHttp = new ProxyHTTP(proxyConfig.getHost(), proxyConfig.getPort());
+                    if (proxyConfig.getUsername() != null)
+                    {
+                        proxyHttp.setUserPasswd(proxyConfig.getUsername(), proxyConfig.getPassword());
+                    }
+                    proxy = proxyHttp;
+                    break;
+
+                case SOCKS4:
+                    ProxySOCKS4 proxySocks4 = new ProxySOCKS4(proxyConfig.getHost(), proxyConfig.getPort());
+                    if (proxyConfig.getUsername() != null)
+                    {
+                        proxySocks4.setUserPasswd(proxyConfig.getUsername(), proxyConfig.getPassword());
+                    }
+                    proxy = proxySocks4;
+                    break;
+
+                case SOCKS5:
+                    ProxySOCKS5 proxySocks5 = new ProxySOCKS5(proxyConfig.getHost(), proxyConfig.getPort());
+                    if (proxyConfig.getUsername() != null)
+                    {
+                        proxySocks5.setUserPasswd(proxyConfig.getUsername(), proxyConfig.getPassword());
+                    }
+                    proxy = proxySocks5;
+                    break;
+
+                default:
+                    throw new IllegalArgumentException(format("Proxy protocol %s not recognized"));
+            }
+
+
+            session.setProxy(proxy);
         }
     }
 
@@ -775,6 +828,11 @@ public class SftpClient
     public void setPreferredAuthenticationMethods(String preferredAuthenticationMethods)
     {
         this.preferredAuthenticationMethods = preferredAuthenticationMethods;
+    }
+
+    public void setProxyConfig(SftpProxyConfig proxyConfig)
+    {
+        this.proxyConfig = proxyConfig;
     }
 
     public enum WriteMode

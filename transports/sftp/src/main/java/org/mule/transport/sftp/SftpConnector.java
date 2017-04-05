@@ -6,9 +6,18 @@
  */
 package org.mule.transport.sftp;
 
+import static java.lang.System.getProperty;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.transport.sftp.AuthenticationMethodValidator.validateAuthenticationMethods;
+import static org.mule.transport.sftp.config.SftpProxyConfig.HOST_PROPERTY;
+import static org.mule.transport.sftp.config.SftpProxyConfig.PASSWORD_PROPERTY;
+import static org.mule.transport.sftp.config.SftpProxyConfig.PORT_PROPERTY;
+import static org.mule.transport.sftp.config.SftpProxyConfig.PROTOCOL_PROPERTY;
+import static org.mule.transport.sftp.config.SftpProxyConfig.USERNAME_PROPERTY;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -20,6 +29,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.file.ExpressionFilenameParser;
 import org.mule.transport.file.FilenameParser;
+import org.mule.transport.sftp.config.SftpProxyConfig;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
 import java.util.HashMap;
@@ -102,6 +112,7 @@ public class SftpConnector extends AbstractConnector
     private String archiveTempReceivingDir = "";
     private String archiveTempSendingDir = "";
     private String preferredAuthenticationMethods;
+    private SftpProxyConfig proxyConfig;
 
     /**
      * Should the file be kept if an error occurs when writing the file on the
@@ -123,7 +134,7 @@ public class SftpConnector extends AbstractConnector
 
     static
     {
-        String propValue = System.getProperty("mule.sftp.transport.maxConnectionPoolSize");
+        String propValue = getProperty("mule.sftp.transport.maxConnectionPoolSize");
         if (propValue != null)
         {
             logger.info("Will override the maxConnectionPoolSize to " + propValue
@@ -190,7 +201,10 @@ public class SftpConnector extends AbstractConnector
             }
             else
             {
-                client = SftpConnectionFactory.createClient(endpoint, preferredAuthenticationMethods);
+                SftpConnectionFactory factory = new SftpConnectionFactory(endpoint);
+                factory.setPreferredAuthenticationMethods(preferredAuthenticationMethods);
+                factory.setProxyConfig(proxyConfig);
+                client = factory.createClient();
             }
 
             // We have to set the working directory before returning
@@ -297,6 +311,7 @@ public class SftpConnector extends AbstractConnector
                     }
                     SftpConnectionFactory factory = new SftpConnectionFactory(endpoint);
                     factory.setPreferredAuthenticationMethods(preferredAuthenticationMethods);
+                    factory.setProxyConfig(proxyConfig);
                     pool = new GenericObjectPool(factory, getMaxConnectionPoolSize());
                     pool.setTestOnBorrow(isValidateConnections());
                     pools.put(endpoint.getEndpointURI(), pool);
@@ -351,6 +366,42 @@ public class SftpConnector extends AbstractConnector
         {
             filenameParser.setMuleContext(muleContext);
         }
+
+        setProxyConfig(createProxyConfig());
+    }
+
+    private static SftpProxyConfig createProxyConfig()
+    {
+        String proxyHost = getProperty(HOST_PROPERTY);
+        String proxyPortString = getProperty(PORT_PROPERTY);
+        String proxyUsername = getProperty(USERNAME_PROPERTY);
+        String proxyPassword = getProperty(PASSWORD_PROPERTY);
+        String proxyProtocolString = getProperty(PROTOCOL_PROPERTY);
+
+        if (proxyHost == null && proxyPortString == null && proxyProtocolString == null)
+        {
+            return null;
+        }
+
+        if (proxyHost == null || proxyPortString == null || proxyProtocolString == null)
+        {
+            throw new MuleRuntimeException(createStaticMessage("SFTP proxy configuration requires host, port and protocol to be specified"));
+        }
+
+        int proxyPort = Integer.valueOf(proxyPortString);
+
+        SftpProxyConfig proxyConfig = new SftpProxyConfig();
+        proxyConfig.setHost(proxyHost);
+        proxyConfig.setPort(proxyPort);
+        proxyConfig.setProtocol(proxyProtocolString);
+
+        if (proxyUsername != null)
+        {
+            proxyConfig.setUsername(proxyUsername);
+            proxyConfig.setPassword(proxyPassword);
+        }
+
+        return proxyConfig;
     }
 
     /*
@@ -613,6 +664,15 @@ public class SftpConnector extends AbstractConnector
         this.preferredAuthenticationMethods = preferredAuthenticationMethods;
     }
 
+    public SftpProxyConfig getProxyConfig()
+    {
+        return proxyConfig;
+    }
+
+    public void setProxyConfig(SftpProxyConfig proxyConfig)
+    {
+        this.proxyConfig = proxyConfig;
+    }
 
     //Since SFTP does not have any connection at the connector level and
     //since we need to fix SFTP connection at the inbound level we just let

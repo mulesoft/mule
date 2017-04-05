@@ -14,18 +14,12 @@ import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STA
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.construct.Flow;
+import org.mule.module.http.functional.TestProxyServer;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.IOUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -55,7 +49,7 @@ public class HttpRequestProxyTlsTestCase extends FunctionalTestCase
     @Rule
     public SystemProperty trustStorePathProperty;
 
-    private MockProxyServer proxyServer = new MockProxyServer(proxyPort.getNumber(), httpPort.getNumber());
+    private TestProxyServer proxyServer = new TestProxyServer(proxyPort.getNumber(), httpPort.getNumber());
 
     private String requestURI;
     private String requestPayload;
@@ -113,95 +107,5 @@ public class HttpRequestProxyTlsTestCase extends FunctionalTestCase
         assertThat(event.getMessage().getPayloadAsString(), equalTo(OK_RESPONSE));
 
         proxyServer.stop();
-    }
-
-    /**
-     * Implementation of an https proxy server for testing purposes. The server will accept only one connection,
-     * which is expected to send a CONNECT request. The request is consumed, a 200 OK answer is returned, and then
-     * it acts as a tunnel between the client and the HTTPS service.
-     */
-    private static class MockProxyServer
-    {
-
-        private int proxyServerPort;
-        private int serverPort;
-        private ServerSocket serverSocket;
-        private Thread serverThread;
-
-        public MockProxyServer(int proxyServerPort, int serverPort)
-        {
-            this.proxyServerPort = proxyServerPort;
-            this.serverPort = serverPort;
-        }
-
-        public void start() throws Exception
-        {
-            serverSocket = new ServerSocket(proxyServerPort);
-
-            serverThread = new Thread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        Socket clientSocket = serverSocket.accept();
-                        handleRequest(clientSocket);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
-
-            serverThread.start();
-        }
-
-        public void stop() throws Exception
-        {
-            serverSocket.close();
-            serverThread.join();
-        }
-
-        private void handleRequest(final Socket clientSocket) throws Exception
-        {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()), 1);
-
-            while (reader.readLine().trim().isEmpty())
-            {
-                // Consume the CONNECT request.
-            }
-
-            OutputStream os = clientSocket.getOutputStream();
-
-            os.write(PROXY_RESPONSE.getBytes());
-            os.flush();
-
-            final Socket server = new Socket("localhost", serverPort);
-
-            // Make a tunnel between both sockets (HTTPS traffic).
-
-            Thread responseThread = new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        IOUtils.copy(server.getInputStream(), clientSocket.getOutputStream());
-                    }
-                    catch (IOException e)
-                    {
-                        throw new RuntimeException(e);
-                    }
-                }
-            };
-            responseThread.start();
-
-            IOUtils.copy(clientSocket.getInputStream(), server.getOutputStream());
-            responseThread.join();
-        }
-
     }
 }
