@@ -34,7 +34,7 @@ public class DefaultTlsContextFactoryBuilderFactory extends AbstractTlsContextFa
 
   @Override
   protected TlsContextFactoryBuilder create() {
-    return new MuleTlsContextFactoryBuilder(defaultTlsContextFactory);
+    return new DefaultTlsContextFactoryBuilder(defaultTlsContextFactory);
   }
 
 }

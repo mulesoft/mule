@@ -9,11 +9,11 @@ package org.mule.runtime.module.tls.internal;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 
-public class MuleTlsContextFactoryBuilder implements TlsContextFactoryBuilder {
+public class DefaultTlsContextFactoryBuilder implements TlsContextFactoryBuilder {
 
   private TlsContextFactory defaultTlsContextFactory;
 
-  public MuleTlsContextFactoryBuilder(TlsContextFactory defaultTlsContextFactory) {
+  public DefaultTlsContextFactoryBuilder(TlsContextFactory defaultTlsContextFactory) {
     this.defaultTlsContextFactory = defaultTlsContextFactory;
   }
 
