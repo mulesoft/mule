@@ -8,13 +8,11 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isInputStream;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getGenerics;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
-import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -43,7 +41,6 @@ import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOp
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -119,11 +116,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
         operation.withOutputAttributes().ofType(getMethodReturnAttributesType(method, loader.getTypeLoader()));
 
         if (isAutoPaging(operationMethod)) {
-          operation.supportsStreaming(true).withOutput().ofType(new BaseTypeBuilder(JAVA).arrayType()
-              .id(Iterator.class.getName())
-              .of(getMethodReturnType(method, loader.getTypeLoader()))
-              .build());
-
+          operation.supportsStreaming(true).withOutput().ofType(getMethodReturnType(method, loader.getTypeLoader()));
           addPagedOperationModelProperty(operationMethod, operation, supportsConfig);
         } else {
           final MetadataType outputType = getMethodReturnType(method, loader.getTypeLoader());

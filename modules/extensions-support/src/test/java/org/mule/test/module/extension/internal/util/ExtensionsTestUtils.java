@@ -97,6 +97,7 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.hamcrest.Matcher;
 
 public final class ExtensionsTestUtils {
 
@@ -173,6 +174,15 @@ public final class ExtensionsTestUtils {
     MessageMetadataType messageType = (MessageMetadataType) type;
     assertThat(messageType.getPayloadType().get(), equalTo(payloadType));
     assertThat(messageType.getAttributesType().get(), equalTo(attributesType));
+  }
+
+  public static void assertMessageType(MetadataType type, Matcher payloadMatch, Matcher attributesMatcher) {
+    assertThat(type, is(instanceOf(MessageMetadataType.class)));
+    assertThat(getTypeId(type).get(), is(Message.class.getName()));
+
+    MessageMetadataType messageType = (MessageMetadataType) type;
+    assertThat(messageType.getPayloadType().get(), payloadMatch);
+    assertThat(messageType.getAttributesType().get(), attributesMatcher);
   }
 
   public static ParameterModel getParameter(String name, Class<?> type) {

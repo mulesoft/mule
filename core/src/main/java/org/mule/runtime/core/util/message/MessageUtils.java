@@ -15,10 +15,12 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -94,6 +96,26 @@ public final class MessageUtils {
       return new ResultsToMessageSet((Set<Result>) results, mediaType, cursorProviderFactory, event);
     } else {
       return new ResultsToMessageCollection(results, mediaType, cursorProviderFactory, event);
+    }
+  }
+
+  /**
+   * Transforms the given {@code results} into a similar collection of {@link Message} objects
+   *
+   * @param results a collection of {@link Result} items
+   * @param mediaType the {@link MediaType} of the generated {@link Message} instances
+   * @param cursorProviderFactory the {@link CursorProviderFactory} used to handle streaming cursors
+   * @param event the {@link Event} which originated the results being transformed
+   * @return a similar collection of {@link Message}
+   */
+  public static Iterator<Message> toMessageIterator(Iterator<Result> results,
+                                                    MediaType mediaType,
+                                                    CursorProviderFactory cursorProviderFactory,
+                                                    Event event) {
+    if (results instanceof StreamingIterator) {
+      return new ResultToMessageStreamingIterator((StreamingIterator<Result>) results, mediaType, cursorProviderFactory, event);
+    } else {
+      return new ResultToMessageIterator(results, mediaType, cursorProviderFactory, event);
     }
   }
 }
