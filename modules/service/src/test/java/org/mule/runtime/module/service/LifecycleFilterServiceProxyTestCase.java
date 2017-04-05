@@ -7,10 +7,15 @@
 
 package org.mule.runtime.module.service;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Rule;
@@ -43,6 +48,33 @@ public class LifecycleFilterServiceProxyTestCase extends AbstractMuleTestCase {
     serviceProxy.stop();
   }
 
+  @Test
+  public void checkedExceptionThrownUnwrapped() throws Exception {
+    CheckedExceptionService checkExceptionService = mock(CheckedExceptionService.class);
+    DefaultMuleException checkedException = new DefaultMuleException("ERROR");
+    doThrow(checkedException).when(checkExceptionService).execute();
+
+    final CheckedExceptionService checkedExceptionServiceProxy =
+        (CheckedExceptionService) LifecycleFilterServiceProxy.createServiceProxy(checkExceptionService);
+
+    expected.expect(is(checkedException));
+    checkedExceptionServiceProxy.execute();
+  }
+
+  @Test
+  public void uncheckedExceptionThrownUnwrapped() throws Exception {
+    UncheckedExceptionService uncheckedExceptionService = mock(UncheckedExceptionService.class);
+    RuntimeException uncheckedException = new RuntimeException();
+    doThrow(uncheckedException).when(uncheckedExceptionService).execute();
+
+    final UncheckedExceptionService uncheckedExceptionServiceProxy =
+        (UncheckedExceptionService) LifecycleFilterServiceProxy.createServiceProxy(uncheckedExceptionService);
+
+    expected.expect(is(uncheckedException));
+    uncheckedExceptionServiceProxy.execute();
+  }
+
+
   public interface StartableService extends Service, Startable {
 
   }
@@ -50,4 +82,16 @@ public class LifecycleFilterServiceProxyTestCase extends AbstractMuleTestCase {
   public interface StoppableService extends Service, Stoppable {
 
   }
+
+  public interface CheckedExceptionService extends Service {
+
+    void execute() throws MuleException;
+  }
+
+  public interface UncheckedExceptionService extends Service {
+
+    void execute();
+  }
+
+
 }
