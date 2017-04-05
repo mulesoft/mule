@@ -14,6 +14,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
@@ -41,7 +42,13 @@ public class LifecycleFilterServiceProxy implements InvocationHandler {
       throw new UnsupportedOperationException("Cannot invoke lifecycle methods on a service instance");
     }
 
-    return method.invoke(service, args);
+    try {
+      return method.invoke(service, args);
+    } catch (InvocationTargetException ite) {
+      // Unwrap target exception to ensure InvocationTargetException (in case of unchecked exceptions) or
+      // UndeclaredThrowableException (in case of checked exceptions) is not thrown by Service instead of target exception.
+      throw ite.getTargetException();
+    }
   }
 
   /**
