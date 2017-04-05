@@ -6,6 +6,7 @@
  */
 package org.mule.transport.sftp;
 
+import static java.lang.String.format;
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION;
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_GET_ACTION;
 import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_PUT_ACTION;
@@ -23,7 +24,10 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Proxy;
 import com.jcraft.jsch.ProxyHTTP;
+import com.jcraft.jsch.ProxySOCKS4;
+import com.jcraft.jsch.ProxySOCKS5;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
@@ -224,11 +228,41 @@ public class SftpClient
     {
         if (proxyConfig != null)
         {
-            ProxyHTTP proxy = new ProxyHTTP(proxyConfig.getHost(), proxyConfig.getPort());
-            if (proxyConfig.getUsername() != null)
+            Proxy proxy = null;
+            switch (proxyConfig.getProtocol())
             {
-                proxy.setUserPasswd(proxyConfig.getUsername(), proxyConfig.getPassword());
+                case HTTP:
+                    ProxyHTTP proxyHttp = new ProxyHTTP(proxyConfig.getHost(), proxyConfig.getPort());
+                    if (proxyConfig.getUsername() != null)
+                    {
+                        proxyHttp.setUserPasswd(proxyConfig.getUsername(), proxyConfig.getPassword());
+                    }
+                    proxy = proxyHttp;
+                    break;
+
+                case SOCKS4:
+                    ProxySOCKS4 proxySocks4 = new ProxySOCKS4(proxyConfig.getHost(), proxyConfig.getPort());
+                    if (proxyConfig.getUsername() != null)
+                    {
+                        proxySocks4.setUserPasswd(proxyConfig.getUsername(), proxyConfig.getPassword());
+                    }
+                    proxy = proxySocks4;
+                    break;
+
+                case SOCKS5:
+                    ProxySOCKS5 proxySocks5 = new ProxySOCKS5(proxyConfig.getHost(), proxyConfig.getPort());
+                    if (proxyConfig.getUsername() != null)
+                    {
+                        proxySocks5.setUserPasswd(proxyConfig.getUsername(), proxyConfig.getPassword());
+                    }
+                    proxy = proxySocks5;
+                    break;
+
+                default:
+                    throw new IllegalArgumentException(format("Proxy protocol %s not recognized"));
             }
+
+
             session.setProxy(proxy);
         }
     }

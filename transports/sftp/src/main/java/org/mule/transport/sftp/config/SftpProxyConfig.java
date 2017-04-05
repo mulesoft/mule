@@ -8,13 +8,23 @@ package org.mule.transport.sftp.config;
 
 /**
  * A Proxy configuration for the SFTP connector.
+ *
+ * @since 3.9
  */
 public class SftpProxyConfig
 {
+    public enum Protocol
+    {
+        HTTP,
+        SOCKS4,
+        SOCKS5
+    };
+
     private String host;
     private int port;
     private String username;
     private String password;
+    private Protocol protocol;
 
     public String getHost()
     {
@@ -54,5 +64,15 @@ public class SftpProxyConfig
     public void setPassword(String password)
     {
         this.password = password;
+    }
+
+    public Protocol getProtocol()
+    {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol)
+    {
+        this.protocol = Protocol.valueOf(protocol);
     }
 }

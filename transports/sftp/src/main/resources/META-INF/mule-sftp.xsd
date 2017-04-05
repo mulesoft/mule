@@ -446,14 +446,14 @@
     <xsd:complexType name="proxyConfigType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractExtensionType">
-                <xsd:attribute name="host" type="xsd:string">
+                <xsd:attribute name="host" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             Proxy host name or internet address.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="port" type="mule:substitutableInt">
+                <xsd:attribute name="port" type="mule:substitutableInt" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             Proxy port number.
@@ -474,7 +474,22 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="protocol" type="proxyProtocol" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Proxy type. Allowed values are HTTP, SOCKS4 and SOCKS5.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:simpleType name="proxyProtocol">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="HTTP"/>
+            <xsd:enumeration value="SOCKS4"/>
+            <xsd:enumeration value="SOCKS5"/>
+        </xsd:restriction>
+    </xsd:simpleType>
 </xsd:schema>

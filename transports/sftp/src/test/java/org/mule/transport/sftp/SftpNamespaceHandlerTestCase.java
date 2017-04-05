@@ -9,6 +9,7 @@ package org.mule.transport.sftp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.transport.sftp.config.SftpProxyConfig.Protocol.SOCKS5;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -40,6 +41,7 @@ public class SftpNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(c.getProxyConfig().getPort(), 8080);
         assertEquals(c.getProxyConfig().getUsername(), "user");
         assertEquals(c.getProxyConfig().getPassword(), "pass");
+        assertEquals(c.getProxyConfig().getProtocol(), SOCKS5);
     }
 
     @Test

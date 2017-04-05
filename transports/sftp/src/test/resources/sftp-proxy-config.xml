@@ -13,7 +13,7 @@
     </spring:beans>
 
     <sftp:connector name="proxyConnector">
-        <sftp:proxy-config host="localhost" port="${proxyPort}"/>
+        <sftp:proxy-config host="localhost" port="${proxyPort}" protocol="HTTP"/>
     </sftp:connector>
 
     <flow name="sftpThroughProxy">

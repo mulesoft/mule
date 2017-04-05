@@ -16,7 +16,7 @@
         <!-- Retry to avoid failure, test will run assertions in parallel with reconnection -->
         <reconnect-forever blocking="false" frequency="20000"/>
 
-        <sftp:proxy-config host="host" port="8080" username="user" password="pass"/>
+        <sftp:proxy-config host="host" port="8080" username="user" password="pass" protocol="SOCKS5"/>
     </sftp:connector>
 
     <flow name="receiving">

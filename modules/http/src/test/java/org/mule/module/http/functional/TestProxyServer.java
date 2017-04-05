@@ -18,8 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of an HTTP proxy server for testing purposes. The server will accept only one connection,
- * which is expected to send a CONNECT request. The request is consumed, a 200 OK answer is returned, and then
+ * Implementation of an HTTP proxy server for testing purposes. The server will accept many connections,
+ * which are expected to send a CONNECT request. The request is consumed, a 200 OK answer is returned, and then
  * it acts as a tunnel between the client and the provided localhost target port. If stopped will close active
  * threads and connectionHandlers.
  *
