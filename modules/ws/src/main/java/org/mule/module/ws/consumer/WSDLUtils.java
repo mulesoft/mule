@@ -157,7 +157,7 @@ public class WSDLUtils
         }
     }
 
-    private static String getBasePath(String documentURI)
+    public static String getBasePath(String documentURI)
     {
         File document = new File(documentURI);
         if (document.isDirectory())

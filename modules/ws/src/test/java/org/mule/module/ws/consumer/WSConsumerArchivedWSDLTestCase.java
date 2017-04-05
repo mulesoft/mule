@@ -9,22 +9,26 @@ package org.mule.module.ws.consumer;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.size.SmallTest;
+
 import java.util.Map;
 
 import org.junit.Test;
 
 /**
- * This tests "mocks" an HTTPS server through which a wsdl with imported namespaces file is served.
- * The initialization of the ws consumer involved
- * in the test app should be routed through the http requester configured with an insecure TLS context.
- * If an URLConnection is used instead of the http requester, the TLS context will not be used.
+ * Retrieves a wsdl from an archive which has an imported schema
+ * which has a relative location within the jar
  */
-public class WSConsumerImportedNamespaceTlsTestCase extends AbstractWSDLHttpImportedSchemaServerTlsTestCase
+@SmallTest
+public class WSConsumerArchivedWSDLTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigFile()
     {
-        return "ws-consumer-wsdl-insecure-tls-imported-namespaces-success.xml";
+
+        return "ws-consumer-archived-wsdl.xml";
     }
 
     @Test

@@ -24,15 +24,15 @@ import java.io.InputStream;
 import java.net.URL;
 
 /**
- * This tests mocks a proxy server through which a wsdl file is served.
+ * This tests mocks a proxy server through which a wsdl (with schema imported) file is served.
  */
-public class AbstractWSDLServerTlsTestCase extends FunctionalTestCase
+public class AbstractWSDLHttpImportedSchemaServerTlsTestCase extends FunctionalTestCase
 {
 
     @ClassRule
     public static DynamicPort port = new DynamicPort("port");
 
-    private static final String WSDL_FILE_LOCATION = "/Test.wsdl";
+    private static final String WSDL_FILE_LOCATION = "/TestMainWsdl.wsdl";
 
     @ClassRule
     public static ExternalResource myServer = new ServerResource(port);
@@ -114,7 +114,8 @@ public class AbstractWSDLServerTlsTestCase extends FunctionalTestCase
                     final InputStream wsdlStream = this.getClass().getResourceAsStream(getContentSourceToReturn(request));
                     final String contents = IOUtils.toString(wsdlStream, UTF_8.name());
                     response.setContentLength(contents.length());
-                    response.getWriter().write(contents);
+                    // this replaces the port in the schema address
+                    response.getWriter().write(contents.replaceAll("\\$\\{port\\}", "" + port));
                 }
 
                 private String getContentSourceToReturn(Request request)
@@ -145,7 +146,7 @@ public class AbstractWSDLServerTlsTestCase extends FunctionalTestCase
         private SSLContextConfigurator createSSLContextConfigurator()
         {
             SSLContextConfigurator sslContextConfigurator = new SSLContextConfigurator();
-            ClassLoader cl = AbstractWSDLServerTlsTestCase.class.getClassLoader();
+            ClassLoader cl = AbstractWSDLHttpImportedSchemaServerTlsTestCase.class.getClassLoader();
 
             URL cacertsUrl = cl.getResource("trustStore");
             if (cacertsUrl != null)
