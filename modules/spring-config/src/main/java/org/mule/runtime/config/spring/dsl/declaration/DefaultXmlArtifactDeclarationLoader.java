@@ -239,7 +239,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   }
 
   private void declareFlow(ConfigLine configLine, ArtifactDeclarer artifactDeclarer) {
-    final FlowElementDeclarer flow = ElementDeclarer.newFlow(getDeclaredName(configLine));
+    final FlowElementDeclarer flow = ElementDeclarer.newFlow().withRefName(getDeclaredName(configLine));
     copyExplicitAttributes(configLine.getConfigAttributes(), flow);
 
     configLine.getChildren().forEach(line -> {

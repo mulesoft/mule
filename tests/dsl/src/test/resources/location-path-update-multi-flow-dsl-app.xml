@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <jms:config name="config">
+        <jms:active-mq-connection disableValidation="true">
+            <jms:caching-strategy>
+                <jms:no-caching/>
+            </jms:caching-strategy>
+        </jms:active-mq-connection>
+    </jms:config>
+
+    <flow name="send-payload">
+        <jms:listener config-ref="config" destination="myListenerDestination"/>
+        <jms:publish config-ref="config" destination="updatedDestination">
+            <jms:message-builder>
+                <jms:body>#[payload]</jms:body>
+                <jms:properties>
+                    #[{(initialProperty): propertyValue}]
+                </jms:properties>
+            </jms:message-builder>
+        </jms:publish>
+    </flow>
+
+    <flow name="bridge">
+        <jms:consume config-ref="config" destination="#[initialDestination]" maximumWait="1000"/>
+        <foreach>
+            <jms:publish config-ref="config" destination="#[finalDestination]">
+                <jms:message-builder jmsxProperties="#[attributes.properties.jmsxProperties]">
+                    <jms:body>#[bridgePrefix ++ payload]</jms:body>
+                    <jms:properties>#[attributes.properties.userProperties]</jms:properties>
+                </jms:message-builder>
+            </jms:publish>
+            <logger message="Message Sent"/>
+        </foreach>
+    </flow>
+
+    <flow name="bridge-receiver">
+        <jms:consume config-ref="config" destination="#[finalDestination]" maximumWait="1000"/>
+    </flow>
+
+</mule>
