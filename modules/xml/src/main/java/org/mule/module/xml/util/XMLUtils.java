@@ -105,16 +105,15 @@ public class XMLUtils extends org.mule.util.XMLUtils
         TransformerFactory tf;
         try
         {
-            tf = TransformerFactory.newInstance();
+            tf = XMLSecureFactories.createDefault().getTransformerFactory();
         }
         catch (TransformerFactoryConfigurationError e)
         {
             System.setProperty("javax.xml.transform.TransformerFactory", TRANSFORMER_FACTORY_JDK5);
-            tf = TransformerFactory.newInstance();
+            tf = XMLSecureFactories.createDefault().getTransformerFactory();
         }
         if (tf != null)
         {
-            XMLSecureFactories.createDefault().configureTransformerFactory(tf);
             return tf.newTransformer();
         }
         else

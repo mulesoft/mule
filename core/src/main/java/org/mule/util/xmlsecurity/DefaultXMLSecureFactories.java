@@ -7,10 +7,11 @@
 package org.mule.util.xmlsecurity;
 
 import static java.lang.String.format;
+import static javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD;
+import static javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET;
 import static javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES;
 import static javax.xml.stream.XMLInputFactory.SUPPORT_DTD;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
@@ -90,8 +91,8 @@ public class DefaultXMLSecureFactories
         {
             try
             {
-                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+                factory.setAttribute(ACCESS_EXTERNAL_STYLESHEET, "");
+                factory.setAttribute(ACCESS_EXTERNAL_DTD, "");
             }
             catch (Exception e)
             {
@@ -106,8 +107,8 @@ public class DefaultXMLSecureFactories
         {
             try
             {
-                factory.setProperty(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-                factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+                factory.setProperty(ACCESS_EXTERNAL_STYLESHEET, "");
+                factory.setProperty(ACCESS_EXTERNAL_DTD, "");
             }
             catch (Exception e)
             {
@@ -122,8 +123,8 @@ public class DefaultXMLSecureFactories
         {
             try
             {
-                validator.setProperty(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-                validator.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+                validator.setProperty(ACCESS_EXTERNAL_STYLESHEET, "");
+                validator.setProperty(ACCESS_EXTERNAL_DTD, "");
             }
             catch (Exception e)
             {

@@ -96,14 +96,13 @@ public class TransformerInputs
         {
             // Create a factory we know to be STAX-compliant
             transformerFactory = (TransformerFactory) Class.forName(PREFERRED_TRANSFORMATION_FACTORY_CLASS_NAME).newInstance();
+            XMLSecureFactories.createDefault().configureTransformerFactory(transformerFactory);
         }
         catch (Exception ex)
         {
             // Fall back to default factory
-            transformerFactory = TransformerFactory.newInstance();
+            transformerFactory = XMLSecureFactories.createDefault().getTransformerFactory();
         }
-
-        XMLSecureFactories.createDefault().configureTransformerFactory(transformerFactory);
 
         return transformerFactory;
     }
@@ -126,7 +125,6 @@ public class TransformerInputs
 
         XMLSecureFactories.createDefault().configureSchemaFactory(schemaFactory);
 
-        System.out.println(schemaFactory.getClass());
         return schemaFactory;
     }
 
