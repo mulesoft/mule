@@ -29,10 +29,9 @@ import java.util.concurrent.ExecutionException;
 /**
  * Authorization element for client credentials oauth grant type
  * <p>
- * When used as a top-level element, any initialization (e.g., first token refresh) will be done when the application is
- * initialized. If used within an http requester, any initialization will be deferred until the requester is first used.
+ * The first token refresh will be done when the application is started.
  */
-@XmlHints(allowTopLevelDefinition = true)
+@XmlHints(allowTopLevelDefinition = true, allowInlineDefinition = false)
 public class ClientCredentialsGrantType extends AbstractGrantType {
 
   /**

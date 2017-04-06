@@ -41,15 +41,13 @@ import java.util.concurrent.ExecutionException;
  * Represents the config element for {@code oauth:authentication-code-config}.
  * <p>
  * This config will: - If the authorization-request is defined then it will create a flow listening for an user call to begin the
- * oauth login. - If the token-request is defined then it will create a flow for listening in the redirect uri so we can get the
+ * OAuth login. - If the token-request is defined then it will create a flow for listening in the redirect uri so we can get the
  * authentication code and retrieve the access token
  * <p>
- * When used as a top-level element, any initialization (e.g., creating the endpoints for authorization) will be done when the
- * application is initialized. If used within an http requester, any initialization will be deferred until the requester is first
- * used.
+ * The creation of the endpoints for authorization will be done when the application is started.
  */
 @Alias("authorization-code-grant-type")
-@XmlHints(allowTopLevelDefinition = true)
+@XmlHints(allowTopLevelDefinition = true, allowInlineDefinition = false)
 public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
 
   /**
