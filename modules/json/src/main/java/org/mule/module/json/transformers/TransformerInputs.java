@@ -125,7 +125,6 @@ public class TransformerInputs
 
         XMLSecureFactories.createDefault().configureSchemaFactory(schemaFactory);
 
-        System.out.println(schemaFactory.getClass());
         return schemaFactory;
     }
 
