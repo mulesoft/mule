@@ -10,7 +10,9 @@ package org.mule.test.runner.infrastructure;
 import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.stream;
+import static java.util.Collections.emptySet;
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
@@ -89,7 +91,8 @@ public class ExtensionsTestInfrastructureDiscoverer {
     Map<String, Object> params = new HashMap<>();
     params.put(TYPE_PROPERTY_NAME, annotatedClass.getName());
     params.put(VERSION, getProductVersion());
-    ExtensionModel model = new JavaExtensionModelLoader().loadExtensionModel(annotatedClass.getClassLoader(), params);
+    ExtensionModel model =
+        new JavaExtensionModelLoader().loadExtensionModel(annotatedClass.getClassLoader(), getDefault(emptySet()), params);
     extensionManager.registerExtension(model);
 
     return model;

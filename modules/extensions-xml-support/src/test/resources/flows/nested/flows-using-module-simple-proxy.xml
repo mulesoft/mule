@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:module-simple-proxy="http://www.mulesoft.org/schema/mule/module-simple-proxy"
+      xsi:schemaLocation="
+      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/module-simple-proxy http://www.mulesoft.org/schema/mule/module-simple-proxy/module-simple-proxy.xsd">
+
+    <flow name="testSetPayloadHardcodedFlow">
+        <module-simple-proxy:set-payload-hardcoded-value />
+    </flow>
+
+    <flow name="testSetPayloadParamFlow">
+        <module-simple-proxy:set-payload-param-value value="new payload" />
+    </flow>
+
+    <flow name="testSetPayloadParamDefaultFlow">
+        <module-simple-proxy:set-payload-param-default-value />
+    </flow>
+
+    <flow name="testSetPayloadParamDefaultUseOptionalFlow">
+        <module-simple-proxy:set-payload-param-default-value-use-optional />
+    </flow>
+
+    <flow name="testSetPayloadNoSideEffectFlowVariable">
+        <set-variable variableName="testVar" value="unchanged value"/>
+        <module-simple-proxy:set-payload-no-side-effect />
+    </flow>
+
+    <flow name="testDoNothingFlow">
+        <set-variable variableName="variableBeforeCalling" value="value of flowvar before calling"/>
+        <set-payload value="before calling" />
+        <module-simple-proxy:do-nothing />
+    </flow>
+
+    <flow name="testSetPayloadParamValueAppender">
+        <module-simple-proxy:set-payload-param-value-appender value="new payload" />
+    </flow>
+
+    <flow name="testSetPayloadConcatParamsValues">
+        <module-simple-proxy:set-payload-concat-params-values value1="10" value2="5" />
+    </flow>
+
+    <flow name="testSetPayloadUsingUndefinedParam">
+        <module-simple-proxy:set-payload-using-undefined-param />
+    </flow>
+
+    <flow name="testSetPayloadHardcodedFlowWithTarget">
+        <module-simple-proxy:set-payload-hardcoded-value target="target-variable" />
+    </flow>
+
+    <flow name="testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable">
+        <set-variable variableName="existing-variable" value="fixed value that should not be read after the following MP"/>
+        <module-simple-proxy:set-payload-hardcoded-value target="existing-variable" />
+    </flow>
+
+    <flow name="testSetPayloadUsingOptionalParam">
+        <module-simple-proxy:set-payload-using-optional-param />
+    </flow>
+</mule>

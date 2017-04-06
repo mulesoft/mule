@@ -6,26 +6,49 @@
  */
 package org.mule.test.functional;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
+import org.mule.test.runner.RunnerDelegateTo;
 
+import java.util.Collection;
+
+@RunnerDelegateTo(Parameterized.class)
 public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
+  @Parameterized.Parameter
+  public String configFile;
+
+  @Parameterized.Parameter(1)
+  public String[] paths;
+
+  @Parameterized.Parameters(name = "{index}: Running tests for {0} ")
+  public static Collection<Object[]> data() {
+    return asList(new Object[][] {
+        //simple scenario
+        {"flows/flows-using-module-simple.xml", new String[] {"modules/module-simple.xml"}},
+        //nested modules scenario
+        {"flows/nested/flows-using-module-simple-proxy.xml",
+            new String[] {"modules/module-simple.xml", "modules/nested/module-simple-proxy.xml"}}
+    });
+  }
+
   @Override
-  protected String getModulePath() {
-    return "module-simple/module-simple.xml";
+  protected String[] getModulePaths() {
+    return paths;
   }
 
   @Override
   protected String getConfigFile() {
-    return "functional/flows-using-module-simple.xml";
+    return configFile;
   }
 
   @Test

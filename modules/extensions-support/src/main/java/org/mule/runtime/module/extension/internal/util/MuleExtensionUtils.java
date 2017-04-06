@@ -9,8 +9,10 @@ package org.mule.runtime.module.extension.internal.util;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
@@ -26,6 +28,7 @@ import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensi
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -534,6 +537,8 @@ public class MuleExtensionUtils {
   public static ExtensionModel loadExtension(Class<?> clazz, Map<String, Object> params) {
     params.put(TYPE_PROPERTY_NAME, clazz.getName());
     params.put(VERSION, getProductVersion());
-    return new JavaExtensionModelLoader().loadExtensionModel(clazz.getClassLoader(), params);
+    //TODO MULE-11797: as this utils is consumed from org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel), this util should get dropped once the ticket gets implemented.
+    final DslResolvingContext dslResolvingContext = getDefault(emptySet());
+    return new JavaExtensionModelLoader().loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
   }
 }

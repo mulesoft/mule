@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-simple-proxy"
+        minMuleVersion="4.0.0"
+
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:simple-prefix="http://www.mulesoft.org/schema/a/different/path/mule/module-simple"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/a/different/path/mule/module-simple http://www.mulesoft.org/schema/a/different/path/mule/module-simple/module-simple.xsd">
+    <operation name="set-payload-hardcoded-value">
+        <body>
+            <simple-prefix:set-payload-hardcoded-value />
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-param-value">
+        <parameters>
+            <parameter name="value" type="string"/>
+        </parameters>
+        <body>
+            <simple-prefix:set-payload-param-value value="#[param.value]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-param-default-value">
+        <parameters>
+            <parameter name="value" type="string" defaultValue="15"/>
+        </parameters>
+        <body>
+            <simple-prefix:set-payload-param-default-value/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-param-default-value-use-optional">
+        <parameters>
+            <parameter name="value" type="string" use="OPTIONAL" defaultValue="15"/>
+        </parameters>
+        <body>
+            <simple-prefix:set-payload-param-default-value-use-optional/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-no-side-effect">
+        <body>
+            <simple-prefix:set-payload-no-side-effect/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="do-nothing">
+        <body>
+            <simple-prefix:do-nothing/>
+        </body>
+        <output type="void"/>
+    </operation>
+
+    <operation name="set-payload-param-value-appender">
+        <parameters>
+            <parameter name="value" type="string"/>
+        </parameters>
+        <body>
+            <simple-prefix:set-payload-param-value-appender value="#[param.value]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-concat-params-values">
+        <parameters>
+            <parameter name="value1" type="string"/>
+            <parameter name="value2" type="string"/>
+        </parameters>
+        <body>
+            <simple-prefix:set-payload-concat-params-values value1="#[param.value1]" value2="#[param.value2]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-using-undefined-param">
+        <body>
+            <simple-prefix:set-payload-using-undefined-param/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-using-optional-param">
+        <parameters>
+            <parameter name="value1" type="string" use="OPTIONAL" />
+        </parameters>
+        <body>
+            <simple-prefix:set-payload-using-optional-param/>
+        </body>
+        <output type="string"/>
+    </operation>
+</module>

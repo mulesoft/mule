@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal;
 
+import static java.util.Collections.emptySet;
 import static org.assertj.core.util.Arrays.isNullOrEmpty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.CHOICE_OPERATION_NAME;
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.EXTENSION_DESCRIPTION;
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.EXTENSION_NAME;
@@ -23,6 +25,8 @@ import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.OTHE
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.VENDOR;
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.VERSION;
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.WHEN_ROUTE_NAME;
+import org.junit.Before;
+import org.junit.Test;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -39,9 +43,6 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;
 import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
 
 @SmallTest
 public class CoreExtensionDeclarationTestCase extends AbstractJavaExtensionDeclarationTestCase {
@@ -61,7 +62,7 @@ public class CoreExtensionDeclarationTestCase extends AbstractJavaExtensionDecla
       protected void declareExtension(ExtensionLoadingContext context) {
         new TestCoreExtensionDeclarer().declareOn(context.getExtensionDeclarer());
       }
-    }.loadExtensionModel(getClass().getClassLoader(), new HashMap<>());
+    }.loadExtensionModel(getClass().getClassLoader(), getDefault(emptySet()), new HashMap<>());
   }
 
   @Test

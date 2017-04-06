@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml;
 
+import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -104,7 +106,8 @@ public class JavaXmlDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
   private XmlDslModel enrich(Class<?> type) {
     extensionDeclarer.withModelProperty(new ImplementingTypeModelProperty(type));
-    declarationEnricher.enrich(new DefaultExtensionLoadingContext(extensionDeclarer, type.getClassLoader()));
+    declarationEnricher
+        .enrich(new DefaultExtensionLoadingContext(extensionDeclarer, type.getClassLoader(), getDefault(emptySet())));
     return extensionDeclarer.getDeclaration().getXmlDslModel();
   }
 

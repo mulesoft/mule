@@ -7,11 +7,15 @@
 package org.mule.runtime.module.extension.internal.resources;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -19,18 +23,9 @@ import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactor
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
 import org.mule.runtime.module.extension.internal.capability.xml.description.DescriptionDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
 import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
-
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -41,6 +36,11 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 
 /**
@@ -106,7 +106,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         super.configureContextBeforeDeclaration(context);
         context.addCustomDeclarationEnricher(new DescriptionDeclarationEnricher());
       }
-    }.loadExtensionModel(extensionClass.getClassLoader(), params);
+    }.loadExtensionModel(extensionClass.getClassLoader(), getDefault(emptySet()), params);
   }
 
   private Optional<TypeElement> getExtension(RoundEnvironment env) {

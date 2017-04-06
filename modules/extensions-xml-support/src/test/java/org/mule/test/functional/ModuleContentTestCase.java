@@ -18,12 +18,12 @@ public class ModuleContentTestCase extends AbstractXmlExtensionMuleArtifactFunct
 
   @Override
   protected String getModulePath() {
-    return "module-content/module-content.xml";
+    return "modules/module-content.xml";
   }
 
   @Override
   protected String getConfigFile() {
-    return "functional/flows-using-module-content.xml";
+    return "flows/flows-using-module-content.xml";
   }
 
   @Test

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.extension.internal.loader.validation;
 
+import static java.util.Collections.emptySet;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
 import org.apache.maven.model.validation.ModelValidator;
 import org.junit.Before;
@@ -71,7 +73,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
   private ExtensionModel getExtensionModelFrom(String modulePath) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put(RESOURCE_XML, modulePath);
-    return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), parameters);
+    return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), getDefault(emptySet()), parameters);
   }
 
 }

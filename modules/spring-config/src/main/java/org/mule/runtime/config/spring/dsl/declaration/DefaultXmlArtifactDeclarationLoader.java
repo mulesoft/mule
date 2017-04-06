@@ -7,7 +7,6 @@
 package org.mule.runtime.config.spring.dsl.declaration;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
@@ -87,6 +86,7 @@ import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationServiceReg
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.w3c.dom.Document;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -97,8 +97,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.w3c.dom.Document;
 
 /**
  * Default implementation of a {@link XmlArtifactDeclarationLoader}
@@ -133,7 +131,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   private ConfigLine loadArtifactConfig(String name, InputStream resource) {
     checkArgument(resource != null, "The given application was not found as resource");
 
-    Document document = new XmlConfigurationDocumentLoader().loadDocument(empty(), name, resource);
+    Document document = new XmlConfigurationDocumentLoader().loadDocument(name, resource);
 
     return new XmlApplicationParser(new XmlApplicationServiceRegistry(new SpiServiceRegistry(), context))
         .parse(document.getDocumentElement())

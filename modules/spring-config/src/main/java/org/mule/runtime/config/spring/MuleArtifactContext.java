@@ -8,6 +8,7 @@ package org.mule.runtime.config.spring;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.join;
@@ -62,13 +63,6 @@ import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -88,6 +82,12 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.w3c.dom.Document;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
@@ -201,7 +201,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
       applicationConfigBuilder.setApplicationProperties(this.artifactProperties);
       for (Resource springResource : artifactConfigResources) {
         Document document =
-            xmlConfigurationDocumentLoader.loadDocument(ofNullable(muleContext.getExtensionManager()),
+            xmlConfigurationDocumentLoader.loadDocument(muleContext.getExtensionManager() == null ? emptySet()
+                : muleContext.getExtensionManager().getExtensions(),
                                                         springResource.getFilename(),
                                                         springResource.getInputStream());
         ConfigLine mainConfigLine = xmlApplicationParser.parse(document.getDocumentElement()).get();
