@@ -202,7 +202,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     StringBuilder accumulator = new StringBuilder();
     withCursor(cursor -> {
 
-      // read a chunk which is significantly smalled than the buffer size
+      // read a chunk which is significantly smaller than the buffer size
       int chunkSize = bufferSize / 2;
       byte[] buffer = new byte[chunkSize];
       int read = cursor.read(buffer, 0, chunkSize);

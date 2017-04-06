@@ -123,7 +123,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
           operation.withOutput().ofType(outputType);
           processInterceptingOperation(operationMethod, operation);
 
-          operation.supportsStreaming(isInputStream(outputType) || method.getAnnotation(Streaming.class) != null);
+          handleByteStreaming(method, operation, outputType);
         }
       }
 
@@ -133,6 +133,10 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       calculateExtendedTypes(declaringClass, method, operation);
       operationDeclarers.put(operationMethod, operation);
     }
+  }
+
+  private void handleByteStreaming(Method method, OperationDeclarer operation, MetadataType outputType) {
+    operation.supportsStreaming(isInputStream(outputType) || method.getAnnotation(Streaming.class) != null);
   }
 
   private boolean processNonBlockingOperation(OperationDeclarer operation, MethodElement operationMethod) {
@@ -172,6 +176,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
     operation.withOutput().ofType(genericTypes.get(0));
     operation.withOutputAttributes().ofType(genericTypes.get(1));
     operation.blocking(false);
+    handleByteStreaming(operationMethod.getMethod(), operation, genericTypes.get(0));
 
     return true;
   }

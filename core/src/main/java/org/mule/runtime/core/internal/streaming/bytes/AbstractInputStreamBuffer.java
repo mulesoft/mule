@@ -9,11 +9,7 @@ package org.mule.runtime.core.internal.streaming.bytes;
 import static java.lang.Math.min;
 import static java.lang.Math.toIntExact;
 import static java.nio.channels.Channels.newChannel;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.streaming.AbstractStreamingBuffer;
 
 import java.io.IOException;
@@ -21,7 +17,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Optional;
 
 /**
  * Base class for implementations of {@link InputStreamBuffer}.
@@ -32,13 +27,12 @@ import java.util.Optional;
  */
 public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer implements InputStreamBuffer {
 
-  private final ByteBufferManager bufferManager;
+  protected final ByteBufferManager bufferManager;
 
   private InputStream stream;
   private ReadableByteChannel streamChannel;
-  private ByteBuffer buffer;
-  private Range bufferRange;
   private boolean streamFullyConsumed = false;
+  protected ByteBuffer buffer;
 
   /**
    * Creates a new instance
@@ -78,8 +72,6 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     this.streamChannel = streamChannel;
     this.bufferManager = bufferManager;
     this.buffer = buffer;
-
-    bufferRange = new Range(0, 0);
   }
 
   /**
@@ -93,36 +85,10 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   /**
    * Consumes the stream in order to obtain data that has not been read yet.
    *
-   * @param buffer the buffer in which the data is to be loaded. The buffer must be in the correct position to receive the data
-   *               and have enough space remaining
    * @return the amount of bytes read
    * @throws IOException
    */
-  public abstract int consumeForwardData(ByteBuffer buffer) throws IOException;
-
-  /**
-   * Re obtains information which has already been consumed and this buffer is keeping somehow. This method will be invoked
-   * when the cursor is rewind.
-   *
-   * @param dest          the buffer in which the data is to be loaded. The buffer must be in the correct position to receive the data
-   *                      and have enough space remaining
-   * @param requiredRange the range of required information
-   * @param length        the amount of information to read
-   * @return the amount of bytes actually read
-   */
-  public abstract int getBackwardsData(ByteBuffer dest, Range requiredRange, int length);
-
-  /**
-   * @return Whether this buffer can be expanded
-   */
-  protected abstract boolean canBeExpanded();
-
-  /**
-   * @return the {@link ByteBufferManager} that <b>MUST</b> to be used to allocate byte buffers
-   */
-  protected ByteBufferManager getBufferManager() {
-    return bufferManager;
-  }
+  public abstract int consumeForwardData() throws IOException;
 
   /**
    * {@inheritDoc}
@@ -162,75 +128,15 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   @Override
   public final int get(ByteBuffer destination, long position, int length) {
     checkState(!closed.get(), "Buffer is closed");
-
-    return doGet(destination, position, length, true);
+    return doGet(destination, position, length);
   }
 
-  private Optional<Integer> getFromCurrentData(Range requiredRange, ByteBuffer dest, int length) {
-    if (streamFullyConsumed && requiredRange.startsAfter(bufferRange)) {
-      return of(-1);
-    }
-
-    if (bufferRange.contains(requiredRange)) {
-      return of(copy(dest, requiredRange));
-    }
-
-    if (bufferRange.isAhead(requiredRange)) {
-      return of(getBackwardsData(dest, requiredRange, length));
-    }
-
-    int overlap = handlePartialOverlap(dest, requiredRange);
-    if (overlap > 0) {
-      return of(overlap);
-    }
-
-    return empty();
-  }
-
-  private int doGet(ByteBuffer dest, long position, int length, boolean consumeStreamIfNecessary) {
-    Range requiredRange = new Range(position, position + length);
-
-    return withReadLock(() -> {
-
-      Optional<Integer> presentRead = getFromCurrentData(requiredRange, dest, length);
-      if (presentRead.isPresent()) {
-        return presentRead.get();
-      }
-
-      if (consumeStreamIfNecessary) {
-        releaseReadLock();
-        return withWriteLock(() -> {
-          Optional<Integer> refetch = getFromCurrentData(requiredRange, dest, length);
-          if (refetch.isPresent()) {
-            return refetch.get();
-          }
-
-          while (!streamFullyConsumed && bufferRange.isBehind(requiredRange)) {
-            try {
-              if (reloadBuffer() > 0) {
-                int overlap = handlePartialOverlap(dest, requiredRange);
-                if (overlap > 0) {
-                  return overlap;
-                }
-              }
-            } catch (IOException e) {
-              throw new MuleRuntimeException(createStaticMessage("Could not read stream"), e);
-            }
-          }
-
-          return doGet(dest, position, length, false);
-        });
-      } else {
-        return handlePartialOverlap(dest, requiredRange);
-      }
-    });
-  }
+  protected abstract int doGet(ByteBuffer destination, long position, int length);
 
   protected void consume(ByteBuffer data) {
     int read = data.remaining();
     if (read > 0) {
       buffer.put(data);
-      bufferRange = bufferRange.advance(read);
     }
   }
 
@@ -241,23 +147,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     return buffer;
   }
 
-  private int reloadBuffer() throws IOException {
-    if (streamFullyConsumed) {
-      return -1;
-    }
-
-    int result = consumeForwardData(buffer);
-
-    if (result >= 0) {
-      bufferRange = bufferRange.advance(result);
-    } else {
-      streamFullyConsumed();
-    }
-
-    return result;
-  }
-
-  protected int loadFromStream(ByteBuffer buffer) throws IOException {
+  protected int consumeStream() throws IOException {
     int result;
     try {
       result = streamChannel.read(buffer);
@@ -267,22 +157,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     return result;
   }
 
-  /**
-   * Expands the size of the buffer by {@code bytesIncrement}
-   *
-   * @param bytesIncrement how many bytes to gain
-   * @return a new, expanded {@link ByteBuffer}
-   */
-  protected ByteBuffer expandBuffer(int bytesIncrement) {
-    ByteBuffer newBuffer = bufferManager.allocate(getExpandedBufferSize(bytesIncrement));
-    buffer.position(0);
-    newBuffer.put(buffer);
-    ByteBuffer oldBuffer = buffer;
-    buffer = newBuffer;
-    deallocate(oldBuffer);
 
-    return buffer;
-  }
 
   protected void deallocate(ByteBuffer byteBuffer) {
     if (byteBuffer != null) {
@@ -290,40 +165,22 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     }
   }
 
-  /**
-   * @return the buffered {@link InputStream}
-   */
-  protected InputStream getStream() {
-    return stream;
-  }
-
-  protected int getExpandedBufferSize(int bytesIncrement) {
-    return buffer.capacity() + bytesIncrement;
+  protected boolean isStreamFullyConsumed() {
+    return streamFullyConsumed;
   }
 
   protected void streamFullyConsumed() {
     streamFullyConsumed = true;
   }
 
-  private int handlePartialOverlap(ByteBuffer dest, Range requiredRange) {
-    return bufferRange.overlap(requiredRange)
-        .filter(r -> !r.isEmpty())
-        .map(overlap -> copy(dest, overlap))
-        .orElse(-1);
-  }
 
-  protected int copy(ByteBuffer dest, Range requiredRange) {
+  protected int copy(ByteBuffer dest, long position, int length) {
     ByteBuffer src = buffer.duplicate();
 
-    final int newPosition;
-    if (requiredRange.getStart() >= buffer.limit()) {
-      newPosition = toIntExact(requiredRange.getStart() - bufferRange.getStart());
-    } else {
-      newPosition = toIntExact(requiredRange.getStart());
-    }
+    final int newPosition = toIntExact(position);
 
     src.position(newPosition);
-    src.limit(newPosition + min(dest.remaining(), min(requiredRange.length(), src.remaining())));
+    src.limit(newPosition + min(dest.remaining(), min(length, src.remaining())));
     if (src.hasRemaining()) {
       int remaining = src.remaining();
       dest.put(src);
