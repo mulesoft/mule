@@ -16,6 +16,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyIterator;
+import static java.util.Collections.singletonList;
+
 public class MVELSplitDataIterator implements Iterator<TypedValue<?>> {
 
   private Iterator<?> delegate;
@@ -51,17 +55,17 @@ public class MVELSplitDataIterator implements Iterator<TypedValue<?>> {
   public static Iterator<TypedValue<?>> createFrom(Object result, int bachSize) {
     Iterator<Object> iter;
     if (result instanceof Object[]) {
-      iter = Arrays.asList((Object[]) result).iterator();
+      iter = asList((Object[]) result).iterator();
     } else if (result instanceof Iterable<?>) {
       iter = ((Iterable<Object>) result).iterator();
     } else if (result instanceof Iterator<?>) {
       iter = (Iterator<Object>) result;
     } else if (result instanceof Map<?, ?>) {
-      iter = ((Map) result).values().iterator();
+      iter = ((Map) result).entrySet().iterator();
     } else if (result == null) {
-      iter = Collections.emptyIterator();
+      iter = emptyIterator();
     } else {
-      iter = Collections.singletonList(result).iterator();
+      iter = singletonList(result).iterator();
     }
     return new MVELSplitDataIterator(iter, bachSize);
   }

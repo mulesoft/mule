@@ -7,6 +7,7 @@
 package org.mule.runtime.core.el;
 
 import static java.util.Optional.empty;
+import static org.apache.commons.lang.SystemUtils.FILE_SEPARATOR;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
@@ -20,9 +21,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.metadata.DataType.OBJECT;
-import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.runtime.api.metadata.DataType.*;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ATTRIBUTES;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.DATA_TYPE;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ERROR;
@@ -43,6 +43,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.message.BaseAttributes;
 
 import com.google.common.collect.Sets;
@@ -94,7 +95,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void splitByJson() throws Exception {
-    Event jsonMessage = eventBuilder().message(Message.builder().payload("[1,2,3]").mediaType(MediaType.APPLICATION_JSON).build()).build();
+    Event jsonMessage = eventBuilder().message(Message.builder().payload("[1,2,3]").mediaType(APPLICATION_JSON).build()).build();
     Iterator<TypedValue<?>> payload = expressionLanguage.split("payload", 0, jsonMessage, BindingContext.builder().build());
     assertThat(payload.hasNext(), is(true));
     assertThat(payload.next().getValue().toString(), is("1"));
@@ -107,8 +108,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void expectedOutputShouldBeUsed() throws Exception {
-    Event jsonMessage = eventBuilder().message(Message.builder().payload("{\"student\": false}").mediaType(MediaType.APPLICATION_JSON).build()).build();
-    TypedValue result = expressionLanguage.evaluate("payload.student", DataType.BOOLEAN, jsonMessage, BindingContext.builder().build());
+    Event jsonMessage = eventBuilder().message(Message.builder().payload("{\"student\": false}").mediaType(APPLICATION_JSON).build()).build();
+    TypedValue result = expressionLanguage.evaluate("payload.student", BOOLEAN, jsonMessage, BindingContext.builder().build());
     assertThat(result.getValue(), is(false));
   }
 
@@ -221,6 +222,30 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   }
 
   @Test
+  public void accessRegistryBean() throws MuleException {
+    Event event = testEvent();
+    muleContext.getRegistry().registerObject("myBean", new MyBean("DataWeave"));
+    TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean.name", event, BindingContext.builder().build());
+    assertThat(evaluate.getValue(), is("DataWeave"));
+  }
+
+  @Test
+  public void accessServerFileSeparator() throws MuleException {
+    Event event = testEvent();
+    muleContext.getRegistry().registerObject("myBean", new MyBean("DataWeave"));
+    TypedValue evaluate = expressionLanguage.evaluate("server.fileSeparator", event, BindingContext.builder().build());
+    assertThat(evaluate.getValue(), is(FILE_SEPARATOR));
+  }
+
+  @Test
+  public void accessMuleVersion() throws MuleException {
+    Event event = testEvent();
+    muleContext.getRegistry().registerObject("myBean", new MyBean("DataWeave"));
+    TypedValue evaluate = expressionLanguage.evaluate("mule.version", event, BindingContext.builder().build());
+    assertThat(evaluate.getValue(), is(MuleManifest.getProductVersion()));
+  }
+
+  @Test
   public void flowNameBinding() {
     Event event = getEventWithError(empty());
     FlowConstruct mockFlowConstruct = mock(FlowConstruct.class);
@@ -241,5 +266,18 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   private class SomeAttributes extends BaseAttributes {
 
+  }
+
+  private class MyBean {
+
+    private String name;
+
+    public MyBean(String name) {
+      this.name = name;
+    }
+
+    public String getName() {
+      return name;
+    }
   }
 }
