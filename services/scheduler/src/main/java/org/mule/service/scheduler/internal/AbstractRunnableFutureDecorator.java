@@ -13,7 +13,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.lang.reflect.Field;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RunnableFuture;
 
@@ -87,12 +86,14 @@ abstract class AbstractRunnableFutureDecorator<V> implements RunnableFuture<V> {
 
     try {
       task.run();
-      task.get();
+      if (task.isCancelled()) {
+        // Log instead of rethrow to avoid flooding the logger with stack traces of cancellation, which may be very common.
+        logger.trace("Task " + toString() + " cancelled");
+      } else {
+        task.get();
+      }
     } catch (ExecutionException e) {
       logger.error("Uncaught throwable in task " + toString(), e);
-    } catch (CancellationException e) {
-      // Log instead of rethrow to avoid flooding the logger with stack traces of cancellation, which may be very common.
-      logger.trace("Task " + toString() + " cancelled");
     } catch (InterruptedException e) {
       currentThread.interrupt();
     } finally {
