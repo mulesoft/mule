@@ -13,11 +13,11 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpConstants.Methods;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.http.api.client.HttpRequestOptions;
-import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -27,8 +27,6 @@ import org.mule.util.IOUtils;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
@@ -56,14 +54,6 @@ public class CxfBackToBlockingTestCase extends FunctionalTestCase
         super.doSetUp();
         echoWsdl = IOUtils.getResourceAsString("cxf-echo-service.wsdl", getClass()).replace("${port1}", dynamicPort.getValue());
         XMLUnit.setIgnoreWhitespace(true);
-        try
-        {
-            XMLUnit.getTransformerFactory();
-        }
-        catch (TransformerFactoryConfigurationError e)
-        {
-            XMLUnit.setTransformerFactory(XMLUtils.TRANSFORMER_FACTORY_JDK5);
-        }
     }
 
     @Test
