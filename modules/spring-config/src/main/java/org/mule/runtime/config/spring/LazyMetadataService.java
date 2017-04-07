@@ -7,6 +7,8 @@
 package org.mule.runtime.config.spring;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
@@ -117,10 +119,11 @@ public class LazyMetadataService implements MetadataService {
   private Optional<MetadataResult<?>> initializeComponent(Location location) {
     try {
       lazyMuleArtifactContext.initializeComponent(location);
-    } catch (NoSuchComponentModelException e) {
-      return Optional.of(failure(newFailure(e).withFailureCode(COMPONENT_NOT_FOUND).onComponent()));
     } catch (Exception e) {
-      return Optional.of(failure(newFailure(e).onComponent()));
+      if (getRootException(e) instanceof NoSuchComponentModelException) {
+        return of(failure(newFailure(e).withFailureCode(COMPONENT_NOT_FOUND).onComponent()));
+      }
+      return of(failure(newFailure(e).onComponent()));
     }
     return empty();
   }
