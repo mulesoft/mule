@@ -258,7 +258,7 @@ public final class IntrospectionUtils {
     return new LinkedList<>();
   }
 
-  private static ResolvableType getMethodType(Method method) {
+  public static ResolvableType getMethodType(Method method) {
     ResolvableType methodType = getMethodResolvableType(method);
     if (isInterceptingCallback(methodType)) {
       methodType = unwrapGenericFromClass(InterceptingCallback.class, methodType, 0);

@@ -6,11 +6,20 @@
  */
 package org.mule.test.transactional;
 
+import static java.lang.System.identityHashCode;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.test.transactional.connection.TestTransactionalConnection;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 public class TransactionalOperations {
 
@@ -38,6 +47,34 @@ public class TransactionalOperations {
                                    @Content TestTransactionalConnection transactionalConnection) {
     checkArgument(transactionalConnection != null, "The transactionalConnection can't be null");
     checkState(connection.getConnectionId() == transactionalConnection.getConnectionId(), "The connection is not the same");
+  }
+
+  public PagingProvider<TestTransactionalConnection, Integer> pagedTransactionalOperation() throws Exception {
+    return new PagingProvider<TestTransactionalConnection, Integer>() {
+
+      private static final int SIZE = 2;
+      private int count = 0;
+
+      @Override
+      public List<Integer> getPage(TestTransactionalConnection connection) {
+        return count++ < SIZE ? asList(identityHashCode(connection)) : emptyList();
+      }
+
+      @Override
+      public Optional<Integer> getTotalResults(TestTransactionalConnection connection) {
+        return of(SIZE);
+      }
+
+      @Override
+      public void close() throws IOException {
+
+      }
+
+      @Override
+      public boolean useStickyConnections() {
+        return false;
+      }
+    };
   }
 
   public void fail() {

@@ -8,6 +8,7 @@ package org.mule.test.heisenberg.extension;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
@@ -129,6 +130,31 @@ public class MoneyLaunderingOperation {
       @Override
       public void close() throws IOException {
         index = 0;
+      }
+    };
+  }
+
+  public PagingProvider<HeisenbergConnection, Integer> stickyPagedOperation() {
+    return new PagingProvider<HeisenbergConnection, Integer>() {
+
+      @Override
+      public List<Integer> getPage(HeisenbergConnection connection) {
+        return asList(System.identityHashCode(connection));
+      }
+
+      @Override
+      public Optional<Integer> getTotalResults(HeisenbergConnection connection) {
+        return empty();
+      }
+
+      @Override
+      public void close() throws IOException {
+
+      }
+
+      @Override
+      public boolean useStickyConnections() {
+        return true;
       }
     };
   }

@@ -22,6 +22,7 @@ import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.annotation.ExtensionOf;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
+import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
@@ -38,12 +39,15 @@ import org.mule.runtime.module.extension.internal.loader.java.type.OperationCont
 import org.mule.runtime.module.extension.internal.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOperationExecutorFactory;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.springframework.core.ResolvableType;
 
 /**
  * Helper class for declaring operations through a {@link JavaModelLoaderDelegate}
@@ -118,6 +122,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
         if (isAutoPaging(operationMethod)) {
           operation.supportsStreaming(true).withOutput().ofType(getMethodReturnType(method, loader.getTypeLoader()));
           addPagedOperationModelProperty(operationMethod, operation, supportsConfig);
+          processPagingTx(operation, method);
         } else {
           final MetadataType outputType = getMethodReturnType(method, loader.getTypeLoader());
           operation.withOutput().ofType(outputType);
@@ -222,6 +227,11 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
     }
     operation.withModelProperty(new PagedOperationModelProperty());
     operation.requiresConnection(true);
+  }
+
+  private void processPagingTx(OperationDeclarer operation, Method method) {
+    ResolvableType connectionType = IntrospectionUtils.getMethodType(method).getGeneric(0);
+    operation.transactional(TransactionalConnection.class.isAssignableFrom(connectionType.getRawClass()));
   }
 
   private boolean isAutoPaging(MethodElement operationMethod) {

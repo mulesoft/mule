@@ -8,6 +8,7 @@ package org.mule.test.module.extension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.core.Is.is;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.INVOLVED_PEOPLE;
@@ -64,6 +65,15 @@ public class PagedOperationExecutionTestCase extends AbstractExtensionFunctional
   public void pagedOperationUsingConnection() throws Exception {
     Iterator iterator = getCursor("pagedOperationUsingConnection");
     assertThat(iterator.next().toString(), containsString(SAUL_NEW_NUMBER));
+  }
+
+  @Test
+  public void pagedOperationWithStickyConnection() throws Exception {
+    Iterator<Integer> iterator = getCursor("pagedOperationWithStickyConnection");
+    Integer connectionId1 = iterator.next();
+    Integer connectionId2 = iterator.next();
+
+    assertThat(connectionId1, equalTo(connectionId2));
   }
 
   private <T> CursorIterator<T> getCursor(String flowName) throws Exception {

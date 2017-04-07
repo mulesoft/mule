@@ -18,6 +18,10 @@
         </tx:connection>
     </tx:config>
 
+    <tx:config name="nonPoolingTx">
+        <tx:non-pooling-connection />
+    </tx:config>
+
     <flow name="commitLocalTx">
         <tx:verify-no-transaction config-ref="localTx1"/>
         <try transactionalAction="ALWAYS_BEGIN">
@@ -60,4 +64,24 @@
         </try>
         <tx:verify-transaction-commited config-ref="localTx1"/>
     </flow>
+
+    <flow name="pagedOperationInTx">
+        <set-variable variableName="accumulator" value="#[[]]" />
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx:paged-transactional-operation config-ref="nonPoolingTx"/>
+            <flow-ref name="accumulatePages" />
+        </try>
+    </flow>
+
+    <flow name="pagedOperationWithoutTx">
+        <set-variable variableName="accumulator" value="#[[]]" />
+        <tx:paged-transactional-operation config-ref="nonPoolingTx"/>
+        <flow-ref name="accumulatePages" />
+    </flow>
+
+    <sub-flow name="accumulatePages">
+        <foreach>
+            <set-variable variableName="accumulator" value="#[accumulator ++ [payload]]" />
+        </foreach>
+    </sub-flow>
 </mule>
