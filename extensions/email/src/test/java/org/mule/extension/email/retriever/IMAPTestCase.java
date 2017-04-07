@@ -26,10 +26,13 @@ import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.ESTEBAN_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
+
 import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
 import org.mule.extension.email.api.exception.EmailNotFoundException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.streaming.object.CursorIterator;
+import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.util.TestConnectivityUtils;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.File;
@@ -40,6 +43,7 @@ import java.util.Collection;
 import javax.mail.Flags.Flag;
 import javax.mail.internet.MimeMessage;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -54,6 +58,16 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
   private static final String RETRIEVE_MATCH_RECENT = "retrieveOnlyRecentEmails";
   private static final String FAIL_MARKING_FLAG = "failMarkingEmail";
   private static final String RETRIEVE_DELETE_SELECTED = "retrieveAndDeleteSelected";
+
+  private TestConnectivityUtils connectivityUtils;
+
+  @Rule
+  public SystemProperty rule = TestConnectivityUtils.disableAutomaticTestConnectivity();
+
+  private static final String SPECIAL_CHARACTER_PASSWORD = "*uawH*IDXlh2p%21xSPOx%23%25zLpL";
+
+  @Rule
+  public SystemProperty specialCharacterPassword = new SystemProperty("specialCharacterPassword", SPECIAL_CHARACTER_PASSWORD);
 
   @Parameterized.Parameter
   public String protocol;
@@ -72,6 +86,14 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
   public String getProtocol() {
     return protocol;
   }
+
+  @Test
+  public void specialCharacterPassword() {
+    connectivityUtils = new TestConnectivityUtils(muleContext);
+    user = server.setUser(JUANI_EMAIL, JUANI_EMAIL, SPECIAL_CHARACTER_PASSWORD);
+    connectivityUtils.assertSuccessConnection("configSpecialCharacterCredentials");
+  }
+
 
   @Test
   public void retrieveAndRead() throws Exception {
