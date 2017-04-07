@@ -7,8 +7,6 @@
 package org.mule.util.xmlsecurity;
 
 import static java.lang.String.format;
-import static javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD;
-import static javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET;
 import static javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES;
 import static javax.xml.stream.XMLInputFactory.SUPPORT_DTD;
 
@@ -28,6 +26,10 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultXMLSecureFactories
 {
     private final static Log logger = LogFactory.getLog(DefaultXMLSecureFactories.class);
+
+    // Copied from javax.xml.XMLConstants to be able to compile on Java 6, as they were introduced in Java 7
+    private static final String ACCESS_EXTERNAL_DTD = "http://javax.xml.XMLConstants/property/accessExternalDTD";
+    private static final String ACCESS_EXTERNAL_STYLESHEET = "http://javax.xml.XMLConstants/property/accessExternalStylesheet";
 
     public static DocumentBuilderFactory createDocumentBuilderFactory(Boolean externalEntities, Boolean expandEntities)
     {
