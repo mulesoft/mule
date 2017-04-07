@@ -6,13 +6,15 @@
  */
 package org.mule.test.module.http.functional.requester;
 
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -26,7 +28,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
 
   private static final String TEST_HEADER_NAME = "TestHeaderName";

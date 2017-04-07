@@ -6,13 +6,15 @@
  */
 package org.mule.test.module.http.functional.proxy;
 
+import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.apache.http.entity.ContentType.DEFAULT_TEXT;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-import org.mule.test.module.http.functional.AbstractHttpExpectHeaderServerTestCase;
+
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.module.http.functional.AbstractHttpExpectHeaderServerTestCase;
 
 import java.io.IOException;
 
@@ -20,8 +22,9 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
-
+@Features(HTTP_EXTENSION)
 public class HttpProxyExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase {
 
   @Rule
