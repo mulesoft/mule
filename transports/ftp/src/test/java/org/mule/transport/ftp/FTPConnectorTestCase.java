@@ -6,6 +6,8 @@
  */
 package org.mule.transport.ftp;
 
+import static org.junit.Assert.assertEquals;
+
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -13,7 +15,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.transport.AbstractConnectorTestCase;
+import org.mule.transport.nameable.AbstractInboundEndpointNameableConnectorTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,13 +23,11 @@ import java.util.Map;
 import org.apache.commons.pool.ObjectPool;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * Test configuration of FTP connector. It's all done in code, no configuration files
  * are used and Mule is not started.
  */
-public class FTPConnectorTestCase extends AbstractConnectorTestCase
+public class FTPConnectorTestCase extends AbstractInboundEndpointNameableConnectorTestCase
 {
     static final long POLLING_FREQUENCY = 1234;
     static final long POLLING_FREQUENCY_OVERRIDE = 4321;

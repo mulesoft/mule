@@ -30,6 +30,7 @@ import org.mule.transport.AbstractConnector;
 import org.mule.transport.file.ExpressionFilenameParser;
 import org.mule.transport.file.FilenameParser;
 import org.mule.transport.sftp.config.SftpProxyConfig;
+import org.mule.transport.nameable.AbstractInboundEndpointNameableConnector;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
 import java.util.HashMap;
@@ -50,7 +51,7 @@ import org.apache.commons.pool.impl.GenericObjectPool;
  * middle-man. 3. More explicit connection lifefecyle management. 4. Leverages sftp
  * stat to determine if a file size changes (simpler and also less memory intensive)
  */
-public class SftpConnector extends AbstractConnector
+public class SftpConnector extends AbstractInboundEndpointNameableConnector
 {
 
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
