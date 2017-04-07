@@ -20,11 +20,10 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.api.exception.LocatedMuleException.INFO_LOCATION_KEY;
+import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.exception.MessagingException.PAYLOAD_INFO_KEY;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.exception.LocatedMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.message.Message;
@@ -264,7 +263,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
 
     MessagingException exception = new MessagingException(CoreMessages.createStaticMessage(""), mockEvent, mockProcessor);
     exception.getInfo().putAll(locationProvider.getContextInfo(mockEvent, mockProcessor, null));
-    assertThat(exception.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(),
+    assertThat(exception.getInfo().get(MuleException.INFO_LOCATION_KEY).toString(),
                is("Mock@1 @ MessagingExceptionTestCase:muleApp.xml:10 (Mock Component)"));
   }
 

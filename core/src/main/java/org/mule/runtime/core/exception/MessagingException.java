@@ -9,9 +9,6 @@ package org.mule.runtime.core.exception;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.abbreviate;
-import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
-import static org.mule.runtime.api.exception.LocatedMuleException.INFO_LOCATION_KEY;
-import static org.mule.runtime.api.exception.LocatedMuleException.INFO_SOURCE_XML_KEY;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
@@ -27,7 +24,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -351,17 +347,6 @@ public class MessagingException extends MuleException {
     if (failingMessageProcessorWasSerialized) {
       this.failingMessageProcessor = (Processor) in.readObject();
     }
-  }
-
-  @Override
-  protected void appendSummaryMessage(StringBuilder builder) {
-    Map exceptionInfo = org.mule.runtime.api.exception.ExceptionHelper.getExceptionInfo(this);
-    builder.append("Element               : ")
-        .append(exceptionInfo.get(INFO_LOCATION_KEY))
-        .append(LINE_SEPARATOR)
-        .append("Element XML           : ")
-        .append(exceptionInfo.get(INFO_SOURCE_XML_KEY))
-        .append(LINE_SEPARATOR);
   }
 
 }

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.exception;
 
-import static org.mule.runtime.api.exception.LocatedMuleException.INFO_LOCATION_KEY;
-import static org.mule.runtime.api.exception.LocatedMuleException.INFO_SOURCE_XML_KEY;
+import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
+import static org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
