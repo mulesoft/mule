@@ -14,7 +14,7 @@ import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.builder.OAuthDancerBuilder;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
@@ -33,7 +33,7 @@ import java.util.function.Supplier;
 public abstract class AbstractOAuthDancerBuilder<D extends OAuthDancer> implements OAuthDancerBuilder<D> {
 
   protected final LockFactory lockProvider;
-  protected final Map<String, ResourceOwnerOAuthContext> tokensStore;
+  protected final Map<String, DefaultResourceOwnerOAuthContext> tokensStore;
   protected final HttpService httpService;
   protected final MuleExpressionLanguage expressionEvaluator;
 
@@ -49,7 +49,7 @@ public abstract class AbstractOAuthDancerBuilder<D extends OAuthDancer> implemen
   protected String scopes = null;
   protected Map<String, String> customParametersExtractorsExprs;
 
-  public AbstractOAuthDancerBuilder(LockFactory lockProvider, Map<String, ResourceOwnerOAuthContext> tokensStore,
+  public AbstractOAuthDancerBuilder(LockFactory lockProvider, Map<String, DefaultResourceOwnerOAuthContext> tokensStore,
                                     HttpService httpService, MuleExpressionLanguage expressionEvaluator) {
     this.lockProvider = lockProvider;
     this.tokensStore = tokensStore;

@@ -26,7 +26,7 @@ import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
 import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.services.oauth.internal.state.TokenResponse;
 
@@ -54,7 +54,7 @@ public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements
                                       boolean encodeClientCredentialsInBody, Charset encoding, String responseAccessTokenExpr,
                                       String responseRefreshTokenExpr, String responseExpiresInExpr,
                                       Map<String, String> customParametersExprs, LockFactory lockProvider,
-                                      Map<String, ResourceOwnerOAuthContext> tokensStore, HttpClient httpClient,
+                                      Map<String, DefaultResourceOwnerOAuthContext> tokensStore, HttpClient httpClient,
                                       MuleExpressionLanguage expressionEvaluator) {
     super(clientId, clientSecret, tokenUrl, encoding, scopes, responseAccessTokenExpr, responseRefreshTokenExpr,
           responseExpiresInExpr, customParametersExprs, lockProvider, tokensStore, httpClient, expressionEvaluator);
@@ -100,7 +100,8 @@ public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements
                      tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), tokenResponse.getExpiresIn());
       }
 
-      final ResourceOwnerOAuthContext defaultUserState = getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID);
+      final DefaultResourceOwnerOAuthContext defaultUserState =
+          getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID);
       defaultUserState.setAccessToken(tokenResponse.getAccessToken());
       defaultUserState.setExpiresIn(tokenResponse.getExpiresIn());
       for (Entry<String, Object> customResponseParameterEntry : tokenResponse.getCustomResponseParameters().entrySet()) {

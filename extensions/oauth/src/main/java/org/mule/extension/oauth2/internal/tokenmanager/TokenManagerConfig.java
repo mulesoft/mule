@@ -22,6 +22,7 @@ import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -49,7 +50,7 @@ public class TokenManagerConfig implements Initialisable, MuleContextAware {
   // TODO MULE-11424 Move to OAuthExtension
   @Parameter
   @Optional
-  private ListableObjectStore<ResourceOwnerOAuthContext> objectStore;
+  private ListableObjectStore<DefaultResourceOwnerOAuthContext> objectStore;
 
   private MuleContext muleContext;
 
@@ -57,11 +58,11 @@ public class TokenManagerConfig implements Initialisable, MuleContextAware {
 
   private boolean initialised;
 
-  public ListableObjectStore<ResourceOwnerOAuthContext> getObjectStore() {
+  public ListableObjectStore<DefaultResourceOwnerOAuthContext> getObjectStore() {
     return objectStore;
   }
 
-  public void setObjectStore(ListableObjectStore<ResourceOwnerOAuthContext> objectStore) {
+  public void setObjectStore(ListableObjectStore<DefaultResourceOwnerOAuthContext> objectStore) {
     this.objectStore = objectStore;
   }
 
@@ -76,7 +77,7 @@ public class TokenManagerConfig implements Initialisable, MuleContextAware {
     }
     if (objectStore == null) {
       objectStore =
-          (ListableObjectStore<ResourceOwnerOAuthContext>) ((MuleObjectStoreManager) muleContext.getObjectStoreManager())
+          (ListableObjectStore<DefaultResourceOwnerOAuthContext>) ((MuleObjectStoreManager) muleContext.getObjectStoreManager())
               .getUserObjectStore("token-manager-store-" + this.name, true);
     }
     configOAuthContext = new ConfigOAuthContext(muleContext.getLockFactory(), objectStore, name);

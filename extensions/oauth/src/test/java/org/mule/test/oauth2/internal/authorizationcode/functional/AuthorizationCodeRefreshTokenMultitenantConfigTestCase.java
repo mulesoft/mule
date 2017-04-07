@@ -7,13 +7,15 @@
 package org.mule.test.oauth2.internal.authorizationcode.functional;
 
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+
+import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
+import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
+import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
+import org.mule.tck.junit4.rule.SystemProperty;
+
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
-import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
-import org.mule.tck.junit4.rule.SystemProperty;
 
 @Ignore("MULE-11439: Different values in a connection don't trigger a new connect() for cached providers")
 public class AuthorizationCodeRefreshTokenMultitenantConfigTestCase extends AbstractAuthorizationCodeRefreshTokenConfigTestCase {
@@ -39,11 +41,13 @@ public class AuthorizationCodeRefreshTokenMultitenantConfigTestCase extends Abst
     final TokenManagerConfig tokenManagerConfig = muleContext.getRegistry().get(MULTITENANT_OAUTH_CONFIG);
     final ConfigOAuthContext configOAuthContext = tokenManagerConfig.getConfigOAuthContext();
 
-    final ResourceOwnerOAuthContext contextForResourceOwnerTony = configOAuthContext.getContextForResourceOwner(USER_ID_TONY);
+    final DefaultResourceOwnerOAuthContext contextForResourceOwnerTony =
+        configOAuthContext.getContextForResourceOwner(USER_ID_TONY);
     contextForResourceOwnerTony.setAccessToken(TONY_ACCESS_TOKEN);
     configOAuthContext.updateResourceOwnerOAuthContext(contextForResourceOwnerTony);
 
-    final ResourceOwnerOAuthContext contextForResourceOwnerJohn = configOAuthContext.getContextForResourceOwner(USER_ID_JOHN);
+    final DefaultResourceOwnerOAuthContext contextForResourceOwnerJohn =
+        configOAuthContext.getContextForResourceOwner(USER_ID_JOHN);
     contextForResourceOwnerJohn.setAccessToken(JOHN_ACCESS_TOKEN);
     configOAuthContext.updateResourceOwnerOAuthContext(contextForResourceOwnerJohn);
 

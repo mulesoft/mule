@@ -15,10 +15,13 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
+import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
+import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.server.HttpServer;
@@ -33,6 +36,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 
@@ -51,9 +55,14 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
 
   private Map<String, String> customParameters = emptyMap();
 
+  private Function<AuthorizationCodeRequest, Map<String, TypedValue>> beforeDanceCallback = r -> emptyMap();
+  private BiConsumer<Map<String, TypedValue>, ResourceOwnerOAuthContext> afterDanceCallback = (vars, ctx) -> {
+  };
+
   public DefaultOAuthAuthorizationCodeDancerBuilder(OAuthCallbackServersManager httpServersManager,
                                                     SchedulerService schedulerService, LockFactory lockProvider,
-                                                    Map<String, ResourceOwnerOAuthContext> tokensStore, HttpService httpService,
+                                                    Map<String, DefaultResourceOwnerOAuthContext> tokensStore,
+                                                    HttpService httpService,
                                                     MuleExpressionLanguage expressionEvaluator) {
     super(lockProvider, tokensStore, httpService, expressionEvaluator);
     this.httpServersManager = httpServersManager;
@@ -180,6 +189,20 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
   }
 
   @Override
+  public OAuthAuthorizationCodeDancerBuilder beforeDanceCallback(Function<AuthorizationCodeRequest, Map<String, TypedValue>> beforeDanceCallback) {
+    requireNonNull(beforeDanceCallback, "beforeDanceCallback cannot be null");
+    this.beforeDanceCallback = beforeDanceCallback;
+    return this;
+  }
+
+  @Override
+  public OAuthAuthorizationCodeDancerBuilder afterDanceCallback(BiConsumer<Map<String, TypedValue>, ResourceOwnerOAuthContext> afterDanceCallback) {
+    requireNonNull(afterDanceCallback, "afterDanceCallback cannot be null");
+    this.afterDanceCallback = afterDanceCallback;
+    return this;
+  }
+
+  @Override
   public AuthorizationCodeOAuthDancer build() {
     checkArgument(isNotBlank(clientId), "clientId cannot be blank");
     checkArgument(isNotBlank(clientSecret), "clientSecret cannot be blank");
@@ -192,7 +215,8 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
                                                    localAuthorizationUrlPath, localAuthorizationUrlResourceOwnerId, state,
                                                    authorizationUrl, responseAccessTokenExpr, responseRefreshTokenExpr,
                                                    responseExpiresInExpr, customParameters, customParametersExtractorsExprs,
-                                                   lockProvider, tokensStore, httpClientFactory.get(), expressionEvaluator);
+                                                   lockProvider, tokensStore, httpClientFactory.get(), expressionEvaluator,
+                                                   beforeDanceCallback, afterDanceCallback);
   }
 
 }
