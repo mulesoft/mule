@@ -62,7 +62,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
@@ -73,6 +72,7 @@ import org.mule.runtime.config.spring.ServerNotificationManagerConfigurator;
 import org.mule.runtime.config.spring.dsl.processor.AddVariablePropertyConfigurator;
 import org.mule.runtime.config.spring.dsl.processor.CustomSecurityFilterObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.EncryptionSecurityFilterObjectFactory;
+import org.mule.runtime.config.spring.dsl.processor.EnvironmentPropertyObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.ExplicitMethodEntryPointResolverObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.MessageEnricherObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.MethodEntryPoint;
@@ -80,7 +80,6 @@ import org.mule.runtime.config.spring.dsl.processor.NoArgumentsEntryPointResolve
 import org.mule.runtime.config.spring.dsl.processor.RetryPolicyTemplateObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.TransformerConfigurator;
 import org.mule.runtime.config.spring.dsl.processor.UsernamePasswordFilterObjectFactory;
-import org.mule.runtime.config.spring.dsl.processor.EnvironmentPropertyObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ComponentObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableInstanceFactory;
 import org.mule.runtime.config.spring.dsl.spring.ConfigurableObjectFactory;
@@ -88,6 +87,7 @@ import org.mule.runtime.config.spring.dsl.spring.ExcludeDefaultObjectMethods;
 import org.mule.runtime.config.spring.dsl.spring.PooledComponentObjectFactory;
 import org.mule.runtime.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
+import org.mule.runtime.config.spring.factories.FlowRefFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.runtime.config.spring.factories.ModuleOperationMessageProcessorChainFactoryBean;
@@ -101,7 +101,6 @@ import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorIterator
 import org.mule.runtime.config.spring.factories.streaming.InMemoryCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.NullCursorIteratorProviderObjectFactory;
 import org.mule.runtime.config.spring.factories.streaming.NullCursorStreamProviderObjectFactory;
-import org.mule.runtime.config.spring.factories.FlowRefFactoryBean;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
@@ -125,6 +124,7 @@ import org.mule.runtime.core.api.processor.AbstractProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
@@ -1644,6 +1644,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     buildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER)
         .withSetterParameterDefinition("count", fromFixedValue(RETRY_COUNT_FOREVER).build()).build());
     buildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier(RECONNECT_ELEMENT_IDENTIFIER)
+        .withSetterParameterDefinition("retryNotifier", fromChildConfiguration(RetryNotifier.class).build())
         .withSetterParameterDefinition("count", fromSimpleParameter("count").build()).build());
 
     buildingDefinitions.add(baseDefinition.copy()

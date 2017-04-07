@@ -71,7 +71,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   @BeforeClass
   public static void beforeClass() {
     final String loadedJson =
-        IOUtils.toString(CoreExtensionModelTestCase.class.getResourceAsStream("/META-INF/core-extension-model.json"));
+        IOUtils.toString(CoreExtensionModelTestCase.class.getResourceAsStream("/META-INF/mule-extension-model.json"));
     coreExtensionModel = new ExtensionModelJsonSerializer().deserialize(loadedJson);
   }
 

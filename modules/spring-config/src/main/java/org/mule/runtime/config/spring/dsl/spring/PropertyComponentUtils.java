@@ -68,7 +68,7 @@ public class PropertyComponentUtils {
       propertyValue = new PropertyValue(propertyComponentModel.getNameAttribute(), propertiesMap);
     } else {
       throw new MuleRuntimeException(createStaticMessage("Unrecognized property model identifier: "
-          + propertyComponentModel.getInnerComponents().get(0)));
+          + propertyComponentModel.getInnerComponents().get(0).getIdentifier()));
     }
     return propertyValue;
   }

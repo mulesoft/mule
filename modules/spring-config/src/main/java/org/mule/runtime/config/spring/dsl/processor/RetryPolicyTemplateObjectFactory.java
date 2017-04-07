@@ -8,6 +8,7 @@ package org.mule.runtime.config.spring.dsl.processor;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
@@ -29,6 +30,7 @@ public class RetryPolicyTemplateObjectFactory extends AbstractAnnotatedObjectFac
   private Integer count = SimpleRetryPolicyTemplate.DEFAULT_RETRY_COUNT;
   private Integer frequency = SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY;
   private MuleContext muleContext;
+  private RetryNotifier retryNotifier;
 
   /**
    * @param blocking true if the policy must run synchronously when invoked, false if it must run asynchronously.
@@ -51,6 +53,13 @@ public class RetryPolicyTemplateObjectFactory extends AbstractAnnotatedObjectFac
     this.frequency = frequency;
   }
 
+  /**
+   * @param retryNotifier the retry notifier to use when retrying in the template
+   */
+  public void setRetryNotifier(RetryNotifier retryNotifier) {
+    this.retryNotifier = retryNotifier;
+  }
+
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
@@ -60,6 +69,9 @@ public class RetryPolicyTemplateObjectFactory extends AbstractAnnotatedObjectFac
   public RetryPolicyTemplate doGetObject() throws Exception {
     SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate(frequency, count);
     retryPolicyTemplate.setMuleContext(muleContext);
+    if (retryNotifier != null) {
+      retryPolicyTemplate.setNotifier(retryNotifier);
+    }
     if (!blocking) {
       return new AsynchronousRetryTemplate(retryPolicyTemplate);
     }

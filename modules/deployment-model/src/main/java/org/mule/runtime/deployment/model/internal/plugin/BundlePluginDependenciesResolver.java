@@ -137,6 +137,9 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
    */
   private Set<ArtifactPluginDescriptor> getArtifactsWithDependencies(Set<ArtifactPluginDescriptor> pluginDescriptors,
                                                                      Set<BundleDescriptor> visited) {
+    Set<ArtifactPluginDescriptor> pluginDescriptorsWithDependences = new HashSet<>();
+    pluginDescriptorsWithDependences.addAll(pluginDescriptors);
+
     if (!pluginDescriptors.isEmpty()) {
       Set<ArtifactPluginDescriptor> foundDependencies = new HashSet<>();
       pluginDescriptors.stream()
@@ -158,9 +161,9 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                 }
               }));
 
-      pluginDescriptors.addAll(getArtifactsWithDependencies(foundDependencies, visited));
+      pluginDescriptorsWithDependences.addAll(getArtifactsWithDependencies(foundDependencies, visited));
     }
-    return pluginDescriptors;
+    return pluginDescriptorsWithDependences;
   }
 
   private boolean isPlugin(BundleDependency dependency) {

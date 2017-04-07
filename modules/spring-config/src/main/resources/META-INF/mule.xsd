@@ -1848,7 +1848,13 @@
         <xsd:complexContent>
             <xsd:extension base="abstractReconnectionStrategyType">
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:group ref="propertiesGroup">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Properties to be set on the created object.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:group>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
@@ -1885,7 +1891,13 @@
         <xsd:complexContent>
             <xsd:extension base="abstractReconnectNotifierType">
                 <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:group ref="propertiesGroup">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Properties to be set on the created object.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:group>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
