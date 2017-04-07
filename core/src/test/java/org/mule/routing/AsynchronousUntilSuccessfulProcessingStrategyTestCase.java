@@ -383,10 +383,13 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
             @Override
             protected boolean test() throws Exception
             {
-                try {
+                try
+                {
                     verify(mockUntilSuccessfulConfiguration, atLeast(1)).getFailureExpressionFilter();
                     return true;
-                } catch (AssertionError e) {
+                }
+                catch (AssertionError e)
+                {
                     return false;
                 }
             }
