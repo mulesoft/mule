@@ -14,7 +14,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.config.i18n.LocaleMessageHandler;
-import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.http.HttpConstants;
@@ -26,8 +25,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
-import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
@@ -61,14 +58,6 @@ public class CxfBasicTestCase extends AbstractServiceAndFlowTestCase
         super.doSetUp();
         echoWsdl = IOUtils.getResourceAsString("cxf-echo-service.wsdl", getClass());
         XMLUnit.setIgnoreWhitespace(true);
-        try
-        {
-            XMLUnit.getTransformerFactory();
-        }
-        catch (TransformerFactoryConfigurationError e)
-        {
-            XMLUnit.setTransformerFactory(XMLUtils.TRANSFORMER_FACTORY_JDK5);
-        }
     }
 
     @Test

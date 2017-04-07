@@ -25,16 +25,8 @@ public class CustomXsltTransformerFactory extends TransformerFactory
     {
         super();
 
-        TransformerFactory tf;
-        try
-        {
-            tf = TransformerFactory.newInstance();
-        }
-        catch (TransformerFactoryConfigurationError e)
-        {
-            System.setProperty("javax.xml.transform.TransformerFactory", XMLUtils.TRANSFORMER_FACTORY_JDK5);
-            tf = TransformerFactory.newInstance();
-        }
+        TransformerFactory tf = TransformerFactory.newInstance();
+
         this.delegate = tf;
     }
 

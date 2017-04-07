@@ -39,8 +39,6 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
@@ -66,7 +64,7 @@ import org.xml.sax.InputSource;
  */
 public class XMLUtils extends org.mule.util.XMLUtils
 {
-    public static final String TRANSFORMER_FACTORY_JDK5 = "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
+    public static final String XPATH1_FALLBACK = "mule.xml.xpath10.fallback";
 
     // xml parser feature names for optional XSD validation
     public static final String APACHE_XML_FEATURES_VALIDATION_SCHEMA = "http://apache.org/xml/features/validation/schema";
@@ -97,24 +95,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
      */
     public static Transformer getTransformer() throws TransformerConfigurationException
     {
-        TransformerFactory tf;
-        try
-        {
-            tf = XMLSecureFactories.createDefault().getTransformerFactory();
-        }
-        catch (TransformerFactoryConfigurationError e)
-        {
-            System.setProperty("javax.xml.transform.TransformerFactory", TRANSFORMER_FACTORY_JDK5);
-            tf = XMLSecureFactories.createDefault().getTransformerFactory();
-        }
-        if (tf != null)
-        {
-            return tf.newTransformer();
-        }
-        else
-        {
-            throw new TransformerConfigurationException("Unable to instantiate a TransformerFactory");
-        }
+        return XMLSecureFactories.createDefault().getTransformerFactory().newTransformer();
     }
 
     public static org.dom4j.Document toDocument(Object obj, MuleContext muleContext) throws Exception

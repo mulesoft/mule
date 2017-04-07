@@ -356,15 +356,7 @@ public class XsltTransformer extends AbstractXmlTransformer
             else
             {
                 // fall back to JDK default
-                try
-                {
-                    factory = XMLSecureFactories.createDefault().getTransformerFactory();
-                }
-                catch (TransformerFactoryConfigurationError e)
-                {
-                    System.setProperty("javax.xml.transform.TransformerFactory", XMLUtils.TRANSFORMER_FACTORY_JDK5);
-                    factory = XMLSecureFactories.createDefault().getTransformerFactory();
-                }
+                factory = XMLSecureFactories.createDefault().getTransformerFactory();
             }
 
             factory.setURIResolver(getUriResolver());
