@@ -15,6 +15,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.validation.SchemaFactory;
 
 import org.junit.Test;
 
@@ -57,5 +58,12 @@ public class XmlLibrariesVerificationTestCase extends AbstractMuleTestCase
     {
         TransformerFactory factory = TransformerFactory.newInstance();
         assertThat(factory, instanceOf(org.apache.xalan.processor.TransformerFactoryImpl.class));
+    }
+
+    @Test
+    public void schema()
+    {
+        SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+        assertThat(factory, instanceOf(org.apache.xerces.jaxp.validation.XMLSchemaFactory.class));
     }
 }

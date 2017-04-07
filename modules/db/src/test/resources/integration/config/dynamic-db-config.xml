@@ -10,7 +10,7 @@
     <flow name="defaultQueryRequestResponse">
         <inbound-endpoint address="vm://testRequestResponse" exchange-pattern="request-response"/>
 
-        <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
+        <set-variable variableName="dataSourceUrl" value="jdbc:derby:target/muleEmbeddedDB;create=true"/>
 
         <db:select config-ref="dynamicDbConfig">
             <db:parameterized-query>select * from PLANET order by ID</db:parameterized-query>

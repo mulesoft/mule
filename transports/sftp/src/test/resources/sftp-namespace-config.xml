@@ -10,9 +10,13 @@
                     autoDelete="true"
                     fileAge="1234"
                     tempDirOutbound="uploading"
-                    maxConnectionPoolSize="42">
-        <!-- the test case depends on the mule context creation but it does not executes any SFTP endpoint -->
-        <reconnect-forever blocking="false"/>
+                    maxConnectionPoolSize="42"
+                    preferredAuthenticationMethods="keyboard-interactive,password">
+
+        <!-- Retry to avoid failure, test will run assertions in parallel with reconnection -->
+        <reconnect-forever blocking="false" frequency="20000"/>
+
+        <sftp:proxy-config host="host" port="8080" username="user" password="pass" protocol="SOCKS5"/>
     </sftp:connector>
 
     <flow name="receiving">

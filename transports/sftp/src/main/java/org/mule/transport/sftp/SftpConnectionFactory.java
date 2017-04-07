@@ -8,6 +8,7 @@ package org.mule.transport.sftp;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.transport.sftp.config.SftpProxyConfig;
 import org.mule.util.StringUtils;
 
 import java.io.File;
@@ -22,6 +23,7 @@ public class SftpConnectionFactory implements PoolableObjectFactory
 
     private final ImmutableEndpoint endpoint;
     private String preferredAuthenticationMethods;
+    private SftpProxyConfig proxyConfig;
 
     public SftpConnectionFactory(ImmutableEndpoint endpoint)
     {
@@ -44,15 +46,10 @@ public class SftpConnectionFactory implements PoolableObjectFactory
     @Override
     public Object makeObject() throws Exception
     {
-        return createClient(endpoint, preferredAuthenticationMethods);
+        return createClient();
     }
 
-    public static SftpClient createClient(ImmutableEndpoint endpoint) throws Exception
-    {
-        return createClient(endpoint, null);
-    }
-
-    public static SftpClient createClient(ImmutableEndpoint endpoint, String preferredAuthenticationMethods) throws IOException
+    public SftpClient createClient() throws IOException
     {
         EndpointURI endpointURI = endpoint.getEndpointURI();
 
@@ -66,6 +63,10 @@ public class SftpConnectionFactory implements PoolableObjectFactory
         if (!StringUtils.isEmpty(preferredAuthenticationMethods))
         {
             client.setPreferredAuthenticationMethods(preferredAuthenticationMethods);
+        }
+        if (proxyConfig != null)
+        {
+            client.setProxyConfig(proxyConfig);
         }
 
         try
@@ -157,5 +158,10 @@ public class SftpConnectionFactory implements PoolableObjectFactory
     public void setPreferredAuthenticationMethods(String preferredAuthenticationMethods)
     {
         this.preferredAuthenticationMethods = preferredAuthenticationMethods;
+    }
+
+    public void setProxyConfig(SftpProxyConfig proxyConfig)
+    {
+        this.proxyConfig = proxyConfig;
     }
 }

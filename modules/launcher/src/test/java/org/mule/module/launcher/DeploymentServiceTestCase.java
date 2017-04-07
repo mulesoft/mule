@@ -29,9 +29,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mule.module.launcher.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
+
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Initialisable;
@@ -111,10 +113,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     public static List<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]
-                                     {
-                                             {false},
-                                             {true},
-                                     });
+                {
+                        {false},
+                        {true},
+                });
     }
 
     // Application plugin file builders
@@ -834,7 +836,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         reset(applicationDeploymentListener);
         org.apache.commons.io.FileUtils.deleteDirectory(new File(appsDir, app.getArtifactName()));
         assertAppFolderIsDeleted(appName);
-        assertUndeploymentSuccess(applicationDeploymentListener, appName);
+        assertAtLeastOneUndeploymentSuccess(applicationDeploymentListener, appName);
 
         final Map<URL, Long> endZombieMap = deploymentService.getZombieApplications();
         assertEquals("Should not be any more zombie files present", 0, endZombieMap.size());
@@ -2964,6 +2966,26 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         });
     }
 
+    private void assertAtLeastOneUndeploymentSuccess(final DeploymentListener listener, final String appName)
+    {
+        Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
+        prober.check(new JUnitProbe()
+        {
+            @Override
+            public boolean test()
+            {
+                verify(listener, atLeastOnce()).onUndeploymentSuccess(appName);
+                return true;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Failed to undeploy artifact: " + appName + System.lineSeparator() + super.describeFailure();
+            }
+        });
+    }
+
     private MuleRegistry getMuleRegistry(Application app)
     {
         final ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
@@ -3011,7 +3033,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             public String describeFailure()
             {
                 return String.format("Application %s was expected to be in status %s but was %s instead",
-                                     application.getArtifactName(), status.name(), application.getStatus().name());
+                        application.getArtifactName(), status.name(), application.getStatus().name());
             }
         });
 
@@ -3132,7 +3154,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         if (performValidation)
         {
             assertTrue("Invalid Mule exploded artifact set",
-                       CollectionUtils.isEqualCollection(Arrays.asList(expectedArtifacts), Arrays.asList(actualArtifacts)));
+                    CollectionUtils.isEqualCollection(Arrays.asList(expectedArtifacts), Arrays.asList(actualArtifacts)));
         }
     }
 
