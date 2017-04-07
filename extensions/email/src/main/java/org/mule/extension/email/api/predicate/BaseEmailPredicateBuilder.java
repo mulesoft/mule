@@ -6,24 +6,23 @@
  */
 package org.mule.extension.email.api.predicate;
 
+import static java.util.regex.Pattern.compile;
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
-import org.mule.runtime.core.api.util.TimeSinceFunction;
-import org.mule.runtime.core.api.util.TimeUntilFunction;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.extension.email.internal.util.TimeSinceFunction;
+import org.mule.extension.email.internal.util.TimeUntilFunction;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.time.LocalDateTime;
 import java.util.function.Predicate;
 
-import static java.util.regex.Pattern.compile;
-
 /**
- * Base builder class for {@link Predicate}s that verify that a {@link BaseEmailAttributes} instance is compliant with a
- * number of criteria. Builder implementation of this class are stateful and not thread-safe. A new instance should be
- * use per each desired {@link Predicate}.
+ * Base builder class for {@link Predicate}s that verify that a {@link BaseEmailAttributes} instance is compliant with a number of
+ * criteria. Builder implementation of this class are stateful and not thread-safe. A new instance should be use per each desired
+ * {@link Predicate}.
  * <p>
- * Builder implementations can either be used programmatically or through Mule's SDK since its internal state is
- * annotated with the {@link Parameter} annotation.
+ * Builder implementations can either be used programmatically or through Mule's SDK since its internal state is annotated with
+ * the {@link Parameter} annotation.
  * <p>
  * Criterias are evaluated using an {@code AND} operator, meaning that for the predicate to accept a file, ALL the criterias must
  * be complied with.
