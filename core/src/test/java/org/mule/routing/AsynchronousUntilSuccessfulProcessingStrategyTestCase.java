@@ -29,6 +29,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.store.SimpleMemoryObjectStore;
@@ -153,7 +155,22 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         when(mockUntilSuccessfulConfiguration.isUsingDefaultExpression()).thenReturn(false);
         executeUntilSuccessful();
         waitUntilRouteIsExecuted();
-        verify(mockUntilSuccessfulConfiguration, atLeast(1)).getFailureExpressionFilter();
+        new PollingProber().check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                try
+                {
+                    verify(mockUntilSuccessfulConfiguration, atLeast(1)).getFailureExpressionFilter();
+                    return true;
+                }
+                catch (AssertionError e)
+                {
+                    return false;
+                }
+            }
+        });
     }
 
     @Test
