@@ -9,51 +9,11 @@ package org.mule.test.integration.exceptions;
 import static org.mule.tck.util.TestUtils.loadConfiguration;
 import org.mule.api.config.ConfigurationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
-import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(Parameterized.class)
 public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMuleTestCase
 {
-
-    @Rule
-    public SystemProperty useXalan;
-
-    /**
-     * Verify that regardless of the XML library used, validation errors are handled correctly.
-     * 
-     * @return
-     */
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][] {
-                                             {false},
-                                             {true}
-        });
-    }
-
-    public ExceptionStrategyConfigurationFailuresTestCase(boolean isUseXalan)
-    {
-        if (isUseXalan)
-        {
-            useXalan = new ForceXalanTransformerFactory();
-        }
-        else
-        {
-            useXalan = null;
-        }
-    }
-
     @Test(expected = ConfigurationException.class)
     public void testNamedFlowExceptionStrategyFails() throws Exception
     {

@@ -12,19 +12,13 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
-import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Rule;
 import org.junit.Test;
 
 public class XsltWithParamsTransformerTestCase extends FunctionalTestCase
 {
-    @Rule
-    public SystemProperty useXalan = new ForceXalanTransformerFactory();
-
     @Override
     protected String getConfigFile()
     {

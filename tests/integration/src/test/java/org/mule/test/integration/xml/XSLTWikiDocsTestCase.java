@@ -13,8 +13,6 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
 
 import java.util.Arrays;
@@ -23,16 +21,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class XSLTWikiDocsTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    @Rule
-    public SystemProperty useXalan = new ForceXalanTransformerFactory();
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
