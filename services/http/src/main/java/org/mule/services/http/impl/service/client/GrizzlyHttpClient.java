@@ -13,19 +13,16 @@ import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Runtime.getRuntime;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.service.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.service.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.service.http.api.client.HttpAuthenticationType;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
@@ -95,6 +92,7 @@ public class GrizzlyHttpClient implements HttpClient {
   private String ownerName;
   private AsyncHttpClient asyncHttpClient;
   private SSLContext sslContext;
+  private TlsContextFactory defaultTlsContextFactory = TlsContextFactory.builder().buildDefault();
 
 
   public GrizzlyHttpClient(HttpClientConfiguration config, SchedulerService schedulerService) {
@@ -156,13 +154,7 @@ public class GrizzlyHttpClient implements HttpClient {
         builder.setAcceptAnyCertificate(true);
       }
     } else {
-      //TODO: MULE-11767 - Replace with DefaultTlsContextFactoryBuilder or a TLS service that provides a single default instance
-      resolvedTlsContextFactory = new DefaultTlsContextFactory();
-      try {
-        initialiseIfNeeded(resolvedTlsContextFactory);
-      } catch (InitialisationException e) {
-        logger.warn("Default TLS configuration could not be initialised.");
-      }
+      resolvedTlsContextFactory = defaultTlsContextFactory;
     }
     // These complete the set up, they must always be set in case an implicit SSL connection is used
     if (resolvedTlsContextFactory.getEnabledCipherSuites() != null) {

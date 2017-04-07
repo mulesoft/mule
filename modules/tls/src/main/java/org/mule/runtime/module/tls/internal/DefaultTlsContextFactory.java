@@ -7,14 +7,17 @@
 package org.mule.runtime.module.tls.internal;
 
 
-import org.mule.runtime.core.api.lifecycle.CreateException;
+import static java.util.Arrays.copyOf;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.security.tls.TlsConfiguration;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
+import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.core.api.security.tls.RestrictedSSLServerSocketFactory;
+import org.mule.runtime.core.api.security.tls.RestrictedSSLSocketFactory;
+import org.mule.runtime.core.api.security.tls.TlsConfiguration;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -27,6 +30,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -213,12 +218,24 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
   }
 
   @Override
+  public SSLSocketFactory getSocketFactory() throws KeyManagementException, NoSuchAlgorithmException {
+    return new RestrictedSSLSocketFactory(createSslContext(), getEnabledCipherSuites(), getEnabledProtocols());
+  }
+
+  @Override
+  public SSLServerSocketFactory getServerSocketFactory() throws KeyManagementException, NoSuchAlgorithmException {
+    return new RestrictedSSLServerSocketFactory(createSslContext(), getEnabledCipherSuites(), getEnabledProtocols());
+  }
+
+  @Override
   public String[] getEnabledCipherSuites() {
-    if (isUseDefaults(enabledCipherSuites)) {
-      return tlsConfiguration.getEnabledCipherSuites();
+    String[] enabledCipherSuites;
+    if (isUseDefaults(this.enabledCipherSuites)) {
+      enabledCipherSuites = tlsConfiguration.getEnabledCipherSuites();
     } else {
-      return enabledCipherSuites;
+      enabledCipherSuites = this.enabledCipherSuites;
     }
+    return enabledCipherSuites != null ? copyOf(enabledCipherSuites, enabledCipherSuites.length) : null;
   }
 
   public void setEnabledCipherSuites(String enabledCipherSuites) {
@@ -227,11 +244,13 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
 
   @Override
   public String[] getEnabledProtocols() {
-    if (isUseDefaults(enabledProtocols)) {
-      return tlsConfiguration.getEnabledProtocols();
+    String[] enabledProtocols;
+    if (isUseDefaults(this.enabledProtocols)) {
+      enabledProtocols = tlsConfiguration.getEnabledProtocols();
     } else {
-      return enabledProtocols;
+      enabledProtocols = this.enabledProtocols;
     }
+    return enabledProtocols != null ? copyOf(enabledProtocols, enabledProtocols.length) : null;
   }
 
   public void setEnabledProtocols(String enabledProtocols) {

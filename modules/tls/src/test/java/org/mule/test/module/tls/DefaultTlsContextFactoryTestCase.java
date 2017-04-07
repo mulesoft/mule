@@ -8,16 +8,19 @@ package org.mule.test.module.tls;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
-import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -117,4 +120,24 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
     expectedException.expectMessage(containsString("cipher suites are invalid"));
     tlsContextFactory.initialise();
   }
+
+  @Test
+  public void cannotMutateEnabledProtocols() throws InitialisationException {
+    TlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+    initialiseIfNeeded(tlsContextFactory);
+    tlsContextFactory.getEnabledProtocols()[0] = "TLSv1";
+    assertThat(tlsContextFactory.getEnabledProtocols(), arrayWithSize(2));
+    assertThat(tlsContextFactory.getEnabledProtocols(), arrayContaining("TLSv1.1", "TLSv1.2"));
+  }
+
+  @Test
+  public void cannotMutateEnabledCipherSuites() throws InitialisationException {
+    TlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+    initialiseIfNeeded(tlsContextFactory);
+    tlsContextFactory.getEnabledCipherSuites()[0] = "TLS_DHE_RSA_WITH_AES_256_CBC_SHA256";
+    assertThat(tlsContextFactory.getEnabledCipherSuites(), arrayWithSize(2));
+    assertThat(tlsContextFactory.getEnabledCipherSuites(), arrayContaining("TLS_DHE_DSS_WITH_AES_128_CBC_SHA256",
+                                                                           "TLS_DHE_DSS_WITH_AES_128_CBC_SHA"));
+  }
+
 }
