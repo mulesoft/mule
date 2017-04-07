@@ -167,9 +167,9 @@ public class JmsListener extends Source<Object, JmsAttributes> {
 
     numberOfConsumers = getValidNumberOfConsumers(numberOfConsumers);
 
+    LOGGER.debug("Starting JMS Listener with [" + numberOfConsumers + "] consumers");
     try {
       for (int i = 0; i < numberOfConsumers; i++) {
-        LOGGER.debug("Starting JMS Listener with [" + numberOfConsumers + "] consumers");
         session = connection.createSession(ackMode, consumerType.isTopic());
 
         final Destination jmsDestination = jmsSupport.createDestination(session.get(), destination, consumerType.isTopic());
