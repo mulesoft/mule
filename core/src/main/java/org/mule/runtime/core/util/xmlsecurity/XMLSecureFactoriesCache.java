@@ -13,6 +13,9 @@ import com.google.common.cache.LoadingCache;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.transform.TransformerFactory;
+
+import net.sf.saxon.jaxp.SaxonTransformerFactory;
 
 /**
  * Avoid configuring factories each time they are used. Since we started using setFeature to avoid security issues,
@@ -81,5 +84,29 @@ public class XMLSecureFactoriesCache {
     };
 
     return (XMLInputFactory) cache.getUnchecked(config);
+  }
+
+  public TransformerFactory getTransformerFactory(Boolean externalEntities, Boolean expandEntities) {
+    XMLFactoryConfig config = new XMLFactoryConfig(externalEntities, expandEntities, TransformerFactory.class.toString()) {
+
+      @Override
+      public Object createFactory() {
+        return DefaultXMLSecureFactories.createTransformerFactory(this.externalEntities, this.expandEntities);
+      }
+    };
+
+    return (TransformerFactory) cache.getUnchecked(config);
+  }
+
+  public TransformerFactory getSaxonTransformerFactory(Boolean externalEntities, Boolean expandEntities) {
+    XMLFactoryConfig config = new XMLFactoryConfig(externalEntities, expandEntities, SaxonTransformerFactory.class.toString()) {
+
+      @Override
+      public Object createFactory() {
+        return DefaultXMLSecureFactories.createSaxonTransformerFactory(this.externalEntities, this.expandEntities);
+      }
+    };
+
+    return (TransformerFactory) cache.getUnchecked(config);
   }
 }

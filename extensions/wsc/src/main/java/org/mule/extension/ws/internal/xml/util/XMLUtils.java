@@ -7,6 +7,7 @@
 package org.mule.extension.ws.internal.xml.util;
 
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
+
 import org.mule.extension.ws.internal.xml.stax.StaxSource;
 import org.mule.extension.ws.internal.xml.transformer.DelayedResult;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -37,7 +38,6 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import net.sf.saxon.jaxp.SaxonTransformerFactory;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.dom4j.io.DOMWriter;
 import org.dom4j.io.DocumentSource;
@@ -57,7 +57,7 @@ public class XMLUtils {
    * @throws TransformerConfigurationException if no TransformerFactory can be located in the runtime environment.
    */
   public static Transformer getTransformer() throws TransformerConfigurationException {
-    TransformerFactory tf = TransformerFactory.newInstance();
+    TransformerFactory tf = XMLSecureFactories.createDefault().getTransformerFactory();
     if (tf != null) {
       return tf.newTransformer();
     } else {
@@ -193,7 +193,7 @@ public class XMLUtils {
     StringWriter writer = new StringWriter();
     DOMSource source = new DOMSource(node);
     StreamResult result = new StreamResult(writer);
-    TransformerFactory idTransformer = new SaxonTransformerFactory();
+    TransformerFactory idTransformer = XMLSecureFactories.createDefault().getSaxonTransformerFactory();
     Transformer transformer = idTransformer.newTransformer();
     transformer.transform(source, result);
     return writer.toString();

@@ -27,6 +27,7 @@ import org.mule.runtime.config.spring.dsl.api.ArtifactDeclarationXmlSerializer;
 import org.mule.runtime.config.spring.dsl.model.DslElementModelFactory;
 import org.mule.runtime.config.spring.dsl.model.XmlArtifactDeclarationLoader;
 import org.mule.runtime.config.spring.dsl.model.XmlDslElementModelConverter;
+import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -109,7 +110,7 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
       artifact.getGlobalElements().forEach(declaration -> declaration.accept(declarationVisitor));
 
       // write the content into xml file
-      TransformerFactory transformerFactory = TransformerFactory.newInstance();
+      TransformerFactory transformerFactory = XMLSecureFactories.createDefault().getTransformerFactory();
 
       Transformer transformer = transformerFactory.newTransformer();
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");

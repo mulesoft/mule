@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.transform.TransformerFactory;
 
 /**
  * Provide XML parser factories configured to avoid XXE and BL attacks according to global configuration (safe by default)
@@ -57,5 +58,17 @@ public class XMLSecureFactories {
 
   public XMLInputFactory getXMLInputFactory() {
     return XMLSecureFactoriesCache.getInstance().getXMLInputFactory(externalEntities, expandEntities);
+  }
+
+  public TransformerFactory getTransformerFactory() {
+    return XMLSecureFactoriesCache.getInstance().getTransformerFactory(externalEntities, expandEntities);
+  }
+
+  public TransformerFactory getSaxonTransformerFactory() {
+    return XMLSecureFactoriesCache.getInstance().getSaxonTransformerFactory(externalEntities, expandEntities);
+  }
+
+  public void configureTransformerFactory(TransformerFactory factory) {
+    DefaultXMLSecureFactories.configureTransformerFactory(externalEntities, expandEntities, factory);
   }
 }
