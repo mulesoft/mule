@@ -12,7 +12,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-
+import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import org.mule.runtime.api.exception.LocatedMuleException;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.meta.NamedObject;
@@ -38,7 +38,7 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
     NamedObject named = mock(NamedObject.class);
     when(named.getName()).thenReturn("mockComponent");
     LocatedMuleException lme = new LocatedMuleException(named);
-    assertThat(lme.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(), is("/mockComponent @ app"));
+    assertThat(lme.getInfo().get(INFO_LOCATION_KEY).toString(), is("/mockComponent @ app"));
   }
 
   @Test
@@ -50,7 +50,7 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
     when(annotated.toString()).thenReturn("Mock@1");
 
     LocatedMuleException lme = new LocatedMuleException(annotated);
-    assertThat(lme.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(),
+    assertThat(lme.getInfo().get(INFO_LOCATION_KEY).toString(),
                is("Mock@1 @ app:muleApp.xml:10 (Mock Component)"));
   }
 
@@ -64,7 +64,7 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
     when(namedAnnotated.toString()).thenReturn("Mock@1");
 
     LocatedMuleException lme = new LocatedMuleException(namedAnnotated);
-    assertThat(lme.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(),
+    assertThat(lme.getInfo().get(INFO_LOCATION_KEY).toString(),
                is("/mockComponent @ app:muleConfig.xml:6 (Mock Component)"));
   }
 
@@ -74,6 +74,6 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
     when(raw.toString()).thenReturn("Mock@1");
 
     LocatedMuleException lme = new LocatedMuleException(raw);
-    assertThat(lme.getInfo().get(LocatedMuleException.INFO_LOCATION_KEY).toString(), is("Mock@1 @ app"));
+    assertThat(lme.getInfo().get(INFO_LOCATION_KEY).toString(), is("Mock@1 @ app"));
   }
 }
