@@ -6,14 +6,16 @@
  */
 package org.mule.extension.ws.metadata;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.extension.ws.WscTestUtils.ECHO;
 import static org.mule.extension.ws.WscTestUtils.ECHO_ACCOUNT;
 import static org.mule.extension.ws.WscTestUtils.NO_PARAMS;
 import static org.mule.extension.ws.internal.metadata.BaseWscResolver.BODY_FIELD;
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
@@ -27,7 +29,7 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories("Metadata")
 public class BodyMetadataTestCase extends AbstractMetadataTestCase {
 

@@ -6,6 +6,8 @@
  */
 package org.mule.services.soap.generator;
 
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
+
 import org.mule.services.soap.generator.attachment.AttachmentRequestEnricher;
 import org.mule.services.soap.generator.attachment.MtomRequestEnricher;
 
@@ -13,7 +15,7 @@ import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Step;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories({"Attachments", "MTOM", "Request Generation"})
 public class MtomRequestEnricherTestCase extends AbstractRequestEnricherTestCase {
 

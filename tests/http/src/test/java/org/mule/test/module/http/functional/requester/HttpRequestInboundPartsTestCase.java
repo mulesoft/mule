@@ -17,6 +17,8 @@ import static org.mule.functional.junit4.matchers.MultiPartPayloadMatchers.hasSi
 import static org.mule.functional.junit4.matchers.PartAttributesMatchers.hasName;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
@@ -31,7 +33,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.util.MultiPartWriter;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpRequestInboundPartsTestCase extends AbstractHttpRequestTestCase {
 
   @Override

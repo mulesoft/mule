@@ -6,10 +6,6 @@
  */
 package org.mule.extension.ws.metadata;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.collection.IsIn.isIn;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.extension.ws.WscTestUtils.DOWNLOAD_ATTACHMENT;
 import static org.mule.extension.ws.WscTestUtils.ECHO;
 import static org.mule.extension.ws.WscTestUtils.ECHO_ACCOUNT;
@@ -18,6 +14,12 @@ import static org.mule.extension.ws.WscTestUtils.FAIL;
 import static org.mule.extension.ws.WscTestUtils.NO_PARAMS;
 import static org.mule.extension.ws.WscTestUtils.NO_PARAMS_HEADER;
 import static org.mule.extension.ws.WscTestUtils.UPLOAD_ATTACHMENT;
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.collection.IsIn.isIn;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -29,7 +31,7 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories("Metadata")
 public class KeysMetadataTestCase extends AbstractMetadataTestCase {
 

@@ -6,12 +6,16 @@
  */
 package org.mule.extension.file;
 
+import static org.mule.test.allure.AllureConstants.FileFeature.FILE_EXTENSION;
+
 import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(FILE_EXTENSION)
 public class FileDeleteTestCase extends FileConnectorTestCase {
 
   private static final String GRAND_CHILD = "grandChild";

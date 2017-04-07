@@ -6,12 +6,14 @@
  */
 package org.mule.extension.file;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.extension.file.common.api.exceptions.FileError.ACCESS_DENIED;
 import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
+import static org.mule.test.allure.AllureConstants.FileFeature.FILE_EXTENSION;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
@@ -32,7 +34,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(FILE_EXTENSION)
 public class FileReadTestCase extends FileConnectorTestCase {
 
   @Override

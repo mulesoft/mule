@@ -6,6 +6,7 @@
  */
 package org.mule.services.soap.metadata;
 
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
@@ -25,7 +26,7 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories("Metadata")
 public class BodyMetadataTestCase extends AbstractMetadataTestCase {
 

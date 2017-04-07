@@ -6,12 +6,13 @@
  */
 package org.mule.test.module.http.functional.requester;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.service.http.api.HttpConstants.Method.POST;
 
 import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.core.api.Event;
@@ -34,11 +35,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
 /**
  * Sets up some HTTPS servers and clients with different protocols and ciphers. Verifies only matching configurations are
  * successful interacting with each other.
  */
+@Features(HTTP_EXTENSION)
 public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestCase {
 
   @Rule

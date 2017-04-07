@@ -6,13 +6,14 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.DEFAULT_ERROR_HANDLER;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
-import org.junit.Test;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.component.Component;
@@ -20,11 +21,13 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.test.AbstractIntegrationTestCase;
+
+import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Error Handling")
-@Stories("Default Error Handler")
+@Features(ERROR_HANDLING)
+@Stories(DEFAULT_ERROR_HANDLER)
 public class DefaultErrorHandlerTestCase extends AbstractIntegrationTestCase {
 
   private static Exception exception;

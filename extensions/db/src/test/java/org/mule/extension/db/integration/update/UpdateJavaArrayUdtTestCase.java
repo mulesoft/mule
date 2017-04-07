@@ -6,11 +6,12 @@
  */
 package org.mule.extension.db.integration.update;
 
+import static org.mule.extension.db.integration.TestDbConfig.getOracleResource;
+import static org.mule.test.allure.AllureConstants.DbFeature.DB_EXTENSION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.mule.extension.db.integration.TestDbConfig.getOracleResource;
 
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.ContactDetails;
@@ -26,7 +27,7 @@ import org.junit.runners.Parameterized;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("DB Extension")
+@Features(DB_EXTENSION)
 @Stories("Update Statement")
 public class UpdateJavaArrayUdtTestCase extends AbstractDbIntegrationTestCase {
 

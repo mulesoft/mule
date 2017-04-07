@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.connector;
 
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.functional.junit4.matchers.ThatMatcher.that;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.EXCEPTION_MAPPINGS;
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import static org.mule.functional.junit4.matchers.ThatMatcher.that;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -28,8 +31,8 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Error Handling")
-@Stories("Error Mappings")
+@Features(ERROR_HANDLING)
+@Stories(EXCEPTION_MAPPINGS)
 public class PetStoreErrorMappingsTestCase extends ExtensionFunctionalTestCase {
 
   private static final String CONNECT_ERROR_MESSAGE = "Could not connect.";

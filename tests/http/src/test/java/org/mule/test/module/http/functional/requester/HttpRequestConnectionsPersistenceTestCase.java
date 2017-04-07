@@ -6,10 +6,12 @@
  */
 package org.mule.test.module.http.functional.requester;
 
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.probe.JUnitProbe;
@@ -24,7 +26,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.io.EndPoint;
 import org.eclipse.jetty.server.Request;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpRequestConnectionsPersistenceTestCase extends AbstractHttpRequestTestCase {
 
   private static final int GRIZZLY_IDLE_CHECK_TIMEOUT_MILLIS = 6000;

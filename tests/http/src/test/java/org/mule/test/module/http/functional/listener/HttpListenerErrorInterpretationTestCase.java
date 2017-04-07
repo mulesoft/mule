@@ -6,11 +6,6 @@
  */
 package org.mule.test.module.http.functional.listener;
 
-import static org.apache.http.client.fluent.Request.Get;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
 import static org.mule.functional.util.http.SimpleHttpServer.DEFAULT_RESPONSE;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
@@ -27,11 +22,19 @@ import static org.mule.service.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAIL
 import static org.mule.service.http.api.HttpConstants.HttpStatus.TOO_MANY_REQUESTS;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
-import static org.mule.test.module.http.functional.HttpConnectorAllureConstants.HTTP_CONNECTOR_FEATURE;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.ERRORS;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 import static org.mule.test.module.http.functional.matcher.HttpResponseContentStringMatcher.body;
 import static org.mule.test.module.http.functional.matcher.HttpResponseHeaderStringMatcher.header;
 import static org.mule.test.module.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
 import static org.mule.test.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
+import static org.apache.http.client.fluent.Request.Get;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
+
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.functional.junit4.rules.HttpServerRule;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -57,8 +60,8 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features(HTTP_CONNECTOR_FEATURE)
-@Stories({"Error Handling", "Errors"})
+@Features(HTTP_EXTENSION)
+@Stories({ERROR_HANDLING, ERRORS})
 public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCase {
 
   public static final String HEADER_NAME = "X-Custom";

@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.streaming;
 
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+
 import org.mule.runtime.core.internal.streaming.object.iterator.CompositeProducer;
 import org.mule.runtime.core.internal.streaming.object.iterator.Producer;
 import org.mule.tck.size.SmallTest;
@@ -24,9 +26,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import ru.yandex.qatools.allure.annotations.Features;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
+@Features(STREAMING)
 public class CompositeProducerTestCase {
 
   private List<String> list1;

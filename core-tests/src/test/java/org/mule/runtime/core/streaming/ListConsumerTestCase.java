@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.streaming;
 
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
@@ -23,8 +24,10 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
 @SmallTest
+@Features(STREAMING)
 public class ListConsumerTestCase {
 
   private static final int totalCount = 50;

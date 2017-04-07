@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.client;
 
+import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
+import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.ExtensionsClientStory.NON_BLOCKING_CLIENT;
+
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -16,8 +19,8 @@ import java.util.concurrent.ExecutionException;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("ExtensionsClient")
-@Stories("Non-Blocking Client")
+@Features(EXTENSIONS_CLIENT)
+@Stories(NON_BLOCKING_CLIENT)
 public class NonBlockingExtensionsClientTestCase extends ExtensionsClientTestCase {
 
   @Override

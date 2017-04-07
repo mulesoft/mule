@@ -6,11 +6,10 @@
  */
 package org.mule.extension.file;
 
+import static org.mule.test.allure.AllureConstants.FileFeature.FILE_EXTENSION;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
@@ -22,6 +21,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+import org.junit.Test;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import ru.yandex.qatools.allure.annotations.Features;
+
+@Features(FILE_EXTENSION)
 @RunnerDelegateTo(Parameterized.class)
 public class FileWriteTypeTestCase extends FileConnectorTestCase {
 

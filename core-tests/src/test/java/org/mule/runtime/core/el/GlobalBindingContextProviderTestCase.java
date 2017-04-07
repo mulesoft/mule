@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.core.el;
 
-import static java.util.Optional.of;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.el.BindingContext.builder;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_FUNCTIONS;
+import static java.util.Optional.of;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
-import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionFunction;
@@ -29,18 +30,18 @@ import org.mule.runtime.core.api.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
-
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Expression Language")
-@Stories("Support Functions")
+@Features(EXPRESSION_LANGUAGE)
+@Stories(SUPPORT_FUNCTIONS)
 public class GlobalBindingContextProviderTestCase extends AbstractMuleContextTestCase {
 
   public static final String KEY = "testProvider";

@@ -6,13 +6,15 @@
  */
 package org.mule.extension.ws.runtime;
 
+import static org.mule.extension.ws.WscTestUtils.ECHO;
+import static org.mule.extension.ws.WscTestUtils.assertSoapResponse;
+import static org.mule.extension.ws.WscTestUtils.getRequestResource;
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import static java.lang.Thread.currentThread;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.mule.extension.ws.WscTestUtils.ECHO;
-import static org.mule.extension.ws.WscTestUtils.assertSoapResponse;
-import static org.mule.extension.ws.WscTestUtils.getRequestResource;
+
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
@@ -24,7 +26,7 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories("Connection")
 public class WscConnectionTestCase extends AbstractSoapServiceTestCase {
 

@@ -6,12 +6,15 @@
  */
 package org.mule.service.http.api.domain.response;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.RESPONSE_BUILDER;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyString;
 import static org.junit.Assert.assertThat;
+
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
@@ -24,8 +27,8 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("HTTP Service")
-@Stories("Response Builder")
+@Features(HTTP_SERVICE)
+@Stories(RESPONSE_BUILDER)
 public class HttpResponseBuilderTestCase {
 
   private HttpResponseBuilder builder = HttpResponse.builder();

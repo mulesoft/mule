@@ -6,6 +6,8 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SchedulerServiceStory.SHUTDOWN;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -24,11 +26,12 @@ import java.util.function.Consumer;
 
 import org.junit.Test;
 import org.quartz.SchedulerException;
-
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Scheduler Shutdown")
+@Features(SCHEDULER_SERVICE)
+@Stories(SHUTDOWN)
 public class DefaultSchedulerShutdownTestCase extends BaseDefaultSchedulerTestCase {
 
   private ScheduledExecutorService executor;

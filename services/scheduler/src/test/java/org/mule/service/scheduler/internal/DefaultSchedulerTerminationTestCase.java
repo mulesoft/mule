@@ -6,6 +6,8 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SchedulerServiceStory.TERMINATION;
 import static java.lang.System.nanoTime;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
@@ -38,12 +40,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
 @RunWith(Parameterized.class)
-@Features("Scheduler Termination")
+@Features(SCHEDULER_SERVICE)
+@Stories(TERMINATION)
 public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTestCase {
 
   private Matcher<ExecutorService> terminatedMatcher;

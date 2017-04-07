@@ -6,13 +6,14 @@
  */
 package org.mule.extension.db.integration.update;
 
+import static org.mule.extension.db.integration.DbTestUtil.DbType.MYSQL;
+import static org.mule.extension.db.integration.DbTestUtil.selectData;
+import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
+import static org.mule.test.allure.AllureConstants.DbFeature.DB_EXTENSION;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
-import static org.mule.extension.db.integration.DbTestUtil.DbType.MYSQL;
-import static org.mule.extension.db.integration.DbTestUtil.selectData;
-import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
@@ -31,7 +32,7 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("DB Extension")
+@Features(DB_EXTENSION)
 @Stories("Update Statement")
 public class UpdateTestCase extends AbstractDbIntegrationTestCase {
 

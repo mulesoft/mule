@@ -6,6 +6,8 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SchedulerServiceStory.EXHAUSTION;
 import static org.hamcrest.CoreMatchers.instanceOf;
 
 import java.util.concurrent.CountDownLatch;
@@ -14,11 +16,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
 import org.junit.Test;
-
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Scheduler Exhaustion")
+@Features(SCHEDULER_SERVICE)
+@Stories(EXHAUSTION)
 public class DefaultSchedulerExhaustionTestCase extends BaseDefaultSchedulerTestCase {
 
   @Test

@@ -6,9 +6,12 @@
  */
 package org.mule.test.integration;
 
+import static org.mule.runtime.api.component.location.Location.builder;
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SchedulerServiceStory.SOURCE_MANAGEMENT;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.api.component.location.Location.builder;
+
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -29,8 +32,8 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Scheduler source")
-@Stories("Scheduler source management")
+@Features(SCHEDULER_SERVICE)
+@Stories(SOURCE_MANAGEMENT)
 public class SchedulerManagementTestCase extends AbstractIntegrationTestCase {
 
   @Override

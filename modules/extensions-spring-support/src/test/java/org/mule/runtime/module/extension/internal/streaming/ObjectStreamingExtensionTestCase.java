@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.streaming;
 
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -19,8 +21,8 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Streaming")
-@Stories("Object Streaming")
+@Features(STREAMING)
+@Stories(OBJECT_STREAMING)
 public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final int DATA_SIZE = 100;

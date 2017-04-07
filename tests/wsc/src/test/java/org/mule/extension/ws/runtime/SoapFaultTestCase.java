@@ -6,15 +6,17 @@
  */
 package org.mule.extension.ws.runtime;
 
+import static org.mule.extension.ws.WscTestUtils.FAIL;
+import static org.mule.extension.ws.WscTestUtils.getRequestResource;
+import static org.mule.services.soap.api.SoapVersion.SOAP11;
+import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isOneOf;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.ws.WscTestUtils.FAIL;
-import static org.mule.extension.ws.WscTestUtils.getRequestResource;
-import static org.mule.services.soap.api.SoapVersion.SOAP11;
-import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
+
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.exception.MessagingException;
@@ -28,7 +30,7 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories({"Operation Execution", "Soap Fault"})
 public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
 

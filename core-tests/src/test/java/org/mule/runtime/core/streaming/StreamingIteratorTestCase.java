@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.streaming;
 
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -35,8 +37,8 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-@Features("Streaming")
-@Stories("Object Streaming")
+@Features(STREAMING)
+@Stories(OBJECT_STREAMING)
 public class StreamingIteratorTestCase {
 
   private static final int PAGE_SIZE = 100;

@@ -6,11 +6,13 @@
  */
 package org.mule.extension.ws.runtime;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.mule.extension.ws.WscTestUtils.SIMPLE_ATTACHMENT;
 import static org.mule.extension.ws.WscTestUtils.resourceAsString;
 import static org.mule.services.soap.api.SoapVersion.SOAP11;
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+
 import org.mule.extension.ws.service.Mtom11Service;
 import org.mule.extension.ws.service.Mtom12Service;
 import org.mule.runtime.api.message.Message;
@@ -24,7 +26,7 @@ import org.apache.commons.io.IOUtils;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories({"Attachments", "MTOM"})
 public class MtomAttachmentsTestCase extends AttachmentsTestCase {
 

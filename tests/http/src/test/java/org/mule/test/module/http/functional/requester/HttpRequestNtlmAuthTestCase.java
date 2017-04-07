@@ -9,6 +9,7 @@ package org.mule.test.module.http.functional.requester;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.service.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -16,8 +17,10 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.runners.Parameterized;
+import ru.yandex.qatools.allure.annotations.Features;
 
 @RunnerDelegateTo(Parameterized.class)
+@Features(HTTP_EXTENSION)
 public class HttpRequestNtlmAuthTestCase extends AbstractNtlmTestCase {
 
   @Parameterized.Parameter(0)

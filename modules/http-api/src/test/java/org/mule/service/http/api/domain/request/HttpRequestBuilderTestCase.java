@@ -6,13 +6,15 @@
  */
 package org.mule.service.http.api.domain.request;
 
+import static org.mule.service.http.api.HttpConstants.Method.POST;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.REQUEST_BUILDER;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.Method.POST;
 
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
@@ -23,12 +25,11 @@ import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("HTTP Service")
-@Stories("Request Builder")
+@Features(HTTP_SERVICE)
+@Stories(REQUEST_BUILDER)
 public class HttpRequestBuilderTestCase {
 
   public static final String URI_VALUE = "someUri";

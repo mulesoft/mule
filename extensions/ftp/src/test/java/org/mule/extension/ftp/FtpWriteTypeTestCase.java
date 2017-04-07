@@ -9,6 +9,8 @@ package org.mule.extension.ftp;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
+import static org.mule.test.allure.AllureConstants.FtpFeature.FTP_EXTENSION;
+
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.runtime.core.api.Event;
@@ -24,8 +26,10 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+import ru.yandex.qatools.allure.annotations.Features;
 
 @RunnerDelegateTo(Parameterized.class)
+@Features(FTP_EXTENSION)
 public class FtpWriteTypeTestCase extends FtpConnectorTestCase {
 
   @Parameterized.Parameters(name = "{0}")

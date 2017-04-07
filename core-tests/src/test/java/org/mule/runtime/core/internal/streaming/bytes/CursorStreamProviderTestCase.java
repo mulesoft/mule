@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import static org.mule.runtime.api.util.DataUnit.BYTE;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static java.lang.Math.toIntExact;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -13,7 +15,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.util.DataUnit.BYTE;
+
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
@@ -36,9 +38,11 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import ru.yandex.qatools.allure.annotations.Features;
 
 @RunWith(Parameterized.class)
 @SmallTest
+@Features(STREAMING)
 public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase {
 
   @Parameterized.Parameters(name = "{0}")

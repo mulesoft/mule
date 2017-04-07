@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -18,8 +19,10 @@ import java.nio.ByteBuffer;
 
 import org.junit.After;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
 @SmallTest
+@Features(STREAMING)
 public class PoolingByteBufferManagerTestCase extends AbstractMuleTestCase {
 
   private PoolingByteBufferManager bufferManager = new PoolingByteBufferManager();

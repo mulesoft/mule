@@ -6,6 +6,7 @@
  */
 package org.mule.services.soap.runtime.wss;
 
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import static java.util.Collections.singletonList;
 import org.mule.services.soap.api.security.SecurityStrategy;
 import org.mule.services.soap.api.security.TimestampSecurityStrategy;
@@ -20,7 +21,7 @@ import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories("WSS")
 public class WssTimestampTestCase extends AbstractWebServiceSecurityTestCase {
 

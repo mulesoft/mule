@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.streaming;
 
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
@@ -25,8 +26,10 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
 @SmallTest
+@Features(STREAMING)
 public class SimpleConsumerTestCase {
 
   private Producer<String> producer;

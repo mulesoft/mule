@@ -10,10 +10,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.HELLO_PATH;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
+import static org.mule.test.allure.AllureConstants.FtpFeature.FTP_EXTENSION;
+
 import org.mule.extension.FtpTestHarness;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(FTP_EXTENSION)
 public class FtpDeleteTestCase extends FtpConnectorTestCase {
 
   private static final String SUB_FOLDER = "files/subfolder";

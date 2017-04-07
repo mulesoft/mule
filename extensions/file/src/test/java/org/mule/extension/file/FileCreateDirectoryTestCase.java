@@ -7,13 +7,17 @@
 package org.mule.extension.file;
 
 import static org.mule.extension.file.common.api.exceptions.FileError.FILE_ALREADY_EXISTS;
+import static org.mule.test.allure.AllureConstants.FileFeature.FILE_EXTENSION;
+
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 
 import java.io.File;
 import java.nio.file.Paths;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(FILE_EXTENSION)
 public class FileCreateDirectoryTestCase extends FileConnectorTestCase {
 
   private static final String DIRECTORY = "validDirectory";

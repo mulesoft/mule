@@ -6,12 +6,14 @@
  */
 package org.mule.services.soap.runtime;
 
-import static java.lang.Thread.currentThread;
 import static org.mule.services.soap.api.client.SoapClientConfiguration.builder;
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
+import static java.lang.Thread.currentThread;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.services.soap.AbstractSoapServiceTestCase;
-import org.mule.services.soap.api.client.SoapClientFactory;
 import org.mule.services.soap.SoapServiceImplementation;
+import org.mule.services.soap.api.client.SoapClientFactory;
 
 import java.net.URL;
 
@@ -22,7 +24,7 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories("Connection")
 public class SoapClientFactoryTestCase extends AbstractSoapServiceTestCase {
 

@@ -6,30 +6,31 @@
  */
 package org.mule.services.soap.runtime;
 
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
+import static org.mule.services.soap.api.message.SoapRequest.builder;
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import static java.lang.Thread.currentThread;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
-import static org.mule.services.soap.api.message.SoapRequest.builder;
+
 import org.mule.services.soap.AbstractSoapServiceTestCase;
 import org.mule.services.soap.TestSoapClient;
 import org.mule.services.soap.api.client.SoapClient;
-import org.mule.services.soap.api.message.SoapHeader;
 import org.mule.services.soap.api.message.ImmutableSoapRequest;
+import org.mule.services.soap.api.message.SoapHeader;
 import org.mule.services.soap.api.message.SoapRequest;
 import org.mule.services.soap.api.message.SoapResponse;
-
-import com.google.common.collect.ImmutableList;
 
 import java.net.URL;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories("Operation Execution")
 public class OperationExecutionTestCase extends AbstractSoapServiceTestCase {
 

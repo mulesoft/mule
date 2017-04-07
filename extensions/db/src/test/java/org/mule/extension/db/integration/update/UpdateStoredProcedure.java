@@ -6,9 +6,11 @@
  */
 package org.mule.extension.db.integration.update;
 
-import static org.junit.Assume.assumeThat;
 import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
+import static org.mule.test.allure.AllureConstants.DbFeature.DB_EXTENSION;
+import static org.junit.Assume.assumeThat;
+
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
@@ -25,7 +27,7 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("DB Extension")
+@Features(DB_EXTENSION)
 @Stories("Update Statement")
 public class UpdateStoredProcedure extends AbstractDbIntegrationTestCase {
 
