@@ -7,9 +7,11 @@
 
 package org.mule.transport.nameable;
 
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transport.AbstractConnectorTestCase;
 
@@ -34,15 +36,23 @@ public abstract class AbstractInboundEndpointNameableConnectorTestCase extends A
 
         Service service = getTestService("anApple", Apple.class);
 
+        EndpointBuilder builderEndpoint1 = new EndpointURIEndpointBuilder(getTestEndpointURI(), muleContext);
+        builderEndpoint1.setName(ENDPOINT1_NAME);
+
         InboundEndpoint endpoint1 =
-                muleContext.getEndpointFactory().getInboundEndpoint(getTestEndpointURI(), ENDPOINT1_NAME);
+                muleContext.getEndpointFactory().getInboundEndpoint(builderEndpoint1);
+
+        EndpointBuilder builderEndpoint2 = new EndpointURIEndpointBuilder(getTestEndpointURI(), muleContext);
+        builderEndpoint1.setName(ENDPOINT2_NAME);
 
         InboundEndpoint endpoint2 =
-                muleContext.getEndpointFactory().getInboundEndpoint(getTestEndpointURI(), ENDPOINT2_NAME);
+                muleContext.getEndpointFactory().getInboundEndpoint(builderEndpoint2);
 
+        // In case no exception is raised, the registration of both endpoints
+        // was successful (same uri, different name)
         connector.registerListener(endpoint1, getSensingNullMessageProcessor(), service);
         connector.registerListener(endpoint2, getSensingNullMessageProcessor(), service);
-
+        
     }
     
 }
