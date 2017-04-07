@@ -27,7 +27,6 @@ import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.ESTEBAN_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 
-import org.junit.Rule;
 import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
 import org.mule.extension.email.api.exception.EmailNotFoundException;
 import org.mule.runtime.api.message.Message;
@@ -44,6 +43,7 @@ import java.util.Collection;
 import javax.mail.Flags.Flag;
 import javax.mail.internet.MimeMessage;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
