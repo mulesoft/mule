@@ -7,11 +7,11 @@
 package org.mule.transport.sftp;
 
 import org.mule.api.transport.Connector;
-import org.mule.transport.AbstractConnectorTestCase;
+import org.mule.transport.nameable.AbstractInboundEndpointNameableConnectorTestCase;
 
 import org.junit.Test;
 
-public class SftpConnectorTestCase extends AbstractConnectorTestCase
+public class SftpConnectorTestCase extends AbstractInboundEndpointNameableConnectorTestCase
 {
 
     /*

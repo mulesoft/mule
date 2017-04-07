@@ -20,7 +20,6 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
-import org.mule.api.transport.Connectable;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.ConnectorException;
 import org.mule.api.transport.DispatchException;
@@ -29,10 +28,10 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.model.streaming.CallbackOutputStream;
 import org.mule.retry.RetryPolicyExhaustedException;
-import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
 import org.mule.transport.file.ExpressionFilenameParser;
 import org.mule.transport.file.FilenameParser;
+import org.mule.transport.nameable.AbstractInboundEndpointNameableConnector;
 import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
@@ -49,7 +48,7 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 
-public class FtpConnector extends AbstractConnector
+public class FtpConnector extends AbstractInboundEndpointNameableConnector
 {
 
     public static final String FTP = "ftp";
@@ -160,8 +159,7 @@ public class FtpConnector extends AbstractConnector
     }
 
     /**
-     * Setter for property 'connectionFactoryClass'. Should be an instance of
-     * {@link FtpConnectionFactory}.
+     * Setter for property 'connectionFactoryClass'. Should be an instance of {@link FtpConnectionFactory}.
      *
      * @param connectionFactoryClass Value to set for property 'connectionFactoryClass'.
      */
