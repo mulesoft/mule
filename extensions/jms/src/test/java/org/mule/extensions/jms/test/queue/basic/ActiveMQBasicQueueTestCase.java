@@ -6,6 +6,7 @@
  */
 package org.mule.extensions.jms.test.queue.basic;
 
+import static org.mule.test.allure.AllureConstants.JmsFeature.JMS_EXTENSION;
 import static java.util.Arrays.asList;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -19,7 +20,7 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 
 @RunnerDelegateTo(Parameterized.class)
-@Features("JMS Extension")
+@Features(JMS_EXTENSION)
 @Stories("Basic Publish and Consume operations test with ActiveMQ Connections")
 public class ActiveMQBasicQueueTestCase extends JmsBaseQueuePublishAndConsumeTestCase {
 

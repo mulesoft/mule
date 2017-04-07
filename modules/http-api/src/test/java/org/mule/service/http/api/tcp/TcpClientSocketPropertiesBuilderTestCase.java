@@ -6,6 +6,8 @@
  */
 package org.mule.service.http.api.tcp;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.TCP_BUILDER;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -14,8 +16,8 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("HTTP Service")
-@Stories("TCP builders")
+@Features(HTTP_SERVICE)
+@Stories(TCP_BUILDER)
 public class TcpClientSocketPropertiesBuilderTestCase {
 
   TcpClientSocketPropertiesBuilder builder = TcpClientSocketProperties.builder();

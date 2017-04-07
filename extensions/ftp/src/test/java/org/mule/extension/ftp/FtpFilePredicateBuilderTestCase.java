@@ -6,6 +6,7 @@
  */
 package org.mule.extension.ftp;
 
+import static org.mule.test.allure.AllureConstants.FtpFeature.FTP_EXTENSION;
 import static org.mockito.Mockito.when;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.FtpFilePredicateBuilder;
@@ -15,7 +16,9 @@ import java.time.LocalDateTime;
 
 import org.junit.Before;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(FTP_EXTENSION)
 public class FtpFilePredicateBuilderTestCase
     extends FilePredicateBuilderContractTestCase<FtpFilePredicateBuilder, FtpFileAttributes> {
 

@@ -7,6 +7,7 @@
 
 package org.mule.extension.db.integration.update;
 
+import static org.mule.test.allure.AllureConstants.DbFeature.DB_EXTENSION;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -25,7 +26,7 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("DB Extension")
+@Features(DB_EXTENSION)
 @Stories("Update Statement")
 public class UpdateMetadataTestCase extends AbstractDbIntegrationTestCase {
 

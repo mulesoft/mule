@@ -11,6 +11,8 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -22,7 +24,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpRequestResponseHeadersTestCase extends AbstractHttpRequestTestCase {
 
   private static final String EMPTY_PATH = "empty";

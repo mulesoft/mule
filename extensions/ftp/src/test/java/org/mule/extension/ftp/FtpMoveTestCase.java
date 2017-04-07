@@ -6,10 +6,14 @@
  */
 package org.mule.extension.ftp;
 
+import static org.mule.test.allure.AllureConstants.FtpFeature.FTP_EXTENSION;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.FtpTestHarness;
 
+import ru.yandex.qatools.allure.annotations.Features;
+
+@Features(FTP_EXTENSION)
 public class FtpMoveTestCase extends FtpCopyTestCase {
 
   public FtpMoveTestCase(String name, FtpTestHarness testHarness) {

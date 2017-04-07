@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MultiPartPayloadMatchers.hasSize;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.MultiPartPayload;
@@ -24,7 +25,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpRequestMultipartTestCase extends AbstractHttpRequestTestCase {
 
   private static final String BOUNDARY = "bec89590-35fe-11e5-a966-de100cec9c0d";

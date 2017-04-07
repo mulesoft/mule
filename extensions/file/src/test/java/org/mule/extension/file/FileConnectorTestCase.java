@@ -6,16 +6,18 @@
  */
 package org.mule.extension.file;
 
+import static org.mule.functional.junit4.rules.ExpectedError.none;
+import static org.mule.test.allure.AllureConstants.FileFeature.FILE_EXTENSION;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.functional.junit4.rules.ExpectedError.none;
+
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -27,7 +29,9 @@ import org.apache.commons.io.FileUtils;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(FILE_EXTENSION)
 public abstract class FileConnectorTestCase extends MuleArtifactFunctionalTestCase {
 
   protected static final String NAMESPACE = "FILE";

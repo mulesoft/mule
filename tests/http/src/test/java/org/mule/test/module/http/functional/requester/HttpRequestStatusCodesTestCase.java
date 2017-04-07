@@ -6,8 +6,10 @@
  */
 package org.mule.test.module.http.functional.requester;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
+
 import org.mule.extension.http.api.request.validator.ResponseValidatorException;
 import org.mule.runtime.core.exception.MessagingException;
 
@@ -18,8 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
-
+@Features(HTTP_EXTENSION)
 public class HttpRequestStatusCodesTestCase extends AbstractHttpRequestTestCase {
 
   @Override

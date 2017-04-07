@@ -6,16 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.client;
 
+import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
+import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
+import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
+import static org.mule.test.vegan.extension.VeganExtension.VEGAN;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
-import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
-import static org.mule.test.vegan.extension.VeganExtension.VEGAN;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -43,7 +45,7 @@ import org.junit.rules.ExpectedException;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 
-@Features("ExtensionsClient")
+@Features(EXTENSIONS_CLIENT)
 public abstract class ExtensionsClientTestCase extends ExtensionFunctionalTestCase {
 
   @Rule

@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.http.functional.listener;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
@@ -20,11 +21,13 @@ import java.io.IOException;
 
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
 /**
  * Sets up two HTTPS servers with regular trust-stores, except one is insecure. Verifies that a request using a certificate not
  * present in the trust-store only works for the insecure server.
  */
+@Features(HTTP_EXTENSION)
 public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase {
 
   @Rule

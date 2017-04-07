@@ -6,11 +6,13 @@
  */
 package org.mule.extensions.jms.test.mimeType;
 
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasMediaType;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.test.allure.AllureConstants.JmsFeature.JMS_EXTENSION;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasMediaType;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+
 import org.mule.extensions.jms.test.JmsAbstractTestCase;
 import org.mule.extensions.jms.test.JmsMessageStorage;
 import org.mule.functional.junit4.FlowRunner;
@@ -33,7 +35,7 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("JMS Extension")
+@Features(JMS_EXTENSION)
 @Stories("MimeType propagation through publishing and consuming of messages")
 @RunnerDelegateTo(Parameterized.class)
 public class JmsMimeTypePropagationTestCase extends JmsAbstractTestCase {

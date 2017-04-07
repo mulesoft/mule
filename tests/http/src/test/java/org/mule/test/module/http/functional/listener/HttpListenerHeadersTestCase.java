@@ -6,14 +6,16 @@
  */
 package org.mule.test.module.http.functional.listener;
 
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 
@@ -23,7 +25,9 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.message.BasicHeader;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpListenerHeadersTestCase extends AbstractHttpTestCase {
 
   @Rule

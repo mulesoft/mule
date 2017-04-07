@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.el;
 
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
 import static org.mockito.Matchers.anyString;
@@ -13,7 +15,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
 
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -28,11 +29,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.verification.VerificationMode;
-
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Expression Language")
+@Features(EXPRESSION_LANGUAGE)
 @Stories("Support Mixing DW and MEL in a same application")
 @RunWith(Parameterized.class)
 public class ExpressionLanguagePrefixTestCase extends AbstractMuleTestCase {

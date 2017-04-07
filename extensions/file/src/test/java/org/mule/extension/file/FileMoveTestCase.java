@@ -6,11 +6,15 @@
  */
 package org.mule.extension.file;
 
+import static org.mule.test.allure.AllureConstants.FileFeature.FILE_EXTENSION;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
 
+import ru.yandex.qatools.allure.annotations.Features;
+
+@Features(FILE_EXTENSION)
 public class FileMoveTestCase extends FileCopyTestCase {
 
   @Override

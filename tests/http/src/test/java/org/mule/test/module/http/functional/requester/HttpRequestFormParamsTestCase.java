@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
@@ -27,7 +28,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpRequestFormParamsTestCase extends AbstractHttpRequestTestCase {
 
   private static final String URL_ENCODED_STRING = "testName1=testValue1&testName2=testValue2";

@@ -6,12 +6,14 @@
  */
 package org.mule.extension.ftp;
 
-import static java.lang.String.format;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
 import static org.mule.extension.file.common.api.exceptions.FileError.FILE_ALREADY_EXISTS;
 import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
+import static org.mule.test.allure.AllureConstants.FtpFeature.FTP_EXTENSION;
+import static java.lang.String.format;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
@@ -19,7 +21,9 @@ import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import java.nio.file.Paths;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(FTP_EXTENSION)
 public class FtpCopyTestCase extends FtpConnectorTestCase {
 
   private static final String SOURCE_FILE_NAME = "test.txt";

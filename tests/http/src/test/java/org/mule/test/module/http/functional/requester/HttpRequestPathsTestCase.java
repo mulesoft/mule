@@ -8,9 +8,12 @@ package org.mule.test.module.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpRequestPathsTestCase extends AbstractHttpRequestTestCase {
 
   @Override

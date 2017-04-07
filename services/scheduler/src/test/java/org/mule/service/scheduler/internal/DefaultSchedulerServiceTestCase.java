@@ -6,6 +6,9 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.WAIT;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -19,8 +22,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.WAIT;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -46,11 +47,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 
-@Features("SchedulerService")
+@Features(SCHEDULER_SERVICE)
 public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
 
   @Rule

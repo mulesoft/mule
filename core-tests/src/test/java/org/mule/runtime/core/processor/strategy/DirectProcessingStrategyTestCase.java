@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
+import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
+import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.SYNCHRONOUS;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -21,8 +23,8 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Processing Strategies")
-@Stories("Synchronous Processing Strategy")
+@Features(PROCESSING_STRATEGIES)
+@Stories(SYNCHRONOUS)
 public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   public DirectProcessingStrategyTestCase(Mode mode) {

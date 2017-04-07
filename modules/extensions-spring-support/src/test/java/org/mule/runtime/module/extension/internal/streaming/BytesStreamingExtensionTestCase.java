@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.streaming;
 
+import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.BYTES_STREAMING;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
+
 import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -37,8 +40,8 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Streaming")
-@Stories("Bytes Streaming")
+@Features(STREAMING)
+@Stories(BYTES_STREAMING)
 public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final String BARGAIN_SPELL = "dormammu i've come to bargain";

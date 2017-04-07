@@ -6,8 +6,10 @@
  */
 package org.mule.services.soap.runtime.wss;
 
-import static java.util.Collections.singletonList;
 import static org.mule.services.soap.api.security.PasswordType.TEXT;
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
+import static java.util.Collections.singletonList;
+
 import org.mule.services.soap.api.security.SecurityStrategy;
 import org.mule.services.soap.api.security.UsernameTokenSecurityStrategy;
 import org.mule.services.soap.service.ServerPasswordCallback;
@@ -21,7 +23,7 @@ import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories("WSS")
 public class WssUsernameTestCase extends AbstractWebServiceSecurityTestCase {
 

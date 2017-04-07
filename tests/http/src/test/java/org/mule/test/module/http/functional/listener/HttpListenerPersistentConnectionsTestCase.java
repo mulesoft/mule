@@ -6,14 +6,15 @@
  */
 package org.mule.test.module.http.functional.listener;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.service.http.api.HttpHeaders.Values.KEEP_ALIVE;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,7 +29,9 @@ import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public abstract class HttpListenerPersistentConnectionsTestCase extends AbstractHttpTestCase {
 
   private static final int HTTP_OK = 200;

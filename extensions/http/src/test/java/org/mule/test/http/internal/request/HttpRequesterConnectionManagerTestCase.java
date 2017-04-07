@@ -6,6 +6,8 @@
  */
 package org.mule.test.http.internal.request;
 
+import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -16,7 +18,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
 
 import org.mule.extension.http.internal.request.HttpRequesterConnectionManager;
 import org.mule.service.http.api.HttpService;
@@ -32,7 +33,7 @@ import org.junit.rules.ExpectedException;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("HTTP Connector")
+@Features(HTTP_EXTENSION)
 @Stories("HTTP Request")
 public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase {
 

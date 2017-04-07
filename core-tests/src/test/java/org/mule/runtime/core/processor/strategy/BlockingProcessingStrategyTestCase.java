@@ -7,6 +7,8 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
+import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
+import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.BLOCKING;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -15,8 +17,8 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Processing Strategies")
-@Stories("Blocking Processing Strategy")
+@Features(PROCESSING_STRATEGIES)
+@Stories(BLOCKING)
 public class BlockingProcessingStrategyTestCase extends DirectProcessingStrategyTestCase {
 
   public BlockingProcessingStrategyTestCase(Mode mode) {

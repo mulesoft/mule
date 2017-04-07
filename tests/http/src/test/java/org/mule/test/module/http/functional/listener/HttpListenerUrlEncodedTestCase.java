@@ -6,6 +6,13 @@
  */
 package org.mule.test.module.http.functional.listener;
 
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.decodeUrlEncodedBody;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.module.http.functional.matcher.ParamMapMatcher.isEqual;
 import static com.google.common.base.Charsets.UTF_8;
 import static org.apache.http.HttpVersion.HTTP_1_0;
 import static org.apache.http.HttpVersion.HTTP_1_1;
@@ -15,12 +22,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
-import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.decodeUrlEncodedBody;
-import static org.mule.test.module.http.functional.matcher.ParamMapMatcher.isEqual;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.service.http.api.domain.ParameterMap;
@@ -28,14 +30,13 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
+import java.io.IOException;
+import java.net.URLDecoder;
+
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
-
-import java.io.IOException;
-import java.net.URLDecoder;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -44,7 +45,9 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
 
   public static final String PARAM_1_NAME = "param1";

@@ -7,6 +7,7 @@
 package org.mule.test.module.http.functional.listener;
 
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
@@ -17,7 +18,9 @@ import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.StringEntity;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpListenerSocketConfigTestCase extends AbstractHttpTestCase {
 
   @Rule

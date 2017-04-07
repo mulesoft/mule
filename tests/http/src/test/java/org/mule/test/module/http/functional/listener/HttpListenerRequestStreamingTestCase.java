@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.http.functional.listener;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -20,7 +21,9 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.InputStreamEntity;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpListenerRequestStreamingTestCase extends AbstractHttpTestCase {
 
   private static final String LARGE_MESSAGE = RandomStringUtils.randomAlphanumeric(100 * 1024);

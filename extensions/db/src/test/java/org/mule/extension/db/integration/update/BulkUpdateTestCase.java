@@ -7,16 +7,18 @@
 
 package org.mule.extension.db.integration.update;
 
-import static java.sql.Statement.SUCCESS_NO_INFO;
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.extension.db.integration.model.Planet.EARTH;
 import static org.mule.extension.db.integration.model.Planet.MARS;
 import static org.mule.extension.db.integration.model.Planet.VENUS;
+import static org.mule.test.allure.AllureConstants.DbFeature.DB_EXTENSION;
+import static java.sql.Statement.SUCCESS_NO_INFO;
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
@@ -32,7 +34,7 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("DB Extension")
+@Features(DB_EXTENSION)
 @Stories("Update Statement")
 public class BulkUpdateTestCase extends AbstractDbIntegrationTestCase {
 

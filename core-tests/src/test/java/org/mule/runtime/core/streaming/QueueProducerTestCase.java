@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.streaming;
 
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+
 import org.mule.runtime.core.internal.streaming.object.iterator.QueueProducer;
 import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.util.queue.Queue;
@@ -26,9 +28,11 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import ru.yandex.qatools.allure.annotations.Features;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
+@Features(STREAMING)
 public class QueueProducerTestCase {
 
   @Mock

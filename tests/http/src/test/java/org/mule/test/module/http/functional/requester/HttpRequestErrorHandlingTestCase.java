@@ -6,10 +6,6 @@
  */
 package org.mule.test.module.http.functional.requester;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.extension.http.api.error.HttpError.RESPONSE_VALIDATION;
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
@@ -23,7 +19,14 @@ import static org.mule.service.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAIL
 import static org.mule.service.http.api.HttpConstants.HttpStatus.TOO_MANY_REQUESTS;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
-import static org.mule.test.module.http.functional.HttpConnectorAllureConstants.HTTP_CONNECTOR_FEATURE;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.ERRORS;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.core.api.Event;
@@ -41,8 +44,8 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features({"Error Handling", HTTP_CONNECTOR_FEATURE})
-@Stories("Errors")
+@Features(HTTP_EXTENSION)
+@Stories({ERROR_HANDLING, ERRORS})
 public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCase {
 
   @Rule

@@ -6,6 +6,8 @@
  */
 package org.mule.service.http.api.client.proxy;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.PROXY_CONFIG_BUILDER;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -13,8 +15,8 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("HTTP Service")
-@Stories("Proxy Config Builder")
+@Features(HTTP_SERVICE)
+@Stories(PROXY_CONFIG_BUILDER)
 public class NtlmProxyConfigBuilderTest extends AbstractProxyConfigTestCase<NtlmProxyConfigBuilder> {
 
   private static final String NTLM_DOMAIN = "DOMAIN";

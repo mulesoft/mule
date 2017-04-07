@@ -6,6 +6,7 @@
  */
 package org.mule.extension.file;
 
+import static org.mule.test.allure.AllureConstants.FileFeature.FILE_EXTENSION;
 import static org.mockito.Mockito.when;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.api.LocalFilePredicateBuilder;
@@ -15,7 +16,9 @@ import java.time.LocalDateTime;
 
 import org.junit.Before;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(FILE_EXTENSION)
 public class LocalFilePredicateBuilderTestCase
     extends FilePredicateBuilderContractTestCase<LocalFilePredicateBuilder, LocalFileAttributes> {
 

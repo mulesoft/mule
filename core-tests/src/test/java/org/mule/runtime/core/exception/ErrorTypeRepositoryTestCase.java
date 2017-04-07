@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.core.exception;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CONNECTIVITY;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_TYPES;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -23,8 +26,8 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Error Handling")
-@Stories("Error Types")
+@Features(ERROR_HANDLING)
+@Stories(ERROR_TYPES)
 public class ErrorTypeRepositoryTestCase extends AbstractMuleTestCase {
 
   private ErrorTypeRepository errorTypeRepository = new ErrorTypeRepository();

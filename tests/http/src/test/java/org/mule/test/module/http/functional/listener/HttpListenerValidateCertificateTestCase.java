@@ -6,11 +6,12 @@
  */
 package org.mule.test.module.http.functional.listener;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.FlowAssert.verify;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -32,7 +33,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCase {
 
   @Rule

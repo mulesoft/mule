@@ -7,6 +7,7 @@
 package org.mule.test.module.http.functional.listener;
 
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.exception.MessagingException;
@@ -16,7 +17,9 @@ import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpListenerCustomTlsConfigMultipleKeysTestCase extends AbstractHttpTestCase {
 
   @Rule
