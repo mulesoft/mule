@@ -17,7 +17,7 @@ import org.mule.extensions.jms.api.config.JmsConfig;
 import org.mule.extensions.jms.api.connection.JmsConnection;
 import org.mule.extensions.jms.api.message.MessageBuilder;
 import org.mule.extensions.jms.api.operation.JmsPublishConsume;
-import org.mule.extensions.jms.internal.publish.JmsPublishParameters;
+import org.mule.extensions.jms.api.publish.JmsPublishParameters;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 

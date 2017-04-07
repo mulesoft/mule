@@ -11,14 +11,16 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.api.source.JmsListener;
 import org.mule.extensions.jms.api.source.JmsListenerLock;
+
 import org.slf4j.Logger;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * Manager that takes the responsibility of register the session information to be able to execute a manual
@@ -108,11 +110,16 @@ public class JmsSessionManager {
             "- The given 'ackId' : [" + ackId + "] is invalid");
       }
     }
-
   }
 
   private Optional<SessionInformation> getSessionInformation(String ackId) {
     return ofNullable(pendingSessions.remove(ackId));
+  }
+
+  public void unlockAll() {
+    pendingSessions.values()
+        .forEach(session -> session.getJmsListenerLock()
+            .ifPresent(JmsListenerLock::unlock));
   }
 
   private class SessionInformation {

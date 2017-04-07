@@ -33,7 +33,7 @@
     </flow>
 
     <flow name="listener" initialState="stopped">
-        <jms:listener config-ref="config" destination="${destination}" ackMode="AUTO"/>
+        <jms:listener config-ref="config" destination="${destination}" ackMode="AUTO" numberOfConsumers="1"/>
         <logger level="DEBUG" message="#[payload]"/>
         <component class="org.mule.extensions.jms.test.JmsMessageStorage"/>
     </flow>

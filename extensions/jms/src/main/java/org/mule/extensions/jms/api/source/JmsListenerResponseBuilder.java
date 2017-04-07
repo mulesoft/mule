@@ -8,7 +8,7 @@ package org.mule.extensions.jms.api.source;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extensions.jms.api.message.MessageBuilder;
-import org.mule.extensions.jms.internal.publish.JmsPublishParameters;
+import org.mule.extensions.jms.api.publish.JmsPublishParameters;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;

@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Default implementation of {@link SourceCallbackContext}
@@ -44,8 +46,8 @@ class DefaultSourceCallbackContext implements SourceCallbackContext {
    * {@inheritDoc}
    */
   @Override
-  public <T> T getVariable(String variableName) {
-    return (T) variables.get(variableName);
+  public <T> Optional<T> getVariable(String variableName) {
+    return ofNullable((T) variables.get(variableName));
   }
 
 
