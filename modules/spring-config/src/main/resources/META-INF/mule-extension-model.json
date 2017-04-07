@@ -1,0 +1,13 @@
+Unstaged changes after reset:
+M	modules/deployment-model-impl/src/main/java/org/mule/runtime/module/deployment/impl/internal/application/MuleApplicationPolicyProvider.java
+M	modules/deployment-model/src/main/java/org/mule/runtime/deployment/model/internal/plugin/BundlePluginDependenciesResolver.java
+M	modules/deployment-model/src/main/java/org/mule/runtime/deployment/model/internal/tooling/ToolingPluginClassLoaderBuilder.java
+M	modules/spring-config/src/main/java/org/mule/runtime/config/spring/dsl/model/CoreComponentBuildingDefinitionProvider.java
+M	modules/spring-config/src/main/java/org/mule/runtime/config/spring/dsl/processor/RetryPolicyTemplateObjectFactory.java
+M	modules/spring-config/src/main/java/org/mule/runtime/config/spring/dsl/spring/PropertyComponentUtils.java
+D	modules/spring-config/src/main/resources/META-INF/core-extension-model.json
+M	modules/spring-config/src/main/resources/META-INF/mule-extension-model.json
+M	modules/spring-config/src/main/resources/META-INF/mule-module.properties
+M	modules/spring-config/src/main/resources/META-INF/mule.xsd
+M	modules/spring-config/src/test/java/org/mule/runtime/config/extension/CoreExtensionModelTestCase.java
+M	tests/dsl/src/test/java/org/mule/test/extension/dsl/AbstractElementModelTestCase.java
