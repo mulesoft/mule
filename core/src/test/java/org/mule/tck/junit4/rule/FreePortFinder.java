@@ -11,6 +11,7 @@ import static java.nio.file.Paths.get;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.DELETE_ON_CLOSE;
 import static java.nio.file.StandardOpenOption.WRITE;
+import static org.apache.commons.lang.SystemUtils.PATH_SEPARATOR;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,6 +39,7 @@ public class FreePortFinder
     private final String LOCK_FILE_EXTENSION = ".lock";
     private final Map<Integer, FileLock> locks = new HashMap<>();
     private final Map<Integer, FileChannel> files = new HashMap<>();
+    private final String basePath = System.getProperty("maven.multiModuleProjectDirectory", ".");
 
     public FreePortFinder(int minPortNumber, int maxPortNumber)
     {
@@ -53,7 +55,7 @@ public class FreePortFinder
             String portFile = port + LOCK_FILE_EXTENSION;
             try
             {
-                FileChannel channel = open(get(portFile), CREATE, WRITE, DELETE_ON_CLOSE);
+                FileChannel channel = open(get(basePath + PATH_SEPARATOR + portFile), CREATE, WRITE, DELETE_ON_CLOSE);
                 FileLock lock = channel.tryLock();
                 if (lock == null)
                 {
