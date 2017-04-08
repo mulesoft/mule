@@ -254,6 +254,7 @@
 /mule-standalone-${productVersion}/lib/opt/reactor-core-3.0.5.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.10.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7R4.jar
+/mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.7.0-15.jar
 /mule-standalone-${productVersion}/lib/opt/snakeyaml-1.15.jar
 /mule-standalone-${productVersion}/lib/opt/spring-aop-4.1.9.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-beans-4.1.9.RELEASE.jar
