@@ -8,7 +8,7 @@ package org.mule.extension.ftp.internal.sftp.connection;
 
 import static java.lang.String.format;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
-import com.jcraft.jsch.JSchException;
+
 import org.mule.extension.file.common.api.exceptions.FileError;
 import org.mule.extension.ftp.api.FTPConnectionException;
 import org.mule.extension.ftp.api.sftp.SftpAuthenticationMethod;
@@ -23,6 +23,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 import com.google.common.base.Joiner;
+import com.jcraft.jsch.JSchException;
 
 import java.net.ConnectException;
 import java.net.UnknownHostException;
@@ -61,6 +62,14 @@ public class SftpConnectionProvider extends AbstractFtpConnectionProvider<SftpFi
   @Optional
   private String knownHostsFile;
 
+  /**
+   * If provided, a proxy will be used for the connection.
+   */
+  @Parameter
+  @Optional
+  @Alias("sftp-proxy-config")
+  private SftpProxyConfig proxyConfig;
+
   private SftpClientFactory clientFactory = new SftpClientFactory();
 
   @Override
@@ -73,6 +82,7 @@ public class SftpConnectionProvider extends AbstractFtpConnectionProvider<SftpFi
       client.setPreferredAuthenticationMethods(Joiner.on(",").join(preferredAuthenticationMethods));
     }
     client.setKnownHostsFile(knownHostsFile);
+    client.setProxyConfig(proxyConfig);
     try {
       client.login(connectionSettings.getUsername());
     } catch (JSchException e) {
@@ -114,6 +124,10 @@ public class SftpConnectionProvider extends AbstractFtpConnectionProvider<SftpFi
 
   void setKnownHostsFile(String knownHostsFile) {
     this.knownHostsFile = knownHostsFile;
+  }
+
+  public void setProxyConfig(SftpProxyConfig proxyConfig) {
+    this.proxyConfig = proxyConfig;
   }
 
   void setClientFactory(SftpClientFactory clientFactory) {

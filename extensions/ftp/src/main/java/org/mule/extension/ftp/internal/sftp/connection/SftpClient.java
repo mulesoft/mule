@@ -6,16 +6,29 @@
  */
 package org.mule.extension.ftp.internal.sftp.connection;
 
-import com.google.common.base.Supplier;
-import com.google.common.collect.ImmutableList;
-import com.jcraft.jsch.*;
+import static com.jcraft.jsch.ChannelSftp.SSH_FX_NO_SUCH_FILE;
+import static java.lang.String.format;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Proxy;
+import com.jcraft.jsch.ProxyHTTP;
+import com.jcraft.jsch.ProxySOCKS4;
+import com.jcraft.jsch.ProxySOCKS5;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpException;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,10 +39,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
 
-import static com.jcraft.jsch.ChannelSftp.SSH_FX_NO_SUCH_FILE;
-import static java.lang.String.format;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wrapper around jsch sftp library which provides access to basic sftp commands.
@@ -56,6 +67,7 @@ public class SftpClient {
   private String knownHostsFile;
   private String preferredAuthenticationMethods;
   private long connectionTimeoutMillis = 0; // No timeout by default
+  private SftpProxyConfig proxyConfig;
 
   /**
    * Creates a new instance which connects to a server on a given {@code host} and {@code port}
@@ -166,6 +178,7 @@ public class SftpClient {
     session.setConfig(hash);
     session.setPort(port);
     session.setTimeout(Long.valueOf(connectionTimeoutMillis).intValue());
+    configureProxy(session);
   }
 
   private void configureHostChecking(Properties hash) throws JSchException {
@@ -175,6 +188,48 @@ public class SftpClient {
       checkExists(knownHostsFile);
       hash.put(STRICT_HOST_KEY_CHECKING, "ask");
       jsch.setKnownHosts(knownHostsFile);
+    }
+  }
+
+  private void configureProxy(Session session)
+  {
+    if (proxyConfig != null)
+    {
+      Proxy proxy = null;
+      switch (proxyConfig.getProtocol())
+      {
+        case HTTP:
+          ProxyHTTP proxyHttp = new ProxyHTTP(proxyConfig.getHost(), proxyConfig.getPort());
+          if (proxyConfig.getUsername() != null)
+          {
+            proxyHttp.setUserPasswd(proxyConfig.getUsername(), proxyConfig.getPassword());
+          }
+          proxy = proxyHttp;
+          break;
+
+        case SOCKS4:
+          ProxySOCKS4 proxySocks4 = new ProxySOCKS4(proxyConfig.getHost(), proxyConfig.getPort());
+          if (proxyConfig.getUsername() != null)
+          {
+            proxySocks4.setUserPasswd(proxyConfig.getUsername(), proxyConfig.getPassword());
+          }
+          proxy = proxySocks4;
+          break;
+
+        case SOCKS5:
+          ProxySOCKS5 proxySocks5 = new ProxySOCKS5(proxyConfig.getHost(), proxyConfig.getPort());
+          if (proxyConfig.getUsername() != null)
+          {
+            proxySocks5.setUserPasswd(proxyConfig.getUsername(), proxyConfig.getPassword());
+          }
+          proxy = proxySocks5;
+          break;
+
+        default:
+          throw new IllegalArgumentException(format("Proxy protocol %s not recognized", proxyConfig.getProtocol()));
+      }
+
+      session.setProxy(proxy);
     }
   }
 
@@ -360,5 +415,9 @@ public class SftpClient {
 
   public void setConnectionTimeoutMillis(long connectionTimeoutMillis) {
     this.connectionTimeoutMillis = connectionTimeoutMillis;
+  }
+
+  public void setProxyConfig(SftpProxyConfig proxyConfig) {
+    this.proxyConfig = proxyConfig;
   }
 }

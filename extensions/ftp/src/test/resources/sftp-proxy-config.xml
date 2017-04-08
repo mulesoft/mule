@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd">
+
+    <ftp:config name="sftp">
+        <ftp:sftp-connection username="muletest1" password="muletest1" host="127.0.0.100" port="${SFTP_PORT}" workingDir="${workingDir}">
+            <ftp:sftp-proxy-config host="localhost" port="${proxyPort}" protocol="HTTP"/>
+        </ftp:sftp-connection>
+    </ftp:config>
+
+    <flow name="sftpRead">
+        <ftp:read path="files/hello.json"/>
+        <object-to-string-transformer/>
+    </flow>
+</mule>

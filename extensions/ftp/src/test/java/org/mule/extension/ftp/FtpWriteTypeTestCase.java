@@ -13,6 +13,7 @@ import static org.mule.test.allure.AllureConstants.FtpFeature.FTP_EXTENSION;
 
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.FileWriteMode;
+import org.mule.extension.sftp.SftpTestHarness;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.IOUtils;
