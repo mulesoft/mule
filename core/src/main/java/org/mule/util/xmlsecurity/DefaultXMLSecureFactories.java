@@ -9,14 +9,12 @@ package org.mule.util.xmlsecurity;
 import static java.lang.String.format;
 import static javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD;
 import static javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET;
-import static javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING;
 import static javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES;
 import static javax.xml.stream.XMLInputFactory.SUPPORT_DTD;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
@@ -98,14 +96,7 @@ public class DefaultXMLSecureFactories
             }
             catch (Exception e)
             {
-                try
-                {
-                    factory.setFeature(FEATURE_SECURE_PROCESSING, true);
-                }
-                catch (TransformerConfigurationException e1)
-                {
-                    logWarning("TransformerFactory", factory.getClass().getName());
-                }
+                logWarning("TransformerFactory", factory.getClass().getName());
             }
         }
     }

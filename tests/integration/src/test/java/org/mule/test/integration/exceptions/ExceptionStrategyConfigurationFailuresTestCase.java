@@ -12,10 +12,7 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMuleTestCase
 {
     @Test(expected = ConfigurationException.class)
