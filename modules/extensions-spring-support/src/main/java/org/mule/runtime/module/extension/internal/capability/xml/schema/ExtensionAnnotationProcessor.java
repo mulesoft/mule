@@ -10,6 +10,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
 import static org.mule.runtime.core.util.ClassUtils.loadClass;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -19,6 +20,7 @@ import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
+import org.apache.commons.lang.StringUtils;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
@@ -31,16 +33,12 @@ import java.util.stream.Stream;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.util.ElementFilter;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Annotation processing class that uses the {@link Processor} API to introspect and extract information from the extension
@@ -141,12 +139,12 @@ public final class ExtensionAnnotationProcessor {
     parseJavaDoc(processingEnv, element, new JavadocParseHandler() {
 
       @Override
-      void onParam(String param) {
+      public void onParam(String param) {
         parseMethodParameter(parameters, param);
       }
 
       @Override
-      void onBodyLine(String bodyLine) {
+      public void onBodyLine(String bodyLine) {
         parsedComment.append(bodyLine).append(NEW_LINE_CHAR);
       }
     });
@@ -194,24 +192,13 @@ public final class ExtensionAnnotationProcessor {
    */
   private void getOperationParameterGroupDocumentation(TypeElement groupElement, final Map<String, String> parameterDocs,
                                                        ProcessingEnvironment processingEnvironment) {
-    for (final Map.Entry<String, VariableElement> field : getFieldsAnnotatedWith(groupElement, Parameter.class).entrySet()) {
-      parseJavaDoc(processingEnvironment, field.getValue(), new JavadocParseHandler() {
+    getFieldsAnnotatedWith(groupElement, Parameter.class)
+        .forEach((key, value) -> parameterDocs.put(key, getJavaDocSummary(processingEnvironment, value)));
 
-        @Override
-        void onParam(String param) {}
-
-        @Override
-        void onBodyLine(String bodyLine) {
-          parameterDocs.put(field.getKey(), bodyLine);
-        }
-      });
-    }
-
-    for (VariableElement field : getFieldsAnnotatedWith(groupElement, ParameterGroup.class).values()) {
-
-      getOperationParameterGroupDocumentation((TypeElement) processingEnvironment.getTypeUtils().asElement(field.asType()),
-                                              parameterDocs, processingEnvironment);
-    }
+    getFieldsAnnotatedWith(groupElement, ParameterGroup.class)
+        .values()
+        .forEach(field -> getOperationParameterGroupDocumentation((TypeElement) processingEnvironment.getTypeUtils()
+            .asElement(field.asType()), parameterDocs, processingEnvironment));
   }
 
   public String getJavaDocSummary(ProcessingEnvironment processingEnv, Element element) {
@@ -219,10 +206,10 @@ public final class ExtensionAnnotationProcessor {
     parseJavaDoc(processingEnv, element, new JavadocParseHandler() {
 
       @Override
-      void onParam(String param) {}
+      public void onParam(String param) {}
 
       @Override
-      void onBodyLine(String bodyLine) {
+      public void onBodyLine(String bodyLine) {
         parsedComment.append(bodyLine).append(NEW_LINE_CHAR);
       }
     });
@@ -306,11 +293,11 @@ public final class ExtensionAnnotationProcessor {
     return comment.trim();
   }
 
-  private abstract class JavadocParseHandler {
+  private interface JavadocParseHandler {
 
-    abstract void onParam(String param);
+    void onParam(String param);
 
-    abstract void onBodyLine(String bodyLine);
+    void onBodyLine(String bodyLine);
   }
 
   /**
@@ -319,20 +306,18 @@ public final class ExtensionAnnotationProcessor {
   public <T> T getAnnotationValue(Element rootElement, Class<? extends Annotation> anAnnotation) {
     if (rootElement.getAnnotation(anAnnotation) != null) {
       final String fullQualifiedAnnotationName = anAnnotation.getName();
-      T annotationFieldValue = null;
-      List<? extends AnnotationMirror> annotationMirrors = rootElement.getAnnotationMirrors();
-      for (AnnotationMirror annotationMirror : annotationMirrors) {
-        if (fullQualifiedAnnotationName.equals(annotationMirror.getAnnotationType().toString())) {
-          for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationMirror.getElementValues()
-              .entrySet()) {
-            if (VALUE.equals(entry.getKey().getSimpleName().toString())) {
-              annotationFieldValue = (T) entry.getValue().getValue();
-              break;
-            }
-          }
-        }
-      }
-      return annotationFieldValue;
+      final Reference<T> annotationFieldValue = new Reference<>();
+      rootElement.getAnnotationMirrors()
+          .stream()
+          .filter(annotationMirror -> fullQualifiedAnnotationName.equals(annotationMirror.getAnnotationType().toString()))
+          .forEach(annotationMirror -> annotationMirror.getElementValues()
+              .entrySet()
+              .stream()
+              .filter(entry -> VALUE.equals(entry.getKey().getSimpleName().toString()))
+              .findFirst()
+              .ifPresent(entry -> annotationFieldValue.set((T) entry.getValue().getValue())));
+
+      return annotationFieldValue.get();
     } else {
       return null;
     }
