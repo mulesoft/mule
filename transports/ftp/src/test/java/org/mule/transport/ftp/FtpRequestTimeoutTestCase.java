@@ -12,6 +12,7 @@ import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
+import org.mule.transport.ConnectException;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -76,8 +77,11 @@ public class FtpRequestTimeoutTestCase extends AbstractFtpServerTestCase
         @Override
         public void handleException(Exception exception)
         {
-            count++;
-            super.handleException(exception);
+            if (!(exception instanceof ConnectException))
+            {
+                count++;
+                super.handleException(exception);
+            }
         }
 
         public int getCount()
