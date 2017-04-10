@@ -13,6 +13,8 @@ import java.util.concurrent.locks.Lock;
 
 /**
  * OAuth state for a particular resource owner which typically represents an user.
+ * 
+ * @since 4.0, was ResourceOwnerOAuthContext in previous versions
  */
 public final class DefaultResourceOwnerOAuthContext implements ResourceOwnerOAuthContext, Serializable {
 
