@@ -6,6 +6,7 @@
  */
 package org.mule.test.transactional;
 
+import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
@@ -18,6 +19,7 @@ import org.mule.test.transactional.connection.TransactionalConnectionProvider;
 @Operations(TransactionalOperations.class)
 @Sources(TransactionalSource.class)
 @Xml(prefix = "tx")
+@Export(classes = org.mule.test.transactional.TransactionalOperations.class)
 public class TransactionalExtension {
 
 }

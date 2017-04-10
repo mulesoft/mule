@@ -19,12 +19,18 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import java.util.List;
 
 @Extension(name = "petstore", description = "PetStore Test connector")
-@Operations(PetStoreOperations.class)
+@Operations({PetStoreOperations.class, PetStoreOperationsWithFailures.class, PetStoreFailingOperations.class})
 @ConnectionProviders({SimplePetStoreConnectionProvider.class, PooledPetStoreConnectionProvider.class,
-    TransactionalPetStoreConnectionProvider.class})
-@Sources({PetStoreSource.class})
+    TransactionalPetStoreConnectionProvider.class, PooledPetStoreConnectionProviderWithFailureInvalidConnection.class,
+    PooledPetStoreConnectionProviderWithValidConnection.class})
+@Sources({PetStoreSource.class, FailingPetStoreSource.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/petstore", prefix = "petstore")
 public class PetStoreConnector {
+
+  /**
+   * Indicates how many times a {@link PetStoreConnector} was started.
+   */
+  public static int timesStarted;
 
   @Parameter
   private List<String> pets;

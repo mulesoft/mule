@@ -11,12 +11,13 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.artifact.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.LookupStrategy;
@@ -70,7 +71,7 @@ public class PluginLookPolicyFactoryTestCase extends AbstractMuleTestCase {
 
     ClassLoaderLookupPolicy pluginPolicy =
         factory.createLookupPolicy(barPluginClassification, pluginClassifications, parentLookupPolicies);
-    assertThat(pluginPolicy.getLookupStrategy(FOO_PACKAGE), sameInstance(CHILD_ONLY));
+    assertThat(pluginPolicy.getLookupStrategy(FOO_PACKAGE), is(nullValue()));
   }
 
   private ClassLoaderLookupPolicy getParentClassLoaderLookupPolicy() {

@@ -2,12 +2,13 @@
 <extension-manifest>
     <name>Heisenberg</name>
     <description><![CDATA[My Test Extension just to unit test]]></description>
-    <version>%PROJECT_VERSION_MAVEN_REPLACER_PLUGIN_TOKEN%</version>
+    <version>4.0.0-SNAPSHOT</version>
     <minMuleVersion>4.1</minMuleVersion>
     <exportedPackages>
         <package>org.mule.test.heisenberg.extension.model.types</package>
         <package>org.mule.test.heisenberg.extension.exception</package>
         <package>org.mule.tck.message</package>
+        <package>org.mule.test.heisenberg.extension</package>
         <package>org.mule.test.heisenberg.extension.model</package>
     </exportedPackages>
     <exportedResources>
