@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.deployment.management.ComponentInitialStateManager.DISABLE_SCHEDULER_SOURCES_PROPERTY;
 import static org.mule.runtime.core.util.UUID.getUUID;
 import static org.mule.runtime.module.embedded.api.EmbeddedContainer.builder;
+import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.embedded.api.Application;
@@ -28,6 +29,7 @@ import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
 import org.mule.runtime.module.embedded.api.DeploymentConfiguration;
 import org.mule.runtime.module.embedded.api.EmbeddedContainer;
 import org.mule.tck.junit4.rule.FreePortFinder;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -59,6 +61,9 @@ public class EmbeddedContainerTestCase {
   public TemporaryFolder containerFolder = new TemporaryFolder();
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @Rule
+  public SystemProperty repositoriesSystemProperty =
+      new SystemProperty(MULE_REMOTE_REPOSITORIES_PROPERTY, "https://repository.mulesoft.org/nexus/content/repositories/public/");
 
   @Description("Embedded runs an application depending on a connector")
   @Test
