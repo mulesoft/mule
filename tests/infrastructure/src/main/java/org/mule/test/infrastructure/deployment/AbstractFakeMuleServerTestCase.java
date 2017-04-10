@@ -6,6 +6,7 @@
  */
 package org.mule.test.infrastructure.deployment;
 
+import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildHttpServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
 
@@ -39,6 +40,7 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
     muleServer = new FakeMuleServer(muleHome.getRoot().getAbsolutePath(), getCoreExtensions());
     muleServer.addZippedService(buildSchedulerServiceFile(compilerWorkFolder.newFolder("schedulerService")));
     muleServer.addZippedService(buildHttpServiceFile(compilerWorkFolder.newFolder("httpService")));
+    muleServer.addZippedService(buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder("expressionLanguageService")));
   }
 
   @After

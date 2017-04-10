@@ -9,6 +9,7 @@ package org.mule.functional.services;
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 
+import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
@@ -51,6 +52,24 @@ public class TestServicesUtils {
     return new ServiceFileBuilder("schedulerService")
         .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.scheduler.MockSchedulerServiceProvider")
         .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath()).getArtifactFile();
+  }
+
+  /**
+   * Provides a packaged mock {@link DefaultExpressionLanguageFactoryService} implementation.
+   *
+   * @param tempFolder where to generate temporary files needed for compilation of the service classes.
+   * @return the zip service file
+   */
+  public static File buildExpressionLanguageServiceFile(File tempFolder) {
+    final File defaulServiceSchedulerJarFile = new CompilerUtils.JarCompiler()
+      .compiling(getResourceFile("/org/mule/service/el/MockExpressionLanguage.java", tempFolder),
+                 getResourceFile("/org/mule/service/el/MockExpressionLanguageFactoryService.java", tempFolder),
+                 getResourceFile("/org/mule/service/el/MockExpressionLanguageFactoryServiceProvider.java", tempFolder))
+      .compile("mule-module-service-mock-expression-language-1.0-SNAPSHOT.jar");
+
+    return new ServiceFileBuilder("expressionLanguageService")
+      .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.el.MockExpressionLanguageFactoryServiceProvider")
+      .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath()).getArtifactFile();
   }
 
   /**

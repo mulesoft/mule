@@ -26,11 +26,6 @@ public class GroovyRefreshableBeanTestCase extends AbstractRefreshableBeanTestCa
   public static final String RECEIVE_RECEIVED2 = RECEIVE_RECEIVED.replaceAll(RECEIVED, RECEIVED2);
 
   @Override
-  protected boolean mockExprExecutorService() {
-    return true;
-  }
-
-  @Override
   protected String[] getConfigFiles() {
     return new String[] {
         "groovy-refreshable-beans.xml",
