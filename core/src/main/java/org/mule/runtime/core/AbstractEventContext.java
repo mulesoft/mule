@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.toList;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.when;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 
@@ -36,7 +37,7 @@ abstract class AbstractEventContext implements EventContext {
   private transient MonoProcessor<Event> responseProcessor;
   private transient MonoProcessor<Void> completionProcessor;
   private transient Disposable completionSubscriberDisposable;
-  private final List<EventContext> childContexts = new LinkedList<>();
+  private transient final List<EventContext> childContexts = new LinkedList<>();
   private transient Mono<Void> completionCallback = empty();
 
   public AbstractEventContext() {
@@ -61,13 +62,24 @@ abstract class AbstractEventContext implements EventContext {
   void addChildContext(EventContext childContext) {
     synchronized (this) {
       childContexts.add(childContext);
-      // When a new child is added dispose existing subscription that triggers completion processor and re-subscribe adding child
-      // completion condition.
-      completionSubscriberDisposable.dispose();
-      completionSubscriberDisposable =
-          responseProcessor.otherwise(throwable -> empty()).and(completionCallback).and(getChildCompletionPublisher()).then()
-              .doOnEach(s -> s.accept(completionProcessor)).subscribe();
+      updateCompletionPublisher();
     }
+  }
+
+  void removeChildContext(EventContext eventContext) {
+    synchronized (this) {
+      childContexts.remove(eventContext);
+      updateCompletionPublisher();
+    }
+  }
+
+  private void updateCompletionPublisher() {
+    // When a new child is added dispose existing subscription that triggers completion processor and re-subscribe adding child
+    // completion condition.
+    completionSubscriberDisposable.dispose();
+    completionSubscriberDisposable =
+        responseProcessor.otherwise(throwable -> empty()).and(completionCallback).and(getChildCompletionPublisher()).then()
+            .doOnEach(s -> s.accept(completionProcessor)).subscribe();
   }
 
   private Mono<Void> getChildCompletionPublisher() {

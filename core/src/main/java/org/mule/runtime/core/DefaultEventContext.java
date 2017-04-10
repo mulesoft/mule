@@ -19,6 +19,8 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.context.notification.DefaultProcessorsTrace;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.OffsetTime;
 import java.util.Optional;
@@ -225,6 +227,15 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     public Optional<EventContext> getParentContext() {
       return of(parent);
     }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+      // Un-register from parent when child is serialized
+      if (parent instanceof AbstractEventContext) {
+        ((AbstractEventContext) parent).removeChildContext(this);
+      }
+      out.defaultWriteObject();
+    }
+
   }
 
 }
