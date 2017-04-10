@@ -423,7 +423,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Description("When a child event context is de-serialized it is decoupled from parent context but response and completion " +
-               "publisher still complete when a response event is available.")
+      "publisher still complete when a response event is available.")
   public void deserializedChild() throws Exception {
     EventContext parent = create(getTestFlow(muleContext), "", null);
     EventContext child = DefaultEventContext.child(parent);
