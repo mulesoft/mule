@@ -116,12 +116,6 @@ public class JmsSessionManager {
     return ofNullable(pendingSessions.remove(ackId));
   }
 
-  public void unlockAll() {
-    pendingSessions.values()
-        .forEach(session -> session.getJmsListenerLock()
-            .ifPresent(JmsListenerLock::unlock));
-  }
-
   private class SessionInformation {
 
     private Message message;
@@ -145,6 +139,5 @@ public class JmsSessionManager {
     Optional<JmsListenerLock> getJmsListenerLock() {
       return ofNullable(jmsListenerLock);
     }
-
   }
 }

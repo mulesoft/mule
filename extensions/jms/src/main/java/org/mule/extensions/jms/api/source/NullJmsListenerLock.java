@@ -23,12 +23,17 @@ public class NullJmsListenerLock implements JmsListenerLock {
   }
 
   @Override
-  public void unlockWithFailure(Error error) {
+  public void unlock() {
 
   }
 
   @Override
-  public void unlock() {
+  public void unlockWithFailure() {
+
+  }
+
+  @Override
+  public void unlockWithFailure(Error error) {
 
   }
 

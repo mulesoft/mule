@@ -7,6 +7,7 @@
 package org.mule.extensions.jms.api.source;
 
 import static org.mule.extensions.jms.api.source.JmsListener.JMS_LOCK_VAR;
+import static org.mule.extensions.jms.api.source.JmsListener.JMS_SESSION_VAR;
 import static org.mule.extensions.jms.api.source.JmsListener.REPLY_TO_DESTINATION_VAR;
 import static org.mule.extensions.jms.internal.common.JmsCommons.evaluateMessageAck;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageContentType;
@@ -88,6 +89,7 @@ public final class JmsMessageListener implements MessageListener {
     evaluateAckAction(message);
     saveReplyToDestination(message, context);
     context.addVariable(JMS_LOCK_VAR, jmsLock);
+    context.addVariable(JMS_SESSION_VAR, session);
     produceMessageResult(message, context, resolveEncoding(message), resolveContentType(message));
     waitForMessageToBeProcessed(jmsLock);
   }
