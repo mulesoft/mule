@@ -6,15 +6,17 @@
  */
 package org.mule.extension.file;
 
+import static org.mule.extension.file.api.FileEventType.CREATE;
+import static org.mule.extension.file.api.FileEventType.DELETE;
+import static org.mule.extension.file.api.FileEventType.UPDATE;
+import static org.mule.runtime.core.util.FileUtils.deleteTree;
+import static org.mule.test.allure.AllureConstants.FileFeature.FILE_EXTENSION;
 import static org.apache.commons.io.FileUtils.write;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.file.api.FileEventType.CREATE;
-import static org.mule.extension.file.api.FileEventType.DELETE;
-import static org.mule.extension.file.api.FileEventType.UPDATE;
-import static org.mule.runtime.core.util.FileUtils.deleteTree;
+
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
 import org.mule.runtime.api.message.Message;
@@ -31,7 +33,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(FILE_EXTENSION)
 public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
 
   private static final String MATCHERLESS_LISTENER_FOLDER_NAME = "matcherless";

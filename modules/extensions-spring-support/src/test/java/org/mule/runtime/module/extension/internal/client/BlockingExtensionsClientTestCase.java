@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.client;
 
+import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
+import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.ExtensionsClientStory.BLOCKING_CLIENT;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.client.OperationParameters;
@@ -14,8 +17,8 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("ExtensionsClient")
-@Stories("Blocking Client")
+@Features(EXTENSIONS_CLIENT)
+@Stories(BLOCKING_CLIENT)
 public class BlockingExtensionsClientTestCase extends ExtensionsClientTestCase {
 
   @Override

@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.exception;
 
+import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_TYPES;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
 
@@ -18,8 +21,8 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Error Handling")
-@Stories("Error Types")
+@Features(ERROR_HANDLING)
+@Stories(ERROR_TYPES)
 public class SingleErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTestCase {
 
   @Test

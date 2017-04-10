@@ -15,15 +15,19 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
+import static org.mule.test.allure.AllureConstants.FtpFeature.FTP_EXTENSION;
+
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.runtime.api.message.Message;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
 import java.util.List;
 
+@Features(FTP_EXTENSION)
 public class FtpListTestCase extends FtpConnectorTestCase {
 
   private static final String TEST_FILE_PATTERN = "test-file-%d.html";

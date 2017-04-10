@@ -7,6 +7,13 @@
 
 package org.mule.runtime.module.embedded;
 
+import static org.mule.runtime.api.deployment.management.ComponentInitialStateManager.DISABLE_SCHEDULER_SOURCES_PROPERTY;
+import static org.mule.runtime.core.util.UUID.getUUID;
+import static org.mule.runtime.module.embedded.api.EmbeddedContainer.builder;
+import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EMBEDDED_API;
+import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EmbeddedApiStory.CONFIGURATION;
 import static com.mashape.unirest.http.Unirest.post;
 import static java.lang.String.valueOf;
 import static java.lang.Thread.sleep;
@@ -18,11 +25,7 @@ import static java.util.Optional.of;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.deployment.management.ComponentInitialStateManager.DISABLE_SCHEDULER_SOURCES_PROPERTY;
-import static org.mule.runtime.core.util.UUID.getUUID;
-import static org.mule.runtime.module.embedded.api.EmbeddedContainer.builder;
-import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
-import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.embedded.api.Application;
 import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
@@ -30,9 +33,6 @@ import org.mule.runtime.module.embedded.api.DeploymentConfiguration;
 import org.mule.runtime.module.embedded.api.EmbeddedContainer;
 import org.mule.tck.junit4.rule.FreePortFinder;
 import org.mule.tck.junit4.rule.SystemProperty;
-
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.exceptions.UnirestException;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +44,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -51,8 +53,8 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Embedded API")
-@Stories("Embedded configuration")
+@Features(EMBEDDED_API)
+@Stories(CONFIGURATION)
 public class EmbeddedContainerTestCase {
 
   private static final String LOGGING_FILE = "app.log";

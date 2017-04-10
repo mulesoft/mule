@@ -6,14 +6,16 @@
  */
 package org.mule.services.soap.generator;
 
-import static java.util.Collections.emptyList;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.services.soap.SoapTestUtils.ECHO;
 import static org.mule.services.soap.SoapTestUtils.FAIL;
 import static org.mule.services.soap.SoapTestUtils.NO_PARAMS;
 import static org.mule.services.soap.SoapTestUtils.getRequestResource;
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
+import static java.util.Collections.emptyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.services.soap.api.exception.BadRequestException;
 import org.mule.services.soap.api.exception.InvalidWsdlException;
 import org.mule.services.soap.introspection.WsdlIntrospecter;
@@ -29,7 +31,7 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories("Request Generation")
 public class EmptyRequestGeneratorTestCase extends AbstractEnricherTestCase {
 

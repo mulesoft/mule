@@ -6,6 +6,8 @@
  */
 package org.mule.extension.ws.runtime.wss;
 
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -16,7 +18,7 @@ import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories("WSS")
 public class WssSignTestCase extends AbstractWebServiceSecurityTestCase {
 

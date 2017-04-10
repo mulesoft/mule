@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.streaming.object;
 
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
 import static java.lang.Math.toIntExact;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -40,8 +42,8 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 @RunWith(Parameterized.class)
 @SmallTest
-@Features("Streaming")
-@Stories("Object Streaming")
+@Features(STREAMING)
+@Stories(OBJECT_STREAMING)
 public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestCase {
 
   protected static final int DATA_SIZE = 500;

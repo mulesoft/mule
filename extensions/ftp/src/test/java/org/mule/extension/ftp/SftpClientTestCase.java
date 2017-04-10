@@ -6,6 +6,23 @@
  */
 package org.mule.extension.ftp;
 
+import static org.mule.test.allure.AllureConstants.FtpFeature.FTP_EXTENSION;
+import static com.jcraft.jsch.ChannelSftp.SSH_FX_NO_SUCH_FILE;
+import static com.jcraft.jsch.ChannelSftp.SSH_FX_PERMISSION_DENIED;
+import static java.lang.String.format;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
+
+import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.tck.size.SmallTest;
+
+import java.nio.file.Path;
+
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.SftpException;
@@ -17,24 +34,11 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.tck.size.SmallTest;
-
-import java.nio.file.Path;
-
-import static com.jcraft.jsch.ChannelSftp.SSH_FX_NO_SUCH_FILE;
-import static com.jcraft.jsch.ChannelSftp.SSH_FX_PERMISSION_DENIED;
-import static java.lang.String.format;
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import ru.yandex.qatools.allure.annotations.Features;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
+@Features(FTP_EXTENSION)
 public class SftpClientTestCase {
 
   private static final String FILE_PATH = "/bla/file.txt";

@@ -157,5 +157,11 @@
             <artifactId>joda-time</artifactId>
             <version>${jodaTimeVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-allure</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

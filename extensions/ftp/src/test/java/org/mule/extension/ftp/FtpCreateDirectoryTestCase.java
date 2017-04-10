@@ -6,16 +6,20 @@
  */
 package org.mule.extension.ftp;
 
+import static org.mule.extension.file.common.api.exceptions.FileError.FILE_ALREADY_EXISTS;
+import static org.mule.test.allure.AllureConstants.FtpFeature.FTP_EXTENSION;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.file.common.api.exceptions.FileError.FILE_ALREADY_EXISTS;
+
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.exceptions.FileAlreadyExistsException;
 
 import java.nio.file.Paths;
 
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(FTP_EXTENSION)
 public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase {
 
   private static final String DIRECTORY = "validDirectory";

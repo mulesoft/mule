@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.exception;
 
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_TYPES;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.is;
@@ -18,8 +20,8 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Error Handling")
-@Stories("Error Types")
+@Features(ERROR_HANDLING)
+@Stories(ERROR_TYPES)
 public class DisjunctiveErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTestCase {
 
 

@@ -6,6 +6,14 @@
  */
 package org.mule.runtime.core.el;
 
+import static org.mule.runtime.api.el.BindingContext.builder;
+import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.api.metadata.DataType.fromFunction;
+import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
 import static java.util.Arrays.asList;
 import static java.util.Optional.of;
 import static org.hamcrest.Matchers.equalTo;
@@ -16,12 +24,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.el.BindingContext.builder;
-import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
-import static org.mule.runtime.api.metadata.DataType.OBJECT;
-import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.api.metadata.DataType.fromFunction;
-import static org.mule.runtime.api.metadata.DataType.fromType;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
@@ -42,13 +44,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Expression Language")
-@Stories("Support both MVEL and DW")
+@Features(EXPRESSION_LANGUAGE)
+@Stories(SUPPORT_MVEL_DW)
 public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCase {
 
   private static final String MY_VAR = "myVar";

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.exception;
 
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.EXCEPTION_MAPPINGS;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -17,8 +19,8 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Error Handling")
-@Stories("Exception Mappings")
+@Features(ERROR_HANDLING)
+@Stories(EXCEPTION_MAPPINGS)
 public class ExceptionMapperTestCase extends AbstractMuleTestCase {
 
   private ErrorType runtimeExceptionErrorType = mock(ErrorType.class);

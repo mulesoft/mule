@@ -6,6 +6,8 @@
  */
 package org.mule.extension.ws.runtime.wss;
 
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
+
 import org.mule.extension.ws.service.VerifyPasswordCallback;
 
 import java.util.HashMap;
@@ -19,7 +21,7 @@ import org.apache.ws.security.components.crypto.Merlin;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories("WSS")
 public class WssVerifySignatureTestCase extends AbstractWebServiceSecurityTestCase {
 

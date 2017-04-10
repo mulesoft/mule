@@ -6,14 +6,16 @@
  */
 package org.mule.services.soap.runtime;
 
+import static org.mule.services.soap.api.SoapVersion.SOAP11;
+import static org.mule.services.soap.api.message.SoapRequest.builder;
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.isOneOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.mule.services.soap.api.SoapVersion.SOAP11;
-import static org.mule.services.soap.api.message.SoapRequest.builder;
-import org.mule.services.soap.api.exception.BadRequestException;
+
 import org.mule.services.soap.AbstractSoapServiceTestCase;
+import org.mule.services.soap.api.exception.BadRequestException;
 import org.mule.services.soap.api.exception.SoapFaultException;
 
 import org.junit.Rule;
@@ -23,7 +25,7 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories({"Operation Execution", "Soap Fault"})
 public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
 

@@ -6,6 +6,10 @@
  */
 package org.mule.test.service.scheduler;
 
+import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
+import static org.mule.runtime.core.DefaultEventContext.create;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -13,9 +17,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
-import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
+
 import org.mule.functional.functional.SkeletonSource;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -45,7 +47,7 @@ import org.junit.rules.ExpectedException;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 
-@Features("Scheduler Service")
+@Features(SCHEDULER_SERVICE)
 public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
 
   private static final int CUSTOM_SCHEDULER_SIZE = 4;

@@ -7,10 +7,15 @@
 
 package org.mule.test.module.http.functional.listener;
 
+import static org.mule.service.http.api.HttpConstants.HttpStatus.NOT_FOUND;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.HttpStatus.NOT_FOUND;
+
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 
@@ -18,12 +23,9 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
-
-
+@Features(HTTP_EXTENSION)
 public class WildcardSpecificCasesTestCase extends AbstractHttpTestCase {
 
   private static final String path1 = "prefix/*/suffix";

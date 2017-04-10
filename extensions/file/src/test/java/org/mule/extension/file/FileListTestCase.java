@@ -6,24 +6,28 @@
  */
 package org.mule.extension.file;
 
+import static org.mule.extension.file.common.api.exceptions.FileError.ACCESS_DENIED;
+import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
+import static org.mule.test.allure.AllureConstants.FileFeature.FILE_EXTENSION;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.file.common.api.exceptions.FileError.ACCESS_DENIED;
-import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
+
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.exceptions.FileAccessDeniedException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.runtime.api.message.Message;
 
-import org.junit.Test;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
+
+@Features(FILE_EXTENSION)
 public class FileListTestCase extends FileConnectorTestCase {
 
   @Override

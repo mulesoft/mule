@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core;
 
+import static org.mule.runtime.core.DefaultEventContext.create;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
+import static org.mule.test.allure.AllureConstants.EventContextFeature.EventContextStory.RESPONSE_AND_COMPLETION_PUBLISHERS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -27,8 +29,8 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("EventContext")
-@Stories("EventContext response and completion publishers")
+@Features(EVENT_CONTEXT)
+@Stories(RESPONSE_AND_COMPLETION_PUBLISHERS)
 public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
   @Rule

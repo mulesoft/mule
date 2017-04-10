@@ -6,8 +6,10 @@
  */
 package org.mule.test.module.http.functional.listener;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.STREAMING;
 import static org.apache.http.client.fluent.Request.Get;
-import static org.mule.test.module.http.functional.HttpConnectorAllureConstants.HTTP_CONNECTOR_FEATURE;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Response;
@@ -15,8 +17,8 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features(HTTP_CONNECTOR_FEATURE)
-@Stories({"Error Handling", "Streaming"})
+@Features(HTTP_EXTENSION)
+@Stories({ERROR_HANDLING, STREAMING})
 public class HttpListenerResponseStreamingErrorHandlingTestCase extends AbstractHttpListenerErrorHandlingTestCase {
 
   @Override

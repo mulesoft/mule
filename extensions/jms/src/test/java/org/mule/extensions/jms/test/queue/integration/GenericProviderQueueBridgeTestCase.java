@@ -6,6 +6,7 @@
  */
 package org.mule.extensions.jms.test.queue.integration;
 
+import static org.mule.test.allure.AllureConstants.JmsFeature.JMS_EXTENSION;
 import static java.util.Arrays.asList;
 import static org.junit.runners.Parameterized.*;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -18,7 +19,7 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 
 @RunnerDelegateTo(Parameterized.class)
-@Features("JMS Extension")
+@Features(JMS_EXTENSION)
 @Stories("Generic Connection Provider Queue Bridge")
 public class GenericProviderQueueBridgeTestCase extends JmsAbstractQueueBridge {
 

@@ -6,10 +6,12 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static org.mule.service.scheduler.ThreadType.CUSTOM;
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SchedulerServiceStory.THROTTLING;
 import static java.lang.Thread.sleep;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.scheduler.ThreadType.CUSTOM;
 
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -21,11 +23,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.junit.Test;
-
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Scheduler Throttling")
+@Features(SCHEDULER_SERVICE)
+@Stories(THROTTLING)
 public class ThrottledSchedulerThrottleTestCase extends BaseDefaultSchedulerTestCase {
 
   private static final int THROTTLE_SIZE = 2;

@@ -6,9 +6,6 @@
  */
 package org.mule.extension.ftp;
 
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
 import static org.mule.extension.file.common.api.exceptions.FileError.CANNOT_REACH;
 import static org.mule.extension.file.common.api.exceptions.FileError.CONNECTION_TIMEOUT;
 import static org.mule.extension.file.common.api.exceptions.FileError.INVALID_CREDENTIALS;
@@ -16,19 +13,25 @@ import static org.mule.extension.file.common.api.exceptions.FileError.SERVICE_NO
 import static org.mule.extension.file.common.api.exceptions.FileError.UNKNOWN_HOST;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import static org.mule.test.allure.AllureConstants.FtpFeature.FTP_EXTENSION;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.ftp.api.FTPConnectionException;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.util.TestConnectivityUtils;
+
+import org.hamcrest.Matcher;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("FTP Extension")
+@Features(FTP_EXTENSION)
 @Stories("Negative Connectivity Testing")
 public class FtpNegativeConnectivityTestCase extends FtpConnectorTestCase {
 

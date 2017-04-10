@@ -7,6 +7,7 @@
 package org.mule.services.soap.runtime.wss;
 
 
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import static java.util.Collections.singletonList;
 import org.mule.services.soap.api.security.SecurityStrategy;
 import org.mule.services.soap.api.security.VerifySignatureSecurityStrategy;
@@ -24,7 +25,7 @@ import org.apache.ws.security.components.crypto.Merlin;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("Web Service Consumer")
+@Features(WSC_EXTENSION)
 @Stories("WSS")
 public class WssVerifySignatureTestCase extends AbstractWebServiceSecurityTestCase {
 

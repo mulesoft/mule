@@ -6,23 +6,25 @@
  */
 package org.mule.test.http.api.policy;
 
+import static org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory.PATH_PARAMETER_NAME;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory.PATH_PARAMETER_NAME;
-import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 
 import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpRequestPolicyPointcutParametersFactoryTestCase extends AbstractMuleTestCase {
 
   private static final ComponentIdentifier HTTP_REQUEST_COMPONENT_IDENTIFIER =

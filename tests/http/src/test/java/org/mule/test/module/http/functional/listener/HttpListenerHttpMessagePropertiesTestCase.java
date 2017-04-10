@@ -6,6 +6,9 @@
  */
 package org.mule.test.module.http.functional.listener;
 
+import static org.mule.service.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
+import static org.mule.service.http.api.domain.HttpProtocol.HTTP_1_1;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.apache.http.client.fluent.Request.Post;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -13,17 +16,13 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
-import static org.mule.service.http.api.domain.HttpProtocol.HTTP_1_1;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.service.http.api.domain.HttpProtocol;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
-
-import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableMap;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -32,12 +31,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
+import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.fluent.Request;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestCase {
 
   public static final String QUERY_PARAM_NAME = "queryParam";

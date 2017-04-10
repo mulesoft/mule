@@ -6,6 +6,8 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SchedulerServiceStory.TASK_SCHEDULING;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
@@ -44,12 +46,13 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.InOrder;
 import org.quartz.SchedulerException;
-
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
 @RunWith(Parameterized.class)
-@Features("Scheduler Task Scheduling")
+@Features(SCHEDULER_SERVICE)
+@Stories(TASK_SCHEDULING)
 public class DefaultSchedulerScheduleTestCase extends BaseDefaultSchedulerTestCase {
 
   private static final long TASK_DURATION_MILLIS = 200;

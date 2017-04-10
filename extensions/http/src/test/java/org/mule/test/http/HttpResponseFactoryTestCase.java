@@ -6,14 +6,16 @@
  */
 package org.mule.test.http;
 
+import static org.mule.extension.http.internal.HttpStreamingType.AUTO;
+import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.extension.http.internal.HttpStreamingType.AUTO;
-import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
-import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.HttpResponseFactory;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -30,7 +32,7 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("HTTP Connector")
+@Features(HTTP_EXTENSION)
 @Stories("Issues")
 public class HttpResponseFactoryTestCase extends AbstractMuleTestCase {
 
