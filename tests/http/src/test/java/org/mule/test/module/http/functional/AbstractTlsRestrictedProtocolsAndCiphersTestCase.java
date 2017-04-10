@@ -31,6 +31,7 @@ import java.util.List;
  * Mostly these scenarios are about changing the {@code tls.properties} so it is modified by tests and that cannot be done with an
  * isolated class loader.
  */
+// TODO(pablo.kraan): MULE-12188 - migrate subclasses to use the isolated test runner
 public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends ExtensionFunctionalTestCase {
 
   // TODO - MULE-11119: Remove once the service is injected higher up on the hierarchy

@@ -7,12 +7,9 @@
 
 package org.mule.test.runner.classloader;
 
-import static org.mule.runtime.module.artifact.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import org.mule.runtime.module.artifact.classloader.ChildOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.LookupStrategy;
-import org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy;
 import org.mule.test.runner.api.PluginUrlClassification;
 
 import java.util.HashMap;
@@ -43,32 +40,15 @@ public class PluginLookPolicyFactory {
         continue;
       }
 
-      LookupStrategy lookUpPolicyStrategy = getClassLoaderLookupStrategy(pluginClassification, dependencyPluginClassification);
+      if (pluginClassification.getPluginDependencies().contains(dependencyPluginClassification.getName())) {
+        LookupStrategy lookUpPolicyStrategy = PARENT_FIRST;
 
-      for (String exportedPackage : dependencyPluginClassification.getExportedPackages()) {
-        pluginsLookupPolicies.put(exportedPackage, lookUpPolicyStrategy);
+        for (String exportedPackage : dependencyPluginClassification.getExportedPackages()) {
+          pluginsLookupPolicies.put(exportedPackage, lookUpPolicyStrategy);
+        }
       }
-
     }
     return parentLookupPolicies.extend(pluginsLookupPolicies);
   }
 
-  /**
-   * If the plugin declares the dependency the {@link PluginUrlClassification} would be {@link ParentFirstLookupStrategy}
-   * otherwise {@link ChildOnlyLookupStrategy}.
-   *
-   * @param currentPluginClassification {@link PluginUrlClassification} being classified.
-   * @param dependencyPluginClassification {@link PluginUrlClassification} from the region.
-   * @return {@link LookupStrategy} to be used by current plugin for the exported packages defined by the dependencyPluginClassification.
-   */
-  private LookupStrategy getClassLoaderLookupStrategy(PluginUrlClassification currentPluginClassification,
-                                                      PluginUrlClassification dependencyPluginClassification) {
-    final LookupStrategy parentFirst;
-    if (currentPluginClassification.getPluginDependencies().contains(dependencyPluginClassification.getName())) {
-      parentFirst = PARENT_FIRST;
-    } else {
-      parentFirst = CHILD_ONLY;
-    }
-    return parentFirst;
-  }
 }

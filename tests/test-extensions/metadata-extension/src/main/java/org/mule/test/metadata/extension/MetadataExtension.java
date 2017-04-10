@@ -6,14 +6,15 @@
  */
 package org.mule.test.metadata.extension;
 
+import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.test.metadata.extension.model.animals.Animal;
 import org.mule.test.metadata.extension.model.animals.Bear;
 import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes;
@@ -23,6 +24,8 @@ import org.mule.test.metadata.extension.model.shapes.Circle;
 import org.mule.test.metadata.extension.model.shapes.Rectangle;
 import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.metadata.extension.model.shapes.Square;
+import org.mule.test.metadata.extension.query.NativeQueryOutputResolver;
+import org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils;
 
 @Extension(name = "Metadata")
 @Operations({MetadataOperations.class, MetadataFailureOperations.class, MetadataInheritedExtensionResolversOperations.class,
@@ -35,6 +38,7 @@ import org.mule.test.metadata.extension.model.shapes.Square;
     subTypes = {AnimalsOutputAttributes.class, ShapeOutputAttributes.class})
 @SubTypeMapping(baseType = Rectangle.class, subTypes = {Square.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/metadata", prefix = "metadata")
+@Export(classes = {TestMetadataResolverUtils.class, NativeQueryOutputResolver.class})
 public class MetadataExtension {
 
   @Parameter

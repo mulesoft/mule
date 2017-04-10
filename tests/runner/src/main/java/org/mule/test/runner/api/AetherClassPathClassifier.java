@@ -830,11 +830,12 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                                                                rootArtifact.getVersion()),
                                                            TEST);
 
+      List<File> urls = dependencyResolver
+          .resolveDependencies(rootTestDependency, directDependencies, managedDependencies,
+                               orFilter(dependencyFilter,
+                                        new PatternExclusionsDependencyFilter(exclusionsPatterns)));
       appFiles
-          .addAll(dependencyResolver
-              .resolveDependencies(rootTestDependency, directDependencies, managedDependencies,
-                                   orFilter(dependencyFilter,
-                                            new PatternExclusionsDependencyFilter(exclusionsPatterns))));
+          .addAll(urls);
     } catch (Exception e) {
       throw new IllegalStateException("Couldn't resolve dependencies for application '" + context.getRootArtifact()
           + "' classification", e);

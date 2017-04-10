@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:implicit="http://www.mulesoft.org/schema/mule/implicit"
+      xmlns:implicitexclusive="http://www.mulesoft.org/schema/mule/implicitexclusive"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/implicit http://www.mulesoft.org/schema/mule/implicit/current/mule-implicit.xsd">
+               http://www.mulesoft.org/schema/mule/implicitexclusive http://www.mulesoft.org/schema/mule/implicitexclusive/current/mule-implicitexclusive.xsd">
 
-    <implicit:blaconf name="blaexplicit"/>
-    <implicit:bleconf name="bleexplicit" number="10"/>
+    <implicitexclusive:blaconf name="blaexplicit"/>
+    <implicitexclusive:bleconf name="bleexplicit" number="10"/>
 
     <flow name="implicitConfig">
-        <implicit:bla/>
-        <implicit:ble/>
+        <implicitexclusive:bla/>
+        <implicitexclusive:ble/>
     </flow>
 </mule>

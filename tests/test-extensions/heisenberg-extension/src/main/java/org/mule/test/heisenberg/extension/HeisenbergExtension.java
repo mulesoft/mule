@@ -46,11 +46,12 @@ import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 
-import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 @Extension(name = HeisenbergExtension.HEISENBERG, description = HeisenbergExtension.EXTENSION_DESCRIPTION, category = SELECT,
     minMuleVersion = "4.1")
@@ -59,7 +60,7 @@ import java.util.Map;
 @OnException(HeisenbergConnectionExceptionEnricher.class)
 @ConnectionProviders(HeisenbergConnectionProvider.class)
 @Sources({HeisenbergSource.class, DEARadioSource.class})
-@Export(classes = {HeisenbergException.class})
+@Export(classes = {HeisenbergExtension.class, HeisenbergException.class})
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
 @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})
 @ExternalLib(name = HeisenbergExtension.HEISENBERG_LIB_NAME, description = HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION,

@@ -111,7 +111,7 @@
 
     <sub-flow name="castSpell">
         <expression-component>mel:
-            org.mule.runtime.module.extension.internal.streaming.BytesStreamingExtensionTestCase.addSpell(payload)
+            org.mule.test.module.extension.streaming.BytesStreamingExtensionTestCase.addSpell(payload)
         </expression-component>
     </sub-flow>
 
