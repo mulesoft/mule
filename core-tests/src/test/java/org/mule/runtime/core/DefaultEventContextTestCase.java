@@ -422,23 +422,8 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  @Description("When a child event context is serialized the parent context no longer waits for completion of child context.")
-  public void childSerializationUnregistersWithParent() throws Exception {
-    EventContext parent = create(getTestFlow(muleContext), "", null);
-    EventContext child = DefaultEventContext.child(parent);
-
-    muleContext.getObjectSerializer().getExternalProtocol().serialize(child);
-
-    Event event = testEvent();
-
-    parent.success(event);
-
-    assertResponse(parent, event);
-    assertCompletionDone(parent);
-  }
-
-  @Test
-  @Description("When a child event context is de-serialized it completion works in the same way.")
+  @Description("When a child event context is de-serialized it is decoupled from parent context but response and completion " +
+               "publisher still complete when a response event is available.")
   public void deserializedChild() throws Exception {
     EventContext parent = create(getTestFlow(muleContext), "", null);
     EventContext child = DefaultEventContext.child(parent);
@@ -470,7 +455,6 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     assertResponse(deserializedParent, event);
     assertCompletionDone(deserializedParent);
   }
-
 
   private void assertResponse(EventContext parent, Event event) {
     assertThat(from(parent.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), equalTo(event));

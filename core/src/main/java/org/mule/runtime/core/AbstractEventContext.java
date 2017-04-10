@@ -14,7 +14,6 @@ import static reactor.core.publisher.Mono.when;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 
-import java.io.ObjectInputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -62,13 +61,6 @@ abstract class AbstractEventContext implements EventContext {
   void addChildContext(EventContext childContext) {
     synchronized (this) {
       childContexts.add(childContext);
-      updateCompletionPublisher();
-    }
-  }
-
-  void removeChildContext(EventContext eventContext) {
-    synchronized (this) {
-      childContexts.remove(eventContext);
       updateCompletionPublisher();
     }
   }
@@ -129,11 +121,6 @@ abstract class AbstractEventContext implements EventContext {
   @Override
   public Publisher<Void> getCompletionPublisher() {
     return completionProcessor;
-  }
-
-  private void readObject(ObjectInputStream in) throws Exception {
-    in.defaultReadObject();
-    initCompletionProcessor();
   }
 
 }
