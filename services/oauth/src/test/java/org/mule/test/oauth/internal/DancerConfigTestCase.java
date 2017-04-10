@@ -11,7 +11,7 @@ import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.collection.IsMapContaining.hasKey;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -23,7 +23,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -36,11 +35,11 @@ import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.OAuthService;
+import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
 import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
 import org.mule.runtime.oauth.api.builder.OAuthDancerBuilder;
@@ -199,7 +198,7 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
       assertThat(r.getState(), is(empty()));
 
       beforeCallbackCalled.set(true);
-      return emptyMap();
+      return null;
     });
 
     startDancer(builder);
@@ -221,7 +220,7 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
       assertThat(r.getState().get(), is(originalState));
 
       beforeCallbackCalled.set(true);
-      return emptyMap();
+      return null;
     });
 
     startDancer(builder);
@@ -243,7 +242,7 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
       assertThat(r.getScopes(), is("aScope"));
 
       beforeCallbackCalled.set(true);
-      return emptyMap();
+      return null;
     });
 
     startDancer(builder);
@@ -337,16 +336,17 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
     AtomicBoolean afterCallbackCalled = new AtomicBoolean(false);
     String resourceOwner = "someOwner";
 
+    AuthorizationCodeDanceCallbackContext callbackContext = new AuthorizationCodeDanceCallbackContext() {
+
+    };
+
     final OAuthAuthorizationCodeDancerBuilder builder = baseAuthCodeDancerbuilder();
     minimalAuthCodeConfig(builder);
     builder.beforeDanceCallback(r -> {
-      return singletonMap("someKey", new TypedValue<>("someValue", STRING));
+      return callbackContext;
     });
-    builder.afterDanceCallback((vars, ctx) -> {
-      assertThat(vars.size(), is(1));
-      assertThat(vars, hasKey("someKey"));
-      assertThat(vars.get("someKey").getValue(), is("someValue"));
-      assertThat(vars.get("someKey").getDataType(), is(STRING));
+    builder.afterDanceCallback((callbackCtx, ctx) -> {
+      assertThat(callbackCtx, sameInstance(callbackContext));
 
       afterCallbackCalled.set(true);
     });

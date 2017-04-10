@@ -15,11 +15,11 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lock.LockFactory;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
+import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
 import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
@@ -55,8 +55,8 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
 
   private Map<String, String> customParameters = emptyMap();
 
-  private Function<AuthorizationCodeRequest, Map<String, TypedValue>> beforeDanceCallback = r -> emptyMap();
-  private BiConsumer<Map<String, TypedValue>, ResourceOwnerOAuthContext> afterDanceCallback = (vars, ctx) -> {
+  private Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> beforeDanceCallback = r -> null;
+  private BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterDanceCallback = (vars, ctx) -> {
   };
 
   public DefaultOAuthAuthorizationCodeDancerBuilder(OAuthCallbackServersManager httpServersManager,
@@ -189,14 +189,14 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
   }
 
   @Override
-  public OAuthAuthorizationCodeDancerBuilder beforeDanceCallback(Function<AuthorizationCodeRequest, Map<String, TypedValue>> beforeDanceCallback) {
+  public OAuthAuthorizationCodeDancerBuilder beforeDanceCallback(Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> beforeDanceCallback) {
     requireNonNull(beforeDanceCallback, "beforeDanceCallback cannot be null");
     this.beforeDanceCallback = beforeDanceCallback;
     return this;
   }
 
   @Override
-  public OAuthAuthorizationCodeDancerBuilder afterDanceCallback(BiConsumer<Map<String, TypedValue>, ResourceOwnerOAuthContext> afterDanceCallback) {
+  public OAuthAuthorizationCodeDancerBuilder afterDanceCallback(BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterDanceCallback) {
     requireNonNull(afterDanceCallback, "afterDanceCallback cannot be null");
     this.afterDanceCallback = afterDanceCallback;
     return this;

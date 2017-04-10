@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.oauth.api.builder;
 
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
@@ -125,21 +124,22 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<
    * <p>
    * The map returned by the provided function will be passed to the {@link #afterDanceCallback(BiConsumer)}, if set.
    * 
-   * @param callback a {@link Function} that receives the parameters that will be used in the executing dance and returns a map to
-   *        be then passed to the {@link #afterDanceCallback(BiConsumer)}. Not null.
-   * 
-   * @return this builder
-   */
-  OAuthAuthorizationCodeDancerBuilder beforeDanceCallback(Function<AuthorizationCodeRequest, Map<String, TypedValue>> callback);
-
-  /**
-   * Allows custom code to be run after doing the request to the provided {@code tokenUrl} and processing its results.
-   * 
-   * @param callback a {@link BiConsumer} that receives the map returned by the callback passed to
-   *        {@link #beforeDanceCallback(Function)} and the OAuth context from the response of the call to {@code tokenUrl}. Not
+   * @param callback a {@link Function} that receives the parameters that will be used in the executing dance and returns an
+   *        {@link AuthorizationCodeDanceCallbackContext} to be then passed to the {@link #afterDanceCallback(BiConsumer)}. Not
    *        null.
    * 
    * @return this builder
    */
-  OAuthAuthorizationCodeDancerBuilder afterDanceCallback(BiConsumer<Map<String, TypedValue>, ResourceOwnerOAuthContext> callback);
+  OAuthAuthorizationCodeDancerBuilder beforeDanceCallback(Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> callback);
+
+  /**
+   * Allows custom code to be run after doing the request to the provided {@code tokenUrl} and processing its results.
+   * 
+   * @param callback a {@link BiConsumer} that receives the {@link AuthorizationCodeDanceCallbackContext} returned by the callback
+   *        passed to {@link #beforeDanceCallback(Function)} and the OAuth context from the response of the call to
+   *        {@code tokenUrl}. Not null.
+   * 
+   * @return this builder
+   */
+  OAuthAuthorizationCodeDancerBuilder afterDanceCallback(BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> callback);
 }

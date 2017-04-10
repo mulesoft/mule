@@ -47,11 +47,11 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
+import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
 import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
 import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
 import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
@@ -111,8 +111,8 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
   private final String authorizationUrl;
   private final Map<String, String> customParameters;
 
-  private final Function<AuthorizationCodeRequest, Map<String, TypedValue>> beforeDanceCallback;
-  private final BiConsumer<Map<String, TypedValue>, ResourceOwnerOAuthContext> afterDanceCallback;
+  private final Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> beforeDanceCallback;
+  private final BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterDanceCallback;
 
   private RequestHandlerManager redirectUrlHandlerManager;
   private RequestHandlerManager localAuthorizationUrlHandlerManager;
@@ -126,8 +126,8 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
                                              Map<String, String> customParametersExtractorsExprs,
                                              LockFactory lockProvider, Map<String, DefaultResourceOwnerOAuthContext> tokensStore,
                                              HttpClient httpClient, MuleExpressionLanguage expressionEvaluator,
-                                             Function<AuthorizationCodeRequest, Map<String, TypedValue>> beforeDanceCallback,
-                                             BiConsumer<Map<String, TypedValue>, ResourceOwnerOAuthContext> afterDanceCallback) {
+                                             Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> beforeDanceCallback,
+                                             BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterDanceCallback) {
     super(clientId, clientSecret, tokenUrl, encoding, scopes, responseAccessTokenExpr, responseRefreshTokenExpr,
           responseExpiresInExpr, customParametersExtractorsExprs, lockProvider, tokensStore, httpClient, expressionEvaluator);
 
@@ -213,7 +213,7 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
         return;
       }
 
-      Map<String, TypedValue> beforeCallbackVariables = beforeDanceCallback
+      AuthorizationCodeDanceCallbackContext beforeCallbackContext = beforeDanceCallback
           .apply(new DefaultAuthorizationCodeRequest(resourceOwnerId, authorizationUrl, tokenUrl, clientId, clientSecret, scopes,
                                                      stateDecoder.decodeOriginalState()));
 
@@ -245,7 +245,7 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
         updateResourceOwnerState(resourceOwnerOAuthContext, stateDecoder.decodeOriginalState(), tokenResponse);
         updateResourceOwnerOAuthContext(resourceOwnerOAuthContext);
 
-        afterDanceCallback.accept(beforeCallbackVariables, resourceOwnerOAuthContext);
+        afterDanceCallback.accept(beforeCallbackContext, resourceOwnerOAuthContext);
 
         sendResponse(stateDecoder, responseCallback, OK, "Successfully retrieved access token",
                      AUTHORIZATION_CODE_RECEIVED_STATUS);
