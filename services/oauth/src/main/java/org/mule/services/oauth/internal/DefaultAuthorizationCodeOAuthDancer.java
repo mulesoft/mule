@@ -40,7 +40,7 @@ import static org.mule.services.oauth.internal.OAuthConstants.REFRESH_TOKEN_PARA
 import static org.mule.services.oauth.internal.OAuthConstants.STATE_PARAMETER;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -117,7 +117,7 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
                                              String responseExpiresInExpr, Map<String, String> customParameters,
                                              Map<String, String> customParametersExtractorsExprs,
                                              LockFactory lockProvider, Map<String, ResourceOwnerOAuthContext> tokensStore,
-                                             HttpClient httpClient, ExpressionEvaluator expressionEvaluator) {
+                                             HttpClient httpClient, MuleExpressionLanguage expressionEvaluator) {
     super(clientId, clientSecret, tokenUrl, encoding, scopes, responseAccessTokenExpr, responseRefreshTokenExpr,
           responseExpiresInExpr, customParametersExtractorsExprs, lockProvider, tokensStore, httpClient, expressionEvaluator);
 

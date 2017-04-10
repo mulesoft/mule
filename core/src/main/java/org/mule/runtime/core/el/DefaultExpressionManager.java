@@ -24,7 +24,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
+import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -33,6 +33,7 @@ import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.util.TemplateParser;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -47,7 +48,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   private static final Logger logger = getLogger(DefaultExpressionManager.class);
 
   private MuleContext muleContext;
-  private ExtendedExpressionLanguage expressionLanguage;
+  private ExtendedExpressionLanguageAdaptor expressionLanguage;
   // Default style parser
   private TemplateParser parser = TemplateParser.createMuleStyleParser();
   private boolean melDefault;
@@ -55,10 +56,10 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   @Inject
   public DefaultExpressionManager(MuleContext muleContext) {
     this.muleContext = muleContext;
-    final DataWeaveExpressionLanguage dwExpressionLanguage = new DataWeaveExpressionLanguage(muleContext);
+    final DataWeaveExpressionLanguageAdaptor dwExpressionLanguage = new DataWeaveExpressionLanguageAdaptor(muleContext);
     final MVELExpressionLanguage mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
-    this.expressionLanguage = new ExtendedExpressionLanguageAdapter(dwExpressionLanguage, mvelExpressionLanguage);
-    this.melDefault = ((ExtendedExpressionLanguageAdapter) expressionLanguage).isMelDefault();
+    this.expressionLanguage = new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage);
+    this.melDefault = ((ExpressionLanguageAdaptorHandler) expressionLanguage).isMelDefault();
   }
 
   @Override
@@ -66,7 +67,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     Collection<GlobalBindingContextProvider> contextProviders =
         muleContext.getRegistry().lookupObjects(GlobalBindingContextProvider.class);
     for (GlobalBindingContextProvider contextProvider : contextProviders) {
-      expressionLanguage.registerGlobalContext(contextProvider.getBindingContext());
+      expressionLanguage.addGlobalBindings(contextProvider.getBindingContext());
     }
     if (melDefault) {
       logger.warn("Using MEL as the default expression language.");
@@ -74,8 +75,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
-  public void addGlobalContext(BindingContext bindingContext) {
-    expressionLanguage.registerGlobalContext(bindingContext);
+  public void addGlobalBindings(BindingContext bindingContext) {
+    expressionLanguage.addGlobalBindings(bindingContext);
   }
 
   @Override
@@ -131,7 +132,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   @Override
   public TypedValue evaluate(String expression, DataType outputType, BindingContext context, Event event) {
-    TypedValue result = evaluate(expression, event, null, null, context);
+    TypedValue result = expressionLanguage.evaluate(expression, outputType, event, context);
     DataType sourceType = result.getDataType();
     try {
       return transform(result, sourceType, outputType);
@@ -141,6 +142,13 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
                                                                       sourceType, outputType),
                                                                e));
     }
+  }
+
+  @Override
+  public TypedValue evaluate(String expression, DataType expectedOutputType, BindingContext context, Event event,
+                             FlowConstruct flowConstruct)
+      throws ExpressionRuntimeException {
+    return expressionLanguage.evaluate(expression, expectedOutputType, event, flowConstruct, context);
   }
 
   private TypedValue transform(TypedValue target, DataType sourceType, DataType outputType) throws TransformerException {
@@ -168,8 +176,9 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public boolean evaluateBoolean(String expression, Event event, FlowConstruct flowConstruct, boolean nullReturnsTrue,
                                  boolean nonBooleanReturnsTrue)
       throws ExpressionRuntimeException {
-    return resolveBoolean(evaluate(expression, event, flowConstruct).getValue(), nullReturnsTrue, nonBooleanReturnsTrue,
-                          expression);
+    return resolveBoolean(evaluate(expression, DataType.BOOLEAN, BindingContext.builder().build(), event, flowConstruct)
+        .getValue(), nullReturnsTrue,
+                          nonBooleanReturnsTrue, expression);
   }
 
   protected boolean resolveBoolean(Object result, boolean nullReturnsTrue, boolean nonBooleanReturnsTrue, String expression) {
@@ -230,6 +239,19 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
+  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, FlowConstruct flowConstruct,
+                                       BindingContext bindingContext)
+      throws ExpressionRuntimeException {
+    return expressionLanguage.split(expression, bachSize, event, flowConstruct, bindingContext);
+  }
+
+  @Override
+  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, BindingContext bindingContext)
+      throws ExpressionRuntimeException {
+    return expressionLanguage.split(expression, bachSize, event, bindingContext);
+  }
+
+  @Override
   public boolean isExpression(String expression) {
     return expression.contains(DEFAULT_EXPRESSION_PREFIX);
   }
@@ -276,8 +298,14 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     return success();
   }
 
+  @Override
+  public Iterator<TypedValue<?>> split(String expression, int bachSize, BindingContext context) {
+    return expressionLanguage.split(expression, bachSize, null, context);
+  }
+
   private boolean hasMelExpression(String expression) {
     return expression.contains(DEFAULT_EXPRESSION_PREFIX + MEL_PREFIX + PREFIX_EXPR_SEPARATOR);
   }
+
 
 }

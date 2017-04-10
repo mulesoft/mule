@@ -7,8 +7,7 @@
 package org.mule.runtime.core.api.el;
 
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.el.ExpressionEvaluator;
-import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
@@ -16,11 +15,13 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
 
+import java.util.Iterator;
+
 /**
  * Provides universal access for evaluating expressions embedded in Mule configurations, such as XML, Java,
  * scripting and annotations.
  */
-public interface ExpressionManager extends ExpressionEvaluator {
+public interface ExpressionManager extends MuleExpressionLanguage {
 
   String DEFAULT_EXPRESSION_PREFIX = "#[";
   String DEFAULT_EXPRESSION_POSTFIX = "]";
@@ -49,7 +50,6 @@ public interface ExpressionManager extends ExpressionEvaluator {
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
   TypedValue evaluate(String expression, Event event) throws ExpressionRuntimeException;
-
 
   /**
    * Execute the expression returning the result. The expression will be executed with MuleEvent context, meaning the expression
@@ -130,6 +130,23 @@ public interface ExpressionManager extends ExpressionEvaluator {
       throws ExpressionRuntimeException;
 
   /**
+   * Evaluates an expression according to a given {@link BindingContext}, the global one, the {@link DataType} of the expected
+   * result and an {@link Event}.
+   *
+   * @param expression the EL expression
+   * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
+   *        type.
+   * @param context an expression binding context to consider
+   * @param event the current event to consider
+   * @param flowConstruct the flow where the event is being processed
+   * @return the result of the expression plus its type
+   * @throws ExpressionRuntimeException if a problem occurs evaluating the expression or during transformation
+   */
+  TypedValue evaluate(String expression, DataType expectedOutputType, BindingContext context, Event event,
+                      FlowConstruct flowConstruct)
+      throws ExpressionRuntimeException;
+
+  /**
    * Evaluates an expression considering a {@code boolean} as output. If the result cannot be clearly transformed or is
    * {@link null}, {@link false} will be returned.
    *
@@ -154,6 +171,33 @@ public interface ExpressionManager extends ExpressionEvaluator {
    */
   boolean evaluateBoolean(String expression, Event event, FlowConstruct flowConstruct, boolean nullReturnsTrue,
                           boolean nonBooleanReturnsTrue)
+      throws ExpressionRuntimeException;
+
+  /**
+   * Evaluates an expression according to a given {@link BindingContext}, an {@link Event} and a {@link FlowConstruct}.
+   *
+   * @param expression the expression to be executed
+   * @param event the current event being processed
+   * @param flowConstruct the flow where the event is being processed
+   * @param bindingContext the bindings to consider
+   * @return the result of execution of the expression.
+   * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
+   */
+  Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, FlowConstruct flowConstruct,
+                                BindingContext bindingContext)
+      throws ExpressionRuntimeException;
+
+
+  /**
+   * Evaluates an expression according to a given {@link BindingContext}, an {@link Event} and a {@link FlowConstruct}.
+   *
+   * @param expression the expression to be executed
+   * @param event the current event being processed
+   * @param bindingContext the bindings to consider
+   * @return the result of execution of the expression.
+   * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
+   */
+  Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, BindingContext bindingContext)
       throws ExpressionRuntimeException;
 
 }

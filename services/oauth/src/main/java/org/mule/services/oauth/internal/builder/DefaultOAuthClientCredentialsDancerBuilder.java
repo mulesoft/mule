@@ -9,7 +9,7 @@ package org.mule.services.oauth.internal.builder;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
@@ -28,7 +28,7 @@ public class DefaultOAuthClientCredentialsDancerBuilder extends AbstractOAuthDan
 
   public DefaultOAuthClientCredentialsDancerBuilder(LockFactory lockProvider,
                                                     Map<String, ResourceOwnerOAuthContext> tokensStore, HttpService httpService,
-                                                    ExpressionEvaluator expressionEvaluator) {
+                                                    MuleExpressionLanguage expressionEvaluator) {
     super(lockProvider, tokensStore, httpService, expressionEvaluator);
   }
 

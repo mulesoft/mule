@@ -18,7 +18,7 @@ import static org.mule.services.oauth.internal.OAuthConstants.GRANT_TYPE_PARAMET
 import static org.mule.services.oauth.internal.OAuthConstants.SCOPE_PARAMETER;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -55,7 +55,7 @@ public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements
                                       String responseRefreshTokenExpr, String responseExpiresInExpr,
                                       Map<String, String> customParametersExprs, LockFactory lockProvider,
                                       Map<String, ResourceOwnerOAuthContext> tokensStore, HttpClient httpClient,
-                                      ExpressionEvaluator expressionEvaluator) {
+                                      MuleExpressionLanguage expressionEvaluator) {
     super(clientId, clientSecret, tokenUrl, encoding, scopes, responseAccessTokenExpr, responseRefreshTokenExpr,
           responseExpiresInExpr, customParametersExprs, lockProvider, tokensStore, httpClient, expressionEvaluator);
     this.encodeClientCredentialsInBody = encodeClientCredentialsInBody;

@@ -12,7 +12,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
-import org.mule.runtime.api.el.ExpressionExecutor;
+import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
+import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
@@ -20,8 +21,6 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.service.http.api.HttpService;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
-
-import com.mulesoft.weave.el.WeaveExpressionExecutor;
 
 import java.util.List;
 
@@ -56,10 +55,10 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
     registry.registerObject(schedulerService.getName(), spy(schedulerService));
 
     if (mockExpressionExecutor) {
-      ExpressionExecutor expressionExecutor = mock(ExpressionExecutor.class);
+      DefaultExpressionLanguageFactoryService expressionExecutor = mock(DefaultExpressionLanguageFactoryService.class);
       registry.registerObject(MOCK_EXPR_EXECUTOR, expressionExecutor);
     } else {
-      final WeaveExpressionExecutor exprExecutor = new WeaveExpressionExecutor();
+      final DefaultExpressionLanguageFactoryService exprExecutor = new WeaveDefaultExpressionLanguageFactoryService();
       registry.registerObject(exprExecutor.getName(), exprExecutor);
     }
 

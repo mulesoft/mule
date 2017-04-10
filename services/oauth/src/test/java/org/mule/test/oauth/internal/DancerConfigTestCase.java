@@ -19,7 +19,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -83,7 +83,7 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
   public void clientCredentialsMinimal() throws MuleException {
     final OAuthClientCredentialsDancerBuilder builder =
         service.clientCredentialsGrantTypeDancerBuilder(muleContext.getRegistry().lookupObject(LockFactory.class),
-                                                        new HashMap<>(), mock(ExpressionEvaluator.class));
+                                                        new HashMap<>(), mock(MuleExpressionLanguage.class));
 
     builder.clientCredentials("clientId", "clientSecret");
     builder.tokenUrl("http://host/token");
@@ -101,7 +101,7 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
   public void authorizationCodeMinimal() throws MuleException, MalformedURLException {
     final OAuthAuthorizationCodeDancerBuilder builder =
         service.authorizationCodeGrantTypeDancerBuilder(muleContext.getRegistry().lookupObject(LockFactory.class),
-                                                        new HashMap<>(), mock(ExpressionEvaluator.class));
+                                                        new HashMap<>(), mock(MuleExpressionLanguage.class));
 
     builder.clientCredentials("clientId", "clientSecret");
     builder.tokenUrl("http://host/token");
@@ -121,7 +121,7 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
   public void clientCredentialsReuseHttpClient() throws MuleException {
     final OAuthClientCredentialsDancerBuilder builder =
         service.clientCredentialsGrantTypeDancerBuilder(muleContext.getRegistry().lookupObject(LockFactory.class),
-                                                        new HashMap<>(), mock(ExpressionEvaluator.class));
+                                                        new HashMap<>(), mock(MuleExpressionLanguage.class));
 
     builder.clientCredentials("clientId", "clientSecret");
     builder.tokenUrl(httpClient, "http://host/token");
@@ -139,7 +139,7 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
   public void authorizationCodeReuseHttpClient() throws MuleException, MalformedURLException {
     final OAuthAuthorizationCodeDancerBuilder builder =
         service.authorizationCodeGrantTypeDancerBuilder(muleContext.getRegistry().lookupObject(LockFactory.class),
-                                                        new HashMap<>(), mock(ExpressionEvaluator.class));
+                                                        new HashMap<>(), mock(MuleExpressionLanguage.class));
 
     builder.clientCredentials("clientId", "clientSecret");
     builder.tokenUrl(httpClient, "http://host/token");
@@ -159,7 +159,7 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
   public void authorizationCodeReuseHttpServer() throws MuleException, IOException {
     final OAuthAuthorizationCodeDancerBuilder builder =
         service.authorizationCodeGrantTypeDancerBuilder(muleContext.getRegistry().lookupObject(LockFactory.class),
-                                                        new HashMap<>(), mock(ExpressionEvaluator.class));
+                                                        new HashMap<>(), mock(MuleExpressionLanguage.class));
 
     builder.clientCredentials("clientId", "clientSecret");
     builder.tokenUrl("http://host/token");

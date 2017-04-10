@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.oauth.api;
 
-import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
@@ -39,7 +39,7 @@ public interface OAuthService extends Service {
    */
   <T> OAuthClientCredentialsDancerBuilder clientCredentialsGrantTypeDancerBuilder(LockFactory lockProvider,
                                                                                   Map<String, T> tokensStore,
-                                                                                  ExpressionEvaluator expressionEvaluator);
+                                                                                  MuleExpressionLanguage expressionEvaluator);
 
   /**
    * Creates a builder for an {@link OAuthDancer} for authorization code grant type. The dancer will use the given
@@ -54,6 +54,6 @@ public interface OAuthService extends Service {
    */
   <T> OAuthAuthorizationCodeDancerBuilder authorizationCodeGrantTypeDancerBuilder(LockFactory lockProvider,
                                                                                   Map<String, T> tokensStore,
-                                                                                  ExpressionEvaluator expressionEvaluator);
+                                                                                  MuleExpressionLanguage expressionEvaluator);
 
 }

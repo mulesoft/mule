@@ -9,7 +9,7 @@ package org.mule.runtime.core.routing;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.routing.MapSplitter.MAP_ENTRY_KEY;
-import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
@@ -34,7 +34,6 @@ import org.w3c.dom.NodeList;
  */
 public class ExpressionSplitter extends AbstractSplitter implements Initialisable {
 
-  protected ExpressionEvaluator expressionManager;
   protected ExpressionConfig config = new ExpressionConfig();
 
   public ExpressionSplitter() {
@@ -47,14 +46,13 @@ public class ExpressionSplitter extends AbstractSplitter implements Initialisabl
 
   @Override
   public void initialise() throws InitialisationException {
-    expressionManager = muleContext.getExpressionManager();
-    config.validate(expressionManager);
+    config.validate();
   }
 
   @Override
   protected List<Event> splitMessage(Event event) {
     Object result =
-        muleContext.getExpressionManager().evaluate(config.getFullExpression(expressionManager), event, flowConstruct)
+        muleContext.getExpressionManager().evaluate(config.getFullExpression(), event, flowConstruct)
             .getValue();
     if (result instanceof Object[]) {
       result = Arrays.asList((Object[]) result);

@@ -9,7 +9,7 @@ package org.mule.runtime.core.expression;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 
-import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
@@ -65,7 +65,7 @@ public class ExpressionConfig {
     this.expression = expressionString;
   }
 
-  public void validate(ExpressionEvaluator expressionManager) {
+  public void validate() {
     if (expression == null) {
       parse(unParsedExpression);
     }
@@ -74,12 +74,12 @@ public class ExpressionConfig {
     }
   }
 
-  public String getFullExpression(ExpressionEvaluator expressionManager) {
+  public String getFullExpression() {
     if (fullExpression == null) {
       if (expression == null) {
         parse(unParsedExpression);
       }
-      validate(expressionManager);
+      validate();
       fullExpression = expressionPrefix + expression + expressionPostfix;
     }
     return fullExpression;

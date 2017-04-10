@@ -14,12 +14,13 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 /**
- * Extends the {@link ExpressionLanguage} supporting mutating operations and the propagation of more variables.
+ * Extends the {@link ExpressionLanguageAdaptor} supporting mutating operations and the propagation of more variables.
  * Only meant to distinguish the Mule 3 inherited behaviour from the current approach.
- * 
+ *
  * @since 4.0
  */
-public interface ExtendedExpressionLanguage extends ExpressionLanguage {
+public interface ExtendedExpressionLanguageAdaptor extends ExpressionLanguageAdaptor {
+
 
   /**
    * Execute the expression returning the result. The expression will be executed with MuleEvent context, meaning the expression

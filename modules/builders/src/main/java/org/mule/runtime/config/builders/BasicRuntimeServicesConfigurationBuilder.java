@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.config.builders;
 
+import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
+import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.service.scheduler.internal.DefaultSchedulerService;
-
-import com.mulesoft.weave.el.WeaveExpressionExecutor;
 
 /**
  * Provides the basic {@link Service}s infrastructure required by the Mule runtime to start in embedded mode.
@@ -29,7 +29,7 @@ public class BasicRuntimeServicesConfigurationBuilder extends AbstractConfigurat
     final DefaultSchedulerService schedulerService = new DefaultSchedulerService();
     schedulerService.start();
     registry.registerObject(schedulerService.getName(), schedulerService);
-    WeaveExpressionExecutor weaveExpressionExecutor = new WeaveExpressionExecutor();
+    DefaultExpressionLanguageFactoryService weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService();
     registry.registerObject(weaveExpressionExecutor.getName(), weaveExpressionExecutor);
   }
 }

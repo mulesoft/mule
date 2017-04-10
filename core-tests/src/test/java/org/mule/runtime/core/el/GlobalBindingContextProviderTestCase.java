@@ -15,7 +15,9 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 
+import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
@@ -27,8 +29,6 @@ import org.mule.runtime.core.api.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import com.mulesoft.weave.el.WeaveExpressionExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +53,7 @@ public class GlobalBindingContextProviderTestCase extends AbstractMuleContextTes
       @Override
       public void configure(MuleContext muleContext) throws ConfigurationException {
         try {
-          WeaveExpressionExecutor weaveExpressionExecutor = new WeaveExpressionExecutor();
+          DefaultExpressionLanguageFactoryService weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService();
           muleContext.getRegistry().registerObject(weaveExpressionExecutor.getName(), weaveExpressionExecutor);
         } catch (RegistrationException e) {
           throw new ConfigurationException(e);

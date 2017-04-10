@@ -12,7 +12,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.el.ExpressionEvaluator;
+import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -54,7 +54,7 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
   public DefaultOAuthAuthorizationCodeDancerBuilder(OAuthCallbackServersManager httpServersManager,
                                                     SchedulerService schedulerService, LockFactory lockProvider,
                                                     Map<String, ResourceOwnerOAuthContext> tokensStore, HttpService httpService,
-                                                    ExpressionEvaluator expressionEvaluator) {
+                                                    MuleExpressionLanguage expressionEvaluator) {
     super(lockProvider, tokensStore, httpService, expressionEvaluator);
     this.httpServersManager = httpServersManager;
   }

@@ -18,7 +18,7 @@ import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.el.ExtendedExpressionLanguage;
+import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
@@ -36,7 +36,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
-  protected ExtendedExpressionLanguage expressionLanguage;
+  protected ExtendedExpressionLanguageAdaptor expressionLanguage;
   protected Flow flowConstruct;
   protected EventContext context;
 
@@ -87,7 +87,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
     return Arrays.asList(new Object[][] {{OptimizerFactory.DYNAMIC}, {OptimizerFactory.SAFE_REFLECTIVE}});
   }
 
-  protected ExtendedExpressionLanguage getExpressionLanguage() {
+  protected ExtendedExpressionLanguageAdaptor getExpressionLanguage() {
     final MVELExpressionLanguage el = new MVELExpressionLanguage(muleContext);
     return el;
   }

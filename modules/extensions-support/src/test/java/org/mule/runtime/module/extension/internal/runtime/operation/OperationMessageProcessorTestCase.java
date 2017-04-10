@@ -42,8 +42,10 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.T
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
+
+import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.el.ExpressionExecutor;
+import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
@@ -70,8 +72,6 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.size.SmallTest;
-
-import com.mulesoft.weave.el.WeaveExpressionExecutor;
 
 import java.util.Map;
 import java.util.Set;
@@ -241,7 +241,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     messageProcessor = createOperationMessageProcessor();
 
     when(context.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE)).thenReturn(new MVELExpressionLanguage(context));
-    when(context.getRegistry().lookupObject(ExpressionExecutor.class)).thenReturn(new WeaveExpressionExecutor());
+    when(context.getRegistry().lookupObject(DefaultExpressionLanguageFactoryService.class))
+        .thenReturn(new WeaveDefaultExpressionLanguageFactoryService());
     doReturn(new DefaultExpressionManager(context)).when(context).getExpressionManager();
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     when(flowConstruct.getName()).thenReturn(flowName);

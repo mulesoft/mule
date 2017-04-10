@@ -21,17 +21,18 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.ATTRIBUTES;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.DATA_TYPE;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.ERROR;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.FLOW;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.PAYLOAD;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguage.VARIABLES;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ATTRIBUTES;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.DATA_TYPE;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ERROR;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.FLOW;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PAYLOAD;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.VARIABLES;
 
-import org.junit.Before;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
@@ -46,12 +47,11 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.message.BaseAttributes;
-import org.mule.runtime.core.util.SystemUtils;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.common.collect.Sets;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
@@ -64,17 +64,10 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features("Expression Language")
 @Stories("Support DW")
-public class DataWeaveExpressionLanguageTestCase extends AbstractMuleContextTestCase {
-
-  private DataWeaveExpressionLanguage expressionLanguage;
+public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExpressionLanguageTestCase {
 
   @Rule
   public ExpectedException expectedEx = ExpectedException.none();
-
-  @Before
-  public void setUp() {
-    expressionLanguage = new DataWeaveExpressionLanguage(muleContext);
-  }
 
   @Test
   public void stringExpression() throws Exception {
@@ -103,9 +96,29 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleContextTest
   }
 
   @Test
+  public void splitByJson() throws Exception {
+    Event jsonMessage = eventBuilder().message(Message.builder().payload("[1,2,3]").mediaType(APPLICATION_JSON).build()).build();
+    Iterator<TypedValue<?>> payload = expressionLanguage.split("payload", 0, jsonMessage, BindingContext.builder().build());
+    assertThat(payload.hasNext(), is(true));
+    assertThat(payload.next().getValue().toString(), is("1"));
+    assertThat(payload.hasNext(), is(true));
+    assertThat(payload.next().getValue().toString(), is("2"));
+    assertThat(payload.hasNext(), is(true));
+    assertThat(payload.next().getValue().toString(), is("3"));
+    assertThat(payload.hasNext(), is(false));
+  }
+
+  @Test
+  public void expectedOutputShouldBeUsed() throws Exception {
+    Event jsonMessage = eventBuilder().message(Message.builder().payload("{\"student\": false}").mediaType(APPLICATION_JSON).build()).build();
+    TypedValue result = expressionLanguage.evaluate("payload.student", BOOLEAN, jsonMessage, BindingContext.builder().build());
+    assertThat(result.getValue(), is(false));
+  }
+
+  @Test
   public void errorBinding() throws Exception {
     Error error = mock(Error.class);
-    Optional<Error> opt = Optional.of(error);
+    Optional opt = Optional.of(error);
     Event event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
 
@@ -114,9 +127,9 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleContextTest
   }
 
   @Test
-  public void errorMessageContainsDataWeaveExceptionCauseMessage() throws Exception {
+  public void errorMessageContainsDataweaveExceptionCauseMessage() throws Exception {
     Error error = mock(Error.class);
-    Optional<Error> opt = Optional.of(error);
+    Optional opt = Optional.of(error);
     Event event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
     String expressionThatThrowsException = "payload + 'foo'";
@@ -202,12 +215,12 @@ public class DataWeaveExpressionLanguageTestCase extends AbstractMuleContextTest
 
     assertThat(expressionLanguage.evaluate(PAYLOAD, event, BindingContext.builder().build()).getValue(), is(TEST_PAYLOAD));
     assertThat(expressionLanguage.evaluate(ATTRIBUTES, event, BindingContext.builder().build()).getValue(), is(instanceOf(
-                                                                                                                          NullAttributes.class)));
+            NullAttributes.class)));
     assertThat(expressionLanguage.evaluate(ERROR, event, BindingContext.builder().build()).getValue(), is(nullValue()));
     assertThat(expressionLanguage.evaluate(VARIABLES, event, BindingContext.builder().build()).getValue(),
-               is(instanceOf(Map.class)));
+            is(instanceOf(Map.class)));
     assertThat(expressionLanguage.evaluate("flow.name", event, mockFlowConstruct, BindingContext.builder().build()).getValue(),
-               is(flowName));
+            is(flowName));
   }
 
   @Test
