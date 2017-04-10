@@ -53,6 +53,7 @@ public class ConfigurationBasedDslElementModelSerializerTestCase extends Abstrac
   public void serialize() throws Exception {
     XmlDslElementModelConverter converter = XmlDslElementModelConverter.getDefault(this.doc);
 
+    doc.getDocumentElement().appendChild(converter.asXml(resolve(getAppElement(applicationModel, WSC_CONFIG))));
     doc.getDocumentElement().appendChild(converter.asXml(resolve(getAppElement(applicationModel, DB_CONFIG))));
     doc.getDocumentElement().appendChild(converter.asXml(resolve(getAppElement(applicationModel, HTTP_LISTENER_CONFIG))));
     doc.getDocumentElement().appendChild(converter.asXml(resolve(getAppElement(applicationModel, HTTP_REQUESTER_CONFIG))));

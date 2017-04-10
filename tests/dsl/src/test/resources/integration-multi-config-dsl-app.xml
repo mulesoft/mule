@@ -7,7 +7,17 @@
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
-
+    <wsc:config name="web_service_consumer">
+      <wsc:connection address="http://www.webservicex.com/globalweather.asmx"
+                      disableValidation="false"
+                      port="GlobalWeatherSoap"
+                      service="GlobalWeather"
+                      wsdlLocation="http://www.webservicex.com/globalweather.asmx?WSDL">
+         <pooling-profile disabled="false"
+                          exhaustedAction="WHEN_EXHAUSTED_GROW"
+                          initialisationPolicy="INITIALISE_ONE"/>
+      </wsc:connection>
+    </wsc:config>
     <db:config name="dbConfig">
         <db:derby-connection database="target/muleEmbeddedDB" create="true">
             <db:pooling-profile maxPoolSize="10"/>

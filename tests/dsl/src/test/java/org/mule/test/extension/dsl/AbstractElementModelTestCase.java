@@ -17,6 +17,7 @@ import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
@@ -29,11 +30,14 @@ import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.ComponentIdentifier;
+import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -60,6 +64,7 @@ import org.w3c.dom.Element;
     providedInclusions = "org.mule.modules:mule-module-sockets")
 public abstract class AbstractElementModelTestCase extends MuleArtifactFunctionalTestCase {
 
+  protected static final String WSC_CONFIG = "web_service_consumer";
   protected static final String DB_CONFIG = "dbConfig";
   protected static final String DB_NS = "http://www.mulesoft.org/schema/mule/db";
   protected static final String WSC_NS = "http://www.mulesoft.org/schema/mule/wsc";
@@ -79,7 +84,15 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
 
   @Before
   public void setup() throws Exception {
-    dslContext = DslResolvingContext.getDefault(muleContext.getExtensionManager().getExtensions());
+    ExtensionModelJsonSerializer extensionModelSerializer = new ExtensionModelJsonSerializer();
+
+    // Make sure everything works with serialized extension models
+    Set<ExtensionModel> extensions = muleContext.getExtensionManager().getExtensions().stream()
+        .map(extensionModelSerializer::serialize)
+        .map(extensionModelSerializer::deserialize)
+        .collect(Collectors.toSet());
+
+    dslContext = DslResolvingContext.getDefault(extensions);
     modelResolver = DslElementModelFactory.getDefault(dslContext);
   }
 

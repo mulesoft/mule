@@ -68,6 +68,23 @@ public class DeclarationBasedDslElementModelSerializerTestCase extends AbstractE
     ElementDeclarer wsc = ElementDeclarer.forExtension("Web Service Consumer");
 
     applicationDeclaration = newArtifact()
+        .withConfig(wsc.newConfiguration("config")
+            .withRefName("web_service_consumer")
+            .withConnection(
+                            wsc.newConnection("connection")
+                                .withParameter("address", "http://www.webservicex.com/globalweather.asmx")
+                                .withParameter("disableValidation", "false")
+                                .withParameter("port", "GlobalWeatherSoap")
+                                .withParameter("service", "GlobalWeather")
+                                .withParameter("wsdlLocation", "http://www.webservicex.com/globalweather.asmx?WSDL")
+                                .withParameter("poolingProfile",
+                                               newObjectValue()
+                                                   .withParameter("disabled", "false")
+                                                   .withParameter("exhaustedAction", "WHEN_EXHAUSTED_GROW")
+                                                   .withParameter("initialisationPolicy", "INITIALISE_ONE")
+                                                   .build())
+                                .getDeclaration())
+            .getDeclaration())
         .withConfig(db.newConfiguration("config")
             .withRefName("dbConfig")
             .withConnection(db.newConnection("derby-connection")
