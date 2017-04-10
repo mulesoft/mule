@@ -58,12 +58,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-embedded-impl</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mobicents</groupId>
             <artifactId>xcap-client-api</artifactId>
             <version>3.0.2</version>
