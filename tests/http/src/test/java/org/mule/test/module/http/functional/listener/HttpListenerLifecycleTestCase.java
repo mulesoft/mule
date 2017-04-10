@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.http.functional.listener;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.construct.Flow;
@@ -24,7 +25,9 @@ import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
 
   @Rule

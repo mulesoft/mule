@@ -6,15 +6,16 @@
  */
 package org.mule.test.module.http.functional.listener;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.service.http.api.HttpHeaders.Names.EXPECT;
 import static org.mule.service.http.api.HttpHeaders.Names.HOST;
 import static org.mule.service.http.api.HttpHeaders.Values.CONTINUE;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -37,8 +38,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+import ru.yandex.qatools.allure.annotations.Features;
 
 @RunnerDelegateTo(Parameterized.class)
+@Features(HTTP_EXTENSION)
 public class HttpListenerExpectHeaderStreamingNeverTestCase extends AbstractHttpTestCase {
 
   private static final String HTTP_11 = "HTTP/1.1";

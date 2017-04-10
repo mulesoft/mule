@@ -6,10 +6,12 @@
  */
 package org.mule.test.module.http.functional.requester;
 
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.Event;
@@ -31,9 +33,11 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+import ru.yandex.qatools.allure.annotations.Features;
 
 
 @RunnerDelegateTo(Parameterized.class)
+@Features(HTTP_EXTENSION)
 public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
 
   private static final String OK_RESPONSE = "OK";

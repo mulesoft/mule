@@ -6,7 +6,9 @@
  */
 package org.mule.test.module.http.functional.requester;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.Matchers.containsString;
+
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
@@ -14,9 +16,11 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import ru.yandex.qatools.allure.annotations.Features;
 
 //TODO: MULE-10281 - Review error handling in requester
 @Ignore
+@Features(HTTP_EXTENSION)
 public class HttpRequestFailureTestCase extends AbstractHttpTestCase {
 
   @Rule

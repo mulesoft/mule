@@ -6,13 +6,15 @@
  */
 package org.mule.test.http;
 
+import static org.mule.runtime.api.component.location.Location.builder;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.METADATA;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
-import static org.mule.runtime.api.component.location.Location.builder;
 
 import org.mule.extension.http.internal.HttpMetadataKey;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
@@ -41,13 +43,12 @@ import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("HTTP Connector")
-@Stories("Metadata")
+@Features(HTTP_EXTENSION)
+@Stories(METADATA)
 public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
 
   private MetadataService service;

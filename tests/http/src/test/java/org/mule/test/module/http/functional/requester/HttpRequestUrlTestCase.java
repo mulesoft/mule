@@ -6,16 +6,16 @@
  */
 package org.mule.test.module.http.functional.requester;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyMap;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpConstants.Method.DELETE;
 import static org.mule.service.http.api.HttpConstants.Method.GET;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
 import static org.mule.service.http.api.HttpConstants.Method.PUT;
-import static org.mule.test.module.http.functional.HttpConnectorAllureConstants.HTTP_CONNECTOR_FEATURE;
-import static org.mule.test.module.http.functional.HttpConnectorAllureConstants.HTTP_REQUEST_URL_STORY;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.REQUEST_BUILDER;
+import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +24,8 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features(HTTP_CONNECTOR_FEATURE)
-@Stories(HTTP_REQUEST_URL_STORY)
+@Features(HTTP_EXTENSION)
+@Stories(REQUEST_BUILDER)
 public class HttpRequestUrlTestCase extends AbstractHttpRequestTestCase {
 
   @Override

@@ -6,12 +6,14 @@
  */
 package org.mule.test.module.http.functional.listener;
 
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.NO_CONTENT;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
@@ -26,7 +28,9 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpListenerNoContentTestCase extends AbstractHttpTestCase {
 
   @Rule

@@ -10,6 +10,8 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
 import org.mule.runtime.core.util.ClassUtils;
@@ -43,7 +45,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpsRequesterSniTestCase extends AbstractHttpTestCase {
 
   private static final String FQDN = "localhost.localdomain";

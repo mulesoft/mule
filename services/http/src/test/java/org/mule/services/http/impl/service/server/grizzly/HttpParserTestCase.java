@@ -6,9 +6,10 @@
  */
 package org.mule.services.http.impl.service.server.grizzly;
 
+import static org.mule.services.http.impl.service.server.grizzly.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.services.http.impl.service.server.grizzly.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

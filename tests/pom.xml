@@ -12,6 +12,7 @@
     <name>Mule Tests</name>
 
     <modules>
+        <module>allure</module>
         <module>unit</module>
         <module>functional</module>
         <module>infrastructure</module>

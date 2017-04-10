@@ -6,6 +6,17 @@
  */
 package org.mule.test.module.http.functional.listener;
 
+import static org.mule.runtime.api.message.Message.builder;
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.metadata.MediaType.BINARY;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.service.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.util.Collections.emptyMap;
@@ -20,16 +31,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.message.Message.builder;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.metadata.MediaType.BINARY;
-import static org.mule.service.http.api.HttpConstants.Method.GET;
-import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
-import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.service.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.service.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.service.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
@@ -50,8 +52,6 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
-import com.google.common.collect.Lists;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,6 +69,7 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 import javax.servlet.ServletException;
 
+import com.google.common.collect.Lists;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -79,7 +80,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
 
   private static final String TEXT_BODY_FIELD_NAME = "field1";

@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.http.functional.listener;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.message.Message;
@@ -20,7 +21,9 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.message.BasicNameValuePair;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpListenerParseRequestTestCase extends AbstractHttpTestCase {
 
   @Rule

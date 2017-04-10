@@ -6,11 +6,17 @@
  */
 package org.mule.test.module.http.functional.proxy;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.module.http.functional.requester.AbstractHttpRequestTestCase;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -18,11 +24,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.test.module.http.functional.requester.AbstractHttpRequestTestCase;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpProxyTemplateErrorHandlingTestCase extends AbstractHttpRequestTestCase {
 
   public static String SERVICE_DOWN_MESSAGE = "Service Down";

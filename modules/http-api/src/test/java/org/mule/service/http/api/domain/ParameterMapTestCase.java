@@ -6,6 +6,8 @@
  */
 package org.mule.service.http.api.domain;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.MULTI_MAP;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItems;
@@ -22,8 +24,8 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features("HTTP Service")
-@Stories("Multi Map")
+@Features(HTTP_SERVICE)
+@Stories(MULTI_MAP)
 public class ParameterMapTestCase {
 
   public static final String KEY_1 = "key1";

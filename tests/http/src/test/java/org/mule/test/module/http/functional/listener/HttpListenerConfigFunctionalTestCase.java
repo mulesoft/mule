@@ -6,16 +6,17 @@
  */
 package org.mule.test.module.http.functional.listener;
 
+import static org.mule.service.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.NOT_FOUND;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.module.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
+import static org.mule.test.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
-import static org.mule.service.http.api.HttpConstants.HttpStatus.NOT_FOUND;
-import static org.mule.service.http.api.HttpConstants.Method.GET;
-import static org.mule.test.module.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
-import static org.mule.test.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
 
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.service.http.api.HttpConstants.HttpStatus;
@@ -39,7 +40,9 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Features;
 
+@Features(HTTP_EXTENSION)
 public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
 
   private static final Pattern IPADDRESS_PATTERN = Pattern.compile("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
