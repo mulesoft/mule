@@ -17,11 +17,6 @@ import org.junit.Test;
 public class GreedyTestCase extends MuleArtifactFunctionalTestCase {
 
   @Override
-  protected boolean mockExprExecutorService() {
-    return true;
-  }
-
-  @Override
   protected String getConfigFile() {
     return "greedy-config.xml";
   }

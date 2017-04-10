@@ -115,7 +115,7 @@
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-weave</artifactId>
             <classifier>mule-service</classifier>
-            <version>${project.version}</version>
+            <version>${weaveVersion}</version>
         </dependency>
 
         <!-- Plugins -->

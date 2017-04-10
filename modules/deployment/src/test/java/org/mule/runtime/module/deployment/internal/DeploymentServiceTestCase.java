@@ -48,6 +48,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.container.api.MuleFoldersUtil.CONTAINER_APP_PLUGINS;
@@ -472,6 +473,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     services = getServicesFolder();
     services.mkdirs();
     copyFileToDirectory(buildSchedulerServiceFile(compilerWorkFolder.newFolder("schedulerService")), services);
+    copyFileToDirectory(buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder("expressionLanguageService")), services);
 
     applicationDeploymentListener = mock(DeploymentListener.class);
     domainDeploymentListener = mock(DeploymentListener.class);

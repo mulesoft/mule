@@ -16,11 +16,6 @@ import org.junit.Test;
 public class GroovyRegistryLookupTestCase extends MuleArtifactFunctionalTestCase {
 
   @Override
-  protected boolean mockExprExecutorService() {
-    return true;
-  }
-
-  @Override
   protected String getConfigFile() {
     return "groovy-registry-lookup-config.xml";
   }
