@@ -110,7 +110,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void expectedOutputShouldBeUsed() throws Exception {
-    Event jsonMessage = eventBuilder().message(Message.builder().payload("{\"student\": false}").mediaType(APPLICATION_JSON).build()).build();
+    Event jsonMessage =
+        eventBuilder().message(Message.builder().payload("{\"student\": false}").mediaType(APPLICATION_JSON).build()).build();
     TypedValue result = expressionLanguage.evaluate("payload.student", BOOLEAN, jsonMessage, BindingContext.builder().build());
     assertThat(result.getValue(), is(false));
   }
@@ -215,12 +216,12 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
     assertThat(expressionLanguage.evaluate(PAYLOAD, event, BindingContext.builder().build()).getValue(), is(TEST_PAYLOAD));
     assertThat(expressionLanguage.evaluate(ATTRIBUTES, event, BindingContext.builder().build()).getValue(), is(instanceOf(
-            NullAttributes.class)));
+                                                                                                                          NullAttributes.class)));
     assertThat(expressionLanguage.evaluate(ERROR, event, BindingContext.builder().build()).getValue(), is(nullValue()));
     assertThat(expressionLanguage.evaluate(VARIABLES, event, BindingContext.builder().build()).getValue(),
-            is(instanceOf(Map.class)));
+               is(instanceOf(Map.class)));
     assertThat(expressionLanguage.evaluate("flow.name", event, mockFlowConstruct, BindingContext.builder().build()).getValue(),
-            is(flowName));
+               is(flowName));
   }
 
   @Test
