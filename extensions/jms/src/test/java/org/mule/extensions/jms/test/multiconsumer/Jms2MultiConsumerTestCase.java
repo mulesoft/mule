@@ -9,10 +9,7 @@ package org.mule.extensions.jms.test.multiconsumer;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.extensions.jms.api.destination.DestinationType.TOPIC;
-import static org.mule.extensions.jms.test.JmsMessageStorage.pollMessage;
 import static org.mule.extensions.jms.test.JmsMessageStorage.receivedMessages;
-import org.mule.extensions.jms.api.message.JmsAttributes;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
@@ -20,8 +17,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
-
-import java.util.Optional;
 
 @Ignore("This should be enabled once JMS 2.0 is enabled for testing")
 @Features("JMS Extension")
@@ -40,10 +35,8 @@ public class Jms2MultiConsumerTestCase extends AbstractJmsMultiConsumerTestCase 
     //This is to check that we don't receive repeated messages
     new PollingProber(5000, 100).check(new JUnitLambdaProbe(() -> receivedMessages() == NUMBER_OF_MESSAGES));
 
-    long distinctAckIds = aFor(0, i -> i < NUMBER_OF_MESSAGES, i -> ++i, i -> pollMessage())
-        .map(Result::getAttributes)
-        .map(Optional::get)
-        .map(JmsAttributes::getAckId)
+    long distinctAckIds = getMessages(NUMBER_OF_MESSAGES)
+        .map(result -> result.getAttributes().get().getAckId())
         .distinct()
         .count();
 

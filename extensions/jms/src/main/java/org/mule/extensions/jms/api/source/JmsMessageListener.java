@@ -90,7 +90,7 @@ public final class JmsMessageListener implements MessageListener {
     saveReplyToDestination(message, context);
     context.addVariable(JMS_LOCK_VAR, jmsLock);
     context.addVariable(JMS_SESSION_VAR, session);
-    produceMessageResult(message, context, resolveEncoding(message), resolveContentType(message));
+    dispatchMessage(message, context, resolveEncoding(message), resolveContentType(message));
     waitForMessageToBeProcessed(jmsLock);
   }
 
@@ -130,7 +130,7 @@ public final class JmsMessageListener implements MessageListener {
     }
   }
 
-  private void produceMessageResult(Message message, SourceCallbackContext context, String encoding, String contentType) {
+  private void dispatchMessage(Message message, SourceCallbackContext context, String encoding, String contentType) {
     try {
       Result<Object, JmsAttributes> result =
           resultFactory.createResult(message, jmsSupport.getSpecification(), contentType, encoding, session.getAckId());

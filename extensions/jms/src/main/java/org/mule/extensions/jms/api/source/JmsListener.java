@@ -153,7 +153,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
    * The number of concurrent consumers that will be used to receive JMS Messages
    */
   @Parameter
-  @Optional(defaultValue = "4")
+  @Optional(defaultValue = "1")
   private int numberOfConsumers;
 
 
@@ -173,7 +173,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
     JmsMessageListenerFactory messageListenerFactory =
         new JmsMessageListenerFactory(ackMode, encoding, contentType, config, sessionManager, jmsSupport, sourceCallback);
 
-    numberOfConsumers = getValidNumberOfConsumers(numberOfConsumers);
+    validateNumberOfConsumers(numberOfConsumers);
 
     LOGGER.debug("Starting JMS Listener with [" + numberOfConsumers + "] consumers");
 
@@ -292,18 +292,20 @@ public class JmsListener extends Source<Object, JmsAttributes> {
     return synchronous ? new DefaultJmsListenerLock() : new NullJmsListenerLock();
   }
 
-  private int getValidNumberOfConsumers(int numberOfConsumers) {
+  private void validateNumberOfConsumers(int numberOfConsumers) {
+    if (numberOfConsumers < 1) {
+      throw new IllegalArgumentException("Invalid number of consumers: [" + numberOfConsumers
+          + "]. The number should be 1 or greater.");
+    }
+
     if (numberOfConsumers > 1 && consumerType.isTopic()) {
       TopicConsumer topicConsumer = (TopicConsumer) consumerType;
 
       if (!isCapableOfMultiConsumersOnTopic(topicConsumer)) {
-        LOGGER.warn("Destination [" + destination + "] is a topic, but " + numberOfConsumers
-            + " receivers have been requested. This is only possible for 'shared' topic consumers. Will configure only 1.");
-        return 1;
+        throw new IllegalArgumentException("Destination [" + destination + "] is a topic, but [" + numberOfConsumers
+            + "] receivers have been requested. This is only possible for 'shared' topic consumers, otherwise use 1.");
       }
     }
-
-    return numberOfConsumers;
   }
 
   private boolean isCapableOfMultiConsumersOnTopic(TopicConsumer topicConsumer) {

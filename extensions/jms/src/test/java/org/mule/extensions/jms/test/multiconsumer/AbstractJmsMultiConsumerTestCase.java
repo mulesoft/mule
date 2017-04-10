@@ -6,18 +6,20 @@
  */
 package org.mule.extensions.jms.test.multiconsumer;
 
+import static org.mule.extensions.jms.test.JmsMessageStorage.pollMessage;
 import org.mule.extensions.jms.api.destination.DestinationType;
+import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.test.JmsAbstractTestCase;
 import org.mule.extensions.jms.test.JmsMessageStorage;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Rule;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
 
-import java.util.function.Function;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public abstract class AbstractJmsMultiConsumerTestCase extends JmsAbstractTestCase {
@@ -53,13 +55,9 @@ public abstract class AbstractJmsMultiConsumerTestCase extends JmsAbstractTestCa
     }
   }
 
-  <T, S> Stream<T> aFor(S initialState, Function<S, Boolean> condition, Function<S, S> updater, Function<S, T> supplier) {
-    S currentState = initialState;
-    Stream.Builder<T> builder = Stream.builder();
-    while (condition.apply(currentState)) {
-      builder.add(supplier.apply(currentState));
-      currentState = updater.apply(currentState);
-    }
-    return builder.build();
+  Stream<Result<TypedValue<Object>, JmsAttributes>> getMessages(int cant) {
+    return IntStream
+        .range(0, cant)
+        .mapToObj(i -> pollMessage());
   }
 }

@@ -9,17 +9,17 @@ package org.mule.extensions.jms.test.multiconsumer;
 import static java.lang.Long.parseLong;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.extensions.jms.api.destination.DestinationType.QUEUE;
-import static org.mule.extensions.jms.api.destination.DestinationType.TOPIC;
 import static org.mule.extensions.jms.test.JmsMessageStorage.cleanUpQueue;
-import static org.mule.extensions.jms.test.JmsMessageStorage.pollMessage;
 import static org.mule.extensions.jms.test.JmsMessageStorage.receivedMessages;
-import org.mule.extensions.jms.api.message.JmsAttributes;
-import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
@@ -28,10 +28,10 @@ import ru.yandex.qatools.allure.annotations.Stories;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Features("JMS Extension")
 @Stories("Multi Consumers - JMS 1.x")
+@RunnerDelegateTo()
 public class Jms1xMultiConsumerTestCase extends AbstractJmsMultiConsumerTestCase {
 
   @Override
@@ -43,10 +43,8 @@ public class Jms1xMultiConsumerTestCase extends AbstractJmsMultiConsumerTestCase
   public void multiConsumersConsumeMessagesInParallel() throws Exception {
     publishTo(NUMBER_OF_MESSAGES, destination.getValue(), QUEUE);
 
-    long distinctAckIds = aFor(0, i -> i < NUMBER_OF_MESSAGES, i -> ++i, i -> pollMessage())
-        .map(Result::getAttributes)
-        .map(Optional::get)
-        .map(JmsAttributes::getAckId)
+    long distinctAckIds = getMessages(NUMBER_OF_MESSAGES)
+        .map(result -> result.getAttributes().get().getAckId())
         .distinct()
         .count();
 
@@ -57,10 +55,8 @@ public class Jms1xMultiConsumerTestCase extends AbstractJmsMultiConsumerTestCase
   public void ackFromOneConsumerDoesntAffectOtherConsumers() throws Exception {
     publishTo(NUMBER_OF_MESSAGES, destination.getValue(), QUEUE);
 
-    Map<String, List<String>> collect = aFor(0, i -> i < NUMBER_OF_MESSAGES, i -> ++i, i -> pollMessage())
-        .map(Result::getAttributes)
-        .map(Optional::get)
-        .map(JmsAttributes::getAckId)
+    Map<String, List<String>> collect = getMessages(NUMBER_OF_MESSAGES)
+        .map(result -> result.getAttributes().get().getAckId())
         .collect(groupingBy(identity()));
 
     Iterator<Map.Entry<String, List<String>>> iterator = collect.entrySet().iterator();
@@ -80,15 +76,10 @@ public class Jms1xMultiConsumerTestCase extends AbstractJmsMultiConsumerTestCase
 
   @Test
   public void non2JMSTopicsCanOnlyUseOneConsumer() throws Exception {
-    publishTo(NUMBER_OF_MESSAGES, topicDestination.getValue(), TOPIC);
-
-    long distinctAckIds = aFor(0, i -> i < NUMBER_OF_MESSAGES, i -> ++i, i -> pollMessage())
-        .map(Result::getAttributes)
-        .map(Optional::get)
-        .map(JmsAttributes::getAckId)
-        .distinct()
-        .count();
-
-    assertThat(distinctAckIds, is(1L));
+    try {
+      ((Flow) getFlowConstruct("topicListener")).start();
+    } catch (RetryPolicyExhaustedException e) {
+      assertThat(e.getCause().getCause(), is(instanceOf(IllegalArgumentException.class)));
+    }
   }
 }
