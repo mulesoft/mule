@@ -63,7 +63,7 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
         return doCreate(transportMessage, null, encoding, muleContext);
     }
 
-    private MuleMessage doCreate(Object transportMessage, MuleMessage previousMessage, String encoding, MuleContext muleContext)
+    protected MuleMessage doCreate(Object transportMessage, MuleMessage previousMessage, String encoding, MuleContext muleContext)
             throws Exception
     {
         if (transportMessage == null)
@@ -71,13 +71,26 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
             return new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
         }
 
+        validateMessage(transportMessage);
+        Object payload = extractPayload(transportMessage, encoding);
+        DefaultMuleMessage message = createMessage(payload, previousMessage, transportMessage, encoding, muleContext);
+        addProperties(message, transportMessage);
+        addAttachments(message, transportMessage);
+        return message;
+    }
+
+    protected void validateMessage (Object transportMessage) throws MessageTypeNotSupportedException
+    {
         if (!isTransportMessageTypeSupported(transportMessage))
         {
             throw new MessageTypeNotSupportedException(transportMessage, getClass());
         }
+    }
 
-        Object payload = extractPayload(transportMessage, encoding);
-        DefaultMuleMessage message;
+    protected DefaultMuleMessage createMessage (Object payload, MuleMessage previousMessage, Object transportMessage, String encoding, MuleContext muleContext)
+    {
+        DefaultMuleMessage message ;
+
         if (previousMessage != null)
         {
             message = new DefaultMuleMessage(payload, previousMessage, muleContext);
@@ -88,8 +101,6 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory
         }
 
         message.setEncoding(encoding);
-        addProperties(message, transportMessage);
-        addAttachments(message, transportMessage);
         return message;
     }
 
