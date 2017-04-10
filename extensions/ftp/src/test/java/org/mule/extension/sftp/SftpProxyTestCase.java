@@ -11,19 +11,14 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
 
 import org.mule.extension.FtpTestHarness;
-import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
-import org.mule.extension.ftp.internal.sftp.connection.SftpClientFactory;
-import org.mule.extension.ftp.internal.sftp.connection.SftpProxyConfig;
-import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.extension.ftp.AbstractFtpConnectorTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-@ArtifactClassLoaderRunnerConfig(exportPluginClasses = {SftpClientFactory.class, SftpClient.class, SftpProxyConfig.class})
-public class SftpProxyTestCase extends MuleArtifactFunctionalTestCase {
+public class SftpProxyTestCase extends AbstractFtpConnectorTestCase {
 
   @Rule
   public final FtpTestHarness testHarness = new SftpTestHarness();
@@ -38,13 +33,13 @@ public class SftpProxyTestCase extends MuleArtifactFunctionalTestCase {
   }
 
   @Override
-  protected void doSetUpBeforeMuleContextCreation() throws Exception
-  {
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
     super.doSetUpBeforeMuleContextCreation();
     proxyServer.start();
   }
 
-  @Override protected void doTearDownAfterMuleContextDispose() throws Exception {
+  @Override
+  protected void doTearDownAfterMuleContextDispose() throws Exception {
     proxyServer.stop();
     super.doTearDownAfterMuleContextDispose();
   }

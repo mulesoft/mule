@@ -24,7 +24,7 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features(FTP_EXTENSION)
-public class FtpCopyTestCase extends FtpConnectorTestCase {
+public class FtpCopyTestCase extends CommonFtpConnectorTestCase {
 
   private static final String SOURCE_FILE_NAME = "test.txt";
   private static final String SOURCE_DIRECTORY_NAME = "source";

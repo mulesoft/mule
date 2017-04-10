@@ -18,7 +18,7 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features(FTP_EXTENSION)
-public class FtpDeleteTestCase extends FtpConnectorTestCase {
+public class FtpDeleteTestCase extends CommonFtpConnectorTestCase {
 
   private static final String SUB_FOLDER = "files/subfolder";
   private static final String SUB_FOLDER_FILE = "grandChild";

@@ -28,7 +28,7 @@ import ru.yandex.qatools.allure.annotations.Features;
 import java.util.List;
 
 @Features(FTP_EXTENSION)
-public class FtpListTestCase extends FtpConnectorTestCase {
+public class FtpListTestCase extends CommonFtpConnectorTestCase {
 
   private static final String TEST_FILE_PATTERN = "test-file-%d.html";
   private static final String SUB_DIRECTORY_NAME = "subDirectory";

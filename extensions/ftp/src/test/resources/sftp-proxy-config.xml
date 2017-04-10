@@ -6,6 +6,7 @@
         http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd">
 
     <ftp:config name="sftp">
+        <!-- Use an invalid port so that it fails if not using the proxy -->
         <ftp:sftp-connection username="muletest1" password="muletest1" host="127.0.0.100" port="${SFTP_PORT}" workingDir="${workingDir}">
             <ftp:sftp-proxy-config host="localhost" port="${proxyPort}" protocol="HTTP"/>
         </ftp:sftp-connection>

@@ -31,7 +31,7 @@ import ru.yandex.qatools.allure.annotations.Features;
 
 @RunnerDelegateTo(Parameterized.class)
 @Features(FTP_EXTENSION)
-public class FtpWriteTypeTestCase extends FtpConnectorTestCase {
+public class FtpWriteTypeTestCase extends CommonFtpConnectorTestCase {
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {

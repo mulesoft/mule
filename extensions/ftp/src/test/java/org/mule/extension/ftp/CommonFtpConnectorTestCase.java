@@ -13,15 +13,11 @@ import static org.apache.commons.io.IOUtils.closeQuietly;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
-import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
-import org.mule.extension.ftp.internal.sftp.connection.SftpClientFactory;
 import org.mule.extension.sftp.SftpTestHarness;
-import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.InputStream;
@@ -34,9 +30,8 @@ import org.junit.runners.Parameterized.Parameters;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @RunnerDelegateTo(Parameterized.class)
-@ArtifactClassLoaderRunnerConfig(exportPluginClasses = {SftpClientFactory.class, SftpClient.class})
 @Features(FTP_EXTENSION)
-public abstract class FtpConnectorTestCase extends MuleArtifactFunctionalTestCase {
+public abstract class CommonFtpConnectorTestCase extends AbstractFtpConnectorTestCase {
 
   protected static final String NAMESPACE = "FTP";
   private final String name;
@@ -49,7 +44,7 @@ public abstract class FtpConnectorTestCase extends MuleArtifactFunctionalTestCas
     return Arrays.asList(new Object[][] {{"ftp", new ClassicFtpTestHarness()}, {"sftp", new SftpTestHarness()}});
   }
 
-  public FtpConnectorTestCase(String name, FtpTestHarness testHarness) {
+  public CommonFtpConnectorTestCase(String name, FtpTestHarness testHarness) {
     this.name = name;
     this.testHarness = testHarness;
   }
