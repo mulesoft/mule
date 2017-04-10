@@ -14,6 +14,7 @@ import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
+import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -31,7 +32,7 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
 
   public SourceMetadataTestCase(ResolutionType resolutionType) {
     super(resolutionType);
-    this.provider = resolutionType == ResolutionType.EXPLICIT_RESOLUTION ? MetadataService::getSourceMetadata
+    this.provider = resolutionType == EXPLICIT_RESOLUTION ? MetadataService::getSourceMetadata
         : (metadataService, componentId, key) -> metadataService.getSourceMetadata(componentId);
     this.location = builder().globalName(SOURCE_METADATA).addSourcePart().build();
   }
