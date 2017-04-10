@@ -62,14 +62,14 @@ public class TestServicesUtils {
    */
   public static File buildExpressionLanguageServiceFile(File tempFolder) {
     final File defaulServiceSchedulerJarFile = new CompilerUtils.JarCompiler()
-      .compiling(getResourceFile("/org/mule/service/el/MockExpressionLanguage.java", tempFolder),
-                 getResourceFile("/org/mule/service/el/MockExpressionLanguageFactoryService.java", tempFolder),
-                 getResourceFile("/org/mule/service/el/MockExpressionLanguageFactoryServiceProvider.java", tempFolder))
-      .compile("mule-module-service-mock-expression-language-1.0-SNAPSHOT.jar");
+        .compiling(getResourceFile("/org/mule/service/el/MockExpressionLanguage.java", tempFolder),
+                   getResourceFile("/org/mule/service/el/MockExpressionLanguageFactoryService.java", tempFolder),
+                   getResourceFile("/org/mule/service/el/MockExpressionLanguageFactoryServiceProvider.java", tempFolder))
+        .compile("mule-module-service-mock-expression-language-1.0-SNAPSHOT.jar");
 
     return new ServiceFileBuilder("expressionLanguageService")
-      .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.el.MockExpressionLanguageFactoryServiceProvider")
-      .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath()).getArtifactFile();
+        .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.el.MockExpressionLanguageFactoryServiceProvider")
+        .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath()).getArtifactFile();
   }
 
   /**
