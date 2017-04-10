@@ -153,7 +153,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
    * The number of concurrent consumers that will be used to receive JMS Messages
    */
   @Parameter
-  @Optional(defaultValue = "1")
+  @Optional(defaultValue = "4")
   private int numberOfConsumers;
 
 

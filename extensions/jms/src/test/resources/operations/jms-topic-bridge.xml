@@ -17,7 +17,7 @@
     </flow>
 
     <flow name="listener">
-        <jms:listener destination="${initialDestination}" ackMode="AUTO">
+        <jms:listener destination="${initialDestination}" ackMode="AUTO" numberOfConsumers="1">
             <jms:consumer-type>
                 <jms:topic-consumer />
             </jms:consumer-type>
@@ -31,7 +31,7 @@
     </flow>
 
     <flow name="final-listener">
-        <jms:listener destination="${finalDestination}" ackMode="AUTO">
+        <jms:listener destination="${finalDestination}" ackMode="AUTO" numberOfConsumers="1">
             <jms:consumer-type>
                 <jms:topic-consumer />
             </jms:consumer-type>
