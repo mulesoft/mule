@@ -12,10 +12,11 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
-import org.mule.test.transactional.connection.TransactionalConnectionProvider;
+import org.mule.test.transactional.connection.NonPoolingTransactionalConnectionProvider;
+import org.mule.test.transactional.connection.PoolingTransactionalConnectionProvider;
 
 @Extension(name = "transactional")
-@ConnectionProviders(TransactionalConnectionProvider.class)
+@ConnectionProviders({PoolingTransactionalConnectionProvider.class, NonPoolingTransactionalConnectionProvider.class})
 @Operations(TransactionalOperations.class)
 @Sources(TransactionalSource.class)
 @Xml(prefix = "tx")

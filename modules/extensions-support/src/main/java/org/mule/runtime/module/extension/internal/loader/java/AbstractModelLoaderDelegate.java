@@ -61,8 +61,8 @@ abstract class AbstractModelLoaderDelegate {
     return loader.getTypeLoader();
   }
 
-  void processComponentConnectivity(ComponentDeclarer componentDeclarer, WithParameters operationMethod, WithAlias alias) {
-    final List<ExtensionParameter> connectionParameters = operationMethod.getParametersAnnotatedWith(Connection.class);
+  void processComponentConnectivity(ComponentDeclarer componentDeclarer, WithParameters component, WithAlias alias) {
+    final List<ExtensionParameter> connectionParameters = component.getParametersAnnotatedWith(Connection.class);
     if (connectionParameters.isEmpty()) {
       componentDeclarer.requiresConnection(false).transactional(false);
     } else if (connectionParameters.size() == 1) {

@@ -6,23 +6,26 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.size.SmallTest;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +44,11 @@ public class PagingProviderProducerTestCase {
   private ConfigurationInstance config = mock(ConfigurationInstance.class);
 
   @InjectMocks
-  private PagingProviderProducer<String> producer = new PagingProviderProducer<>(delegate, config, connectionManager);
+  private PagingProviderProducer<String> producer = createProducer();
+
+  private PagingProviderProducer<String> createProducer() {
+    return new PagingProviderProducer<>(delegate, config, connectionManager);
+  }
 
   @Before
   public void setUp() throws ConnectionException {
@@ -53,9 +60,39 @@ public class PagingProviderProducerTestCase {
 
   @Test
   public void produce() throws Exception {
-    List<String> page = new ArrayList<>();
+    List<String> page = asList("bleh");
     when(delegate.getPage(anyObject())).thenReturn(page);
     assertThat(page, sameInstance(producer.produce()));
+  }
+
+  @Test
+  public void produceWithDifferentConnections() throws Exception {
+    ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
+    when(connectionManager.getConnection(any())).thenReturn(connectionHandler);
+
+    produce();
+    produce();
+
+    verify(connectionHandler, times(2)).getConnection();
+    verify(connectionHandler, times(2)).release();
+  }
+
+  @Test
+  public void produceWithStickyConnection() throws Exception {
+    when(delegate.useStickyConnections()).thenReturn(true);
+    producer = createProducer();
+
+    ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
+    when(connectionManager.getConnection(any())).thenReturn(connectionHandler);
+
+    produce();
+    produce();
+
+    verify(connectionHandler, times(1)).getConnection();
+    verify(connectionHandler, never()).release();
+
+    producer.close();
+    verify(connectionHandler).release();
   }
 
   @Test
@@ -75,6 +112,5 @@ public class PagingProviderProducerTestCase {
   public void closeNoisely() throws Exception {
     doThrow(new DefaultMuleException(new Exception())).when(delegate).close();
     producer.close();
-
   }
 }

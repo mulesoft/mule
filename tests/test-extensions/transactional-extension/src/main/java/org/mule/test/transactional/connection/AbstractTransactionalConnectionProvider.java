@@ -8,12 +8,12 @@ package org.mule.test.transactional.connection;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-public class TransactionalConnectionProvider implements PoolingConnectionProvider<TestTransactionalConnection> {
+abstract class AbstractTransactionalConnectionProvider implements ConnectionProvider<TestTransactionalConnection> {
 
   private DummyXaResource dummyXaResource = new DummyXaResource();
 
@@ -35,4 +35,5 @@ public class TransactionalConnectionProvider implements PoolingConnectionProvide
   public ConnectionValidationResult validate(TestTransactionalConnection testTransactionalConnection) {
     return success();
   }
+
 }

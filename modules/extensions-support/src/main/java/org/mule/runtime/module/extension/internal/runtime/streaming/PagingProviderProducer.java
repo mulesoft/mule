@@ -11,10 +11,15 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.internal.streaming.object.iterator.Producer;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,11 +36,13 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   private PagingProvider<Object, T> delegate;
   private final ConfigurationInstance config;
   private final ConnectionManager connectionManager;
+  private final ConnectionSupplierFactory connectionSupplierFactory;
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate, ConfigurationInstance config, ConnectionManager manager) {
     this.delegate = new PagingProviderWrapper(delegate);
     this.config = config;
     this.connectionManager = manager;
+    this.connectionSupplierFactory = createConnectionSupplierFactory();
   }
 
   /**
@@ -58,19 +65,19 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * Finds a connection and applies the {@link Function} passed as parameter.
    *
    * @param function a function that receives a connection as input and returns a value.
-   * @param <R> the return type of the function
+   * @param <R>      the return type of the function
    * @return
    */
   private <R> R performWithConnection(Function<Object, R> function) {
-    ConnectionHandler connectionHandler = null;
+    ConnectionSupplier connectionSupplier = null;
     try {
-      connectionHandler = connectionManager.getConnection(config.getValue());
-      return function.apply(connectionHandler.getConnection());
+      connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
+      return function.apply(connectionSupplier.getConnection());
     } catch (ConnectionException e) {
       throw new MuleRuntimeException(createStaticMessage("Could not obtain a connection for the configuration"), e);
     } finally {
-      if (connectionHandler != null) {
-        connectionHandler.release();
+      if (connectionSupplier != null) {
+        connectionSupplier.close();
       }
     }
   }
@@ -80,6 +87,117 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    */
   @Override
   public void close() throws IOException {
-    this.delegate.close();
+    try {
+      this.delegate.close();
+    } finally {
+      connectionSupplierFactory.dispose();
+    }
+  }
+
+  private ConnectionSupplierFactory createConnectionSupplierFactory() {
+    if (delegate.useStickyConnections() || isTransactional()) {
+      return new StickyConnectionSupplierFactory();
+    }
+
+    return new DefaultConnectionSupplierFactory();
+  }
+
+  private boolean isTransactional() {
+    Transaction tx = TransactionCoordination.getInstance().getTransaction();
+    return tx != null && tx.hasResource(new ExtensionTransactionKey(config));
+  }
+
+  private interface ConnectionSupplierFactory {
+
+    ConnectionSupplier getConnectionSupplier() throws ConnectionException;
+
+    void dispose();
+  }
+
+
+  private class DefaultConnectionSupplierFactory implements ConnectionSupplierFactory {
+
+    @Override
+    public ConnectionSupplier getConnectionSupplier() throws ConnectionException {
+      return new DefaultConnectionSupplier(connectionManager.getConnection(config.getValue()));
+    }
+
+    @Override
+    public void dispose() {
+
+    }
+  }
+
+
+  private class StickyConnectionSupplierFactory implements ConnectionSupplierFactory {
+
+    private final LazyValue<ConnectionSupplier> stickyConnection = new LazyValue<>(new CheckedSupplier<ConnectionSupplier>() {
+
+      @Override
+      public ConnectionSupplier getChecked() throws Throwable {
+        StickyConnectionSupplierFactory.this.connectionHandler = connectionManager.getConnection(config.getValue());
+        return new StickyConnectionSupplier(StickyConnectionSupplierFactory.this.connectionHandler.getConnection());
+      }
+    });
+
+    private ConnectionHandler connectionHandler;
+
+    @Override
+    public ConnectionSupplier getConnectionSupplier() throws ConnectionException {
+      return stickyConnection.get();
+    }
+
+    @Override
+    public void dispose() {
+      if (connectionHandler != null) {
+        connectionHandler.release();
+      }
+    }
+  }
+
+
+  private interface ConnectionSupplier {
+
+    Object getConnection() throws ConnectionException;
+
+    void close();
+  }
+
+
+  private class DefaultConnectionSupplier implements ConnectionSupplier {
+
+    private final ConnectionHandler connectionHandler;
+
+    public DefaultConnectionSupplier(ConnectionHandler connectionHandler) {
+      this.connectionHandler = connectionHandler;
+    }
+
+    public Object getConnection() throws ConnectionException {
+      return connectionHandler.getConnection();
+    }
+
+    public void close() {
+      connectionHandler.release();
+    }
+  }
+
+
+  private class StickyConnectionSupplier implements ConnectionSupplier {
+
+    private final Object connection;
+
+    public StickyConnectionSupplier(Object connection) {
+      this.connection = connection;
+    }
+
+    @Override
+    public Object getConnection() throws ConnectionException {
+      return connection;
+    }
+
+    @Override
+    public void close() {
+
+    }
   }
 }

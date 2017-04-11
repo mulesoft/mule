@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
+import static java.util.Optional.empty;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
 import java.io.IOException;
@@ -14,7 +16,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This implementation of {@link PagingProvider} takes care of enforcing some basic behaviour of the delegate contract so that
@@ -27,13 +28,13 @@ import org.slf4j.LoggerFactory;
  */
 final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(PagingProviderWrapper.class);
+  private static final Logger LOGGER = getLogger(PagingProviderWrapper.class);
 
-  private final PagingProvider<C, T> wrapped;
+  private final PagingProvider<C, T> delegate;
   private boolean closed = false;
 
-  public PagingProviderWrapper(PagingProvider<C, T> wrapped) {
-    this.wrapped = wrapped;
+  public PagingProviderWrapper(PagingProvider<C, T> delegate) {
+    this.delegate = delegate;
   }
 
   /**
@@ -41,8 +42,8 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
    */
   @Override
   public void close() throws IOException {
-    this.closed = true;
-    this.wrapped.close();
+    closed = true;
+    delegate.close();
   }
 
   private void handleCloseException(Throwable t) {
@@ -57,23 +58,23 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
    */
   @Override
   public List<T> getPage(C connection) {
-    if (this.closed) {
+    if (closed) {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("paging delegate is closed. Returning null");
       }
       return null;
     }
 
-    List<T> page = this.wrapped.getPage(connection);
+    List<T> page = delegate.getPage(connection);
     if (isEmpty(page)) {
       try {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Empty page was obtained. Closing delegate since this means that the data source has been consumed");
         }
 
-        this.close();
+        close();
       } catch (Exception e) {
-        this.handleCloseException(e);
+        handleCloseException(e);
       }
     }
 
@@ -82,6 +83,12 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
 
   @Override
   public Optional<Integer> getTotalResults(C connection) {
-    return this.wrapped.getTotalResults(connection);
+    Optional<Integer> size = delegate.getTotalResults(connection);
+    return size != null ? size : empty();
+  }
+
+  @Override
+  public boolean useStickyConnections() {
+    return delegate.useStickyConnections();
   }
 }

@@ -44,4 +44,8 @@
         <heisenberg:paged-operation-using-connection config-ref="heisenberg"/>
     </flow>
 
+    <flow name="pagedOperationWithStickyConnection">
+        <heisenberg:sticky-paged-operation config-ref="heisenberg"/>
+    </flow>
+
 </mule>
