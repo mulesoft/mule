@@ -12,7 +12,10 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.extension.file.common.api.FileWriteMode;
+import org.mule.extension.file.common.api.exceptions.FileError;
+import org.mule.extension.ftp.api.FTPConnectionException;
 import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
@@ -193,6 +196,7 @@ public class SftpClient {
 
   private void configureProxy(Session session) {
     if (proxyConfig != null) {
+
       Proxy proxy = null;
       switch (proxyConfig.getProtocol()) {
         case HTTP:
@@ -220,6 +224,7 @@ public class SftpClient {
           break;
 
         default:
+          // should never get here, except a new type was added to the enum and not handled
           throw new IllegalArgumentException(format("Proxy protocol %s not recognized", proxyConfig.getProtocol()));
       }
 
@@ -411,7 +416,18 @@ public class SftpClient {
     this.connectionTimeoutMillis = connectionTimeoutMillis;
   }
 
-  public void setProxyConfig(SftpProxyConfig proxyConfig) {
-    this.proxyConfig = proxyConfig;
+  public void setProxyConfig(SftpProxyConfig proxyConfig) throws ConnectionException {
+    if (proxyConfig != null) {
+      if (proxyConfig.getHost() == null || proxyConfig.getPort() == null) {
+        throw new FTPConnectionException("SFTP Proxy must have both \"host\" and \"port\" set", FileError.CONNECTIVITY);
+      }
+
+      if ((proxyConfig.getUsername() == null) != (proxyConfig.getPassword() == null)) {
+        throw new FTPConnectionException("SFTP Proxy requires both \"username\" and \"password\" if configured with authentication (otherwise none)",
+                                         FileError.INVALID_CREDENTIALS);
+      }
+
+      this.proxyConfig = proxyConfig;
+    }
   }
 }

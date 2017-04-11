@@ -25,7 +25,7 @@ public class SftpProxyConfig {
   private String host;
 
   @Parameter
-  private int port;
+  private Integer port;
 
   @Parameter
   @Optional
@@ -43,7 +43,7 @@ public class SftpProxyConfig {
     return host;
   }
 
-  public int getPort() {
+  public Integer getPort() {
     return port;
   }
 
