@@ -7,13 +7,14 @@
 package org.mule.extension.http.api.policy;
 
 
-import static org.mule.runtime.core.util.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.core.policy.OperationPolicyPointcutParametersFactory;
-import org.mule.runtime.core.policy.PolicyPointcutParameters;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;
+import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public class HttpRequestPolicyPointcutParametersFactory implements OperationPoli
   public static final String PATH_PARAMETER_NAME = "path";
   public static final String METHOD_PARAMETER_NAME = "method";
   private final static ComponentIdentifier requestIdentifier =
-      builder().withNamespace("http").withName("request").build();
+      builder().withNamespace("httpn").withName("request").build();
 
   @Override
   public boolean supportsOperationIdentifier(ComponentIdentifier operationIdentifier) {
@@ -35,11 +36,11 @@ public class HttpRequestPolicyPointcutParametersFactory implements OperationPoli
   }
 
   @Override
-  public PolicyPointcutParameters createPolicyPointcutParameters(String flowName, ComponentIdentifier operationIdentifier,
+  public PolicyPointcutParameters createPolicyPointcutParameters(ComponentLocation componentLocation,
                                                                  Map<String, Object> operationParameters) {
-    checkArgument(isNotEmpty(flowName), "Cannot create a policy pointcut parameter instance with an empty flow name");
+    checkNotNull(componentLocation, "Cannot create a policy pointcut parameter instance without a valid component location");
     String pathParameter = (String) operationParameters.get(PATH_PARAMETER_NAME);
     String methodParameter = (String) operationParameters.get(METHOD_PARAMETER_NAME);
-    return new HttpRequestPolicyPointcutParameters(flowName, operationIdentifier, pathParameter, methodParameter);
+    return new HttpRequestPolicyPointcutParameters(componentLocation, pathParameter, methodParameter);
   }
 }

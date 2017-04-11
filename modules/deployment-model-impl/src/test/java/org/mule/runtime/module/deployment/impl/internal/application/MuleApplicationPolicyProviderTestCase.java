@@ -19,10 +19,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.deployment.impl.internal.application.MuleApplicationPolicyProvider.createPolicyRegistrationError;
+
 import org.mule.runtime.core.policy.Policy;
 import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.core.policy.PolicyPointcut;
-import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
@@ -33,6 +33,7 @@ import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicyInstance;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstanceProviderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateFactory;
+import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

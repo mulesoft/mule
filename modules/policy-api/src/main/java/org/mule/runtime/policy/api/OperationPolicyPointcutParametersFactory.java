@@ -4,17 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.policy;
+package org.mule.runtime.policy.api;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 
 import java.util.Map;
 
 /**
  * Factory for instances of {@link PolicyPointcutParameters} for a particular operation.
  *
- * Instances of this factory must be registered in the {@link org.mule.runtime.core.api.MuleContext} and will be discovered by the
- * {@link PolicyManager} and used to create the set of pointcut parameters for an operation before executing it.
+ * Instances of this factory must be registered in the application's context and will be discovered and used to create the set of
+ * pointcut parameters for an operation before executing it.
  * 
  * @since 4.0
  */
@@ -28,12 +29,11 @@ public interface OperationPolicyPointcutParametersFactory {
   /**
    * Creates an specific {@link PolicyPointcutParameters} for a particular operation identifier by {@code operationIdentifier}.
    *
-   * @param flowName name of the flow executing the operation. Not empty.
-   * @param operationIdentifier identifier of the message source
+   * @param componentLocation the component location where the operation is defined.
    * @param operationParameters set of parameters that are going to be used to execute the operation.
    * @return the pointcut parameters.
    */
-  PolicyPointcutParameters createPolicyPointcutParameters(String flowName, ComponentIdentifier operationIdentifier,
+  PolicyPointcutParameters createPolicyPointcutParameters(ComponentLocation componentLocation,
                                                           Map<String, Object> operationParameters);
 
 }

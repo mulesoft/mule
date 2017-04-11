@@ -54,7 +54,7 @@ public class HttpListenerNotificationsTestCase extends AbstractHttpTestCase {
 
     CountDownLatch latch = new CountDownLatch(2);
     // for now use none since we have no way of sending the endpoint
-    TestConnectorMessageNotificationListener listener = new TestConnectorMessageNotificationListener(latch, "http");
+    TestConnectorMessageNotificationListener listener = new TestConnectorMessageNotificationListener(latch, "httpn");
     muleContext.getNotificationManager().addListener(listener);
 
     Request.Post(listenerUrl).execute();

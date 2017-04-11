@@ -29,7 +29,7 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
 
   @Override
   public boolean supports(ComponentIdentifier componentIdentifier) {
-    return componentIdentifier.equals(buildFromStringRepresentation("http:listener"));
+    return componentIdentifier.equals(buildFromStringRepresentation("httpn:listener"));
   }
 
   @Override

@@ -6,47 +6,26 @@
  */
 package org.mule.extension.http.api.policy;
 
-import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.core.policy.PolicyPointcutParameters;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.http.policy.api.HttpPolicyPointcutParameters;
+import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 /**
  * Specific implementation of {@link PolicyPointcutParameters} for http:listener operation.
  * 
  * @since 4.0
  */
-public class HttpListenerPolicyPointcutParameters extends PolicyPointcutParameters {
-
-  private final String path;
-  private final String method;
+public class HttpListenerPolicyPointcutParameters extends HttpPolicyPointcutParameters {
 
   /**
    * Creates a new {@link PolicyPointcutParameters}
    *
-   * @param flowName name of the flow where the listener is defined. Not empty.
-   * @param componentIdentifier the component identifier. This is the namespace of the module were it is defined and the source /
-   *        operation identifier.
+   * @param componentLocation the component location where the source / operation is defined.
    * @param path the target path of the incoming request
    * @param method the HTTP method of the incoming request
    */
-  public HttpListenerPolicyPointcutParameters(String flowName, ComponentIdentifier componentIdentifier, String path,
-                                              String method) {
-    super(flowName, componentIdentifier);
-    this.path = path;
-    this.method = method;
-  }
-
-  /**
-   * @return the target path of the http:request operation.
-   */
-  public String getPath() {
-    return path;
-  }
-
-  /**
-   * @return the HTTP method of the http:request operation.
-   */
-  public String getMethod() {
-    return method;
+  public HttpListenerPolicyPointcutParameters(ComponentLocation componentLocation, String path, String method) {
+    super(componentLocation, path, method);
   }
 
 }

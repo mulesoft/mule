@@ -21,6 +21,7 @@ import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollectio
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Attributes;
@@ -83,14 +84,15 @@ public class ModuleFlowProcessingPhase
 
       final MessagingExceptionHandler exceptionHandler = messageProcessContext.getFlowConstruct().getExceptionListener();
       MessageSource messageSource = messageProcessContext.getMessageSource();
-      ComponentIdentifier sourceIdentifier = messageProcessContext.getSourceIdentifier();
+      ComponentLocation sourceLocation = messageSource.getLocation();
       Consumer<MessagingException> errorConsumer =
           getErrorConsumer(messageSource, template.getFailedExecutionResponseParametersFunction(),
                            messageProcessContext, template, phaseResultNotifier);
 
       MonoProcessor<Void> responseCompletion = MonoProcessor.create();
 
-      Event templateEvent = createEvent(template, messageProcessContext, sourceIdentifier, responseCompletion);
+      Event templateEvent = createEvent(template, messageProcessContext, sourceLocation.getComponentIdentifier().getIdentifier(),
+                                        responseCompletion);
 
       // TODO MULE-11167 Policies should be non blocking
       if (System.getProperty(ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY) == null) {
@@ -111,7 +113,7 @@ public class ModuleFlowProcessingPhase
             .subscribe();
       } else {
         Processor nextOperation = createFlowExecutionProcessor(messageSource, exceptionHandler, messageProcessContext, template);
-        SourcePolicy policy = policyManager.createSourcePolicyInstance(sourceIdentifier, templateEvent, nextOperation, template);
+        SourcePolicy policy = policyManager.createSourcePolicyInstance(sourceLocation, templateEvent, nextOperation, template);
 
         try {
           Either<FailureSourcePolicyResult, SuccessSourcePolicyResult> sourcePolicyResult = policy.process(templateEvent);

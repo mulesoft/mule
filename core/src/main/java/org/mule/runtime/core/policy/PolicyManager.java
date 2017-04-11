@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.policy;
 
-import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -27,13 +27,13 @@ public interface PolicyManager {
    * policies applied to that source and also the {@code sourceEvent} which will be used to extract data to match against the policies
    * pointcuts.
    *
-   * @param sourceIdentifier the source identifier.
+   * @param sourceLocation the source location.
    * @param sourceEvent the event generated from the source.
    * @param flowExecutionProcessor the processor that executes the flow.
    * @param messageSourceResponseParametersProcessor processor to generate the response and error response parameters of the source.
    * @return a {@link SourcePolicy} associated to that source.
    */
-  SourcePolicy createSourcePolicyInstance(ComponentIdentifier sourceIdentifier, Event sourceEvent,
+  SourcePolicy createSourcePolicyInstance(ComponentLocation sourceLocation, Event sourceEvent,
                                           Processor flowExecutionProcessor,
                                           MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor);
 
@@ -42,13 +42,13 @@ public interface PolicyManager {
    * policies applied to that operation and also the {@code operationParameters} which will be used to extract data to match against the policies
    * pointcuts.
    *
-   * @param operationIdentifier component identifier of the operation.
+   * @param operationLocation component location of the operation.
    * @param operationEvent the event used to execute the operation.
    * @param operationParameters the set of parameters to use to execute the operation.
    * @param operationExecutionFunction the function that executes the operation.
    * @return a {@link OperationPolicy} associated to that source.
    */
-  OperationPolicy createOperationPolicy(ComponentIdentifier operationIdentifier, Event operationEvent,
+  OperationPolicy createOperationPolicy(ComponentLocation operationLocation, Event operationEvent,
                                         Map<String, Object> operationParameters,
                                         OperationExecutionFunction operationExecutionFunction);
 

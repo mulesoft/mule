@@ -26,8 +26,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
-import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.TypedComponentIdentifier;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -102,7 +101,6 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
 
   private final ExtensionModel extensionModel;
   private final OperationModel operationModel;
-  private final TypedComponentIdentifier operationIdentifier;
   private final ResolverSet resolverSet;
   private final String target;
   private final EntityMetadataMediator entityMetadataMediator;
@@ -127,10 +125,6 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     this.target = target;
     this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
     this.policyManager = policyManager;
-    operationIdentifier = TypedComponentIdentifier.builder().withIdentifier(ComponentIdentifier.builder()
-        .withName(operationModel.getName())
-        .withNamespace(extensionModel.getName().toLowerCase())
-        .build()).withType(TypedComponentIdentifier.ComponentType.PROCESSOR).build();
   }
 
   @Override
@@ -151,7 +145,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
         };
 
         OperationPolicy policy =
-            policyManager.createOperationPolicy(operationIdentifier.getIdentifier(), event,
+            policyManager.createOperationPolicy(getLocation(), event,
                                                 operationParameters,
                                                 operationExecutionFunction);
         return policy.process(event);

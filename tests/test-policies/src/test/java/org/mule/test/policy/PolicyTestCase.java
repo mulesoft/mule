@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -25,8 +26,8 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.policy.Policy;
 import org.mule.runtime.core.policy.PolicyInstance;
-import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.core.policy.PolicyProvider;
+import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.List;
 import java.util.Optional;

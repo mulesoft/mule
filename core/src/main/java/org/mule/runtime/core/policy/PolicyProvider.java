@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.policy;
 
+import org.mule.runtime.policy.api.PolicyPointcutParameters;
+
 import java.util.List;
 
 /**

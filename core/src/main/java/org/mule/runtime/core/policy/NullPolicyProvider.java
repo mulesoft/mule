@@ -8,6 +8,8 @@ package org.mule.runtime.core.policy;
 
 import static java.util.Collections.emptyList;
 
+import org.mule.runtime.policy.api.PolicyPointcutParameters;
+
 import java.util.List;
 
 /**
