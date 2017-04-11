@@ -64,6 +64,7 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -338,6 +339,10 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
 
     AuthorizationCodeDanceCallbackContext callbackContext = new AuthorizationCodeDanceCallbackContext() {
 
+      @Override
+      public Optional<Object> getParameter(String paramKey) {
+        return empty();
+      }
     };
 
     final OAuthAuthorizationCodeDancerBuilder builder = baseAuthCodeDancerbuilder();

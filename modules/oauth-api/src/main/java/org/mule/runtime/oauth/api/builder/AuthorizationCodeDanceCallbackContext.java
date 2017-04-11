@@ -8,6 +8,8 @@ package org.mule.runtime.oauth.api.builder;
 
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 
+import java.util.Optional;
+
 /**
  * Implementations keep context information between the before and after callbacks set for an
  * {@link AuthorizationCodeOAuthDancer}.
@@ -16,4 +18,11 @@ import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
  */
 public interface AuthorizationCodeDanceCallbackContext {
 
+  /**
+   * Allows access to an attribute of this context, as defined by the implementation.
+   * 
+   * @param paramKey the key of the parameter to get from the context.
+   * @return an {@link Optional} containing the value for the requested {@code paramKey} if present, or {@code empty} if not.
+   */
+  Optional<Object> getParameter(String paramKey);
 }
