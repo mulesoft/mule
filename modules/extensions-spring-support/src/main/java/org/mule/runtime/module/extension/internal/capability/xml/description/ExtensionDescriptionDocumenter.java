@@ -15,6 +15,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
@@ -58,13 +59,13 @@ final class ExtensionDescriptionDocumenter extends AbstractDescriptionDocumenter
   }
 
   private void documentConfigurations(ExtensionDeclaration declaration, TypeElement extensionElement) {
-    List<ConfigurationDeclaration> configurations = declaration.getConfigurations();
-    if (configurations.size() > 1) {
-      processor.getTypeElementsAnnotatedWith(Configuration.class, roundEnv)
+    Set<TypeElement> configurations = processor.getTypeElementsAnnotatedWith(Configuration.class, roundEnv);
+    if (!configurations.isEmpty()) {
+      configurations
           .forEach(config -> findMatchingConfiguration(declaration, config)
               .ifPresent(configDeclaration -> configDeclarer.document(configDeclaration, config)));
     } else {
-      configurations.forEach(config -> configDeclarer.document(config, extensionElement));
+      configDeclarer.document(declaration.getConfigurations().get(0), extensionElement);
     }
   }
 
