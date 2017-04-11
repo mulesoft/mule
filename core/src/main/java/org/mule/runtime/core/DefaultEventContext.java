@@ -225,6 +225,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     public Optional<EventContext> getParentContext() {
       return of(parent);
     }
+
   }
 
 }
