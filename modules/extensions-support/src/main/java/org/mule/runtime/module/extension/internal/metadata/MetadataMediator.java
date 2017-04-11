@@ -230,7 +230,6 @@ public final class MetadataMediator<T extends ComponentModel> {
       public void visit(ScopeModel scopeModel) {
         typedModel.set((T) new ImmutableScopeModel(scopeModel.getName(),
                                                    scopeModel.getDescription(),
-                                                   scopeModel.getRouteModel(),
                                                    resolveParameterGroupModelType(
                                                                                   scopeModel.getParameterGroupModels(),
                                                                                   inputMetadataDescriptor.getAllParameters()),

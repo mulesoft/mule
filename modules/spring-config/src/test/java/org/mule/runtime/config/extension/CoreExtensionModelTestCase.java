@@ -305,9 +305,6 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   public void foreach() {
     final ScopeModel foreachModel = (ScopeModel) coreExtensionModel.getOperationModel("foreach").get();
 
-    assertThat(foreachModel.getRouteModel().getMinOccurs(), is(1));
-    assertThat(foreachModel.getRouteModel().getMaxOccurs(), is(Optional.empty()));
-
     assertThat(foreachModel.getErrorModels(), empty());
     assertThat(foreachModel.getExecutionType(), is(CPU_LITE));
 
@@ -434,9 +431,6 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   @Test
   public void async() {
     final ScopeModel asyncModel = (ScopeModel) coreExtensionModel.getOperationModel("async").get();
-
-    assertThat(asyncModel.getRouteModel().getMinOccurs(), is(1));
-    assertThat(asyncModel.getRouteModel().getMaxOccurs(), is(Optional.empty()));
 
     assertThat(asyncModel.getErrorModels(), empty());
     assertThat(asyncModel.getExecutionType(), is(CPU_LITE));
