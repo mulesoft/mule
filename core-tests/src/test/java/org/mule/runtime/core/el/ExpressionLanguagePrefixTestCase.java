@@ -184,14 +184,14 @@ public class ExpressionLanguagePrefixTestCase extends AbstractMuleTestCase {
 
   @Test
   public void fullWeaveScript() {
-    elAdapter.validate("%dw 1.0 --- expr]");
+    elAdapter.validate("%dw 2.0 --- expr]");
     verify(dwLanguage).validate(anyString());
     verify(melLanguage, never()).validate(anyString());
   }
 
   @Test
   public void fullWeaveMultilineScript() {
-    elAdapter.validate(lineSeparator() + "%dw 1.0" + lineSeparator() + " ---" + lineSeparator() + "expr]");
+    elAdapter.validate(lineSeparator() + "%dw 2.0" + lineSeparator() + " ---" + lineSeparator() + "expr]");
     verify(dwLanguage).validate(anyString());
     verify(melLanguage, never()).validate(anyString());
   }

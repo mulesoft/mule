@@ -34,7 +34,7 @@
             <wsc:message>
                 <wsc:body>
                 #[
-                %dw 1.0
+                %dw 2.0
                 %output application/xml
                 %namespace con http://service.ws.extension.mule.org/
                 ---
@@ -44,7 +44,7 @@
                 </wsc:body>
                 <wsc:headers>
                 #[
-                %dw 1.0
+                %dw 2.0
                 %output application/xml
                 %namespace con http://service.ws.extension.mule.org/
                    ---
