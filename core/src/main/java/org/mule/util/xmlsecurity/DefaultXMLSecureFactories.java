@@ -16,6 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
@@ -28,6 +29,8 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultXMLSecureFactories
 {
     private final static Log logger = LogFactory.getLog(DefaultXMLSecureFactories.class);
+
+    private static final String TRANSFORMER_FACTORY_JDK5 = "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
 
     public static DocumentBuilderFactory createDocumentBuilderFactory(Boolean externalEntities, Boolean expandEntities)
     {
@@ -78,7 +81,16 @@ public class DefaultXMLSecureFactories
 
     public static TransformerFactory createTransformerFactory(Boolean externalEntities, Boolean expandEntities)
     {
-        TransformerFactory factory = TransformerFactory.newInstance();
+        TransformerFactory factory;
+        try
+        {
+            factory = TransformerFactory.newInstance();
+        }
+        catch (TransformerFactoryConfigurationError e)
+        {
+            System.setProperty("javax.xml.transform.TransformerFactory", TRANSFORMER_FACTORY_JDK5);
+            factory = TransformerFactory.newInstance();
+        }
 
         configureTransformerFactory(externalEntities, expandEntities, factory);
 

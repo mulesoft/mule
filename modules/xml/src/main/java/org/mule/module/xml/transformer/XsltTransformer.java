@@ -30,7 +30,6 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
