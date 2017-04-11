@@ -75,12 +75,11 @@ public class SftpAutoDeleteTestCase extends AbstractSftpFunctionalTestCase
     }
 
     @Override
-    public void doTearDown() throws Exception
+    public void doTearDownAfterMuleContextDispose() throws Exception
     {
         sftpClient.changeWorkingDirectory("..");
         sftpClient.recursivelyDeleteDirectory(AUTO_DELETE_OFF);
         sftpClient.recursivelyDeleteDirectory(AUTO_DELETE_ON);
-        super.doTearDown();
     }
 
     @Test
