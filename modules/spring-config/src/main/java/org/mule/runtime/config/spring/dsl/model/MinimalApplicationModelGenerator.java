@@ -13,7 +13,6 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
 
@@ -67,7 +66,7 @@ public class MinimalApplicationModelGenerator {
   public ApplicationModel getMinimalModel(Location location) {
     ComponentModel requestedComponentModel = findRequiredComponentModel(location);
     final Set<String> otherRequiredGlobalComponents = resolveComponentDependencies(requestedComponentModel);
-    otherRequiredGlobalComponents.add(location.getGlobalComponentName());
+    otherRequiredGlobalComponents.add(location.getGlobalElementName());
     Set<String> allRequiredComponentModels = findComponentModelsDependencies(otherRequiredGlobalComponents);
     Iterator<ComponentModel> iterator = applicationModel.getRootComponentModel().getInnerComponents().iterator();
     while (iterator.hasNext()) {
@@ -141,7 +140,7 @@ public class MinimalApplicationModelGenerator {
 
   private ComponentModel findRequiredComponentModel(Location location) {
     final Reference<ComponentModel> foundComponentModelReference = new Reference<>();
-    Optional<ComponentModel> globalComponent = applicationModel.findNamedComponent(location.getGlobalComponentName());
+    Optional<ComponentModel> globalComponent = applicationModel.findNamedComponent(location.getGlobalElementName());
     globalComponent.ifPresent(componentModel -> {
       findComponentWithLocation(componentModel, location).ifPresent(foundComponentModel -> {
         foundComponentModelReference.set(foundComponentModel);

@@ -193,9 +193,8 @@ class DeclarationBasedElementModelFactory {
     DslElementModel.Builder<ConfigurationModel> element =
         createParameterizedElementModel(model, configDsl, configDeclaration, configuration);
 
-    if (configDeclaration.getConnection() != null) {
-      addConnectionProvider(configDeclaration.getConnection(), model, configuration, element);
-    }
+    configDeclaration.getConnection()
+        .ifPresent(connection -> addConnectionProvider(connection, model, configuration, element));
 
     return element.withConfig(configuration.build()).build();
   }
