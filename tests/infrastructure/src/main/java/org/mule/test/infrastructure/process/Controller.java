@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 
 public abstract class Controller {
 
+  public static final String LIB_USER_FOLDER = "/lib/user";
+  public static final String PLUGINS_FOLDER = "/plugins";
   private static Logger logger = LoggerFactory.getLogger(Controller.class);
   protected static final String ANCHOR_SUFFIX = "-anchor.txt";
   private static final IOFileFilter ANCHOR_FILTER = FileFilterUtils.suffixFileFilter(ANCHOR_SUFFIX);
@@ -52,7 +54,7 @@ public abstract class Controller {
   private static final String MULE_HOME_VARIABLE = "MULE_HOME";
   private static final String DOMAIN_DEPLOY_ERROR = "Error deploying domain %s.";
   private static final String ANCHOR_DELETE_ERROR = "Could not delete anchor file [%s] when stopping Mule Runtime.";
-  private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
+  private static final String ADD_FILE_ERROR = "Error copying [%s] file [%s] to [%s] directory [%s].";
   private static final int IS_RUNNING_STATUS_CODE = 0;
   private static final Pattern pattern = Pattern.compile("wrapper\\.java\\.additional\\.(\\d*)=");
   protected String muleHome;
@@ -60,6 +62,7 @@ public abstract class Controller {
   protected File domainsDir;
   protected File appsDir;
   protected File libsDir;
+  protected File pluginsDir;
   protected Path wrapperConf;
   protected int timeout;
 
@@ -68,7 +71,8 @@ public abstract class Controller {
     this.muleBin = getMuleBin();
     this.domainsDir = new File(muleHome + "/domains");
     this.appsDir = new File(muleHome + "/apps/");
-    this.libsDir = new File(muleHome + "/lib/user");
+    this.libsDir = new File(muleHome + LIB_USER_FOLDER);
+    this.pluginsDir = new File(muleHome + PLUGINS_FOLDER);
     this.wrapperConf = Paths.get(muleHome + "/conf/wrapper.conf");
     this.timeout = timeout != 0 ? timeout : DEFAULT_TIMEOUT;
   }
@@ -159,16 +163,26 @@ public abstract class Controller {
     }
   }
 
-  protected void addLibrary(File jar) {
-    verify(jar.exists(), "Jar file does not exist: %s", jar);
-    verify("jar".equals(FilenameUtils.getExtension(jar.getAbsolutePath())), "Library [%s] don't have .jar extension.", jar);
-    verify(jar.canRead(), "Cannot read jar file: %s", jar);
-    verify(libsDir.canWrite(), "Cannot write on lib dir: %", libsDir);
+  private void addFileToFolder(File file, String fileExtension, File folderToCopyFile, String artifactType,
+                                 String errorMessage) {
+    verify(file.exists(), "%s file does not exist: %s", artifactType, file);
+    verify(fileExtension.equals(FilenameUtils.getExtension(file.getAbsolutePath())), "[%s] [%s] doesn't have .[%s] extension.",
+           artifactType, file, fileExtension);
+    verify(file.canRead(), "Cannot read %s file: %s", artifactType, file);
+    verify(folderToCopyFile.canWrite(), "Cannot write on [%s] dir: %", artifactType, folderToCopyFile);
     try {
-      copyFileToDirectory(jar, libsDir);
+      copyFileToDirectory(file, folderToCopyFile);
     } catch (IOException e) {
-      throw new MuleControllerException(String.format(ADD_LIBRARY_ERROR, jar, libsDir), e);
+      throw new MuleControllerException(String.format(errorMessage, artifactType, file, artifactType, folderToCopyFile), e);
     }
+  }
+
+  protected void addLibrary(File jar) {
+    addFileToFolder(jar, "jar", libsDir, "Library", ADD_FILE_ERROR);
+  }
+
+  protected void addPlugin(File plugin) {
+    addFileToFolder(plugin, "jar", pluginsDir, "Plugin", ADD_FILE_ERROR);
   }
 
   protected void deleteAnchors() {

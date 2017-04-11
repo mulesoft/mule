@@ -84,6 +84,7 @@ public class MuleDeployment extends MuleInstallation {
   private List<String> applications = new ArrayList<>();
   private List<String> domains = new ArrayList<>();
   private List<String> libraries = new ArrayList<>();
+  private List<String> plugins = new ArrayList<>();
   private MuleProcessController mule;
   private Map<String, String> properties = new HashMap<>();
   private Map<String, Supplier<String>> propertiesUsingLambdas = new HashMap<>();
@@ -202,6 +203,17 @@ public class MuleDeployment extends MuleInstallation {
       return this;
     }
 
+    /**
+     * Adds plugins to plugins folder.
+     *
+     * @param plugins
+     * @return
+     */
+    public Builder withPlugins(String... plugins) {
+      Collections.addAll(deployment.plugins, plugins);
+      return this;
+    }
+
   }
 
   public static MuleDeployment.Builder builder() {
@@ -266,6 +278,7 @@ public class MuleDeployment extends MuleInstallation {
     if (mule.isRunning()) {
       logger.warn("Mule Server was already running");
       libraries.forEach((library) -> mule.addLibrary(new File(library)));
+      plugins.forEach((plugin) -> mule.addPlugin(new File(plugin)));
       logger.info("Redeploying domains");
       domains.forEach((domain) -> redeployDomain(domain));
       logger.info("Redeploying applications");
@@ -273,6 +286,7 @@ public class MuleDeployment extends MuleInstallation {
       logger.info("Redeployment successful");
     } else {
       libraries.forEach((library) -> mule.addLibrary(new File(library)));
+      plugins.forEach((plugin) -> mule.addPlugin(new File(plugin)));
       domains.forEach((domain) -> mule.deployDomain(domain));
       applications.forEach((application) -> mule.deploy(application));
       logger.info("Starting Mule Server");

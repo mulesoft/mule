@@ -86,6 +86,10 @@ public class MuleProcessController {
     controller.addLibrary(jar);
   }
 
+  public void addPlugin(File plugin) {
+    controller.addPlugin(plugin);
+  }
+
   public void deployDomain(String domain) {
     controller.deployDomain(domain);
   }
