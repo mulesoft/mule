@@ -268,6 +268,47 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
         }
     }
 
+    private SensingNullMessageProcessor getSensingNullMessageProcessorWithoutCorrelationSequence() {
+        return new SensingNullMessageProcessor()
+        {
+            @Override
+            protected MuleEvent processBlocking(MuleEvent event) throws MuleException
+            {
+                event.getMessage().setCorrelationSequence(-1);
+                return super.processBlocking(event);
+            }
+        };
+    }
+
+    @Test
+    public void testCorrelationSequence() throws Exception
+    {
+        // Correlation sequence should not be used in AsyncRequestReplyRequester to wait for the message,
+        // since messages will be processed sequentially
+        asyncReplyMP = new TestAsyncRequestReplyRequester(muleContext);
+        asyncReplyMP.setTimeout(1000);
+        SensingNullMessageProcessor target = getSensingNullMessageProcessorWithoutCorrelationSequence();
+        LaxAsyncInterceptingMessageProcessor asyncMP = new LaxAsyncInterceptingMessageProcessor(
+                new WorkManagerSource()
+                {
+                    public WorkManager getWorkManager() throws MuleException
+                    {
+                        return muleContext.getWorkManager();
+                    }
+                }
+        );
+
+        asyncMP.setListener(target);
+        asyncReplyMP.setListener(asyncMP);
+        asyncReplyMP.setReplySource(target.getMessageSource());
+
+        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestService(),
+                getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
+        event.getMessage().setCorrelationSequence(3);
+
+        asyncReplyMP.process(event);
+    }
+
     public void exceptionThrown(Exception e)
     {
         e.printStackTrace();
