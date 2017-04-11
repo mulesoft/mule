@@ -1308,18 +1308,6 @@
       "blocking": true,
       "executionType": "CPU_LITE",
       "errors": [],
-      "routeModel": {
-        "minOccurs": 1,
-        "allowedStereotypes": [
-          {
-            "name": "foreacheable"
-          }
-        ],
-        "parameterGroupModels": [],
-        "name": "body",
-        "description": "",
-        "modelProperties": {}
-      },
       "output": {
         "type": {
           "format": "java",
@@ -1810,13 +1798,6 @@
       "blocking": true,
       "executionType": "CPU_LITE",
       "errors": [],
-      "routeModel": {
-        "minOccurs": 1,
-        "parameterGroupModels": [],
-        "name": "body",
-        "description": "",
-        "modelProperties": {}
-      },
       "output": {
         "type": {
           "format": "java",

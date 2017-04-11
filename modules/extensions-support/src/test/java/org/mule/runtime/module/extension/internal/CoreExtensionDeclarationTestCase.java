@@ -19,14 +19,10 @@ import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.EXTE
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.EXTENSION_NAME;
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.FOREACH_EXPRESSION_PARAMETER_NAME;
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.FOREACH_OPERATION_NAME;
-import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.FOREACH_ROUTE_NAME;
-import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.FOREACH_STEREOTYPE;
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.OTHERWISE_ROUTE_NAME;
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.VENDOR;
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.VERSION;
 import static org.mule.runtime.api.meta.model.tck.TestCoreExtensionDeclarer.WHEN_ROUTE_NAME;
-import org.junit.Before;
-import org.junit.Test;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -43,6 +39,9 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;
 import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
 
 @SmallTest
 public class CoreExtensionDeclarationTestCase extends AbstractJavaExtensionDeclarationTestCase {
@@ -97,7 +96,6 @@ public class CoreExtensionDeclarationTestCase extends AbstractJavaExtensionDecla
     assertThat(parameter.getName(), is(FOREACH_EXPRESSION_PARAMETER_NAME));
     assertType(parameter.getType(), String.class, StringType.class);
 
-    assertRoute(foreach.getRouteModel(), FOREACH_ROUTE_NAME, 1, 1, FOREACH_STEREOTYPE);
   }
 
   private void assertRoute(RouteModel route, String name, int minOccurs, Integer maxOccurs, Stereotype... stereotypes) {
