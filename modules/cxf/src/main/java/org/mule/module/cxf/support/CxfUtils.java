@@ -100,6 +100,8 @@ public final class CxfUtils
             url = url.replace("servlet://", "http://");
             url = url.replace("jetty://", "http://");
             url = url.replace("jetty-ssl://", "https://");
+            url = url.replace("wmq://", "http://");
+            url = url.replace("amqp://", "http://");
         }
         return url;
     }
