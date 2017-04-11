@@ -6,10 +6,9 @@
  */
 package org.mule.extension.socket.api.worker;
 
+import static org.mule.extension.socket.internal.SocketUtils.WORK;
 import static org.mule.extension.socket.internal.SocketUtils.createResult;
-
 import org.mule.extension.socket.api.SocketAttributes;
-import org.mule.extension.socket.internal.SocketUtils;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
@@ -48,7 +47,7 @@ public abstract class SocketWorker implements Disposable, Runnable {
 
   protected void handle(InputStream content, SocketAttributes attributes) {
     SourceCallbackContext ctx = callback.createContext();
-    ctx.addVariable(SocketUtils.WORK, this);
+    ctx.addVariable(WORK, this);
     callback.handle(createResult(content, attributes), ctx);
   }
 

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+             http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+      http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+
+    <flow name="publisher">
+        <set-payload value="#[payload]" mimeType="application/json"/>
+        <jms:publish config-ref="config" destination="#[destination]" destinationType="#[destinationType]"/>
+        <logger level="DEBUG" message="#[payload]"/>
+    </flow>
+
+    <flow name="topicListener" initialState="started">
+        <jms:listener config-ref="config" destination="${topicDestination}" ackMode="MANUAL" numberOfConsumers="${consumers}">
+            <jms:consumer-type>
+                <jms:topic-consumer isShared="true"/>
+            </jms:consumer-type>
+        </jms:listener>
+        <logger level="DEBUG" message="#[payload]"/>
+        <flow-ref name="saveMessage" />
+    </flow>
+
+    <flow name="saveMessage">
+        <component class="org.mule.extensions.jms.test.JmsMessageStorage"/>
+    </flow>
+</mule>

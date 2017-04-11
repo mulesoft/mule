@@ -18,7 +18,7 @@
     </flow>
 
     <flow name="listener">
-        <jms:listener config-ref="config" destination="topicListenerDestination">
+        <jms:listener config-ref="config" destination="topicListenerDestination" numberOfConsumers="1">
             <jms:consumer-type>
                 <jms:topic-consumer/>
             </jms:consumer-type>

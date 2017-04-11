@@ -30,12 +30,11 @@ import org.mule.extensions.jms.api.exception.JmsPublishConsumeErrorTypeProvider;
 import org.mule.extensions.jms.api.exception.JmsPublishException;
 import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.api.message.MessageBuilder;
+import org.mule.extensions.jms.api.publish.JmsPublishParameters;
 import org.mule.extensions.jms.internal.consume.JmsMessageConsumer;
 import org.mule.extensions.jms.internal.message.JmsResultFactory;
 import org.mule.extensions.jms.internal.metadata.JmsOutputResolver;
-import org.mule.extensions.jms.internal.publish.JmsPublishParameters;
 import org.mule.extensions.jms.internal.support.JmsSupport;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -47,7 +46,10 @@ import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+
 import org.slf4j.Logger;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.jms.Destination;
@@ -55,7 +57,6 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Queue;
 import javax.jms.Topic;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Operation that allows the user to send a message to a JMS {@link Destination} and waits for a response
@@ -71,38 +72,39 @@ public class JmsPublishConsume {
   @Inject
   private JmsSessionManager sessionManager;
 
-
   /**
    * Operation that allows the user to send a message to a JMS {@link Destination} and waits for a response
    * either to the provided {@code ReplyTo} destination or to a temporary {@link Destination} created dynamically
    *
-   * @param config         the current {@link JmsProducerConfig}
-   * @param connection     the current {@link JmsConnection}
-   * @param destination    the name of the {@link Destination} where the {@link Message} should be sent
-   * @param messageBuilder the {@link MessageBuilder} used to create the {@link Message} to be sent
-   * @param ackMode        the {@link AckMode} that will be configured over the Message and Session
+   * @param config          the current {@link JmsProducerConfig}
+   * @param connection      the current {@link JmsConnection}
+   * @param destination     the name of the {@link Destination} where the {@link Message} should be sent
+   * @param messageBuilder  the {@link MessageBuilder} used to create the {@link Message} to be sent
+   * @param ackMode         the {@link AckMode} that will be configured over the Message and Session
+   * @param maximumWait     Maximum time to wait for a response before timeout
+   * @param maximumWaitUnit Time unit to be used in the maximumWaitTime configuration
+   * @param overrides       Parameter group that lets override the publish configuration
+   * @param contentType     The content type of the consumed message body
+   * @param encoding        The encoding of the consumed message body
    * @return a {@link Result} with the reply {@link Message} content as {@link Result#getOutput} and its properties
    * and headers as {@link Result#getAttributes}
    * @throws JmsExtensionException if an error occurs
    */
   @OutputResolver(output = JmsOutputResolver.class)
   @Throws(JmsPublishConsumeErrorTypeProvider.class)
-  public Result<Object, JmsAttributes> publishConsume(@UseConfig JmsConfig config, @Connection JmsConnection connection,
-                                                      @Placement(order = 0) @XmlHints(
-                                                          allowReferences = false) @Summary("The name of the Destination where the Message should be sent") String destination,
+  public Result<Object, JmsAttributes> publishConsume(@UseConfig JmsConfig config,
+                                                      @Connection JmsConnection connection,
+                                                      @Placement(order = 0) String destination,
                                                       @Optional @NullSafe @Placement(
                                                           order = 1) @Summary("A builder for the message that will be published") MessageBuilder messageBuilder,
                                                       //TODO - MULE-11962 : Limit ACK Modes for PublishConsume operation
                                                       @Optional AckMode ackMode,
-                                                      @Optional(
-                                                          defaultValue = "10000") @Summary("Maximum time to wait for a response before timeout") long maximumWait,
-                                                      @Optional(
-                                                          defaultValue = "MILLISECONDS") @Summary("Time unit to be used in the maximumWaitTime configuration") TimeUnit maximumWaitUnit,
-                                                      @Placement(
-                                                          order = 2) @ParameterGroup(
-                                                              name = "Publish Configuration") JmsPublishParameters overrides,
-                                                      @Optional @Summary("The content type of the consumed message body") @Example(EXAMPLE_CONTENT_TYPE) String contentType,
-                                                      @Optional @Summary("The encoding of the consumed message body") @Example(EXAMPLE_ENCODING) String encoding)
+                                                      @Optional(defaultValue = "10000") long maximumWait,
+                                                      @Optional(defaultValue = "MILLISECONDS") TimeUnit maximumWaitUnit,
+                                                      @Placement(order = 2) @ParameterGroup(
+                                                          name = "Publish Configuration") JmsPublishParameters overrides,
+                                                      @Optional @Example(EXAMPLE_CONTENT_TYPE) String contentType,
+                                                      @Optional @Example(EXAMPLE_ENCODING) String encoding)
       throws JmsExtensionException {
 
     JmsSession session;
@@ -190,5 +192,4 @@ public class JmsPublishConsume {
   private String getReplyDestinationName(Destination destination, ConsumerType replyConsumerType) throws JMSException {
     return replyConsumerType.isTopic() ? ((Topic) destination).getTopicName() : ((Queue) destination).getQueueName();
   }
-
 }

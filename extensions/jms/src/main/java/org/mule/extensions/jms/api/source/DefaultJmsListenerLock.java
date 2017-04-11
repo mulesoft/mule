@@ -55,6 +55,17 @@ public class DefaultJmsListenerLock implements JmsListenerLock {
    * {@inheritDoc}
    */
   @Override
+  public void unlockWithFailure() {
+    isFailure = true;
+    cause =
+        new MuleRuntimeException(createStaticMessage("The JMS Lock has been unlocked indicating that a session recover should be executed."));
+    releaseIfNecessary();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public void unlock() {
     isFailure = false;
     releaseIfNecessary();

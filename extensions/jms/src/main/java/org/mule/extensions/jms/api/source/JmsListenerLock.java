@@ -29,6 +29,11 @@ public interface JmsListenerLock {
 
   /**
    * Unlocks the listener indicating that message has been processed with failures and the error should be propagated
+   */
+  void unlockWithFailure();
+
+  /**
+   * Unlocks the listener indicating that message has been processed with failures and the error should be propagated
    * @param error The error to propagate inside the message listener
    */
   void unlockWithFailure(Error error);

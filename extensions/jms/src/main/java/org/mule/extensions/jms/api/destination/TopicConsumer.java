@@ -6,7 +6,6 @@
  */
 package org.mule.extensions.jms.api.destination;
 
-import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -48,7 +47,7 @@ public final class TopicConsumer implements ConsumerType, Initialisable {
    */
   @Parameter
   @Optional(defaultValue = "false")
-  @Summary("Only for JMS 2.0: Allows the processing of messages from at topic subscription by multiple threads, connections or JVMs")
+  @Summary("Only for JMS 2.0: Allows the processing of messages from a topic subscription by multiple threads, connections or JVMs")
   private boolean isShared;
 
   /**
@@ -97,15 +96,12 @@ public final class TopicConsumer implements ConsumerType, Initialisable {
   public void initialise() throws InitialisationException {
     if (!isBlank(subscriptionName)) {
       checkArgument(isShared() || isDurable(),
-                    format("A [subscriptionName] was provided, but the subscription is neither [durable] nor [shared]"));
+                    "A [subscriptionName] was provided, but the subscription is neither [durable] nor [shared]");
     } else {
       checkArgument(!isShared() && !isDurable(),
-                    format("No [subscriptionName] was provided, but one is required to create a [durable] or [shared] subscriber"));
+                    "No [subscriptionName] was provided, but one is required to create a [durable] or [shared] subscriber");
     }
 
     checkArgument(!(isShared() && isNoLocal()), "A [shared] topic consumer can't be [noLocal]");
-
   }
-
-
 }

@@ -27,7 +27,6 @@ import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -78,13 +77,13 @@ import org.mule.service.http.api.server.RequestHandlerManager;
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.service.http.api.server.async.ResponseStatusCallback;
 
+import org.slf4j.Logger;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
 
 /**
  * Represents a listener for HTTP requests.
@@ -102,6 +101,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   private static final String SERVER_PROBLEM = "Server encountered a problem";
   private static final String ERROR_RESPONSE_SETTINGS = "Error Response Settings";
   private static final String RESPONSE_CONTEXT = "responseContext";
+  private static final String RESPONSE_CONTEXT_NOT_FOUND = "Response Context is not present. Could not send response.";
 
 
   @Inject
@@ -162,7 +162,8 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
                         SourceCallbackContext callbackContext)
       throws Exception {
 
-    HttpResponseContext context = callbackContext.getVariable(RESPONSE_CONTEXT);
+    HttpResponseContext context = callbackContext.<HttpResponseContext>getVariable(RESPONSE_CONTEXT)
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(RESPONSE_CONTEXT_NOT_FOUND)));
     responseSender.sendResponse(context, response);
   }
 
@@ -179,7 +180,8 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
       errorResponse.setBody(new TypedValue<>(error.getCause().getMessage(), STRING));
     }
 
-    HttpResponseContext context = callbackContext.getVariable("responseContext");
+    HttpResponseContext context = callbackContext.<HttpResponseContext>getVariable(RESPONSE_CONTEXT)
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(RESPONSE_CONTEXT_NOT_FOUND)));
 
     HttpResponse response;
     try {

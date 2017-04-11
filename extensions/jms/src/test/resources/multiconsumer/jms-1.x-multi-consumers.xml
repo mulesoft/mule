@@ -9,37 +9,26 @@
 
     <flow name="publisher">
         <set-payload value="#[payload]" mimeType="application/json"/>
-        <jms:publish config-ref="config" destination="${destination}">
-            <jms:message-builder >
-            </jms:message-builder>
-        </jms:publish>
+        <jms:publish config-ref="config" destination="#[destination]" destinationType="#[destinationType]"/>
         <logger level="DEBUG" message="#[payload]"/>
     </flow>
 
-    <flow name="listener" initialState="started">
-        <jms:listener config-ref="config" destination="${destination}" ackMode="${ack.mode}" numberOfConsumers="1"/>
+    <flow name="listener">
+        <jms:listener config-ref="config" destination="${destination}" ackMode="MANUAL" numberOfConsumers="${consumers}"/>
         <logger level="DEBUG" message="#[payload]"/>
-        <set-variable variableName="action" value="#[%output application/java --- payload.action]" mimeType="application/java"/>
         <flow-ref name="saveMessage" />
-        <choice>
-            <when expression="#[variables.action == 'ACK']">
-                <logger level="DEBUG" message="ACKNOWLEDGING SESSION"/>
-                <jms:ack ackId="#[attributes.ackId]"/>
-            </when>
-            <when expression="#[variables.action == 'EXPLODE']">
-                <logger level="DEBUG" message="THROWING EXCEPTION"/>
-                <test:component throwException="true"/>
-            </when>
-            <when expression="#[variables.action == 'RECOVER']">
-                <logger level="DEBUG" message="RECOVERING SESSION"/>
-                <jms:recover-session ackId="#[attributes.ackId]"/>
-            </when>
-            <otherwise>
-                <logger level="DEBUG" message="Nothing to do"/>
-            </otherwise>
-        </choice>
     </flow>
-    
+
+    <flow name="topicListener" initialState="stopped">
+        <jms:listener config-ref="config" destination="${topicDestination}" ackMode="MANUAL" numberOfConsumers="${consumers}">
+            <jms:consumer-type>
+                <jms:topic-consumer/>
+            </jms:consumer-type>
+        </jms:listener>
+        <logger level="DEBUG" message="#[payload]"/>
+        <flow-ref name="saveMessage" />
+    </flow>
+
     <flow name="saveMessage">
         <component class="org.mule.extensions.jms.test.JmsMessageStorage"/>
     </flow>

@@ -12,7 +12,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.extension.socket.internal.SocketUtils.WORK;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-
 import org.mule.extension.socket.api.SocketAttributes;
 import org.mule.extension.socket.api.config.ListenerConfig;
 import org.mule.extension.socket.api.connection.ListenerConnection;
@@ -37,14 +36,14 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Listens for socket connections of the given protocol in the configured host and port.
@@ -96,15 +95,15 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
   @OnSuccess
   public void onSuccess(@Optional(defaultValue = "#[mel:payload]") @XmlHints(allowReferences = false) Object responseValue,
                         SourceCallbackContext context) {
-    SocketWorker worker = context.getVariable(WORK);
-    worker.onComplete(responseValue);
+    context.<SocketWorker>getVariable(WORK)
+        .ifPresent(worker -> worker.onComplete(responseValue));
   }
 
 
   @OnError
   public void onError(Error error, SourceCallbackContext context) {
-    SocketWorker worker = context.getVariable("work");
-    worker.onError(error.getCause());
+    context.<SocketWorker>getVariable(WORK)
+        .ifPresent(woker -> woker.onError(error.getCause()));
   }
 
   /**

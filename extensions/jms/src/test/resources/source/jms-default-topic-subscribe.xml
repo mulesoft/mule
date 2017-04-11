@@ -6,7 +6,7 @@
       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
     <flow name="default-topic-subscriber">
-        <jms:listener config-ref="config" destination="topicSubscriberDestinationToOnIncomingConnection">
+        <jms:listener config-ref="config" destination="topicSubscriberDestinationToOnIncomingConnection" numberOfConsumers="1">
             <jms:consumer-type>
                 <jms:topic-consumer/>
             </jms:consumer-type>

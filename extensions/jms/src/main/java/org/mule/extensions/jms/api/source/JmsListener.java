@@ -10,11 +10,9 @@ import static java.lang.String.format;
 import static org.mule.extensions.jms.api.config.AckMode.AUTO;
 import static org.mule.extensions.jms.api.config.AckMode.DUPS_OK;
 import static org.mule.extensions.jms.api.config.AckMode.MANUAL;
+import static org.mule.extensions.jms.api.connection.JmsSpecification.JMS_2_0;
 import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_CONTENT_TYPE;
 import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_ENCODING;
-import static org.mule.extensions.jms.internal.common.JmsCommons.evaluateMessageAck;
-import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageContentType;
-import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageEncoding;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveOverride;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.JmsSessionManager;
@@ -24,17 +22,18 @@ import org.mule.extensions.jms.api.config.JmsConsumerConfig;
 import org.mule.extensions.jms.api.connection.JmsConnection;
 import org.mule.extensions.jms.api.connection.JmsSession;
 import org.mule.extensions.jms.api.destination.ConsumerType;
+import org.mule.extensions.jms.api.destination.TopicConsumer;
 import org.mule.extensions.jms.api.exception.JmsExtensionException;
 import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.api.message.MessageBuilder;
+import org.mule.extensions.jms.api.publish.JmsPublishParameters;
 import org.mule.extensions.jms.internal.consume.JmsMessageConsumer;
-import org.mule.extensions.jms.internal.message.JmsResultFactory;
 import org.mule.extensions.jms.internal.metadata.JmsOutputResolver;
-import org.mule.extensions.jms.internal.publish.JmsPublishParameters;
 import org.mule.extensions.jms.internal.support.Jms102bSupport;
 import org.mule.extensions.jms.internal.support.JmsSupport;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
@@ -48,11 +47,14 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+
 import org.slf4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.jms.Destination;
@@ -70,12 +72,14 @@ import javax.jms.Topic;
 @Alias("listener")
 @EmitsResponse
 @MetadataScope(outputResolver = JmsOutputResolver.class)
-//TODO - MULE-11964 : Review JMS Listener's consumers usage implementation
 public class JmsListener extends Source<Object, JmsAttributes> {
 
   private static final Logger LOGGER = getLogger(JmsListener.class);
-  private static final String REPLY_TO_DESTINATION = "REPLY_TO_DESTINATION";
-  private final JmsResultFactory resultFactory = new JmsResultFactory();
+  private static final String TOPIC = "TOPIC";
+  private static final String QUEUE = "QUEUE";
+  static final String REPLY_TO_DESTINATION_VAR = "REPLY_TO_DESTINATION";
+  static final String JMS_LOCK_VAR = "JMS_LOCK";
+  static final String JMS_SESSION_VAR = "JMS_SESSION";
 
   @Inject
   private JmsSessionManager sessionManager;
@@ -86,9 +90,12 @@ public class JmsListener extends Source<Object, JmsAttributes> {
   @Connection
   private JmsConnection connection;
 
-  private JmsSession session;
-
   private JmsSupport jmsSupport;
+
+  /**
+   * List to save all the created {@link JmsSession} and {@link JmsListenerLock} by this listener.
+   */
+  private final List<Pair<JmsSession, JmsListenerLock>> sessions = new ArrayList<>();
 
   /**
    * The name of the Destination from where the Message should be consumed
@@ -142,45 +149,50 @@ public class JmsListener extends Source<Object, JmsAttributes> {
   @Optional(defaultValue = "true")
   private boolean synchronous;
 
-  private JmsListenerLock jmsLock;
+  /**
+   * The number of concurrent consumers that will be used to receive JMS Messages
+   */
+  @Parameter
+  @Optional(defaultValue = "4")
+  private int numberOfConsumers;
+
 
   @Override
   public void onStart(SourceCallback<Object, JmsAttributes> sourceCallback) throws MuleException {
-    jmsLock = synchronous ? new DefaultJmsListenerLock() : new NullJmsListenerLock();
 
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Starting message listener");
+      LOGGER.debug("Starting JMS Message Listener");
     }
 
     JmsConsumerConfig consumerConfig = config.getConsumerConfig();
     ackMode = resolveOverride(consumerConfig.getAckMode(), ackMode);
     selector = resolveOverride(consumerConfig.getSelector(), selector);
     consumerType = resolveOverride(config.getConsumerConfig().getConsumerType(), consumerType);
+    jmsSupport = connection.getJmsSupport();
+
+    JmsMessageListenerFactory messageListenerFactory =
+        new JmsMessageListenerFactory(ackMode, encoding, contentType, config, sessionManager, jmsSupport, sourceCallback);
+
+    validateNumberOfConsumers(numberOfConsumers);
+
+    LOGGER.debug("Starting JMS Listener with [" + numberOfConsumers + "] consumers");
 
     try {
-      session = connection.createSession(ackMode, consumerType.isTopic());
-      jmsSupport = connection.getJmsSupport();
-      final Destination jmsDestination = jmsSupport.createDestination(session.get(), destination, consumerType.isTopic());
-      final JmsMessageConsumer consumer = connection.createConsumer(session.get(), jmsDestination, selector, consumerType);
+      for (int i = 0; i < numberOfConsumers; i++) {
+        JmsSession session = connection.createSession(ackMode, consumerType.isTopic());
 
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(format("Starting Message listener on destination [%s] of type [%s]",
-                            destination, consumerType.isTopic() ? "TOPIC" : "QUEUE"));
-      }
-      consumer.listen(message -> {
-        SourceCallbackContext context = sourceCallback.createContext();
+        final Destination jmsDestination = jmsSupport.createDestination(session.get(), destination, consumerType.isTopic());
+        final JmsMessageConsumer consumer = connection.createConsumer(session.get(), jmsDestination, selector, consumerType);
 
-        if (message != null) {
-          evaluateAckAction(sourceCallback, session, message, jmsLock);
-          encoding = resolveEncoding(message);
-          contentType = resolveContentType(message);
-          saveReplyToDestination(sourceCallback, message, context);
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(format("Starting Message listener on destination [%s] of type [%s]",
+                              destination, consumerType.isTopic() ? TOPIC : QUEUE));
         }
 
-        produceMessageResult(sourceCallback, jmsSupport, session, message, context);
-        waitForMessageToBeProcesed();
-      });
-
+        JmsListenerLock jmsLock = createJmsLock();
+        sessions.add(new Pair<>(session, jmsLock));
+        consumer.listen(messageListenerFactory.createMessageListener(session, jmsLock));
+      }
     } catch (Exception e) {
       LOGGER.error("An error occurred while consuming a message: ", e);
       sourceCallback.onSourceException(new JmsExtensionException(e, "An error occurred while consuming a message: "));
@@ -190,47 +202,58 @@ public class JmsListener extends Source<Object, JmsAttributes> {
   @Override
   public void onStop() {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Stopping JMSSubscriber source");
+      LOGGER.debug("Stopping JMS Message Listener");
     }
 
-    jmsLock.unlock();
-
-    try {
-      if (ackMode.equals(AUTO) || ackMode.equals(DUPS_OK) || ackMode.equals(MANUAL)) {
-        session.get().recover();
+    if (synchronous) {
+      sessions.stream()
+          .map(Pair::getSecond)
+          .forEach(JmsListenerLock::unlockWithFailure);
+    } else {
+      try {
+        if (ackMode.equals(AUTO) || ackMode.equals(DUPS_OK) || ackMode.equals(MANUAL)) {
+          for (Pair<JmsSession, JmsListenerLock> session : sessions) {
+            session.getFirst().get().recover();
+          }
+        }
+      } catch (JMSException e) {
+        throw new JmsExtensionException(e, "A problem occurred recovering the session before returning the session to the pool");
       }
-    } catch (JMSException e) {
-      throw new JmsExtensionException(e, "A problem occurred recovering the session before returning the session to the pool");
     }
   }
 
   @OnSuccess
   public void onSuccess(@Optional @NullSafe JmsListenerResponseBuilder response,
                         SourceCallbackContext callbackContext) {
-    jmsLock.unlock();
-    Destination replyTo = callbackContext.getVariable(REPLY_TO_DESTINATION);
-    if (replyTo != null) {
-      doReply(response.getMessageBuilder(), response.getOverrides(), callbackContext, replyTo);
-    }
+    callbackContext.<JmsListenerLock>getVariable(JMS_LOCK_VAR)
+        .ifPresent(JmsListenerLock::unlock);
+
+    callbackContext.<Destination>getVariable(REPLY_TO_DESTINATION_VAR)
+        .ifPresent(replyTo -> callbackContext.<JmsSession>getVariable(JMS_SESSION_VAR)
+            .ifPresent(session -> doReply(response.getMessageBuilder(), response.getOverrides(), callbackContext, replyTo,
+                                          session)));
   }
 
   @OnError
-  public void onError(Error error) {
-    if (ackMode.equals(AUTO) || ackMode.equals(DUPS_OK)) {
-      jmsLock.unlockWithFailure(error);
-    } else {
-      jmsLock.unlock();
-    }
+  public void onError(Error error, SourceCallbackContext callbackContext) {
+    callbackContext.<JmsListenerLock>getVariable(JMS_LOCK_VAR)
+        .ifPresent(jmsLock -> {
+          if (ackMode.equals(AUTO) || ackMode.equals(DUPS_OK)) {
+            jmsLock.unlockWithFailure(error);
+          } else {
+            jmsLock.unlock();
+          }
+        });
   }
 
   private void doReply(MessageBuilder messageBuilder, JmsPublishParameters overrides,
-                       SourceCallbackContext callbackContext, Destination replyTo) {
+                       SourceCallbackContext callbackContext, Destination replyTo, JmsSession session) {
     try {
       boolean replyToTopic = replyDestinationIsTopic(replyTo);
       String destinationName = replyToTopic ? ((Topic) replyTo).getTopicName() : ((Queue) replyTo).getQueueName();
 
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(format("Begin reply to destination [%s] of type [%s]", destinationName, replyToTopic ? "TOPIC" : "QUEUE"));
+        LOGGER.debug(format("Begin reply to destination [%s] of type [%s]", destinationName, replyToTopic ? TOPIC : QUEUE));
       }
 
       Message message = messageBuilder.build(connection.getJmsSupport(), session.get(), config);
@@ -246,59 +269,6 @@ public class JmsListener extends Source<Object, JmsAttributes> {
     } catch (Exception e) {
       LOGGER.error("An error occurred during reply: ", e);
       callbackContext.getSourceCallback().onSourceException(e);
-    }
-  }
-
-  private void produceMessageResult(SourceCallback<Object, JmsAttributes> sourceCallback, JmsSupport jmsSupport,
-                                    JmsSession session, Message message, SourceCallbackContext context) {
-    try {
-
-      Result<Object, JmsAttributes> result = resultFactory.createResult(message, jmsSupport.getSpecification(), contentType,
-                                                                        encoding,
-                                                                        session.getAckId());
-      sourceCallback.handle(result, context);
-
-    } catch (Exception e) {
-      LOGGER.error("An error occurred while creating the initial message", e);
-      sourceCallback.onSourceException(e);
-    }
-  }
-
-  private void evaluateAckAction(SourceCallback<Object, JmsAttributes> sourceCallback, JmsSession session, Message message,
-                                 JmsListenerLock jmsLock) {
-    try {
-      evaluateMessageAck(ackMode, session, message, sessionManager, jmsLock);
-    } catch (JMSException e) {
-      LOGGER.error("An error occurred while processing an incoming message: ", e);
-      sourceCallback.onSourceException(e);
-    }
-  }
-
-  private String resolveContentType(Message message) {
-    // If no explicit content type was provided to the operation, fallback to the
-    // one communicated in the message properties. Finally if no property was set,
-    // use the default one provided by the config
-    return resolveOverride(resolveMessageContentType(message, config.getContentType()), contentType);
-  }
-
-  private String resolveEncoding(Message message) {
-    // If no explicit content type was provided to the operation, fallback to the
-    // one communicated in the message properties. Finally if no property was set,
-    // use the default one provided by the config
-    return resolveOverride(resolveMessageEncoding(message, config.getEncoding()), encoding);
-  }
-
-  private void saveReplyToDestination(SourceCallback<Object, JmsAttributes> sourceCallback, Message message,
-                                      SourceCallbackContext context) {
-    try {
-      Destination replyTo = message.getJMSReplyTo();
-      if (replyTo != null) {
-        context.addVariable(REPLY_TO_DESTINATION, replyTo);
-      }
-    } catch (JMSException e) {
-      LOGGER.error("An error occurred while obtaining the ReplyTo destination: ", e);
-      sourceCallback
-          .onSourceException(new JmsExtensionException(e, "An error occurred while obtaining the ReplyTo destination: "));
     }
   }
 
@@ -318,9 +288,27 @@ public class JmsListener extends Source<Object, JmsAttributes> {
     return destination instanceof Topic;
   }
 
-  private void waitForMessageToBeProcesed() {
-    if (synchronous) {
-      jmsLock.lock();
+  private JmsListenerLock createJmsLock() {
+    return synchronous ? new DefaultJmsListenerLock() : new NullJmsListenerLock();
+  }
+
+  private void validateNumberOfConsumers(int numberOfConsumers) {
+    if (numberOfConsumers < 1) {
+      throw new IllegalArgumentException("Invalid number of consumers: [" + numberOfConsumers
+          + "]. The number should be 1 or greater.");
     }
+
+    if (numberOfConsumers > 1 && consumerType.isTopic()) {
+      TopicConsumer topicConsumer = (TopicConsumer) consumerType;
+
+      if (!isCapableOfMultiConsumersOnTopic(topicConsumer)) {
+        throw new IllegalArgumentException("Destination [" + destination + "] is a topic, but [" + numberOfConsumers
+            + "] receivers have been requested. This is only possible for 'shared' topic consumers, otherwise use 1.");
+      }
+    }
+  }
+
+  private boolean isCapableOfMultiConsumersOnTopic(TopicConsumer topicConsumer) {
+    return jmsSupport.getSpecification().equals(JMS_2_0) && topicConsumer.isShared();
   }
 }

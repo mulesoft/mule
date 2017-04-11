@@ -14,7 +14,10 @@ import static org.mule.extensions.jms.internal.common.JmsCommons.resolveOverride
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.api.config.JmsProducerConfig;
+import org.mule.extensions.jms.api.publish.JmsPublishParameters;
 import org.mule.extensions.jms.internal.support.JmsSupport;
+
+import org.slf4j.Logger;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -22,8 +25,6 @@ import java.util.concurrent.TimeUnit;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
-
-import org.slf4j.Logger;
 
 /**
  * Wrapper implementation of a JMS {@link MessageProducer}

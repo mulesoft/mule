@@ -18,7 +18,7 @@ import org.mule.extensions.jms.api.exception.JmsExtensionException;
 import org.mule.extensions.jms.api.exception.JmsPublishException;
 import org.mule.extensions.jms.api.exception.JmsPublisherErrorTypeProvider;
 import org.mule.extensions.jms.api.message.MessageBuilder;
-import org.mule.extensions.jms.internal.publish.JmsPublishParameters;
+import org.mule.extensions.jms.api.publish.JmsPublishParameters;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Connection;
