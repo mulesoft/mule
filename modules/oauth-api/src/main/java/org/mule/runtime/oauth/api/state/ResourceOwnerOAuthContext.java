@@ -6,103 +6,45 @@
  */
 package org.mule.runtime.oauth.api.state;
 
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
 
 /**
- * OAuth state for a particular resource owner which typically represents an user.
+ * OAuth state for a particular resource owner, which typically represents an user.
+ * 
+ * @since 4.0
  */
-public final class ResourceOwnerOAuthContext implements Serializable {
+public interface ResourceOwnerOAuthContext {
 
-  private static final long serialVersionUID = -4260965520423792113L;
-
-  public static final String DEFAULT_RESOURCE_OWNER_ID = "default";
-
-  private final String resourceOwnerId;
-  private transient Lock refreshUserOAuthContextLock;
-  private String accessToken;
-  private String refreshToken;
-  private String state;
-  private String expiresIn;
-  private Map<String, Object> tokenResponseParameters = new HashMap<String, Object>();
-
-  public ResourceOwnerOAuthContext(final Lock refreshUserOAuthContextLock, final String resourceOwnerId) {
-    this.refreshUserOAuthContextLock = refreshUserOAuthContextLock;
-    this.resourceOwnerId = resourceOwnerId;
-  }
+  String DEFAULT_RESOURCE_OWNER_ID = "default";
 
   /**
    * @return access token of the oauth context retrieved by the token request
    */
-  public String getAccessToken() {
-    return accessToken;
-  }
+  String getAccessToken();
 
   /**
    * @return refresh token of the oauth context retrieved by the token request
    */
-  public String getRefreshToken() {
-    return refreshToken;
-  }
+  String getRefreshToken();
 
   /**
    * @return state of the oauth context send in the authorization request
    */
-  public String getState() {
-    return state;
-  }
-
-  public void setAccessToken(final String accessToken) {
-    this.accessToken = accessToken;
-  }
-
-  public void setRefreshToken(final String refreshToken) {
-    this.refreshToken = refreshToken;
-  }
-
-  public void setExpiresIn(final String expiresIn) {
-    this.expiresIn = expiresIn;
-  }
+  String getState();
 
   /**
    * @return expires in value retrieved by the token request.
    */
-  public String getExpiresIn() {
-    return expiresIn;
-  }
-
-  public void setState(final String state) {
-    this.state = state;
-  }
+  String getExpiresIn();
 
   /**
    * @return custom token request response parameters configured for extraction.
    */
-  public Map<String, Object> getTokenResponseParameters() {
-    return tokenResponseParameters;
-  }
-
-  public void setTokenResponseParameters(final Map<String, Object> tokenResponseParameters) {
-    this.tokenResponseParameters = tokenResponseParameters;
-  }
-
-  /**
-   * @return a lock that can be used to avoid concurrency problems trying to update oauth context.
-   */
-  public Lock getRefreshUserOAuthContextLock() {
-    return refreshUserOAuthContextLock;
-  }
+  Map<String, Object> getTokenResponseParameters();
 
   /**
    * @return id for the oauth state.
    */
-  public String getResourceOwnerId() {
-    return resourceOwnerId;
-  }
+  String getResourceOwnerId();
 
-  public void setRefreshUserOAuthContextLock(Lock refreshUserOAuthContextLock) {
-    this.refreshUserOAuthContextLock = refreshUserOAuthContextLock;
-  }
 }

@@ -13,7 +13,7 @@ import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.services.oauth.internal.ClientCredentialsOAuthDancer;
@@ -27,7 +27,8 @@ public class DefaultOAuthClientCredentialsDancerBuilder extends AbstractOAuthDan
   private boolean encodeClientCredentialsInBody = false;
 
   public DefaultOAuthClientCredentialsDancerBuilder(LockFactory lockProvider,
-                                                    Map<String, ResourceOwnerOAuthContext> tokensStore, HttpService httpService,
+                                                    Map<String, DefaultResourceOwnerOAuthContext> tokensStore,
+                                                    HttpService httpService,
                                                     MuleExpressionLanguage expressionEvaluator) {
     super(lockProvider, tokensStore, httpService, expressionEvaluator);
   }

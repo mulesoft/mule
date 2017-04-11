@@ -8,11 +8,15 @@ package org.mule.runtime.oauth.api.builder;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
+import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
 import org.mule.runtime.oauth.api.OAuthDancer;
+import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.service.http.api.server.HttpServer;
 
 import java.net.URL;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 /**
  * Builder that allows to configure the attributes for the authorization code grant type.
@@ -115,4 +119,27 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<
    */
   OAuthAuthorizationCodeDancerBuilder externalCallbackUrl(String externalCallbackUrl);
 
+  /**
+   * Allows custom code to be run just before doing the request to the provided {@code tokenUrl}.
+   * <p>
+   * The map returned by the provided function will be passed to the {@link #afterDanceCallback(BiConsumer)}, if set.
+   * 
+   * @param callback a {@link Function} that receives the parameters that will be used in the executing dance and returns an
+   *        {@link AuthorizationCodeDanceCallbackContext} to be then passed to the {@link #afterDanceCallback(BiConsumer)}. Not
+   *        null.
+   * 
+   * @return this builder
+   */
+  OAuthAuthorizationCodeDancerBuilder beforeDanceCallback(Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> callback);
+
+  /**
+   * Allows custom code to be run after doing the request to the provided {@code tokenUrl} and processing its results.
+   * 
+   * @param callback a {@link BiConsumer} that receives the {@link AuthorizationCodeDanceCallbackContext} returned by the callback
+   *        passed to {@link #beforeDanceCallback(Function)} and the OAuth context from the response of the call to
+   *        {@code tokenUrl}. Not null.
+   * 
+   * @return this builder
+   */
+  OAuthAuthorizationCodeDancerBuilder afterDanceCallback(BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> callback);
 }

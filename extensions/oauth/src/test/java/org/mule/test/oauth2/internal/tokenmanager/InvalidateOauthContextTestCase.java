@@ -14,7 +14,7 @@ import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT
 
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.extension.oauth2.internal.tokenmanager.TokenManagerConfig;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 
 import org.junit.Test;
@@ -64,7 +64,7 @@ public class InvalidateOauthContextTestCase extends AbstractOAuthAuthorizationTe
   }
 
   private void loadResourceOwnerWithAccessToken(ConfigOAuthContext configOAuthContext, String resourceOwnerId) {
-    final ResourceOwnerOAuthContext resourceOwnerContext = configOAuthContext.getContextForResourceOwner(resourceOwnerId);
+    final DefaultResourceOwnerOAuthContext resourceOwnerContext = configOAuthContext.getContextForResourceOwner(resourceOwnerId);
     resourceOwnerContext.setAccessToken(ACCESS_TOKEN);
     configOAuthContext.updateResourceOwnerOAuthContext(resourceOwnerContext);
   }

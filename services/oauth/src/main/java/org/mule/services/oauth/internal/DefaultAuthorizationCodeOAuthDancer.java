@@ -50,8 +50,11 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
+import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
+import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
 import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
 import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
+import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.service.http.api.HttpConstants;
 import org.mule.service.http.api.HttpConstants.HttpStatus;
@@ -70,6 +73,7 @@ import org.mule.service.http.api.server.RequestHandlerManager;
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.service.http.api.server.async.ResponseStatusCallback;
 import org.mule.services.oauth.internal.authorizationcode.AuthorizationRequestUrlBuilder;
+import org.mule.services.oauth.internal.authorizationcode.DefaultAuthorizationCodeRequest;
 import org.mule.services.oauth.internal.state.StateDecoder;
 import org.mule.services.oauth.internal.state.StateEncoder;
 import org.mule.services.oauth.internal.state.TokenResponse;
@@ -79,6 +83,8 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -105,9 +111,11 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
   private final String authorizationUrl;
   private final Map<String, String> customParameters;
 
+  private final Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> beforeDanceCallback;
+  private final BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterDanceCallback;
+
   private RequestHandlerManager redirectUrlHandlerManager;
   private RequestHandlerManager localAuthorizationUrlHandlerManager;
-
 
   public DefaultAuthorizationCodeOAuthDancer(HttpServer httpServer, String clientId, String clientSecret,
                                              String tokenUrl, String scopes, String externalCallbackUrl, Charset encoding,
@@ -116,8 +124,10 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
                                              String responseAccessTokenExpr, String responseRefreshTokenExpr,
                                              String responseExpiresInExpr, Map<String, String> customParameters,
                                              Map<String, String> customParametersExtractorsExprs,
-                                             LockFactory lockProvider, Map<String, ResourceOwnerOAuthContext> tokensStore,
-                                             HttpClient httpClient, MuleExpressionLanguage expressionEvaluator) {
+                                             LockFactory lockProvider, Map<String, DefaultResourceOwnerOAuthContext> tokensStore,
+                                             HttpClient httpClient, MuleExpressionLanguage expressionEvaluator,
+                                             Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> beforeDanceCallback,
+                                             BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterDanceCallback) {
     super(clientId, clientSecret, tokenUrl, encoding, scopes, responseAccessTokenExpr, responseRefreshTokenExpr,
           responseExpiresInExpr, customParametersExtractorsExprs, lockProvider, tokensStore, httpClient, expressionEvaluator);
 
@@ -129,6 +139,9 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
     this.state = state;
     this.authorizationUrl = authorizationUrl;
     this.customParameters = customParameters;
+
+    this.beforeDanceCallback = beforeDanceCallback;
+    this.afterDanceCallback = afterDanceCallback;
   }
 
   @Override
@@ -186,6 +199,9 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
       final String state = queryParams.get(STATE_PARAMETER);
       final StateDecoder stateDecoder = new StateDecoder(state);
       final String authorizationCode = queryParams.get(CODE_PARAMETER);
+
+      String resourceOwnerId = stateDecoder.decodeResourceOwnerId();
+
       if (authorizationCode == null) {
         LOGGER.info("HTTP Request to redirect URL done by the OAuth provider does not contains a code query parameter. "
             + "Code query parameter is required to get the access token.");
@@ -196,6 +212,10 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
                      NO_AUTHORIZATION_CODE_STATUS);
         return;
       }
+
+      AuthorizationCodeDanceCallbackContext beforeCallbackContext = beforeDanceCallback
+          .apply(new DefaultAuthorizationCodeRequest(resourceOwnerId, authorizationUrl, tokenUrl, clientId, clientSecret, scopes,
+                                                     stateDecoder.decodeOriginalState()));
 
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Redirect url request state: " + state);
@@ -212,9 +232,8 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
       try {
         TokenResponse tokenResponse = invokeTokenUrl(tokenUrl, formData, null, true, encoding);
 
-        String encodedResourceOwnerId = stateDecoder.decodeResourceOwnerId();
-        final ResourceOwnerOAuthContext resourceOwnerOAuthContext =
-            getContextForResourceOwner(encodedResourceOwnerId == null ? DEFAULT_RESOURCE_OWNER_ID : encodedResourceOwnerId);
+        final DefaultResourceOwnerOAuthContext resourceOwnerOAuthContext =
+            getContextForResourceOwner(resourceOwnerId == null ? DEFAULT_RESOURCE_OWNER_ID : resourceOwnerId);
 
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Update OAuth Context for resourceOwnerId %s", resourceOwnerOAuthContext.getResourceOwnerId());
@@ -225,6 +244,8 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
 
         updateResourceOwnerState(resourceOwnerOAuthContext, stateDecoder.decodeOriginalState(), tokenResponse);
         updateResourceOwnerOAuthContext(resourceOwnerOAuthContext);
+
+        afterDanceCallback.accept(beforeCallbackContext, resourceOwnerOAuthContext);
 
         sendResponse(stateDecoder, responseCallback, OK, "Successfully retrieved access token",
                      AUTHORIZATION_CODE_RECEIVED_STATUS);
@@ -401,7 +422,7 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Executing refresh token for user " + resourceOwner);
     }
-    final ResourceOwnerOAuthContext resourceOwnerOAuthContext = getContextForResourceOwner(resourceOwner);
+    final DefaultResourceOwnerOAuthContext resourceOwnerOAuthContext = getContextForResourceOwner(resourceOwner);
     final boolean lockWasAcquired = resourceOwnerOAuthContext.getRefreshUserOAuthContextLock().tryLock();
     try {
       if (lockWasAcquired) {
@@ -444,7 +465,7 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
     return completedFuture(null);
   }
 
-  private void updateResourceOwnerState(ResourceOwnerOAuthContext resourceOwnerOAuthContext, String newState,
+  private void updateResourceOwnerState(DefaultResourceOwnerOAuthContext resourceOwnerOAuthContext, String newState,
                                         TokenResponse tokenResponse) {
     resourceOwnerOAuthContext.setAccessToken(tokenResponse.getAccessToken());
     if (tokenResponse.getRefreshToken() != null) {
