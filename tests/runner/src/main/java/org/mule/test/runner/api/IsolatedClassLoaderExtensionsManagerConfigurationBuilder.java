@@ -10,8 +10,8 @@ package org.mule.test.runner.api;
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.VERSION;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -19,11 +19,9 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,6 +29,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link org.mule.runtime.core.api.config.ConfigurationBuilder} that creates an
@@ -87,8 +88,9 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
         Map<String, Object> params = new HashMap<>();
         params.put(TYPE_PROPERTY_NAME, extensionManifest.getDescriberManifest().getProperties().get("type"));
         params.put(VERSION, extensionManifest.getVersion());
-        extensionManager
-            .registerExtension(new JavaExtensionModelLoader().loadExtensionModel(classLoader, getDefault(emptySet()), params));
+        // TODO: soap extensions
+        final DefaultJavaExtensionModelLoader loader = new DefaultJavaExtensionModelLoader();
+        extensionManager.registerExtension(loader.loadExtensionModel(classLoader, getDefault(emptySet()), params));
       } else {
         LOGGER.debug(
                      "Discarding plugin artifact class loader with artifactName '{}' due to it doesn't have an extension descriptor",

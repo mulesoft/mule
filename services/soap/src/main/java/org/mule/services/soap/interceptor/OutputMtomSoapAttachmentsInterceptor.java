@@ -6,17 +6,19 @@
  */
 package org.mule.services.soap.interceptor;
 
-import static java.util.Collections.emptyList;
 import static org.apache.cxf.interceptor.Fault.FAULT_CODE_SERVER;
 import static org.apache.cxf.phase.Phase.PRE_PROTOCOL;
 import static org.mule.services.soap.client.SoapCxfClient.MULE_ATTACHMENTS_KEY;
 import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.services.soap.api.message.SoapAttachment;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.extension.api.soap.SoapAttachment;
+import org.mule.services.soap.api.message.SoapRequest;
+import org.mule.services.soap.client.SoapCxfClient;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 import javax.activation.DataHandler;
 
@@ -29,8 +31,8 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
 /**
  * CXF out interceptor that collects the received Mtom SOAP attachments in the response, transforms it to message parts and stores
- * them in the response message {@link Exchange} so then can be returned by the {@link ConsumeOperation} as a
- * {@link MultiPartPayload}, if no attachments are returned an empty list is set.
+ * them in the response message {@link Exchange} so then can be returned by the {@link SoapCxfClient#consume(SoapRequest)} as a
+ * {@link MultiPartPayload}, if no attachments are returned an empty map is set.
  *
  * @since 4.0
  */
@@ -42,21 +44,26 @@ public class OutputMtomSoapAttachmentsInterceptor extends AbstractPhaseIntercept
 
   @Override
   public void handleMessage(Message message) throws Fault {
+    final ImmutableMap.Builder<String, SoapAttachment> result = ImmutableMap.builder();
     Collection<Attachment> attachments = message.getAttachments();
-    List attachmentParts = emptyList();
     if (attachments != null && !attachments.isEmpty()) {
-      attachmentParts = attachments.stream().map(this::createSoapAttachment).collect(new ImmutableListCollector<>());
+      attachments.forEach(a -> result.put(getName(a), getSoapAttachment(a)));
     }
-    message.getExchange().put(MULE_ATTACHMENTS_KEY, attachmentParts);
+    message.getExchange().put(MULE_ATTACHMENTS_KEY, result.build());
   }
 
-  private SoapAttachment createSoapAttachment(Attachment attachment) {
+  private String getName(Attachment attachment) {
     DataHandler dataHandler = attachment.getDataHandler();
-    String name = dataHandler.getName() != null ? dataHandler.getName() : attachment.getId();
+    return dataHandler.getName() != null ? dataHandler.getName() : attachment.getId();
+  }
+
+  private SoapAttachment getSoapAttachment(Attachment attachment) {
+    DataHandler dataHandler = attachment.getDataHandler();
     try {
-      return new SoapAttachment(name, dataHandler.getContentType(), dataHandler.getInputStream());
+      MediaType contentType = MediaType.parse(dataHandler.getContentType());
+      return new SoapAttachment(dataHandler.getInputStream(), contentType);
     } catch (IOException e) {
-      throw new SoapFault("Error copying received attachment [" + name + "]", e, FAULT_CODE_SERVER);
+      throw new SoapFault("Error copying received attachment [" + getName(attachment) + "]", e, FAULT_CODE_SERVER);
     }
   }
 }

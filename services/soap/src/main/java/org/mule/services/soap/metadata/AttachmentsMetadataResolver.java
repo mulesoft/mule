@@ -16,7 +16,7 @@ import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.services.soap.api.message.SoapAttachment;
+import org.mule.runtime.extension.api.soap.SoapAttachment;
 import org.mule.services.soap.introspection.WsdlIntrospecter;
 
 import java.util.List;

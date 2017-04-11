@@ -33,7 +33,7 @@
             <wsc:message>
                 <wsc:body>#[payload]</wsc:body>
                 <wsc:attachments>
-                    #[{ attachment: { content: attachmentContent, contentType: mediaType} as Object { class : "org.mule.extension.ws.api.WscSoapAttachment" } } ]
+                    #[{ attachment: { content: attachmentContent, contentType: mediaType} as Object { class :"org.mule.runtime.extension.api.soap.SoapAttachment" } } ]
                 </wsc:attachments>
             </wsc:message>
         </wsc:consume>

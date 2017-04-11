@@ -15,6 +15,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasSourceDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.extension.api.annotation.Streaming;
@@ -40,7 +41,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * Helper class for declaring sources through a {@link JavaModelLoaderDelegate}
+ * Helper class for declaring sources through a {@link DefaultJavaModelLoaderDelegate}
  * @since 4.0
  */
 final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
@@ -49,7 +50,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private final Map<Class<?>, SourceDeclarer> sourceDeclarers = new HashMap<>();
 
-  SourceModelLoaderDelegate(JavaModelLoaderDelegate delegate) {
+  SourceModelLoaderDelegate(DefaultJavaModelLoaderDelegate delegate) {
     super(delegate);
   }
 
@@ -130,9 +131,10 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
    * Declares the parameters needed to generate messages
    */
   private void declareSourceParameters(SourceElement sourceType, SourceDeclarer source) {
-    loader.declareFieldBasedParameters(source, sourceType.getParameters(),
-                                       new ParameterDeclarationContext(SOURCE, source.getDeclaration()))
-        .forEach(p -> p.withExpressionSupport(NOT_SUPPORTED));
+    ParameterModelsLoaderDelegate parametersLoader = loader.getFieldParametersLoader();
+    ParameterDeclarationContext declarationContext = new ParameterDeclarationContext(SOURCE, source.getDeclaration());
+    List<ParameterDeclarer> parameters = parametersLoader.declare(source, sourceType.getParameters(), declarationContext);
+    parameters.forEach(p -> p.withExpressionSupport(NOT_SUPPORTED));
   }
 
   private void declareSourceCallback(SourceElement sourceType, SourceDeclarer source) {
@@ -149,12 +151,10 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private void declareSourceCallbackParameters(SourceDeclarer source, Optional<MethodElement> sourceCallback,
                                                Supplier<ParameterizedDeclarer> callback) {
-    sourceCallback.ifPresent(method -> loader.declareMethodBasedParameters(
-                                                                           callback.get(),
-                                                                           method.getParameters(),
-                                                                           new ParameterDeclarationContext(SOURCE,
-                                                                                                           source
-                                                                                                               .getDeclaration())));
+    sourceCallback.ifPresent(method -> {
+      ParameterDeclarationContext declarationContext = new ParameterDeclarationContext(SOURCE, source.getDeclaration());
+      loader.getMethodParametersLoader().declare(callback.get(), method.getParameters(), declarationContext);
+    });
   }
 
   private Optional<Method> getMethod(Optional<MethodElement> method) {

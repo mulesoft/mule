@@ -9,7 +9,7 @@ package org.mule.services.soap.generator.attachment;
 import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.codec.Base64Encoder;
-import org.mule.services.soap.api.message.SoapAttachment;
+import org.mule.runtime.extension.api.soap.SoapAttachment;
 import org.mule.services.soap.api.exception.EncodingException;
 import org.mule.services.soap.introspection.WsdlIntrospecter;
 
@@ -35,9 +35,9 @@ public final class SoapAttachmentRequestEnricher extends AttachmentRequestEnrich
    * Adds the attachment content encoded to Base64 plain in the XML Request in the generated attachment node.
    */
   @Override
-  protected void addAttachmentElement(Document bodyDocument, SoapAttachment soapAttachment, Element attachmentElement) {
+  protected void addAttachmentElement(Document bodyDocument, String name, SoapAttachment attachment, Element attachmentElement) {
     // Encode the attachment to base64 to be sent as SOAP with Attachments.
-    attachmentElement.setTextContent(toBase64(soapAttachment.getContent()));
+    attachmentElement.setTextContent(toBase64(attachment.getContent()));
   }
 
   /**

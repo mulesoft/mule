@@ -9,8 +9,8 @@ package org.mule.services.soap.client;
 import static java.lang.String.format;
 import org.mule.metadata.xml.XmlTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.service.http.api.HttpService;
-import org.mule.services.soap.api.client.MessageDispatcher;
 import org.mule.services.soap.api.client.SoapClient;
 import org.mule.services.soap.api.client.SoapClientConfiguration;
 import org.mule.services.soap.api.client.SoapClientFactory;
@@ -42,14 +42,20 @@ public class SoapCxfClientFactory implements SoapClientFactory {
     WsdlIntrospecter introspecter = getIntrospecter(config);
     XmlTypeLoader xmlTypeLoader = new XmlTypeLoader(introspecter.getSchemas());
     Client client = CxfClientProvider.getClient(config);
-    MessageDispatcher dispatcher =
-        createDispatcher(config.getAddress() != null ? config.getAddress() : findAddress(introspecter));
     return new SoapCxfClient(client,
                              introspecter,
                              xmlTypeLoader,
-                             dispatcher,
+                             getMessageDispatcher(config, introspecter),
                              config.getVersion(),
                              config.isMtomEnabled());
+  }
+
+  private MessageDispatcher getMessageDispatcher(SoapClientConfiguration config, WsdlIntrospecter introspecter)
+      throws ConnectionException {
+    if (config.getDispatcher() != null) {
+      return config.getDispatcher();
+    }
+    return createDispatcher(config.getAddress() != null ? config.getAddress() : findAddress(introspecter));
   }
 
   private WsdlIntrospecter getIntrospecter(SoapClientConfiguration config) throws ConnectionException {

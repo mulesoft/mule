@@ -9,7 +9,7 @@ package org.mule.services.soap.security.config;
 import static org.apache.ws.security.components.crypto.Merlin.TRUSTSTORE_FILE;
 import static org.apache.ws.security.components.crypto.Merlin.TRUSTSTORE_PASSWORD;
 import static org.apache.ws.security.components.crypto.Merlin.TRUSTSTORE_TYPE;
-import org.mule.services.soap.api.security.config.WssTrustStoreConfiguration;
+import org.mule.runtime.extension.api.soap.security.config.WssTrustStoreConfiguration;
 
 import java.util.Properties;
 

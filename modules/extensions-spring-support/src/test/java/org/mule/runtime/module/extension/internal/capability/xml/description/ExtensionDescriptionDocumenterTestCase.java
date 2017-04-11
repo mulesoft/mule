@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.capability.xml.description;
 
 import static com.google.common.truth.Truth.assert_;
 import static com.google.testing.compile.JavaSourcesSubjectFactory.javaSources;
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptySet;
 import static javax.lang.model.SourceVersion.RELEASE_8;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,7 +19,6 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
-import org.junit.Test;
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -34,9 +34,13 @@ import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.module.extension.internal.AbstractAnnotationProcessorTestCase;
 import org.mule.runtime.module.extension.internal.capability.xml.TestExtensionWithDocumentation;
 import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescriptionsEnricher;
-import org.mule.runtime.module.extension.internal.loader.java.JavaModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
 import org.mule.tck.size.SmallTest;
+
+import java.io.InputStream;
+import java.util.List;
+import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -45,9 +49,8 @@ import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Set;
+
+import org.junit.Test;
 
 @SmallTest
 public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationProcessorTestCase {
@@ -67,9 +70,9 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
 
   @Test
   public void loadDocumentationFromFile() throws Exception {
-    ExtensionLoadingContext ctx =
-        new DefaultExtensionLoadingContext(Thread.currentThread().getContextClassLoader(), getDefault(emptySet()));
-    JavaModelLoaderDelegate loader = new JavaModelLoaderDelegate(TestExtensionWithDocumentation.class, "1.0.0-dev");
+    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(currentThread().getContextClassLoader(),
+                                                                     getDefault(emptySet()));
+    DefaultJavaModelLoaderDelegate loader = new DefaultJavaModelLoaderDelegate(TestExtensionWithDocumentation.class, "1.0.0-dev");
     loader.declare(ctx);
     ExtensionDescriptionsEnricher enricher = new ExtensionDescriptionsEnricher();
     enricher.enrich(ctx);
@@ -145,8 +148,9 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
         assertThat(extensionElements, hasSize(1));
         Element extension = extensionElements.iterator().next();
         assertThat(extension, instanceOf(TypeElement.class));
-        ctx = new DefaultExtensionLoadingContext(Thread.currentThread().getContextClassLoader(), getDefault(emptySet()));
-        JavaModelLoaderDelegate loader = new JavaModelLoaderDelegate(TestExtensionWithDocumentation.class, "1.0.0-dev");
+        ctx = new DefaultExtensionLoadingContext(currentThread().getContextClassLoader(), getDefault(emptySet()));
+        DefaultJavaModelLoaderDelegate loader = new DefaultJavaModelLoaderDelegate(TestExtensionWithDocumentation.class,
+                                                                                   "1.0.0-dev");
         declaration = loader.declare(ctx).getDeclaration();
         declarer.document(declaration, (TypeElement) extension);
       }

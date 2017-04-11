@@ -9,7 +9,7 @@ package org.mule.services.soap.security;
 import static org.apache.ws.security.handler.WSHandlerConstants.ENCRYPT;
 import static org.apache.ws.security.handler.WSHandlerConstants.ENCRYPTION_USER;
 import static org.apache.ws.security.handler.WSHandlerConstants.ENC_PROP_REF_ID;
-import org.mule.services.soap.api.security.config.WssKeyStoreConfiguration;
+import org.mule.runtime.extension.api.soap.security.config.WssKeyStoreConfiguration;
 import org.mule.services.soap.security.callback.WSPasswordCallbackHandler;
 import org.mule.services.soap.security.config.WssKeyStoreConfigurationPropertiesBuilder;
 

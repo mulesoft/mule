@@ -6,15 +6,21 @@
  */
 package org.mule.services.soap.message;
 
-import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
+import static org.mule.runtime.api.message.Message.builder;
+import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.services.soap.api.message.SoapAttachment;
-import org.mule.services.soap.api.message.SoapHeader;
+import org.mule.runtime.core.message.PartAttributes;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.soap.SoapAttachment;
+import org.mule.services.soap.api.message.SoapAttributes;
+import org.mule.services.soap.api.message.SoapMultipartPayload;
 import org.mule.services.soap.api.message.SoapResponse;
 
+import com.google.common.collect.ImmutableList;
+
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,20 +31,20 @@ import java.util.Map;
 public final class ImmutableSoapResponse implements SoapResponse {
 
   private final InputStream content;
-  private final List<SoapHeader> soapHeaders;
+  private final Map<String, String> soapHeaders;
   private final Map<String, String> transportHeaders;
-  private final List<SoapAttachment> attachments;
+  private final Map<String, SoapAttachment> attachments;
   private final MediaType contentType;
 
   public ImmutableSoapResponse(InputStream content,
-                               List<SoapHeader> soapHeaders,
+                               Map<String, String> soapHeaders,
                                Map<String, String> transportHeaders,
-                               List<SoapAttachment> attachments,
+                               Map<String, SoapAttachment> attachments,
                                MediaType contentType) {
     this.content = content;
-    this.soapHeaders = unmodifiableList(soapHeaders);
+    this.soapHeaders = unmodifiableMap(soapHeaders);
     this.transportHeaders = unmodifiableMap(transportHeaders);
-    this.attachments = unmodifiableList(attachments);
+    this.attachments = unmodifiableMap(attachments);
     this.contentType = contentType;
   }
 
@@ -49,7 +55,7 @@ public final class ImmutableSoapResponse implements SoapResponse {
   }
 
   @Override
-  public List<SoapHeader> getSoapHeaders() {
+  public Map<String, String> getSoapHeaders() {
     return soapHeaders;
   }
 
@@ -59,12 +65,32 @@ public final class ImmutableSoapResponse implements SoapResponse {
   }
 
   @Override
-  public List<SoapAttachment> getAttachments() {
+  public Map<String, SoapAttachment> getAttachments() {
     return attachments;
   }
 
   @Override
   public MediaType getContentType() {
     return contentType;
+  }
+
+  @Override
+  public Result<?, SoapAttributes> getAsResult() {
+    SoapAttributes attributes = new SoapAttributes(soapHeaders, transportHeaders);
+    if (attachments.isEmpty()) {
+      return Result.<InputStream, SoapAttributes>builder().output(content).attributes(attributes).mediaType(contentType).build();
+    } else {
+      ImmutableList.Builder<Message> parts = ImmutableList.builder();
+      parts.add(builder().payload(content).mediaType(contentType).attributes(BODY_ATTRIBUTES).build());
+      attachments.forEach((name, attachment) -> parts.add(builder()
+          .payload(attachment.getContent())
+          .mediaType(attachment.getContentType())
+          .attributes(new PartAttributes(name))
+          .build()));
+      return Result.<SoapMultipartPayload, SoapAttributes>builder()
+          .output(new SoapMultipartPayload(parts.build()))
+          .attributes(attributes)
+          .build();
+    }
   }
 }

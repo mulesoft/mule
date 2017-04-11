@@ -17,8 +17,11 @@ import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
+import org.mule.runtime.module.extension.soap.internal.runtime.connection.SoapConnectionProviderObjectBuilder;
 
 import javax.inject.Inject;
 
@@ -49,12 +52,23 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
 
   @Override
   public ConnectionProviderResolver doGetObject() throws Exception {
-    resolverSet = parametersResolver.getParametersAsResolverSet(providerModel, muleContext);
-    return new ConnectionProviderResolver(new ConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
-                                                                              disableValidation, retryPolicyTemplate,
-                                                                              getConnectionManager(), extensionModel,
-                                                                              muleContext),
-                                          resolverSet, muleContext);
+    ResolverSet resolverSet = parametersResolver.getParametersAsResolverSet(providerModel, muleContext);
+
+    ConnectionManagerAdapter connectionManager = getConnectionManager();
+    ConnectionProviderObjectBuilder builder;
+    if (extensionModel.getModelProperty(SoapExtensionModelProperty.class).isPresent()) {
+      builder = new SoapConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
+                                                        disableValidation, retryPolicyTemplate,
+                                                        connectionManager, extensionModel,
+                                                        muleContext);
+    } else {
+      builder = new DefaultConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
+                                                           disableValidation, retryPolicyTemplate,
+                                                           connectionManager, extensionModel,
+                                                           muleContext);
+    }
+
+    return new ConnectionProviderResolver<>(builder, resolverSet, muleContext);
   }
 
   private ConnectionManagerAdapter getConnectionManager() throws ConfigurationException {

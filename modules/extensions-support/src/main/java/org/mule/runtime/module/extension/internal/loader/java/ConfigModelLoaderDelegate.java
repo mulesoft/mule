@@ -24,14 +24,15 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Helper class for declaring configurations through a {@link JavaModelLoaderDelegate}
+ * Helper class for declaring configurations through a {@link DefaultJavaModelLoaderDelegate}
+ *
  * @since 4.0
  */
 final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private static final String CONFIGURATION = "Configuration";
 
-  ConfigModelLoaderDelegate(JavaModelLoaderDelegate delegate) {
+  ConfigModelLoaderDelegate(DefaultJavaModelLoaderDelegate delegate) {
     super(delegate);
   }
 
@@ -46,12 +47,11 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
     }
   }
 
-  private void declareConfiguration(ExtensionDeclarer declarer, ExtensionElement extensionType,
-                                    ComponentElement configurationType) {
-    checkConfigurationIsNotAnOperation(configurationType.getDeclaringClass());
+  private void declareConfiguration(ExtensionDeclarer declarer, ExtensionElement extensionType, ComponentElement configType) {
+    checkConfigurationIsNotAnOperation(configType.getDeclaringClass());
     ConfigurationDeclarer configurationDeclarer;
 
-    Optional<Configuration> configurationAnnotation = configurationType.getAnnotation(Configuration.class);
+    Optional<Configuration> configurationAnnotation = configType.getAnnotation(Configuration.class);
     if (configurationAnnotation.isPresent()) {
       final Configuration configuration = configurationAnnotation.get();
       configurationDeclarer = declarer.withConfig(configuration.name()).describedAs(configuration.description());
@@ -60,21 +60,19 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
           declarer.withConfig(DEFAULT_CONFIG_NAME).describedAs(DEFAULT_CONFIG_DESCRIPTION);
     }
 
-    configurationDeclarer.withModelProperty(
-                                            new ConfigurationFactoryModelProperty(new TypeAwareConfigurationFactory(configurationType
-                                                .getDeclaringClass(),
-                                                                                                                    extensionType
-                                                                                                                        .getDeclaringClass()
-                                                                                                                        .getClassLoader())))
-        .withModelProperty(new ImplementingTypeModelProperty(configurationType.getDeclaringClass()));
+    TypeAwareConfigurationFactory typeAwareConfigurationFactory =
+        new TypeAwareConfigurationFactory(configType.getDeclaringClass(), extensionType.getDeclaringClass().getClassLoader());
+    configurationDeclarer
+        .withModelProperty(new ConfigurationFactoryModelProperty(typeAwareConfigurationFactory))
+        .withModelProperty(new ImplementingTypeModelProperty(configType.getDeclaringClass()));
 
-    loader.parseExternalLibs(configurationType, configurationDeclarer);
-    loader.declareFieldBasedParameters(configurationDeclarer, configurationType.getParameters(),
-                                       new ParameterDeclarationContext(CONFIGURATION, configurationDeclarer.getDeclaration()));
+    loader.parseExternalLibs(configType, configurationDeclarer);
+    ParameterDeclarationContext context = new ParameterDeclarationContext(CONFIGURATION, configurationDeclarer.getDeclaration());
+    loader.getFieldParametersLoader().declare(configurationDeclarer, configType.getParameters(), context);
 
-    getOperationLoaderDelegate().declareOperations(declarer, configurationDeclarer, configurationType);
-    getSourceModelLoaderDelegate().declareMessageSources(declarer, configurationDeclarer, configurationType);
-    getConnectionProviderModelLoaderDelegate().declareConnectionProviders(configurationDeclarer, configurationType);
+    getOperationLoaderDelegate().declareOperations(declarer, configurationDeclarer, configType);
+    getSourceModelLoaderDelegate().declareMessageSources(declarer, configurationDeclarer, configType);
+    getConnectionProviderModelLoaderDelegate().declareConnectionProviders(configurationDeclarer, configType);
   }
 
   private void checkConfigurationIsNotAnOperation(Class<?> configurationType) {

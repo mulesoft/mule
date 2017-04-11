@@ -9,6 +9,7 @@ package org.mule.services.soap;
 import static java.util.Collections.emptyList;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.extension.api.soap.security.SecurityStrategy;
 import org.mule.services.http.impl.service.HttpServiceImplementation;
 import org.mule.services.soap.api.SoapVersion;
 import org.mule.services.soap.api.client.SoapClient;
@@ -17,7 +18,6 @@ import org.mule.services.soap.api.client.SoapClientConfigurationBuilder;
 import org.mule.services.soap.api.client.metadata.SoapMetadataResolver;
 import org.mule.services.soap.api.message.SoapRequest;
 import org.mule.services.soap.api.message.SoapResponse;
-import org.mule.services.soap.api.security.SecurityStrategy;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 import java.util.List;

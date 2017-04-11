@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.services.soap.api.message.SoapAttachment;
+import org.mule.runtime.extension.api.soap.SoapAttachment;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -109,7 +109,6 @@ public class SoapTestUtils {
   @Step("Prepares a test attachment")
   public static SoapAttachment getTestAttachment() {
     SoapAttachment attachment = mock(SoapAttachment.class);
-    when(attachment.getId()).thenReturn("attachment-id");
     when(attachment.getContent()).thenReturn(IOUtils.toInputStream("Some Content"));
     when(attachment.getContentType()).thenReturn(MediaType.TEXT);
     return attachment;

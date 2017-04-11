@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.cxf.binding.soap.SoapHeader;
@@ -55,8 +56,9 @@ final class SoapServiceConduit extends AbstractConduit {
   }
 
   private void addAttachments(Message message) {
-    List<Attachment> soapAttachments = (List<Attachment>) message.getExchange().get(SoapCxfClient.MULE_ATTACHMENTS_KEY);
-    message.setAttachments(soapAttachments);
+    Map<String, Attachment> soapAttachments =
+        (Map<String, Attachment>) message.getExchange().get(SoapCxfClient.MULE_ATTACHMENTS_KEY);
+    message.setAttachments(soapAttachments.values());
   }
 
   private void addHeaders(Message message) {

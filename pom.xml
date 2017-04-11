@@ -192,6 +192,7 @@
         <muleDslApiVersion>1.0.0-SNAPSHOT</muleDslApiVersion>
         <muleEmbeddedApiVersion>1.0.0-SNAPSHOT</muleEmbeddedApiVersion>
         <muleExtensionsApiVersion>1.0.0-SNAPSHOT</muleExtensionsApiVersion>
+        <muleExtensionsSoapApiVersion>1.0.0-SNAPSHOT</muleExtensionsSoapApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <muleApiVersion>1.0.0-SNAPSHOT</muleApiVersion>
         <muleMetadataModelVersion>1.0.0-SNAPSHOT</muleMetadataModelVersion>
@@ -1258,6 +1259,11 @@
                 <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-extensions-api</artifactId>
                 <version>${muleExtensionsApiVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-extensions-soap-api</artifactId>
+                <version>${muleExtensionsSoapApiVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mule.runtime</groupId>

@@ -18,9 +18,10 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.extension.ws.AbstractSoapServiceTestCase;
-import org.mule.extension.ws.api.WscAttributes;
 import org.mule.runtime.api.message.Message;
-import org.mule.services.soap.api.message.SoapHeader;
+import org.mule.services.soap.api.message.SoapAttributes;
+
+import java.util.Map;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
@@ -57,12 +58,18 @@ public class EchoTestCase extends AbstractSoapServiceTestCase {
     String out = (String) message.getPayload().getValue();
     assertSoapResponse(ECHO_HEADERS, out);
 
-    WscAttributes attributes = (WscAttributes) message.getAttributes();
-    assertThat(attributes.getSoapHeaders(), hasSize(2));
-    assertSoapResponse(HEADER_INOUT, attributes.getSoapHeaders().stream().filter(h -> h.getId().equals(HEADER_INOUT))
-        .map(SoapHeader::getValue).findFirst().get());
-    assertSoapResponse(HEADER_OUT, attributes.getSoapHeaders().stream().filter(h -> h.getId().equals(HEADER_OUT))
-        .map(SoapHeader::getValue).findFirst().get());
+    SoapAttributes attributes = (SoapAttributes) message.getAttributes();
+    assertThat(attributes.getSoapHeaders().entrySet(), hasSize(2));
+
+    String inoutHeader = attributes.getSoapHeaders().entrySet().stream()
+        .filter(h -> h.getKey().equals(HEADER_INOUT))
+        .map(Map.Entry::getValue).findFirst().get();
+    assertSoapResponse(HEADER_INOUT, inoutHeader);
+
+    String outHeader = attributes.getSoapHeaders().entrySet().stream()
+        .filter(h -> h.getKey().equals(HEADER_OUT))
+        .map(Map.Entry::getValue).findFirst().get();
+    assertSoapResponse(HEADER_OUT, outHeader);
   }
 
   @Test
@@ -71,7 +78,7 @@ public class EchoTestCase extends AbstractSoapServiceTestCase {
     Message message = runFlowWithRequest(ECHO_ACCOUNT_FLOW, ECHO_ACCOUNT);
     String out = (String) message.getPayload().getValue();
     assertSoapResponse(ECHO_ACCOUNT, out);
-    WscAttributes attributes = (WscAttributes) message.getAttributes();
+    SoapAttributes attributes = (SoapAttributes) message.getAttributes();
     assertThat(attributes.getSoapHeaders().isEmpty(), is(true));
   }
 }

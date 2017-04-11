@@ -7,15 +7,14 @@
 package org.mule.services.soap.generator.attachment;
 
 import static org.mule.services.soap.impl.xml.util.XMLUtils.toXml;
-
 import org.mule.metadata.api.TypeLoader;
-import org.mule.services.soap.api.message.SoapAttachment;
+import org.mule.runtime.extension.api.soap.SoapAttachment;
 import org.mule.services.soap.api.exception.SoapServiceException;
 import org.mule.services.soap.introspection.WsdlIntrospecter;
 import org.mule.services.soap.util.XmlTransformationException;
 import org.mule.services.soap.util.XmlTransformationUtils;
 
-import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -31,7 +30,7 @@ public abstract class AttachmentRequestEnricher {
   protected WsdlIntrospecter introspecter;
   protected TypeLoader loader;
 
-  protected AttachmentRequestEnricher(WsdlIntrospecter introspecter, TypeLoader loader) {
+  AttachmentRequestEnricher(WsdlIntrospecter introspecter, TypeLoader loader) {
     this.introspecter = introspecter;
     this.loader = loader;
   }
@@ -40,13 +39,13 @@ public abstract class AttachmentRequestEnricher {
    * @param body        the XML SOAP body provided by the user.
    * @param attachments the attachments to upload.
    */
-  public String enrichRequest(String body, List<SoapAttachment> attachments) {
+  public String enrichRequest(String body, Map<String, SoapAttachment> attachments) {
     try {
       Document bodyDocument = XmlTransformationUtils.stringToDocument(body);
       Element documentElement = bodyDocument.getDocumentElement();
-      attachments.forEach(a -> {
-        Element attachmentElement = bodyDocument.createElement(a.getId());
-        addAttachmentElement(bodyDocument, a, attachmentElement);
+      attachments.forEach((name, attachment) -> {
+        Element attachmentElement = bodyDocument.createElement(name);
+        addAttachmentElement(bodyDocument, name, attachment, attachmentElement);
         documentElement.appendChild(attachmentElement);
       });
       return toXml(bodyDocument);
@@ -59,9 +58,9 @@ public abstract class AttachmentRequestEnricher {
    * Adds the content to the attachment node recently created to the XML SOAP request
    *
    * @param bodyDocument      the document where we are adding the node element.
-   * @param soapAttachment      the attachment to be sent.
+   * @param attachment      the attachment to be sent.
    * @param attachmentElement the recently created attachment node in the xml request.
    */
-  protected abstract void addAttachmentElement(Document bodyDocument, SoapAttachment soapAttachment, Element attachmentElement);
+  abstract void addAttachmentElement(Document bodyDocument, String name, SoapAttachment attachment, Element attachmentElement);
 
 }

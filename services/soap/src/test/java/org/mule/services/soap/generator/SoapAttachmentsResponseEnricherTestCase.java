@@ -11,11 +11,11 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mule.services.soap.client.SoapCxfClient.MULE_ATTACHMENTS_KEY;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.services.soap.api.message.SoapAttachment;
+import org.mule.runtime.extension.api.soap.SoapAttachment;
 import org.mule.services.soap.generator.attachment.AttachmentResponseEnricher;
 import org.mule.services.soap.generator.attachment.SoapAttachmentResponseEnricher;
 
-import java.util.List;
+import java.util.Map;
 
 import org.apache.cxf.message.Exchange;
 
@@ -38,9 +38,9 @@ public class SoapAttachmentsResponseEnricherTestCase extends ResponseEnricherTes
 
   @Override
   protected void assertAttachment(Exchange exchange) {
-    List<SoapAttachment> attachments = (List<SoapAttachment>) exchange.get(MULE_ATTACHMENTS_KEY);
-    assertThat(attachments, hasSize(1));
-    String value = IOUtils.toString(attachments.get(0).getContent());
+    Map<String, SoapAttachment> attachments = (Map<String, SoapAttachment>) exchange.get(MULE_ATTACHMENTS_KEY);
+    assertThat(attachments.entrySet(), hasSize(1));
+    String value = IOUtils.toString(attachments.get("attachment").getContent());
     assertThat(value, is("Some Content"));
   }
 }

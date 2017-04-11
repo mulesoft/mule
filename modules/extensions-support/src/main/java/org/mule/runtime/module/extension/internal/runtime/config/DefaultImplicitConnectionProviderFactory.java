@@ -70,9 +70,8 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
   public <T> ConnectionProvider<T> createImplicitConnectionProvider(String configName, Event event) {
     ResolverSet resolverSet = resolverSetProvider.get();
     ConnectionProviderObjectBuilder<T> builder =
-        new ConnectionProviderObjectBuilder<>(connectionProviderModel, resolverSet, getConnectionManager(muleContext),
-                                              extensionModel,
-                                              muleContext);
+        new DefaultConnectionProviderObjectBuilder<>(connectionProviderModel, resolverSet, getConnectionManager(muleContext),
+                                                     extensionModel, muleContext);
     builder.setOwnerConfigName(configName);
     try {
       return builder.build(event);

@@ -26,18 +26,18 @@ import java.util.List;
 
 public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractMuleTestCase {
 
-  private JavaModelLoaderDelegate loader;
+  private DefaultJavaModelLoaderDelegate loader;
 
-  protected JavaModelLoaderDelegate getLoader() {
+  protected DefaultJavaModelLoaderDelegate getLoader() {
     return loader;
   }
 
-  protected void setLoader(JavaModelLoaderDelegate loader) {
+  protected void setLoader(DefaultJavaModelLoaderDelegate loader) {
     this.loader = loader;
   }
 
-  protected JavaModelLoaderDelegate loaderFor(final Class<?> type) {
-    return new JavaModelLoaderDelegate(type, getProductVersion());
+  protected DefaultJavaModelLoaderDelegate loaderFor(final Class<?> type) {
+    return new DefaultJavaModelLoaderDelegate(type, getProductVersion());
   }
 
   protected ExtensionDeclarer declareExtension() {

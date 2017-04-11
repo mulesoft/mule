@@ -14,8 +14,8 @@ import static org.apache.cxf.phase.Phase.SEND_ENDING;
 import static org.mule.services.soap.client.SoapCxfClient.MULE_SOAP_ACTION;
 import static org.mule.services.soap.client.SoapCxfClient.MULE_WSC_ENCODING;
 import static org.mule.services.soap.client.SoapCxfClient.WSC_DISPATCHER;
-import org.mule.services.soap.api.client.DispatcherResponse;
-import org.mule.services.soap.api.client.MessageDispatcher;
+import org.mule.runtime.extension.api.soap.message.DispatcherResponse;
+import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.services.soap.api.client.SoapClientConfiguration;
 
 import com.google.common.collect.ImmutableMap;

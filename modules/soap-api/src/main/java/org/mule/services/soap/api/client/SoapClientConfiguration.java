@@ -6,8 +6,9 @@
  */
 package org.mule.services.soap.api.client;
 
+import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
+import org.mule.runtime.extension.api.soap.security.SecurityStrategy;
 import org.mule.services.soap.api.SoapVersion;
-import org.mule.services.soap.api.security.SecurityStrategy;
 
 import java.util.List;
 

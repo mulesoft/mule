@@ -97,7 +97,7 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
   }
 
   private Optional<Bucket<T>> fetch(Position position) {
-    return withWriteLock(() -> {
+    return (Optional<Bucket<T>>) withWriteLock(() -> {
       Optional<Bucket<T>> presentBucket = getPresentBucket(position);
       if (presentBucket.filter(bucket -> bucket.contains(position)).isPresent()) {
         return presentBucket;

@@ -9,7 +9,7 @@ package org.mule.services.soap.generator.attachment;
 
 import static java.lang.String.format;
 import org.mule.metadata.api.TypeLoader;
-import org.mule.services.soap.api.message.SoapAttachment;
+import org.mule.runtime.extension.api.soap.SoapAttachment;
 import org.mule.services.soap.introspection.WsdlIntrospecter;
 
 import org.w3c.dom.Document;
@@ -43,10 +43,10 @@ public final class MtomRequestEnricher extends AttachmentRequestEnricher {
    * attachmentContentId</strong> to identify the attachment in the multipart.
    */
   @Override
-  protected void addAttachmentElement(Document bodyDocument, SoapAttachment soapAttachment, Element attachmentNode) {
+  protected void addAttachmentElement(Document bodyDocument, String name, SoapAttachment attachment, Element attachmentNode) {
     Element xop = bodyDocument.createElementNS(XOP_NS, XOP_TAG_NAME);
     // sets the content id of the attachment that is going to be sent in the multipart message.
-    xop.setAttribute(HREF, format(CONTENT_ID_MASK, soapAttachment.getId()));
+    xop.setAttribute(HREF, format(CONTENT_ID_MASK, name));
     attachmentNode.appendChild(xop);
   }
 }

@@ -6,12 +6,11 @@
  */
 package org.mule.services.soap.api.message;
 
-import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.extension.api.soap.SoapAttachment;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,22 +21,22 @@ import java.util.Map;
 public final class ImmutableSoapRequest implements SoapRequest {
 
   private final InputStream content;
-  private final List<SoapHeader> soapHeaders;
+  private final Map<String, String> soapHeaders;
+  private final Map<String, SoapAttachment> attachments;
   private final Map<String, String> transportHeaders;
-  private final List<SoapAttachment> attachments;
   private final MediaType contentType;
   private final String operation;
 
   ImmutableSoapRequest(InputStream content,
-                       List<SoapHeader> soapHeaders,
+                       Map<String, String> soapHeaders,
                        Map<String, String> transportHeaders,
-                       List<SoapAttachment> attachments,
+                       Map<String, SoapAttachment> attachments,
                        MediaType contentType,
                        String operation) {
     this.content = content;
-    this.soapHeaders = unmodifiableList(soapHeaders);
+    this.soapHeaders = unmodifiableMap(soapHeaders);
     this.transportHeaders = unmodifiableMap(transportHeaders);
-    this.attachments = unmodifiableList(attachments);
+    this.attachments = unmodifiableMap(attachments);
     this.contentType = contentType;
     this.operation = operation;
   }
@@ -48,7 +47,7 @@ public final class ImmutableSoapRequest implements SoapRequest {
   }
 
   @Override
-  public List<SoapHeader> getSoapHeaders() {
+  public Map<String, String> getSoapHeaders() {
     return soapHeaders;
   }
 
@@ -58,7 +57,7 @@ public final class ImmutableSoapRequest implements SoapRequest {
   }
 
   @Override
-  public List<SoapAttachment> getAttachments() {
+  public Map<String, SoapAttachment> getAttachments() {
     return attachments;
   }
 

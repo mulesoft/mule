@@ -11,6 +11,7 @@ import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.soap.SoapAttachment;
 
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class SoapMessageBuilder {
   @Optional
   @NullSafe
   @Content
-  private Map<String, WscSoapAttachment> attachments;
+  private Map<String, SoapAttachment> attachments;
 
   public String getBody() {
     return body;
@@ -54,7 +55,7 @@ public class SoapMessageBuilder {
     return headers;
   }
 
-  public Map<String, WscSoapAttachment> getAttachments() {
+  public Map<String, SoapAttachment> getAttachments() {
     return attachments;
   }
 }

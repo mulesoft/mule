@@ -6,6 +6,8 @@
  */
 package org.mule.services.soap.api.message;
 
+import org.mule.runtime.extension.api.runtime.operation.Result;
+
 /**
  * Represents a response retrieved by a Soap Web Service.
  *
@@ -13,4 +15,5 @@ package org.mule.services.soap.api.message;
  */
 public interface SoapResponse extends SoapMessage {
 
+  Result<?, SoapAttributes> getAsResult();
 }

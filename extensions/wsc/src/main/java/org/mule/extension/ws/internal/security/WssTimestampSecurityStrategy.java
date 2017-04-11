@@ -9,8 +9,8 @@ package org.mule.extension.ws.internal.security;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.services.soap.api.security.SecurityStrategy;
-import org.mule.services.soap.api.security.TimestampSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.SecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.TimestampSecurityStrategy;
 
 import java.util.concurrent.TimeUnit;
 

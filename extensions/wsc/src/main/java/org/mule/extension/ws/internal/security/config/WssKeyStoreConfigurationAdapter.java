@@ -11,7 +11,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.services.soap.api.security.config.WssStoreConfiguration;
+import org.mule.runtime.extension.api.soap.security.config.WssStoreConfiguration;
 
 /**
  * Default {@link WssStoreConfiguration} implementation for Key Stores, used for encryption, decryption and signing.

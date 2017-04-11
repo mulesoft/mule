@@ -14,8 +14,8 @@ import static java.util.Collections.emptySet;
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
-import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.VERSION;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -24,10 +24,11 @@ import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.util.NullDslResolvingContext;
 
 import java.io.File;
@@ -54,16 +55,24 @@ public class ExtensionsTestInfrastructureDiscoverer {
 
   private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
   private final ExtensionManager extensionManager;
+  private final ExtensionModelLoader extensionModelLoader;
 
   /**
    * Creates a {@link ExtensionsTestInfrastructureDiscoverer} that will use the extensionManager passed here in order to register
    * the extensions, resources for the extensions will be created in the generatedResourcesDirectory.
    *
    * @param extensionManagerAdapter {@link ExtensionManager} to be used for registering the extensions
+   * @param extensionModelLoader
    * @throws {@link RuntimeException} if there was an error while creating the MANIFEST.MF file
    */
-  public ExtensionsTestInfrastructureDiscoverer(ExtensionManager extensionManagerAdapter) {
+  public ExtensionsTestInfrastructureDiscoverer(ExtensionManager extensionManagerAdapter,
+                                                ExtensionModelLoader extensionModelLoader) {
     this.extensionManager = extensionManagerAdapter;
+    this.extensionModelLoader = extensionModelLoader;
+  }
+
+  public ExtensionsTestInfrastructureDiscoverer(ExtensionManager extensionManagerAdapter) {
+    this(extensionManagerAdapter, new DefaultJavaExtensionModelLoader());
   }
 
   /**
@@ -76,7 +85,7 @@ public class ExtensionsTestInfrastructureDiscoverer {
    */
   public void discoverExtensions(Class<?>[] annotatedClasses) {
     if (!isEmpty(annotatedClasses)) {
-      stream(annotatedClasses).forEach(c -> discoverExtension(c));
+      stream(annotatedClasses).forEach(this::discoverExtension);
     }
   }
 
@@ -91,10 +100,9 @@ public class ExtensionsTestInfrastructureDiscoverer {
     Map<String, Object> params = new HashMap<>();
     params.put(TYPE_PROPERTY_NAME, annotatedClass.getName());
     params.put(VERSION, getProductVersion());
-    ExtensionModel model =
-        new JavaExtensionModelLoader().loadExtensionModel(annotatedClass.getClassLoader(), getDefault(emptySet()), params);
+    DslResolvingContext dslResolvingContext = getDefault(emptySet());
+    ExtensionModel model = extensionModelLoader.loadExtensionModel(annotatedClass.getClassLoader(), dslResolvingContext, params);
     extensionManager.registerExtension(model);
-
     return model;
   }
 

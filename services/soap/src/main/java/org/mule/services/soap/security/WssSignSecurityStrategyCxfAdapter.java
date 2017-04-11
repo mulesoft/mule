@@ -10,7 +10,7 @@ import static java.util.Optional.of;
 import static org.apache.ws.security.WSPasswordCallback.SIGNATURE;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIGNATURE_USER;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIG_PROP_REF_ID;
-import org.mule.services.soap.api.security.config.WssKeyStoreConfiguration;
+import org.mule.runtime.extension.api.soap.security.config.WssKeyStoreConfiguration;
 import org.mule.services.soap.security.callback.WSPasswordCallbackHandler;
 import org.mule.services.soap.security.config.WssKeyStoreConfigurationPropertiesBuilder;
 

@@ -11,6 +11,8 @@ import static java.lang.String.format;
 import static org.apache.cxf.message.Message.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.extension.api.soap.message.DispatcherResponse;
+import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
@@ -19,8 +21,6 @@ import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
-import org.mule.services.soap.api.client.DispatcherResponse;
-import org.mule.services.soap.api.client.MessageDispatcher;
 import org.mule.services.soap.api.exception.DispatchingException;
 
 import java.io.IOException;
@@ -47,7 +47,7 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
 
   @Override
   public void initialise() throws InitialisationException {
-
+    // do nothing
   }
 
   /**

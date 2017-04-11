@@ -11,16 +11,16 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.cxf.message.Message.MTOM_ENABLED;
 import static org.apache.ws.security.handler.WSHandlerConstants.ACTION;
 import static org.apache.ws.security.handler.WSHandlerConstants.PW_CALLBACK_REF;
+import org.mule.runtime.extension.api.soap.security.DecryptSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.EncryptSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.SecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.SecurityStrategyVisitor;
+import org.mule.runtime.extension.api.soap.security.SignSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.TimestampSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.UsernameTokenSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.VerifySignatureSecurityStrategy;
 import org.mule.services.soap.api.SoapVersion;
 import org.mule.services.soap.api.client.SoapClientConfiguration;
-import org.mule.services.soap.api.security.SecurityStrategy;
-import org.mule.services.soap.api.security.SecurityStrategyVisitor;
-import org.mule.services.soap.api.security.DecryptSecurityStrategy;
-import org.mule.services.soap.api.security.EncryptSecurityStrategy;
-import org.mule.services.soap.api.security.SignSecurityStrategy;
-import org.mule.services.soap.api.security.TimestampSecurityStrategy;
-import org.mule.services.soap.api.security.UsernameTokenSecurityStrategy;
-import org.mule.services.soap.api.security.VerifySignatureSecurityStrategy;
 import org.mule.services.soap.interceptor.NamespaceRestorerStaxInterceptor;
 import org.mule.services.soap.interceptor.NamespaceSaverStaxInterceptor;
 import org.mule.services.soap.interceptor.OutputMtomSoapAttachmentsInterceptor;
@@ -66,7 +66,7 @@ import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
  *
  * @since 4.0
  */
-public class CxfClientProvider {
+class CxfClientProvider {
 
   static Client getClient(SoapClientConfiguration configuration) {
     SoapServiceTransportFactory factory = new SoapServiceTransportFactory();
