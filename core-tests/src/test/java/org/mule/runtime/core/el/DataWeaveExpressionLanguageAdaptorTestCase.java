@@ -15,7 +15,9 @@ import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ATTRIB
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.DATA_TYPE;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ERROR;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.FLOW;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PARAM;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PAYLOAD;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PROPERTY;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.VARIABLES;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
@@ -34,7 +36,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
@@ -50,6 +51,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.message.BaseAttributes;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -222,6 +224,38 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
                is(instanceOf(Map.class)));
     assertThat(expressionLanguage.evaluate("flow.name", event, mockFlowConstruct, BindingContext.builder().build()).getValue(),
                is(flowName));
+  }
+
+  @Test
+  public void propertiesBindings() throws Exception {
+    Event event = getEventWithError(empty());
+    String var1 = "var1";
+    String var2 = "var2";
+    TypedValue varValue = new TypedValue<>(null, OBJECT);
+    final HashMap<String, TypedValue<Object>> properties = new HashMap<>();
+    properties.put(var1, varValue);
+    properties.put(var2, varValue);
+    when(event.getProperties()).thenReturn(properties);
+    TypedValue result = expressionLanguage.evaluate(PROPERTY, event, BindingContext.builder().build());
+    assertThat(result.getValue(), is(instanceOf(Map.class)));
+    assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var1, varValue));
+    assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var2, varValue));
+  }
+
+  @Test
+  public void parametersBindings() throws Exception {
+    Event event = getEventWithError(empty());
+    String var1 = "var1";
+    String var2 = "var2";
+    TypedValue varValue = new TypedValue<>(null, OBJECT);
+    final HashMap<String, TypedValue<Object>> parameters = new HashMap<>();
+    parameters.put(var1, varValue);
+    parameters.put(var2, varValue);
+    when(event.getParameters()).thenReturn(parameters);
+    TypedValue result = expressionLanguage.evaluate(PARAM, event, BindingContext.builder().build());
+    assertThat(result.getValue(), is(instanceOf(Map.class)));
+    assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var1, varValue));
+    assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var2, varValue));
   }
 
   @Test

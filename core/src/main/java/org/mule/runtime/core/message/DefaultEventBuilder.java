@@ -33,6 +33,8 @@ import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -44,9 +46,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class DefaultEventBuilder implements Event.Builder {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultMessageBuilder.class);
@@ -54,6 +53,8 @@ public class DefaultEventBuilder implements Event.Builder {
   private EventContext context;
   private Message message;
   private Map<String, TypedValue<Object>> flowVariables = new HashMap<>();
+  private Map<String, TypedValue<Object>> moduleProperties = new HashMap<>();
+  private Map<String, TypedValue<Object>> moduleParameters = new HashMap<>();
   private Error error;
   private FlowConstruct flow;
   private GroupCorrelation groupCorrelation = new GroupCorrelation(null, null);
@@ -90,6 +91,8 @@ public class DefaultEventBuilder implements Event.Builder {
 
     event.getVariableNames().forEach(key -> this.flowVariables
         .put(key, event.getVariable(key)));
+    this.moduleProperties = event.getProperties();
+    this.moduleParameters = event.getParameters();
   }
 
   @Override
@@ -101,9 +104,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
   @Override
   public Event.Builder variables(Map<String, Object> flowVariables) {
-    this.flowVariables.clear();
-    flowVariables.forEach((s, o) -> this.flowVariables.put(s, new TypedValue<>(o, DataType.fromObject(o))));
-    this.modified = true;
+    copyFromTo(flowVariables, this.flowVariables);
     return this;
   }
 
@@ -126,6 +127,18 @@ public class DefaultEventBuilder implements Event.Builder {
   public Event.Builder removeVariable(String key) {
     flowVariables.remove(key);
     this.modified = true;
+    return this;
+  }
+
+  @Override
+  public Builder properties(Map<String, Object> properties) {
+    copyFromTo(properties, this.moduleProperties);
+    return this;
+  }
+
+  @Override
+  public Builder parameters(Map<String, Object> parameters) {
+    copyFromTo(parameters, this.moduleParameters);
     return this;
   }
 
@@ -190,10 +203,17 @@ public class DefaultEventBuilder implements Event.Builder {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
-      return new EventImplementation(context, message, flowVariables, flow, session, replyToDestination,
+      return new EventImplementation(context, message, flowVariables, moduleProperties, moduleParameters, flow, session,
+                                     replyToDestination,
                                      replyToHandler,
                                      flowCallStack, groupCorrelation, error, legacyCorrelationId, notificationsEnabled);
     }
+  }
+
+  private void copyFromTo(Map<String, Object> source, Map<String, TypedValue<Object>> target) {
+    target.clear();
+    source.forEach((s, o) -> target.put(s, new TypedValue<>(o, DataType.fromObject(o))));
+    this.modified = true;
   }
 
   /**
@@ -225,6 +245,8 @@ public class DefaultEventBuilder implements Event.Builder {
     private final boolean notificationsEnabled;
 
     private final CopyOnWriteCaseInsensitiveMap<String, TypedValue> variables = new CopyOnWriteCaseInsensitiveMap<>();
+    private final Map<String, TypedValue<Object>> properties;
+    private final Map<String, TypedValue<Object>> parameters;
 
     private FlowCallStack flowCallStack = new DefaultFlowCallStack();
     private final String legacyCorrelationId;
@@ -235,6 +257,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
     // Use this constructor from the builder
     private EventImplementation(EventContext context, Message message, Map<String, TypedValue<Object>> variables,
+                                Map<String, TypedValue<Object>> properties, Map<String, TypedValue<Object>> parameters,
                                 FlowConstruct flowConstruct, MuleSession session,
                                 Object replyToDestination, ReplyToHandler replyToHandler,
                                 FlowCallStack flowCallStack, GroupCorrelation groupCorrelation, Error error,
@@ -247,6 +270,8 @@ public class DefaultEventBuilder implements Event.Builder {
       this.session = session;
       this.message = message;
       variables.forEach((s, value) -> this.variables.put(s, new TypedValue<>(value.getValue(), value.getDataType())));
+      this.properties = properties;
+      this.parameters = parameters;
 
       this.replyToHandler = replyToHandler;
       this.replyToDestination = replyToDestination;
@@ -461,6 +486,16 @@ public class DefaultEventBuilder implements Event.Builder {
       } else {
         return typedValue;
       }
+    }
+
+    @Override
+    public Map<String, TypedValue<Object>> getProperties() {
+      return properties;
+    }
+
+    @Override
+    public Map<String, TypedValue<Object>> getParameters() {
+      return parameters;
     }
 
     @Override

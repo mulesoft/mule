@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.message.DefaultEventBuilder;
 import org.mule.runtime.core.message.GroupCorrelation;
+import org.mule.runtime.core.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
@@ -80,6 +81,20 @@ public interface Event extends Serializable {
    * @return the set of names
    */
   Set<String> getVariableNames();
+
+  /**
+   * Returns the complete set of properties in the current event
+   *
+   * @return a {@link Map} containing the properties' name as key and the {@link TypedValue} as value
+   */
+  Map<String, TypedValue<Object>> getProperties();
+
+  /**
+   * Returns the complete set of parameters in the current event
+   *
+   * @return a {@link Map} containing the parameters' name as key and the {@link TypedValue} as value
+   */
+  Map<String, TypedValue<Object>> getParameters();
 
   /**
    * Returns the message payload for this event
@@ -333,6 +348,22 @@ public interface Event extends Serializable {
      * @return the builder instance
      */
     Builder removeVariable(String key);
+
+    /**
+     * Set a map of properties to be consumed within a {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
+     *
+     * @param properties properties to be set.
+     * @return the builder instance
+     */
+    Builder properties(Map<String, Object> properties);
+
+    /**
+     * Set a map of parameters to be consumed within a {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
+     *
+     * @param parameters parameters to be set.
+     * @return the builder instance
+     */
+    Builder parameters(Map<String, Object> parameters);
 
     /**
      * Set correlationId overriding the correlationId from {@link EventContext#getCorrelationId()} that came from the source

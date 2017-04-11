@@ -14,7 +14,6 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.expressionEvaluatio
 import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionExecutionException;
@@ -32,18 +31,16 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.MuleInstanceContext;
 import org.mule.runtime.core.el.context.ServerContext;
 import org.slf4j.Logger;
+
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor {
 
@@ -53,6 +50,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   public static final String ATTRIBUTES = "attributes";
   public static final String ERROR = "error";
   public static final String VARIABLES = "variables";
+  public static final String PROPERTY = "property";
+  public static final String PARAM = "param";
   public static final String FLOW = "flow";
   public static final String SERVER = "server";
   public static final String MULE = "mule";
@@ -186,6 +185,13 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       });
       contextBuilder.addBinding(VARIABLES,
                                 new TypedValue<>(unmodifiableMap(flowVars), fromType(flowVars.getClass())));
+      contextBuilder.addBinding(PROPERTY,
+                                new TypedValue<>(unmodifiableMap(event.getProperties()),
+                                                 fromType(event.getProperties().getClass())));
+      contextBuilder.addBinding(PARAM,
+                                new TypedValue<>(unmodifiableMap(event.getParameters()),
+                                                 fromType(event.getParameters().getClass())));
+
       Message message = event.getMessage();
       Attributes attributes = message.getAttributes();
       contextBuilder.addBinding(ATTRIBUTES, new TypedValue<>(attributes, fromType(attributes.getClass())));

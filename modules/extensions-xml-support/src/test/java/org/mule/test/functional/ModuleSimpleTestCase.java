@@ -134,4 +134,11 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
     Event muleEvent = flowRunner("testSetPayloadUsingOptionalParam").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is(nullValue()));
   }
+
+  @Test
+  public void testSetPayloadUsingParamValueMoreThanOnceFlow() throws Exception {
+    Event muleEvent = flowRunner("testSetPayloadUsingParamValueMoreThanOnceFlow").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(),
+               is("a payload written 2 or more times in the same operation using the same parameter"));
+  }
 }

@@ -96,4 +96,14 @@
         </body>
         <output type="string"/>
     </operation>
+
+    <operation name="set-payload-using-param-value-more-than-once">
+        <parameters>
+            <parameter name="value" type="string"/>
+        </parameters>
+        <body>
+            <simple-prefix:set-payload-using-param-value-more-than-once value="#[param.value]"/>
+        </body>
+        <output type="string"/>
+    </operation>
 </module>
