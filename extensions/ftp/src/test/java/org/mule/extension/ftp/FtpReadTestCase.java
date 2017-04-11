@@ -31,7 +31,7 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features(FTP_EXTENSION)
-public class FtpReadTestCase extends FtpConnectorTestCase {
+public class FtpReadTestCase extends CommonFtpConnectorTestCase {
 
   public FtpReadTestCase(String name, FtpTestHarness testHarness) {
     super(name, testHarness);

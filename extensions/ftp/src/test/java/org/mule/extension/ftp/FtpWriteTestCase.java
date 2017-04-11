@@ -34,7 +34,7 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features(FTP_EXTENSION)
-public class FtpWriteTestCase extends FtpConnectorTestCase {
+public class FtpWriteTestCase extends CommonFtpConnectorTestCase {
 
   private static final String TEMP_DIRECTORY = "files";
 

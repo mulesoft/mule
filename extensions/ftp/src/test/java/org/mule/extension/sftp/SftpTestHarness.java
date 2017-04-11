@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ftp;
+package org.mule.extension.sftp;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -14,7 +14,7 @@ import static org.mule.extension.file.common.api.FileWriteMode.APPEND;
 import static org.mule.extension.file.common.api.FileWriteMode.OVERWRITE;
 import static org.mule.functional.util.sftp.SftpServer.PASSWORD;
 import static org.mule.functional.util.sftp.SftpServer.USERNAME;
-import com.jcraft.jsch.JSchException;
+
 import org.mule.extension.AbstractFtpTestHarness;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.file.common.api.FileAttributes;
@@ -24,6 +24,8 @@ import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClientFactory;
 import org.mule.functional.util.sftp.SftpServer;
 import org.mule.tck.junit4.rule.DynamicPort;
+
+import com.jcraft.jsch.JSchException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

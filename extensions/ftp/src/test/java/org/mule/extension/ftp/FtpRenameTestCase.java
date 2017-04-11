@@ -25,7 +25,7 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features(FTP_EXTENSION)
-public class FtpRenameTestCase extends FtpConnectorTestCase {
+public class FtpRenameTestCase extends CommonFtpConnectorTestCase {
 
   private static final String RENAME_TO = "renamed";
 

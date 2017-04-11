@@ -33,7 +33,7 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features(FTP_EXTENSION)
 @Stories("Negative Connectivity Testing")
-public class FtpNegativeConnectivityTestCase extends FtpConnectorTestCase {
+public class FtpNegativeConnectivityTestCase extends CommonFtpConnectorTestCase {
 
   private static final Matcher<Exception> ANYTHING =
       is(allOf(instanceOf(ConnectionException.class), hasCause(instanceOf(FTPConnectionException.class))));

@@ -20,7 +20,7 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features(FTP_EXTENSION)
-public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase {
+public class FtpCreateDirectoryTestCase extends CommonFtpConnectorTestCase {
 
   private static final String DIRECTORY = "validDirectory";
 
