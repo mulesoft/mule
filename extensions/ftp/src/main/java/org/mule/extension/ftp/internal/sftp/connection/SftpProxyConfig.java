@@ -6,16 +6,15 @@
  */
 package org.mule.extension.ftp.internal.sftp.connection;
 
-import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Password;
 
 /**
  * A Proxy configuration for the SFTP connector.
  *
  * @since 3.9
  */
-@Configuration
 public class SftpProxyConfig {
 
   public enum Protocol {
@@ -34,6 +33,7 @@ public class SftpProxyConfig {
 
   @Parameter
   @Optional
+  @Password
   private String password;
 
   @Parameter
@@ -43,39 +43,20 @@ public class SftpProxyConfig {
     return host;
   }
 
-  public void setHost(String host) {
-    this.host = host;
-  }
-
   public int getPort() {
     return port;
-  }
-
-  public void setPort(int port) {
-    this.port = port;
   }
 
   public String getUsername() {
     return username;
   }
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
   public String getPassword() {
     return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
   }
 
   public Protocol getProtocol() {
     return protocol;
   }
 
-  public void setProtocol(String protocol) {
-    this.protocol = Protocol.valueOf(protocol);
-  }
 }

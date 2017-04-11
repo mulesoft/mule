@@ -197,7 +197,7 @@ public class SftpClient {
       switch (proxyConfig.getProtocol()) {
         case HTTP:
           ProxyHTTP proxyHttp = new ProxyHTTP(proxyConfig.getHost(), proxyConfig.getPort());
-          if (proxyConfig.getUsername() != null) {
+          if (proxyConfig.getUsername() != null && proxyConfig.getPassword() != null) {
             proxyHttp.setUserPasswd(proxyConfig.getUsername(), proxyConfig.getPassword());
           }
           proxy = proxyHttp;
@@ -205,7 +205,7 @@ public class SftpClient {
 
         case SOCKS4:
           ProxySOCKS4 proxySocks4 = new ProxySOCKS4(proxyConfig.getHost(), proxyConfig.getPort());
-          if (proxyConfig.getUsername() != null) {
+          if (proxyConfig.getUsername() != null && proxyConfig.getPassword() != null) {
             proxySocks4.setUserPasswd(proxyConfig.getUsername(), proxyConfig.getPassword());
           }
           proxy = proxySocks4;
@@ -213,7 +213,7 @@ public class SftpClient {
 
         case SOCKS5:
           ProxySOCKS5 proxySocks5 = new ProxySOCKS5(proxyConfig.getHost(), proxyConfig.getPort());
-          if (proxyConfig.getUsername() != null) {
+          if (proxyConfig.getUsername() != null && proxyConfig.getPassword() != null) {
             proxySocks5.setUserPasswd(proxyConfig.getUsername(), proxyConfig.getPassword());
           }
           proxy = proxySocks5;
