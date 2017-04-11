@@ -19,6 +19,7 @@ import static org.eclipse.aether.util.artifact.JavaScopes.SYSTEM;
 import static org.eclipse.aether.util.artifact.JavaScopes.TEST;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
@@ -36,6 +37,7 @@ import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
@@ -46,6 +48,7 @@ import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
+import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.eclipse.aether.util.filter.PatternInclusionsDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
@@ -71,10 +74,19 @@ public class Repository {
   private static String userHome = getProperty(USER_HOME);
   private static final String MAVEN_REPOSITORY_FOLDER = userHome + M2_REPO;
 
+  /**
+   * System property key to specify the remote repositories to use. Multiple values must be comma separated.
+   * <p>
+   * If no value is provided then the repository will be disabled causing a {@code RepositoryServiceDisabledException} if any
+   * method is called.
+   */
+  public static final String MULE_REMOTE_REPOSITORIES_PROPERTY = "mule.repository.repositories";
+
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private DefaultRepositorySystemSession session;
   private RepositorySystem system;
+  private List<RemoteRepository> repositories;
 
   public Repository() {
     createRepositorySystem();
@@ -82,7 +94,8 @@ public class Repository {
 
   private void createRepositorySystem() {
     session = newDefaultRepositorySystemSession();
-    session.setOffline(true);
+    repositories = collectRemoteRepositories();
+    session.setOffline(repositories.isEmpty());
     session.setIgnoreArtifactDescriptorRepositories(true);
 
     File mavenLocalRepositoryLocation = new File(MAVEN_REPOSITORY_FOLDER);
@@ -103,6 +116,18 @@ public class Repository {
     return session;
   }
 
+  private List<RemoteRepository> collectRemoteRepositories() {
+    String[] remoteRepositoriesArray = System.getProperty(MULE_REMOTE_REPOSITORIES_PROPERTY, "").split(",");
+    List<RemoteRepository> remoteRepositories = new ArrayList<>();
+    for (String remoteRepository : remoteRepositoriesArray) {
+      if (!remoteRepository.trim().equals("")) {
+        remoteRepositories
+            .add(new RemoteRepository.Builder(remoteRepository, "default", remoteRepository.trim()).build());
+      }
+    }
+    return remoteRepositories;
+  }
+
   public PreorderNodeListGenerator assemblyDependenciesForArtifact(Artifact artifact, Predicate<Dependency> filter) {
     final CollectRequest collectRequest = new CollectRequest();
     try {
@@ -114,6 +139,7 @@ public class Repository {
           .filter(dependency -> filter.test(dependency))
           .collect(toList()));
       collectRequest.setManagedDependencies(artifactDescriptorResult.getManagedDependencies());
+      collectRequest.setRepositories(collectRemoteRepositories());
 
       final CollectResult collectResult = system.collectDependencies(session, collectRequest);
 
@@ -193,6 +219,7 @@ public class Repository {
     final DefaultServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
     locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
     locator.addService(TransporterFactory.class, FileTransporterFactory.class);
+    locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
     return locator.getService(RepositorySystem.class);
   }
 
