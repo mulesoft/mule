@@ -46,7 +46,7 @@ public class ArtifactDeclarationLocationPathTestCase extends AbstractElementMode
   public void setup() throws Exception {
     Set<ExtensionModel> extensions = muleContext.getExtensionManager().getExtensions();
     String core = IOUtils
-        .toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/core-extension-model.json"));
+        .toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/mule-extension-model.json"));
     ExtensionModel coreModel = new ExtensionModelJsonSerializer().deserialize(core);
 
     dslContext = DslResolvingContext.getDefault(ImmutableSet.<ExtensionModel>builder()
