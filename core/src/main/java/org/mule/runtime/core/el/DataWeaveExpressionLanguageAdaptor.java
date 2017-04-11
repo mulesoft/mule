@@ -50,8 +50,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   public static final String ATTRIBUTES = "attributes";
   public static final String ERROR = "error";
   public static final String VARIABLES = "variables";
-  public static final String PROPERTY = "property";
-  public static final String PARAM = "param";
+  public static final String PROPERTIES = "properties";
+  public static final String PARAMETERS = "parameters";
   public static final String FLOW = "flow";
   public static final String SERVER = "server";
   public static final String MULE = "mule";
@@ -185,10 +185,10 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       });
       contextBuilder.addBinding(VARIABLES,
                                 new TypedValue<>(unmodifiableMap(flowVars), fromType(flowVars.getClass())));
-      contextBuilder.addBinding(PROPERTY,
+      contextBuilder.addBinding(PROPERTIES,
                                 new TypedValue<>(unmodifiableMap(event.getProperties()),
                                                  fromType(event.getProperties().getClass())));
-      contextBuilder.addBinding(PARAM,
+      contextBuilder.addBinding(PARAMETERS,
                                 new TypedValue<>(unmodifiableMap(event.getParameters()),
                                                  fromType(event.getParameters().getClass())));
 

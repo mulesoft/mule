@@ -13,7 +13,7 @@
             <parameter name="aWrongDefinedParameter" type="string" use="REQUIRED" defaultValue="a default value"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[param.value]"/>
+            <mule:set-payload value="#[parameters.value]"/>
         </body>
         <output type="string"/>
     </operation>

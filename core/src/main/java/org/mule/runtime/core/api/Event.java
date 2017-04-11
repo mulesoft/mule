@@ -351,17 +351,27 @@ public interface Event extends Serializable {
 
     /**
      * Set a map of properties to be consumed within a {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
+     * <p/>
+     * For every module's <operation/> being consumed in a Mule Application, when being macro expanded, these properties will be
+     * feed to it in a new and isolated {@link Event}, so that we can guarantee that for each invocation there's a real
+     * variable scoping for them.
      *
      * @param properties properties to be set.
      * @return the builder instance
+     * @see #parameters(Map)
      */
     Builder properties(Map<String, Object> properties);
 
     /**
      * Set a map of parameters to be consumed within a {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
+     * <p/>
+     * For every module's <operation/> being consumed in a Mule Application, when being macro expanded, these parameters will be
+     * feed to it in a new and isolated {@link Event}, so that we can guarantee that for each invocation there's a real
+     * variable scoping for them.
      *
      * @param parameters parameters to be set.
      * @return the builder instance
+     * @see #properties(Map) 
      */
     Builder parameters(Map<String, Object> parameters);
 

@@ -15,9 +15,9 @@ import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ATTRIB
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.DATA_TYPE;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ERROR;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.FLOW;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PARAM;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PARAMETERS;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PAYLOAD;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PROPERTY;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PROPERTIES;
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.VARIABLES;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
@@ -236,7 +236,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     properties.put(var1, varValue);
     properties.put(var2, varValue);
     when(event.getProperties()).thenReturn(properties);
-    TypedValue result = expressionLanguage.evaluate(PROPERTY, event, BindingContext.builder().build());
+    TypedValue result = expressionLanguage.evaluate(PROPERTIES, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Map.class)));
     assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var1, varValue));
     assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var2, varValue));
@@ -252,7 +252,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     parameters.put(var1, varValue);
     parameters.put(var2, varValue);
     when(event.getParameters()).thenReturn(parameters);
-    TypedValue result = expressionLanguage.evaluate(PARAM, event, BindingContext.builder().build());
+    TypedValue result = expressionLanguage.evaluate(PARAMETERS, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Map.class)));
     assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var1, varValue));
     assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var2, varValue));
