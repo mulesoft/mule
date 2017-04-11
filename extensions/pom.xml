@@ -87,7 +87,7 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core-tests</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>
