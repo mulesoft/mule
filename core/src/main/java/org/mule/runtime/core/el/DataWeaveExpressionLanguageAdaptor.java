@@ -35,6 +35,14 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.MuleInstanceContext;
 import org.mule.runtime.core.el.context.ServerContext;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.function.Function;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -95,14 +103,14 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   @Override
   public TypedValue evaluate(String expression, Event event, BindingContext context) {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
-    return evaluate(expression, contextBuilder.build());
+    return sanitizeAndEvaluate(expression, exp -> expressionExecutor.evaluate(exp, contextBuilder.build()));
   }
 
   @Override
   public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, BindingContext context)
       throws ExpressionRuntimeException {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
-    return expressionExecutor.evaluate(expression, expectedOutputType, contextBuilder.build());
+    return sanitizeAndEvaluate(expression, exp -> expressionExecutor.evaluate(exp, expectedOutputType, contextBuilder.build()));
   }
 
   @Override
@@ -111,7 +119,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       throws ExpressionRuntimeException {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
     addFlowBindings(flowConstruct, contextBuilder);
-    return expressionExecutor.evaluate(expression, expectedOutputType, contextBuilder.build());
+    return sanitizeAndEvaluate(expression, exp -> expressionExecutor.evaluate(exp, expectedOutputType, contextBuilder.build()));
   }
 
   @Override
@@ -124,7 +132,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
                              BindingContext context) {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
     addFlowBindings(flowConstruct, contextBuilder);
-    return evaluate(expression, contextBuilder.build());
+    return sanitizeAndEvaluate(expression, exp -> expressionExecutor.evaluate(exp, contextBuilder.build()));
   }
 
   @Override
@@ -138,14 +146,14 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       throws ExpressionRuntimeException {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, bindingContext);
     addFlowBindings(flowConstruct, contextBuilder);
-    return expressionExecutor.split(expression, bachSize, contextBuilder.build());
+    return sanitizeAndEvaluate(expression, exp -> expressionExecutor.split(exp, bachSize, contextBuilder.build()));
   }
 
   @Override
   public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, BindingContext bindingContext)
       throws ExpressionRuntimeException {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, bindingContext);
-    return expressionExecutor.split(expression, bachSize, contextBuilder.build());
+    return sanitizeAndEvaluate(expression, exp -> expressionExecutor.split(exp, bachSize, contextBuilder.build()));
   }
 
   @Override
@@ -159,9 +167,18 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     throw new UnsupportedOperationException("Enrichment is not allowed, yet.");
   }
 
-  private TypedValue evaluate(String expression, BindingContext context) {
+  /**
+   * Sanitizes the expression by removing the expression brackets and then evaluates it, handling any exceptions accordingly. All
+   * evaluations should be done in this way.
+   *
+   * @param expression the expression to sanitize before running
+   * @param evaluation the function to evaluate the expression with
+   * @param <T> the type that the function returns
+   * @return the result of the evaluation
+   */
+  private <T> T sanitizeAndEvaluate(String expression, Function<String, T> evaluation) {
     try {
-      return expressionExecutor.evaluate(sanitize(expression), context);
+      return evaluation.apply(sanitize(expression));
     } catch (ExpressionExecutionException e) {
       throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
     }
