@@ -10,20 +10,19 @@
 
     <oauth:token-manager-config name="tokenManagerConfig"/>
 
+    <oauth:authorization-code-grant-type
+            name="authCode"
+            clientId="${client.id}"
+            clientSecret="${client.secret}"
+            localCallbackUrl="${local.callback.url}"
+            externalCallbackUrl="${external.redirect.url}"
+            tokenManager="tokenManagerConfig"
+            localAuthorizationUrl="${local.authorization.url}"
+            authorizationUrl="${authorization.url}"
+            tokenUrl="${token.url}">
+    </oauth:authorization-code-grant-type>
+
     <httpn:request-config name="requestConfig">
-        <httpn:request-connection>
-            <httpn:authentication>
-                <oauth:authorization-code-grant-type
-                        clientId="${client.id}"
-                        clientSecret="${client.secret}"
-                        localCallbackUrl="${local.callback.url}"
-                        externalCallbackUrl="${external.redirect.url}"
-                        tokenManager="tokenManagerConfig"
-                        localAuthorizationUrl="${local.authorization.url}"
-                        authorizationUrl="${authorization.url}"
-                        tokenUrl="${token.url}">
-                </oauth:authorization-code-grant-type>
-            </httpn:authentication>
-        </httpn:request-connection>
+        <httpn:request-connection authentication="authCode"/>
     </httpn:request-config>
 </mule>

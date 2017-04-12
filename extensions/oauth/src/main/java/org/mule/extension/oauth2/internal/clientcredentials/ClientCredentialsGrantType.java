@@ -15,6 +15,7 @@ import org.mule.extension.oauth2.internal.AbstractGrantType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.util.store.ObjectStoreToMapAdapter;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -27,7 +28,10 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * Authorization element for client credentials oauth grant type
+ * <p>
+ * The first token refresh will be done when the application is started.
  */
+@XmlHints(allowTopLevelDefinition = true, allowInlineDefinition = false)
 public class ClientCredentialsGrantType extends AbstractGrantType {
 
   /**

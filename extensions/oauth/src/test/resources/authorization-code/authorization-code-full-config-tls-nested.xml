@@ -12,39 +12,38 @@
 
     <oauth:token-manager-config name="tokenManagerConfig"/>
 
+    <oauth:authorization-code-grant-type
+            name="authCode"
+            clientId="${client.id}"
+            clientSecret="${client.secret}"
+            localCallbackUrl="${local.callback.url}"
+            externalCallbackUrl="${local.callback.url}"
+            tokenManager="tokenManagerConfig"
+            localAuthorizationUrl="${local.authorization.url}"
+            authorizationUrl="${authorization.url}"
+            scopes="${scopes}"
+            state="${state}"
+            tokenUrl="${token.url}"
+            responseAccessToken="#[payload['access_token']]"
+            responseExpiresIn="#[payload['expires_in']]"
+            responseRefreshToken="#[payload['refresh_token']]">
+        <oauth:custom-parameters>
+            <oauth:custom-parameter key="${auth.request.param1}" value="${auth.request.value1}"/>
+            <oauth:custom-parameter key="${auth.request.param2}" value="${auth.request.value2}"/>
+        </oauth:custom-parameters>
+        <oauth:custom-parameter-extractors>
+            <oauth:parameter-extractor paramName="${custom.param.extractor1}"
+                                        value="#[payload['${custom.param.extractor1}']]"/>
+            <oauth:parameter-extractor paramName="${custom.param.extractor2}"
+                                        value="#[payload['${custom.param.extractor2}']]"/>
+        </oauth:custom-parameter-extractors>
+        <tls:context>
+            <tls:trust-store path="ssltest-cacerts.jks" password="changeit" />
+            <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+        </tls:context>
+    </oauth:authorization-code-grant-type>
+
     <httpn:request-config name="requestConfig">
-        <httpn:request-connection>
-            <httpn:authentication>
-                <oauth:authorization-code-grant-type
-                        clientId="${client.id}"
-                        clientSecret="${client.secret}"
-                        localCallbackUrl="${local.callback.url}"
-                        externalCallbackUrl="${local.callback.url}"
-                        tokenManager="tokenManagerConfig"
-                        localAuthorizationUrl="${local.authorization.url}"
-                        authorizationUrl="${authorization.url}"
-                        scopes="${scopes}"
-                        state="${state}"
-                        tokenUrl="${token.url}"
-                        responseAccessToken="#[payload['access_token']]"
-                        responseExpiresIn="#[payload['expires_in']]"
-                        responseRefreshToken="#[payload['refresh_token']]">
-                    <oauth:custom-parameters>
-                        <oauth:custom-parameter key="${auth.request.param1}" value="${auth.request.value1}"/>
-                        <oauth:custom-parameter key="${auth.request.param2}" value="${auth.request.value2}"/>
-                    </oauth:custom-parameters>
-                    <oauth:custom-parameter-extractors>
-                        <oauth:parameter-extractor paramName="${custom.param.extractor1}"
-                                                    value="#[payload['${custom.param.extractor1}']]"/>
-                        <oauth:parameter-extractor paramName="${custom.param.extractor2}"
-                                                    value="#[payload['${custom.param.extractor2}']]"/>
-                    </oauth:custom-parameter-extractors>
-                    <tls:context>
-                        <tls:trust-store path="ssltest-cacerts.jks" password="changeit" />
-                        <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
-                    </tls:context>
-                </oauth:authorization-code-grant-type>
-            </httpn:authentication>
-        </httpn:request-connection>
+        <httpn:request-connection authentication="authCode"/>
     </httpn:request-config>
 </mule>

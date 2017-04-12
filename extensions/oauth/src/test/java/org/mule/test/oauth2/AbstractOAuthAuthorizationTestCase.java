@@ -19,7 +19,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.codec.binary.Base64.encodeBase64String;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
 import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
@@ -37,18 +36,20 @@ import static org.mule.services.oauth.internal.OAuthConstants.GRANT_TYPE_PARAMET
 import static org.mule.services.oauth.internal.OAuthConstants.REDIRECT_URI_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.SCOPE_PARAMETER;
-import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.google.common.collect.ImmutableMap;
-import org.junit.Before;
-import org.junit.Rule;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.io.UnsupportedEncodingException;
+
+import org.junit.Rule;
+
+import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 @ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets", "org.mule.modules:mule-module-http-ext"},
     providedInclusions = "org.mule.modules:mule-module-sockets")
@@ -93,22 +94,6 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
   public SystemProperty localCallbackUrl =
       new SystemProperty("local.callback.url",
                          format("%s://localhost:%d%s", getProtocol(), localHostPort.getNumber(), localCallbackPath.getValue()));
-
-  private ExtensionsClient client;
-
-  @Before
-  public void before() throws Exception {
-    try {
-      // Force the initialization of the OAuth context
-      client = muleContext.getRegistry().lookupObject(ExtensionsClient.class);
-      client.execute("HTTP", "request", builder()
-          .configName("requestConfig")
-          .addParameter("path", "/")
-          .build());
-    } catch (Exception e) {
-      // Ignore
-    }
-  }
 
   protected String getProtocol() {
     return "http";

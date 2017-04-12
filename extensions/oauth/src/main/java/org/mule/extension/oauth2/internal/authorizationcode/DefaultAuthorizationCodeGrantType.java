@@ -19,6 +19,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.util.store.ObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
@@ -40,10 +41,13 @@ import java.util.concurrent.ExecutionException;
  * Represents the config element for {@code oauth:authentication-code-config}.
  * <p>
  * This config will: - If the authorization-request is defined then it will create a flow listening for an user call to begin the
- * oauth login. - If the token-request is defined then it will create a flow for listening in the redirect uri so we can get the
+ * OAuth login. - If the token-request is defined then it will create a flow for listening in the redirect uri so we can get the
  * authentication code and retrieve the access token
+ * <p>
+ * The creation of the endpoints for authorization will be done when the application is started.
  */
 @Alias("authorization-code-grant-type")
+@XmlHints(allowTopLevelDefinition = true, allowInlineDefinition = false)
 public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
 
   /**

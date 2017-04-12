@@ -15,27 +15,27 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.core.Is.isA;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
-import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
-import org.mule.runtime.extension.api.client.ExtensionsClient;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.function.Consumer;
 
 import org.hamcrest.Matcher;
-import org.junit.Before;
+import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runners.Parameterized;
+
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 @RunnerDelegateTo(Parameterized.class)
 public class ClientCredentialsFailureTestCase extends AbstractOAuthAuthorizationTestCase {
@@ -62,14 +62,6 @@ public class ClientCredentialsFailureTestCase extends AbstractOAuthAuthorization
     return "client-credentials/client-credentials-minimal-config.xml";
   }
 
-  @Override
-  @Before
-  public void before() throws Exception {
-    // Force the initialization of the OAuth context
-    muleContext.getRegistry().lookupObject(ExtensionsClient.class)
-        .execute("HTTP", "request", builder().configName("requestConfig").addParameter("path", "/").build());
-  }
-
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> parameters() {
     return asList(new Object[] {"tokenUrlFailsDuringAppStartup",
@@ -86,13 +78,19 @@ public class ClientCredentialsFailureTestCase extends AbstractOAuthAuthorization
 
   public ClientCredentialsFailureTestCase(String name, Consumer<WireMockRule> wireMockConfigurer, String tokenPath,
                                           Matcher<? extends Throwable> expectedCauseMatcher) {
+    setStartContext(false);
     wireMockConfigurer.accept(wireMockRule);
     tokenPathProp = new SystemProperty(TOKEN_PATH_PROPERTY_NAME, tokenPath);
     expectedException.expectCause(expectedCauseMatcher);
   }
 
   @Test
-  public void runTest() {
-    // Nothing to do here since the test subject is run during the setup.
+  public void runTest() throws MuleException {
+    muleContext.start();
+  }
+
+  @After
+  public void after() throws MuleException {
+    muleContext.dispose();
   }
 }
