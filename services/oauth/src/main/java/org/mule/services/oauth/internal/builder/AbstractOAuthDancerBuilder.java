@@ -12,7 +12,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.builder.OAuthDancerBuilder;
 import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
 import org.mule.service.http.api.HttpService;
@@ -30,7 +29,7 @@ import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
-public abstract class AbstractOAuthDancerBuilder<D extends OAuthDancer> implements OAuthDancerBuilder<D> {
+public abstract class AbstractOAuthDancerBuilder<D> implements OAuthDancerBuilder<D> {
 
   protected final LockFactory lockProvider;
   protected final Map<String, DefaultResourceOwnerOAuthContext> tokensStore;

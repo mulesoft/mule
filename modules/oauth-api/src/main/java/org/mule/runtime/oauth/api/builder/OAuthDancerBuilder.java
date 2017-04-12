@@ -7,7 +7,6 @@
 package org.mule.runtime.oauth.api.builder;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.service.http.api.client.HttpClient;
 
 import java.nio.charset.Charset;
@@ -18,7 +17,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public interface OAuthDancerBuilder<D extends OAuthDancer> {
+public interface OAuthDancerBuilder<D> {
 
   /**
    * @param clientId the application identifier as defined in the OAuth authentication server.
@@ -110,7 +109,7 @@ public interface OAuthDancerBuilder<D extends OAuthDancer> {
   OAuthDancerBuilder<D> customParametersExtractorsExprs(Map<String, String> customParamsExtractorsExprs);
 
   /**
-   * Uses the configuration provided to this builder to create a new {@link OAuthDancer dancer}.
+   * Uses the configuration provided to this builder to create a new dancer.
    * 
    * @return a fresh instance of a dancer.
    */

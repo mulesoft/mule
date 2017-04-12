@@ -52,6 +52,7 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
 import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
+import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
 import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
 import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
 import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
@@ -233,7 +234,8 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
         TokenResponse tokenResponse = invokeTokenUrl(tokenUrl, formData, null, true, encoding);
 
         final DefaultResourceOwnerOAuthContext resourceOwnerOAuthContext =
-            getContextForResourceOwner(resourceOwnerId == null ? DEFAULT_RESOURCE_OWNER_ID : resourceOwnerId);
+            (DefaultResourceOwnerOAuthContext) getContextForResourceOwner(resourceOwnerId == null ? DEFAULT_RESOURCE_OWNER_ID
+                : resourceOwnerId);
 
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Update OAuth Context for resourceOwnerId %s", resourceOwnerOAuthContext.getResourceOwnerId());
@@ -418,11 +420,24 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
   }
 
   @Override
+  public CompletableFuture<String> accessToken(String resourceOwner) throws RequestAuthenticationException {
+    final String accessToken = getContextForResourceOwner(resourceOwner).getAccessToken();
+    if (accessToken == null) {
+      throw new RequestAuthenticationException(createStaticMessage(format("No access token found. "
+          + "Verify that you have authenticated before trying to execute an operation to the API.")));
+    }
+
+    // TODO MULE-11858 proactively refresh if the token has already expired based on its 'expiresIn' parameter
+    return completedFuture(accessToken);
+  }
+
+  @Override
   public CompletableFuture<Void> refreshToken(String resourceOwner) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Executing refresh token for user " + resourceOwner);
     }
-    final DefaultResourceOwnerOAuthContext resourceOwnerOAuthContext = getContextForResourceOwner(resourceOwner);
+    final DefaultResourceOwnerOAuthContext resourceOwnerOAuthContext =
+        (DefaultResourceOwnerOAuthContext) getContextForResourceOwner(resourceOwner);
     final boolean lockWasAcquired = resourceOwnerOAuthContext.getRefreshUserOAuthContextLock().tryLock();
     try {
       if (lockWasAcquired) {

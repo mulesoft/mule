@@ -7,6 +7,7 @@
 package org.mule.extension.oauth2.internal.authorizationcode;
 
 import static java.lang.Thread.currentThread;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 
@@ -17,6 +18,7 @@ import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthCon
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.util.store.ObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -24,9 +26,9 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
-import org.mule.runtime.oauth.api.builder.OAuthDancerBuilder;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.mule.service.http.api.server.HttpServer;
 
@@ -127,6 +129,8 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
   @Optional(defaultValue = DEFAULT_RESOURCE_OWNER_ID)
   private ParameterResolver<String> resourceOwnerId;
 
+  private AuthorizationCodeOAuthDancer dancer;
+
   public HttpListenerConfig getLocalCallbackConfig() {
     return localCallbackConfig;
   }
@@ -148,8 +152,23 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
   }
 
   @Override
-  protected OAuthDancerBuilder configDancer(OAuthService oauthService)
-      throws InitialisationException {
+  public final void initialise() throws InitialisationException {
+    initTokenManager();
+
+    try {
+      OAuthAuthorizationCodeDancerBuilder dancerBuilder =
+          configDancer(muleContext.getRegistry().lookupObject(OAuthService.class));
+      dancerBuilder.clientCredentials(getClientId(), getClientSecret());
+
+      configureBaseDancer(dancerBuilder);
+      dancer = dancerBuilder.build();
+    } catch (RegistrationException e) {
+      throw new InitialisationException(e, this);
+    }
+    initialiseIfNeeded(getDancer());
+  }
+
+  private OAuthAuthorizationCodeDancerBuilder configDancer(OAuthService oauthService) throws InitialisationException {
     OAuthAuthorizationCodeDancerBuilder dancerBuilder =
         oauthService.authorizationCodeGrantTypeDancerBuilder(lockId -> muleContext.getLockFactory().createLock(lockId),
                                                              new ObjectStoreToMapAdapter(tokenManager.getObjectStore()),
@@ -217,5 +236,10 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
       }
     }
     return shouldRetryRequest;
+  }
+
+  @Override
+  public AuthorizationCodeOAuthDancer getDancer() {
+    return dancer;
   }
 }

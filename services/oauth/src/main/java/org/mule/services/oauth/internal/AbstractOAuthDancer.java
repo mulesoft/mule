@@ -6,9 +6,6 @@
  */
 package org.mule.services.oauth.internal;
 
-import static java.lang.String.format;
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
@@ -30,10 +27,10 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.MapUtils;
-import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
 import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
 import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
 import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
+import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
@@ -49,7 +46,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 
@@ -107,17 +103,6 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
   @Override
   public void stop() throws MuleException {
     httpClient.stop();
-  }
-
-  public CompletableFuture<String> accessToken(String resourceOwner) throws RequestAuthenticationException {
-    final String accessToken = getContextForResourceOwner(resourceOwner).getAccessToken();
-    if (accessToken == null) {
-      throw new RequestAuthenticationException(createStaticMessage(format("No access token found. "
-          + "Verify that you have authenticated before trying to execute an operation to the API.")));
-    }
-
-    // TODO MULE-11858 proactively refresh if the token has already expired based on its 'expiresIn' parameter
-    return completedFuture(accessToken);
   }
 
   protected TokenResponse invokeTokenUrl(String tokenUrl, Map<String, String> tokenRequestFormToSend, String authorization,
@@ -238,7 +223,7 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
    * @param resourceOwnerId id of the user.
    * @return oauth state
    */
-  protected DefaultResourceOwnerOAuthContext getContextForResourceOwner(final String resourceOwnerId) {
+  public ResourceOwnerOAuthContext getContextForResourceOwner(final String resourceOwnerId) {
     DefaultResourceOwnerOAuthContext resourceOwnerOAuthContext = null;
     if (!tokensStore.containsKey(resourceOwnerId)) {
       final Lock lock = lockProvider.createLock(toString() + "-config-oauth-context");
