@@ -43,7 +43,7 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features("OAuth Service")
-public class OAuthContextTestcase extends AbstractMuleContextTestCase {
+public class OAuthContextTestCase extends AbstractMuleContextTestCase {
 
   private OAuthService service;
   private Map<String, ResourceOwnerOAuthContext> tokensStore;
