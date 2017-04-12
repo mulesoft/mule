@@ -112,10 +112,11 @@ public class AbstractWSDLHttpImportedSchemaServerTlsTestCase extends FunctionalT
                 {
                     response.setContentType(APPLICATION_XML_UTF_8.toString());
                     final InputStream wsdlStream = this.getClass().getResourceAsStream(getContentSourceToReturn(request));
-                    final String contents = IOUtils.toString(wsdlStream, UTF_8.name());
+                    String contents = IOUtils.toString(wsdlStream, UTF_8.name());
+                    contents = contents.replaceAll("\\$\\{port\\}", "" + port);
                     response.setContentLength(contents.length());
                     // this replaces the port in the schema address
-                    response.getWriter().write(contents.replaceAll("\\$\\{port\\}", "" + port));
+                    response.getWriter().write(contents);
                 }
 
                 private String getContentSourceToReturn(Request request)
