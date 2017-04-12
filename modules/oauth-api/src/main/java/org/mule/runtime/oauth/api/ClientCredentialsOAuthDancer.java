@@ -41,7 +41,7 @@ public interface ClientCredentialsOAuthDancer {
    *
    * @return a completable future that is complete when the context has been cleared.
    */
-  CompletableFuture<Void> invalidateContext();
+  void invalidateContext();
 
   /**
    * Retrieves the oauth context. If there's no state, a new state is retrieved so never returns null.

@@ -134,8 +134,8 @@ public class DefaultClientCredentialsOAuthDancer extends AbstractOAuthDancer imp
   }
 
   @Override
-  public CompletableFuture<Void> invalidateContext() {
-    return invalidateContext(DEFAULT_RESOURCE_OWNER_ID);
+  public void invalidateContext() {
+    invalidateContext(DEFAULT_RESOURCE_OWNER_ID);
   }
 
   @Override

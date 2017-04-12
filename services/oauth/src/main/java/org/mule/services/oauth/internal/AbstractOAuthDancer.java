@@ -6,7 +6,6 @@
  */
 package org.mule.services.oauth.internal;
 
-import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
@@ -46,7 +45,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 
@@ -217,7 +215,7 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
     }
   }
 
-  public CompletableFuture<Void> invalidateContext(String resourceOwner) {
+  public void invalidateContext(String resourceOwner) {
     DefaultResourceOwnerOAuthContext context = (DefaultResourceOwnerOAuthContext) getContextForResourceOwner(resourceOwner);
     context.getRefreshUserOAuthContextLock().lock();
     try {
@@ -225,7 +223,6 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
     } finally {
       context.getRefreshUserOAuthContextLock().unlock();
     }
-    return completedFuture(null);
   }
 
   /**

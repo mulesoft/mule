@@ -87,7 +87,7 @@ public class OAuthContextTestCase extends AbstractMuleContextTestCase {
     clientCredentialsDancer.getContext();
     assertThat(tokensStore, hasKey(DEFAULT_RESOURCE_OWNER_ID));
 
-    clientCredentialsDancer.invalidateContext().get();
+    clientCredentialsDancer.invalidateContext();
     assertThat(tokensStore, not(hasKey(DEFAULT_RESOURCE_OWNER_ID)));
   }
 
@@ -136,7 +136,7 @@ public class OAuthContextTestCase extends AbstractMuleContextTestCase {
     authCodeDancer.getContextForResourceOwner("user1");
     assertThat(tokensStore, hasKey("user1"));
 
-    authCodeDancer.invalidateContext("user1").get();
+    authCodeDancer.invalidateContext("user1");
     assertThat(tokensStore, not(hasKey("user1")));
   }
 
@@ -152,7 +152,7 @@ public class OAuthContextTestCase extends AbstractMuleContextTestCase {
     assertThat(tokensStore, hasKey("user1"));
     assertThat(tokensStore, hasKey("user2"));
 
-    authCodeDancer.invalidateContext("user1").get();
+    authCodeDancer.invalidateContext("user1");
     assertThat(tokensStore, not(hasKey("user1")));
     assertThat(tokensStore, hasKey("user2"));
   }
