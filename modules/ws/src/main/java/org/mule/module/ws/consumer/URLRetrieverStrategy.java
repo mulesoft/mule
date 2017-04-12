@@ -24,17 +24,20 @@ import javax.wsdl.WSDLException;
 public class URLRetrieverStrategy implements WsdlRetrieverStrategy
 {
 
-
     @Override
     public InputStream retrieveWsdlResource(String url) throws WSDLException
     {
+        InputStream responseStream = null;
+        URL location = IOUtils.getResourceAsUrl(url, getClass());
+
+        if (location == null)
+        {
+            throw new WSDLException("No resource was found on: %s", url.toString());
+        }
+        
         try
         {
-            InputStream responseStream = null;
-
-            URL location = IOUtils.getResourceAsUrl(url, getClass());
             URLConnection urlConnection = location.openConnection();
-
             if (location.getUserInfo() != null)
             {
                 urlConnection.setRequestProperty("Authorization", "Basic " + encodeBytes(location.getUserInfo().getBytes()));

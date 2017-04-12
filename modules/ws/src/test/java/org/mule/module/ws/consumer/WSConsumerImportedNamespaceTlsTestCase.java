@@ -12,7 +12,21 @@ import static org.mule.api.config.MuleProperties.MULE_USE_CONNECTOR_TO_RETRIEVE_
 
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import org.mule.api.MuleException;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.module.http.api.requester.HttpRequesterConfig;
+
 import java.util.Map;
+
+import javax.wsdl.Binding;
+import javax.wsdl.BindingOperation;
+import javax.wsdl.Definition;
+import javax.wsdl.Port;
+import javax.wsdl.Service;
+import javax.wsdl.factory.WSDLFactory;
+import javax.wsdl.xml.WSDLLocator;
+import javax.wsdl.xml.WSDLReader;
+import javax.xml.namespace.QName;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,7 +37,7 @@ import org.junit.Test;
  * in the test app should be routed through the http requester configured with an insecure TLS context.
  * If an URLConnection is used instead of the http requester, the TLS context will not be used.
  */
-public class WSConsumerImportedNamespaceTlsTestCase extends AbstractWSDLServerTlsTestCase
+public class WSConsumerImportedNamespaceTlsTestCase extends AbstractWSDLHttpImportedSchemaServerTlsTestCase
 {
     @Rule
     public SystemProperty useConnectorToRetrieveWsdl = new SystemProperty(MULE_USE_CONNECTOR_TO_RETRIEVE_WSDL, "true");
@@ -31,8 +45,6 @@ public class WSConsumerImportedNamespaceTlsTestCase extends AbstractWSDLServerTl
     @Rule
     public SystemProperty acceptAnyCertificate = new SystemProperty("com.ning.http.client.AsyncHttpClientConfig.acceptAnyCertificate", "true");
 
-    private static String WSDL_FILE_LOCATION = "/TestMainWsdl.wsdl";
-    
     @Override
     protected String getConfigFile()
     {
@@ -47,8 +59,4 @@ public class WSConsumerImportedNamespaceTlsTestCase extends AbstractWSDLServerTl
         assertThat(consumers.values().size(), equalTo(1));
     }
 
-    @Override
-    protected String getWsdlFileLocation() {
-        return WSDL_FILE_LOCATION;
-    }
 }

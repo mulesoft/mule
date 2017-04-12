@@ -427,7 +427,7 @@
 /mule-standalone-${productVersion}/lib/opt/xstream-1.4.9.jar
 /mule-standalone-${productVersion}/lib/opt/opensaml-2.6.1.jar
 /mule-standalone-${productVersion}/lib/opt/openws-1.5.1.jar
-/mule-standalone-${productVersion}/lib/opt/xmlbeans-2.3.0.jar
+/mule-standalone-${productVersion}/lib/opt/xmlbeans-2.3.2.jar
 /mule-standalone-${productVersion}/lib/opt/xmltooling-1.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/xqj-api-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/yecht-1.1-jruby.jar

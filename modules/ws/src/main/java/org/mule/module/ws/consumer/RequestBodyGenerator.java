@@ -6,9 +6,12 @@
  */
 package org.mule.module.ws.consumer;
 
+import org.mule.api.MuleContext;
 import org.mule.common.metadata.DefaultXmlMetaDataModel;
 import org.mule.common.metadata.MetaDataGenerationException;
 import org.mule.common.metadata.property.AllowsAnyMetaDataModelProperty;
+import org.mule.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.transport.ssl.api.TlsContextFactory;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -32,10 +35,17 @@ public class RequestBodyGenerator
     private static final Logger logger = LoggerFactory.getLogger(RequestBodyGenerator.class);
 
     private Definition wsdlDefinition;
-
+    private MuleWSDLLocator locator;
+    
     public RequestBodyGenerator(Definition wsdlDefinition)
     {
         this.wsdlDefinition = wsdlDefinition;
+    }
+
+    public RequestBodyGenerator(Definition wsdlDefinition, MuleWSDLLocator locator)
+    {
+        this.wsdlDefinition = wsdlDefinition;
+        this.locator = locator;
     }
 
     /**
@@ -77,7 +87,7 @@ public class RequestBodyGenerator
 
         try
         {
-            DefaultXmlMetaDataModel model = new DefaultXmlMetaDataModel(schemas, part.getElementName(), Charset.defaultCharset());
+            DefaultXmlMetaDataModel model = new DefaultXmlMetaDataModel(schemas, locator, part.getElementName(), Charset.defaultCharset());
 
             if (model.getFields().isEmpty() && model.getProperty(AllowsAnyMetaDataModelProperty.class) == null)
             {

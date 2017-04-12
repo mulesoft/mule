@@ -83,7 +83,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
     private String requestBody;
     private SoapVersion soapVersion;
     private boolean mtomEnabled;
-    private WSDLLocator wsdlLocator;
+    private MuleWSDLLocator wsdlLocator;
 
     @Override
     public void initialise() throws InitialisationException
@@ -435,7 +435,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         this.soapVersion = WSDLUtils.getSoapVersion(binding);
         this.soapAction = getSoapAction(bindingOperation);
 
-        RequestBodyGenerator requestBodyGenerator = new RequestBodyGenerator(wsdlDefinition);
+        RequestBodyGenerator requestBodyGenerator = new RequestBodyGenerator(wsdlDefinition, wsdlLocator);
         this.requestBody = requestBodyGenerator.generateRequestBody(bindingOperation);
 
     }

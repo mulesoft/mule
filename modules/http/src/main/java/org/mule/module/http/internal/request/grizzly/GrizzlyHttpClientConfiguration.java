@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.request.grizzly;
 
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.module.http.internal.request.grizzly.GrizzlyHttpClientConfiguration.Builder;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.TcpClientSocketProperties;
 
@@ -25,10 +26,11 @@ public class GrizzlyHttpClientConfiguration
     private final Integer workerCoreSize;
     private final Integer maxKernelPoolSize;
     private final Integer kernelCoreSize;
+    private final Integer selectorRunnersCount;
 
     private GrizzlyHttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties,
             int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix, String ownerName,
-            Integer maxWorkerPoolSize, Integer workerCoreSize, Integer maxKernelPoolSize, Integer kernelCoreSize)
+            Integer maxWorkerPoolSize, Integer workerCoreSize, Integer maxKernelPoolSize, Integer kernelCoreSize, Integer selectorRunnersCount)
     {
         this.tlsContextFactory = tlsContextFactory;
         this.proxyConfig = proxyConfig;
@@ -42,6 +44,7 @@ public class GrizzlyHttpClientConfiguration
         this.workerCoreSize = workerCoreSize;
         this.maxKernelPoolSize = maxKernelPoolSize;
         this.kernelCoreSize = kernelCoreSize;
+        this.selectorRunnersCount = selectorRunnersCount;
     }
 
     public TlsContextFactory getTlsContextFactory()
@@ -105,6 +108,11 @@ public class GrizzlyHttpClientConfiguration
         return kernelCoreSize;
     }
 
+    public Integer getSelectorRunnersCount()
+    {
+        return selectorRunnersCount;
+    }
+
     public static class Builder
     {
         private TlsContextFactory tlsContextFactory;
@@ -119,6 +127,7 @@ public class GrizzlyHttpClientConfiguration
         private Integer workerCoreSize;
         private Integer maxKernelPoolSize;
         private Integer kernelCoreSize;
+        private Integer selectorRunnersCount;
 
         public Builder setTlsContextFactory(TlsContextFactory tlsContextFactory)
         {
@@ -192,11 +201,18 @@ public class GrizzlyHttpClientConfiguration
             return this;
         }
 
+        public Builder setSelectorRunnersCount(int selectorRunnersCount)
+        {
+            this.selectorRunnersCount = selectorRunnersCount;
+            return this;
+        }
+
         public GrizzlyHttpClientConfiguration build()
         {
             return new GrizzlyHttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
                     usePersistentConnections, connectionIdleTimeout, threadNamePrefix, ownerName,
-                    maxWorkerPoolSize, workerCoreSize, maxKernelPoolSize, kernelCoreSize);
+                    maxWorkerPoolSize, workerCoreSize, maxKernelPoolSize, kernelCoreSize, selectorRunnersCount);
         }
+
     }
 }
