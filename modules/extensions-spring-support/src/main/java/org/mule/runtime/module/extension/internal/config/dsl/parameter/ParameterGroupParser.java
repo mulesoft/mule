@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
@@ -42,9 +43,8 @@ public class ParameterGroupParser extends ExtensionDefinitionParser {
 
   public ParameterGroupParser(Builder definition, ParameterGroupModel group, ParameterGroupDescriptor groupDescriptor,
                               ClassLoader classLoader, DslElementSyntax groupDsl, DslSyntaxResolver dslResolver,
-                              ExtensionParsingContext context,
-                              MuleContext muleContext) {
-    super(definition, dslResolver, context, muleContext);
+                              ExtensionParsingContext context) {
+    super(definition, dslResolver, context);
 
     checkArgument(group.isShowInDsl(), "Cannot parse an implicit group");
     this.group = group;
@@ -62,7 +62,7 @@ public class ParameterGroupParser extends ExtensionDefinitionParser {
         .withObjectFactoryType(TopLevelParameterObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(metadataType).build())
         .withConstructorParameterDefinition(fromFixedValue(classLoader).build())
-        .withConstructorParameterDefinition(fromFixedValue(muleContext).build());
+        .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build());
 
     this.parseParameters(group.getParameterModels());
   }

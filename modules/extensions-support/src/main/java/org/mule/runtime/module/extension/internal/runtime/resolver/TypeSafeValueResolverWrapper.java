@@ -8,14 +8,18 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.core.util.ClassUtils.isInstance;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.transformer.Transformer;
 
+import javax.inject.Inject;
+
 /**
- * {@link ValueResolver} wrapper implementation which wraps another {@link ValueResolver} and ensures that the output
- * is always of a certain type.
+ * {@link ValueResolver} wrapper implementation which wraps another {@link ValueResolver} and ensures that the output is always of
+ * a certain type.
  * <p>
  * If the returned value of the {@link this#valueResolverDelegate} is not of the desired type, it tries to locate a
  * {@link Transformer} which can do the transformation from the obtained type to the expected one.
@@ -23,15 +27,33 @@ import org.mule.runtime.core.api.transformer.Transformer;
  * @param <T>
  * @since 4.0
  */
-public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T> {
+public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initialisable {
 
+  private final Class<T> expectedType;
   private ValueResolver valueResolverDelegate;
   private Resolver<T> resolver;
 
-  public TypeSafeValueResolverWrapper(ValueResolver valueResolverDelegate, Class<T> expectedType, MuleContext muleContext) {
-    TypeSafeTransformer typeSafeTransformer = new TypeSafeTransformer(muleContext);
-    this.valueResolverDelegate = valueResolverDelegate;
+  @Inject
+  private TransformationService transformationService;
 
+  public TypeSafeValueResolverWrapper(ValueResolver valueResolverDelegate, Class<T> expectedType) {
+    this.expectedType = expectedType;
+    this.valueResolverDelegate = valueResolverDelegate;
+  }
+
+  @Override
+  public T resolve(Event event) throws MuleException {
+    return resolver.resolve(event);
+  }
+
+  @Override
+  public boolean isDynamic() {
+    return valueResolverDelegate.isDynamic();
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    TypeSafeTransformer typeSafeTransformer = new TypeSafeTransformer(transformationService);
     resolver = (event -> {
       Object resolvedValue = valueResolverDelegate.resolve(event);
       return isInstance(expectedType, resolvedValue)
@@ -45,14 +67,8 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T> {
     }
   }
 
-  @Override
-  public T resolve(Event event) throws MuleException {
-    return resolver.resolve(event);
-  }
-
-  @Override
-  public boolean isDynamic() {
-    return valueResolverDelegate.isDynamic();
+  public void setTransformationService(TransformationService transformationService) {
+    this.transformationService = transformationService;
   }
 
   @FunctionalInterface
@@ -62,8 +78,8 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T> {
   }
 
   /**
-   * {@link Resolver} implementation which caches the value of the resolution of the given {@param resolver} so
-   * the resolution logic is executed once.
+   * {@link Resolver} implementation which caches the value of the resolution of the given {@param resolver} so the resolution
+   * logic is executed once.
    */
   private class CachedResolver implements Resolver<T> {
 

@@ -308,6 +308,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     public void doWork(RetryContext context) throws Exception {
       try {
         createSource();
+        sourceAdapter.initialise();
         sourceAdapter.start();
       } catch (Exception e) {
         stopSource();

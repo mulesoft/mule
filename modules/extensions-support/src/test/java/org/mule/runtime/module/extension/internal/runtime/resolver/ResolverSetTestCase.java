@@ -102,7 +102,7 @@ public class ResolverSetTestCase extends AbstractMuleTestCase {
   }
 
   private ResolverSet buildSet(Map<ParameterModel, ValueResolver> mapping) {
-    ResolverSet set = new ResolverSet();
+    ResolverSet set = new ResolverSet(muleContext);
     mapping.forEach((key, value) -> set.add(key.getName(), value));
 
     return set;

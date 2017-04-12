@@ -18,6 +18,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -49,8 +50,8 @@ import org.slf4j.Logger;
  * {@link ResolverSetResult} to build an instance of type {@code T}
  * <p>
  * Although each invocation to {@link #get(Object)} is guaranteed to end up in an invocation to
- * {@link #resolverSet#resolve(Object)}, the resulting {@link ResolverSetResult} might not end up generating a new instance.
- * This is so because {@link ResolverSetResult} instances are put in a cache to guarantee that equivalent evaluations of the
+ * {@link #resolverSet#resolve(Object)}, the resulting {@link ResolverSetResult} might not end up generating a new instance. This
+ * is so because {@link ResolverSetResult} instances are put in a cache to guarantee that equivalent evaluations of the
  * {@code resolverSet} return the same instance.
  *
  * @since 4.0.0
@@ -87,7 +88,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
                                       ConnectionProviderValueResolver connectionProviderResolver,
                                       ExpirationPolicy expirationPolicy,
                                       MuleContext muleContext) {
-    super(name, extensionModel, configurationModel);
+    super(name, extensionModel, configurationModel, muleContext);
     configurationInstanceFactory =
         new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet, muleContext);
     this.resolverSet = resolverSet;
@@ -96,8 +97,8 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   }
 
   /**
-   * Evaluates {@link #resolverSet} using the given {@code event} and returns an instance produced with the result. For
-   * equivalent {@link ResolverSetResult}s it will return the same instance.
+   * Evaluates {@link #resolverSet} using the given {@code event} and returns an instance produced with the result. For equivalent
+   * {@link ResolverSetResult}s it will return the same instance.
    *
    * @param event the current {@code event}
    * @return the resolved {@link ConfigurationInstance}
@@ -213,5 +214,15 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   private boolean isExpired(ConfigurationInstance configuration) {
     ConfigurationStats stats = configuration.getStatistics();
     return stats.getInflightOperations() == 0 && expirationPolicy.isExpired(stats.getLastUsedMillis(), MILLISECONDS);
+  }
+
+  @Override
+  protected void doInitialise() {
+    try {
+      initialiseIfNeeded(resolverSet, muleContext);
+      initialiseIfNeeded(connectionProviderResolver, muleContext);
+    } catch (InitialisationException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 }

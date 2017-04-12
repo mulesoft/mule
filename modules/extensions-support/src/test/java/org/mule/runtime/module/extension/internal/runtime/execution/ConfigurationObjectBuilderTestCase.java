@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getResolver;
@@ -18,6 +19,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.config.ConfigurationObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -43,15 +45,12 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase {
   public static final ParameterModel descriptionParameterModel = getParameter("description", String.class);
 
   public static ResolverSet createResolverSet() throws Exception {
-    ResolverSet resolverSet = new ResolverSet();
+    ResolverSet resolverSet = new ResolverSet(mock(MuleContext.class));
     resolverSet.add(nameParameterModel.getName(), getResolver(NAME_VALUE));
     resolverSet.add(descriptionParameterModel.getName(), getResolver(DESCRIPTION_VALUE));
 
     return resolverSet;
   }
-
-  @Mock
-  private ExtensionModel extensionModel;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ConfigurationModel configurationModel;

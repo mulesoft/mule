@@ -24,6 +24,13 @@
                  substitutionGroup="mule:abstract-extension"/>
     <xsd:element name="parameter-collection-parser" type="simpleParameterCollectionParser"
                  substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="component-created-with-object-factory" substitutionGroup="mule:abstract-extension">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractExtensionType"/>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
 
     <xsd:element name="global-element-with-object-factory" substitutionGroup="mule:abstract-extension">
         <xsd:complexType>

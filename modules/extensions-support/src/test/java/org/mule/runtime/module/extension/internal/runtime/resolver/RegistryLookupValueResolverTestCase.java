@@ -44,7 +44,8 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase {
   public void before() throws Exception {
     when(muleContext.getRegistry().get(KEY)).thenReturn(HELLO_WORLD);
     when(muleContext.getRegistry().get(FAKE_KEY)).thenReturn(null);
-    resolver = new RegistryLookupValueResolver(KEY, muleContext);
+    resolver = new RegistryLookupValueResolver(KEY);
+    ((RegistryLookupValueResolver) resolver).setMuleContext(muleContext);
   }
 
   @Test
@@ -61,16 +62,18 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalArgumentException.class)
   public void nullKey() {
-    new RegistryLookupValueResolver(null, muleContext);
+    new RegistryLookupValueResolver(null);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void blankKey() {
-    new RegistryLookupValueResolver("", muleContext);
+    new RegistryLookupValueResolver("");
   }
 
   @Test(expected = ConfigurationException.class)
   public void nonExistingKey() throws Exception {
-    new RegistryLookupValueResolver<>(FAKE_KEY, muleContext).resolve(event);
+    RegistryLookupValueResolver<Object> valueResolver = new RegistryLookupValueResolver<>(FAKE_KEY);
+    valueResolver.setMuleContext(muleContext);
+    valueResolver.resolve(event);
   }
 }

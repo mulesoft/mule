@@ -52,7 +52,6 @@ import org.mule.runtime.config.spring.processors.PostRegistrationActionsPostProc
 import org.mule.runtime.config.spring.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.TransformerResolver;
@@ -63,6 +62,14 @@ import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -82,12 +89,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.w3c.dom.Document;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
@@ -148,9 +149,9 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
     serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, currentThread().getContextClassLoader())
         .forEach(componentBuildingDefinitionProvider -> {
-          // TODO MULE-9637 remove support for MuleContextAware injection.
-          if (componentBuildingDefinitionProvider instanceof MuleContextAware) {
-            ((MuleContextAware) componentBuildingDefinitionProvider).setMuleContext(muleContext);
+          if (componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider) {
+            ((ExtensionBuildingDefinitionProvider) componentBuildingDefinitionProvider)
+                .setExtensionModels(muleContext.getExtensionManager().getExtensions());
           }
           componentBuildingDefinitionProvider.init();
           componentBuildingDefinitionProvider.getComponentBuildingDefinitions()

@@ -14,6 +14,13 @@ import org.mule.runtime.api.meta.AnnotatedObject;
  *
  * This object may have a complex construction with setters and constructor parameters which are going to be defined by the
  * {@link ComponentBuildingDefinition} that use them.
+ * <p>
+ * Implementations of ObjectFactory can be annotated with @Inject at the field level to get dependency injection that can later be
+ * used for the purpose of creating the object with {@code getObject} method. Objects created with the ObjectFactory will not have
+ * dependency injection support.
+ * <p>
+ * ObjectFactories do not support any lifecycle method but the object created through {@code getObject} may implement lifecycle
+ * interfaces.
  *
  * @param <T> the type of the object to be created.
  *

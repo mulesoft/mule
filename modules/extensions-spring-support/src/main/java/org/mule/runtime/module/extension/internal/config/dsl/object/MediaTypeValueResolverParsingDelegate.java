@@ -29,8 +29,7 @@ public class MediaTypeValueResolverParsingDelegate implements ValueResolverParsi
   }
 
   @Override
-  public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl,
-                                     MuleContext muleContext) {
+  public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl) {
     return new StaticValueResolver<>(DataType.builder().mediaType(key).build().getMediaType());
   }
 }

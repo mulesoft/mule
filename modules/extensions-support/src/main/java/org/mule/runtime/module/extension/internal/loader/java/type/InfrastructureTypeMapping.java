@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
+import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
-import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_TLS_NAMESPACE;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.collection.ImmutableMapCollector;
@@ -34,7 +33,7 @@ public final class InfrastructureTypeMapping {
       .put(TlsContextFactory.class, TLS_PARAMETER_NAME).build();
 
   private static Map<String, QNameModelProperty> QNAMES = ImmutableMap.<String, QNameModelProperty>builder()
-      .put(TLS_PARAMETER_NAME, new QNameModelProperty(new QName(MULE_TLS_NAMESPACE,
+      .put(TLS_PARAMETER_NAME, new QNameModelProperty(new QName("http://www.mulesoft.org/schema/mule/tls",
                                                                 TLS_CONTEXT_ELEMENT_IDENTIFIER,
                                                                 TLS_PREFIX)))
       .build();

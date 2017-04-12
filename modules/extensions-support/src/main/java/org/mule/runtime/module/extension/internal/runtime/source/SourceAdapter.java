@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
@@ -19,6 +20,8 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -46,8 +49,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
-import org.apache.commons.collections.CollectionUtils;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -57,13 +58,15 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.apache.commons.collections.CollectionUtils;
+
 /**
  * An adapter for {@link Source} which acts as a bridge with {@link ExtensionMessageSource}. It also propagates lifecycle and
  * performs injection of both, dependencies and parameters
  *
  * @since 4.0
  */
-public final class SourceAdapter implements Startable, Stoppable, FlowConstructAware {
+public final class SourceAdapter implements Startable, Stoppable, Initialisable, FlowConstructAware {
 
   private final ExtensionModel extensionModel;
   private final SourceModel sourceModel;
@@ -128,6 +131,13 @@ public final class SourceAdapter implements Startable, Stoppable, FlowConstructA
                                                                                          sourceModel, source, m,
                                                                                          muleContext))
         .orElse(new NullSourceCallbackExecutor());
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(this.nonCallbackParameters, true, muleContext);
+    initialiseIfNeeded(this.errorCallbackParameters, true, muleContext);
+    initialiseIfNeeded(this.successCallbackParameters, true, muleContext);
   }
 
 

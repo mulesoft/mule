@@ -47,6 +47,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
@@ -63,6 +64,7 @@ import org.mule.runtime.config.spring.processors.MuleObjectNameProcessor;
 import org.mule.runtime.config.spring.processors.ParentContextPropertyPlaceholderProcessor;
 import org.mule.runtime.config.spring.processors.PropertyPlaceholderProcessor;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
 import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
@@ -220,6 +222,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_CONNECTIVITY_TESTING_SERVICE, getBeanDefinition(DefaultConnectivityTestingService.class))
       .put(OBJECT_COMPONENT_INITIAL_STATE_MANAGER, getBeanDefinition(DefaultComponentInitialStateManager.class))
       .put(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class))
+      .put(OBJECT_TRANSFORMATION_SERVICE, getBeanDefinition(TransformationService.class))
       .build();
 
   private final SpringConfigurationComponentLocator componentLocator;

@@ -114,7 +114,7 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
   public void typedValueForStringOnSourceOnSuccess() throws Exception {
     Flow flow = (Flow) getFlowConstruct("typedValueForStringOnSourceOnSuccess");
     flow.start();
-    new PollingProber().check(new JUnitLambdaProbe(() -> TypedValueSource.onSuccessValue != null));
+    new PollingProber(RECEIVE_TIMEOUT, 100).check(new JUnitLambdaProbe(() -> TypedValueSource.onSuccessValue != null));
     assertTypedValue(TypedValueSource.onSuccessValue, "string", MediaType.APPLICATION_JSON, UTF8);
   }
 

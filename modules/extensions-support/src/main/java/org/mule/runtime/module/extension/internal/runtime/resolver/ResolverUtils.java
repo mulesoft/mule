@@ -12,6 +12,8 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -59,14 +61,35 @@ public class ResolverUtils {
   private static ValueResolver<?> getExpressionBasedValueResolver(String expression, BooleanSupplier isTypedValue,
                                                                   BooleanSupplier isParameterResolver, MetadataType type,
                                                                   MuleContext muleContext) {
-    if (isTypedValue.getAsBoolean()) {
-      return new ExpressionTypedValueValueResolver<>(expression, getType(type), muleContext);
-    } else if (isParameterResolver.getAsBoolean()) {
-      return new ExpressionBasedParameterResolverValueResolver<>(expression, type, muleContext);
-    } else if (muleContext.getExpressionManager().isExpression(expression)) {
-      return new TypeSafeExpressionValueResolver<>(expression, getType(type), muleContext);
-    } else {
-      return new TypeSafeValueResolverWrapper(new StaticValueResolver<>(expression), getType(type), muleContext);
+
+    try {
+      if (isTypedValue.getAsBoolean()) {
+        ExpressionTypedValueValueResolver<Object> valueResolver =
+            new ExpressionTypedValueValueResolver<>(expression, getType(type));
+        valueResolver.setTransformationService(muleContext.getTransformationService());
+        valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
+        return valueResolver;
+      } else if (isParameterResolver.getAsBoolean()) {
+        ExpressionBasedParameterResolverValueResolver<Object> valueResolver =
+            new ExpressionBasedParameterResolverValueResolver<>(expression, type);
+        valueResolver.setTransformationService(muleContext.getTransformationService());
+        valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
+        return valueResolver;
+      } else if (muleContext.getExpressionManager().isExpression(expression)) {
+        TypeSafeExpressionValueResolver<Object> valueResolver = new TypeSafeExpressionValueResolver<>(expression, getType(type));
+        valueResolver.setTransformationService(muleContext.getTransformationService());
+        valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
+        valueResolver.initialise();
+        return valueResolver;
+      } else {
+        TypeSafeValueResolverWrapper typeSafeValueResolverWrapper =
+            new TypeSafeValueResolverWrapper(new StaticValueResolver<>(expression), getType(type));
+        typeSafeValueResolverWrapper.setTransformationService(muleContext.getTransformationService());
+        typeSafeValueResolverWrapper.initialise();
+        return typeSafeValueResolverWrapper;
+      }
+    } catch (InitialisationException e) {
+      throw new MuleRuntimeException(e);
     }
   }
 }

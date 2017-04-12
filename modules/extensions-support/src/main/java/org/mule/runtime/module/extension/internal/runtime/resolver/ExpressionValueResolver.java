@@ -8,45 +8,53 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.ClassUtils.isInstance;
-import org.apache.commons.lang.StringUtils;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
 import java.util.function.BiConsumer;
 
+import javax.inject.Inject;
+
+import org.apache.commons.lang.StringUtils;
+
 /**
  * A {@link ValueResolver} which evaluates a MEL expressions
  * <p>
- * It resolves the expressions by making use of the {@link AttributeEvaluator} so that it's compatible with simple
- * expressions and templates alike
+ * It resolves the expressions by making use of the {@link AttributeEvaluator} so that it's compatible with simple expressions and
+ * templates alike
  *
  * @param <T>
  * @since 4.0
  */
 public class ExpressionValueResolver<T> implements ValueResolver<T> {
 
+  @Inject
+  private ExtendedExpressionManager extendedExpressionManager;
   final AttributeEvaluator evaluator;
-  private final MuleContext muleContext;
   private boolean evaluatorInitialized = false;
-  private BiConsumer<AttributeEvaluator, MuleContext> evaluatorInitialiser = (evaluator, context) -> {
-    synchronized (context) {
-      if (!evaluatorInitialized) {
-        evaluator.initialize(context.getExpressionManager());
-        evaluatorInitialiser = (e, c) -> {
-        };
-        evaluatorInitialized = true;
-      }
-    }
-  };
+  private BiConsumer<AttributeEvaluator, ExtendedExpressionManager> evaluatorInitialiser =
+      (evaluator, extendedExpressionManager) -> {
+        synchronized (extendedExpressionManager) {
+          if (!evaluatorInitialized) {
+            evaluator.initialize(extendedExpressionManager);
+            evaluatorInitialiser = (e, c) -> {
+            };
+            evaluatorInitialized = true;
+          }
+        }
+      };
 
-  public ExpressionValueResolver(String expression, MuleContext muleContext) {
+  public ExpressionValueResolver(String expression) {
     checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
 
     this.evaluator = new AttributeEvaluator(expression);
-    this.muleContext = muleContext;
+  }
+
+  public void setExtendedExpressionManager(ExtendedExpressionManager extendedExpressionManager) {
+    this.extendedExpressionManager = extendedExpressionManager;
   }
 
   @Override
@@ -64,7 +72,7 @@ public class ExpressionValueResolver<T> implements ValueResolver<T> {
   }
 
   void initEvaluator() {
-    evaluatorInitialiser.accept(evaluator, muleContext);
+    evaluatorInitialiser.accept(evaluator, extendedExpressionManager);
   }
 
   /**

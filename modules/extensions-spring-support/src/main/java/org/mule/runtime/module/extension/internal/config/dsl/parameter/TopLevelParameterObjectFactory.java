@@ -52,7 +52,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
       resolveParameters(objectType, builder);
       resolveParameterGroups(objectType, builder);
 
-      ValueResolver<Object> resolver = new ObjectBuilderValueResolver<>(builder);
+      ValueResolver<Object> resolver = new ObjectBuilderValueResolver<>(builder, muleContext);
       return resolver.isDynamic() ? resolver : resolver.resolve(getInitialiserEvent(muleContext));
     }, Exception.class, exception -> {
       throw exception;

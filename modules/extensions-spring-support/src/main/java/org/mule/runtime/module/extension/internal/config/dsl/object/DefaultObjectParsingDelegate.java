@@ -36,12 +36,10 @@ public class DefaultObjectParsingDelegate implements ObjectParsingDelegate {
    * @param name the element name
    * @param objectType a {@link ObjectType}
    * @param elementDsl the {@link DslElementSyntax} of the parsed element
-   * @param muleContext the Mule node
    * @return a {@link AttributeDefinition.Builder}
    */
   @Override
-  public AttributeDefinition.Builder parse(String name, ObjectType objectType, DslElementSyntax elementDsl,
-                                           MuleContext muleContext) {
+  public AttributeDefinition.Builder parse(String name, ObjectType objectType, DslElementSyntax elementDsl) {
     AttributeDefinition.Builder builder = fromChildConfiguration(ValueResolver.class);
     if (elementDsl.isWrapped()) {
       builder.withWrapperIdentifier(elementDsl.getElementName());

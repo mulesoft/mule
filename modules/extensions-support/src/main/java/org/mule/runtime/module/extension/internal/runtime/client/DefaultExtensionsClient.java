@@ -13,6 +13,7 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -22,6 +23,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.util.TemplateParser;
@@ -45,8 +47,8 @@ import javax.inject.Inject;
 
 
 /**
- * This is the default implementation for a {@link ExtensionsClient}, it uses the {@link ExtensionManager}
- * in the {@link MuleContext} to search for the extension that wants to execute the operation from.
+ * This is the default implementation for a {@link ExtensionsClient}, it uses the {@link ExtensionManager} in the
+ * {@link MuleContext} to search for the extension that wants to execute the operation from.
  * <p>
  * The concrete execution of the operation is handled by an {@link OperationMessageProcessor} instance.
  * <p>
@@ -98,8 +100,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
   }
 
   /**
-   * Creates a new {@link OperationMessageProcessor} for the required operation and parses all the parameters passed by
-   * the client user.
+   * Creates a new {@link OperationMessageProcessor} for the required operation and parses all the parameters passed by the client
+   * user.
    */
   private OperationMessageProcessor createProcessor(String extensionName, String operationName, OperationParameters parameters) {
     ExtensionModel extension = findExtension(extensionName);
@@ -126,7 +128,14 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
       if (value instanceof ComplexParameter) {
         ComplexParameter complex = (ComplexParameter) value;
         DefaultObjectBuilder<?> builder = new DefaultObjectBuilder<>(complex.getType());
-        resolveParameters(complex.getParameters(), event).forEach(builder::addPropertyResolver);
+        resolveParameters(complex.getParameters(), event).forEach((propertyName, valueResolver) -> {
+          try {
+            LifecycleUtils.initialiseIfNeeded(valueResolver, true, muleContext);
+            builder.addPropertyResolver(propertyName, valueResolver);
+          } catch (InitialisationException e) {
+            throw new MuleRuntimeException(e);
+          }
+        });
         try {
           values.put(name, new StaticValueResolver<>(builder.build(event)));
         } catch (MuleException e) {
@@ -134,7 +143,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
         }
       } else {
         if (value instanceof String && parser.isContainsTemplate((String) value)) {
-          values.put(name, new TypeSafeExpressionValueResolver<>((String) value, Object.class, muleContext));
+          values.put(name, new TypeSafeExpressionValueResolver<>((String) value, Object.class));
         } else {
           values.put(name, new StaticValueResolver<>(value));
         }

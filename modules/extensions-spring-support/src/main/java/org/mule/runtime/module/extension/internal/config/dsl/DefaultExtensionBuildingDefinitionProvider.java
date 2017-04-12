@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
@@ -29,9 +30,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.config.spring.dsl.model.extension.xml.XmlExtensionModelProperty;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
@@ -39,6 +38,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
+import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
 import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.config.dsl.config.ConfigurationDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.connection.ConnectionProviderDefinitionParser;
@@ -58,6 +58,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
@@ -70,11 +71,15 @@ import java.util.stream.Stream;
  *
  * @since 4.0
  */
-public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider, MuleContextAware {
+public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuildingDefinitionProvider {
 
   private final List<ComponentBuildingDefinition> definitions = new LinkedList<>();
-  private ExtensionManager extensionManager;
-  private MuleContext muleContext;
+
+  private Set<ExtensionModel> extensions;
+
+  public void setExtensions(Set<ExtensionModel> extensions) {
+    this.extensions = extensions;
+  }
 
   /**
    * Gets a hold on a {@link ExtensionManager} instance and generates the definitions.
@@ -83,17 +88,15 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
    */
   @Override
   public void init() {
-    extensionManager = muleContext.getExtensionManager();
-    if (extensionManager != null) {
-      extensionManager.getExtensions().stream()
-          .filter(this::shouldRegisterExtensionParser)
-          .forEach(this::registerExtensionParsers);
-    }
+    checkState(extensions != null, "extensions cannot be null");
+    extensions.stream()
+        .filter(this::shouldRegisterExtensionParser)
+        .forEach(this::registerExtensionParsers);
   }
 
   /**
-   * Taking an {@link ExtensionModel}, it will indicate whether it must register a {@link ComponentBuildingDefinitionProvider}
-   * or not.
+   * Taking an {@link ExtensionModel}, it will indicate whether it must register a {@link ComponentBuildingDefinitionProvider} or
+   * not.
    *
    * @param extensionModel to introspect
    * @return true if a parser must be registered, false otherwise.
@@ -149,7 +152,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
     final Builder definitionBuilder =
         new Builder().withNamespace(xmlDslModel.getPrefix());
     final DslSyntaxResolver dslSyntaxResolver =
-        DslSyntaxResolver.getDefault(extensionModel, DslResolvingContext.getDefault(extensionManager.getExtensions()));
+        DslSyntaxResolver.getDefault(extensionModel, DslResolvingContext.getDefault(extensions));
 
     final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
     withContextClassLoader(extensionClassLoader, () -> {
@@ -158,25 +161,24 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
         @Override
         public void onConfiguration(ConfigurationModel model) {
           parseWith(new ConfigurationDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
-                                                      muleContext, parsingContext));
+                                                      parsingContext));
         }
 
         @Override
         public void onOperation(OperationModel model) {
           parseWith(new OperationDefinitionParser(definitionBuilder, extensionModel,
-                                                  model, dslSyntaxResolver, muleContext, parsingContext));
+                                                  model, dslSyntaxResolver, parsingContext));
         }
 
         @Override
         public void onConnectionProvider(ConnectionProviderModel model) {
           parseWith(new ConnectionProviderDefinitionParser(definitionBuilder, model, extensionModel, dslSyntaxResolver,
-                                                           muleContext,
                                                            parsingContext));
         }
 
         @Override
         public void onSource(SourceModel model) {
-          parseWith(new SourceDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver, muleContext,
+          parseWith(new SourceDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
                                                parsingContext));
         }
 
@@ -249,7 +251,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
             parsingContext.getAllSubTypes().contains(objectType)) {
 
           parseWith(new ObjectTypeParameterParser(definitionBuilder, objectType, extensionClassLoader, dslSyntaxResolver,
-                                                  parsingContext, muleContext));
+                                                  parsingContext));
         }
 
         registerSubTypes(objectType, definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
@@ -313,7 +315,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
   }
 
   @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
+  public void setExtensionModels(Set<ExtensionModel> extensionModels) {
+    this.extensions = extensionModels;
   }
 }

@@ -7,14 +7,16 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 
+import javax.inject.Inject;
+
 /**
- * {@link ValueResolver} implementation for {@link ParameterResolver} that are resolved from an
- * expression
+ * {@link ValueResolver} implementation for {@link ParameterResolver} that are resolved from an expression
  *
  * @since 4.0
  */
@@ -22,12 +24,15 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements ValueRe
 
   private final String exp;
   private final MetadataType metadataType;
-  private final MuleContext muleContext;
 
-  public ExpressionBasedParameterResolverValueResolver(String exp, MetadataType metadataType, MuleContext muleContext) {
+  @Inject
+  private TransformationService transformationService;
+  @Inject
+  private ExtendedExpressionManager extendedExpressionManager;
+
+  public ExpressionBasedParameterResolverValueResolver(String exp, MetadataType metadataType) {
     this.exp = exp;
     this.metadataType = metadataType;
-    this.muleContext = muleContext;
   }
 
   /**
@@ -35,7 +40,11 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements ValueRe
    */
   @Override
   public ParameterResolver<T> resolve(Event event) throws MuleException {
-    return new ExpressionBasedParameterResolver<>(exp, metadataType, muleContext, event);
+    ExpressionBasedParameterResolver<T> resolver = new ExpressionBasedParameterResolver<>(exp, metadataType, event);
+    resolver.setTransformationService(transformationService);
+    resolver.setExtendedExpressionManager(extendedExpressionManager);
+    resolver.initialise();
+    return resolver;
   }
 
   /**
@@ -45,4 +54,13 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements ValueRe
   public boolean isDynamic() {
     return true;
   }
+
+  public void setTransformationService(TransformationService transformationService) {
+    this.transformationService = transformationService;
+  }
+
+  public void setExtendedExpressionManager(ExtendedExpressionManager extendedExpressionManager) {
+    this.extendedExpressionManager = extendedExpressionManager;
+  }
+
 }

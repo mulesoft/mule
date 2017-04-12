@@ -8,11 +8,13 @@ package org.mule.runtime.module.extension.internal.config.dsl.config;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.time.TimeSupplier;
+import org.mule.runtime.core.util.func.CheckedConsumer;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
@@ -49,6 +51,9 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   private boolean requiresConnection = false;
 
   @Inject
+  private MuleContext muleContext;
+
+  @Inject
   private TimeSupplier timeSupplier;
 
   ConfigurationProviderObjectFactory(String name,
@@ -70,8 +75,10 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   }
 
   private ConfigurationProvider createInnerInstance() throws ConfigurationException {
-    ResolverSet resolverSet = parametersResolver.getParametersAsResolverSet(configurationModel);
+    ResolverSet resolverSet = parametersResolver.getParametersAsResolverSet(configurationModel, muleContext);
     final ConnectionProviderValueResolver connectionProviderResolver = getConnectionProviderResolver();
+    connectionProviderResolver.getResolverSet()
+        .ifPresent((CheckedConsumer) resolver -> initialiseIfNeeded(resolver, true, muleContext));
 
     ConfigurationProvider configurationProvider;
     try {
@@ -93,7 +100,6 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
                                                muleContext);
       }
 
-      muleContext.getInjector().inject(configurationProvider);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

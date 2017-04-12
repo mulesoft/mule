@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
@@ -26,7 +28,8 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -34,8 +37,6 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 import java.util.List;
 import java.util.Optional;
-
-import javax.inject.Inject;
 
 /**
  * Adds the capability to expose all the {@link MetadataKey}s associated with the {@link StaticConfigurationProvider}'s
@@ -46,17 +47,17 @@ import javax.inject.Inject;
 public final class ConfigurationProviderMetadataAdapter extends StaticConfigurationProvider
     implements MetadataKeyProvider {
 
-  @Inject
-  private MuleMetadataService metadataService;
-
-  @Inject
-  protected ConnectionManagerAdapter connectionManager;
+  private final MuleMetadataService metadataService;
+  protected final ConnectionManager connectionManager;
 
   public ConfigurationProviderMetadataAdapter(String name,
                                               ExtensionModel extensionModel,
                                               ConfigurationModel configurationModel,
-                                              ConfigurationInstance configuration) {
-    super(name, extensionModel, configurationModel, configuration);
+                                              ConfigurationInstance configuration,
+                                              MuleContext muleContext) {
+    super(name, extensionModel, configurationModel, configuration, muleContext);
+    this.metadataService = muleContext.getRegistry().get(OBJECT_METADATA_SERVICE);
+    this.connectionManager = muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER);
   }
 
   public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {

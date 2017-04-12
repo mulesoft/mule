@@ -48,7 +48,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-spring-config</artifactId>
+            <artifactId>mule-module-deployment-model</artifactId>
             <version>${project.version}</version>
         </dependency>
 

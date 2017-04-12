@@ -45,8 +45,7 @@ public class FixedTypeParsingDelegate implements ObjectParsingDelegate {
    * {@inheritDoc}
    */
   @Override
-  public AttributeDefinition.Builder parse(String name, ObjectType objectType, DslElementSyntax elementDsl,
-                                           MuleContext muleContext) {
+  public AttributeDefinition.Builder parse(String name, ObjectType objectType, DslElementSyntax elementDsl) {
     return fromChildConfiguration(type);
   }
 }

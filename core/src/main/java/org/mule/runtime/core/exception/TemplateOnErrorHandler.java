@@ -6,18 +6,20 @@
  */
 package org.mule.runtime.core.exception;
 
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
-import static reactor.core.publisher.Flux.error;
-import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -25,16 +27,16 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.rx.Exceptions;
-import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 import org.mule.runtime.core.transaction.TransactionCoordination;
+
+import java.util.List;
+import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 
@@ -44,6 +46,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private MessageProcessorChain configuredMessageProcessors;
   private Processor replyToMessageProcessor = new ReplyToPropertyRequestReplyReplier();
 
+  private String errorType = null;
   private ErrorTypeMatcher errorTypeMatcher = null;
   private String when;
   private boolean handleException;
@@ -191,6 +194,25 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     configuredMessageProcessors = newChain(getMessageProcessors());
     configuredMessageProcessors.setFlowConstruct(flowConstruct);
     configuredMessageProcessors.setMuleContext(muleContext);
+
+    errorTypeMatcher = createErrorType();
+  }
+
+  private ErrorTypeMatcher createErrorType() {
+    if (errorType == null) {
+      return null;
+    }
+    String[] errorTypeIdentifiers = errorType.split(",");
+    List<ErrorTypeMatcher> matchers = stream(errorTypeIdentifiers).map((identifier) -> {
+      String parsedIdentifier = identifier.trim();
+      Optional<ErrorType> optional =
+          muleContext.getErrorTypeRepository().lookupErrorType(buildFromStringRepresentation(parsedIdentifier));
+      ErrorType errorType = optional
+          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not found ErrorType for the given identifier: '%s'",
+                                                                          parsedIdentifier)));
+      return new SingleErrorTypeMatcher(errorType);
+    }).collect(toList());
+    return new DisjunctiveErrorTypeMatcher(matchers);
   }
 
   public void setWhen(String when) {
@@ -231,8 +253,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     this.handleException = handleException;
   }
 
-  public void setErrorTypeMatcher(ErrorTypeMatcher errorTypeMatcher) {
-    this.errorTypeMatcher = errorTypeMatcher;
+  public void setErrorType(String errorType) {
+    this.errorType = errorType;
   }
-
 }

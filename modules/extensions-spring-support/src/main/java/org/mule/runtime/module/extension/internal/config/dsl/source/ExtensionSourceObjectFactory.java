@@ -10,9 +10,9 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import com.google.common.base.Joiner;
-import org.mule.runtime.api.exception.MuleException;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
@@ -32,9 +32,12 @@ import org.mule.runtime.module.extension.internal.runtime.source.SourceAdapterFa
 import org.mule.runtime.module.extension.internal.runtime.source.SourceConfigurer;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
-import javax.inject.Inject;
+import com.google.common.base.Joiner;
+
 import java.util.List;
 import java.util.Optional;
+
+import javax.inject.Inject;
 
 /**
  * An {@link AbstractExtensionObjectFactory} that produces instances of {@link ExtensionMessageSource}
@@ -60,7 +63,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   }
 
   @Override
-  public ExtensionMessageSource doGetObject() throws ConfigurationException {
+  public ExtensionMessageSource doGetObject() throws ConfigurationException, InitialisationException {
     parametersResolver.checkParameterGroupExclusiveness(sourceModel, parameters.keySet());
     ResolverSet nonCallbackParameters = getNonCallbackParameters();
 
@@ -71,6 +74,10 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
     ResolverSet responseCallbackParameters = getCallbackParameters(sourceModel.getSuccessCallback());
     ResolverSet errorCallbackParameters = getCallbackParameters(sourceModel.getErrorCallback());
 
+    initialiseIfNeeded(nonCallbackParameters, true, muleContext);
+    initialiseIfNeeded(responseCallbackParameters, true, muleContext);
+    initialiseIfNeeded(errorCallbackParameters, true, muleContext);
+
     ExtensionMessageSource messageSource =
         new ExtensionMessageSource(extensionModel,
                                    sourceModel,
@@ -79,24 +86,18 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                    getRetryPolicyTemplate(),
                                    cursorProviderFactory,
                                    muleContext.getExtensionManager());
-    try {
-      muleContext.getInjector().inject(messageSource);
-    } catch (MuleException e) {
-      throw new ConfigurationException(createStaticMessage("Could not inject dependencies into source"), e);
-    }
-
     return messageSource;
   }
 
   private ResolverSet getNonCallbackParameters() throws ConfigurationException {
     return parametersResolver.getParametersAsResolverSet(sourceModel, sourceModel.getParameterGroupModels().stream()
         .flatMap(g -> g.getParameterModels().stream())
-        .collect(toList()));
+        .collect(toList()), muleContext);
   }
 
   private ResolverSet getCallbackParameters(Optional<SourceCallbackModel> callbackModel) throws ConfigurationException {
     return parametersResolver.getParametersAsResolverSet(sourceModel, callbackModel.map(ParameterizedModel::getAllParameterModels)
-        .orElse(emptyList()));
+        .orElse(emptyList()), muleContext);
   }
 
   private SourceAdapterFactory getSourceFactory(ResolverSet nonCallbackParameters,

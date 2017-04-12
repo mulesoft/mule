@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 
 import java.util.Optional;
@@ -20,7 +24,8 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject implements ConnectionProviderValueResolver<C> {
+public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject
+    implements ConnectionProviderValueResolver<C>, Initialisable {
 
   private final ConnectionProviderObjectBuilder<C> objectBuilder;
   private final ObjectBuilderValueResolver<ConnectionProvider<C>> valueResolver;
@@ -31,9 +36,10 @@ public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject imple
    *
    * @param objectBuilder an object builder to instantiate the {@link ConnectionProvider}
    */
-  public ConnectionProviderResolver(ConnectionProviderObjectBuilder<C> objectBuilder, ResolverSet resolverSet) {
+  public ConnectionProviderResolver(ConnectionProviderObjectBuilder<C> objectBuilder, ResolverSet resolverSet,
+                                    MuleContext muleContext) {
     this.objectBuilder = objectBuilder;
-    this.valueResolver = new ObjectBuilderValueResolver<>(objectBuilder);
+    this.valueResolver = new ObjectBuilderValueResolver<>(objectBuilder, muleContext);
     this.resolverSet = resolverSet;
   }
 
@@ -63,5 +69,10 @@ public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject imple
 
   public void setOwnerConfigName(String ownerConfigName) {
     objectBuilder.setOwnerConfigName(ownerConfigName);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(resolverSet);
   }
 }

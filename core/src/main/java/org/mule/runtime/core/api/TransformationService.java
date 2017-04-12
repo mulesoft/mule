@@ -8,6 +8,7 @@ package org.mule.runtime.core.api;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Arrays.asList;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.exception.MuleException;
@@ -20,11 +21,14 @@ import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transformer.TransformerUtils;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +44,39 @@ public class TransformationService {
 
   private MuleContext muleContext;
 
+  @Inject
   public TransformationService(MuleContext muleContext) {
     this.muleContext = muleContext;
+  }
+
+  /**
+   * Given a {@code value) it will try to transform it to the expected type defined in the {@code expectedDataType}
+   *
+   * @param value the value to transform
+   * @param valueDataType the value's {@link DataType}
+   * @param expectedDataType the expected type's {@link DataType}
+   * @param event the event to perform the transformation
+   * @return the transformed value
+   * @throws MessagingException If could not be able to find a proper transformer do obtain the desired type
+   * @throws MessageTransformerException If a problem occurs transforming the value
+   * @throws TransformerException If a problem occurs transforming the value
+   */
+  public Object transform(Object value, DataType valueDataType, DataType expectedDataType)
+      throws MessagingException, MessageTransformerException, TransformerException {
+    Transformer transformer;
+    if (value != null) {
+      try {
+        transformer = muleContext.getRegistry().lookupTransformer(valueDataType, expectedDataType);
+      } catch (TransformerException e) {
+        throw new TransformerException(createStaticMessage(String
+            .format("The value '%s' of type %s could not be transformed to the desired type %s",
+                    value.toString(), expectedDataType.getType().getName(),
+                    value.getClass().getName())), e);
+      }
+
+      return transformer.transform(value);
+    }
+    return null;
   }
 
   /**

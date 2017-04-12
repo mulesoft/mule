@@ -6,11 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -24,6 +28,8 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 /**
  * Base implementation of an {@link ObjectBuilder} which generates object based on an {@link EnrichableModel} for with parameter
  * groups have been defined based on a {@link ParameterGroupModelProperty}
@@ -31,11 +37,14 @@ import java.util.Optional;
  * @param <T> the generic type of the instances to be produced
  * @since 4.0
  */
-public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<T> {
+public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<T>, Initialisable {
 
   protected final ResolverSet resolverSet;
   private final List<ValueSetter> singleValueSetters;
   private final List<ValueSetter> groupValueSetters;
+
+  @Inject
+  private MuleContext muleContext;
 
   public ResolverSetBasedObjectBuilder(Class<?> prototypeClass, ResolverSet resolverSet) {
     this(prototypeClass, null, resolverSet);
@@ -89,4 +98,9 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
    * Creates the instances to be produced
    */
   protected abstract T instantiateObject();
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(resolverSet, true, muleContext);
+  }
 }

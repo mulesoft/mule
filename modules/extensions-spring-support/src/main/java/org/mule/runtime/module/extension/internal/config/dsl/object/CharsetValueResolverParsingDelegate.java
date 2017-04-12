@@ -36,12 +36,10 @@ public class CharsetValueResolverParsingDelegate implements ValueResolverParsing
    * @param key the parsed entity key
    * @param metadataType a {@link MetadataType}
    * @param elementDsl the {@link DslElementSyntax} of the parsed element
-   * @param muleContext the Mule node
    * @return A {@link ValueResolver} which resolves to the {@link Charset} corresponding with the given {@code key}
    */
   @Override
-  public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl,
-                                     MuleContext muleContext) {
+  public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl) {
     return new StaticValueResolver<>(Charset.forName(key));
   }
 }

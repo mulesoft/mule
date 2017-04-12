@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl.config;
 
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
@@ -41,9 +42,9 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
 
   public ConfigurationDefinitionParser(ComponentBuildingDefinition.Builder definition, ExtensionModel extensionModel,
                                        ConfigurationModel configurationModel,
-                                       DslSyntaxResolver dslResolver, MuleContext muleContext,
+                                       DslSyntaxResolver dslResolver,
                                        ExtensionParsingContext parsingContext) {
-    super(definition, dslResolver, parsingContext, muleContext);
+    super(definition, dslResolver, parsingContext);
     this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;
     this.configDsl = dslResolver.resolve(configurationModel);
@@ -56,7 +57,7 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
         .withConstructorParameterDefinition(fromSimpleParameter("name").build())
         .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
         .withConstructorParameterDefinition(fromFixedValue(configurationModel).build())
-        .withConstructorParameterDefinition(fromFixedValue(muleContext).build())
+        .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
         .withSetterParameterDefinition("dynamicConfigPolicy", fromChildConfiguration(DynamicConfigPolicy.class).build());
 
     List<ParameterGroupModel> inlineGroups = getInlineGroups(configurationModel);

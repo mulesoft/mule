@@ -20,6 +20,8 @@ import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProvi
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
+import javax.inject.Inject;
+
 /**
  * A {@link AbstractExtensionObjectFactory} that produces {@link ConnectionProviderResolver} instances
  *
@@ -33,6 +35,10 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
   private PoolingProfile poolingProfile = null;
   private RetryPolicyTemplate retryPolicyTemplate = null;
   private boolean disableValidation = false;
+  private ResolverSet resolverSet;
+
+  @Inject
+  private MuleContext muleContext;
 
   public ConnectionProviderObjectFactory(ConnectionProviderModel providerModel, MuleContext muleContext,
                                          ExtensionModel extensionModel) {
@@ -43,12 +49,12 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
 
   @Override
   public ConnectionProviderResolver doGetObject() throws Exception {
-    ResolverSet resolverSet = parametersResolver.getParametersAsResolverSet(providerModel);
+    resolverSet = parametersResolver.getParametersAsResolverSet(providerModel, muleContext);
     return new ConnectionProviderResolver(new ConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
                                                                               disableValidation, retryPolicyTemplate,
                                                                               getConnectionManager(), extensionModel,
                                                                               muleContext),
-                                          resolverSet);
+                                          resolverSet, muleContext);
   }
 
   private ConnectionManagerAdapter getConnectionManager() throws ConfigurationException {
@@ -70,4 +76,5 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
   public void setDisableValidation(boolean disableValidation) {
     this.disableValidation = disableValidation;
   }
+
 }

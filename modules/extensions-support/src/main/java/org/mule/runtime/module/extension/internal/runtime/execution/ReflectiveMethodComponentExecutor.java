@@ -75,7 +75,12 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel> impleme
   }
 
   private Object[] getParameterValues(ExecutionContext<M> executionContext, Class<?>[] parameterTypes) {
-    return argumentResolverDelegate.resolve(executionContext, parameterTypes);
+    // try {
+    Object[] parameters = argumentResolverDelegate.resolve(executionContext, parameterTypes);
+    return parameters;
+    // } catch (InitialisationException e) {
+    // throw new MuleRuntimeException(e);
+    // }
   }
 
   @Override

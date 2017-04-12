@@ -6,13 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.transformer.MessageTransformer;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
-import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
 
@@ -23,10 +20,10 @@ import org.mule.runtime.core.exception.MessagingException;
  */
 public class TypeSafeTransformer {
 
-  private MuleContext muleContext;
+  private TransformationService transformationService;
 
-  TypeSafeTransformer(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  public TypeSafeTransformer(TransformationService transformationService) {
+    this.transformationService = transformationService;
   }
 
   /**
@@ -43,27 +40,9 @@ public class TypeSafeTransformer {
    */
   public Object transform(Object value, DataType valueDataType, DataType expectedDataType, Event event)
       throws MessagingException, MessageTransformerException, TransformerException {
-    Transformer transformer;
-    if (value != null) {
-      try {
-        transformer = muleContext.getRegistry().lookupTransformer(valueDataType, expectedDataType);
-      } catch (TransformerException e) {
-        throw new MessagingException(createStaticMessage(String
-            .format("The value '%s' of type %s could not be transformed to the desired type %s",
-                    value.toString(), expectedDataType.getType().getName(),
-                    value.getClass().getName())),
-                                     event, e);
-      }
 
-      Object result;
-      if (transformer instanceof MessageTransformer) {
-        result = ((MessageTransformer) transformer).transform(value, event);
-      } else {
-        result = transformer.transform(value);
-      }
-      return result;
-    }
-    return null;
+    //TODO review that event is not need but there was logic to use MessageTransform
+    return transformationService.transform(value, valueDataType, expectedDataType);
   }
 }
 

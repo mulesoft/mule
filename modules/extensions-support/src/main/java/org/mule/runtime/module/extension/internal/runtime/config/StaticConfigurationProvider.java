@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
@@ -22,8 +23,8 @@ public class StaticConfigurationProvider extends LifecycleAwareConfigurationProv
   private final ConfigurationInstance configuration;
 
   public StaticConfigurationProvider(String name, ExtensionModel extensionModel, ConfigurationModel configurationModel,
-                                     ConfigurationInstance configuration) {
-    super(name, extensionModel, configurationModel);
+                                     ConfigurationInstance configuration, MuleContext muleContext) {
+    super(name, extensionModel, configurationModel, muleContext);
     this.configuration = configuration;
     registerConfiguration(configuration);
   }

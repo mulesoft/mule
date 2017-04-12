@@ -41,8 +41,7 @@ public interface ParsingDelegate<M extends MetadataType, T> {
    * @param key the parsed entity key
    * @param metadataType a {@link MetadataType}
    * @param elementDsl the {@link DslElementSyntax} of the parsed element
-   * @param muleContext the Mule node
    * @return
    */
-  T parse(String key, M metadataType, DslElementSyntax elementDsl, MuleContext muleContext);
+  T parse(String key, M metadataType, DslElementSyntax elementDsl);
 }

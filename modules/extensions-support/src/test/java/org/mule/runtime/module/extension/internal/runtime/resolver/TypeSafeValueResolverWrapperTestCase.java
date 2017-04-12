@@ -10,21 +10,27 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.junit.Test;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.Test;
+
 @SmallTest
 public class TypeSafeValueResolverWrapperTestCase extends AbstractMuleContextTestCase {
 
+  private TransformationService transformationService = mock(TransformationService.class);
   private ValueResolver<String> staticValueResolver = mock(ValueResolver.class);
   private ValueResolver<String> dynamicValueResolver = mock(ValueResolver.class);
   private TypeSafeValueResolverWrapper<Integer> dynamicResolver;
@@ -43,8 +49,14 @@ public class TypeSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
 
-    dynamicResolver = new TypeSafeValueResolverWrapper<>(dynamicValueResolver, Integer.class, muleContext);
-    staticResolver = new TypeSafeValueResolverWrapper<>(staticValueResolver, Integer.class, muleContext);
+    dynamicResolver = new TypeSafeValueResolverWrapper<>(dynamicValueResolver, Integer.class);
+    dynamicResolver.setTransformationService(transformationService);
+    dynamicResolver.initialise();
+    staticResolver = new TypeSafeValueResolverWrapper<>(staticValueResolver, Integer.class);
+    staticResolver.setTransformationService(transformationService);
+    staticResolver.initialise();
+
+    when(transformationService.transform(eq("123"), any(DataType.class), any(DataType.class))).thenReturn(123);
   }
 
   @Test
