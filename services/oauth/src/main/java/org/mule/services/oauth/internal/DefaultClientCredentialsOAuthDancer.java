@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.apache.commons.codec.binary.Base64.encodeBase64String;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.services.oauth.internal.OAuthConstants.CLIENT_ID_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.CLIENT_SECRET_PARAMETER;
@@ -23,7 +24,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
-import org.mule.runtime.oauth.api.OAuthDancer;
+import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
+import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
 import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
 import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
 import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
@@ -44,18 +46,19 @@ import org.slf4j.Logger;
  * 
  * @since 4.0
  */
-public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements OAuthDancer, Startable {
+public class DefaultClientCredentialsOAuthDancer extends AbstractOAuthDancer implements Startable, ClientCredentialsOAuthDancer {
 
-  private static final Logger LOGGER = getLogger(ClientCredentialsOAuthDancer.class);
+  private static final Logger LOGGER = getLogger(DefaultClientCredentialsOAuthDancer.class);
 
   private final boolean encodeClientCredentialsInBody;
 
-  public ClientCredentialsOAuthDancer(String clientId, String clientSecret, String tokenUrl, String scopes,
-                                      boolean encodeClientCredentialsInBody, Charset encoding, String responseAccessTokenExpr,
-                                      String responseRefreshTokenExpr, String responseExpiresInExpr,
-                                      Map<String, String> customParametersExprs, LockFactory lockProvider,
-                                      Map<String, DefaultResourceOwnerOAuthContext> tokensStore, HttpClient httpClient,
-                                      MuleExpressionLanguage expressionEvaluator) {
+  public DefaultClientCredentialsOAuthDancer(String clientId, String clientSecret, String tokenUrl, String scopes,
+                                             boolean encodeClientCredentialsInBody, Charset encoding,
+                                             String responseAccessTokenExpr,
+                                             String responseRefreshTokenExpr, String responseExpiresInExpr,
+                                             Map<String, String> customParametersExprs, LockFactory lockProvider,
+                                             Map<String, DefaultResourceOwnerOAuthContext> tokensStore, HttpClient httpClient,
+                                             MuleExpressionLanguage expressionEvaluator) {
     super(clientId, clientSecret, tokenUrl, encoding, scopes, responseAccessTokenExpr, responseRefreshTokenExpr,
           responseExpiresInExpr, customParametersExprs, lockProvider, tokensStore, httpClient, expressionEvaluator);
     this.encodeClientCredentialsInBody = encodeClientCredentialsInBody;
@@ -65,7 +68,7 @@ public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements
   public void start() throws MuleException {
     super.start();
     try {
-      refreshToken(null).get();
+      refreshToken().get();
     } catch (ExecutionException e) {
       super.stop();
       throw new LifecycleException(e.getCause(), this);
@@ -77,7 +80,19 @@ public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements
   }
 
   @Override
-  public CompletableFuture<Void> refreshToken(String resourceOwner) {
+  public CompletableFuture<String> accessToken() throws RequestAuthenticationException {
+    final String accessToken = getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID).getAccessToken();
+    if (accessToken == null) {
+      throw new RequestAuthenticationException(createStaticMessage(format("No access token found. "
+          + "Verify that you have authenticated before trying to execute an operation to the API.")));
+    }
+
+    // TODO MULE-11858 proactively refresh if the token has already expired based on its 'expiresIn' parameter
+    return completedFuture(accessToken);
+  }
+
+  @Override
+  public CompletableFuture<Void> refreshToken() {
     final Map<String, String> formData = new HashMap<>();
 
     formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_CLIENT_CREDENTIALS);
@@ -100,8 +115,7 @@ public class ClientCredentialsOAuthDancer extends AbstractOAuthDancer implements
                      tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), tokenResponse.getExpiresIn());
       }
 
-      final DefaultResourceOwnerOAuthContext defaultUserState =
-          getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID);
+      final DefaultResourceOwnerOAuthContext defaultUserState = getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID);
       defaultUserState.setAccessToken(tokenResponse.getAccessToken());
       defaultUserState.setExpiresIn(tokenResponse.getExpiresIn());
       for (Entry<String, Object> customResponseParameterEntry : tokenResponse.getCustomResponseParameters().entrySet()) {

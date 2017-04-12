@@ -7,20 +7,22 @@
 package org.mule.extension.oauth2.internal.clientcredentials;
 
 import static java.lang.Thread.currentThread;
-import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.oauth2.internal.AbstractGrantType;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.util.store.ObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
 import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
-import org.mule.runtime.oauth.api.builder.OAuthDancerBuilder;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 
 import java.util.concurrent.ExecutionException;
@@ -38,19 +40,34 @@ public class ClientCredentialsGrantType extends AbstractGrantType {
   @Optional(defaultValue = "false")
   private boolean encodeClientCredentialsInBody;
 
+  private ClientCredentialsOAuthDancer dancer;
+
   @Override
-  protected OAuthDancerBuilder configDancer(OAuthService oauthService) {
-    OAuthClientCredentialsDancerBuilder dancerBuilder =
-        oauthService.clientCredentialsGrantTypeDancerBuilder(lockId -> muleContext.getLockFactory().createLock(lockId),
-                                                             new ObjectStoreToMapAdapter(tokenManager.getObjectStore()),
-                                                             muleContext.getExpressionManager());
-    return dancerBuilder.encodeClientCredentialsInBody(encodeClientCredentialsInBody);
+  public final void initialise() throws InitialisationException {
+    initTokenManager();
+
+    try {
+      OAuthService oauthService = muleContext.getRegistry().lookupObject(OAuthService.class);
+
+      OAuthClientCredentialsDancerBuilder dancerBuilder =
+          oauthService.clientCredentialsGrantTypeDancerBuilder(lockId -> muleContext.getLockFactory().createLock(lockId),
+                                                               new ObjectStoreToMapAdapter(tokenManager.getObjectStore()),
+                                                               muleContext.getExpressionManager());
+      dancerBuilder.encodeClientCredentialsInBody(encodeClientCredentialsInBody);
+      dancerBuilder.clientCredentials(getClientId(), getClientSecret());
+
+      configureBaseDancer(dancerBuilder);
+      dancer = dancerBuilder.build();
+    } catch (RegistrationException e) {
+      throw new InitialisationException(e, this);
+    }
+    initialiseIfNeeded(getDancer());
   }
 
   @Override
   public void authenticate(HttpRequestBuilder builder) throws MuleException {
     try {
-      builder.addHeader(AUTHORIZATION, buildAuthorizationHeaderContent(dancer.accessToken(DEFAULT_RESOURCE_OWNER_ID).get()));
+      builder.addHeader(AUTHORIZATION, buildAuthorizationHeaderContent(dancer.accessToken().get()));
     } catch (InterruptedException e) {
       currentThread().interrupt();
       throw new DefaultMuleException(e);
@@ -64,7 +81,7 @@ public class ClientCredentialsGrantType extends AbstractGrantType {
     final Boolean shouldRetryRequest = resolver.resolveExpression(getRefreshTokenWhen(), firstAttemptResult);
     if (shouldRetryRequest) {
       try {
-        dancer.refreshToken(DEFAULT_RESOURCE_OWNER_ID).get();
+        dancer.refreshToken().get();
       } catch (InterruptedException e) {
         currentThread().interrupt();
         throw new DefaultMuleException(e);
@@ -73,5 +90,10 @@ public class ClientCredentialsGrantType extends AbstractGrantType {
       }
     }
     return shouldRetryRequest;
+  }
+
+  @Override
+  public ClientCredentialsOAuthDancer getDancer() {
+    return dancer;
   }
 }

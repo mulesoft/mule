@@ -11,30 +11,28 @@ import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Implementations provide OAuth dance support for a specific grant-type.
+ * Implementations provide OAuth dance support for client-credentials grant-type.
  *
  * @since 4.0
  */
-public interface OAuthDancer {
+public interface ClientCredentialsOAuthDancer {
 
   /**
-   * Will query the internal state (the {@code tokensStore} parameter passed to the service to build the {@link OAuthDancer}) to
-   * get the appropriate accessToken. This requires that the authorization has been performed beforehand, otherwise, a
-   * {@link RequestAuthenticationException} will be thrown.
+   * Will query the internal state (the {@code tokensStore} parameter passed to the service to build the
+   * {@link ClientCredentialsOAuthDancer}) to get the appropriate accessToken. This requires that the authorization has been
+   * performed beforehand, otherwise, a {@link RequestAuthenticationException} will be thrown.
    * 
-   * @param resourceOwner The resource owner to get the token for.
    * @return a future with the token to send on the authorized request. This will be immediately available unless a refresh has to
    *         be made.
    * @throws RequestAuthenticationException if called for a {@code resourceOwner} that has not yet been authorized.
    */
-  CompletableFuture<String> accessToken(String resourceOwner) throws RequestAuthenticationException;
+  CompletableFuture<String> accessToken() throws RequestAuthenticationException;
 
   /**
    * Performs the refresh of the access token.
    * 
-   * @param resourceOwner The resource owner to get the token for.
-   * 
    * @return a completable future that is complete when the token has been refreshed.
    */
-  CompletableFuture<Void> refreshToken(String resourceOwner);
+  CompletableFuture<Void> refreshToken();
+
 }

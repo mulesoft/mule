@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 
 /**
- * Allows for creation of {@link OAuthDancer} implementations for the supported grant types:
+ * Allows for creation of OAuth dancer implementations for the supported grant types:
  * <ul>
  * <li>Authorization Code Grant Type</li>
  * <li>Client Credentials</li>
@@ -27,12 +27,12 @@ import java.util.concurrent.locks.Lock;
 public interface OAuthService extends Service {
 
   /**
-   * Creates a builder for an {@link OAuthDancer} for client credentials grant type. The dancer will use the given
-   * {@code lockProvider} and {@code tokensStore} to manage its internal state.
+   * Creates a builder for an {@link ClientCredentialsOAuthDancer} for client credentials grant type. The dancer will use the
+   * given {@code lockProvider} and {@code tokensStore} to manage its internal state.
    * 
    * @param lockProvider a factory for {@link Lock}s, uniquely identified by the {@code name} passed to
    *        {@link LockFactory#createLock(String)}.
-   * @param tokensStore the repository for the tokens for the returned {@link OAuthDancer dancer}.
+   * @param tokensStore the repository for the tokens for the returned {@link ClientCredentialsOAuthDancer dancer}.
    * @param expressionEvaluator the object used to evaluate expressions.
    * 
    * @return a builder for a client-credentials grant type dancer.
@@ -42,12 +42,12 @@ public interface OAuthService extends Service {
                                                                                   MuleExpressionLanguage expressionEvaluator);
 
   /**
-   * Creates a builder for an {@link OAuthDancer} for authorization code grant type. The dancer will use the given
-   * {@code lockProvider} and {@code tokensStore} to manage its internal state.
+   * Creates a builder for an {@link AuthorizationCodeOAuthDancer} for authorization code grant type. The dancer will use the
+   * given {@code lockProvider} and {@code tokensStore} to manage its internal state.
    * 
    * @param lockProvider a factory for {@link Lock}s, uniquely identified by the {@code name} passed to
    *        {@link LockFactory#createLock(String)}.
-   * @param tokensStore the repository for the tokens for the returned {@link OAuthDancer dancer}.
+   * @param tokensStore the repository for the tokens for the returned {@link AuthorizationCodeOAuthDancer dancer}.
    * @param expressionEvaluator the object used to evaluate expressions.
    * 
    * @return a builder for an authorization-code grant type dancer.

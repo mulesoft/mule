@@ -9,7 +9,6 @@ package org.mule.runtime.oauth.api.builder;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
-import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.service.http.api.server.HttpServer;
 
@@ -26,7 +25,8 @@ import java.util.function.Function;
 public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<AuthorizationCodeOAuthDancer> {
 
   /**
-   * The produced {@link OAuthDancer} will create an {@link HttpServer} to listen on the provided {@code localCallbackUrl}.
+   * The produced {@link AuthorizationCodeOAuthDancer} will create an {@link HttpServer} to listen on the provided
+   * {@code localCallbackUrl}.
    * 
    * @param localCallbackUrl the url to listen on
    * 
@@ -35,8 +35,8 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<
   OAuthAuthorizationCodeDancerBuilder localCallback(URL localCallbackUrl);
 
   /**
-   * The produced {@link OAuthDancer} will create an {@link HttpServer} with the provided {@code tlsContextFactory} to listen on
-   * the provided {@code localCallbackUrl}.
+   * The produced {@link AuthorizationCodeOAuthDancer} will create an {@link HttpServer} with the provided
+   * {@code tlsContextFactory} to listen on the provided {@code localCallbackUrl}.
    * 
    * @param localCallbackUrl the url to listen on
    * @param tlsContextFactory the TLS context to use for the listener
@@ -46,7 +46,7 @@ public interface OAuthAuthorizationCodeDancerBuilder extends OAuthDancerBuilder<
   OAuthAuthorizationCodeDancerBuilder localCallback(URL localCallbackUrl, TlsContextFactory tlsContextFactory);
 
   /**
-   * The produced {@link OAuthDancer} will use an existing {@link HttpServer} to listen on the provided
+   * The produced {@link AuthorizationCodeOAuthDancer} will use an existing {@link HttpServer} to listen on the provided
    * {@code localCallbackConfigPath}.
    * 
    * @param server a server listening on a specific host and port

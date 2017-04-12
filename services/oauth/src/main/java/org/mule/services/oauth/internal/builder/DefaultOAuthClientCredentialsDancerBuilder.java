@@ -11,17 +11,16 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.lock.LockFactory;
-import org.mule.runtime.oauth.api.OAuthDancer;
+import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
 import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
 import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
 import org.mule.service.http.api.HttpService;
-import org.mule.service.http.api.client.HttpClient;
-import org.mule.services.oauth.internal.ClientCredentialsOAuthDancer;
+import org.mule.services.oauth.internal.DefaultClientCredentialsOAuthDancer;
 
 import java.util.Map;
 
 
-public class DefaultOAuthClientCredentialsDancerBuilder extends AbstractOAuthDancerBuilder
+public class DefaultOAuthClientCredentialsDancerBuilder extends AbstractOAuthDancerBuilder<ClientCredentialsOAuthDancer>
     implements OAuthClientCredentialsDancerBuilder {
 
   private boolean encodeClientCredentialsInBody = false;
@@ -40,15 +39,15 @@ public class DefaultOAuthClientCredentialsDancerBuilder extends AbstractOAuthDan
   }
 
   @Override
-  public OAuthDancer build() {
+  public ClientCredentialsOAuthDancer build() {
     checkArgument(isNotBlank(clientId), "clientId cannot be blank");
     checkArgument(isNotBlank(clientSecret), "clientSecret cannot be blank");
     checkArgument(isNotBlank(tokenUrl), "tokenUrl cannot be blank");
 
-    return new ClientCredentialsOAuthDancer(clientId, clientSecret, tokenUrl, scopes, encodeClientCredentialsInBody, encoding,
-                                            responseAccessTokenExpr, responseRefreshTokenExpr, responseExpiresInExpr,
-                                            customParametersExtractorsExprs, lockProvider, tokensStore,
-                                            (HttpClient) httpClientFactory.get(), expressionEvaluator);
+    return new DefaultClientCredentialsOAuthDancer(clientId, clientSecret, tokenUrl, scopes, encodeClientCredentialsInBody,
+                                                   encoding, responseAccessTokenExpr, responseRefreshTokenExpr,
+                                                   responseExpiresInExpr, customParametersExtractorsExprs, lockProvider,
+                                                   tokensStore, httpClientFactory.get(), expressionEvaluator);
   }
 
 }

@@ -37,7 +37,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.oauth.api.OAuthDancer;
 import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
@@ -114,7 +113,7 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
     final OAuthClientCredentialsDancerBuilder builder = baseClientCredentialsDancerBuilder();
     builder.tokenUrl("http://host/token");
 
-    OAuthDancer minimalDancer = startDancer(builder);
+    Object minimalDancer = startDancer(builder);
     verify(httpClient).start();
 
     stopIfNeeded(minimalDancer);
@@ -126,7 +125,7 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
     final OAuthAuthorizationCodeDancerBuilder builder = baseAuthCodeDancerbuilder();
     minimalAuthCodeConfig(builder);
 
-    OAuthDancer minimalDancer = startDancer(builder);
+    Object minimalDancer = startDancer(builder);
     verify(httpClient).start();
 
     stopIfNeeded(minimalDancer);
@@ -145,7 +144,7 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
     minimalAuthCodeConfig(builder);
     builder.tokenUrl(httpClient, "http://host/token");
 
-    OAuthDancer minimalDancer = startDancer(builder);
+    Object minimalDancer = startDancer(builder);
     verify(httpClient, never()).start();
 
     stopIfNeeded(minimalDancer);
@@ -160,7 +159,7 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
     builder.authorizationUrl("http://host/auth");
     builder.localCallback(new URL("http://localhost:8080/localCallback"));
 
-    OAuthDancer minimalDancer = startDancer(builder);
+    Object minimalDancer = startDancer(builder);
     verify(httpClient, never()).start();
 
     stopIfNeeded(minimalDancer);
@@ -175,7 +174,7 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
     builder.authorizationUrl("http://host/auth");
     builder.localCallback(httpServer, "/localCallback");
 
-    OAuthDancer minimalDancer = startDancer(builder);
+    Object minimalDancer = startDancer(builder);
     verify(httpServer, never()).start();
 
     stopIfNeeded(minimalDancer);
@@ -381,9 +380,9 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
     return builder;
   }
 
-  private OAuthDancer startDancer(final OAuthDancerBuilder builder)
+  private Object startDancer(final OAuthDancerBuilder builder)
       throws InitialisationException, MuleException {
-    final OAuthDancer dancer = builder.build();
+    final Object dancer = builder.build();
     initialiseIfNeeded(dancer);
     startIfNeeded(dancer);
 

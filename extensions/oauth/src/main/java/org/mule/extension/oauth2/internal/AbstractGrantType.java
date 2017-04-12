@@ -26,7 +26,6 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -34,8 +33,6 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
-import org.mule.runtime.oauth.api.OAuthDancer;
-import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.runtime.oauth.api.builder.OAuthDancerBuilder;
 
 import java.util.List;
@@ -139,57 +136,48 @@ public abstract class AbstractGrantType implements HttpAuthentication, MuleConte
   @Placement(tab = SECURITY_TAB)
   private TlsContextFactory tlsContextFactory;
 
-  protected OAuthDancer dancer;
-
-  @Override
-  public final void initialise() throws InitialisationException {
+  protected void initTokenManager() throws InitialisationException {
     if (tokenManager == null) {
       this.tokenManager = TokenManagerConfig.createDefault(muleContext);
     }
     initialiseIfNeeded(tokenManager, muleContext);
-
-    try {
-      OAuthDancerBuilder dancerBuilder = configDancer(muleContext.getRegistry().lookupObject(OAuthService.class))
-          .clientCredentials(getClientId(), getClientSecret());
-
-      if (getTlsContextFactory() != null) {
-        initialiseIfNeeded(getTlsContextFactory());
-        dancerBuilder = dancerBuilder.tokenUrl(getTokenUrl(), getTlsContextFactory());
-      } else {
-        dancerBuilder = dancerBuilder.tokenUrl(getTokenUrl());
-      }
-
-      dancer = dancerBuilder
-          .scopes(getScopes())
-          .encoding(getDefaultEncoding(muleContext))
-          .responseAccessTokenExpr(resolver.getExpression(getResponseAccessToken()))
-          .responseRefreshTokenExpr(resolver.getExpression(getResponseRefreshToken()))
-          .responseExpiresInExpr(resolver.getExpression(getResponseExpiresIn()))
-          .customParametersExtractorsExprs(getCustomParameterExtractors().stream()
-              .collect(toMap(extractor -> extractor.getParamName(),
-                             extractor -> resolver.getExpression(extractor.getValue()))))
-          .build();
-    } catch (RegistrationException e) {
-      throw new InitialisationException(e, this);
-    }
-    initialiseIfNeeded(dancer);
   }
 
-  protected abstract OAuthDancerBuilder configDancer(OAuthService oauthService) throws InitialisationException;
+  protected OAuthDancerBuilder configureBaseDancer(OAuthDancerBuilder dancerBuilder) throws InitialisationException {
+    if (getTlsContextFactory() != null) {
+      initialiseIfNeeded(getTlsContextFactory());
+      dancerBuilder = dancerBuilder.tokenUrl(getTokenUrl(), getTlsContextFactory());
+    } else {
+      dancerBuilder = dancerBuilder.tokenUrl(getTokenUrl());
+    }
+
+    dancerBuilder.scopes(getScopes())
+        .encoding(getDefaultEncoding(muleContext))
+        .responseAccessTokenExpr(resolver.getExpression(getResponseAccessToken()))
+        .responseRefreshTokenExpr(resolver.getExpression(getResponseRefreshToken()))
+        .responseExpiresInExpr(resolver.getExpression(getResponseExpiresIn()))
+        .customParametersExtractorsExprs(getCustomParameterExtractors().stream()
+            .collect(toMap(extractor -> extractor.getParamName(),
+                           extractor -> resolver.getExpression(extractor.getValue()))));
+
+    return dancerBuilder;
+  }
+
+  public abstract Object getDancer();
 
   @Override
   public void start() throws MuleException {
-    startIfNeeded(dancer);
+    startIfNeeded(getDancer());
   }
 
   @Override
   public void stop() throws MuleException {
-    stopIfNeeded(dancer);
+    stopIfNeeded(getDancer());
   }
 
   @Override
   public void dispose() {
-    disposeIfNeeded(dancer, LOGGER);
+    disposeIfNeeded(getDancer(), LOGGER);
   }
 
   /**
@@ -247,4 +235,5 @@ public abstract class AbstractGrantType implements HttpAuthentication, MuleConte
   public TlsContextFactory getTlsContextFactory() {
     return tlsContextFactory;
   }
+
 }

@@ -52,6 +52,7 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
 import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
+import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
 import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
 import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
 import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
@@ -415,6 +416,18 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
     redirectUrlHandlerManager.dispose();
     localAuthorizationUrlHandlerManager.dispose();
     httpServer.dispose();
+  }
+
+  @Override
+  public CompletableFuture<String> accessToken(String resourceOwner) throws RequestAuthenticationException {
+    final String accessToken = getContextForResourceOwner(resourceOwner).getAccessToken();
+    if (accessToken == null) {
+      throw new RequestAuthenticationException(createStaticMessage(format("No access token found. "
+          + "Verify that you have authenticated before trying to execute an operation to the API.")));
+    }
+
+    // TODO MULE-11858 proactively refresh if the token has already expired based on its 'expiresIn' parameter
+    return completedFuture(accessToken);
   }
 
   @Override
