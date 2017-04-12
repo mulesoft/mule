@@ -8,6 +8,7 @@ package org.mule.test.core.context.notification;
 
 import static org.junit.Assert.fail;
 
+import org.junit.After;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -22,6 +23,12 @@ public abstract class AbstractNotificationTestCase extends AbstractIntegrationTe
 
   private NotificationLogger notificationLogger;
 
+  @After
+  public void clearNotifications() {
+    if (notificationLogger != null) {
+      notificationLogger.getNotifications().clear();
+    }
+  }
 
   public final void assertNotifications() throws Exception {
     notificationLogger = muleContext.getRegistry().lookupObject("notificationLogger");
