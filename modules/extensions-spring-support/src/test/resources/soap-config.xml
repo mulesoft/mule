@@ -22,10 +22,9 @@
 
     <flow name="getLeagueTeams">
         <soap:invoke config-ref="leagues" service="leagues" operation="getLeagueTeams">
-            <soap:request>#[payload]</soap:request>
             <soap:headers>
             #[
-            %dw 1.0
+            %dw 2.0
             %output application/xml
             %namespace con http://services.soap.internal.extension.module.runtime.mule.org/
              ---
@@ -33,6 +32,7 @@
                 con#auth: "Authorized"
             }]
             </soap:headers>
+            <soap:request>#[payload]</soap:request>
         </soap:invoke>
     </flow>
 

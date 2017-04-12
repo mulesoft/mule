@@ -20,6 +20,7 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
+import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.extension.api.soap.SoapAttachment;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
@@ -54,23 +55,22 @@ public class InvokeOperationDeclarer {
    *
    * @param declarer the soap extension declarer
    * @param loader   a {@link ClassTypeLoader} to load some parameters types.
-   * @return
    */
   public OperationDeclarer declare(ExtensionDeclarer declarer, ClassTypeLoader loader) {
 
-    OperationDeclarer operation = declarer.withOperation(OPERATION_NAME).describedAs(OPERATION_DESCRIPTION)
+    OperationDeclarer operation = declarer.withOperation(OPERATION_NAME)
+        .describedAs(OPERATION_DESCRIPTION)
         .withModelProperty(new OperationExecutorModelProperty(new SoapOperationExecutorFactory()));
 
     UnionTypeBuilder output = TYPE_BUILDER.unionType();
+    output.id(Object.class.getName());
     output.of().stringType();
     output.of(loader.load(SoapMultipartPayload.class));
     operation.withOutput().ofType(output.build());
     operation.withOutputAttributes().ofType(TYPE_BUILDER.nullType().build());
-
-    operation.requiresConnection(true)
-        .withModelProperty(new ConnectivityModelProperty(ForwardingSoapClient.class));
-
+    operation.requiresConnection(true).withModelProperty(new ConnectivityModelProperty(ForwardingSoapClient.class));
     declareParameters(operation, loader);
+
     return operation;
   }
 
@@ -89,14 +89,19 @@ public class InvokeOperationDeclarer {
         .with(new TypeIdAnnotation(Map.class.getName()))
         .build();
 
-    group.withRequiredParameter(SERVICE_PARAM).ofType(stringType);
-    group.withRequiredParameter(OPERATION_PARAM).ofType(stringType);
-    group.withOptionalParameter(REQUEST_PARAM).ofType(binary).withRole(PRIMARY_CONTENT);
-    group.withOptionalParameter(HEADERS_PARAM).ofType(binary).withRole(CONTENT);
-    group.withOptionalParameter(ATTACHMENTS_PARAM).ofType(attachments).withRole(CONTENT);
+    group.withRequiredParameter(SERVICE_PARAM).ofType(stringType).withLayout(getLayout(1));
+    group.withRequiredParameter(OPERATION_PARAM).ofType(stringType).withLayout(getLayout(2));
+    group.withOptionalParameter(HEADERS_PARAM).ofType(binary).withRole(CONTENT).withLayout(getLayout(3));
+    group.withOptionalParameter(REQUEST_PARAM).ofType(binary).withRole(PRIMARY_CONTENT).withLayout(getLayout(4));
+    group.withOptionalParameter(ATTACHMENTS_PARAM).ofType(attachments).withRole(CONTENT).withLayout(getLayout(5));
     group.withOptionalParameter(TRANSPORT_HEADERS_PARAM).ofType(TYPE_BUILDER.objectType()
         .openWith(stringType)
         .with(new TypeIdAnnotation(Map.class.getName()))
-        .build());
+        .build())
+        .withLayout(getLayout(6));
+  }
+
+  private LayoutModel getLayout(int order) {
+    return LayoutModel.builder().order(order).build();
   }
 }

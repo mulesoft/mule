@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.extension.soap.internal.loader;
 
-import static java.util.Collections.singleton;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.enricher.ConnectionDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader;
 
 /**
@@ -24,12 +21,4 @@ public class SoapExtensionModelLoader extends AbstractJavaExtensionModelLoader {
     super(LOADER_ID, SoapModelLoaderDelegate::new);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
-    //super.configureContextBeforeDeclaration(context);
-    context.addCustomDeclarationEnrichers(singleton(new ConnectionDeclarationEnricher()));
-  }
 }

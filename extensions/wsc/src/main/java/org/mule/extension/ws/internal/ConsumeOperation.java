@@ -76,7 +76,7 @@ public class ConsumeOperation {
     requestBuilder.withAttachments(message.getAttachments());
     requestBuilder.withOperation(operation);
 
-    if (message.getHeaders() != null) {
+    if (!isBlank(message.getHeaders())) {
       requestBuilder.withSoapHeaders((Map<String, String>) evaluateHeaders(message.getHeaders()));
     }
 
