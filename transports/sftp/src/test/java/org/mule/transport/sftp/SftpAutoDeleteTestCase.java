@@ -80,6 +80,7 @@ public class SftpAutoDeleteTestCase extends AbstractSftpFunctionalTestCase
         sftpClient.changeWorkingDirectory("..");
         sftpClient.recursivelyDeleteDirectory(AUTO_DELETE_OFF);
         sftpClient.recursivelyDeleteDirectory(AUTO_DELETE_ON);
+        super.doTearDownAfterMuleContextDispose();
     }
 
     @Test
