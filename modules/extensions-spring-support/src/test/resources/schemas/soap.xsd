@@ -84,8 +84,8 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="request"></xs:element>
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="headers"></xs:element>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="request"></xs:element>
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="attachments"></xs:element>
                     <xs:element minOccurs="0" maxOccurs="1" name="transport-headers">
                         <xs:complexType>

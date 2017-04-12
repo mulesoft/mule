@@ -20,7 +20,7 @@ import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 

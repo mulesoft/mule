@@ -4,30 +4,36 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.java;
+package org.mule.runtime.module.extension.internal.loader.java.property;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
 /**
- * Marker {@link ModelProperty} for components's {@link ParameterModel parameter models} that indicates that the
- * enriched parameter is of {@link TypedValue} type and resolve values of the generic type.
+ * Marker {@link ModelProperty} for {@link ParameterModel}s that indicates that the
+ * enriched parameter is of {@link ParameterResolver} type and resolve values of the generic type.
  * <p>
- * This model property is required, due that the {@link TypedValue} wrapper type information
+ * This model property is required, due that the {@link ParameterResolver} wrapper type information
  * is missing once the {@link ExtensionModel} is built.
  *
- * @see TypedValue
+ * @see ParameterResolver
  * @since 4.0
  */
-public class TypedValueTypeModelProperty implements ModelProperty {
+public class ParameterResolverTypeModelProperty implements ModelProperty {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
-    return "typedValueParameter";
+    return "parameterResolver";
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean isPublic() {
     return false;

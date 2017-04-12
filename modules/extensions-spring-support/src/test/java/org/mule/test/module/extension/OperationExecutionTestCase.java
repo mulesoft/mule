@@ -33,7 +33,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -57,7 +56,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Matchers;
@@ -388,10 +386,9 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   }
 
   @Test
-  public void operationWithLiteralArgument() throws Exception {
-    Event event = flowRunner("literalEcho").withPayload(EMPTY).run();
-    assertThat(((ParameterResolver<String>) event.getMessage().getPayload().getValue()).getExpression(),
-               is(Optional.of("#[mel:money]")));
+  public void operationWithParameterResolver() throws Exception {
+    Object value = flowRunner("literalEcho").withPayload(EMPTY).run().getMessage().getPayload().getValue();
+    assertThat(value, equalTo("#[money]"));
   }
 
   @Test

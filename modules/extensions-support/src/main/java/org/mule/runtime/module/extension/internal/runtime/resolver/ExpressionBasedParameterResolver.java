@@ -15,7 +15,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
 import java.util.Optional;
 

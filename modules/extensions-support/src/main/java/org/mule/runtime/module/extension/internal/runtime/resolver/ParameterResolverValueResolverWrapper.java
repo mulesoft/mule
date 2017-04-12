@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
 /**
  * {@link ValueResolver} implementation for {@link ParameterResolver} that are not resolved from an

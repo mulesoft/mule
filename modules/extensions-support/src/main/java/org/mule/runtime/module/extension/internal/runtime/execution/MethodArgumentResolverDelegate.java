@@ -22,7 +22,8 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
@@ -33,6 +34,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.CompletionCal
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ErrorArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.LiteralArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MediaTypeArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverArgumentResolver;
@@ -118,6 +120,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = new ParameterResolverArgumentResolver<>(paramNames.get(i));
       } else if (TypedValue.class.isAssignableFrom(parameterType)) {
         argumentResolver = new TypedValueArgumentResolver<>(paramNames.get(i));
+      } else if (Literal.class.isAssignableFrom(parameterType)) {
+        argumentResolver = new LiteralArgumentResolver(paramNames.get(i), parameterType);
       } else if (CompletionCallback.class.isAssignableFrom(parameterType)) {
         argumentResolver = NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER;
       } else if (MediaType.class.equals(parameterType)) {

@@ -30,12 +30,16 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterTypeUnwrapperContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.LiteralModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterResolverTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.TypedValueTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionTypeFactory;
@@ -81,14 +85,16 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   private List<ParameterDeclarerContributor> getParameterMethodsContributors() {
     return ImmutableList
         .of(new ParameterTypeUnwrapperContributor(typeLoader, TypedValue.class, new TypedValueTypeModelProperty()),
-            new ParameterTypeUnwrapperContributor(typeLoader, ParameterResolver.class, new ParameterResolverTypeModelProperty()));
+            new ParameterTypeUnwrapperContributor(typeLoader, ParameterResolver.class, new ParameterResolverTypeModelProperty()),
+            new ParameterTypeUnwrapperContributor(typeLoader, Literal.class, new LiteralModelProperty()));
   }
 
   private ImmutableList<ParameterDeclarerContributor> getParameterFieldsContributors() {
     return ImmutableList
         .of(new InfrastructureFieldContributor(),
             new ParameterTypeUnwrapperContributor(typeLoader, TypedValue.class, new TypedValueTypeModelProperty()),
-            new ParameterTypeUnwrapperContributor(typeLoader, ParameterResolver.class, new ParameterResolverTypeModelProperty()));
+            new ParameterTypeUnwrapperContributor(typeLoader, ParameterResolver.class, new ParameterResolverTypeModelProperty()),
+            new ParameterTypeUnwrapperContributor(typeLoader, Literal.class, new LiteralModelProperty()));
   }
 
   /**
