@@ -81,7 +81,7 @@ public class OAuthContextTestCase extends AbstractMuleContextTestCase {
   @Test
   public void clientCredentialsInvalidateContext() throws Exception {
     ClientCredentialsOAuthDancer clientCredentialsDancer =
-      baseClientCredentialsDancerBuilder().tokenUrl(mock(HttpClient.class), "http://host/token").build();
+        baseClientCredentialsDancerBuilder().tokenUrl(mock(HttpClient.class), "http://host/token").build();
 
     assertThat(tokensStore, not(hasKey(DEFAULT_RESOURCE_OWNER_ID)));
     clientCredentialsDancer.getContext();
@@ -130,7 +130,7 @@ public class OAuthContextTestCase extends AbstractMuleContextTestCase {
   @Test
   public void authCodeInvalidateContext() throws Exception {
     AuthorizationCodeOAuthDancer authCodeDancer =
-      baseAuthCodeDancerbuilder().tokenUrl(mock(HttpClient.class), "http://host/token").build();
+        baseAuthCodeDancerbuilder().tokenUrl(mock(HttpClient.class), "http://host/token").build();
 
     assertThat(tokensStore, not(hasKey("user1")));
     authCodeDancer.getContextForResourceOwner("user1");
@@ -143,7 +143,7 @@ public class OAuthContextTestCase extends AbstractMuleContextTestCase {
   @Test
   public void authCodeInvalidateContextDoesNotAffectOtherUsers() throws Exception {
     AuthorizationCodeOAuthDancer authCodeDancer =
-      baseAuthCodeDancerbuilder().tokenUrl(mock(HttpClient.class), "http://host/token").build();
+        baseAuthCodeDancerbuilder().tokenUrl(mock(HttpClient.class), "http://host/token").build();
 
     authCodeDancer.getContextForResourceOwner("user1");
     authCodeDancer.getContextForResourceOwner("user2");
