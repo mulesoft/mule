@@ -30,6 +30,7 @@ import org.mule.runtime.core.util.MapUtils;
 import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
 import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
 import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
+import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
@@ -222,7 +223,7 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
    * @param resourceOwnerId id of the user.
    * @return oauth state
    */
-  protected DefaultResourceOwnerOAuthContext getContextForResourceOwner(final String resourceOwnerId) {
+  public ResourceOwnerOAuthContext getContextForResourceOwner(final String resourceOwnerId) {
     DefaultResourceOwnerOAuthContext resourceOwnerOAuthContext = null;
     if (!tokensStore.containsKey(resourceOwnerId)) {
       final Lock lock = lockProvider.createLock(toString() + "-config-oauth-context");

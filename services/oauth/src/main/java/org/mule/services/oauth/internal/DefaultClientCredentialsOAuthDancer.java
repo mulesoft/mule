@@ -29,6 +29,7 @@ import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
 import org.mule.runtime.oauth.api.exception.TokenNotFoundException;
 import org.mule.runtime.oauth.api.exception.TokenUrlResponseException;
 import org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext;
+import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.services.oauth.internal.state.TokenResponse;
 
@@ -115,7 +116,7 @@ public class DefaultClientCredentialsOAuthDancer extends AbstractOAuthDancer imp
                      tokenResponse.getAccessToken(), tokenResponse.getRefreshToken(), tokenResponse.getExpiresIn());
       }
 
-      final DefaultResourceOwnerOAuthContext defaultUserState = getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID);
+      final DefaultResourceOwnerOAuthContext defaultUserState = (DefaultResourceOwnerOAuthContext) getContext();
       defaultUserState.setAccessToken(tokenResponse.getAccessToken());
       defaultUserState.setExpiresIn(tokenResponse.getExpiresIn());
       for (Entry<String, Object> customResponseParameterEntry : tokenResponse.getCustomResponseParameters().entrySet()) {
@@ -130,7 +131,11 @@ public class DefaultClientCredentialsOAuthDancer extends AbstractOAuthDancer imp
       exceptionFuture.completeExceptionally(e);
       return exceptionFuture;
     }
+  }
 
+  @Override
+  public ResourceOwnerOAuthContext getContext() {
+    return getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID);
   }
 
 }

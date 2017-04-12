@@ -234,7 +234,8 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
         TokenResponse tokenResponse = invokeTokenUrl(tokenUrl, formData, null, true, encoding);
 
         final DefaultResourceOwnerOAuthContext resourceOwnerOAuthContext =
-            getContextForResourceOwner(resourceOwnerId == null ? DEFAULT_RESOURCE_OWNER_ID : resourceOwnerId);
+            (DefaultResourceOwnerOAuthContext) getContextForResourceOwner(resourceOwnerId == null ? DEFAULT_RESOURCE_OWNER_ID
+                : resourceOwnerId);
 
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Update OAuth Context for resourceOwnerId %s", resourceOwnerOAuthContext.getResourceOwnerId());
@@ -435,7 +436,8 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Executing refresh token for user " + resourceOwner);
     }
-    final DefaultResourceOwnerOAuthContext resourceOwnerOAuthContext = getContextForResourceOwner(resourceOwner);
+    final DefaultResourceOwnerOAuthContext resourceOwnerOAuthContext =
+        (DefaultResourceOwnerOAuthContext) getContextForResourceOwner(resourceOwner);
     final boolean lockWasAcquired = resourceOwnerOAuthContext.getRefreshUserOAuthContextLock().tryLock();
     try {
       if (lockWasAcquired) {

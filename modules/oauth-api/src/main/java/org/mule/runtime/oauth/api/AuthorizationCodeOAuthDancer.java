@@ -7,6 +7,7 @@
 package org.mule.runtime.oauth.api;
 
 import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
+import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 
@@ -39,6 +40,15 @@ public interface AuthorizationCodeOAuthDancer {
    * @return a completable future that is complete when the token has been refreshed.
    */
   CompletableFuture<Void> refreshToken(String resourceOwner);
+
+  /**
+   * Retrieves the oauth context for a particular user. If there's no state for that user a new state is retrieved so never
+   * returns null.
+   *
+   * @param resourceOwnerId id of the user.
+   * @return oauth state
+   */
+  ResourceOwnerOAuthContext getContextForResourceOwner(final String resourceOwnerId);
 
   /**
    * Handles an http request that will redirect to the access page in {@code authorizationUrl} with the configured credentials.

@@ -7,6 +7,7 @@
 package org.mule.runtime.oauth.api;
 
 import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
+import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -34,5 +35,13 @@ public interface ClientCredentialsOAuthDancer {
    * @return a completable future that is complete when the token has been refreshed.
    */
   CompletableFuture<Void> refreshToken();
+
+  /**
+   * Retrieves the oauth context. If there's no state, a new state is retrieved so never returns null.
+   *
+   * @param resourceOwnerId id of the user.
+   * @return oauth state
+   */
+  ResourceOwnerOAuthContext getContext();
 
 }
