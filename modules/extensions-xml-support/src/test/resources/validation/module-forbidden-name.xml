@@ -15,7 +15,7 @@
             <parameter name="name" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[param.value]"/>
+            <mule:set-payload value="#[parameters.value]"/>
         </body>
         <output type="string"/>
     </operation>

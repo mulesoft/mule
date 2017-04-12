@@ -20,9 +20,9 @@
             <parameter name="content" type="string"/>
         </parameters>
         <body>
-            <jms:publish config-ref="jmsConfig" destination="#[param.destination]">
+            <jms:publish config-ref="jmsConfig" destination="#[parameters.destination]">
                 <jms:message-builder>
-                    <jms:body>#[param.content]</jms:body>
+                    <jms:body>#[parameters.content]</jms:body>
                 </jms:message-builder>
             </jms:publish>
         </body>
@@ -34,7 +34,7 @@
             <parameter name="destination" type="string"/>
         </parameters>
         <body>
-            <jms:consume config-ref="jmsConfig" destination="#[param.destination]"/>
+            <jms:consume config-ref="jmsConfig" destination="#[parameters.destination]"/>
         </body>
         <output type="string"/>
     </operation>

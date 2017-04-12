@@ -49,9 +49,6 @@ import java.util.stream.Collectors;
  */
 public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessageProcessorChainBuilder {
 
-  private static final String PARAM_VARS = "param";
-  private static final String PROPERTY_VARS = "property";
-
   private Map<String, String> properties;
   private Map<String, String> parameters;
   private boolean returnsVoid;
@@ -142,9 +139,8 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
     private Event createEventWithParameters(Event event) {
       Event.Builder builder = Event.builder(event.getContext());
       builder.message(builder().nullPayload().build());
-      //TODO until MULE-10291 & MULE-10353 are done, we will use flowVars to store the parameter.value and property.value
-      builder.addVariable(PARAM_VARS, evaluateParameters(event, parameters));
-      builder.addVariable(PROPERTY_VARS, evaluateParameters(event, properties));
+      builder.parameters(evaluateParameters(event, parameters));
+      builder.properties(evaluateParameters(event, properties));
       return builder.build();
     }
 
@@ -156,7 +152,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
 
     private Object getEvaluatedValue(Event event, String value) {
       return expressionManager.isExpression(value)
-          ? expressionManager.evaluate(value, event, flowConstruct)
+          ? expressionManager.evaluate(value, event, flowConstruct).getValue()
           : value;
     }
   }
