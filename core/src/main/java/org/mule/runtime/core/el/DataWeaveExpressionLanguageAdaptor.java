@@ -45,11 +45,6 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor {
 
   private static final Logger logger = getLogger(DataWeaveExpressionLanguageAdaptor.class);
