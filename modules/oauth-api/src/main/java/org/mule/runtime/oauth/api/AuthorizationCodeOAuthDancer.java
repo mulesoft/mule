@@ -45,7 +45,6 @@ public interface AuthorizationCodeOAuthDancer {
    * Clears the oauth context for a given user.
    *
    * @param resourceOwnerId id of the user.
-   * @return a completable future that is complete when the context has been cleared.
    */
   void invalidateContext(String resourceOwnerId);
 

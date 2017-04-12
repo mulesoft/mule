@@ -38,8 +38,6 @@ public interface ClientCredentialsOAuthDancer {
 
   /**
    * Clears the oauth context.
-   *
-   * @return a completable future that is complete when the context has been cleared.
    */
   void invalidateContext();
 
