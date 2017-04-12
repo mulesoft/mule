@@ -42,6 +42,14 @@ public interface AuthorizationCodeOAuthDancer {
   CompletableFuture<Void> refreshToken(String resourceOwner);
 
   /**
+   * Clears the oauth context for a given user.
+   *
+   * @param resourceOwnerId id of the user.
+   * @return a completable future that is complete when the context has been cleared.
+   */
+  CompletableFuture<Void> invalidateContext(String resourceOwnerId);
+
+  /**
    * Retrieves the oauth context for a particular user. If there's no state for that user a new state is retrieved so never
    * returns null.
    *
