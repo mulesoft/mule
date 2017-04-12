@@ -12,8 +12,6 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import com.google.common.collect.ImmutableSet;
-import org.junit.Before;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
@@ -36,8 +34,13 @@ import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
+import com.google.common.collect.ImmutableSet;
+
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.Optional;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -47,20 +50,12 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.util.Optional;
-import java.util.Set;
 
-@ArtifactClassLoaderRunnerConfig(
-    sharedRuntimeLibs = {"org.apache.derby:derby"},
-    plugins = {
-        "org.mule.modules:mule-module-sockets",
-        "org.mule.modules:mule-module-http-ext",
-        "org.mule.modules:mule-module-db",
-        "org.mule.modules:mule-module-wsc",
-        "org.mule.modules:mule-module-jms"},
-    providedInclusions = "org.mule.modules:mule-module-sockets")
+import org.junit.Before;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+@ArtifactClassLoaderRunnerConfig(sharedRuntimeLibs = {"org.apache.derby:derby"})
 public abstract class AbstractElementModelTestCase extends MuleArtifactFunctionalTestCase {
 
   protected static final String DB_CONFIG = "dbConfig";

@@ -11,8 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
-
-import org.mule.functional.extensions.UsesHttpExtensionFunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -23,7 +22,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CustomSecManagerHttpFilterFunctionalTestCase extends UsesHttpExtensionFunctionalTestCase {
+public class CustomSecManagerHttpFilterFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");

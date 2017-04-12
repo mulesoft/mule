@@ -11,11 +11,10 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.test.IntegrationTestCaseRunnerConfig;
 
 import org.junit.Test;
 
-public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase implements IntegrationTestCaseRunnerConfig {
+public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase {
 
   @Override
   protected String getConfigFile() {

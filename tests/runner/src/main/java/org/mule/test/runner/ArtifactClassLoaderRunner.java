@@ -37,11 +37,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.aether.repository.LocalRepository;
 import org.junit.internal.builders.AnnotatedBuilder;
@@ -190,13 +188,11 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     builder.setPluginResourcesFolder(targetTestClassesFolder.getParentFile());
 
     builder.setProvidedExclusions(runnerConfiguration.getProvidedExclusions());
-    builder.setProvidedInclusions(runnerConfiguration.getProvidedInclusions());
     builder.setTestExclusions(runnerConfiguration.getTestExclusions());
     builder.setTestInclusions(runnerConfiguration.getTestInclusions());
 
     builder.setExportPluginClasses(runnerConfiguration.getExportPluginClasses());
 
-    builder.setPluginCoordinates(runnerConfiguration.getPlugins());
     builder.setSharedPluginLibCoordinates(runnerConfiguration.getSharedRuntimeLibs());
     builder.setExtensionMetadataGeneration(true);
 

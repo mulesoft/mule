@@ -55,25 +55,12 @@ public class ArtifactIsolatedClassLoaderBuilder {
   private List<String> providedExclusions = newArrayList();
   private List<String> testExclusions = newArrayList();
   private List<String> testInclusions = newArrayList();
-  private List<String> pluginCoordinates = newArrayList();
   private List<String> sharedPluginLibCoordinates = newArrayList();
   private List<Class> exportPluginClasses = newArrayList();
   private boolean extensionMetadataGenerationEnabled = false;
   private List<String> providedInclusions = newArrayList();
   private List<URL> applicationUrls = newArrayList();
   private List<String> extraBootPackages;
-
-  /**
-   * Sets the {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to create plugin
-   * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}s
-   *
-   * @param pluginCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>}
-   * @return this
-   */
-  public ArtifactIsolatedClassLoaderBuilder setPluginCoordinates(List<String> pluginCoordinates) {
-    this.pluginCoordinates = pluginCoordinates;
-    return this;
-  }
 
   /**
    * Sets the {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be
@@ -161,8 +148,6 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * Sets Maven artifacts to be excluded from the {@code provided} scope direct dependencies of the rootArtifact. In format
    * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * <p/>
-   * {@link #setPluginCoordinates(List)} Maven artifacts if declared will be considered to be excluded from being added as
-   * {@code provided} due to they are going to be added to its class loaders.
    *
    * @param providedExclusions Maven artifacts to be excluded from the {@code provided} scope direct dependencies of the
    *        rootArtifact. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
@@ -170,22 +155,6 @@ public class ArtifactIsolatedClassLoaderBuilder {
    */
   public ArtifactIsolatedClassLoaderBuilder setProvidedExclusions(final List<String> providedExclusions) {
     this.providedExclusions = providedExclusions;
-    return this;
-  }
-
-  /**
-   * Sets Maven artifacts to be explicitly included from the {@code provided} scope direct dependencies of the rootArtifact. In
-   * format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
-   * <p/>
-   * This artifacts have to be declared as {@code provided} scope in rootArtifact direct dependencies and no matter if they were
-   * excluded or not from {@link #setProvidedExclusions(List)} and {@link #setPluginCoordinates(List)}. Meaning that the same
-   * artifact could ended up being added to the container class loader and as plugin.
-   *
-   * @param providedInclusions
-   * @return this
-   */
-  public ArtifactIsolatedClassLoaderBuilder setProvidedInclusions(List<String> providedInclusions) {
-    this.providedInclusions = providedInclusions;
     return this;
   }
 
@@ -275,10 +244,8 @@ public class ArtifactIsolatedClassLoaderBuilder {
                                          excludedArtifacts,
                                          extraBootPackages,
                                          providedExclusions,
-                                         providedInclusions,
                                          testExclusions,
                                          testInclusions,
-                                         pluginCoordinates,
                                          sharedPluginLibCoordinates,
                                          exportPluginClasses,
                                          applicationUrls,

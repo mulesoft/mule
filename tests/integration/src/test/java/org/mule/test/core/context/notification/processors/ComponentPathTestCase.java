@@ -31,8 +31,6 @@ import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.test.IntegrationTestCaseRunnerConfig;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -40,9 +38,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-@ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-validation"})
-public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase
-    implements IntegrationTestCaseRunnerConfig {
+public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase {
 
   private static final Optional<TypedComponentIdentifier> FLOW_TYPED_COMPONENT_IDENTIFIER =
       of(builder().withIdentifier(FLOW_IDENTIFIER).withType(FLOW).build());

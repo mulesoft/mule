@@ -115,77 +115,77 @@
             <artifactId>mule-metadata-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-vegan-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-heisenberg-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tx-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-marvel-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-subtypes-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-petstore-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-some-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-implicit-config-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-typed-value-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-parameter-resolver-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -199,7 +199,7 @@
             <artifactId>mule-multi-implicit-config-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>

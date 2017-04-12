@@ -8,7 +8,6 @@
 package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.test.runner.utils.RunnerModuleUtils;
 
@@ -36,13 +35,11 @@ public class ClassPathClassifierContext {
   private final List<URL> classPathURLs;
 
   private final List<String> providedExclusions = newArrayList();
-  private final List<String> providedInclusions = newArrayList();
   private final List<String> testExclusions = newArrayList();
   private final List<String> testInclusions = newArrayList();
 
   private final List<String> extraBootPackages = newArrayList();
 
-  private final List<String> pluginCoordinates = newArrayList();
   private final List<String> sharedPluginLibCoordinates = newArrayList();
   private final List<Class> exportPluginClasses = newArrayList();
   private final List<String> excludedArtifacts = newArrayList();
@@ -64,14 +61,10 @@ public class ClassPathClassifierContext {
    *        container in addition to the pre-defined ones.
    * @param providedExclusions Maven artifacts to be excluded from the provided scope direct dependencies of rootArtifact. In
    *        format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
-   * @param providedInclusions Maven artifacts to be excluded from the provided scope direct dependencies of rootArtifact. In
-   *        format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @param testExclusions {@link List} of Maven coordinates to be excluded from application class loader. In format
    *        {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @param testInclusions {@link List} of Maven coordinates to be included in application class loader. In format
    *        {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
-   * @param pluginCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to create plugin
-   *        {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}s
    * @param sharedPluginLibCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be
    *        added to the sharedLib {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
    * @param exportPluginClasses {@link List} of {@link Class} to be exported in addition to the ones already exported by the
@@ -89,10 +82,8 @@ public class ClassPathClassifierContext {
                                     final List<String> excludedArtifacts,
                                     final List<String> extraBootPackages,
                                     final List<String> providedExclusions,
-                                    final List<String> providedInclusions,
                                     final List<String> testExclusions,
                                     final List<String> testInclusions,
-                                    final List<String> pluginCoordinates,
                                     final List<String> sharedPluginLibCoordinates,
                                     final List<Class> exportPluginClasses,
                                     final List<URL> applicationUrls,
@@ -109,12 +100,10 @@ public class ClassPathClassifierContext {
     this.extraBootPackages.addAll(extraBootPackages);
 
     this.providedExclusions.addAll(providedExclusions);
-    this.providedInclusions.addAll(providedInclusions);
 
     this.testExclusions.addAll(testExclusions);
     this.testInclusions.addAll(testInclusions);
 
-    this.pluginCoordinates.addAll(pluginCoordinates);
     this.sharedPluginLibCoordinates.addAll(sharedPluginLibCoordinates);
     this.exportPluginClasses.addAll(exportPluginClasses);
 
@@ -150,14 +139,6 @@ public class ClassPathClassifierContext {
    */
   public List<String> getProvidedExclusions() {
     return this.providedExclusions;
-  }
-
-  /**
-   * @return Maven artifacts to be explicitly included from the {@code provided} scope direct dependencies of the rootArtifact. In
-   *         format {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
-   */
-  public List<String> getProvidedInclusions() {
-    return this.providedInclusions;
   }
 
   /**
@@ -209,14 +190,6 @@ public class ClassPathClassifierContext {
    */
   public List<Class> getExportPluginClasses() {
     return this.exportPluginClasses;
-  }
-
-  /**
-   * @return {@link List} of plugins as {@code [groupId]:[artifactId]} format for creates plugin
-   *         {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
-   */
-  public List<String> getPluginCoordinates() {
-    return this.pluginCoordinates;
   }
 
   /**

@@ -6,12 +6,9 @@
  */
 package org.mule.test.config.spring.parsers;
 
-import org.mule.test.IntegrationTestCaseRunnerConfig;
-
 import org.junit.Test;
 
-public class ConstrainedConnectorExceptionStrategyMule2126TestCase extends AbstractBadConfigTestCase implements
-    IntegrationTestCaseRunnerConfig {
+public class ConstrainedConnectorExceptionStrategyMule2126TestCase extends AbstractBadConfigTestCase {
 
   @Override
   protected String getConfigFile() {

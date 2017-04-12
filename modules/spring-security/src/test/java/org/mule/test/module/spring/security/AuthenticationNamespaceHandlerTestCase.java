@@ -10,8 +10,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-
-import org.mule.functional.extensions.UsesHttpExtensionFunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.core.security.DefaultMuleSecurityManager;
@@ -23,7 +22,7 @@ import java.util.Collection;
 
 import org.junit.Test;
 
-public abstract class AuthenticationNamespaceHandlerTestCase extends UsesHttpExtensionFunctionalTestCase {
+public abstract class AuthenticationNamespaceHandlerTestCase extends MuleArtifactFunctionalTestCase {
 
   @Test
   public void testSecurityManagerConfigured() {

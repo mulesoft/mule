@@ -13,15 +13,7 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.util.Optional;
 
-@ArtifactClassLoaderRunnerConfig(
-    plugins = {"org.mule.tests:mule-heisenberg-extension", "org.mule.tests:mule-vegan-extension",
-        "org.mule.tests:mule-petstore-extension", "org.mule.tests:mule-metadata-extension",
-        "org.mule.tests:mule-marvel-extension", "org.mule.tests:mule-subtypes-extension",
-        "org.mule.tests:mule-tx-extension", "org.mule.tests:mule-some-extension",
-        "org.mule.tests:mule-implicit-config-extension", "org.mule.tests:mule-typed-value-extension",
-        "org.mule.tests:mule-parameter-resolver-extension", "org.mule.tests:mule-implicit-exclusive-config-extension",
-        "org.mule.tests:mule-multi-implicit-config-extension"},
-    sharedRuntimeLibs = {"org.mule.tests:mule-tests-unit"})
+@ArtifactClassLoaderRunnerConfig(sharedRuntimeLibs = {"org.mule.tests:mule-tests-unit"})
 public class AbstractExtensionFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 
   protected Optional<ExtensionModel> getExtensionModel(String name) {

@@ -14,7 +14,6 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.test.IntegrationTestCaseRunnerConfig;
 
 import org.junit.Test;
 
@@ -26,8 +25,7 @@ import org.junit.Test;
  * lost quite a few tests on merging. So I am afraid we are left with two rather rambling, parallel tests. But these tests examing
  * "corner cases" no other tests cover, so are quite valuable...
  */
-public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilderTestCase implements
-    IntegrationTestCaseRunnerConfig {
+public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilderTestCase {
 
   public SpringNamespaceConfigBuilderV2TestCase() {
     super(true);

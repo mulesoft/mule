@@ -6,9 +6,7 @@
  */
 package org.mule.test.integration.message;
 
-import org.mule.test.IntegrationTestCaseRunnerConfig;
-
-public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase implements IntegrationTestCaseRunnerConfig {
+public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase {
 
   @Override
   protected String getConfigFile() {
