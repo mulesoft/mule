@@ -36,16 +36,17 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 
 import javax.jms.ConnectionFactory;
 
-
 /**
  * <code>JmsExtension</code> is a JMS 1.0.2b, 1.1 and 2.0 compliant MuleSoft Extension,
  * used to consume and produce JMS Messages.
+ * <p>
  * The Extension supports all JMS functionality including topics and queues,
  * durable subscribers, acknowledgement modes and local transactions.
  *
  * @since 4.0
  */
-@Extension(name = "JMS")
+@Extension(name = "JMS",
+    description = "Jms Extension used to consume and produce JMS Messages, this extension is JMS 1.0.2b, 1.1 and 2.0 compliant")
 @Xml(prefix = "jms")
 @Configurations({JmsConfig.class})
 @ConnectionProviders({GenericConnectionProvider.class, ActiveMQConnectionProvider.class})
