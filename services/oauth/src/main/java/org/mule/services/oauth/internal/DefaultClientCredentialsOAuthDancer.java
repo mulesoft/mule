@@ -82,7 +82,7 @@ public class DefaultClientCredentialsOAuthDancer extends AbstractOAuthDancer imp
 
   @Override
   public CompletableFuture<String> accessToken() throws RequestAuthenticationException {
-    final String accessToken = getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID).getAccessToken();
+    final String accessToken = getContext().getAccessToken();
     if (accessToken == null) {
       throw new RequestAuthenticationException(createStaticMessage(format("No access token found. "
           + "Verify that you have authenticated before trying to execute an operation to the API.")));
