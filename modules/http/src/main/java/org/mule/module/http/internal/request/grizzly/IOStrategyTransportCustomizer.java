@@ -25,14 +25,16 @@ public class IOStrategyTransportCustomizer implements TransportCustomizer
     private Integer workerCoreSize;
     private Integer maxKernelPoolSize;
     private Integer kernelCoreSize;
+    private Integer selectorRunnerCoreSize;
 
-    public IOStrategyTransportCustomizer(String threadNamePrefix, Integer maxWorkerPoolSize, Integer workerCoreSize, Integer maxKernelPoolSize, Integer kernelCoreSize)
+    public IOStrategyTransportCustomizer(String threadNamePrefix, Integer maxWorkerPoolSize, Integer workerCoreSize, Integer maxKernelPoolSize, Integer kernelCoreSize, Integer selectorRunnerCoreSize)
     {
         this.threadNamePrefix = threadNamePrefix;
         this.maxWorkerPoolSize = maxWorkerPoolSize;
         this.workerCoreSize = workerCoreSize;
         this.maxKernelPoolSize = maxKernelPoolSize;
         this.kernelCoreSize = kernelCoreSize;
+        this.selectorRunnerCoreSize = selectorRunnerCoreSize;
     }
 
     @Override
@@ -61,12 +63,17 @@ public class IOStrategyTransportCustomizer implements TransportCustomizer
 
         if (maxWorkerPoolSize != null)
         {
-            transport.getKernelThreadPoolConfig().setMaxPoolSize(maxWorkerPoolSize);
+            transport.getWorkerThreadPoolConfig().setMaxPoolSize(maxWorkerPoolSize);
         }
 
         if (workerCoreSize != null)
         {
-            transport.getKernelThreadPoolConfig().setCorePoolSize(workerCoreSize);
+            transport.getWorkerThreadPoolConfig().setCorePoolSize(workerCoreSize);
+        }
+        
+        if (selectorRunnerCoreSize != null)
+        {
+            transport.setSelectorRunnersCount(selectorRunnerCoreSize);
         }
     }
 }

@@ -40,10 +40,11 @@ public class HttpRequesterWsdlRetrieverStrategy implements WsdlRetrieverStrategy
     private static final int MINIMUM_WORKER_MAX_POOL_SIZE = 1;
     private static final int MINIMUM_WORKER_CORE_SIZE = 1;
     private static final int DEFAULT_CONNECTIONS = 1;
+    private static final int DEFAULT_SELECTOR_RUNNERS_COUNT = 1;
     private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
     private static final int DEFAULT_CONNECTION_TIMEOUT = 60 * 1000;
     private static final Boolean DEFAULT_FOLLOW_REDIRECTS = Boolean.TRUE;
-    private static final Boolean DEFAULT_USE_PERSISTENT_CONNECTION = Boolean.FALSE;
+    private static final Boolean DEFAULT_USE_PERSISTENT_CONNECTION = Boolean.TRUE;
     private static final String HTTP_METHOD_WSDL_RETRIEVAL = "GET";
     private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.wsdl.%s";
     private static final String WSDL_RETRIEVER = "wsdl.retriever";
@@ -114,6 +115,7 @@ public class HttpRequesterWsdlRetrieverStrategy implements WsdlRetrieverStrategy
                                                                                      .setWorkerCoreSize(MINIMUM_WORKER_CORE_SIZE)
                                                                                      .setMaxKernelPoolSize(MINIMUM_KERNEL_MAX_POOL_SIZE)
                                                                                      .setKernelCoreSize(MINIMUM_KERNEL_CORE_SIZE)
+                                                                                     .setSelectorRunnersCount(DEFAULT_SELECTOR_RUNNERS_COUNT)
                                                                                      .build();
 
 
