@@ -28,7 +28,6 @@
         <module>http-api</module>
         <module>oauth-api</module>
         <module>jboss-transactions</module>
-        <module>management</module>
         <module>reboot</module>
         <module>schedulers</module>
         <module>scripting</module>

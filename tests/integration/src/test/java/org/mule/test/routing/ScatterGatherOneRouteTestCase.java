@@ -6,6 +6,7 @@
  */
 package org.mule.test.routing;
 
+import static org.junit.Assert.assertTrue;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
@@ -15,8 +16,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import com.yourkit.util.Asserts;
 
 import java.util.Collections;
 
@@ -54,7 +53,7 @@ public class ScatterGatherOneRouteTestCase extends AbstractMuleTestCase {
     try {
       sc.initialise();
     } catch (InitialisationException e) {
-      Asserts.assertTrue(e.getCause() instanceof IllegalStateException);
+      assertTrue(e.getCause() instanceof IllegalStateException);
       throw e;
     }
   }
