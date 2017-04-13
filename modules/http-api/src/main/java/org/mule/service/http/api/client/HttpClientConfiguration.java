@@ -24,12 +24,14 @@ public class HttpClientConfiguration {
   private final int maxConnections;
   private final boolean usePersistentConnections;
   private final int connectionIdleTimeout;
+  private final int responseBufferSize;
   private final String threadNamePrefix;
   private final String ownerName;
 
   HttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig,
                           TcpClientSocketProperties clientSocketProperties, int maxConnections,
-                          boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix,
+                          boolean usePersistentConnections, int connectionIdleTimeout, int responseBufferSize,
+                          String threadNamePrefix,
                           String ownerName) {
     this.tlsContextFactory = tlsContextFactory;
     this.proxyConfig = proxyConfig;
@@ -37,6 +39,7 @@ public class HttpClientConfiguration {
     this.maxConnections = maxConnections;
     this.usePersistentConnections = usePersistentConnections;
     this.connectionIdleTimeout = connectionIdleTimeout;
+    this.responseBufferSize = responseBufferSize;
     this.threadNamePrefix = threadNamePrefix;
     this.ownerName = ownerName;
   }
@@ -65,6 +68,10 @@ public class HttpClientConfiguration {
     return connectionIdleTimeout;
   }
 
+  public int getResponseBufferSize() {
+    return responseBufferSize;
+  }
+
   public String getThreadNamePrefix() {
     return threadNamePrefix;
   }
@@ -84,6 +91,7 @@ public class HttpClientConfiguration {
     private int maxConnections = -1;
     private boolean usePersistentConnections = true;
     private int connectionIdleTimeout = 30000;
+    private int responseBufferSize = 10240;
     private String threadNamePrefix;
     private String ownerName;
 
@@ -158,6 +166,17 @@ public class HttpClientConfiguration {
     }
 
     /**
+     * Defines the size of the buffer in bytes used to store the HTTP response, the default value is 10KB.
+     *
+     * @param responseBufferSize buffer size (in bytes)
+     * @return this builder
+     */
+    public Builder setResponseBufferSize(int responseBufferSize) {
+      this.responseBufferSize = responseBufferSize;
+      return this;
+    }
+
+    /**
      * Defines the prefix to use to name the {@link HttpClient}'s threads. Must be specified.
      *
      * @param threadNamePrefix a {@link String} representing the prefix
@@ -184,7 +203,8 @@ public class HttpClientConfiguration {
      */
     public HttpClientConfiguration build() {
       return new HttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
-                                         usePersistentConnections, connectionIdleTimeout, threadNamePrefix, ownerName);
+                                         usePersistentConnections, connectionIdleTimeout, responseBufferSize, threadNamePrefix,
+                                         ownerName);
     }
   }
 }

@@ -84,6 +84,7 @@ public class GrizzlyHttpClient implements HttpClient {
   private int maxConnections;
   private boolean usePersistentConnections;
   private int connectionIdleTimeout;
+  private int responseBufferSize;
 
   private String threadNamePrefix;
   private Scheduler selectorScheduler;
@@ -102,6 +103,7 @@ public class GrizzlyHttpClient implements HttpClient {
     this.maxConnections = config.getMaxConnections();
     this.usePersistentConnections = config.isUsePersistentConnections();
     this.connectionIdleTimeout = config.getConnectionIdleTimeout();
+    this.responseBufferSize = config.getResponseBufferSize();
     this.threadNamePrefix = config.getThreadNamePrefix();
     this.ownerName = config.getOwnerName();
 
@@ -237,7 +239,7 @@ public class GrizzlyHttpClient implements HttpClient {
 
     Request grizzlyRequest = createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
     PipedOutputStream outPipe = new PipedOutputStream();
-    PipedInputStream inPipe = new PipedInputStream(outPipe);
+    PipedInputStream inPipe = new PipedInputStream(outPipe, responseBufferSize);
     BodyDeferringAsyncHandler asyncHandler = new BodyDeferringAsyncHandler(outPipe);
     asyncHttpClient.executeRequest(grizzlyRequest, asyncHandler);
     try {
@@ -410,7 +412,7 @@ public class GrizzlyHttpClient implements HttpClient {
         throws IOException {
       this.output = output;
       this.responseHandler = responseHandler;
-      this.input = new PipedInputStream(output);
+      this.input = new PipedInputStream(output, responseBufferSize);
     }
 
     @Override

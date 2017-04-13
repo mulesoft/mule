@@ -175,6 +175,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
           .setMaxConnections(connectionParams.getMaxConnections())
           .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
           .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
+          .setResponseBufferSize(connectionParams.getResponseBufferSize())
           .setThreadNamePrefix(threadNamePrefix)
           .setOwnerName(configName)
           .build();
@@ -201,8 +202,8 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   @Override
   public void disconnect(HttpExtensionClient httpClient) {}
 
-  public Integer getPort() {
-    return connectionParams.getPort();
+  public RequestConnectionParams getConnectionParams() {
+    return connectionParams;
   }
 
   public ProxyConfig getProxyConfig() {
