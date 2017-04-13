@@ -34,6 +34,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
+import org.custommonkey.xmlunit.ElementNameAndTextQualifier;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
 import org.junit.Test;
@@ -108,6 +111,9 @@ public class CxfBasicTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl", getTestMuleMessage(null), HTTP_REQUEST_OPTIONS);
         assertNotNull(result.getPayload());
-        assertThat(XMLUnit.compareXML(echoWsdl, result.getPayloadAsString()).similar(), is(true));
+        Diff wsdlComparation = XMLUnit.compareXML(echoWsdl, result.getPayloadAsString());
+        // Different JDKs generate some wsdl elements in different order
+        wsdlComparation.overrideElementQualifier(new ElementNameAndAttributeQualifier());
+		assertThat(wsdlComparation.toString(), wsdlComparation.similar(), is(true));
     }
 }
