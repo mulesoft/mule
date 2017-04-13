@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
 import static org.mule.runtime.api.message.Message.of;
 import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.just;
@@ -47,7 +46,7 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
   public ExpectedException thrown = ExpectedException.none();
 
   private Processor testProcessor = event -> Event.builder(eventContext).message(of(TEST_PAYLOAD)).build();
-  private Processor testProcessorReturnsNull = event -> Event.builder(eventContext).message(NULL_MESSAGE).build();
+  private Processor testProcessorReturnsNull = event -> Event.builder(eventContext).message(of(null)).build();
   private Processor testProcessorThrowsException = event -> {
     throw exception;
   };

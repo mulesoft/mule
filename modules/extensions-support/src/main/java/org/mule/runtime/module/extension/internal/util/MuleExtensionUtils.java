@@ -13,7 +13,7 @@ import static java.util.Collections.emptySet;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
@@ -290,7 +290,7 @@ public class MuleExtensionUtils {
         return null;
       }
     };
-    return Event.builder(create(flowConstruct, "InitializerEvent")).message(NULL_MESSAGE).flow(flowConstruct).build();
+    return Event.builder(create(flowConstruct, "InitializerEvent")).message(of(null)).flow(flowConstruct).build();
   }
 
   /**

@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.client;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
@@ -181,7 +181,7 @@ public class DefaultLocalMuleClient implements MuleClient {
       if (connectorMessageProcessor instanceof FlowConstructAware) {
         ((FlowConstructAware) connectorMessageProcessor).setFlowConstruct(flowConstruct);
       }
-      final Event event = connectorMessageProcessor.process(createMuleEvent(NULL_MESSAGE));
+      final Event event = connectorMessageProcessor.process(createMuleEvent(of(null)));
       if (event == null) {
         return right(empty());
       }

@@ -9,7 +9,7 @@ package org.mule.runtime.core.message;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.message.ErrorBuilder.builder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -53,7 +53,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
     String detailedDescription = "detailed description";
     String description = "description";
     ErrorType errorType = mockErrorType;
-    Message errorMessage = NULL_MESSAGE;
+    Message errorMessage = of(null);
     IllegalArgumentException exception = new IllegalArgumentException("some message");
     Error error = builder()
         .errorType(errorType)
