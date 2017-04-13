@@ -28,6 +28,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
+import org.custommonkey.xmlunit.ElementNameAndTextQualifier;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,9 +79,10 @@ public class CxfBackToBlockingTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl", getTestMuleMessage(null), HTTP_REQUEST_OPTIONS);
         assertNotNull(result.getPayload());
-        System.out.println(result.getPayloadAsString());
-        System.out.println(XMLUnit.compareXML(echoWsdl, result.getPayloadAsString()));
-        assertThat(XMLUnit.compareXML(echoWsdl, result.getPayloadAsString()).similar(), is(true));
+        Diff wsdlComparation = XMLUnit.compareXML(echoWsdl, result.getPayloadAsString());
+        // Different JDKs generate some wsdl elements in different order
+        wsdlComparation.overrideElementQualifier(new ElementNameAndAttributeQualifier());
+        assertThat(wsdlComparation.toString(), wsdlComparation.similar(), is(true));
         muleContext.getRegistry().lookupObject(SensingNullRequestResponseMessageProcessor.class).assertRequestResponseThreadsSame();
     }
 
