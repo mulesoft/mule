@@ -244,5 +244,16 @@ public interface AllureConstants {
 
   }
 
+  interface LifecycleAndDependencyInjectionFeature {
+
+    String LIFECYCLE_AND_DEPENDNECY_INJECTION = "Lifecycle and Dependency Injection";
+
+    interface ObjectFactoryStory {
+
+      String OBJECT_FACTORY_INECTION_AND_LIFECYCLE = "Object Factory Injection And Lifecycle";
+    }
+
+  }
+
 }
 

@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl.source;
 
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
@@ -40,9 +41,9 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser {
   private final DslElementSyntax sourceDsl;
 
   public SourceDefinitionParser(ComponentBuildingDefinition.Builder definition, ExtensionModel extensionModel,
-                                SourceModel sourceModel, DslSyntaxResolver dslSyntaxResolver, MuleContext muleContext,
+                                SourceModel sourceModel, DslSyntaxResolver dslSyntaxResolver,
                                 ExtensionParsingContext parsingContext) {
-    super(definition, dslSyntaxResolver, parsingContext, muleContext);
+    super(definition, dslSyntaxResolver, parsingContext);
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
     this.sourceDsl = dslSyntaxResolver.resolve(sourceModel);
@@ -54,7 +55,7 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser {
         .withObjectFactoryType(ExtensionSourceObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
         .withConstructorParameterDefinition(fromFixedValue(sourceModel).build())
-        .withConstructorParameterDefinition(fromFixedValue(muleContext).build())
+        .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
         .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME,
                                        fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build())

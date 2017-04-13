@@ -7,11 +7,15 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 
 import com.google.common.collect.ImmutableList;
 
@@ -20,6 +24,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 /**
  * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation of {@link #resolve(Event)} it return a
@@ -30,10 +36,13 @@ import java.util.Set;
  * @param <T> the generic type for the items of the returned {@link Collection}
  * @since 3.7.0
  */
-public final class CollectionValueResolver<T> implements ValueResolver<Collection<T>> {
+public final class CollectionValueResolver<T> implements ValueResolver<Collection<T>>, Initialisable {
 
   private final List<ValueResolver<T>> resolvers;
   private final Class<? extends Collection> collectionType;
+
+  @Inject
+  private MuleContext muleContext;
 
   /**
    * Creates a new instance
@@ -90,5 +99,10 @@ public final class CollectionValueResolver<T> implements ValueResolver<Collectio
     } catch (Exception e) {
       throw new RuntimeException("Could not create instance of " + collectionType.getName(), e);
     }
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(resolvers, true, muleContext);
   }
 }

@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
-import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
@@ -27,7 +26,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
-import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -200,6 +198,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     returnDelegate = createReturnDelegate();
     operationExecutor = getOperationExecutorFactory(operationModel).createExecutor(operationModel);
     executionMediator = createExecutionMediator();
+    initialiseIfNeeded(resolverSet, muleContext);
     initialiseIfNeeded(operationExecutor, true, muleContext);
   }
 

@@ -39,7 +39,6 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
 
   @Rule
   public final ExpectedException expectedException = none();
-  private final MuleContext mockMuleContext = mock(MuleContext.class);
   private final ServiceRegistry mockServiceRegistry = mock(ServiceRegistry.class);
   private final XmlApplicationParser xmlApplicationParser = new XmlApplicationParser(mockServiceRegistry);
   private final XmlConfigurationDocumentLoader documentLoader = new XmlConfigurationDocumentLoader();
@@ -164,7 +163,6 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry = new ComponentBuildingDefinitionRegistry();
     CoreComponentBuildingDefinitionProvider coreComponentBuildingDefinitionProvider =
         new CoreComponentBuildingDefinitionProvider();
-    coreComponentBuildingDefinitionProvider.setMuleContext(mockMuleContext);
     coreComponentBuildingDefinitionProvider.init();
     coreComponentBuildingDefinitionProvider.getComponentBuildingDefinitions()
         .stream().forEach(componentBuildingDefinitionRegistry::register);

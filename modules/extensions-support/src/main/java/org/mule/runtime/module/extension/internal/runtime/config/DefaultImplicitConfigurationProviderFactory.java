@@ -7,22 +7,26 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.String.format;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.canBeUsedImplicitly;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
 import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.canBeUsedImplicitly;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.time.TimeSupplier;
+import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.module.extension.internal.runtime.ImmutableExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+
+import javax.inject.Inject;
 
 /**
  * Default implementation of {@link ImplicitConfigurationProviderFactory}. Implicit configurations are created from
@@ -32,6 +36,13 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
  * @since 3.8.0
  */
 public final class DefaultImplicitConfigurationProviderFactory implements ImplicitConfigurationProviderFactory {
+
+
+  @Inject
+  private ConnectionManager connectionManager;
+
+  @Inject
+  private MuleMetadataService metadataService;
 
   /**
    * {@inheritDoc}
@@ -67,7 +78,7 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
       }
 
       return new ConfigurationProviderMetadataAdapter(implicitConfigurationModel.getName(), extensionModel,
-                                                      implicitConfigurationModel, configurationInstance);
+                                                      implicitConfigurationModel, configurationInstance, muleContext);
 
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);

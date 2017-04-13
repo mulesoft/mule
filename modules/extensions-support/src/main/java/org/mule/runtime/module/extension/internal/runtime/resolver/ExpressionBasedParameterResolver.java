@@ -10,11 +10,16 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 
 import java.util.Optional;
+
+import javax.inject.Inject;
 
 /**
  * {@link ParameterResolver} implementation for the parameters that are resolved from an expression
@@ -22,16 +27,22 @@ import java.util.Optional;
  * @param <T> Concrete parameter type to be resolved
  * @since 4.0
  */
-class ExpressionBasedParameterResolver<T> implements ParameterResolver<T> {
+class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initialisable {
 
   private final String expression;
   private final Event event;
-  private final TypeSafeExpressionValueResolver<T> valueResolver;
+  private final MetadataType metadataType;
+  private TypeSafeExpressionValueResolver<T> valueResolver;
 
-  ExpressionBasedParameterResolver(String expression, MetadataType metadataType, MuleContext muleContext, Event event) {
+  @Inject
+  private TransformationService transformationService;
+  @Inject
+  private ExtendedExpressionManager extendedExpressionManager;
+
+  ExpressionBasedParameterResolver(String expression, MetadataType metadataType, Event event) {
     this.expression = expression;
     this.event = event;
-    this.valueResolver = new TypeSafeExpressionValueResolver<>(expression, getType(metadataType), muleContext);
+    this.metadataType = metadataType;
   }
 
   /**
@@ -52,5 +63,21 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T> {
   @Override
   public Optional<String> getExpression() {
     return Optional.ofNullable(expression);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    valueResolver = new TypeSafeExpressionValueResolver<>(expression, getType(metadataType));
+    valueResolver.setExtendedExpressionManager(extendedExpressionManager);
+    valueResolver.setTransformationService(transformationService);
+    valueResolver.initialise();
+  }
+
+  public void setTransformationService(TransformationService transformationService) {
+    this.transformationService = transformationService;
+  }
+
+  public void setExtendedExpressionManager(ExtendedExpressionManager extendedExpressionManager) {
+    this.extendedExpressionManager = extendedExpressionManager;
   }
 }

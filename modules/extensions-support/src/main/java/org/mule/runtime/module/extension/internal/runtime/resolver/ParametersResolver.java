@@ -15,6 +15,7 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
@@ -27,9 +28,10 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
-import com.google.common.base.Joiner;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -49,6 +51,8 @@ import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEn
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
+
+import com.google.common.base.Joiner;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -90,15 +94,15 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   }
 
   /**
-   * Constructs a {@link ResolverSet} from the parameters, using {@link #toValueResolver(Object, Set)} to
-   * process the values.
+   * Constructs a {@link ResolverSet} from the parameters, using {@link #toValueResolver(Object, Set)} to process the values.
    *
    * @return a {@link ResolverSet}
    */
-  public ResolverSet getParametersAsResolverSet(ParameterizedModel model) throws ConfigurationException {
+  public ResolverSet getParametersAsResolverSet(ParameterizedModel model, MuleContext muleContext) throws ConfigurationException {
 
     List<ParameterGroupModel> inlineGroups = getInlineGroups(model);
-    ResolverSet resolverSet = getParametersAsResolverSet(model, getFlatParameters(inlineGroups, model.getAllParameterModels()));
+    ResolverSet resolverSet =
+        getParametersAsResolverSet(model, getFlatParameters(inlineGroups, model.getAllParameterModels()), muleContext);
     for (ParameterGroupModel group : inlineGroups) {
       String containerName = getContainerName(group.getModelProperty(ParameterGroupModelProperty.class)
           .map(mp -> mp.getDescriptor().getContainer())
@@ -113,9 +117,10 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     return resolverSet;
   }
 
-  public ResolverSet getParametersAsResolverSet(ParameterizedModel model, List<ParameterModel> parameterModels)
+  public ResolverSet getParametersAsResolverSet(ParameterizedModel model, List<ParameterModel> parameterModels,
+                                                MuleContext muleContext)
       throws ConfigurationException {
-    ResolverSet resolverSet = new ResolverSet();
+    ResolverSet resolverSet = new ResolverSet(muleContext);
     parameterModels.forEach(p -> {
       String parameterName = getMemberName(p, p.getName());
       ValueResolver<?> resolver;
@@ -182,7 +187,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
           final ObjectType groupType = (ObjectType) groupField.getValue();
           final Field objectField = getField(objectClass, getLocalPart(groupField));
           DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder(getType(groupField.getValue()));
-          builder.addPropertyResolver(objectField.getName(), new ObjectBuilderValueResolver<>(groupBuilder));
+          builder.addPropertyResolver(objectField.getName(), new ObjectBuilderValueResolver<>(groupBuilder, muleContext));
 
           resolveParameters(groupType, groupBuilder);
           resolveParameterGroups(groupType, groupBuilder);
@@ -219,7 +224,12 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       }
 
       if (valueResolver != null) {
-        builder.addPropertyResolver(objectField.getName(), valueResolver);
+        try {
+          initialiseIfNeeded(valueResolver, true, muleContext);
+          builder.addPropertyResolver(objectField.getName(), valueResolver);
+        } catch (InitialisationException e) {
+          throw new MuleRuntimeException(e);
+        }
       } else if (field.isRequired() && !isParameterGroup(field)) {
         throw new IllegalStateException(format("The object '%s' requires the parameter '%s' but is not set",
                                                objectClass.getSimpleName(), objectField.getName()));
@@ -280,7 +290,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
    * <p>
    * Other values (including {@code null}) are wrapped in a {@link StaticValueResolver}.
    *
-   * @param value           the value to expose
+   * @param value the value to expose
    * @param modelProperties of the value's parameter
    * @return a {@link ValueResolver}
    */
@@ -306,7 +316,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     Map<ValueResolver<Object>, ValueResolver<Object>> normalizedMap = new LinkedHashMap<>(value.size());
     value.forEach((key, entryValue) -> normalizedMap.put((ValueResolver<Object>) toValueResolver(key),
                                                          (ValueResolver<Object>) toValueResolver(entryValue)));
-    return MapValueResolver.of(value.getClass(), copyOf(normalizedMap.keySet()), copyOf(normalizedMap.values()));
+    return MapValueResolver.of(value.getClass(), copyOf(normalizedMap.keySet()), copyOf(normalizedMap.values()), muleContext);
   }
 
   private ValueResolver<?> getCollectionResolver(Collection<?> collection) {
@@ -319,7 +329,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
    *
    * @param hasDefaultEncoding whether the parameter has to use runtime's default encoding or not
    * @return {@link Supplier} for obtaining the the proper {@link ValueResolver} for the default value, {@code null} if there is
-   * no default.
+   *         no default.
    */
   private ValueResolver<?> getDefaultValueResolver(boolean hasDefaultEncoding, Supplier<ValueResolver<?>> supplier) {
     return hasDefaultEncoding ? new StaticValueResolver<>(muleContext.getConfiguration().getDefaultEncoding()) : supplier.get();

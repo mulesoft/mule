@@ -18,9 +18,11 @@ import static org.mule.test.config.dsl.ParserXmlNamespaceInfoProvider.PARSERS_TE
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.test.config.spring.parsers.beans.ParameterAndChildElement;
-import org.mule.test.config.spring.parsers.beans.PojoWithSameTypeChildren;
 import org.mule.test.config.spring.parsers.beans.ParsersTestObject;
+import org.mule.test.config.spring.parsers.beans.PojoWithSameTypeChildren;
 import org.mule.test.config.spring.parsers.beans.SimplePojo;
+import org.mule.test.config.spring.parsers.beans.TestObject;
+import org.mule.test.config.spring.parsers.beans.TestObjectFactory;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -177,6 +179,11 @@ public class ParserComponentBuildingDefinitionProvider implements ComponentBuild
 
     definitions.add(baseBuilder.copy().withIdentifier("simple-type").withTypeConverter(o -> new SimplePojo((String) o))
         .withTypeDefinition(fromType(String.class)).build());
+
+    definitions.add(baseBuilder.copy().withIdentifier("component-created-with-object-factory")
+        .withObjectFactoryType(TestObjectFactory.class)
+        .withTypeDefinition(fromType(TestObject.class)).build());
+
     return definitions;
   }
 

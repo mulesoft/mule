@@ -33,12 +33,10 @@ public class DefaultValueResolverParsingDelegate implements ValueResolverParsing
    * @param key the parsed entity key
    * @param metadataType a {@link MetadataType}
    * @param dslElementResolver
-   * @param muleContext the Mule node
    * @return A {@link ValueResolver} that performs a registry lookup using the given {@code key}
    */
   @Override
-  public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl,
-                                     MuleContext muleContext) {
-    return new RegistryLookupValueResolver<>(key, muleContext);
+  public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl) {
+    return new RegistryLookupValueResolver<>(key);
   }
 }

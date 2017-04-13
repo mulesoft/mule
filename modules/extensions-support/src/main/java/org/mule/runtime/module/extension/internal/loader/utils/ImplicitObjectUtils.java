@@ -32,11 +32,11 @@ public final class ImplicitObjectUtils {
    * If a {@link ParameterModel} returns {@code null} for {@link ParameterModel#getDefaultValue()} then it's ignored
    *
    * @param parameterizedModel a model holding the {@link ParameterModel}s to consider
-   * @param muleContext        the Mule node.
+   * @param muleContext the Mule node.
    * @return a {@link ResolverSet}
    */
   public static ResolverSet buildImplicitResolverSet(ParameterizedModel parameterizedModel, MuleContext muleContext) {
-    ResolverSet resolverSet = new ResolverSet();
+    ResolverSet resolverSet = new ResolverSet(muleContext);
     ParametersResolver parametersResolver =
         ParametersResolver.fromDefaultValues(parameterizedModel, muleContext);
 

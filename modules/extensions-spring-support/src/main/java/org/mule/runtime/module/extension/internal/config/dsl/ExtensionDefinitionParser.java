@@ -155,7 +155,6 @@ public abstract class ExtensionDefinitionParser {
   private final List<ValueResolverParsingDelegate> valueResolverParsingDelegates =
       ImmutableList.of(new CharsetValueResolverParsingDelegate(), new MediaTypeValueResolverParsingDelegate());
   private final ValueResolverParsingDelegate defaultValueResolverParsingDelegate = new DefaultValueResolverParsingDelegate();
-  protected final MuleContext muleContext;
   protected final Map<String, String> infrastructureParameterMap = getNameMap();
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
@@ -167,11 +166,10 @@ public abstract class ExtensionDefinitionParser {
    * @param parsingContext        the {@link ExtensionParsingContext} in which {@code this} parser operates
    */
   protected ExtensionDefinitionParser(Builder baseDefinitionBuilder, DslSyntaxResolver dslSyntaxResolver,
-                                      ExtensionParsingContext parsingContext, MuleContext muleContext) {
+                                      ExtensionParsingContext parsingContext) {
     this.baseDefinitionBuilder = baseDefinitionBuilder;
     this.dslResolver = dslSyntaxResolver;
     this.parsingContext = parsingContext;
-    this.muleContext = muleContext;
   }
 
   /**
@@ -378,7 +376,7 @@ public abstract class ExtensionDefinitionParser {
           try {
             parsingContext.registerObjectType(valueChild.getElementName(), valueChild.getPrefix(), objectType);
             new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(), dslResolver,
-                                          parsingContext, muleContext).parse().forEach(definition -> addDefinition(definition));
+                                          parsingContext).parse().forEach(definition -> addDefinition(definition));
           } catch (ConfigurationException e) {
             throw new MuleRuntimeException(createStaticMessage("Could not create parser for map complex type"), e);
           }
@@ -502,7 +500,7 @@ public abstract class ExtensionDefinitionParser {
             try {
               parsingContext.registerObjectType(itemDsl.getElementName(), itemDsl.getPrefix(), objectType);
               new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(), dslResolver,
-                                            parsingContext, muleContext).parse().forEach(definition -> addDefinition(definition));
+                                            parsingContext).parse().forEach(definition -> addDefinition(definition));
             } catch (ConfigurationException e) {
               throw new MuleRuntimeException(createStaticMessage("Could not create parser for collection complex type"), e);
             }
@@ -563,11 +561,11 @@ public abstract class ExtensionDefinitionParser {
                                                         Set<ModelProperty> modelProperties, Class<Object> expectedClass) {
     ValueResolver resolver;
     if (isParameterResolver(modelProperties, expectedType)) {
-      resolver = new ExpressionBasedParameterResolverValueResolver(value, expectedType, muleContext);
+      resolver = new ExpressionBasedParameterResolverValueResolver(value, expectedType);
     } else if (isTypedValue(modelProperties, expectedType)) {
-      resolver = new ExpressionTypedValueValueResolver(value, expectedClass, muleContext);
+      resolver = new ExpressionTypedValueValueResolver(value, expectedClass);
     } else {
-      resolver = new TypeSafeExpressionValueResolver<>(value, expectedClass, muleContext);
+      resolver = new TypeSafeExpressionValueResolver<>(value, expectedClass);
     }
     return resolver;
   }
@@ -629,10 +627,10 @@ public abstract class ExtensionDefinitionParser {
         Optional<DslElementSyntax> typeDsl = dslResolver.resolve(objectType);
 
         if (delegate.isPresent() && typeDsl.isPresent()) {
-          valueResolver = (ValueResolver) delegate.get().parse(value.toString(), objectType, typeDsl.get(), muleContext);
+          valueResolver = (ValueResolver) delegate.get().parse(value.toString(), objectType, typeDsl.get());
         } else {
           valueResolver = acceptsReferences
-              ? defaultValueResolverParsingDelegate.parse(value.toString(), objectType, null, muleContext)
+              ? defaultValueResolverParsingDelegate.parse(value.toString(), objectType, null)
               : new StaticValueResolver<>(value);
         }
 
@@ -642,10 +640,10 @@ public abstract class ExtensionDefinitionParser {
       @Override
       protected void defaultVisit(MetadataType metadataType) {
         ValueResolver delegateResolver = locateParsingDelegate(valueResolverParsingDelegates, metadataType)
-            .map(delegate -> delegate.parse(value.toString(), metadataType, null, muleContext))
+            .map(delegate -> delegate.parse(value.toString(), metadataType, null))
             .orElseGet(() -> acceptsReferences
-                ? defaultValueResolverParsingDelegate.parse(value.toString(), metadataType, null, muleContext)
-                : new TypeSafeValueResolverWrapper<>(new StaticValueResolver<>(value), expectedClass, muleContext));
+                ? defaultValueResolverParsingDelegate.parse(value.toString(), metadataType, null)
+                : new TypeSafeValueResolverWrapper<>(new StaticValueResolver<>(value), expectedClass));
 
         resolverValueHolder.set(delegateResolver);
       }
@@ -764,7 +762,7 @@ public abstract class ExtensionDefinitionParser {
         modelProperties.stream().noneMatch(m -> m.getName().equals(InfrastructureParameterModelProperty.NAME))) {
       try {
         new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), elementName, elementNamespace, type, getContextClassLoader(),
-                                      dslResolver, parsingContext, muleContext).parse()
+                                      dslResolver, parsingContext).parse()
                                           .forEach(this::addDefinition);
       } catch (Exception e) {
         throw new MuleRuntimeException(new ConfigurationException(e));
@@ -781,7 +779,7 @@ public abstract class ExtensionDefinitionParser {
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find a parsing delegate for type "
             + getType(type).getName())));
 
-    addParameter(getChildKey(key), delegate.parse(name, type, elementDsl, muleContext));
+    addParameter(getChildKey(key), delegate.parse(name, type, elementDsl));
   }
 
   private <M extends MetadataType, T> Optional<ParsingDelegate<M, T>> locateParsingDelegate(
@@ -888,7 +886,7 @@ public abstract class ExtensionDefinitionParser {
 
     Class<?> type = getType(dateType);
     if (isExpression(value, parser)) {
-      return new TypeSafeExpressionValueResolver<>((String) value, type, muleContext);
+      return new TypeSafeExpressionValueResolver<>((String) value, type);
     }
 
     if (value == null) {
@@ -932,10 +930,10 @@ public abstract class ExtensionDefinitionParser {
 
     DslElementSyntax dslElementSyntax = dslResolver.resolveInline(group);
     addParameter(getChildKey(getContainerName(descriptor.getContainer())),
-                 new DefaultObjectParsingDelegate().parse("", null, dslElementSyntax, muleContext));
+                 new DefaultObjectParsingDelegate().parse("", null, dslElementSyntax));
 
     new ParameterGroupParser(baseDefinitionBuilder.copy(), group, descriptor, getContextClassLoader(), dslElementSyntax,
-                             dslResolver, parsingContext, muleContext).parse().forEach(this::addDefinition);
+                             dslResolver, parsingContext).parse().forEach(this::addDefinition);
   }
 
   protected List<ParameterModel> getFlatParameters(List<ParameterGroupModel> inlineGroups, List<ParameterModel> parameters) {

@@ -16,7 +16,7 @@ import java.nio.charset.Charset;
 public interface MessageTransformer extends Transformer {
 
   /**
-   * Thransforms the supplied data and returns the result
+   * Transforms the supplied data and returns the result
    *
    * @param src the data to transform
    * @param event the event currently being processed
@@ -27,7 +27,7 @@ public interface MessageTransformer extends Transformer {
   Object transform(Object src, Event event) throws MessageTransformerException;
 
   /**
-   * Thransforms the supplied data and returns the result
+   * Transforms the supplied data and returns the result
    *
    * @param src the data to transform
    * @param encoding the encoding to use by this transformer. many transformations will not need encoding unless dealing with text

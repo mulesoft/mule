@@ -10,6 +10,7 @@ import static java.util.Collections.emptySet;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.acceptsReferences;
@@ -51,9 +52,8 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
   private final String namespace;
 
   public ObjectTypeParameterParser(Builder definition, ObjectType type, ClassLoader classLoader,
-                                   DslSyntaxResolver dslResolver, ExtensionParsingContext context,
-                                   MuleContext muleContext) {
-    super(definition, dslResolver, context, muleContext);
+                                   DslSyntaxResolver dslResolver, ExtensionParsingContext context) {
+    super(definition, dslResolver, context);
     this.type = type;
     this.classLoader = classLoader;
     this.typeDsl = dslResolver.resolve(type).orElseThrow(() -> new IllegalArgumentException("Non parseable object"));
@@ -63,9 +63,8 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
 
   public ObjectTypeParameterParser(Builder definition, String name, String namespace, ObjectType type,
                                    ClassLoader classLoader,
-                                   DslSyntaxResolver dslResolver, ExtensionParsingContext context,
-                                   MuleContext muleContext) {
-    super(definition, dslResolver, context, muleContext);
+                                   DslSyntaxResolver dslResolver, ExtensionParsingContext context) {
+    super(definition, dslResolver, context);
     this.type = type;
     this.classLoader = classLoader;
     this.typeDsl = dslResolver.resolve(type).orElseThrow(() -> new IllegalArgumentException("Non parseable object"));
@@ -79,7 +78,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
         .withObjectFactoryType(TopLevelParameterObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(type).build())
         .withConstructorParameterDefinition(fromFixedValue(classLoader).build())
-        .withConstructorParameterDefinition(fromFixedValue(muleContext).build());
+        .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build());
 
     type.getFields().forEach(this::parseField);
   }

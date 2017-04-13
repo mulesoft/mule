@@ -28,6 +28,7 @@ import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
@@ -49,6 +50,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.core.transformer.simple.StringToEnum;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -211,6 +213,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     when(connectionManagerAdapter.getDefaultRetryPolicyTemplate()).thenReturn(new NoRetryPolicyTemplate());
     when(muleContext.getRegistry().lookupObject(OBJECT_CONNECTION_MANAGER))
         .thenReturn(connectionManagerAdapter);
+    when(muleContext.getRegistry().get(OBJECT_METADATA_SERVICE)).thenReturn(mock(MuleMetadataService.class));
+    when(muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER)).thenReturn(connectionManagerAdapter);
   }
 
   private void registerExtensions(ExtensionModel... extensionModels) {

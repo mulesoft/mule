@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -34,8 +33,6 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -59,14 +56,14 @@ public abstract class LifecycleAwareConfigurationProvider extends AbstractAnnota
   private final List<ConfigurationInstance> configurationInstances = new LinkedList<>();
   private final ClassLoader extensionClassLoader;
   protected final SimpleLifecycleManager lifecycleManager;
+  protected final MuleContext muleContext;
 
-  @Inject
-  protected MuleContext muleContext;
-
-  public LifecycleAwareConfigurationProvider(String name, ExtensionModel extensionModel, ConfigurationModel configurationModel) {
+  public LifecycleAwareConfigurationProvider(String name, ExtensionModel extensionModel, ConfigurationModel configurationModel,
+                                             MuleContext muleContext) {
     this.name = name;
     this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;
+    this.muleContext = muleContext;
     extensionClassLoader = getClassLoader(extensionModel);
     lifecycleManager = new DefaultLifecycleManager<>(format("%s-%s", getClass().getName(), getName()), this);
   }
@@ -84,12 +81,18 @@ public abstract class LifecycleAwareConfigurationProvider extends AbstractAnnota
         for (ConfigurationInstance configurationInstance : configurationInstances) {
           initialiseIfNeeded(configurationInstance, true, muleContext);
         }
+        doInitialise();
       });
       return null;
     }, InitialisationException.class, e -> {
       throw new InitialisationException(e, this);
     });
   }
+
+  /**
+   * Template method so subclasses can do initialisation.
+   */
+  protected void doInitialise() {}
 
   /**
    * When needed, fires the {@link Startable#start()} phase on the currently provided configurations

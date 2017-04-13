@@ -7,10 +7,14 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
 import com.google.common.collect.ImmutableMap;
@@ -31,10 +35,15 @@ import java.util.Map;
  *
  * @since 3.7.0
  */
-public class ResolverSet implements ValueResolver<ResolverSetResult> {
+public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisable {
 
   private Map<String, ValueResolver> resolvers = new LinkedHashMap<>();
   private boolean dynamic = false;
+  private final MuleContext muleContext;
+
+  public ResolverSet(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 
   /**
    * Links the given {@link ValueResolver} to the given {@link ParameterModel}. If such {@code parameter} was already added, then
@@ -101,5 +110,17 @@ public class ResolverSet implements ValueResolver<ResolverSetResult> {
 
   public Map<String, ValueResolver> getResolvers() {
     return ImmutableMap.copyOf(resolvers);
+  }
+
+  public void initialise() {
+
+    try {
+      for (ValueResolver valueResolver : resolvers.values()) {
+        muleContext.getInjector().inject(valueResolver);
+        LifecycleUtils.initialiseIfNeeded(valueResolver);
+      }
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 }

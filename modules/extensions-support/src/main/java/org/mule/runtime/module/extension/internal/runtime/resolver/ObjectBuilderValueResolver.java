@@ -7,9 +7,13 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.core.api.Event;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
 /**
@@ -21,13 +25,15 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBu
  * @param <T> the generic type for the instances built.
  * @since 3.7.0
  */
-public class ObjectBuilderValueResolver<T> implements ValueResolver<T> {
+public class ObjectBuilderValueResolver<T> implements ValueResolver<T>, Initialisable {
 
   private final ObjectBuilder<T> builder;
+  private final MuleContext muleContext;
 
-  public ObjectBuilderValueResolver(ObjectBuilder<T> builder) {
+  public ObjectBuilderValueResolver(ObjectBuilder<T> builder, MuleContext muleContext) {
     checkArgument(builder != null, "builder cannot be null");
     this.builder = builder;
+    this.muleContext = muleContext;
   }
 
   /**
@@ -39,7 +45,8 @@ public class ObjectBuilderValueResolver<T> implements ValueResolver<T> {
    */
   @Override
   public T resolve(Event event) throws MuleException {
-    return builder.build(event);
+    T object = builder.build(event);
+    return object;
   }
 
   /**
@@ -48,5 +55,10 @@ public class ObjectBuilderValueResolver<T> implements ValueResolver<T> {
   @Override
   public boolean isDynamic() {
     return builder.isDynamic();
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(builder, true, muleContext);
   }
 }

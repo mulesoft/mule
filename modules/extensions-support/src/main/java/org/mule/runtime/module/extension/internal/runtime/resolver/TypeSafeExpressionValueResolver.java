@@ -8,10 +8,15 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.util.AttributeEvaluator;
+
+import javax.inject.Inject;
 
 /**
  * A {@link ValueResolver} which evaluates a MEL expressions and tries to ensure that the output is always of a certain type.
@@ -25,14 +30,21 @@ import org.mule.runtime.core.util.AttributeEvaluator;
  * @param <T>
  * @since 3.7.0
  */
-public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
+public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Initialisable {
 
-  private final ValueResolver<T> delegate;
+  private final Class<T> expectedType;
+  private final String expression;
+  private TypeSafeValueResolverWrapper<T> delegate;
 
-  public TypeSafeExpressionValueResolver(String expression, Class<T> expectedType, MuleContext muleContext) {
+  @Inject
+  private TransformationService transformationService;
+  @Inject
+  private ExtendedExpressionManager extendedExpressionManager;
+
+  public TypeSafeExpressionValueResolver(String expression, Class<T> expectedType) {
     checkArgument(expectedType != null, "expected type cannot be null");
-    delegate =
-        new TypeSafeValueResolverWrapper<>(new ExpressionValueResolver(expression, muleContext), expectedType, muleContext);
+    this.expectedType = expectedType;
+    this.expression = expression;
   }
 
   @Override
@@ -46,5 +58,23 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
   @Override
   public boolean isDynamic() {
     return true;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    ExpressionValueResolver resolver = new ExpressionValueResolver(expression);
+    resolver.setExtendedExpressionManager(extendedExpressionManager);
+    delegate =
+        new TypeSafeValueResolverWrapper<>(resolver, expectedType);
+    delegate.setTransformationService(transformationService);
+    delegate.initialise();
+  }
+
+  public void setTransformationService(TransformationService transformationService) {
+    this.transformationService = transformationService;
+  }
+
+  public void setExtendedExpressionManager(ExtendedExpressionManager extendedExpressionManager) {
+    this.extendedExpressionManager = extendedExpressionManager;
   }
 }

@@ -8,29 +8,37 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.core.util.ClassUtils.isInstance;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.TransformationService;
+
+import javax.inject.Inject;
 
 /**
- * A {@link ValueResolver} implementation and extension of {@link TypeSafeExpressionValueResolver } which evaluates
- * expressions and tries to ensure that the output is always of a certain type.
+ * A {@link ValueResolver} implementation and extension of {@link TypeSafeExpressionValueResolver } which evaluates expressions
+ * and tries to ensure that the output is always of a certain type.
  * <p>
  * This {@link ValueResolver} will return the {@link TypedValue} of the MEL evaluation result.
  *
  * @param <T>
  * @since 4.0
  */
-public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolver<TypedValue<T>> {
+public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolver<TypedValue<T>> implements Initialisable
+
+{
 
   private final Class<T> expectedClass;
   private TypeSafeTransformer typeSafeTransformer;
 
-  public ExpressionTypedValueValueResolver(String expression, Class<T> expectedClass, MuleContext muleContext) {
-    super(expression, muleContext);
+  @Inject
+  private TransformationService transformationService;
+
+  public ExpressionTypedValueValueResolver(String expression, Class<T> expectedClass) {
+    super(expression);
     this.expectedClass = expectedClass;
-    this.typeSafeTransformer = new TypeSafeTransformer(muleContext);
   }
 
   @Override
@@ -47,5 +55,14 @@ public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolve
                                                                 event),
                               expectedDataType);
     }
+  }
+
+  public void setTransformationService(TransformationService transformationService) {
+    this.transformationService = transformationService;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    this.typeSafeTransformer = new TypeSafeTransformer(transformationService);
   }
 }

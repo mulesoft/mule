@@ -14,6 +14,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getFieldDefaultValueValueResolver;
@@ -28,9 +29,12 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -41,8 +45,7 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 
 /**
- * A {@link ValueResolver} wrapper which generates and returns default instances
- * if the {@link #delegate} returns {@code null}.
+ * A {@link ValueResolver} wrapper which generates and returns default instances if the {@link #delegate} returns {@code null}.
  * <p>
  * The values are generated according to the rules described in {@link NullSafe}.
  * <p>
@@ -52,18 +55,19 @@ import java.util.Optional;
  * @param <T> the generic type of the produced values.
  * @since 4.0
  */
-public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
+public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initialisable {
 
   private final ValueResolver<T> delegate;
   private final ValueResolver<T> fallback;
+  private final MuleContext muleContext;
 
   /**
    * Creates a new instance
    *
-   * @param delegate    the {@link ValueResolver} to wrap
-   * @param type        the type of the value this resolver returns
+   * @param delegate the {@link ValueResolver} to wrap
+   * @param type the type of the value this resolver returns
    * @param muleContext the current {@link MuleContext}
-   * @param <T>         the generic type of the produced values
+   * @param <T> the generic type of the produced values
    * @return a new null safe {@link ValueResolver}
    * @throws IllegalParameterModelDefinitionException if used on parameters of not supported types
    */
@@ -81,7 +85,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
         Class clazz = getType(objectType);
 
         if (isMap(objectType)) {
-          value.set(MapValueResolver.of(clazz, emptyList(), emptyList()));
+          value.set(MapValueResolver.of(clazz, emptyList(), emptyList(), muleContext));
           return;
         }
 
@@ -97,7 +101,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
                                                                     requiredFields));
         }
 
-        ResolverSet resolverSet = new ResolverSet();
+        ResolverSet resolverSet = new ResolverSet(muleContext);
         for (Field field : getFields(clazz)) {
           ValueResolver<?> resolver = null;
           ObjectFieldType objectField = objectType.getFieldByName(getAlias(field)).orElse(null);
@@ -110,7 +114,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
             resolver = getFieldDefaultValueValueResolver(objectField, muleContext);
           } else if (isParameterGroup(objectField)) {
             DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder(getType(objectField.getValue()));
-            resolverSet.add(field.getName(), new ObjectBuilderValueResolver<>(groupBuilder));
+            resolverSet.add(field.getName(), new ObjectBuilderValueResolver<>(groupBuilder, muleContext));
 
             ObjectType childGroup = (ObjectType) objectField.getValue();
             parametersResolver.resolveParameters(childGroup, groupBuilder);
@@ -141,7 +145,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
         ObjectBuilder<T> objectBuilder =
             new DefaultResolverSetBasedObjectBuilder(clazz, resolverSet);
 
-        value.set(new ObjectBuilderValueResolver(objectBuilder));
+        value.set(new ObjectBuilderValueResolver(objectBuilder, muleContext));
       }
 
       @Override
@@ -158,12 +162,13 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
       }
     });
 
-    return new NullSafeValueResolverWrapper<>(delegate, value.get());
+    return new NullSafeValueResolverWrapper<>(delegate, value.get(), muleContext);
   }
 
-  private NullSafeValueResolverWrapper(ValueResolver<T> delegate, ValueResolver<T> fallback) {
+  private NullSafeValueResolverWrapper(ValueResolver<T> delegate, ValueResolver<T> fallback, MuleContext muleContext) {
     this.delegate = delegate;
     this.fallback = fallback;
+    this.muleContext = muleContext;
   }
 
   @Override
@@ -182,4 +187,15 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T> {
     return delegate.isDynamic() || fallback.isDynamic();
   }
 
+  @Override
+  public void initialise() throws InitialisationException {
+    try {
+      muleContext.getInjector().inject(delegate);
+      muleContext.getInjector().inject(fallback);
+      initialiseIfNeeded(delegate, muleContext);
+      initialiseIfNeeded(fallback, muleContext);
+    } catch (MuleException e) {
+      throw new InitialisationException(e, this);
+    }
+  }
 }

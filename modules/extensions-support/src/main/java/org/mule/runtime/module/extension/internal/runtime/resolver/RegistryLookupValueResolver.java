@@ -15,6 +15,8 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -22,15 +24,14 @@ import org.apache.commons.lang.StringUtils;
  * <p/>
  * Although the registry is mutable, {@link #isDynamic()} will always return {@code false} since the value associated to a given
  * key is not meant to change.
- * <p/>
- * The registry is accessed through the {@link MuleContext} that is exposed in the {@link Event} that is passed to the
- * {@link #resolve(Event)} method
  *
  * @since 3.7.0
  */
 public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
 
   private final String key;
+
+  @Inject
   private MuleContext muleContext;
 
   /**
@@ -39,10 +40,9 @@ public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
    * @param key a not blank {@link String}
    * @param muleContext the Mule node
    */
-  public RegistryLookupValueResolver(String key, MuleContext muleContext) {
+  public RegistryLookupValueResolver(String key) {
     checkArgument(!StringUtils.isBlank(key), "key cannot be null or blank");
     this.key = key;
-    this.muleContext = muleContext;
   }
 
   /**
@@ -69,5 +69,9 @@ public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
   @Override
   public boolean isDynamic() {
     return false;
+  }
+
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
   }
 }

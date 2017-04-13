@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl.connection;
 
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import org.mule.runtime.api.config.PoolingProfile;
@@ -37,9 +38,8 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
 
   public ConnectionProviderDefinitionParser(Builder definition, ConnectionProviderModel providerModel,
                                             ExtensionModel extensionModel, DslSyntaxResolver dslSyntaxResolver,
-                                            MuleContext muleContext,
                                             ExtensionParsingContext parsingContext) {
-    super(definition, dslSyntaxResolver, parsingContext, muleContext);
+    super(definition, dslSyntaxResolver, parsingContext);
     this.providerModel = providerModel;
     this.extensionModel = extensionModel;
     this.connectionDsl = dslSyntaxResolver.resolve(providerModel);
@@ -51,7 +51,7 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
         .withTypeDefinition(fromType(ConnectionProviderResolver.class))
         .withObjectFactoryType(ConnectionProviderObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(providerModel).build())
-        .withConstructorParameterDefinition(fromFixedValue(muleContext).build())
+        .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
         .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
         .withSetterParameterDefinition("disableValidation", fromSimpleParameter("disableValidation").build())
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())

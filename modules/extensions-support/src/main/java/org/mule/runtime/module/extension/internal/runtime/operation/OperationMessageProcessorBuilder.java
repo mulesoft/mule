@@ -77,7 +77,7 @@ public final class OperationMessageProcessorBuilder {
     return withContextClassLoader(getClassLoader(extensionModel), () -> {
       try {
         ResolverSet resolverSet =
-            ParametersResolver.fromValues(parameters, muleContext).getParametersAsResolverSet(operationModel);
+            ParametersResolver.fromValues(parameters, muleContext).getParametersAsResolverSet(operationModel, muleContext);
         OperationMessageProcessor processor;
         ExtensionManager extensionManager = muleContext.getExtensionManager();
         if (operationModel.getModelProperty(InterceptingModelProperty.class).isPresent()) {

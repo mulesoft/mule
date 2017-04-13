@@ -97,6 +97,10 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
   }
 
   private ValueResolver getResolver(String expression, Class<?> expectedType) throws Exception {
-    return new TypeSafeExpressionValueResolver(expression, expectedType, muleContext);
+    TypeSafeExpressionValueResolver valueResolver = new TypeSafeExpressionValueResolver(expression, expectedType);
+    valueResolver.setExtendedExpressionManager(expressionManager);
+    valueResolver.setTransformationService(muleContext.getTransformationService());
+    valueResolver.initialise();
+    return valueResolver;
   }
 }
