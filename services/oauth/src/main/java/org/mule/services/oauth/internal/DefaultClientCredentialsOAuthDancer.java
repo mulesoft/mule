@@ -134,6 +134,11 @@ public class DefaultClientCredentialsOAuthDancer extends AbstractOAuthDancer imp
   }
 
   @Override
+  public void invalidateContext() {
+    invalidateContext(DEFAULT_RESOURCE_OWNER_ID);
+  }
+
+  @Override
   public ResourceOwnerOAuthContext getContext() {
     return getContextForResourceOwner(DEFAULT_RESOURCE_OWNER_ID);
   }

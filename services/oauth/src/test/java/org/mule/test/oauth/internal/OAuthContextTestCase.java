@@ -79,6 +79,19 @@ public class OAuthContextTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
+  public void clientCredentialsInvalidateContext() throws Exception {
+    ClientCredentialsOAuthDancer clientCredentialsDancer =
+        baseClientCredentialsDancerBuilder().tokenUrl(mock(HttpClient.class), "http://host/token").build();
+
+    assertThat(tokensStore, not(hasKey(DEFAULT_RESOURCE_OWNER_ID)));
+    clientCredentialsDancer.getContext();
+    assertThat(tokensStore, hasKey(DEFAULT_RESOURCE_OWNER_ID));
+
+    clientCredentialsDancer.invalidateContext();
+    assertThat(tokensStore, not(hasKey(DEFAULT_RESOURCE_OWNER_ID)));
+  }
+
+  @Test
   public void authCodeFirstGetContext() throws Exception {
     AuthorizationCodeOAuthDancer authCodeDancer =
         baseAuthCodeDancerbuilder().tokenUrl(mock(HttpClient.class), "http://host/token").build();
@@ -112,6 +125,36 @@ public class OAuthContextTestCase extends AbstractMuleContextTestCase {
     assertThat(authCodeDancer.getContextForResourceOwner("user2"), sameInstance(contextFromDancer2));
     assertThat(contextFromDancer1, not(sameInstance(contextFromDancer2)));
     assertThat(tokensStore.entrySet(), hasSize(2));
+  }
+
+  @Test
+  public void authCodeInvalidateContext() throws Exception {
+    AuthorizationCodeOAuthDancer authCodeDancer =
+        baseAuthCodeDancerbuilder().tokenUrl(mock(HttpClient.class), "http://host/token").build();
+
+    assertThat(tokensStore, not(hasKey("user1")));
+    authCodeDancer.getContextForResourceOwner("user1");
+    assertThat(tokensStore, hasKey("user1"));
+
+    authCodeDancer.invalidateContext("user1");
+    assertThat(tokensStore, not(hasKey("user1")));
+  }
+
+  @Test
+  public void authCodeInvalidateContextDoesNotAffectOtherUsers() throws Exception {
+    AuthorizationCodeOAuthDancer authCodeDancer =
+        baseAuthCodeDancerbuilder().tokenUrl(mock(HttpClient.class), "http://host/token").build();
+
+    authCodeDancer.getContextForResourceOwner("user1");
+    authCodeDancer.getContextForResourceOwner("user2");
+
+    assertThat(tokensStore.entrySet(), hasSize(2));
+    assertThat(tokensStore, hasKey("user1"));
+    assertThat(tokensStore, hasKey("user2"));
+
+    authCodeDancer.invalidateContext("user1");
+    assertThat(tokensStore, not(hasKey("user1")));
+    assertThat(tokensStore, hasKey("user2"));
   }
 
   private OAuthClientCredentialsDancerBuilder baseClientCredentialsDancerBuilder() throws Exception {

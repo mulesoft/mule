@@ -15,7 +15,6 @@ import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.decodeUrlEncodedBody;
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeString;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
@@ -213,6 +212,16 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
           .build();
 
       return (T) expressionEvaluator.evaluate(expr, resultContext).getValue();
+    }
+  }
+
+  public void invalidateContext(String resourceOwner) {
+    DefaultResourceOwnerOAuthContext context = (DefaultResourceOwnerOAuthContext) getContextForResourceOwner(resourceOwner);
+    context.getRefreshUserOAuthContextLock().lock();
+    try {
+      tokensStore.remove(resourceOwner);
+    } finally {
+      context.getRefreshUserOAuthContextLock().unlock();
     }
   }
 

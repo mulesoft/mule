@@ -37,9 +37,13 @@ public interface ClientCredentialsOAuthDancer {
   CompletableFuture<Void> refreshToken();
 
   /**
+   * Clears the oauth context.
+   */
+  void invalidateContext();
+
+  /**
    * Retrieves the oauth context. If there's no state, a new state is retrieved so never returns null.
    *
-   * @param resourceOwnerId id of the user.
    * @return oauth state
    */
   ResourceOwnerOAuthContext getContext();
