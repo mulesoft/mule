@@ -8,7 +8,7 @@ package org.mule.runtime.core.processor;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
 import static org.mule.runtime.core.config.i18n.CoreMessages.failedToInvoke;
 import static org.mule.runtime.core.config.i18n.CoreMessages.initialisationFailure;
@@ -252,7 +252,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
       eventBuilder
           .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, singletonList(template)));
     } else {
-      eventBuilder.message(NULL_MESSAGE);
+      eventBuilder.message(of(null));
     }
     return eventBuilder.build();
   }

@@ -6,10 +6,6 @@
  */
 package org.mule.test.service.scheduler;
 
-import static org.mule.runtime.api.message.Message.NULL_MESSAGE;
-import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
-import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -17,7 +13,10 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.DefaultEventContext.create;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
 import org.mule.functional.functional.SkeletonSource;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -137,7 +136,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     Scheduler scheduler = muleContext.getSchedulerService().cpuLightScheduler();
     try {
       scheduler.submit(() -> ((SkeletonSource) messageSource).getListener()
-          .process(Event.builder(create(delayScheduleFlow, SchedulerServiceTestCase.class.getSimpleName())).message(NULL_MESSAGE)
+          .process(Event.builder(create(delayScheduleFlow, SchedulerServiceTestCase.class.getSimpleName())).message(of(null))
               .build()))
           .get();
     } catch (ExecutionException executionException) {
