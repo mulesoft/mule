@@ -151,7 +151,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
         .forEach(componentBuildingDefinitionProvider -> {
           if (componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider) {
             ((ExtensionBuildingDefinitionProvider) componentBuildingDefinitionProvider)
-                .setExtensionModels(muleContext.getExtensionManager().getExtensions());
+                .setExtensionModels(muleContext.getExtensionManager() != null ? muleContext.getExtensionManager().getExtensions()
+                    : emptySet());
           }
           componentBuildingDefinitionProvider.init();
           componentBuildingDefinitionProvider.getComponentBuildingDefinitions()
