@@ -43,11 +43,15 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
+import org.mule.runtime.extension.internal.property.TransactionalActionModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -57,8 +61,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
-
-import org.apache.commons.collections.CollectionUtils;
 
 /**
  * An adapter for {@link Source} which acts as a bridge with {@link ExtensionMessageSource}. It also propagates lifecycle and
@@ -289,7 +291,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
   }
 
   public SourceTransactionalAction getTransactionalAction() {
-    ValueResolver valueResolver = nonCallbackParameters.getResolvers().get(TRANSACTIONAL_ACTION_PARAMETER_NAME);
+    ValueResolver valueResolver = nonCallbackParameters.getResolvers().get(getTransactionalActionFieldName());
     Object transactionalAction;
 
     try {
@@ -302,6 +304,16 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
       throw new IllegalStateException("The resolved value is not a Transactional Action");
     }
     return (SourceTransactionalAction) transactionalAction;
+  }
+
+  private String getTransactionalActionFieldName() {
+    return sourceModel.getAllParameterModels()
+        .stream()
+        .filter(param -> param.getModelProperty(TransactionalActionModelProperty.class).isPresent())
+        .filter(param -> param.getModelProperty(DeclaringMemberModelProperty.class).isPresent())
+        .map(param -> param.getModelProperty(DeclaringMemberModelProperty.class).get())
+        .findAny()
+        .map(modelProperty -> modelProperty.getDeclaringField().getName()).orElse(TRANSACTIONAL_ACTION_PARAMETER_NAME);
   }
 
   @Override

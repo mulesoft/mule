@@ -18,7 +18,7 @@ import org.mule.test.transactional.connection.PoolingTransactionalConnectionProv
 @Extension(name = "transactional")
 @ConnectionProviders({PoolingTransactionalConnectionProvider.class, NonPoolingTransactionalConnectionProvider.class})
 @Operations(TransactionalOperations.class)
-@Sources(TransactionalSource.class)
+@Sources({TransactionalSource.class, TransactionalSourceWithTXParameters.class})
 @Xml(prefix = "tx")
 @Export(classes = org.mule.test.transactional.TransactionalOperations.class)
 public class TransactionalExtension {
