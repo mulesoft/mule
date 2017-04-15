@@ -9,14 +9,9 @@ package org.mule.runtime.core.exception;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.exception.ErrorTypeRepository.CRITICAL_ERROR_TYPE;
 import static reactor.core.publisher.Mono.error;
-import static reactor.core.publisher.Mono.from;
-import static reactor.core.publisher.Mono.just;
-
-import java.util.List;
-import java.util.Optional;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -30,9 +25,10 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.reactivestreams.Publisher;
-import reactor.core.Exceptions;
-import reactor.core.publisher.Mono;
 
 /**
  * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3. On error
@@ -109,8 +105,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   @Override
   public void initialise() throws InitialisationException {
-    addDefaultExceptionStrategyIfRequired();
     super.initialise();
+    addDefaultExceptionStrategyIfRequired();
     validateConfiguredExceptionStrategies();
   }
 
@@ -130,7 +126,10 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
             + "error-handler. If error-handler is defined as default one "
             + "check that last exception strategy inside matches all errors"), e, this);
       }
-      this.exceptionListeners.add(new MessagingExceptionStrategyAcceptorDelegate(defaultExceptionStrategy));
+      MessagingExceptionStrategyAcceptorDelegate acceptsAllStrategy =
+          new MessagingExceptionStrategyAcceptorDelegate(defaultExceptionStrategy);
+      initialiseIfNeeded(acceptsAllStrategy, muleContext, flowConstruct);
+      this.exceptionListeners.add(acceptsAllStrategy);
     }
   }
 
