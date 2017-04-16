@@ -19,6 +19,7 @@ import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.repository.api.BundleNotFoundException;
 
+import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,8 @@ public class TemporaryArtifactConnectivityTestingService implements Connectivity
       application = applicationSupplier.get();
     } catch (Exception e) {
       throw getCausalChain(e).stream()
-          .filter(exception -> exception.getClass().equals(ArtifactNotFoundException.class))
+          .filter(exception -> exception.getClass().equals(ArtifactNotFoundException.class)
+              || exception.getClass().equals(ArtifactResolutionException.class))
           .findFirst().map(exception -> (RuntimeException) new BundleNotFoundException(exception))
           .orElse(new MuleRuntimeException(e));
     }
