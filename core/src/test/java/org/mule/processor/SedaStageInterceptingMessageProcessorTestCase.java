@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -25,6 +26,7 @@ import static org.mule.api.config.ThreadingProfile.WHEN_EXHAUSTED_WAIT;
 import static org.mule.processor.SedaStageInterceptingMessageProcessor.DEFAULT_QUEUE_SIZE_MAX_THREADS_FACTOR;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -438,6 +440,52 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
         assertThat(listener.asyncCompleteEvent, is(notNullValue()));
         assertThat(listener.asyncCompleteEvent, is(not(sameInstance(event))));
         assertThat(listener.asyncCompleteEvent, is(sameInstance(target.sensedEvent)));
+    }
+
+    @Test
+    public void cleaningRequestContext() throws Exception
+    {
+        ThreadingProfile threadingProfile = new ChainedThreadingProfile(
+                muleContext.getDefaultThreadingProfile());
+        threadingProfile.setDoThreading(false);
+        threadingProfile.setMuleContext(muleContext);
+
+        SedaStageInterceptingMessageProcessor sedaStageInterceptingMessageProcessor = new SedaStageInterceptingMessageProcessor(
+                "cleaningRequestContext", "cleaningRequestContext",
+                queueProfile, queueTimeout, threadingProfile, queueStatistics, muleContext);
+
+        MuleEvent testEvent = getTestEvent("", MessageExchangePattern.ONE_WAY);
+
+        final TestLifeCycleState testState = new TestLifeCycleState()
+        {
+            int times = 0;
+            @Override
+            public boolean isStopped()
+            {
+                if (times > 0)
+                {
+                    return true;
+                }
+                times++;
+                return super.isStopped();
+            }
+        };
+        testState.initialise();
+        testState.start();
+        sedaStageInterceptingMessageProcessor.setLifecycleManager(new SedaStageLifecycleManager("cleaningRequestContext", sedaStageInterceptingMessageProcessor)
+        {
+            @Override
+            public LifecycleState getState()
+            {
+                return testState;
+            }
+        });
+
+        sedaStageInterceptingMessageProcessor.setListener(target);
+        sedaStageInterceptingMessageProcessor.process(testEvent);
+        sedaStageInterceptingMessageProcessor.run();
+        assertNull(RequestContext.getEvent());
+
     }
 
     private class AsynMessageFiringNotificationListener implements AsyncMessageNotificationListener<AsyncMessageNotification>

@@ -8,6 +8,7 @@ package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
+import org.mule.RequestContext;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -79,6 +80,11 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
 
         // If user has not set an explicit queue size set one here, to prevent OutOfMemoryException's.
         configureDefaultQueueSize(queueProfile, threadingProfile);
+    }
+
+    public void setLifecycleManager(SedaStageLifecycleManager lifecycleManager)
+    {
+        this.lifecycleManager = lifecycleManager;
     }
 
     protected void configureDefaultQueueSize(QueueProfile queueProfile, ThreadingProfile threadingProfile)
@@ -236,6 +242,9 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
             catch (Exception e)
             {
                 muleContext.getExceptionListener().handleException(e);
+            }
+            finally {
+                RequestContext.clear();
             }
 
             if (event != null)
