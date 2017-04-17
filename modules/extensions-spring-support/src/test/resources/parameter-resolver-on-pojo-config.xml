@@ -5,7 +5,8 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/parameter-resolver http://www.mulesoft.org/schema/mule/parameter-resolver/current/mule-parameter-resolver.xsd">
 
-    <parameter-resolver:config name="config-with-dynamic-parameter-resolvers" stringResolver="#[payload]" doorResolver="#[app.registry.staticDoor]"/>
+    <parameter-resolver:config name="config-with-dynamic-parameter-resolvers" stringResolver="#[payload]"
+                               doorResolver="#[app.registry.staticDoor]" literalDoor="#[aDoor]" />
 
     <parameter-resolver:config name="config-with-static-parameter-resolvers" stringResolver="this is a string">
         <parameter-resolver:door-resolver victim="Name" address="Address"/>
@@ -58,7 +59,7 @@
     </flow>
 
     <flow name="sourceWithParameterResolver" initialState="stopped">
-        <parameter-resolver:some-source someString="this is not an expression" config-ref="config-with-dynamic-parameter-resolvers"/>
+        <parameter-resolver:some-source someString="this is not an expression" literalString="#[literal]" config-ref="config-with-dynamic-parameter-resolvers"/>
         <logger />
     </flow>
 

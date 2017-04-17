@@ -28,7 +28,8 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
@@ -64,7 +65,7 @@ public class HeisenbergOperations implements Disposable {
   public static final String CALL_GUS_MESSAGE = "You are not allowed to speak with gus.";
   public static final String KILL_WITH_GROUP = "KillGroup";
 
-  public static final String OPERATION_WITH_DISPLAY_NAME_PARAMETER = "literalEcho";
+  public static final String OPERATION_WITH_DISPLAY_NAME_PARAMETER = "resolverEcho";
   public static final String OPERATION_WITH_SUMMARY = "knockMany";
   public static final String OPERATION_WITH_EXAMPLE = "alias";
   public static final String OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME = "literalExpression";
@@ -216,9 +217,13 @@ public class HeisenbergOperations implements Disposable {
     return connection.getSaulPhoneNumber();
   }
 
-  public ParameterResolver<String> literalEcho(
-                                               @DisplayName(OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME) ParameterResolver<String> literalExpression) {
+  public ParameterResolver<String> resolverEcho(
+                                                @DisplayName(OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME) ParameterResolver<String> literalExpression) {
     return literalExpression;
+  }
+
+  public String literalEcho(Literal<String> literalExpression) {
+    return literalExpression.getLiteralValue().orElse(null);
   }
 
   public int[][] getGramsInStorage(@Optional(defaultValue = PAYLOAD) int[][] grams) {

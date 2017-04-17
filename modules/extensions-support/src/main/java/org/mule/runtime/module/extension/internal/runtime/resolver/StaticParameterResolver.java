@@ -6,11 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import static java.util.Optional.empty;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
 import java.util.Optional;
-
-import static java.util.Optional.empty;
 
 /**
  * {@link ParameterResolver} implementation for the parameter values that are resolved statically

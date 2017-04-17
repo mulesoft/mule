@@ -8,9 +8,11 @@ package org.mule.test.module.extension.parameter.resolver;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import static org.junit.Assert.assertThat;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.parameter.resolver.extension.extension.ParameterResolverExtension;
 import org.mule.test.parameter.resolver.extension.extension.SomeSource;
@@ -33,6 +35,7 @@ public class ParameterResolverOnConfigTestCase extends AbstractParameterResolver
 
     assertParameterResolver(doorResolver, of("#[app.registry.staticDoor]"), is(instanceOf(KnockeableDoor.class)));
     assertParameterResolver(stringResolver, of("#[payload]"), is("this is the payload"));
+    assertThat(config.getLiteralDoor().getLiteralValue().get(), equalTo("#[aDoor]"));
   }
 
   @Test
@@ -61,5 +64,10 @@ public class ParameterResolverOnConfigTestCase extends AbstractParameterResolver
   @Test
   public void sourceWithParameterResolver() throws Exception {
     assertParameterResolver(SomeSource.someString, empty(), is("this is not an expression"));
+  }
+
+  @Test
+  public void sourceWithLiteral() throws Exception {
+    assertThat(SomeSource.literalString.getLiteralValue().get(), equalTo("#[literal]"));
   }
 }

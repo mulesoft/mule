@@ -13,16 +13,18 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.module.extension.internal.loader.java.ParameterModelsLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.java.ParameterResolverTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.TypedValueTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterTypeUnwrapperContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.LiteralModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterResolverTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.TypedValueTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapServiceProviderWrapper;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
@@ -68,7 +70,8 @@ public class ServiceProviderDeclarer {
     return ImmutableList
         .of(new InfrastructureFieldContributor(),
             new ParameterTypeUnwrapperContributor(loader, TypedValue.class, new TypedValueTypeModelProperty()),
-            new ParameterTypeUnwrapperContributor(loader, ParameterResolver.class, new ParameterResolverTypeModelProperty()));
+            new ParameterTypeUnwrapperContributor(loader, ParameterResolver.class, new ParameterResolverTypeModelProperty()),
+            new ParameterTypeUnwrapperContributor(loader, Literal.class, new LiteralModelProperty()));
   }
 
   private String getName(SoapServiceProviderWrapper provider) {

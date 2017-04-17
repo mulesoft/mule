@@ -10,7 +10,6 @@ import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.oauth2.internal.AbstractGrantType;
@@ -24,8 +23,9 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
@@ -86,7 +86,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
    */
   @Parameter
   @Optional
-  private ParameterResolver<String> state;
+  private Literal<String> state;
 
   /**
    * Identifier under which the oauth authentication attributes are stored (accessToken, refreshToken, etc).
@@ -96,7 +96,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
    */
   @Parameter
   @Optional
-  private ParameterResolver<String> localAuthorizationUrlResourceOwnerId;
+  private Literal<String> localAuthorizationUrlResourceOwnerId;
 
   /**
    * If this attribute is provided mule will automatically create and endpoint in the host server that the user can hit to
@@ -227,7 +227,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
     Boolean shouldRetryRequest = resolver.resolveExpression(getRefreshTokenWhen(), firstAttemptResult);
     if (shouldRetryRequest) {
       try {
-        dancer.refreshToken(resolver.resolveExpression(resourceOwnerId, firstAttemptResult)).get();
+        dancer.refreshToken(resourceOwnerId.resolve()).get();
       } catch (InterruptedException e) {
         currentThread().interrupt();
         throw new DefaultMuleException(e);

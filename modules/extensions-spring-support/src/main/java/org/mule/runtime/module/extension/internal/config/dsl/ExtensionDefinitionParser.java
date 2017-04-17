@@ -88,6 +88,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.NativeQueryPa
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorListValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverValueResolverWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticLiteralValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValueResolverWrapper;
@@ -528,7 +529,7 @@ public abstract class ExtensionDefinitionParser {
       return (ValueResolver<?>) value;
     }
 
-    ValueResolver resolver = null;
+    ValueResolver resolver;
 
     final Class<Object> expectedClass = getType(expectedType);
 
@@ -564,6 +565,8 @@ public abstract class ExtensionDefinitionParser {
       resolver = new ExpressionBasedParameterResolverValueResolver(value, expectedType);
     } else if (isTypedValue(modelProperties, expectedType)) {
       resolver = new ExpressionTypedValueValueResolver(value, expectedClass);
+    } else if (isLiteral(modelProperties, expectedType)) {
+      resolver = new StaticLiteralValueResolver(value, expectedClass);
     } else {
       resolver = new TypeSafeExpressionValueResolver<>(value, expectedClass);
     }
@@ -576,6 +579,10 @@ public abstract class ExtensionDefinitionParser {
   private ValueResolver getStaticValueResolver(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
                                                Set<ModelProperty> modelProperties, boolean acceptsReferences,
                                                Class<Object> expectedClass) {
+    if (isLiteral(modelProperties, expectedType)) {
+      return new StaticLiteralValueResolver(value != null ? value.toString() : null, expectedClass);
+    }
+
     ValueResolver resolver;
     resolver = value != null
         ? getValueResolverFromMetadataType(parameterName, expectedType, value, defaultValue, acceptsReferences, expectedClass)
@@ -586,6 +593,7 @@ public abstract class ExtensionDefinitionParser {
     } else if (isTypedValue(modelProperties, expectedType)) {
       resolver = new TypedValueValueResolverWrapper(resolver);
     }
+
     return resolver;
   }
 
@@ -839,6 +847,10 @@ public abstract class ExtensionDefinitionParser {
     return IntrospectionUtils.isTypedValue(modelProperties) || IntrospectionUtils.isTypedValue(expectedType);
   }
 
+  private boolean isLiteral(Set<ModelProperty> modelProperties, MetadataType expectedType) {
+    return IntrospectionUtils.isLiteral(modelProperties) || IntrospectionUtils.isLiteral(expectedType);
+  }
+
   private ValueResolver doParseDate(Object value, Class<?> type) {
 
     if (value instanceof String) {
@@ -883,7 +895,6 @@ public abstract class ExtensionDefinitionParser {
   }
 
   private ValueResolver parseDate(Object value, MetadataType dateType, Object defaultValue) {
-
     Class<?> type = getType(dateType);
     if (isExpression(value, parser)) {
       return new TypeSafeExpressionValueResolver<>((String) value, type);

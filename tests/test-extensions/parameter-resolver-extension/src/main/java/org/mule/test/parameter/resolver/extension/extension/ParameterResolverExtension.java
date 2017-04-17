@@ -13,13 +13,27 @@ import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 
 @Operations(ParameterResolverParameterOperations.class)
 @Extension(name = "ParameterResolver")
 @Sources(SomeSource.class)
 public class ParameterResolverExtension {
+
+  @Parameter
+  @Optional
+  private ParameterResolver<String> stringResolver;
+
+  @Parameter
+  @Optional
+  @XmlHints(allowTopLevelDefinition = true)
+  private ParameterResolver<KnockeableDoor> doorResolver;
+
+  @Parameter
+  @Optional
+  private Literal<KnockeableDoor> literalDoor;
 
   public ParameterResolver<String> getStringResolver() {
     return stringResolver;
@@ -37,13 +51,11 @@ public class ParameterResolverExtension {
     this.doorResolver = doorResolver;
   }
 
-  @Parameter
-  @Optional
-  ParameterResolver<String> stringResolver;
+  public Literal<KnockeableDoor> getLiteralDoor() {
+    return literalDoor;
+  }
 
-  @Parameter
-  @Optional
-  @XmlHints(allowTopLevelDefinition = true)
-  ParameterResolver<KnockeableDoor> doorResolver;
-
+  public void setLiteralDoor(Literal<KnockeableDoor> literalDoor) {
+    this.literalDoor = literalDoor;
+  }
 }

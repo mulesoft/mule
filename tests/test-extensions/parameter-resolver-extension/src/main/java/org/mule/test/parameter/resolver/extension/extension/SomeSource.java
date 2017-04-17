@@ -11,7 +11,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
@@ -19,6 +20,9 @@ public class SomeSource extends Source<String, Attributes> {
 
   @Parameter
   public static ParameterResolver<String> someString;
+
+  @Parameter
+  public static Literal<String> literalString;
 
   @UseConfig
   public static ParameterResolverExtension extension;

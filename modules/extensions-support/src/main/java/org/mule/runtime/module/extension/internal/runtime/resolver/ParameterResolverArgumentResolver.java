@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
 /**
  * {@link ArgumentResolver} for the parameters that are of {@link ParameterResolver} type.

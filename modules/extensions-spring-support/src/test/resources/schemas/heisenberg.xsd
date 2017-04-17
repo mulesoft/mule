@@ -1514,6 +1514,20 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="ResolverEchoType" substitutionGroup="heisenberg-empire" name="resolver-echo"></xs:element>
+    <xs:complexType name="ResolverEchoType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:attribute type="mule:expressionString" use="required" name="literalExpression"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="StickyPagedOperationType" substitutionGroup="heisenberg-empire" name="sticky-paged-operation"></xs:element>
     <xs:complexType name="StickyPagedOperationType">
         <xs:complexContent>

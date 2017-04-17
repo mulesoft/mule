@@ -226,7 +226,7 @@
     </flow>
 
     <flow name="literalEcho">
-        <heisenberg:literal-echo literalExpression="#[mel:money]"/>
+        <heisenberg:literal-echo literalExpression="#[money]"/>
     </flow>
 
     <flow name="getMedicalHistory">

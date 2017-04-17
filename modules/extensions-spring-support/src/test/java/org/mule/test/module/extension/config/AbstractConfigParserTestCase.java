@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AbstractConfigParserTestCase extends AbstractExtensionFunctionalTestCase {
+public abstract class AbstractConfigParserTestCase extends AbstractExtensionFunctionalTestCase {
 
   protected static final String HEISENBERG_BYNAME = "heisenberg";
   protected static final String HEISENBERG_EXPRESSION = "expressionHeisenberg";

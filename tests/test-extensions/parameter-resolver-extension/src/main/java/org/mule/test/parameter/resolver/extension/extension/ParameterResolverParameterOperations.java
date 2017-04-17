@@ -9,7 +9,7 @@ package org.mule.test.parameter.resolver.extension.extension;
 
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 
