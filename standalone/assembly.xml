@@ -130,6 +130,7 @@
                 <include>org.mule.runtime:mule-message-metadata-model</include>
                 <!-- extensions API -->
                 <include>org.mule.runtime:mule-extensions-api</include>
+                <include>org.mule.runtime:mule-extensions-soap-api</include>
                 <include>org.mule.runtime:mule-extensions-api-persistence</include>
                 <include>org.mule.runtime:mule-extensions-api-dsql</include>
                 <!-- Core -->
@@ -149,6 +150,7 @@
                 <include>org.mule.runtime:mule-module-container</include>
                 <include>org.mule.runtime:mule-module-builders</include>
                 <include>org.mule.runtime:mule-module-extensions-support</include>
+                <include>org.mule.runtime:mule-module-extensions-soap-support</include>
                 <include>org.mule.runtime:mule-module-extensions-spring-support</include>
                 <include>org.mule.runtime:mule-module-extensions-xml-support</include>
                 <include>org.mule.runtime:mule-module-jbossts</include>
@@ -202,6 +204,7 @@
                 <exclude>org.mule.runtime:mule-message-metadata-model</exclude>
                 <!--extensions API-->
                 <exclude>org.mule.runtime:mule-extensions-api</exclude>
+                <exclude>org.mule.runtime:mule-extensions-soap-api</exclude>
                 <exclude>org.mule.runtime:mule-extensions-api-persistence</exclude>
                 <exclude>org.mule.runtime:mule-extensions-api-dsql</exclude>
                 <!--Services-->
@@ -217,6 +220,7 @@
                 <exclude>org.mule.runtime:mule-module-artifact</exclude>
                 <exclude>org.mule.runtime:mule-module-builders</exclude>
                 <exclude>org.mule.runtime:mule-module-extensions-support</exclude>
+                <exclude>org.mule.runtime:mule-module-extensions-soap-support</exclude>
                 <exclude>org.mule.runtime:mule-module-extensions-spring-support</exclude>
                 <exclude>org.mule.runtime:mule-module-extensions-xml-support</exclude>
                 <exclude>org.mule.modules:mule-module-http-ext</exclude>
