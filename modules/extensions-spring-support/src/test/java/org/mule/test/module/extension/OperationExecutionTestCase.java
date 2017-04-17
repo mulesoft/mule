@@ -33,7 +33,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
