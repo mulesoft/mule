@@ -7,6 +7,8 @@
 package org.mule.routing.requestreply;
 
 import static junit.framework.Assert.assertNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -306,7 +308,8 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
                 getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
         event.getMessage().setCorrelationSequence(3);
 
-        asyncReplyMP.process(event);
+        MuleEvent result = asyncReplyMP.process(event);
+        assertThat(result.getMessage().getCorrelationSequence(), is(-1));
     }
 
     public void exceptionThrown(Exception e)
