@@ -12,6 +12,7 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
@@ -20,7 +21,6 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 import org.mule.runtime.config.spring.dsl.model.DslElementModelFactory;
@@ -30,9 +30,8 @@ import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
+import org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import com.google.common.collect.ImmutableSet;
@@ -50,6 +49,10 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.junit.Before;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import org.junit.Before;
 import org.w3c.dom.Document;
@@ -78,12 +81,9 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
   @Before
   public void setup() throws Exception {
     Set<ExtensionModel> extensions = muleContext.getExtensionManager().getExtensions();
-    String core = IOUtils
-        .toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/mule-extension-model.json"));
-    ExtensionModel coreModel = new ExtensionModelJsonSerializer().deserialize(core);
-
     dslContext = DslResolvingContext.getDefault(ImmutableSet.<ExtensionModel>builder()
-        .addAll(extensions).add(coreModel).build());
+        .addAll(extensions)
+        .add(MuleExtensionModelProvider.getMuleExtensionModel()).build());
     modelResolver = DslElementModelFactory.getDefault(dslContext);
   }
 
@@ -164,7 +164,7 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
     InputStream appIs = Thread.currentThread().getContextClassLoader().getResourceAsStream(configFile);
     checkArgument(appIs != null, "The given application was not found as resource");
 
-    Document document = new XmlConfigurationDocumentLoader()
+    Document document = schemaValidatingDocumentLoader()
         .loadDocument(muleContext.getExtensionManager().getExtensions(), configFile, appIs);
 
     XmlApplicationServiceRegistry customRegistry = new XmlApplicationServiceRegistry(new SpiServiceRegistry(), dslContext);

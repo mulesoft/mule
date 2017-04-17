@@ -12,15 +12,16 @@ import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+
+import java.io.InputStream;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.beans.factory.xml.DocumentLoader;
 import org.w3c.dom.Document;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
-
-import java.io.InputStream;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Loads a mule configuration file into a {@link Document} object.
@@ -29,7 +30,6 @@ import java.util.Set;
  * {@link #loadDocument(Set, String, InputStream)} will throw an exception containing all the errors.
  *
  * @see {@link #loadDocument(Set, String, InputStream)}
- *
  * @since 4.0
  */
 public class XmlConfigurationDocumentLoader {
@@ -39,7 +39,13 @@ public class XmlConfigurationDocumentLoader {
    */
   private static final int VALIDATION_XSD = 3;
 
+  /**
+   * Indicates that the validation should be disabled.
+   */
+  private static final int NO_VALIDATION = 0;
+
   private final XmlGathererErrorHandlerFactory xmlGathererErrorHandlerFactory;
+  private final int validationMode;
 
   /**
    * Creates an {@link XmlConfigurationDocumentLoader} using the default {@link DefaultXmlGathererErrorHandlerFactory}
@@ -48,9 +54,11 @@ public class XmlConfigurationDocumentLoader {
    * <p/>
    * Using the default constructor implies that all XSD validations will take place and, at the end of the parsing, all
    * the errors will be contained in an {@link MuleRuntimeException} which will be thrown.
+   *
+   * @return a new instance of {@link XmlConfigurationDocumentLoader}
    */
-  public XmlConfigurationDocumentLoader() {
-    this(new DefaultXmlGathererErrorHandlerFactory());
+  public static XmlConfigurationDocumentLoader schemaValidatingDocumentLoader() {
+    return new XmlConfigurationDocumentLoader(new DefaultXmlGathererErrorHandlerFactory());
   }
 
   /**
@@ -61,21 +69,37 @@ public class XmlConfigurationDocumentLoader {
    * Depending on what type of {@link XmlGathererErrorHandler} the factory returns, the {@link #loadDocument(Set, String, InputStream)}
    * method will not thrown any exception if {@link XmlGathererErrorHandler#getErrors()} is an empty list.
    *
-   * @param xmlGathererErrorHandlerFactory to create {@link XmlGathererErrorHandler} in the {@link #loadDocument(Set, String, InputStream)}
+   * @param errorHandlerFactory to create {@link XmlGathererErrorHandler} in the {@link #loadDocument(Set, String, InputStream)}
+   * @return a new instance of {@link XmlConfigurationDocumentLoader}
    */
-  public XmlConfigurationDocumentLoader(XmlGathererErrorHandlerFactory xmlGathererErrorHandlerFactory) {
-    this.xmlGathererErrorHandlerFactory = xmlGathererErrorHandlerFactory;
+  public static XmlConfigurationDocumentLoader schemaValidatingDocumentLoader(XmlGathererErrorHandlerFactory errorHandlerFactory) {
+    return new XmlConfigurationDocumentLoader(errorHandlerFactory);
+  }
+
+  /**
+   * Creates an {@link XmlConfigurationDocumentLoader} that will ignore XSD validation when
+   * executing the {@link #loadDocument(Set, String, InputStream)} method.
+   * <p/>
+   *
+   * @return a new instance of {@link XmlConfigurationDocumentLoader}
+   */
+  public static XmlConfigurationDocumentLoader noValidationDocumentLoader() {
+    return new XmlConfigurationDocumentLoader(null);
+  }
+
+  private XmlConfigurationDocumentLoader(XmlGathererErrorHandlerFactory errorHandlerFactory) {
+    this.validationMode = errorHandlerFactory != null ? VALIDATION_XSD : NO_VALIDATION;
+    this.xmlGathererErrorHandlerFactory = errorHandlerFactory;
   }
 
   /**
    * Creates a {@link Document} from an {@link InputStream} with the required configuration
    * of a mule configuration file parsing.
    *
-   * @param filename name of the file to display a better error messages (if there are any). Non null.
    * @param inputStream the input stream with the XML configuration content.
    * @return a new {@link Document} object with the provided content.
    * @throws MuleRuntimeException if an error occurs in {@link DocumentLoader} factory, or if the current {@code filename}
-   * contains 1 or more errors.
+   *                              contains 1 or more errors.
    * @see {@link DefaultXmlLoggerErrorHandler#getErrors()}
    */
   public Document loadDocument(String filename, InputStream inputStream) {
@@ -86,27 +110,29 @@ public class XmlConfigurationDocumentLoader {
    * Creates a {@link Document} from an {@link InputStream} with the required configuration
    * of a mule configuration file parsing.
    *
-   * @param extensions if the current {@code inputStream} relies in other schemas pending to be loaded from an {@link ExtensionModel},
-   *                   it will be picked up from {@code extensions} set
-   * @param filename name of the file to display a better error messages (if there are any). Non null.
+   * @param extensions  if the current {@code inputStream} relies in other schemas pending to be loaded from an {@link ExtensionModel},
+   *                    it will be picked up from {@code extensions} set
+   * @param filename    name of the file to display a better error messages (if there are any). Non null.
    * @param inputStream the input stream with the XML configuration content.
    * @return a new {@link Document} object with the provided content.
    * @throws MuleRuntimeException if an error occurs in {@link DocumentLoader} factory, or if the current {@code filename}
-   * contains 1 or more errors.
+   *                              contains 1 or more errors.
    * @see {@link DefaultXmlLoggerErrorHandler#getErrors()}
    */
   public Document loadDocument(Set<ExtensionModel> extensions, String filename, InputStream inputStream) {
-    final XmlGathererErrorHandler errorHandler = xmlGathererErrorHandlerFactory.create();
+    final XmlGathererErrorHandler errorHandler = createXmlGathererErrorHandler();
     Document document;
     try {
       document = new MuleDocumentLoader()
           .loadDocument(new InputSource(inputStream),
                         new ModuleDelegatingEntityResolver(extensions), errorHandler,
-                        VALIDATION_XSD, true);
+                        validationMode, true);
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
-    throwExceptionIfErrorsWereFound(errorHandler, filename);
+    if (validationMode == VALIDATION_XSD) {
+      throwExceptionIfErrorsWereFound(errorHandler, filename);
+    }
     return document;
   }
 
@@ -115,11 +141,15 @@ public class XmlConfigurationDocumentLoader {
     if (!errors.isEmpty()) {
       final String subMessage = format(errors.size() == 1 ? "was '%s' error" : "were '%s' errors", errors.size());
       final StringBuilder sb =
-          new StringBuilder(format("There %s while parsing the file '%s'.", subMessage, filename));
+          new StringBuilder("There " + subMessage + " while parsing the given file" + (filename.isEmpty() ? "." : " '%s'."));
       sb.append(lineSeparator()).append("Full list:");
       errors.stream().forEach(error -> sb.append(lineSeparator()).append(error));
       sb.append(lineSeparator());
       throw new MuleRuntimeException(createStaticMessage(sb.toString()));
     }
+  }
+
+  private XmlGathererErrorHandler createXmlGathererErrorHandler() {
+    return validationMode == VALIDATION_XSD ? xmlGathererErrorHandlerFactory.create() : null;
   }
 }

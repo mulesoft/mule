@@ -34,6 +34,14 @@ public interface XmlArtifactDeclarationLoader {
   /**
    * Creates an {@link ArtifactDeclaration} from a given mule artifact XML configuration file.
    *
+   * @param configResource the input stream with the XML configuration content.
+   * @return an {@link ArtifactDeclaration} that represents the given mule configuration.
+   */
+  ArtifactDeclaration load(InputStream configResource);
+
+  /**
+   * Creates an {@link ArtifactDeclaration} from a given mule artifact XML configuration file.
+   *
    * @param name name of the file to display a better error messages (if there are any).
    * @param configResource the input stream with the XML configuration content.
    * @return an {@link ArtifactDeclaration} that represents the given mule configuration.

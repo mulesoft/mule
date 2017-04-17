@@ -13,6 +13,7 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newObjectValue;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.extension.api.ExtensionConstants.DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
@@ -77,7 +78,6 @@ import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.dsl.model.XmlArtifactDeclarationLoader;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
@@ -86,7 +86,6 @@ import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationServiceReg
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
-import org.w3c.dom.Document;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -97,6 +96,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.w3c.dom.Document;
 
 /**
  * Default implementation of a {@link XmlArtifactDeclarationLoader}
@@ -119,6 +120,14 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
    * {@inheritDoc}
    */
   @Override
+  public ArtifactDeclaration load(InputStream configResource) {
+    return load("app.xml", configResource);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public ArtifactDeclaration load(String name, InputStream configResource) {
 
     context.getExtensions().forEach(e -> extensionsByNamespace.put(e.getXmlDslModel().getPrefix(), e));
@@ -131,7 +140,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   private ConfigLine loadArtifactConfig(String name, InputStream resource) {
     checkArgument(resource != null, "The given application was not found as resource");
 
-    Document document = new XmlConfigurationDocumentLoader().loadDocument(name, resource);
+    Document document = noValidationDocumentLoader().loadDocument(context.getExtensions(), name, resource);
 
     return new XmlApplicationParser(new XmlApplicationServiceRegistry(new SpiServiceRegistry(), context))
         .parse(document.getDocumentElement())
@@ -221,8 +230,8 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
               .orElse(false))
           .findFirst()
           .ifPresent(type -> {
-            String id = getId(type);
-            TopLevelParameterDeclarer topLevelParameter = extensionElementsDeclarer.newGlobalParameter(id)
+            TopLevelParameterDeclarer topLevelParameter = extensionElementsDeclarer
+                .newGlobalParameter(configLine.getIdentifier())
                 .withRefName(getDeclaredName(configLine));
 
             type.accept(getParameterDeclarerVisitor(configLine, dsl.resolve(type).get(),

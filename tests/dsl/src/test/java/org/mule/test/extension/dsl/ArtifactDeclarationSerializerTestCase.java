@@ -6,6 +6,10 @@
  */
 package org.mule.test.extension.dsl;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newArtifact;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newFlow;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newListValue;
@@ -29,14 +33,15 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.c
 import org.mule.extension.db.api.param.QueryDefinition;
 import org.mule.extensions.jms.api.connection.caching.NoCachingConfiguration;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.app.declaration.ParameterElementDeclaration;
 import org.mule.runtime.api.app.declaration.fluent.ElementDeclarer;
 import org.mule.runtime.config.spring.dsl.api.ArtifactDeclarationXmlSerializer;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,8 +60,7 @@ public class ArtifactDeclarationSerializerTestCase extends AbstractElementModelT
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
-
-    return Arrays.asList(new Object[][] {
+    return asList(new Object[][] {
         {"full-artifact-config-dsl-app.xml", createFullArtifactDeclaration()},
         {"multi-flow-dsl-app.xml", createMultiFlowArtifactDeclaration()}
     });
@@ -74,11 +78,26 @@ public class ArtifactDeclarationSerializerTestCase extends AbstractElementModelT
   }
 
   @Test
+  public void loadCustomConfigParameters() throws Exception {
+    InputStream configIs = Thread.currentThread().getContextClassLoader().getResourceAsStream(configFile);
+    ArtifactDeclarationXmlSerializer serializer = ArtifactDeclarationXmlSerializer.getDefault(dslContext);
+
+    ArtifactDeclaration artifact = serializer.deserialize(configIs);
+
+    List<String> expectedCustomParams = asList("xmlns", "xmlns:xsi", "xmlns:db", "xmlns:httpn", "xmlns:jms", "xmlns:sockets",
+                                               "xmlns:wsc", "xsi:schemaLocation");
+    List<ParameterElementDeclaration> customParameters = artifact.getCustomConfigurationParameters();
+    expectedCustomParams
+        .forEach(custom -> assertThat("Missing parameter: " + custom,
+                                      customParameters.stream().anyMatch(p -> p.getName().equals(custom)), is(true)));
+  }
+
+  @Test
   public void loadAndserialize() throws Exception {
     InputStream configIs = Thread.currentThread().getContextClassLoader().getResourceAsStream(configFile);
     ArtifactDeclarationXmlSerializer serializer = ArtifactDeclarationXmlSerializer.getDefault(dslContext);
 
-    ArtifactDeclaration artifact = serializer.deserialize(configFile, configIs);
+    ArtifactDeclaration artifact = serializer.deserialize(configIs);
 
     String serializationResult = serializer.serialize(artifact);
     compareXML(expectedAppXml, serializationResult);

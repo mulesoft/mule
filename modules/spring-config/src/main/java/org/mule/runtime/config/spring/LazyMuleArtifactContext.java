@@ -7,8 +7,8 @@
 package org.mule.runtime.config.spring;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -36,8 +36,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionReader;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 /**
  * Implementation of {@link MuleArtifactContext} that allows to create configuration components lazily.
@@ -73,7 +71,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
 
   @Override
   protected XmlConfigurationDocumentLoader newXmlConfigurationDocumentLoader() {
-    return new XmlConfigurationDocumentLoader(() -> new NoOpErrorHandler());
+    return noValidationDocumentLoader();
   }
 
   private void createComponents(DefaultListableBeanFactory beanFactory, ApplicationModel applicationModel, boolean mustBeRoot) {
@@ -168,30 +166,4 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
     return metadataService;
   }
 
-  /**
-   * {@link XmlGathererErrorHandler} implementation that doesn't handle errors.
-   */
-  class NoOpErrorHandler implements XmlGathererErrorHandler {
-
-    @Override
-    public List<SAXParseException> getErrors() {
-      return emptyList();
-    }
-
-    @Override
-    public void warning(SAXParseException exception) throws SAXException {
-
-    }
-
-    @Override
-    public void error(SAXParseException exception) throws SAXException {
-
-    }
-
-    @Override
-    public void fatalError(SAXParseException exception) throws SAXException {
-
-    }
-
-  }
 }

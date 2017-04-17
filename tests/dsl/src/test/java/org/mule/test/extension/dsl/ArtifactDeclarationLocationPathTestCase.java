@@ -20,8 +20,7 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.spring.dsl.api.ArtifactDeclarationXmlSerializer;
 import org.mule.runtime.config.spring.dsl.model.DslElementModelFactory;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
+import org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -45,12 +44,9 @@ public class ArtifactDeclarationLocationPathTestCase extends AbstractElementMode
   @Before
   public void setup() throws Exception {
     Set<ExtensionModel> extensions = muleContext.getExtensionManager().getExtensions();
-    String core = IOUtils
-        .toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/mule-extension-model.json"));
-    ExtensionModel coreModel = new ExtensionModelJsonSerializer().deserialize(core);
-
     dslContext = DslResolvingContext.getDefault(ImmutableSet.<ExtensionModel>builder()
-        .addAll(extensions).add(coreModel).build());
+        .addAll(extensions)
+        .add(MuleExtensionModelProvider.getMuleExtensionModel()).build());
     modelResolver = DslElementModelFactory.getDefault(dslContext);
     serializer = ArtifactDeclarationXmlSerializer.getDefault(dslContext);
     multiFlowDeclaration = serializer.deserialize(getConfigFile(),

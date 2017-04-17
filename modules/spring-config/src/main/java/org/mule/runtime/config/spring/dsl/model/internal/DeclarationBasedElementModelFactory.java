@@ -174,12 +174,9 @@ class DeclarationBasedElementModelFactory {
   }
 
   private <T> Optional<DslElementModel<T>> createFromType(TopLevelParameterDeclaration declaration) {
-    Optional<ObjectType> type = context.getTypeCatalog().getType(declaration.getValue()
-        .getTypeId());
-    if (!type.isPresent()) {
-      return Optional.empty();
-    }
-    return Optional.of(createTopLevelElement(type.get(), declaration));
+    return context.getTypeCatalog()
+        .getType(declaration.getValue().getTypeId())
+        .map(objectType -> createTopLevelElement(objectType, declaration));
   }
 
   private DslElementModel<ConfigurationModel> createConfigurationElement(ConfigurationModel model,
@@ -283,7 +280,8 @@ class DeclarationBasedElementModelFactory {
 
   private DslElementModel createTopLevelElement(ObjectType model, TopLevelParameterDeclaration declaration) {
 
-    DslElementSyntax objectDsl = dsl.resolve(model).orElseThrow(() -> new IllegalArgumentException());
+    DslElementSyntax objectDsl = dsl.resolve(model)
+        .orElseThrow(() -> new IllegalArgumentException("Failed to resolve the DSL syntax for type '" + getId(model) + "'"));
     DslElementModel.Builder<MetadataType> parentElement = DslElementModel.<MetadataType>builder()
         .withModel(model)
         .withDsl(objectDsl);
