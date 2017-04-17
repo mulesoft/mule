@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="getResultSet">
-        <db:stored-procedure streaming="true">
+        <db:stored-procedure>
             <db:sql>{ call getSplitTestRecords() }</db:sql>
         </db:stored-procedure>
 

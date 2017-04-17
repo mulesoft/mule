@@ -20,10 +20,12 @@ import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
 import org.mule.extension.db.integration.model.XmlField;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 
 import java.sql.SQLException;
 import java.sql.Struct;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -42,14 +44,33 @@ public class TestRecordUtil {
   }
 
   public static void assertRecords(Object value, Record... records) {
-    assertTrue("Expected a list but received: " + ((value == null) ? "null" : value.getClass().getName()), value instanceof List);
-    List<Map<String, Object>> resultList = (List<Map<String, Object>>) value;
-    assertThat(resultList.size(), equalTo(records.length));
+    if (value instanceof List) {
+      List<Map<String, Object>> resultList = (List<Map<String, Object>>) value;
+      assertThat(resultList.size(), equalTo(records.length));
 
-    for (int i = 0, recordsLength = records.length; i < recordsLength; i++) {
-      Record actualRecord = createRecord(resultList.get(i));
-      assertRecord(records[i], actualRecord);
+      for (int i = 0, recordsLength = records.length; i < recordsLength; i++) {
+        Record actualRecord = createRecord(resultList.get(i));
+        assertRecord(records[i], actualRecord);
+      }
+
+      return;
     }
+
+    if (value instanceof CursorIteratorProvider) {
+      value = ((CursorIteratorProvider) value).openCursor();
+    }
+
+    assertTrue("Expected an iterator but received: " + ((value == null) ? "null" : value.getClass().getName()),
+               value instanceof Iterator);
+    Iterator<Map<String, Object>> result = (Iterator<Map<String, Object>>) value;
+
+    int recordsFound = 0;
+    while (result.hasNext()) {
+      Record actualRecord = createRecord(result.next());
+      assertRecord(records[recordsFound], actualRecord);
+      recordsFound++;
+    }
+    assertThat(recordsFound, equalTo(records.length));
   }
 
   private static Record createRecord(Map<String, Object> fields) {

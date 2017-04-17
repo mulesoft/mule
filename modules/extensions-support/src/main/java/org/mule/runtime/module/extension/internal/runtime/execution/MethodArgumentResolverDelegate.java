@@ -22,6 +22,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.extension.api.runtime.operation.FlowListener;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -34,6 +35,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.CompletionCal
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ErrorArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.FlowListenerArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.LiteralArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MediaTypeArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
@@ -67,6 +69,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       new CompletionCallbackArgumentResolver();
   private static final ArgumentResolver<AuthenticationHandler> SECURITY_CONTEXT_HANDLER =
       new SecurityContextHandlerArgumentResolver();
+  private static final ArgumentResolver<FlowListener> FLOW_LISTENER_ARGUMENT_RESOLVER = new FlowListenerArgumentResolver();
 
 
   private final Method method;
@@ -111,23 +114,25 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = CONNECTOR_ARGUMENT_RESOLVER;
       } else if (Error.class.isAssignableFrom(parameterType)) {
         argumentResolver = ERROR_ARGUMENT_RESOLVER;
-      } else if (SourceCallbackContext.class.isAssignableFrom(parameterType)) {
+      } else if (SourceCallbackContext.class.equals(parameterType)) {
         argumentResolver = SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER;
       } else if (isParameterContainer(annotations.keySet(), typeLoader.load(parameterType)) &&
           !((ParameterGroup) annotations.get(ParameterGroup.class)).showInDsl()) {
         argumentResolver = parameterGroupResolvers.get(parameters[i]);
-      } else if (ParameterResolver.class.isAssignableFrom(parameterType)) {
+      } else if (ParameterResolver.class.equals(parameterType)) {
         argumentResolver = new ParameterResolverArgumentResolver<>(paramNames.get(i));
-      } else if (TypedValue.class.isAssignableFrom(parameterType)) {
+      } else if (TypedValue.class.equals(parameterType)) {
         argumentResolver = new TypedValueArgumentResolver<>(paramNames.get(i));
-      } else if (Literal.class.isAssignableFrom(parameterType)) {
+      } else if (Literal.class.equals(parameterType)) {
         argumentResolver = new LiteralArgumentResolver(paramNames.get(i), parameterType);
-      } else if (CompletionCallback.class.isAssignableFrom(parameterType)) {
+      } else if (CompletionCallback.class.equals(parameterType)) {
         argumentResolver = NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER;
       } else if (MediaType.class.equals(parameterType)) {
         argumentResolver = MEDIA_TYPE_ARGUMENT_RESOLVER;
       } else if (AuthenticationHandler.class.equals(parameterType)) {
         argumentResolver = SECURITY_CONTEXT_HANDLER;
+      } else if (FlowListener.class.equals(parameterType)) {
+        argumentResolver = FLOW_LISTENER_ARGUMENT_RESOLVER;
       } else {
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
       }

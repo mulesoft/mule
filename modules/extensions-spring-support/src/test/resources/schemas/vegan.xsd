@@ -77,8 +77,8 @@
                         <xs:element minOccurs="0" maxOccurs="1" name="cook-book">
                             <xs:complexType>
                                 <xs:choice minOccurs="1" maxOccurs="1">
-                  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-vegan-cook-book"></xs:element>
-                  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-vegan-cook-book"></xs:element>
+                                    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-vegan-cook-book"></xs:element>
+                                    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-vegan-cook-book"></xs:element>
                                 </xs:choice>
                             </xs:complexType>
                         </xs:element>
@@ -292,42 +292,6 @@
     </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetLunchType" substitutionGroup="mule:abstract-operator" name="get-lunch"></xs:element>
     <xs:complexType name="GetLunchType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetQualifiedLunchType" substitutionGroup="mule:abstract-operator" name="get-qualified-lunch"></xs:element>
-    <xs:complexType name="GetQualifiedLunchType">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="target">
-                    <xs:annotation>
-                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetRawLunchType" substitutionGroup="mule:abstract-operator" name="get-raw-lunch"></xs:element>
-    <xs:complexType name="GetRawLunchType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
@@ -622,8 +586,8 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="food">
                         <xs:complexType>
                             <xs:choice minOccurs="1" maxOccurs="1">
-                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
-                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
                             </xs:choice>
                         </xs:complexType>
                     </xs:element>
