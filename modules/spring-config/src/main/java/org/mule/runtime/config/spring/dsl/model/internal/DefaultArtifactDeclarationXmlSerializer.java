@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring.dsl.model.internal;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_SCHEMA_LOCATION;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
@@ -51,6 +51,8 @@ import org.w3c.dom.Element;
  */
 public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarationXmlSerializer {
 
+  private static final String XMLNS_W3_URL = "http://www.w3.org/2000/xmlns/";
+  private static final String XSI_W3_URL = "http://www.w3.org/2001/XMLSchema-instance";
   private static final String XSI_SCHEMA_LOCATION = "xsi:schemaLocation";
   private static final String XMLNS = "xmlns";
   private final DslResolvingContext context;
@@ -62,6 +64,12 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
   @Override
   public String serialize(ArtifactDeclaration declaration) {
     return serializeArtifact(declaration);
+  }
+
+  @Override
+  public ArtifactDeclaration deserialize(InputStream configResource) {
+    checkArgument(configResource != null, "The artifact to deserialize cannot be null");
+    return XmlArtifactDeclarationLoader.getDefault(context).load(configResource);
   }
 
   @Override
@@ -140,19 +148,23 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
 
     artifact.getCustomConfigurationParameters().forEach(p -> mule.setAttribute(p.getName(), p.getValue().toString()));
 
-    mule.setAttributeNS("http://www.w3.org/2000/xmlns/", XMLNS, MULE_SCHEMA_LOCATION);
-
     if (isBlank(mule.getAttribute(XSI_SCHEMA_LOCATION))) {
-      StringBuilder location = new StringBuilder();
+      StringBuilder schemaLocation = new StringBuilder();
       context.getExtensions().forEach(extension -> {
         XmlDslModel xml = extension.getXmlDslModel();
-        location.append(xml.getNamespace()).append(" ").append(xml.getSchemaLocation())
+        schemaLocation.append(xml.getNamespace())
+            .append(" ")
+            .append(xml.getSchemaLocation())
             .append(" ");
+
+        String prefix = xml.getNamespace().equals(CORE_NAMESPACE) ? "" : ":" + xml.getPrefix();
+        mule.setAttributeNS(XMLNS_W3_URL, XMLNS + prefix, xml.getNamespace());
       });
 
-      mule.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
-                          XSI_SCHEMA_LOCATION, location.toString().trim());
+      mule.setAttributeNS(XSI_W3_URL,
+                          XSI_SCHEMA_LOCATION, schemaLocation.toString().trim());
     }
+
     return doc;
   }
 

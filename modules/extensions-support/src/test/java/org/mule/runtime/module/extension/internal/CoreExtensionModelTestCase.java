@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.extension;
+package org.mule.runtime.module.extension.internal;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -25,7 +25,7 @@ import static org.mule.runtime.core.config.MuleManifest.getProductName;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.config.MuleManifest.getVendorName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-
+import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.getMuleExtensionModel;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.impl.DefaultAnyType;
 import org.mule.metadata.api.model.impl.DefaultArrayType;
@@ -52,29 +52,18 @@ import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.routing.AggregationStrategy;
 import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
   private static final ErrorModel errorMuleAny = newError("ANY", "MULE").build();
 
-  private static ExtensionModel coreExtensionModel;
-
-  @BeforeClass
-  public static void beforeClass() {
-    final String loadedJson =
-        IOUtils.toString(CoreExtensionModelTestCase.class.getResourceAsStream("/META-INF/mule-extension-model.json"));
-    coreExtensionModel = new ExtensionModelJsonSerializer().deserialize(loadedJson);
-  }
-
+  private static ExtensionModel coreExtensionModel = getMuleExtensionModel();
 
   @Test
   public void consistentWithManifest() {

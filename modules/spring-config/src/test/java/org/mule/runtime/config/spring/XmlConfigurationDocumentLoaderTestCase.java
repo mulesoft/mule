@@ -13,6 +13,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.isNull;
+import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -69,7 +70,7 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
     // We will use a custom gathered that stores the errors but returns an empty list when asked
     final XmlGathererErrorHandlerTest xmlGathererErrorHandlerTest = new XmlGathererErrorHandlerTest();
     final XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader =
-        new XmlConfigurationDocumentLoader(() -> xmlGathererErrorHandlerTest);
+        schemaValidatingDocumentLoader(() -> xmlGathererErrorHandlerTest);
 
     // Validates that the DOM was properly parsed even when it was non-XSD valid
     final Document document = getDocument("mule-config-malformed.xml", xmlConfigurationDocumentLoader);
@@ -88,7 +89,7 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
   }
 
   private Document getDocument(String filename) {
-    final XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader = new XmlConfigurationDocumentLoader();
+    final XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader = schemaValidatingDocumentLoader();
     return getDocument(filename, xmlConfigurationDocumentLoader);
   }
 
@@ -120,7 +121,8 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
     }
 
     /**
-     * @return {@link Collections#emptyList()} always. We want to make the {@link XmlConfigurationDocumentLoader#loadDocument(java.util.Optional, java.lang.String, java.io.InputStream)}
+     * @return {@link Collections#emptyList()} always. We want to make the
+     * {@link XmlConfigurationDocumentLoader#loadDocument(java.lang.String, java.io.InputStream)}
      * method believe there was no errors while working with the current file.
      */
     @Override

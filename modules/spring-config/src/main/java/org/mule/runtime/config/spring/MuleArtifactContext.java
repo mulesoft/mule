@@ -14,6 +14,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.join;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
@@ -169,7 +170,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   }
 
   protected XmlConfigurationDocumentLoader newXmlConfigurationDocumentLoader() {
-    return new XmlConfigurationDocumentLoader();
+    return schemaValidatingDocumentLoader();
   }
 
   private XmlApplicationParser createApplicationParser() {

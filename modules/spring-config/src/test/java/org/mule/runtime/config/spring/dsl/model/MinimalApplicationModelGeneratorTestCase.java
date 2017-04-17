@@ -16,6 +16,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.location.Location.builder;
+import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
@@ -41,7 +42,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   public final ExpectedException expectedException = none();
   private final ServiceRegistry mockServiceRegistry = mock(ServiceRegistry.class);
   private final XmlApplicationParser xmlApplicationParser = new XmlApplicationParser(mockServiceRegistry);
-  private final XmlConfigurationDocumentLoader documentLoader = new XmlConfigurationDocumentLoader();
+  private final XmlConfigurationDocumentLoader documentLoader = schemaValidatingDocumentLoader();
 
   @Test
   public void noElements() throws Exception {
