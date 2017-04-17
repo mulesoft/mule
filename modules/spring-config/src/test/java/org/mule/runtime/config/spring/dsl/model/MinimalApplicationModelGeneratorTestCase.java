@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.model;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
@@ -17,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
+
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
@@ -24,7 +26,6 @@ import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -41,7 +42,9 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   @Rule
   public final ExpectedException expectedException = none();
   private final ServiceRegistry mockServiceRegistry = mock(ServiceRegistry.class);
-  private final XmlApplicationParser xmlApplicationParser = new XmlApplicationParser(mockServiceRegistry);
+  private final XmlApplicationParser xmlApplicationParser =
+      new XmlApplicationParser(mockServiceRegistry,
+                               singletonList(MinimalApplicationModelGeneratorTestCase.class.getClassLoader()));
   private final XmlConfigurationDocumentLoader documentLoader = schemaValidatingDocumentLoader();
 
   @Test

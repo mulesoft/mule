@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.spring;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.of;
@@ -27,6 +26,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
+
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
@@ -71,6 +71,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -96,6 +98,8 @@ import org.w3c.dom.Document;
  * Classpath of file system using the MuleBeanDefinitionReader.
  */
 public class MuleArtifactContext extends AbstractXmlApplicationContext {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(MuleArtifactContext.class);
 
   private static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<>();
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
@@ -126,19 +130,23 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
    * @param artifactDeclaration the mule configuration defined programmatically
    * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
    *        org.mule.runtime.config.spring.SpringRegistry
+   * @param pluginsClassLoaders the classloades of the plugins included in the artifact, on hwich contexts the parsers will
+   *        process.
    * @since 3.7.0
    */
   public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
                              ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
-                             Map<String, String> artifactProperties, ArtifactType artifactType)
+                             Map<String, String> artifactProperties, ArtifactType artifactType,
+                             List<ClassLoader> pluginsClassLoaders)
       throws BeansException {
     this(muleContext, convert(artifactConfigResources), artifactDeclaration, optionalObjectsController, artifactProperties,
-         artifactType);
+         artifactType, pluginsClassLoaders);
   }
 
   public MuleArtifactContext(MuleContext muleContext, Resource[] artifactConfigResources,
                              ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
-                             Map<String, String> artifactProperties, ArtifactType artifactType) {
+                             Map<String, String> artifactProperties, ArtifactType artifactType,
+                             List<ClassLoader> pluginsClassLoaders) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = muleContext;
     this.artifactConfigResources = artifactConfigResources;
@@ -148,7 +156,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     this.artifactDeclaration = artifactDeclaration;
     this.xmlConfigurationDocumentLoader = newXmlConfigurationDocumentLoader();
 
-    serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, currentThread().getContextClassLoader())
+    serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, MuleArtifactContext.class.getClassLoader())
         .forEach(componentBuildingDefinitionProvider -> {
           if (componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider) {
             ((ExtensionBuildingDefinitionProvider) componentBuildingDefinitionProvider)
@@ -160,8 +168,18 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
               .forEach(componentBuildingDefinitionRegistry::register);
         });
 
+    for (ClassLoader pluginArtifactClassLoader : pluginsClassLoaders) {
+      serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, pluginArtifactClassLoader)
+          .forEach(componentBuildingDefinitionProvider -> {
+            if (!(componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider)) {
+              componentBuildingDefinitionProvider.init();
+              componentBuildingDefinitionProvider.getComponentBuildingDefinitions()
+                  .forEach(componentBuildingDefinitionRegistry::register);
+            }
+          });
+    }
 
-    xmlApplicationParser = createApplicationParser();
+    xmlApplicationParser = createApplicationParser(pluginsClassLoaders);
     this.beanDefinitionFactory =
         new BeanDefinitionFactory(componentBuildingDefinitionRegistry, muleContext.getErrorTypeRepository());
 
@@ -173,14 +191,14 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     return schemaValidatingDocumentLoader();
   }
 
-  private XmlApplicationParser createApplicationParser() {
+  private XmlApplicationParser createApplicationParser(List<ClassLoader> pluginsClassLoaders) {
     ExtensionManager extensionManager = muleContext.getExtensionManager();
 
     ServiceRegistry customRegistry = extensionManager != null
         ? new XmlApplicationServiceRegistry(serviceRegistry, DslResolvingContext.getDefault(extensionManager.getExtensions()))
         : serviceRegistry;
 
-    return new XmlApplicationParser(customRegistry);
+    return new XmlApplicationParser(customRegistry, pluginsClassLoaders);
   }
 
   private void determineIfOnlyNewParsingMechanismCanBeUsed() {
@@ -303,7 +321,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
       createApplicationComponents(beanFactory, applicationModel, true);
     } else {
       // TODO MULE-9638 - Remove log line
-      logger
+      LOGGER
           .info("Using mixed mechanism to load configuration since there are some components that were not yet migrated to the new mechanism: "
               + getOldParsingMechanismComponentIdentifiers());
       beanDefinitionReader.loadBeanDefinitions(getConfigResources());

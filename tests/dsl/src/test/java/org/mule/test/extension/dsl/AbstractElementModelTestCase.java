@@ -13,6 +13,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
@@ -34,8 +35,6 @@ import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Optional;
@@ -54,9 +53,7 @@ import org.junit.Before;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.junit.Before;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import com.google.common.collect.ImmutableSet;
 
 @ArtifactClassLoaderRunnerConfig(sharedRuntimeLibs = {"org.apache.derby:derby"})
 public abstract class AbstractElementModelTestCase extends MuleArtifactFunctionalTestCase {
@@ -168,9 +165,10 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
         .loadDocument(muleContext.getExtensionManager().getExtensions(), configFile, appIs);
 
     XmlApplicationServiceRegistry customRegistry = new XmlApplicationServiceRegistry(new SpiServiceRegistry(), dslContext);
-    ConfigLine configLine = new XmlApplicationParser(customRegistry)
-        .parse(document.getDocumentElement())
-        .orElseThrow(() -> new Exception("Failed to load config"));
+    ConfigLine configLine =
+        new XmlApplicationParser(customRegistry, singletonList(AbstractElementModelTestCase.class.getClassLoader()))
+            .parse(document.getDocumentElement())
+            .orElseThrow(() -> new Exception("Failed to load config"));
 
     ArtifactConfig artifactConfig = new ArtifactConfig.Builder()
         .addConfigFile(new ConfigFile(configFile, singletonList(configLine)))

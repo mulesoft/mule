@@ -7,22 +7,18 @@
 
 package org.mule.runtime.config.spring.dsl.processor.xml;
 
-import static java.lang.Thread.currentThread;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_CONTEXT_NAMESPACE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_NAMESPACE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLineProvider;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.ImmutableList;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +30,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 
 /**
  * Simple parser that transforms an XML document to a set of {@link org.mule.runtime.config.spring.dsl.processor.ConfigLine}
@@ -57,9 +58,13 @@ public class XmlApplicationParser {
     predefinedNamespace.put("http://www.springframework.org/schema/context", SPRING_CONTEXT_NAMESPACE);
   }
 
-  public XmlApplicationParser(ServiceRegistry serviceRegistry) {
-    namespaceInfoProviders = ImmutableList
-        .copyOf(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class, currentThread().getContextClassLoader()));
+  public XmlApplicationParser(ServiceRegistry serviceRegistry, List<ClassLoader> pluginsClassLoaders) {
+    final Builder<XmlNamespaceInfoProvider> namespaceInfoProvidersBuilder = ImmutableList.builder();
+    for (ClassLoader pluginClassLoader : pluginsClassLoaders) {
+      namespaceInfoProvidersBuilder.addAll(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class, pluginClassLoader));
+    }
+
+    namespaceInfoProviders = namespaceInfoProvidersBuilder.build();
     namespaceCache = CacheBuilder.newBuilder().build();
   }
 

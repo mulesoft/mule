@@ -6,27 +6,31 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.beanutils.BeanUtils.copyProperty;
 import static org.mule.runtime.api.meta.AnnotatedObject.PROPERTY_NAME;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DEFAULT_ES_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FILTER_ELEMENT_SUFFIX;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MESSAGE_FILTER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DEFAULT_ES_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYPE_OBJECT_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_PROPERTY_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FILTER_ELEMENT_SUFFIX;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYPE_OBJECT_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
 import static org.mule.runtime.config.spring.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
 import static org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser.processMetadataAnnotationsHelper;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -38,6 +42,7 @@ import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import com.google.common.collect.ImmutableSet;
@@ -90,14 +95,30 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
   public CommonBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository) {
     this.objectFactoryClassRepository = objectFactoryClassRepository;
-    try {
-      // TODO MULE-9728 - Provide a mechanism to hook per transport in the endpoint address parsing
-      this.beanDefinitionPostProcessor = (BeanDefinitionPostProcessor) ClassUtils
-          .getClass(Thread.currentThread().getContextClassLoader(), TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS).newInstance();
-    } catch (Exception e) {
-      this.beanDefinitionPostProcessor = (componentModel, beanDefinition) -> {
-      };
+
+    this.beanDefinitionPostProcessor = resolvePostProcessor();
+  }
+
+  // TODO MULE-9728 - Provide a mechanism to hook per transport in the endpoint address parsing
+  private BeanDefinitionPostProcessor resolvePostProcessor() {
+    List<ClassLoader> artifactPluginClassLoaders;
+    if (currentThread().getContextClassLoader() instanceof MuleApplicationClassLoader) {
+      artifactPluginClassLoaders = ((MuleApplicationClassLoader) currentThread().getContextClassLoader())
+          .getArtifactPluginClassLoaders().stream().map(acl -> acl.getClassLoader()).collect(toList());
+    } else {
+      artifactPluginClassLoaders = singletonList(currentThread().getContextClassLoader());
     }
+
+    for (ClassLoader classLoader : artifactPluginClassLoaders) {
+      try {
+        return (BeanDefinitionPostProcessor) ClassUtils.getClass(classLoader, TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS)
+            .newInstance();
+      } catch (Exception e) {
+        // Nothing to do, we just don't have compatibility plugin in the app
+      }
+    }
+    return (componentModel, beanDefinition) -> {
+    };
   }
 
   @Override

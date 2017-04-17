@@ -7,6 +7,8 @@
 package org.mule.runtime.config.spring.dsl.declaration;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
@@ -38,6 +40,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -84,6 +87,7 @@ import org.mule.runtime.config.spring.dsl.processor.SimpleConfigAttribute;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 
@@ -142,10 +146,16 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
     Document document = noValidationDocumentLoader().loadDocument(context.getExtensions(), name, resource);
 
-    return new XmlApplicationParser(new XmlApplicationServiceRegistry(new SpiServiceRegistry(), context))
-        .parse(document.getDocumentElement())
-        .orElseThrow(
-                     () -> new MuleRuntimeException(createStaticMessage("Could not load load a Configuration from the given resource")));
+    List<ClassLoader> artifactPluginClassLoaders;
+    if (currentThread().getContextClassLoader() instanceof MuleApplicationClassLoader) {
+      artifactPluginClassLoaders = ((MuleApplicationClassLoader) currentThread().getContextClassLoader())
+          .getArtifactPluginClassLoaders().stream().map(acl -> acl.getClassLoader()).collect(toList());
+    } else {
+      artifactPluginClassLoaders = singletonList(currentThread().getContextClassLoader());
+    }
+    return new XmlApplicationParser(new XmlApplicationServiceRegistry(new SpiServiceRegistry(), context),
+                                    artifactPluginClassLoaders).parse(document.getDocumentElement())
+                                        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not load load a Configuration from the given resource")));
   }
 
   private ArtifactDeclaration declareArtifact(ConfigLine configLine) {

@@ -6,9 +6,13 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -20,6 +24,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.builders.AbstractResourceConfigurationBuilder;
+import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -141,12 +146,21 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   protected MuleArtifactContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
                                                            ArtifactDeclaration artifactDeclaration,
                                                            OptionalObjectsController optionalObjectsController) {
+    List<ClassLoader> artifactPluginClassLoaders;
+    if (currentThread().getContextClassLoader() instanceof MuleApplicationClassLoader) {
+      artifactPluginClassLoaders = ((MuleApplicationClassLoader) currentThread().getContextClassLoader())
+          .getArtifactPluginClassLoaders().stream().map(acl -> acl.getClassLoader()).collect(toList());
+    } else {
+      artifactPluginClassLoaders = singletonList(currentThread().getContextClassLoader());
+    }
+
     if (enableLazyInit) {
       return new LazyMuleArtifactContext(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
-                                         getArtifactProperties(), artifactType);
+                                         getArtifactProperties(), artifactType, artifactPluginClassLoaders);
     }
+
     return new MuleArtifactContext(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
-                                   getArtifactProperties(), artifactType);
+                                   getArtifactProperties(), artifactType, artifactPluginClassLoaders);
   }
 
 
