@@ -8,7 +8,7 @@ package org.mule.runtime.core.processor.simple;
 
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.internal.message.InternalMessage;
 
 import java.util.Set;
 

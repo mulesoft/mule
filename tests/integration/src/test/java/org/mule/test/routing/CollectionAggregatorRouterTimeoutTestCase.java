@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.RoutingNotificationListener;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.context.notification.RoutingNotification;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;

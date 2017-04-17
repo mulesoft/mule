@@ -16,7 +16,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.el.context.AbstractELTestCase;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.size.SmallTest;

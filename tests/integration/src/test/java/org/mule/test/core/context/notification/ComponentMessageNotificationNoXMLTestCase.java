@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.ComponentMessageNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.component.simple.EchoComponent;
 import org.mule.runtime.core.context.notification.ComponentMessageNotification;

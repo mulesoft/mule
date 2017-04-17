@@ -16,9 +16,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.message.ExceptionPayload;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.connector.ConnectException;
-import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
 /**

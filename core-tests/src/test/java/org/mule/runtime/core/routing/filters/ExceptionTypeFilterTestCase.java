@@ -17,8 +17,8 @@ import static org.mule.tck.MuleTestUtils.createErrorMock;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;

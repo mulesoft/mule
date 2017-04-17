@@ -12,6 +12,10 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.exception.ErrorTypeRepository.CRITICAL_ERROR_TYPE;
 import static reactor.core.publisher.Mono.error;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -21,12 +25,9 @@ import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
-
-import java.util.List;
-import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 

@@ -8,7 +8,7 @@ package org.mule.runtime.core.el.context;
 
 import static java.util.Collections.emptyMap;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.internal.message.InternalMessage;
 
 import java.util.Set;
 
