@@ -41,9 +41,19 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+        <groupId>org.mule.runtime</groupId>
+        <artifactId>mule-module-http-policy-api</artifactId>
+        <version>${muleHttpPolicyApiVersion}</version>
+    </dependency>
+        <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-jbossts</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-policy-api</artifactId>
+            <version>${mulePolicyApiVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
