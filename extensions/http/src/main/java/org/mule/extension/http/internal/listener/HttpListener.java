@@ -58,7 +58,7 @@ import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -107,7 +107,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   @Inject
   private MuleContext muleContext;
 
-  @UseConfig
+  @Config
   private HttpListenerConfig config;
 
   @Connection

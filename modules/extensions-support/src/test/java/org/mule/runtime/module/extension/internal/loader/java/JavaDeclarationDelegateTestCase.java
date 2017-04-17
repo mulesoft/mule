@@ -68,7 +68,7 @@ import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProvider
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
@@ -864,7 +864,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
   public static class DuplicateConfigOperation {
 
-    public Long launder(@UseConfig HeisenbergExtension config, @UseConfig HeisenbergExtension config2) {
+    public Long launder(@Config HeisenbergExtension config, @Config HeisenbergExtension config2) {
       return 10L;
     }
 

@@ -7,7 +7,7 @@
 package org.mule.test.vegan.extension;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -15,7 +15,7 @@ import org.mule.tck.testmodels.fruit.Fruit;
 
 public class InterceptingBananaOperations {
 
-  public InterceptingCallback<Fruit> getLunch(@UseConfig BananaConfig config) {
+  public InterceptingCallback<Fruit> getLunch(@Config BananaConfig config) {
     return new VeganInterceptor<Fruit>(config) {
 
       @Override
@@ -25,7 +25,7 @@ public class InterceptingBananaOperations {
     };
   }
 
-  public NoGenericsInterceptingCallback getRawLunch(@UseConfig BananaConfig config) {
+  public NoGenericsInterceptingCallback getRawLunch(@Config BananaConfig config) {
     return new NoGenericsInterceptingCallback();
   }
 
@@ -37,7 +37,7 @@ public class InterceptingBananaOperations {
     }
   }
 
-  public InterceptingCallback<Result<Fruit, VeganAttributes>> getQualifiedLunch(@UseConfig BananaConfig config) {
+  public InterceptingCallback<Result<Fruit, VeganAttributes>> getQualifiedLunch(@Config BananaConfig config) {
     return new VeganInterceptor<Result<Fruit, VeganAttributes>>(config) {
 
       private final VeganAttributes veganAttributes = new VeganAttributes();

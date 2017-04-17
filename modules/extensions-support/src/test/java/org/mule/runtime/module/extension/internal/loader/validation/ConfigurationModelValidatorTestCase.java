@@ -10,7 +10,7 @@ import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -46,7 +46,7 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase {
     ExtensionsTestUtils.validate(connectorClass, validator);
   }
 
-  interface Config {
+  interface ConfigInterface {
 
   }
 
@@ -67,31 +67,31 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Configuration(name = "config")
   @Operations(ValidTestOperations.class)
-  public static class TestConfig implements Config {
+  public static class TestConfig implements ConfigInterface {
 
   }
 
 
   @Operations(InvalidTestOperations.class)
-  public static class InvalidTestConfig implements Config {
+  public static class InvalidTestConfig implements ConfigInterface {
 
   }
 
 
   @Configuration(name = "config2")
   @Operations(ValidTestOperations.class)
-  public static class TestConfig2 implements Config {
+  public static class TestConfig2 implements ConfigInterface {
 
   }
 
 
   public static class ValidTestOperations {
 
-    public void foo(@UseConfig Config connection) {
+    public void foo(@Config ConfigInterface connection) {
 
     }
 
-    public void bar(@UseConfig Config connection) {
+    public void bar(@Config ConfigInterface connection) {
 
     }
   }
@@ -99,11 +99,11 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase {
 
   public static class InvalidTestOperations {
 
-    public void foo(@UseConfig Config config) {
+    public void foo(@Config ConfigInterface config) {
 
     }
 
-    public void bar(@UseConfig Apple config) {
+    public void bar(@Config Apple config) {
 
     }
   }

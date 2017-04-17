@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -23,7 +23,7 @@ import org.mule.tck.testmodels.fruit.Apple;
     outputResolver = HarvestAppleKeyResolver.class)
 public class HarvestApplesSource extends Source<Apple, Attributes> {
 
-  @UseConfig
+  @Config
   AppleConfig appleConfig;
 
   @MetadataKeyId

@@ -11,7 +11,7 @@ import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class SpreadVeganismOperation {
 
   public static final String ARGUMENTS_TAB = "Arguments";
 
-  public String spreadTheWord(String theWord, @UseConfig Object config) {
+  public String spreadTheWord(String theWord, @Config Object config) {
     return theWord;
   }
 

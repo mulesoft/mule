@@ -20,7 +20,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.util.collection.ImmutableMapCollector;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
@@ -105,7 +105,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
       ArgumentResolver<?> argumentResolver;
 
-      if (annotations.containsKey(UseConfig.class)) {
+      if (annotations.containsKey(Config.class)) {
         argumentResolver = CONFIGURATION_ARGUMENT_RESOLVER;
       } else if (annotations.containsKey(Connection.class)) {
         argumentResolver = CONNECTOR_ARGUMENT_RESOLVER;

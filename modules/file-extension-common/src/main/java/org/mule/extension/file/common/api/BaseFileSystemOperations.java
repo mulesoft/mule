@@ -17,7 +17,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -85,7 +85,7 @@ public abstract class BaseFileSystemOperations {
    * @return the file's content and metadata on a {@link FileAttributes} instance
    * @throws IllegalArgumentException if the file at the given path doesn't exists
    */
-  protected Result<InputStream, FileAttributes> doRead(@UseConfig FileConnectorConfig config,
+  protected Result<InputStream, FileAttributes> doRead(@Config FileConnectorConfig config,
                                                        @Connection FileSystem fileSystem,
                                                        @DisplayName("File Path") String path,
                                                        MediaType mediaType,

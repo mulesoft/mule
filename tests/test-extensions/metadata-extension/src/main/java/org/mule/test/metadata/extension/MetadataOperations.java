@@ -15,7 +15,7 @@ import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Query;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.message.StringAttributes;
@@ -50,7 +50,7 @@ import java.util.Map;
 public class MetadataOperations {
 
   @OutputResolver(output = TestOutputAnyTypeResolver.class)
-  public Object contentMetadataWithKeyId(@UseConfig Object object, @Connection MetadataConnection connection,
+  public Object contentMetadataWithKeyId(@Config Object object, @Connection MetadataConnection connection,
                                          @MetadataKeyId(TestInputResolverWithKeyResolver.class) String type,
                                          @Optional @Content @TypeResolver(TestInputResolverWithKeyResolver.class) Object content) {
     return null;

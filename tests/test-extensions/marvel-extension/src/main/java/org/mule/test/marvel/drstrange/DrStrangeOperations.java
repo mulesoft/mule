@@ -15,7 +15,7 @@ import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
 import java.io.ByteArrayInputStream;
@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DrStrangeOperations {
 
-  public String seekStream(@UseConfig DrStrange dr, @Optional(defaultValue = PAYLOAD) InputStream stream, int position)
+  public String seekStream(@Config DrStrange dr, @Optional(defaultValue = PAYLOAD) InputStream stream, int position)
       throws IOException {
     checkArgument(stream instanceof CursorStream, "Stream was not cursored");
 
@@ -38,15 +38,15 @@ public class DrStrangeOperations {
     return readStream(dr, cursor);
   }
 
-  public String readStream(@UseConfig DrStrange dr, @Optional(defaultValue = PAYLOAD) InputStream stream) throws IOException {
+  public String readStream(@Config DrStrange dr, @Optional(defaultValue = PAYLOAD) InputStream stream) throws IOException {
     return IOUtils.toString(stream);
   }
 
-  public InputStream toStream(@UseConfig DrStrange dr, @Optional(defaultValue = PAYLOAD) String data) {
+  public InputStream toStream(@Config DrStrange dr, @Optional(defaultValue = PAYLOAD) String data) {
     return new ByteArrayInputStream(data.getBytes());
   }
 
-  public void crashCar(@UseConfig DrStrange dr) {
+  public void crashCar(@Config DrStrange dr) {
     throw new RuntimeException();
   }
 

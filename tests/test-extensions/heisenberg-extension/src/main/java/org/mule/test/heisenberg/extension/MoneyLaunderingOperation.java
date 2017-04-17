@@ -9,7 +9,7 @@ package org.mule.test.heisenberg.extension;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
@@ -36,7 +36,7 @@ public class MoneyLaunderingOperation {
 
   private long totalLaunderedAmount = 0;
 
-  public synchronized Long launder(@UseConfig HeisenbergExtension config, long amount) {
+  public synchronized Long launder(@Config HeisenbergExtension config, long amount) {
     config.setMoney(config.getMoney().subtract(BigDecimal.valueOf(amount)));
     totalLaunderedAmount += amount;
     return totalLaunderedAmount;

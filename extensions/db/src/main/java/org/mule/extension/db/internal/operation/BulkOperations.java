@@ -34,7 +34,7 @@ import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.sql.SQLException;
@@ -66,7 +66,7 @@ public class BulkOperations extends BaseDbOperations {
   public int[] bulkInsert(@Content @Placement(
       order = 1) @TypeResolver(DbBulkInputMetadataResolver.class) List<Map<String, Object>> parameterValues,
                           @ParameterGroup(name = QUERY_GROUP) BulkQueryDefinition query,
-                          @UseConfig DbConnector connector,
+                          @Config DbConnector connector,
                           @Connection DbConnection connection)
       throws SQLException {
 
@@ -89,7 +89,7 @@ public class BulkOperations extends BaseDbOperations {
   public int[] bulkUpdate(@Content @Placement(
       order = 1) @TypeResolver(DbBulkInputMetadataResolver.class) List<Map<String, Object>> parameterValues,
                           @ParameterGroup(name = QUERY_GROUP) BulkQueryDefinition query,
-                          @UseConfig DbConnector connector,
+                          @Config DbConnector connector,
                           @Connection DbConnection connection)
       throws SQLException {
 
@@ -112,7 +112,7 @@ public class BulkOperations extends BaseDbOperations {
   public int[] bulkDelete(@Content @Placement(
       order = 1) @TypeResolver(DbBulkInputMetadataResolver.class) List<Map<String, Object>> parameterValues,
                           @ParameterGroup(name = QUERY_GROUP) BulkQueryDefinition query,
-                          @UseConfig DbConnector connector,
+                          @Config DbConnector connector,
                           @Connection DbConnection connection)
       throws SQLException {
 

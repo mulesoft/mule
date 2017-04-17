@@ -34,7 +34,7 @@ import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -80,7 +80,7 @@ public final class JmsConsume {
    */
   @OutputResolver(output = JmsOutputResolver.class)
   @Throws(JmsConsumeErrorTypeProvider.class)
-  public Result<Object, JmsAttributes> consume(@Connection JmsConnection connection, @UseConfig JmsConfig config,
+  public Result<Object, JmsAttributes> consume(@Connection JmsConnection connection, @Config JmsConfig config,
                                                @XmlHints(
                                                    allowReferences = false) @Summary("The name of the Destination from where the Message should be consumed") String destination,
                                                @Optional @Summary("The Type of the Consumer that should be used for the provided destination") ConsumerType consumerType,

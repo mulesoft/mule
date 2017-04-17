@@ -25,7 +25,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.slf4j.Logger;
 
@@ -59,7 +59,7 @@ public final class JmsPublish {
    * @throws JmsPublishException if an error occurs
    */
   @Throws(JmsPublisherErrorTypeProvider.class)
-  public void publish(@UseConfig JmsConfig config, @Connection JmsConnection connection,
+  public void publish(@Config JmsConfig config, @Connection JmsConnection connection,
                       @XmlHints(
                           allowReferences = false) @Summary("The name of the Destination where the Message should be sent") String destination,
                       @Optional(defaultValue = "QUEUE") @Summary("The type of the Destination") DestinationType destinationType,

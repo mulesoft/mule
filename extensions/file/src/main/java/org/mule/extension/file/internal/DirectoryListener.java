@@ -45,7 +45,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -135,7 +135,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
   private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryListener.class);
   static final String DIRECTORY_LISTENER = "directory-listener";
 
-  @UseConfig
+  @Config
   private FileConnector config;
 
   /**

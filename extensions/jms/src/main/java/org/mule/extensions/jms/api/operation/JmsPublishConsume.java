@@ -41,7 +41,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -92,7 +92,7 @@ public class JmsPublishConsume {
    */
   @OutputResolver(output = JmsOutputResolver.class)
   @Throws(JmsPublishConsumeErrorTypeProvider.class)
-  public Result<Object, JmsAttributes> publishConsume(@UseConfig JmsConfig config,
+  public Result<Object, JmsAttributes> publishConsume(@Config JmsConfig config,
                                                       @Connection JmsConnection connection,
                                                       @Placement(order = 0) String destination,
                                                       @Optional @NullSafe @Placement(

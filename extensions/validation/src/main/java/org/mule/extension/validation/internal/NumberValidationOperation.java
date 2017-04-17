@@ -11,11 +11,10 @@ import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.extension.validation.api.Validator;
 import org.mule.extension.validation.internal.validator.NumberValidator;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 
 import java.util.Locale;
 
@@ -42,7 +41,7 @@ public class NumberValidationOperation extends ValidationSupport {
                        @Optional String minValue,
                        @Optional String maxValue, NumberType numberType,
                        @ParameterGroup(name = ERROR_GROUP) ValidationOptions options,
-                       @UseConfig ValidationExtension config)
+                       @Config ValidationExtension config)
       throws Exception {
 
     ValidationContext context = createContext(options, config);

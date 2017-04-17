@@ -36,7 +36,7 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.util.func.CheckedRunnable;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -106,7 +106,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
     this.successCallbackParameters = successCallbackParameters;
     this.errorCallbackParameters = errorCallbackParameters;
 
-    configurationSetter = fetchField(UseConfig.class);
+    configurationSetter = fetchField(Config.class);
     connectionSetter = fetchField(Connection.class);
   }
 

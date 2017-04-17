@@ -41,7 +41,7 @@ import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
@@ -87,7 +87,7 @@ public final class ParameterModelsLoaderDelegate {
                                          ParameterDeclarationContext declarationContext,
                                          ParameterGroupDeclarer parameterGroupDeclarer) {
     List<ParameterDeclarer> declarerList = new ArrayList<>();
-    checkAnnotationsNotUsedMoreThanOnce(parameters, Connection.class, UseConfig.class, MetadataKeyId.class);
+    checkAnnotationsNotUsedMoreThanOnce(parameters, Connection.class, Config.class, MetadataKeyId.class);
 
     for (ExtensionParameter extensionParameter : parameters) {
 

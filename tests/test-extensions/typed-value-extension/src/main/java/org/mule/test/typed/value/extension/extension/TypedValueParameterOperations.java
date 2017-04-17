@@ -11,7 +11,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.vegan.extension.VeganProductInformation;
@@ -24,7 +24,7 @@ public class TypedValueParameterOperations {
   public static final String THIS_IS_A_DEFAULT_STRING = "This is a default string";
 
   public TypedValue<String> typedValueOperationStringParameter(@Optional(
-      defaultValue = THIS_IS_A_DEFAULT_STRING) TypedValue<String> stringValue, @UseConfig TypedValueExtension config) {
+      defaultValue = THIS_IS_A_DEFAULT_STRING) TypedValue<String> stringValue, @Config TypedValueExtension config) {
     return stringValue;
   }
 
@@ -56,7 +56,7 @@ public class TypedValueParameterOperations {
     return differedDoor;
   }
 
-  public TypedValueExtension typedValueOnConfig(@UseConfig TypedValueExtension extension) {
+  public TypedValueExtension typedValueOnConfig(@Config TypedValueExtension extension) {
     return extension;
   }
 

@@ -7,13 +7,13 @@
 
 package org.foo.hello;
 
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 
 public class HelloOperation {
 
   public HelloOperation() {}
 
-  public String printMessage(@UseConfig HelloExtension config) {
+  public String printMessage(@Config HelloExtension config) {
     System.out.println("Test plugin extension says: " + config.getMessage());
     return config.getMessage();
   }
