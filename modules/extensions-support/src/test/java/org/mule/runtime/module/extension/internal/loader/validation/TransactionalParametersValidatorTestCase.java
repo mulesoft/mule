@@ -82,20 +82,6 @@ public class TransactionalParametersValidatorTestCase {
     problemsReporter = new ProblemsReporter(extensionModel);
   }
 
-  public <T extends A & B> String get(T get) {
-    return "";
-  }
-
-  private interface A {
-
-    String getA();
-  }
-
-  private interface B {
-
-    String getB();
-  }
-
   @Test
   public void transactionalActionIsReservedWord() {
     when(txParameter.getModelProperty(any())).thenReturn(Optional.empty());
