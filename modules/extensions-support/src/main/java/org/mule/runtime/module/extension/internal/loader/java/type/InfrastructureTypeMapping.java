@@ -52,6 +52,12 @@ public final class InfrastructureTypeMapping {
                    .allowTopLevelDefinition(true)
                    .allowsReferences(true)
                    .build())
+          .put(TRANSACTIONAL_ACTION_PARAMETER_NAME,
+               ParameterDslConfiguration.builder()
+                   .allowsInlineDefinition(false)
+                   .allowTopLevelDefinition(false)
+                   .allowsReferences(false)
+                   .build())
           .build();
 
   private static Map<String, String> nameMap = MAPPING.entrySet().stream()

@@ -23,7 +23,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
-import org.mule.runtime.extension.internal.loader.validator.TransactionalDeclarationValidator;
+import org.mule.runtime.extension.internal.loader.validator.TransactionalParametersValidator;
 import org.mule.runtime.extension.internal.property.TransactionalActionModelProperty;
 import org.mule.tck.size.SmallTest;
 
@@ -39,7 +39,7 @@ import java.util.Optional;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class TransactionalDeclarationValidatorTestCase {
+public class TransactionalParametersValidatorTestCase {
 
   private final Optional<TransactionalActionModelProperty> transactionalActionModelProperty =
       Optional.of(new TransactionalActionModelProperty());
@@ -59,7 +59,7 @@ public class TransactionalDeclarationValidatorTestCase {
   @Mock
   ParameterModel txParameter;
 
-  ExtensionModelValidator validator = new TransactionalDeclarationValidator();
+  ExtensionModelValidator validator = new TransactionalParametersValidator();
   private ProblemsReporter problemsReporter;
 
   @Before
@@ -80,6 +80,20 @@ public class TransactionalDeclarationValidatorTestCase {
     when(txParameter.getModelProperty(TransactionalActionModelProperty.class)).thenReturn(transactionalActionModelProperty);
 
     problemsReporter = new ProblemsReporter(extensionModel);
+  }
+
+  public <T extends A & B> String get(T get) {
+    return "";
+  }
+
+  private interface A {
+
+    String getA();
+  }
+
+  private interface B {
+
+    String getB();
   }
 
   @Test
