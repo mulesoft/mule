@@ -61,6 +61,9 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     Builder payload(Object payload);
 
     @Override
+    Builder mediaType(MediaType mediaType);
+
+    @Override
     CollectionBuilder streamPayload(Iterator payload, Class<?> itemType);
 
     @Override
@@ -70,13 +73,19 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     CollectionBuilder collectionPayload(Object[] payload);
   }
 
-  interface Builder extends Message.Builder, PayloadBuilder {
+  interface AttributesBuilder extends Message.AttributesBuilder {
 
     @Override
-    Builder mediaType(MediaType mediaType);
+    Builder nullAttributes();
 
     @Override
-    Builder attributes(Attributes value);
+    Builder attributes(Object value);
+
+    @Override
+    Builder attributesMediaType(MediaType mediaType);
+  }
+
+  interface Builder extends Message.Builder, PayloadBuilder, AttributesBuilder {
 
     /**
      * @param exceptionPayload

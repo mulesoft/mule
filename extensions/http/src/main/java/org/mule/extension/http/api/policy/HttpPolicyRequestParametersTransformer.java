@@ -47,8 +47,8 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
 
   @Override
   public Map<String, Object> fromMessageToParameters(Message message) {
-    if (message.getAttributes() instanceof BaseHttpRequestAttributes) {
-      BaseHttpRequestAttributes requestAttributes = (BaseHttpRequestAttributes) message.getAttributes();
+    if (message.getAttributes().getValue() instanceof BaseHttpRequestAttributes) {
+      BaseHttpRequestAttributes requestAttributes = (BaseHttpRequestAttributes) message.getAttributes().getValue();
       HttpRequesterRequestBuilder httpRequesterRequestBuilder = new HttpRequesterRequestBuilder();
       httpRequesterRequestBuilder.setHeaders(requestAttributes.getHeaders());
       httpRequesterRequestBuilder.setQueryParams(requestAttributes.getQueryParams());

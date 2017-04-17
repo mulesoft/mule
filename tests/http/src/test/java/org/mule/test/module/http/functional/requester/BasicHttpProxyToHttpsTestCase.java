@@ -101,7 +101,7 @@ public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase {
   public void validProxyHttpConnectToHttpsAuth() throws Exception {
     Message response = runFlow("httpFlow").getMessage();
 
-    assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(SC_OK));
+    assertThat((HttpResponseAttributes) response.getAttributes().getValue(), hasStatusCode(SC_OK));
     assertThat(response.getPayload().getValue(), equalTo(AUTHORIZED));
   }
 }

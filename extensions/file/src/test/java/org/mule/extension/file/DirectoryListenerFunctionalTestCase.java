@@ -173,7 +173,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
     Reference<Message> messageHolder = new Reference<>();
     prober.check(new JUnitLambdaProbe(() -> {
       for (Message message : receivedMessages) {
-        ListenerFileAttributes attributes = (ListenerFileAttributes) message.getAttributes();
+        ListenerFileAttributes attributes = (ListenerFileAttributes) message.getAttributes().getValue();
         if (attributes.getPath().equals(file.getAbsolutePath()) && attributes.getEventType().equals(type.name())) {
           messageHolder.set(message);
           return true;

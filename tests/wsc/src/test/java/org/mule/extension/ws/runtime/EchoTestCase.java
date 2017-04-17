@@ -58,7 +58,7 @@ public class EchoTestCase extends AbstractSoapServiceTestCase {
     String out = (String) message.getPayload().getValue();
     assertSoapResponse(ECHO_HEADERS, out);
 
-    SoapAttributes attributes = (SoapAttributes) message.getAttributes();
+    SoapAttributes attributes = (SoapAttributes) message.getAttributes().getValue();
     assertThat(attributes.getSoapHeaders().entrySet(), hasSize(2));
 
     String inoutHeader = attributes.getSoapHeaders().entrySet().stream()
@@ -78,7 +78,7 @@ public class EchoTestCase extends AbstractSoapServiceTestCase {
     Message message = runFlowWithRequest(ECHO_ACCOUNT_FLOW, ECHO_ACCOUNT);
     String out = (String) message.getPayload().getValue();
     assertSoapResponse(ECHO_ACCOUNT, out);
-    SoapAttributes attributes = (SoapAttributes) message.getAttributes();
+    SoapAttributes attributes = (SoapAttributes) message.getAttributes().getValue();
     assertThat(attributes.getSoapHeaders().isEmpty(), is(true));
   }
 }

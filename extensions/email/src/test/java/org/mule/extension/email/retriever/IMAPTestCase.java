@@ -103,7 +103,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
       size++;
       Message m = messages.next();
       assertBodyContent((String) m.getPayload().getValue());
-      assertThat(((IMAPEmailAttributes) m.getAttributes()).getFlags().isSeen(), is(true));
+      assertThat(((IMAPEmailAttributes) m.getAttributes().getValue()).getFlags().isSeen(), is(true));
     }
 
     assertThat(size, is(pageSize));
@@ -115,7 +115,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
     int count = 0;
     while (messages.hasNext()) {
       Message m = messages.next();
-      assertThat(((IMAPEmailAttributes) m.getAttributes()).getFlags().isSeen(), is(false));
+      assertThat(((IMAPEmailAttributes) m.getAttributes().getValue()).getFlags().isSeen(), is(false));
       count++;
     }
     assertThat(count, is(pageSize));

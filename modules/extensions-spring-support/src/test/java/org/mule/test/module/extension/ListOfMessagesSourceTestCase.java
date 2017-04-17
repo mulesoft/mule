@@ -58,7 +58,7 @@ public class ListOfMessagesSourceTestCase extends AbstractExtensionFunctionalTes
 
     for (Message message : payload) {
       assertThat(message.getPayload().getValue(), is(instanceOf(String.class)));
-      assertThat(message.getAttributes(), is(instanceOf(DEAOfficerAttributes.class)));
+      assertThat(message.getAttributes().getValue(), is(instanceOf(DEAOfficerAttributes.class)));
     }
   }
 }

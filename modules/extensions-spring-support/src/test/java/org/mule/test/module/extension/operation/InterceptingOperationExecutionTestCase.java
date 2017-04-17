@@ -42,7 +42,7 @@ public class InterceptingOperationExecutionTestCase extends AbstractExtensionFun
   public void interceptingWithoutNext() throws Exception {
     Message message = flowRunner("interceptingWithoutNext").run().getMessage();
     assertThat(message.getPayload().getValue(), is(instanceOf(Banana.class)));
-    assertThat(message.getAttributes(), is(instanceOf(VeganAttributes.class)));
+    assertThat(message.getAttributes().getValue(), is(instanceOf(VeganAttributes.class)));
   }
 
   @Test

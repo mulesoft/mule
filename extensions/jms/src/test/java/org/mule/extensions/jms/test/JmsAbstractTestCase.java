@@ -135,6 +135,6 @@ public abstract class JmsAbstractTestCase extends MuleArtifactFunctionalTestCase
   }
 
   protected String getReplyDestination(Message firstMessage) {
-    return ((JmsAttributes) firstMessage.getAttributes()).getHeaders().getJMSReplyTo().getDestination();
+    return ((JmsAttributes) firstMessage.getAttributes().getValue()).getHeaders().getJMSReplyTo().getDestination();
   }
 }

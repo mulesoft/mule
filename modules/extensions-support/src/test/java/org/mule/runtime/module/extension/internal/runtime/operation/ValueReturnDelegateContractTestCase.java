@@ -83,7 +83,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     Message message = getOutputMessage(result);
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
-    assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
+    assertThat(message.getAttributes().getValue(), is(NULL_ATTRIBUTES));
     assertThat(message.getPayload().getDataType().getMediaType(), equalTo(mediaType));
   }
 
@@ -96,7 +96,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     Message message = getOutputMessage(result);
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
-    assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
+    assertThat(message.getAttributes().getValue(), is(NULL_ATTRIBUTES));
     assertThat(message.getPayload().getDataType().getType().equals(String.class), is(true));
   }
 
@@ -110,7 +110,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     Message message = getOutputMessage(result);
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
-    assertThat(message.getAttributes(), is(sameInstance(newAttributes)));
+    assertThat(message.getAttributes().getValue(), is(sameInstance(newAttributes)));
     assertThat(message.getPayload().getDataType().getType().equals(String.class), is(true));
   }
 

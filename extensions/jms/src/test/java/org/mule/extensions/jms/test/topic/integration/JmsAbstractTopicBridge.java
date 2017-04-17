@@ -12,13 +12,15 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mule.extensions.jms.test.JmsMessageStorage.pollMuleMessage;
-import org.junit.Rule;
-import org.junit.Test;
+
 import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.api.message.JmsMessageProperties;
 import org.mule.extensions.jms.test.JmsAbstractTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.SystemProperty;
+
+import org.junit.Rule;
+import org.junit.Test;
 
 public abstract class JmsAbstractTopicBridge extends JmsAbstractTestCase {
 
@@ -50,7 +52,7 @@ public abstract class JmsAbstractTopicBridge extends JmsAbstractTestCase {
     assertThat(message.getPayload().getValue(), is(equalTo(BRIDGED_PREFIX + FIRST_MESSAGE)));
     assertThat(message.getAttributes(), not(nullValue()));
 
-    JmsMessageProperties properties = ((JmsAttributes) message.getAttributes()).getProperties();
+    JmsMessageProperties properties = ((JmsAttributes) message.getAttributes().getValue()).getProperties();
     assertThat(properties, not(nullValue()));
     assertThat(properties.getUserProperties().get(PROPERTY_KEY_VALUE), is(equalTo(PROPERTY_VALUE_VALUE)));
   }

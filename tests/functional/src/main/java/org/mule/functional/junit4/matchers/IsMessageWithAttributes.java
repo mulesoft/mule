@@ -18,7 +18,7 @@ import org.hamcrest.TypeSafeMatcher;
  *
  * @since 4.0
  */
-public class IsMessageWithAttributes<T extends Attributes> extends TypeSafeMatcher<Message> {
+public class IsMessageWithAttributes<T> extends TypeSafeMatcher<Message> {
 
   private final Matcher<T> attributesMatcher;
 
@@ -28,7 +28,7 @@ public class IsMessageWithAttributes<T extends Attributes> extends TypeSafeMatch
 
   @Override
   protected boolean matchesSafely(Message message) {
-    return attributesMatcher.matches(message.getAttributes());
+    return attributesMatcher.matches(message.getAttributes().getValue());
   }
 
   @Override
@@ -40,6 +40,6 @@ public class IsMessageWithAttributes<T extends Attributes> extends TypeSafeMatch
   @Override
   protected void describeMismatchSafely(Message message, Description mismatchDescription) {
     mismatchDescription.appendText("got a message that ");
-    attributesMatcher.describeMismatch(message.getAttributes(), mismatchDescription);
+    attributesMatcher.describeMismatch(message.getAttributes().getValue(), mismatchDescription);
   }
 }

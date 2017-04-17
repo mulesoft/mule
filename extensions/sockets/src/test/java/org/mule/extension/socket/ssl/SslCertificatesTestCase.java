@@ -48,7 +48,7 @@ public class SslCertificatesTestCase extends SocketExtensionTestCase {
 
       String payload = (String) muleMessage.getPayload().getValue();
       assertThat(payload, is(notNullValue()));
-      SocketAttributes attributes = (SocketAttributes) muleMessage.getAttributes();
+      SocketAttributes attributes = (SocketAttributes) muleMessage.getAttributes().getValue();
       assertThat(attributes.getLocalCertificates(), is(notNullValue()));
     }
 

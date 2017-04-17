@@ -12,7 +12,7 @@ import static org.mule.runtime.core.util.StringUtils.isNotEmpty;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.policy.PolicyPointcutParameters;
 import org.mule.runtime.core.policy.SourcePolicyPointcutParametersFactory;
 
@@ -32,13 +32,14 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
   }
 
   @Override
-  public PolicyPointcutParameters createPolicyPointcutParameters(String flowName, ComponentIdentifier sourceIdentifier,
-                                                                 Attributes attributes) {
+  public <T> PolicyPointcutParameters createPolicyPointcutParameters(String flowName, ComponentIdentifier sourceIdentifier,
+                                                                     TypedValue<T> attributes) {
     checkArgument(isNotEmpty(flowName), "Cannot create a policy pointcut parameter instance with an empty flow name");
-    checkArgument(attributes instanceof HttpRequestAttributes, String
+    checkArgument(attributes.getValue() instanceof HttpRequestAttributes, String
         .format("Cannot create a policy pointcut parameter instance from a message which attributes is not an instance of %s, the current attribute instance type is: %s",
-                HttpRequestAttributes.class.getName(), attributes != null ? attributes.getClass().getName() : "null"));
-    HttpRequestAttributes httpRequestAttributes = (HttpRequestAttributes) attributes;
+                HttpRequestAttributes.class.getName(),
+                attributes.getValue() != null ? attributes.getValue().getClass().getName() : "null"));
+    HttpRequestAttributes httpRequestAttributes = (HttpRequestAttributes) attributes.getValue();
     return new HttpListenerPolicyPointcutParameters(flowName, sourceIdentifier, httpRequestAttributes.getRequestPath(),
                                                     httpRequestAttributes.getMethod());
   }

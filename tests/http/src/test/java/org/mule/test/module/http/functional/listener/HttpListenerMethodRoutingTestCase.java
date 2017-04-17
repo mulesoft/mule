@@ -71,7 +71,7 @@ public class HttpListenerMethodRoutingTestCase extends AbstractHttpTestCase {
   private void sendRequestAndAssertMethod(String payload) throws Exception {
     Event event = flowRunner("requestFlow").withPayload(payload).withVariable("method", method).run();
 
-    HttpResponseAttributes attributes = (HttpResponseAttributes) event.getMessage().getAttributes();
+    HttpResponseAttributes attributes = (HttpResponseAttributes) event.getMessage().getAttributes().getValue();
     assertThat(attributes.getStatusCode(), is(OK.getStatusCode()));
     assertThat(event.getMessageAsString(muleContext), is(expectedContent));
   }

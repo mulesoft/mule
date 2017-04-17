@@ -10,17 +10,19 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+
+import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.runtime.api.message.Message;
+import org.mule.tck.junit4.rule.SystemProperty;
+
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.runtime.api.message.Message;
-import org.mule.tck.junit4.rule.SystemProperty;
-
-import java.util.List;
 
 public class ModuleWithMultipleGlobalElementsTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
@@ -71,7 +73,7 @@ public class ModuleWithMultipleGlobalElementsTestCase extends AbstractXmlExtensi
     List<Message> messages = (List<Message>) flowRunner(flowName).run().getMessage().getPayload().getValue();
     assertThat(messages, is(notNullValue()));
     assertThat(messages, hasSize(1));
-    FileAttributes attributes = (FileAttributes) messages.get(0).getAttributes();
+    FileAttributes attributes = (FileAttributes) messages.get(0).getAttributes().getValue();
     assertThat(attributes.getName(), is(subDirectoryName));
   }
 }

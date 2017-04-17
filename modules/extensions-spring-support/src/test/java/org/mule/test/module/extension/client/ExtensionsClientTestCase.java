@@ -6,23 +6,17 @@
  */
 package org.mule.test.module.extension.client;
 
-import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
-import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
-import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
-import static org.mule.test.vegan.extension.VeganExtension.VEGAN;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
 import static org.mule.test.vegan.extension.VeganExtension.VEGAN;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Attributes;
@@ -76,7 +70,7 @@ public abstract class ExtensionsClientTestCase extends AbstractExtensionFunction
     return new String[] {"vegan-config.xml", "heisenberg-config.xml"};
   }
 
-  abstract <T, A extends Attributes> Result<T, A> doExecute(String extension, String operation, OperationParameters params)
+  abstract <T, A> Result<T, A> doExecute(String extension, String operation, OperationParameters params)
       throws Throwable;
 
   @Test

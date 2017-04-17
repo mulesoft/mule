@@ -146,7 +146,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
   @Test
   public void attributes() throws Exception {
     Attributes attributes = NULL_ATTRIBUTES;
-    when(message.getAttributes()).thenReturn(attributes);
+    when(message.getAttributes()).thenReturn(new TypedValue<>(attributes, DataType.OBJECT));
     assertThat(evaluate("message.attributes", event), is(attributes));
   }
 }

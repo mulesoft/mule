@@ -88,7 +88,7 @@ public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase {
   public void validNtlmAuth() throws Exception {
     Message response = runFlow(getFlowName()).getMessage();
 
-    assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(SC_OK));
+    assertThat((HttpResponseAttributes) response.getAttributes().getValue(), hasStatusCode(SC_OK));
     assertThat(getPayloadAsString(response), equalTo(AUTHORIZED));
   }
 

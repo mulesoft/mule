@@ -82,7 +82,7 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
   public void requestIsSentCorrectlyThroughHttpsProxy() throws Exception {
     getFunctionalTestComponent("serverFlow").setEventCallback((context, component, muleContext) -> {
       requestPayload = getPayloadAsString(context.getMessage());
-      requestURI = ((HttpRequestAttributes) context.getMessage().getAttributes()).getRequestUri();
+      requestURI = ((HttpRequestAttributes) context.getMessage().getAttributes().getValue()).getRequestUri();
     });
 
     proxyServer.start();
@@ -92,7 +92,7 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
 
     assertThat(requestPayload, equalTo(TEST_MESSAGE));
     assertThat(requestURI, equalTo(PATH));
-    assertThat((HttpResponseAttributes) event.getMessage().getAttributes(), hasStatusCode(OK.getStatusCode()));
+    assertThat((HttpResponseAttributes) event.getMessage().getAttributes().getValue(), hasStatusCode(OK.getStatusCode()));
     assertThat(event.getMessage().getPayload().getValue(), equalTo(OK_RESPONSE));
 
     proxyServer.stop();

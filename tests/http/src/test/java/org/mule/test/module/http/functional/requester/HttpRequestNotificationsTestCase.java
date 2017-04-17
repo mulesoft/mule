@@ -64,8 +64,8 @@ public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCas
     // End event should have appended http.status and http.reason as inbound properties
     Message message = listener.getNotifications(getActionName(MESSAGE_REQUEST_END)).get(0).getSource();
     // For now, check the response, since we no longer have control over the MuleEvent generated, only the Message
-    assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(OK.getStatusCode()));
-    assertThat((HttpResponseAttributes) response.getAttributes(), hasReasonPhrase(OK.getReasonPhrase()));
+    assertThat((HttpResponseAttributes) response.getAttributes().getValue(), hasStatusCode(OK.getStatusCode()));
+    assertThat((HttpResponseAttributes) response.getAttributes().getValue(), hasReasonPhrase(OK.getReasonPhrase()));
 
     Message requestMessage = listener.getNotifications(getActionName(MESSAGE_REQUEST_BEGIN)).get(0).getSource();
     assertThat(requestMessage, equalTo(message));

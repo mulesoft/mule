@@ -11,10 +11,10 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
@@ -74,9 +74,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
    * {@inheritDoc}
    */
   @Override
-  public <T, A extends Attributes> CompletableFuture<Result<T, A>> executeAsync(String extension,
-                                                                                String operation,
-                                                                                OperationParameters parameters) {
+  public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension,
+                                                             String operation,
+                                                             OperationParameters parameters) {
     OperationMessageProcessor processor = createProcessor(extension, operation, parameters);
     return from(processor.apply(just(getInitialiserEvent(muleContext))))
         .map(event -> Result.<T, A>builder(event.getMessage()).build())
@@ -88,7 +88,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
    * {@inheritDoc}
    */
   @Override
-  public <T, A extends Attributes> Result<T, A> execute(String extension, String operation, OperationParameters params)
+  public <T, A> Result<T, A> execute(String extension, String operation, OperationParameters params)
       throws MuleException {
     OperationMessageProcessor processor = createProcessor(extension, operation, params);
     try {

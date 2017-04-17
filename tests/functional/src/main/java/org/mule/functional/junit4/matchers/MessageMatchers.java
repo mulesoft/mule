@@ -19,7 +19,7 @@ public class MessageMatchers {
    * Verifies the {@link Message}'s attributes using any {@link Attributes} matcher.
    */
   @Factory
-  public static <T extends Attributes> Matcher<Message> hasAttributes(Matcher<T> attributesMatcher) {
+  public static <T> Matcher<Message> hasAttributes(Matcher<T> attributesMatcher) {
     return new IsMessageWithAttributes<>(attributesMatcher);
   }
 

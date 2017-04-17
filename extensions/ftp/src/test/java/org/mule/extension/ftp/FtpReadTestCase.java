@@ -113,7 +113,7 @@ public class FtpReadTestCase extends CommonFtpConnectorTestCase {
 
   @Test
   public void getProperties() throws Exception {
-    FtpFileAttributes fileAttributes = (FtpFileAttributes) readHelloWorld().getMessage().getAttributes();
+    FtpFileAttributes fileAttributes = (FtpFileAttributes) readHelloWorld().getMessage().getAttributes().getValue();
     testHarness.assertAttributes(HELLO_PATH, fileAttributes);
   }
 

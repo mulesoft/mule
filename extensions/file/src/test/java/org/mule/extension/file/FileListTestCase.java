@@ -70,7 +70,7 @@ public class FileListTestCase extends FileConnectorTestCase {
 
     List<Message> subDirectories =
         messages.stream()
-            .filter(message -> ((FileAttributes) message.getAttributes()).isDirectory())
+            .filter(message -> ((FileAttributes) message.getAttributes().getValue()).isDirectory())
             .collect(Collectors.toList());
 
     assertThat(subDirectories, hasSize(1));
@@ -103,7 +103,7 @@ public class FileListTestCase extends FileConnectorTestCase {
 
     assertThat(messages, hasSize(1));
 
-    FileAttributes file = (FileAttributes) messages.get(0).getAttributes();
+    FileAttributes file = (FileAttributes) messages.get(0).getAttributes().getValue();
     assertThat(file.isDirectory(), is(true));
     assertThat(file.getName(), equalTo(SUB_DIRECTORY_NAME));
   }
@@ -112,7 +112,7 @@ public class FileListTestCase extends FileConnectorTestCase {
     boolean directoryWasFound = false;
 
     for (Message message : messages) {
-      FileAttributes attributes = (FileAttributes) message.getAttributes();
+      FileAttributes attributes = (FileAttributes) message.getAttributes().getValue();
       if (attributes.isDirectory()) {
         assertThat("two directories found", directoryWasFound, is(false));
         directoryWasFound = true;

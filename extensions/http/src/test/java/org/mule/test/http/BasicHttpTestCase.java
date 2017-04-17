@@ -154,8 +154,8 @@ public class BasicHttpTestCase extends AbstractHttpTestCase {
       Message message = event.getMessage();
       Object payload = message.getPayload().getValue();
       assertThat(payload, is(nullValue()));
-      assertThat(message.getAttributes(), instanceOf(HttpRequestAttributes.class));
-      HttpRequestAttributes requestAttributes = (HttpRequestAttributes) message.getAttributes();
+      assertThat(message.getAttributes().getValue(), instanceOf(HttpRequestAttributes.class));
+      HttpRequestAttributes requestAttributes = (HttpRequestAttributes) message.getAttributes().getValue();
       assertThat(requestAttributes.getMethod(), is("GET"));
       assertThat(requestAttributes.getScheme(), is("http"));
       assertThat(requestAttributes.getVersion(), is("HTTP/1.1"));

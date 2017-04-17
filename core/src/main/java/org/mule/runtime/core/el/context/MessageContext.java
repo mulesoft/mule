@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.el.context;
 
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
@@ -113,8 +112,12 @@ public class MessageContext {
     return new OutboundAttachmentMapContext(event, eventBuilder);
   }
 
-  public Attributes getAttributes() {
-    return event.getMessage().getAttributes();
+  public Object getAttributes() {
+    return event.getMessage().getAttributes() != null ? event.getMessage().getAttributes().getValue() : null;
+  }
+
+  public DataType getAttributesDataType() {
+    return event.getMessage().getAttributes().getDataType();
   }
 
   @Override

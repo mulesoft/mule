@@ -56,7 +56,8 @@ public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderSer
       }
     }).run();
 
-    assertThat((HttpResponseAttributes) response.getMessage().getAttributes(), hasStatusCode(EXPECTATION_FAILED.getStatusCode()));
+    assertThat((HttpResponseAttributes) response.getMessage().getAttributes().getValue(),
+               hasStatusCode(EXPECTATION_FAILED.getStatusCode()));
 
     stopServer();
   }

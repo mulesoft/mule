@@ -43,7 +43,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
 
-import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
@@ -72,6 +71,7 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.size.SmallTest;
+import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
 
 import java.util.Map;
 import java.util.Set;
@@ -132,7 +132,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     assertThat(message, is(notNullValue()));
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
-    assertThat(message.getAttributes(), is(sameInstance(attributes)));
+    assertThat(message.getAttributes().getValue(), is(sameInstance(attributes)));
     assertThat(message.getPayload().getDataType().getMediaType(), is(mediaType));
   }
 
@@ -152,7 +152,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     assertThat(message, is(notNullValue()));
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
-    assertThat(message.getAttributes(), is(sameInstance(attributes)));
+    assertThat(message.getAttributes().getValue(), is(sameInstance(attributes)));
     assertThat(message.getPayload().getDataType().getMediaType(), equalTo(mediaType));
   }
 
@@ -171,7 +171,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     assertThat(message, is(notNullValue()));
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
-    assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
+    assertThat(message.getAttributes().getValue(), is(NULL_ATTRIBUTES));
     assertThat(message.getPayload().getDataType().getMediaType(), equalTo(mediaType));
   }
 
@@ -187,7 +187,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     assertThat(message, is(notNullValue()));
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
-    assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
+    assertThat(message.getAttributes().getValue(), is(NULL_ATTRIBUTES));
     assertThat(message.getPayload().getDataType().getType().equals(String.class), is(true));
   }
 
@@ -203,7 +203,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     assertThat(message, is(notNullValue()));
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
-    assertThat(message.getAttributes(), is(sameInstance(attributes)));
+    assertThat(message.getAttributes().getValue(), is(sameInstance(attributes)));
     assertThat(message.getPayload().getDataType().getType().equals(String.class), is(true));
   }
 

@@ -46,6 +46,6 @@ public class SoapMultipartPayload extends DefaultMultiPartPayload {
   }
 
   private String getPartName(Message part) {
-    return ((PartAttributes) part.getAttributes()).getName();
+    return ((PartAttributes) part.getAttributes().getValue()).getName();
   }
 }

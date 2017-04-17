@@ -21,7 +21,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule</groupId>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-api</artifactId>
             <version>${muleApiVersion}</version>
             <scope>provided</scope>

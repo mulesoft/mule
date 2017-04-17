@@ -27,6 +27,7 @@ import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -77,13 +78,13 @@ import org.mule.service.http.api.server.RequestHandlerManager;
 import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.service.http.api.server.async.ResponseStatusCallback;
 
-import org.slf4j.Logger;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 /**
  * Represents a listener for HTTP requests.
@@ -199,7 +200,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     final HttpResponseBuilder failureResponseBuilder;
     if (hasCustomResponse(ofNullable(error))) {
       Message errorMessage = error.getErrorMessage();
-      HttpResponseAttributes attributes = (HttpResponseAttributes) errorMessage.getAttributes();
+      HttpResponseAttributes attributes = (HttpResponseAttributes) errorMessage.getAttributes().getValue();
       failureResponseBuilder = HttpResponse.builder()
           .setStatusCode(attributes.getStatusCode())
           .setReasonPhrase(attributes.getReasonPhrase());
@@ -325,7 +326,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
   private boolean hasCustomResponse(java.util.Optional<Error> error) {
     return error.isPresent() && knownErrors.match(error.get().getErrorType()) && error.get().getErrorMessage() != null
-        && interpretedAttributes.isInstance(error.get().getErrorMessage().getAttributes());
+        && interpretedAttributes.isInstance(error.get().getErrorMessage().getAttributes().getValue());
   }
 
   private HttpResponseBuilder createDefaultFailureResponseBuilder(Error error) {
