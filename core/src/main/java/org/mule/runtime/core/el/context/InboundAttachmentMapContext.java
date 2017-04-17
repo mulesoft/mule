@@ -7,7 +7,7 @@
 package org.mule.runtime.core.el.context;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.util.Set;

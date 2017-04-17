@@ -7,7 +7,7 @@
 package org.mule.runtime.core.exception;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.internal.message.InternalMessage;
 
 /**
  * Handler that will consume errors and finally commit transactions. Replaces the catch-exception-strategy from Mule 3.

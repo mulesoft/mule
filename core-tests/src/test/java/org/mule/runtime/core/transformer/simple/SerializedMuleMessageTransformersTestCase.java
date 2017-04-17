@@ -9,7 +9,7 @@ package org.mule.runtime.core.transformer.simple;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;

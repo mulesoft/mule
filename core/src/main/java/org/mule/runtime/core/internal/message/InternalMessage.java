@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.message;
+package org.mule.runtime.core.internal.message;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.message.DefaultMessageBuilderFactory;
+import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 
 import java.io.Serializable;

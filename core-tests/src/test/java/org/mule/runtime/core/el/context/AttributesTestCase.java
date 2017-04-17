@@ -14,7 +14,7 @@ import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.ATTRIBUTES;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.internal.message.InternalMessage;
 
 import org.junit.Before;
 import org.junit.Test;

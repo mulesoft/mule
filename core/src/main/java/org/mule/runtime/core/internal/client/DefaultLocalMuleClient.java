@@ -33,8 +33,8 @@ import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.message.InternalMessage.Builder;
+import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.internal.message.InternalMessage.Builder;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.io.Serializable;

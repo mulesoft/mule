@@ -7,7 +7,7 @@
 package org.mule.runtime.core.message;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.internal.message.InternalMessage;
 
 import java.io.IOException;
 import java.io.NotSerializableException;

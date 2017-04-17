@@ -10,8 +10,8 @@ import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.message.InternalMessage.Builder;
+import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.internal.message.InternalMessage.Builder;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Setup;

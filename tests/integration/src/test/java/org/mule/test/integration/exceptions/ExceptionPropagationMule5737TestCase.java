@@ -13,7 +13,7 @@ import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause
 
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;

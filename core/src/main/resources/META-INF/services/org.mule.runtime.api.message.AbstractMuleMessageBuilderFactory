@@ -1,1 +1,1 @@
-org.mule.runtime.core.message.DefaultMessageBuilderFactory
+org.mule.runtime.core.internal.message.DefaultMessageBuilderFactory

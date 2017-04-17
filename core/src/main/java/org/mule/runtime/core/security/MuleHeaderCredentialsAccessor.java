@@ -9,7 +9,7 @@ package org.mule.runtime.core.security;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.security.CredentialsAccessor;
 
 import java.io.Serializable;
