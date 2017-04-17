@@ -7,37 +7,19 @@
 
     <vegan:banana-config name="banana"/>
 
-    <flow name="interceptingWithoutNext">
-        <vegan:get-qualified-lunch />
-    </flow>
-
-    <flow name="interceptingBanana">
+    <flow name="listenAndByteBanana">
         <vegan:get-lunch />
         <expression-component>mel:payload.bite()</expression-component>
     </flow>
 
-    <flow name="interceptingNotBanana">
+    <flow name="listenAndEatMeat">
         <vegan:get-lunch />
         <set-payload value="pork beef" />
     </flow>
 
-    <flow name="interceptingError">
+    <flow name="listenAndFail">
         <vegan:get-lunch />
         <expression-component>mel:bla bla bla</expression-component>
     </flow>
-
-    <flow name="interceptingWithTarget">
-        <vegan:get-lunch target="banana"/>
-        <expression-component>mel:banana.payload.value.bite()</expression-component>
-    </flow>
-
-    <flow name="nestedInterceptingWithTarget">
-        <vegan:get-lunch />
-        <vegan:get-lunch target="banana"/>
-    </flow>
-
-    <flow name="InterceptingWithoutGenerics">
-        <vegan:get-raw-lunch />
-    </flow>
-
+                  
 </mule>

@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.java.type;
 
 
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.assignableFromAny;
-import com.google.common.collect.ImmutableSet;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Error;
@@ -19,9 +18,12 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.runtime.operation.FlowListener;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
+
+import com.google.common.collect.ImmutableSet;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Set;
@@ -39,6 +41,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
       .add(CompletionCallback.class)
       .add(MediaType.class)
       .add(AuthenticationHandler.class)
+      .add(FlowListener.class)
       .build();
 
   /**

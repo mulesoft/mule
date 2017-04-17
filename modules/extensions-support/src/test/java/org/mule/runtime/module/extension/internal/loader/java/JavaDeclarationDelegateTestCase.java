@@ -100,7 +100,6 @@ import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
-import org.mule.test.vegan.extension.VeganAttributes;
 import org.mule.test.vegan.extension.VeganExtension;
 
 import com.google.common.reflect.TypeToken;
@@ -359,18 +358,6 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(operation, is(notNullValue()));
     assertOutputType(operation.getOutput(), toMetadataType(Fruit.class), false);
     assertOutputType(operation.getOutputAttributes(), TYPE_BUILDER.voidType().build(), false);
-  }
-
-  @Test
-  public void interceptingOperationWithAttributes() {
-    setLoader(loaderFor(VeganExtension.class));
-    ExtensionDeclarer declarer = declareExtension();
-    final ExtensionDeclaration declaration = declarer.getDeclaration();
-
-    OperationDeclaration operation = getOperation(getConfiguration(declaration, BANANA), "getQualifiedLunch");
-    assertThat(operation, is(notNullValue()));
-    assertOutputType(operation.getOutput(), toMetadataType(Fruit.class), false);
-    assertOutputType(operation.getOutputAttributes(), toMetadataType(VeganAttributes.class), false);
   }
 
   private <T extends NamedDeclaration> T findDeclarationByName(Collection<T> declarations, String name) {

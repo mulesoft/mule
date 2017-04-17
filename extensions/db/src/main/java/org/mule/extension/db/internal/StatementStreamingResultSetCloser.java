@@ -33,10 +33,6 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
     super();
   }
 
-  public StatementStreamingResultSetCloser(boolean autoCloseConnection) {
-    super(autoCloseConnection);
-  }
-
   /**
    * Closes all tracked {@link ResultSet}s for the passed {@code connection}.
    *

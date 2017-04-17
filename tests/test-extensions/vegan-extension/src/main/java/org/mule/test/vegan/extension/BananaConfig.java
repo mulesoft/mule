@@ -18,7 +18,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Configuration(name = BANANA)
-@Operations({EatBananaOperation.class, SpreadVeganismOperation.class, InterceptingBananaOperations.class})
+@Operations({EatBananaOperation.class, SpreadVeganismOperation.class, FlowListenerBananaOperations.class})
 @ConnectionProviders(VeganBananaConnectionProvider.class)
 @Sources(PaulMcCartneySource.class)
 public class BananaConfig {
