@@ -11,7 +11,7 @@ import static org.apache.ws.security.components.crypto.Merlin.KEYSTORE_FILE;
 import static org.apache.ws.security.components.crypto.Merlin.KEYSTORE_PASSWORD;
 import static org.apache.ws.security.components.crypto.Merlin.KEYSTORE_PRIVATE_PASSWORD;
 import static org.apache.ws.security.components.crypto.Merlin.KEYSTORE_TYPE;
-import org.mule.services.soap.api.security.config.WssKeyStoreConfiguration;
+import org.mule.runtime.extension.api.soap.security.config.WssKeyStoreConfiguration;
 
 import java.util.Properties;
 

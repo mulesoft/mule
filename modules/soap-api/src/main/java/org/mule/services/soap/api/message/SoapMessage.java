@@ -6,8 +6,9 @@
  */
 package org.mule.services.soap.api.message;
 
+import org.mule.runtime.extension.api.soap.SoapAttachment;
+
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,7 +26,7 @@ public interface SoapMessage extends WithContentType {
   /**
    * @return a set of Soap Headers.
    */
-  List<SoapHeader> getSoapHeaders();
+  Map<String, String> getSoapHeaders();
 
   /**
    * @return a set of Transport Specific Headers.
@@ -35,5 +36,5 @@ public interface SoapMessage extends WithContentType {
   /**
    * @return a set of attachments.
    */
-  List<SoapAttachment> getAttachments();
+  Map<String, SoapAttachment> getAttachments();
 }

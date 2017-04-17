@@ -24,8 +24,7 @@ public abstract class AbstractEnricherTestCase extends AbstractSoapServiceTestCa
 
   @Before
   public void setup() {
-
-    introspecter = new WsdlIntrospecter(defaultAddress + "?wsdl", "TestService", "TestPort");
+    introspecter = new WsdlIntrospecter(server.getDefaultAddress() + "?wsdl", "TestService", "TestPort");
     loader = new XmlTypeLoader(introspecter.getSchemas());
   }
 }

@@ -7,17 +7,16 @@
 package org.mule.services.soap.interceptor;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 import static org.apache.cxf.phase.Phase.PRE_PROTOCOL;
+import static org.mule.services.soap.util.XmlTransformationUtils.nodeToString;
 import org.mule.services.soap.api.exception.BadResponseException;
-import org.mule.services.soap.api.message.SoapHeader;
 import org.mule.services.soap.api.message.SoapResponse;
 import org.mule.services.soap.client.SoapCxfClient;
 import org.mule.services.soap.util.XmlTransformationException;
-import org.mule.services.soap.util.XmlTransformationUtils;
 
-import java.util.List;
+import com.google.common.collect.ImmutableMap;
 
+import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -41,14 +40,19 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor {
    */
   @Override
   public void handleMessage(SoapMessage message) throws Fault {
-    List<org.mule.services.soap.api.message.SoapHeader> headers =
-        message.getHeaders().stream().filter(header -> header instanceof org.apache.cxf.binding.soap.SoapHeader).map(h -> {
-          try {
-            return new SoapHeader(h.getName().getLocalPart(), XmlTransformationUtils.nodeToString((Node) h.getObject()));
-          } catch (XmlTransformationException e) {
-            throw new BadResponseException(format("Error while processing response header [%s]", h.getName()), e);
-          }
-        }).collect(toList());
-    message.getExchange().put(SoapCxfClient.MULE_HEADERS_KEY, headers);
+    ImmutableMap.Builder<String, String> headers = ImmutableMap.builder();
+    message.getHeaders().stream()
+        .filter(header -> header instanceof SoapHeader)
+        .map(h -> (SoapHeader) h)
+        .forEach(header -> headers.put(header.getName().getLocalPart(), getHeaderInputStream(header)));
+    message.getExchange().put(SoapCxfClient.MULE_HEADERS_KEY, headers.build());
+  }
+
+  private String getHeaderInputStream(SoapHeader h) {
+    try {
+      return nodeToString((Node) h.getObject());
+    } catch (XmlTransformationException e) {
+      throw new BadResponseException(format("Error while processing response header [%s]", h.getName()), e);
+    }
   }
 }

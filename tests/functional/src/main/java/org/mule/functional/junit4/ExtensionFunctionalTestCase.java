@@ -12,15 +12,16 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsUrl;
 import static org.springframework.util.ReflectionUtils.findMethod;
-
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.test.runner.infrastructure.ExtensionsTestInfrastructureDiscoverer;
 
@@ -72,6 +73,10 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
   @Override
   //TODO - MULE-11119: Make final again once we can add the HTTP service injection as the scehduler's is
   protected void addBuilders(List<ConfigurationBuilder> builders) {
+    //builders.add(TestServicesConfigurationBuilder.builder()
+    //    .withMockHttpService()
+    //    .withExpressionExecutor()
+    //    .build());
     super.addBuilders(builders);
     builders.add(0, new AbstractConfigurationBuilder() {
 
@@ -94,7 +99,8 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
     initialiseIfNeeded(extensionManager, muleContext);
 
     ExtensionsTestInfrastructureDiscoverer extensionsTestInfrastructureDiscoverer =
-        new ExtensionsTestInfrastructureDiscoverer(extensionManager);
+        new ExtensionsTestInfrastructureDiscoverer(extensionManager, getExtensionModelLoader());
+
     extensionsTestInfrastructureDiscoverer.discoverExtensions(getAnnotatedExtensionClasses());
 
     generateResourcesAndAddToClasspath(generatedResourcesDirectory,
@@ -157,4 +163,7 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
     return null;
   }
 
+  protected ExtensionModelLoader getExtensionModelLoader() {
+    return new DefaultJavaExtensionModelLoader();
+  }
 }

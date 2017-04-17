@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Helper class for declaring connection providers through a {@link JavaModelLoaderDelegate}
+ * Helper class for declaring connection providers through a {@link DefaultJavaModelLoaderDelegate}
  * @since 4.0
  */
 final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDelegate {
@@ -40,7 +40,7 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
 
   private final Map<Class<?>, ConnectionProviderDeclarer> connectionProviderDeclarers = new HashMap<>();
 
-  ConnectionProviderModelLoaderDelegate(JavaModelLoaderDelegate loader) {
+  ConnectionProviderModelLoaderDelegate(DefaultJavaModelLoaderDelegate loader) {
     super(loader);
   }
 
@@ -92,9 +92,8 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
     }
 
     providerDeclarer.withConnectionManagementType(managementType);
-
     connectionProviderDeclarers.put(providerClass, providerDeclarer);
-    loader.declareFieldBasedParameters(providerDeclarer, providerType.getParameters(),
-                                       new ParameterDeclarationContext(CONNECTION_PROVIDER, providerDeclarer.getDeclaration()));
+    ParameterDeclarationContext context = new ParameterDeclarationContext(CONNECTION_PROVIDER, providerDeclarer.getDeclaration());
+    loader.getFieldParametersLoader().declare(providerDeclarer, providerType.getParameters(), context);
   }
 }

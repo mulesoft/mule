@@ -19,7 +19,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
  *
  * @since 3.7.0
  */
-final class TypeAwareConfigurationFactory implements ConfigurationFactory {
+public final class TypeAwareConfigurationFactory implements ConfigurationFactory {
 
   private final Class<?> configurationType;
   private final ClassLoader extensionClassLoader;
@@ -31,7 +31,7 @@ final class TypeAwareConfigurationFactory implements ConfigurationFactory {
    * @param extensionClassLoader the {@link ClassLoader} on which the extension is loaded
    * @throws IllegalArgumentException if the type is {@code null} or doesn't have a default public constructor
    */
-  TypeAwareConfigurationFactory(Class<?> configurationType, ClassLoader extensionClassLoader) {
+  public TypeAwareConfigurationFactory(Class<?> configurationType, ClassLoader extensionClassLoader) {
     checkArgument(configurationType != null, "configuration type cannot be null");
     checkArgument(extensionClassLoader != null, "extensionClassLoader type cannot be null");
     checkInstantiable(configurationType);

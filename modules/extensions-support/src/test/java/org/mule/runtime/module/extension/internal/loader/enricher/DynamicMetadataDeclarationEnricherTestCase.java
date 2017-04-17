@@ -19,8 +19,6 @@ import static org.mule.runtime.module.extension.internal.loader.enricher.Enriche
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import org.junit.Before;
-import org.junit.Test;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
@@ -31,7 +29,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.JavaModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.MetadataExtension;
@@ -41,6 +39,9 @@ import org.mule.test.metadata.extension.model.shapes.Shape;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
+import org.junit.Test;
+
 public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
   private static final String CONTENT_METADATA_WITH_KEY_ID = "contentMetadataWithKeyId";
@@ -48,7 +49,7 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
 
   @Before
   public void setUp() {
-    final JavaModelLoaderDelegate loader = new JavaModelLoaderDelegate(MetadataExtension.class, getProductVersion());
+    DefaultJavaModelLoaderDelegate loader = new DefaultJavaModelLoaderDelegate(MetadataExtension.class, getProductVersion());
     ExtensionDeclarer declarer =
         loader.declare(new DefaultExtensionLoadingContext(getClass().getClassLoader(), getDefault(emptySet())));
     new DynamicMetadataDeclarationEnricher()

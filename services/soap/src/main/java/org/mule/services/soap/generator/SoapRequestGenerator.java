@@ -8,14 +8,14 @@ package org.mule.services.soap.generator;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import org.mule.metadata.xml.XmlTypeLoader;
-import org.mule.services.soap.api.message.SoapAttachment;
-import org.mule.services.soap.generator.attachment.AttachmentRequestEnricher;
+import org.mule.runtime.extension.api.soap.SoapAttachment;
 import org.mule.services.soap.api.exception.SoapServiceException;
+import org.mule.services.soap.generator.attachment.AttachmentRequestEnricher;
 import org.mule.services.soap.introspection.WsdlIntrospecter;
-import org.mule.services.soap.util.XmlTransformationUtils;
 import org.mule.services.soap.util.XmlTransformationException;
+import org.mule.services.soap.util.XmlTransformationUtils;
 
-import java.util.List;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
 
@@ -44,7 +44,7 @@ public final class SoapRequestGenerator {
    * @param body        the body content provided by the user.
    * @param attachments the attachments provided by the user.
    */
-  public XMLStreamReader generate(String operation, String body, List<SoapAttachment> attachments) {
+  public XMLStreamReader generate(String operation, String body, Map<String, SoapAttachment> attachments) {
 
     if (isBlank(body)) {
       body = emptyRequestGenerator.generateRequest(operation);

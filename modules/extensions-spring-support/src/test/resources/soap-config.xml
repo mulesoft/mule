@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:soap="http://www.mulesoft.org/schema/mule/soap"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/soap http://www.mulesoft.org/schema/mule/soap/current/mule-soap.xsd">
+
+
+    <soap:config name="leagues">
+        <soap:base-connection leaguesAddress="${footballAddress}"/>
+    </soap:config>
+
+    <soap:config name="laLiga">
+        <soap:la-liga-connection wsdlLocation="${laLigaAddress}?wsdl" firstDivision="A" secondDivision="B"/>
+    </soap:config>
+
+    <flow name="getLeagues">
+        <soap:invoke config-ref="leagues" service="leagues" operation="getLeagues">
+            <soap:request>#[payload]</soap:request>
+        </soap:invoke>
+    </flow>
+
+    <flow name="getLeagueTeams">
+        <soap:invoke config-ref="leagues" service="leagues" operation="getLeagueTeams">
+            <soap:headers>
+            #[
+            %dw 2.0
+            %output application/xml
+            %namespace con http://services.soap.internal.extension.module.runtime.mule.org/
+             ---
+            "headers": {
+                con#auth: "Authorized"
+            }]
+            </soap:headers>
+            <soap:request>#[payload]</soap:request>
+        </soap:invoke>
+    </flow>
+
+    <flow name="uploadResult">
+        <soap:invoke config-ref="laLiga" service="A" operation="uploadResult">
+            <soap:request>#[payload]</soap:request>
+            <soap:attachments>
+            #[{
+                result: {
+                    content: att, contentType: attCt
+                } as Object { class :"org.mule.runtime.extension.api.soap.SoapAttachment"}
+            }]
+            </soap:attachments>
+        </soap:invoke>
+    </flow>
+</mule>

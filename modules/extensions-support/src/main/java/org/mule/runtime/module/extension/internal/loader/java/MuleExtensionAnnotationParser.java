@@ -145,15 +145,15 @@ public final class MuleExtensionAnnotationParser {
     }
   }
 
-  static Optional<LayoutModel> parseLayoutAnnotations(AnnotatedElement annotatedElement) {
+  public static Optional<LayoutModel> parseLayoutAnnotations(AnnotatedElement annotatedElement) {
     return parseLayoutAnnotations(annotatedElement, LayoutModel.builder());
   }
 
-  static Optional<LayoutModel> parseLayoutAnnotations(WithAnnotations annotatedElement) {
+  public static Optional<LayoutModel> parseLayoutAnnotations(WithAnnotations annotatedElement) {
     return parseLayoutAnnotations(annotatedElement, LayoutModel.builder());
   }
 
-  static Optional<LayoutModel> parseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelBuilder builder) {
+  public static Optional<LayoutModel> parseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelBuilder builder) {
     if (isDisplayAnnotationPresent(annotatedElement)) {
       doParseLayoutAnnotations(annotatedElement, builder);
       parsePlacementAnnotation(annotatedElement, builder);
@@ -162,7 +162,7 @@ public final class MuleExtensionAnnotationParser {
     return empty();
   }
 
-  static Optional<LayoutModel> parseLayoutAnnotations(AnnotatedElement annotatedElement, LayoutModelBuilder builder) {
+  public static Optional<LayoutModel> parseLayoutAnnotations(AnnotatedElement annotatedElement, LayoutModelBuilder builder) {
     if (isDisplayAnnotationPresent(annotatedElement)) {
       doParseLayoutAnnotations(annotatedElement, builder);
       parsePlacementAnnotation(annotatedElement, builder);

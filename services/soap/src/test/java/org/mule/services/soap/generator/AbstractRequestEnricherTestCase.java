@@ -6,9 +6,9 @@
  */
 package org.mule.services.soap.generator;
 
-import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
+import org.mule.runtime.extension.api.soap.SoapAttachment;
 import org.mule.services.soap.SoapTestUtils;
-import org.mule.services.soap.api.message.SoapAttachment;
 import org.mule.services.soap.generator.attachment.AttachmentRequestEnricher;
 
 import org.junit.Test;
@@ -22,7 +22,7 @@ public abstract class AbstractRequestEnricherTestCase extends AbstractEnricherTe
     SoapAttachment attachment = SoapTestUtils.getTestAttachment();
     String providedBody = SoapTestUtils.getRequestResource(SoapTestUtils.UPLOAD_ATTACHMENT);
     AttachmentRequestEnricher enricher = getEnricher();
-    String request = enricher.enrichRequest(providedBody, asList(attachment));
+    String request = enricher.enrichRequest(providedBody, singletonMap("attachment-id", attachment));
     SoapTestUtils.assertSimilarXml(getExpectedResult(), request);
   }
 

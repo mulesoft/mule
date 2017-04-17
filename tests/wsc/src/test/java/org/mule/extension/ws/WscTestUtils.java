@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.IOUtils.copy;
 import static org.mule.runtime.core.util.IOUtils.toInputStream;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.services.soap.api.message.SoapAttachment;
+import org.mule.runtime.extension.api.soap.SoapAttachment;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -111,7 +111,6 @@ public class WscTestUtils {
   @Step("Prepares a test attachment")
   public static SoapAttachment getTestAttachment() {
     SoapAttachment attachment = mock(SoapAttachment.class);
-    when(attachment.getId()).thenReturn("attachment-id");
     when(attachment.getContent()).thenReturn(toInputStream(ATTACHMENT_CONTENT));
     when(attachment.getContentType()).thenReturn(MediaType.BINARY);
     return attachment;

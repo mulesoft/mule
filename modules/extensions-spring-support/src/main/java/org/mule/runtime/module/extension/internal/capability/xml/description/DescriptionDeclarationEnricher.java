@@ -12,7 +12,7 @@ import static org.mule.runtime.module.extension.internal.resources.ExtensionReso
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor;
+import org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
@@ -27,8 +27,8 @@ import javax.lang.model.element.TypeElement;
  * <p/>
  * For this to be possible, the context should have as custom parameters a {@link ProcessingEnvironment} and the corresponding
  * {@link TypeElement}, which will be fetched in the provided context under the keys
- * {@link ExtensionResourcesGeneratorAnnotationProcessor#PROCESSING_ENVIRONMENT} and
- * {@link ExtensionResourcesGeneratorAnnotationProcessor#EXTENSION_ELEMENT}.
+ * {@link BaseExtensionResourcesGeneratorAnnotationProcessor#PROCESSING_ENVIRONMENT} and
+ * {@link BaseExtensionResourcesGeneratorAnnotationProcessor#EXTENSION_ELEMENT}.
  *
  * @since 4.0
  */

@@ -9,9 +9,9 @@ package org.mule.services.soap.runtime.wss;
 
 import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import static java.util.Collections.singletonList;
-import org.mule.services.soap.api.security.SecurityStrategy;
-import org.mule.services.soap.api.security.EncryptSecurityStrategy;
-import org.mule.services.soap.api.security.config.WssKeyStoreConfiguration;
+import org.mule.runtime.extension.api.soap.security.EncryptSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.SecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.config.WssKeyStoreConfiguration;
 import org.mule.services.soap.service.EncryptPasswordCallback;
 
 import java.util.HashMap;
@@ -49,8 +49,7 @@ public class WssEncryptTestCase extends AbstractWebServiceSecurityTestCase {
 
   @Override
   protected List<SecurityStrategy> getSecurityStrategies() {
-    return singletonList(new EncryptSecurityStrategy(
-                                                     new WssKeyStoreConfiguration("s1as", "changeit",
-                                                                                  "security/ssltest-cacerts.jks")));
+    WssKeyStoreConfiguration keyStoreConfig = new WssKeyStoreConfiguration("s1as", "changeit", "security/ssltest-cacerts.jks");
+    return singletonList(new EncryptSecurityStrategy(keyStoreConfig));
   }
 }

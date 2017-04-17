@@ -6,12 +6,12 @@
  */
 package org.mule.services.soap.runtime.wss;
 
-import static org.mule.services.soap.api.security.PasswordType.TEXT;
 import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import static java.util.Collections.singletonList;
 
-import org.mule.services.soap.api.security.SecurityStrategy;
-import org.mule.services.soap.api.security.UsernameTokenSecurityStrategy;
+import static org.mule.runtime.extension.api.soap.security.PasswordType.TEXT;
+import org.mule.runtime.extension.api.soap.security.SecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.UsernameTokenSecurityStrategy;
 import org.mule.services.soap.service.ServerPasswordCallback;
 
 import java.util.HashMap;

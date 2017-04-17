@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -27,7 +28,6 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.failure
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -50,7 +50,6 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -77,12 +76,11 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Parameters(name = "{0}")
   public static Collection<Object[]> data() {
-    return Arrays.asList(
-                         new Object[][] {
-                             {"With provider",
-                                 mock(ConnectionProvider.class,
-                                      withSettings().extraInterfaces(Lifecycle.class, MuleContextAware.class))},
-                             {"Without provider", null}});
+    return asList(new Object[][] {
+        {"With provider",
+            mock(ConnectionProvider.class, withSettings().extraInterfaces(Lifecycle.class, MuleContextAware.class))},
+        {"Without provider", null}
+    });
   }
 
   @Rule

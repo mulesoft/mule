@@ -21,15 +21,15 @@ import org.mule.runtime.module.extension.internal.loader.java.type.WithParameter
 import java.util.List;
 
 /**
- * Base class for sub delegates of {@link JavaModelLoaderDelegate}
+ * Base class for sub delegates of {@link DefaultJavaModelLoaderDelegate}
  *
  * @since 4.0
  */
 abstract class AbstractModelLoaderDelegate {
 
-  protected final JavaModelLoaderDelegate loader;
+  protected final DefaultJavaModelLoaderDelegate loader;
 
-  AbstractModelLoaderDelegate(JavaModelLoaderDelegate loader) {
+  AbstractModelLoaderDelegate(DefaultJavaModelLoaderDelegate loader) {
     this.loader = loader;
   }
 

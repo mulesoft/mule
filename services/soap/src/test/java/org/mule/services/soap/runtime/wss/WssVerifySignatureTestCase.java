@@ -9,9 +9,9 @@ package org.mule.services.soap.runtime.wss;
 
 import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import static java.util.Collections.singletonList;
-import org.mule.services.soap.api.security.SecurityStrategy;
-import org.mule.services.soap.api.security.VerifySignatureSecurityStrategy;
-import org.mule.services.soap.api.security.config.WssTrustStoreConfiguration;
+import org.mule.runtime.extension.api.soap.security.SecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.VerifySignatureSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.config.WssTrustStoreConfiguration;
 import org.mule.services.soap.service.VerifyPasswordCallback;
 
 import java.util.HashMap;

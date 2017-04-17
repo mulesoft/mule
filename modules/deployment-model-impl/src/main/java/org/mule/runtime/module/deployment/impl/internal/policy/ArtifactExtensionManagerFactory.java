@@ -11,8 +11,8 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactExtensionManagerConfigurationBuilder.META_INF_FOLDER;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.VERSION;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -23,9 +23,8 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.extension.internal.loader.java.JavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
-import org.slf4j.Logger;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -33,6 +32,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.slf4j.Logger;
 
 /**
  * Creates {@link ExtensionManager} for mule artifacts that own a {@link MuleContext}
@@ -77,19 +78,15 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
         Map<String, Object> params = new HashMap<>();
         params.put(TYPE_PROPERTY_NAME, extensionManifest.getDescriberManifest().getProperties().get("type"));
         params.put(VERSION, extensionManifest.getVersion());
-
-        extensions.add(new JavaExtensionModelLoader()
-            .loadExtensionModel(artifactPlugin.getArtifactClassLoader().getClassLoader(),
-                                getDefault(extensions),
-                                params));
+        ClassLoader cl = artifactPlugin.getArtifactClassLoader().getClassLoader();
+        extensions.add(new DefaultJavaExtensionModelLoader().loadExtensionModel(cl, getDefault(extensions), params));
       } else {
         discoverExtensionThroughJsonDescriber(artifactPlugin, extensions);
       }
     }
 
-    for (ExtensionModel extension : extensions) {
-      extensionManager.registerExtension(extension);
-    }
+    extensions.forEach(extensionManager::registerExtension);
+
     return extensionManager;
   }
 

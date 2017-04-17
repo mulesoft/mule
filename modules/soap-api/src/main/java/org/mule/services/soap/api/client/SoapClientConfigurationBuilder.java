@@ -7,15 +7,16 @@
 package org.mule.services.soap.api.client;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
+import org.mule.runtime.extension.api.soap.security.DecryptSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.EncryptSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.SecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.SignSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.TimestampSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.UsernameTokenSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.VerifySignatureSecurityStrategy;
 import org.mule.services.soap.api.SoapVersion;
 import org.mule.services.soap.api.message.SoapMessage;
-import org.mule.services.soap.api.security.SecurityStrategy;
-import org.mule.services.soap.api.security.DecryptSecurityStrategy;
-import org.mule.services.soap.api.security.EncryptSecurityStrategy;
-import org.mule.services.soap.api.security.SignSecurityStrategy;
-import org.mule.services.soap.api.security.TimestampSecurityStrategy;
-import org.mule.services.soap.api.security.UsernameTokenSecurityStrategy;
-import org.mule.services.soap.api.security.VerifySignatureSecurityStrategy;
 
 import java.util.ArrayList;
 import java.util.List;

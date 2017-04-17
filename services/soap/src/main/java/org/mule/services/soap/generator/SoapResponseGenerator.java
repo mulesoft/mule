@@ -9,18 +9,20 @@ package org.mule.services.soap.generator;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.services.soap.api.message.SoapAttachment;
-import org.mule.services.soap.api.message.SoapHeader;
+import org.mule.runtime.extension.api.soap.SoapAttachment;
+import org.mule.services.soap.api.client.SoapClient;
+import org.mule.services.soap.api.exception.BadResponseException;
+import org.mule.services.soap.api.message.SoapAttributes;
+import org.mule.services.soap.api.message.SoapRequest;
 import org.mule.services.soap.api.message.SoapResponse;
 import org.mule.services.soap.client.SoapCxfClient;
 import org.mule.services.soap.generator.attachment.AttachmentResponseEnricher;
-import org.mule.services.soap.api.exception.BadResponseException;
 import org.mule.services.soap.message.ImmutableSoapResponse;
-import org.mule.services.soap.util.XmlTransformationUtils;
 import org.mule.services.soap.util.XmlTransformationException;
+import org.mule.services.soap.util.XmlTransformationUtils;
 
 import java.io.ByteArrayInputStream;
-import java.util.List;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
 
@@ -28,7 +30,7 @@ import org.apache.cxf.message.Exchange;
 import org.w3c.dom.Document;
 
 /**
- * Class used to generate the output of the {@link ConsumeOperation} using the CXF response.
+ * Class used to generate the output of the {@link SoapClient#consume(SoapRequest)} using the CXF response.
  *
  * @since 4.0
  */
@@ -55,12 +57,11 @@ public final class SoapResponseGenerator {
    */
   public SoapResponse generate(String operation, Object[] response, Exchange exchange) {
     Document document = unwrapResponse(response);
-    // Streaming
     String result = responseEnricher.enrich(document, operation, exchange);
-    List<SoapAttachment> attachments = (List<SoapAttachment>) exchange.get(SoapCxfClient.MULE_ATTACHMENTS_KEY);
-    List<SoapHeader> soapHeaders = (List<SoapHeader>) exchange.get(SoapCxfClient.MULE_HEADERS_KEY);
+    Map<String, SoapAttachment> attachments = (Map<String, SoapAttachment>) exchange.get(SoapCxfClient.MULE_ATTACHMENTS_KEY);
+    Map<String, String> headers = (Map<String, String>) exchange.get(SoapCxfClient.MULE_HEADERS_KEY);
     ByteArrayInputStream resultStream = new ByteArrayInputStream(result.getBytes());
-    return new ImmutableSoapResponse(resultStream, soapHeaders, emptyMap(), attachments, APPLICATION_XML);
+    return new ImmutableSoapResponse(resultStream, headers, emptyMap(), attachments, APPLICATION_XML);
   }
 
   /**

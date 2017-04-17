@@ -11,9 +11,9 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.services.soap.api.security.PasswordType;
-import org.mule.services.soap.api.security.SecurityStrategy;
-import org.mule.services.soap.api.security.UsernameTokenSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.PasswordType;
+import org.mule.runtime.extension.api.soap.security.SecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.UsernameTokenSecurityStrategy;
 
 /**
  * Provides the capability to authenticate using Username and Password with a SOAP service by adding the UsernameToken

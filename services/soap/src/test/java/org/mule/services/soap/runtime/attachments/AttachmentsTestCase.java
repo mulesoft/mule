@@ -9,13 +9,15 @@ package org.mule.services.soap.runtime.attachments;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.services.soap.api.message.SoapRequest.builder;
-import org.mule.services.soap.api.message.SoapAttachment;
+import org.mule.runtime.extension.api.soap.SoapAttachment;
+import org.mule.services.soap.AbstractSoapServiceTestCase;
 import org.mule.services.soap.api.message.SoapRequest;
 import org.mule.services.soap.api.message.SoapResponse;
-import org.mule.services.soap.AbstractSoapServiceTestCase;
 
 import java.io.ByteArrayInputStream;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -35,17 +37,17 @@ public class AttachmentsTestCase extends AbstractSoapServiceTestCase {
     SoapResponse response = client.consume(request);
     assertSimilarXml("<ns2:downloadAttachmentResponse xmlns:ns2=\"http://service.soap.services.mule.org/\"/>",
                      response.getContent());
-    assertThat(response.getAttachments(), hasSize(1));
-    assertThat(response.getAttachments().get(0).getId(), containsString("attachment"));
-    assertThat(IOUtils.toString(response.getAttachments().get(0).getContent()), containsString("Simple Attachment Content"));
+    Map<String, SoapAttachment> attachments = response.getAttachments();
+    assertThat(attachments.entrySet(), hasSize(1));
+    SoapAttachment attachment = attachments.entrySet().iterator().next().getValue();
+    assertThat(IOUtils.toString(attachment.getContent()), containsString("Simple Attachment Content"));
   }
 
   @Test
   @Description("Uploads an attachment to a mtom server")
   public void uploadAttachment() throws Exception {
     SoapRequest request = builder()
-        .withAttachment(new SoapAttachment("attachment", "text/html",
-                                           new ByteArrayInputStream("Some Content".getBytes())))
+        .withAttachment("attachment", new SoapAttachment(new ByteArrayInputStream("Some Content".getBytes()), HTML))
         .withContent("<con:uploadAttachment xmlns:con=\"http://service.soap.services.mule.org/\"/>")
         .withOperation("uploadAttachment")
         .build();

@@ -10,9 +10,9 @@ package org.mule.extension.ws.internal.security;
 import org.mule.extension.ws.internal.security.config.WssTrustStoreConfigurationAdapter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.services.soap.api.security.SecurityStrategy;
-import org.mule.services.soap.api.security.VerifySignatureSecurityStrategy;
-import org.mule.services.soap.api.security.config.WssTrustStoreConfiguration;
+import org.mule.runtime.extension.api.soap.security.SecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.VerifySignatureSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.config.WssTrustStoreConfiguration;
 
 
 /**

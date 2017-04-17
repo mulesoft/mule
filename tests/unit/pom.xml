@@ -51,6 +51,11 @@
             <artifactId>mule-service-weave</artifactId>
             <classifier>mule-service</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-service-soap-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>
 

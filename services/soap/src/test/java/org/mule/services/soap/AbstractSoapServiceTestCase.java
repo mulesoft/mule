@@ -14,8 +14,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.services.soap.api.SoapVersion.SOAP11;
 import static org.mule.services.soap.api.SoapVersion.SOAP12;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.extension.api.soap.security.SecurityStrategy;
 import org.mule.services.soap.api.SoapVersion;
-import org.mule.services.soap.api.security.SecurityStrategy;
 import org.mule.services.soap.service.Soap11Service;
 import org.mule.services.soap.service.Soap12Service;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -36,17 +36,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.ws.Endpoint;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.interceptor.Interceptor;
-import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -59,6 +52,9 @@ import org.xml.sax.SAXException;
 @RunWith(Parameterized.class)
 public abstract class AbstractSoapServiceTestCase {
 
+  @Rule
+  public DynamicPort port = new DynamicPort("port");
+
   public static final String HEADER_IN =
       "<con:headerIn xmlns:con=\"http://service.soap.services.mule.org/\">Header In Value</con:headerIn>";
   public static final String HEADER_INOUT =
@@ -68,19 +64,14 @@ public abstract class AbstractSoapServiceTestCase {
   public static final String HEADER_OUT =
       "<con:headerOut xmlns:con=\"http://service.soap.services.mule.org/\">Header In Value OUT</con:headerOut>\n";
 
-  @Rule
-  public DynamicPort servicePort = new DynamicPort("servicePort");
-
-  protected String defaultAddress = "http://localhost:" + servicePort.getValue() + "/server";
-
   @Parameterized.Parameter
   public SoapVersion soapVersion;
 
   @Parameterized.Parameter(1)
   public String serviceClass;
 
-  private Server httpServer;
   protected TestSoapClient client;
+  protected TestHttpSoapServer server;
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
@@ -93,8 +84,15 @@ public abstract class AbstractSoapServiceTestCase {
   @Before
   public void before() throws Exception {
     XMLUnit.setIgnoreWhitespace(true);
-    createWebService();
+    this.server = new TestHttpSoapServer(port.getNumber(), buildInInterceptor(), buildOutInterceptor(), createServiceInstance());
+    this.server.init();
+    String defaultAddress = server.getDefaultAddress();
     this.client = new TestSoapClient(defaultAddress + "?wsdl", defaultAddress, isMtom(), getSecurityStrategies(), soapVersion);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    this.server.stop();
   }
 
   protected List<SecurityStrategy> getSecurityStrategies() {
@@ -109,39 +107,6 @@ public abstract class AbstractSoapServiceTestCase {
     return serviceClass;
   }
 
-  private void createWebService() throws Exception {
-    try {
-      httpServer = new Server(servicePort.getNumber());
-      ServletHandler servletHandler = new ServletHandler();
-      httpServer.setHandler(servletHandler);
-
-      CXFNonSpringServlet cxf = new CXFNonSpringServlet();
-      ServletHolder servlet = new ServletHolder(cxf);
-      servlet.setName("server");
-      servlet.setForcedPath("/");
-
-      servletHandler.addServletWithMapping(servlet, "/*");
-
-      httpServer.start();
-
-      Bus bus = cxf.getBus();
-
-      Interceptor inInterceptor = buildInInterceptor();
-      if (inInterceptor != null) {
-        bus.getInInterceptors().add(inInterceptor);
-      }
-      Interceptor outInterceptor = buildOutInterceptor();
-      if (outInterceptor != null) {
-        bus.getOutInterceptors().add(outInterceptor);
-      }
-
-      BusFactory.setDefaultBus(bus);
-      Endpoint.publish("/server", createServiceInstance());
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   protected Interceptor buildInInterceptor() {
     return null;
   }
@@ -150,17 +115,9 @@ public abstract class AbstractSoapServiceTestCase {
     return null;
   }
 
-  private Object createServiceInstance() throws Exception {
+  protected Object createServiceInstance() throws Exception {
     Class<?> serviceClass = this.getClass().getClassLoader().loadClass(getServiceClass());
     return serviceClass.newInstance();
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    if (httpServer != null) {
-      httpServer.stop();
-      httpServer.destroy();
-    }
   }
 
   protected void assertSimilarXml(String expected, InputStream resultStream) throws Exception {

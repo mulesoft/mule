@@ -10,7 +10,7 @@ package org.mule.services.soap.security;
 import static org.apache.ws.security.components.crypto.Merlin.LOAD_CA_CERTS;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIGNATURE;
 import static org.apache.ws.security.handler.WSHandlerConstants.SIG_PROP_REF_ID;
-import org.mule.services.soap.api.security.config.WssTrustStoreConfiguration;
+import org.mule.runtime.extension.api.soap.security.config.WssTrustStoreConfiguration;
 import org.mule.services.soap.security.callback.WSPasswordCallbackHandler;
 import org.mule.services.soap.security.config.WssStoreConfigurationPropertiesBuilder;
 import org.mule.services.soap.security.config.WssTrustStoreConfigurationPropertiesBuilder;

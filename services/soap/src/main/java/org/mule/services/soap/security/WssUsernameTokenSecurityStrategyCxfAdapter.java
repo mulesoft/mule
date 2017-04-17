@@ -14,8 +14,8 @@ import static org.apache.ws.security.WSPasswordCallback.USERNAME_TOKEN;
 import static org.apache.ws.security.handler.WSHandlerConstants.ADD_UT_ELEMENTS;
 import static org.apache.ws.security.handler.WSHandlerConstants.PASSWORD_TYPE;
 import static org.apache.ws.security.handler.WSHandlerConstants.USER;
-import org.mule.services.soap.api.security.PasswordType;
-import org.mule.services.soap.api.security.UsernameTokenSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.PasswordType;
+import org.mule.runtime.extension.api.soap.security.UsernameTokenSecurityStrategy;
 import org.mule.services.soap.security.callback.WSPasswordCallbackHandler;
 
 import com.google.common.collect.ImmutableMap;

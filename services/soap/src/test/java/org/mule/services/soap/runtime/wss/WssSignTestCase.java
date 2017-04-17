@@ -8,9 +8,9 @@ package org.mule.services.soap.runtime.wss;
 
 import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import static java.util.Collections.singletonList;
-import org.mule.services.soap.api.security.SecurityStrategy;
-import org.mule.services.soap.api.security.SignSecurityStrategy;
-import org.mule.services.soap.api.security.config.WssKeyStoreConfiguration;
+import org.mule.runtime.extension.api.soap.security.SecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.SignSecurityStrategy;
+import org.mule.runtime.extension.api.soap.security.config.WssKeyStoreConfiguration;
 
 import java.util.HashMap;
 import java.util.List;
