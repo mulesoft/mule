@@ -147,7 +147,7 @@ public class BulkOperations extends BaseDbOperations {
     BulkQuery bulkQuery = bulkQueryFactory.resolve();
 
     BulkUpdateExecutor bulkUpdateExecutor =
-        new BulkUpdateExecutor(getStatementFactory(false, settings));
+        new BulkUpdateExecutor(getStatementFactory(settings));
 
     return (int[]) bulkUpdateExecutor.execute(connection, bulkQuery);
   }
@@ -165,7 +165,7 @@ public class BulkOperations extends BaseDbOperations {
     List<List<QueryParamValue>> paramSets = resolveParamSets(values);
 
     BulkUpdateExecutor bulkUpdateExecutor =
-        new BulkUpdateExecutor(getStatementFactory(false, query));
+        new BulkUpdateExecutor(getStatementFactory(query));
     return (int[]) bulkUpdateExecutor.execute(connection, resolvedQuery, paramSets);
   }
 

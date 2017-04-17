@@ -9,5 +9,8 @@
         <db:select queryTimeout="1">
             <db:sql>#["select * from PLANET where DELAY($(payload)) = 1 order by ID"]</db:sql>
         </db:select>
+        <foreach>
+            <logger />
+        </foreach>
     </flow>
 </mule>

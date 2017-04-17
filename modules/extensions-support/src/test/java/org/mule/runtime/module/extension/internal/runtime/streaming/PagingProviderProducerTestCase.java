@@ -18,12 +18,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.tck.size.SmallTest;
 
 import java.util.List;
@@ -39,7 +40,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class PagingProviderProducerTestCase {
 
-  private ConnectionManager connectionManager = mock(ConnectionManager.class);
+  private ExtensionConnectionSupplier extensionConnectionSupplier = mock(ExtensionConnectionSupplier.class);
+  private ExecutionContextAdapter executionContext = mock(ExecutionContextAdapter.class);
   private PagingProvider<Object, String> delegate = mock(PagingProvider.class);
   private ConfigurationInstance config = mock(ConfigurationInstance.class);
 
@@ -47,15 +49,15 @@ public class PagingProviderProducerTestCase {
   private PagingProviderProducer<String> producer = createProducer();
 
   private PagingProviderProducer<String> createProducer() {
-    return new PagingProviderProducer<>(delegate, config, connectionManager);
+    return new PagingProviderProducer<>(delegate, config, executionContext, extensionConnectionSupplier);
   }
 
   @Before
-  public void setUp() throws ConnectionException {
+  public void setUp() throws MuleException {
     when(config.getValue()).thenReturn("config");
     ConnectionHandler handler = mock(ConnectionHandler.class);
     when(handler.getConnection()).thenReturn(new Object());
-    when(connectionManager.getConnection(anyObject())).thenReturn(handler);
+    when(extensionConnectionSupplier.getConnection(executionContext)).thenReturn(handler);
   }
 
   @Test
@@ -68,7 +70,7 @@ public class PagingProviderProducerTestCase {
   @Test
   public void produceWithDifferentConnections() throws Exception {
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-    when(connectionManager.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
 
     produce();
     produce();
@@ -83,7 +85,7 @@ public class PagingProviderProducerTestCase {
     producer = createProducer();
 
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-    when(connectionManager.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
 
     produce();
     produce();

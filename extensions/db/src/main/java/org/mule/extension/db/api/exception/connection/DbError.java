@@ -27,9 +27,6 @@ public enum DbError implements ErrorTypeDefinition<DbError> {
     this.parent = parent;
   }
 
-  DbError() {}
-
-
   @Override
   public Optional<ErrorTypeDefinition<? extends Enum<?>>> getParent() {
     return Optional.ofNullable(parent);

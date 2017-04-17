@@ -34,7 +34,7 @@ public class IteratorResultSetHandler implements ResultSetHandler {
     streamingResultSetCloser.trackResultSet(connection, resultSet);
     connection.beginStreaming();
 
-    return new ResultSetIterator(connection, resultSet, rowHandler, streamingResultSetCloser);
+    return new ResultSetIterator(resultSet, rowHandler);
   }
 
   @Override

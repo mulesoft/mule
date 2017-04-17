@@ -12,7 +12,6 @@ import static org.mule.extension.db.api.param.JdbcType.DISTINCT;
 import static org.mule.extension.db.api.param.JdbcType.STRUCT;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.result.resultset.ResultSetIterator;
-import org.mule.extension.db.internal.result.resultset.SingleResultResultSetCloser;
 import org.mule.extension.db.internal.result.row.InsensitiveMapRowHandler;
 
 import java.sql.DatabaseMetaData;
@@ -80,7 +79,7 @@ public class MetadataDbTypeManager implements DbTypeManager {
       DatabaseMetaData metaData = connection.getJdbcConnection().getMetaData();
       ResultSet typeInfo = metaData.getTypeInfo();
       ResultSetIterator resultSetIterator =
-          new ResultSetIterator(connection, typeInfo, new InsensitiveMapRowHandler(), new SingleResultResultSetCloser(false));
+          new ResultSetIterator(typeInfo, new InsensitiveMapRowHandler());
       while (resultSetIterator.hasNext()) {
         Map<String, Object> typeRecord = resultSetIterator.next();
 

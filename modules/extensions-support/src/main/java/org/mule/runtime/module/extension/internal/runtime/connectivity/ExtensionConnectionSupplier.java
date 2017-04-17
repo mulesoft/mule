@@ -23,8 +23,9 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionBindingDelegate;
 
-import javax.inject.Inject;
 import java.util.Optional;
+
+import javax.inject.Inject;
 
 /**
  * A bridge between the execution of a {@link ComponentModel} and the {@link ConnectionManager} which provides
@@ -34,7 +35,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class ExtensionsConnectionAdapter {
+public class ExtensionConnectionSupplier {
 
   @Inject
   private ConnectionManager connectionManager;
@@ -79,8 +80,8 @@ public class ExtensionsConnectionAdapter {
     final ExtensionTransactionKey txKey = new ExtensionTransactionKey(configuration);
 
     TransactionBindingDelegate transactionBindingDelegate = new TransactionBindingDelegate(extensionModel, componentModel);
-    return transactionBindingDelegate.bindResource(transactionConfig, txKey,
-                                                   () -> getTransactionlessConnectionHandler(executionContext));
+    return transactionBindingDelegate.getBoundResource(transactionConfig, txKey,
+                                                       () -> getTransactionlessConnectionHandler(executionContext));
   }
 
   private <T> ConnectionHandler<T> getTransactionlessConnectionHandler(ExecutionContext executionContext)

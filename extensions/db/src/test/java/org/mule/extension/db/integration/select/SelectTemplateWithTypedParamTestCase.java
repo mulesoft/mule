@@ -23,7 +23,7 @@ public class SelectTemplateWithTypedParamTestCase extends AbstractDbIntegrationT
 
   @Test
   public void selectParameterizedQuery() throws Exception {
-    Message response = flowRunner("selectParameterizedQuery").withPayload(MARS.getName()).run().getMessage();
+    Message response = flowRunner("selectParameterizedQuery").keepStreamsOpen().withPayload(MARS.getName()).run().getMessage();
     assertMessageContains(response, getMarsRecord());
   }
 }

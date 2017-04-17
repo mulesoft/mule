@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -14,11 +15,13 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptingModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
@@ -31,6 +34,7 @@ public final class OperationMessageProcessorBuilder {
   private final OperationModel operationModel;
   private final PolicyManager policyManager;
   private final MuleContext muleContext;
+  private final ExtensionConnectionSupplier extensionConnectionSupplier;
 
   private ConfigurationProvider configurationProvider;
   private Map<String, ?> parameters;
@@ -51,6 +55,11 @@ public final class OperationMessageProcessorBuilder {
     this.operationModel = operationModel;
     this.policyManager = policyManager;
     this.muleContext = muleContext;
+    try {
+      extensionConnectionSupplier = muleContext.getRegistry().lookupObject(ExtensionConnectionSupplier.class);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(createStaticMessage(ExtensionConnectionSupplier.class.getName() + " Not Found"), e);
+    }
   }
 
   public OperationMessageProcessorBuilder setConfigurationProvider(ConfigurationProvider configurationProvider) {
@@ -87,7 +96,8 @@ public final class OperationMessageProcessorBuilder {
         } else if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
           processor =
               new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                                 cursorProviderFactory, extensionManager, policyManager);
+                                                 cursorProviderFactory, extensionManager, policyManager,
+                                                 extensionConnectionSupplier);
         } else {
           processor = new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
                                                     cursorProviderFactory, extensionManager, policyManager);

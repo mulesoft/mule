@@ -23,13 +23,13 @@ public class SelectNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
 
   @Test
   public void usesParamOverriddenByName() throws Exception {
-    Message response = flowRunner("overriddenParamsByName").run().getMessage();
+    Message response = flowRunner("overriddenParamsByName").keepStreamsOpen().run().getMessage();
     assertMessageContains(response, getMarsRecord());
   }
 
   @Test
   public void usesInlineParamOverriddenByName() throws Exception {
-    Message response = flowRunner("inlineOverriddenParamsByName").run().getMessage();
+    Message response = flowRunner("inlineOverriddenParamsByName").keepStreamsOpen().run().getMessage();
     assertMessageContains(response, getVenusRecord());
   }
 }

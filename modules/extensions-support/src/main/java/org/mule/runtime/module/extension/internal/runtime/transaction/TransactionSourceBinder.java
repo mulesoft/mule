@@ -51,6 +51,6 @@ public class TransactionSourceBinder {
                                                             extensionModel.getName())));
 
     final ExtensionTransactionKey txKey = new ExtensionTransactionKey(configuration);
-    transactionBindingDelegate.bindResource(transactionConfig, txKey, () -> connectionHandler);
+    transactionBindingDelegate.getBoundResource(transactionConfig, txKey, () -> connectionHandler);
   }
 }

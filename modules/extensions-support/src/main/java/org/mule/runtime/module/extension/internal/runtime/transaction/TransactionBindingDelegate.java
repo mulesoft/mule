@@ -46,9 +46,9 @@ public class TransactionBindingDelegate {
    * @throws ConnectionException if a problem occurred retrieving the {@link ConnectionHandler}
    * @throws TransactionException if the connection could not be bound to the current transaction
    */
-  public <T extends TransactionalConnection> ConnectionHandler<T> bindResource(TransactionConfig transactionConfig,
-                                                                               ExtensionTransactionKey txKey,
-                                                                               ConnectionSupplier<ConnectionHandler<T>> connectionHandlerSupplier)
+  public <T extends TransactionalConnection> ConnectionHandler<T> getBoundResource(TransactionConfig transactionConfig,
+                                                                                   ExtensionTransactionKey txKey,
+                                                                                   ConnectionSupplier<ConnectionHandler<T>> connectionHandlerSupplier)
       throws ConnectionException, TransactionException {
 
     final Transaction currentTx = TransactionCoordination.getInstance().getTransaction();

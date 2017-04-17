@@ -37,7 +37,9 @@ public class AbstractStreamingResultSetCloser implements StreamingResultSetClose
   @Override
   public void close(DbConnection connection, ResultSet resultSet) {
     try {
-      resultSet.close();
+      if (!resultSet.isClosed()) {
+        resultSet.close();
+      }
     } catch (SQLException e) {
       LOGGER.warn("Error attempting to close resultSet", e);
     } finally {

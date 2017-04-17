@@ -15,7 +15,6 @@ import static org.mule.extension.db.internal.domain.query.QueryType.STORE_PROCED
 import static org.mule.extension.db.internal.domain.query.QueryType.TRUNCATE;
 import static org.mule.extension.db.internal.domain.query.QueryType.UPDATE;
 import static org.mule.extension.db.internal.operation.AutoGenerateKeysAttributes.AUTO_GENERATE_KEYS;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.api.param.QueryDefinition;
@@ -32,27 +31,28 @@ import org.mule.extension.db.internal.domain.query.QueryType;
 import org.mule.extension.db.internal.domain.statement.QueryStatementFactory;
 import org.mule.extension.db.internal.resolver.query.StoredProcedureQueryResolver;
 import org.mule.extension.db.internal.result.resultset.IteratorResultSetHandler;
-import org.mule.extension.db.internal.result.resultset.ListResultSetHandler;
 import org.mule.extension.db.internal.result.resultset.ResultSetHandler;
+import org.mule.extension.db.internal.result.resultset.ResultSetIterator;
 import org.mule.extension.db.internal.result.row.InsensitiveMapRowHandler;
 import org.mule.extension.db.internal.result.statement.StatementResultHandler;
 import org.mule.extension.db.internal.result.statement.StreamingStatementResultHandler;
-import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
-import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Config;
-import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
-import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
@@ -69,36 +69,75 @@ public class DmlOperations extends BaseDbOperations {
   private final StoredProcedureQueryResolver storedProcedureResolver = new StoredProcedureQueryResolver();
 
   /**
-   * Selects data from a database
+   * Selects data from a database.
    *
-   * @param query               a {@link QueryDefinition} as a parameter group
-   * @param streaming           if enabled retrieves the result set in blocks so that memory is not exhausted in case of large data sets.
-   *                            This works in tandem with the fetch size parameter
-   * @param connector           the acting connector
-   * @param connection          the acting connection
+   * Streaming is automatically applied to avoid preemptive consumption of such results, which may lead
+   * to performance and memory issues.
+   *
+   * @param query     a {@link QueryDefinition} as a parameter group
+   * @param connector the acting connector
    * @return depending on the value of {@code streaming}, it can be a {@link List} or {@link Iterator} of maps
    * @throws SQLException if an error is produced
    */
   @OutputResolver(output = SelectMetadataResolver.class)
-  public InterceptingCallback<Object> select(@ParameterGroup(name = QUERY_GROUP) @Placement(
-      tab = ADVANCED_TAB) QueryDefinition query,
-                                             @Optional(defaultValue = "false") @Expression(NOT_SUPPORTED) @Placement(
-                                                 tab = ADVANCED_TAB) @DisplayName("Stream Response") boolean streaming,
-                                             @Config DbConnector connector,
-                                             @Connection DbConnection connection)
+  public PagingProvider<DbConnection, Map<String, Object>> select(
+                                                                  @ParameterGroup(name = QUERY_GROUP) @Placement(
+                                                                      tab = ADVANCED_TAB) QueryDefinition query,
+                                                                  @Config DbConnector connector,
+                                                                  @Connection DbConnection connection)
       throws SQLException {
 
-    final Query resolvedQuery = resolveQuery(query, connector, connection, SELECT, STORE_PROCEDURE_CALL);
+    return new PagingProvider<DbConnection, Map<String, Object>>() {
 
-    QueryStatementFactory statementFactory = getStatementFactory(streaming, query);
-    InsensitiveMapRowHandler recordHandler = new InsensitiveMapRowHandler();
-    ResultSetHandler resultSetHandler = streaming
-        ? new IteratorResultSetHandler(recordHandler, resultSetCloser)
-        : new ListResultSetHandler(recordHandler);
+      private ResultSetIterator iterator;
+      private final AtomicBoolean initialised = new AtomicBoolean(false);
 
-    Object result = new SelectExecutor(statementFactory, resultSetHandler).execute(connection, resolvedQuery);
+      @Override
+      public List<Map<String, Object>> getPage(DbConnection connection) {
+        ResultSetIterator iterator = getIterator(connection);
+        final int fetchSize = getFetchSize(query);
+        final List<Map<String, Object>> page = new ArrayList<>(fetchSize);
+        for (int i = 0; i < fetchSize && iterator.hasNext(); i++) {
+          page.add(iterator.next());
+        }
 
-    return interceptingCallback(result, connection);
+        return page;
+      }
+
+      @Override
+      public java.util.Optional<Integer> getTotalResults(DbConnection connection) {
+        return java.util.Optional.empty();
+      }
+
+      @Override
+      public void close() throws IOException {
+        resultSetCloser.closeResultSets(connection);
+      }
+
+      private ResultSetIterator getIterator(DbConnection connection) {
+        if (initialised.compareAndSet(false, true)) {
+          final Query resolvedQuery = resolveQuery(query, connector, connection, SELECT, STORE_PROCEDURE_CALL);
+
+          QueryStatementFactory statementFactory = getStatementFactory(query);
+          InsensitiveMapRowHandler recordHandler = new InsensitiveMapRowHandler();
+          ResultSetHandler resultSetHandler = new IteratorResultSetHandler(recordHandler, resultSetCloser);
+
+          try {
+            iterator =
+                (ResultSetIterator) new SelectExecutor(statementFactory, resultSetHandler).execute(connection, resolvedQuery);
+          } catch (SQLException e) {
+            throw new MuleRuntimeException(e);
+          }
+        }
+
+        return iterator;
+      }
+
+      @Override
+      public boolean useStickyConnections() {
+        return true;
+      }
+    };
   }
 
   /**
@@ -161,14 +200,14 @@ public class DmlOperations extends BaseDbOperations {
 
   /**
    * Invokes a Stored Procedure on the database.
-   *
+   * <p>
    * When the stored procedure returns one or more {@link ResultSet} instances, streaming
    * is automatically applied to avoid preemptive consumption of such results, which may lead
    * to performance and memory issues.
    *
-   * @param call                       a {@link StoredProcedureCall} as a parameter group
-   * @param connector                  the acting connector
-   * @param connection                 the acting connection
+   * @param call       a {@link StoredProcedureCall} as a parameter group
+   * @param connector  the acting connector
+   * @param connection the acting connection
    * @return A {@link Map} with the procedure's output
    * @throws SQLException if an error is produced
    */
@@ -183,7 +222,7 @@ public class DmlOperations extends BaseDbOperations {
 
     final Query resolvedQuery = resolveQuery(call, connector, connection, STORE_PROCEDURE_CALL);
 
-    QueryStatementFactory statementFactory = getStatementFactory(true, call);
+    QueryStatementFactory statementFactory = getStatementFactory(call);
 
     InsensitiveMapRowHandler recordHandler = new InsensitiveMapRowHandler();
 
@@ -197,21 +236,6 @@ public class DmlOperations extends BaseDbOperations {
     return result;
   }
 
-
-  private <T> InterceptingCallback<T> interceptingCallback(T result, DbConnection connection) {
-    return new InterceptingCallback<T>() {
-
-      @Override
-      public T getResult() throws Exception {
-        return result;
-      }
-
-      @Override
-      public void onException(Exception exception) {
-        resultSetCloser.closeResultSets(connection);
-      }
-    };
-  }
 
   protected Query resolveQuery(StoredProcedureCall call,
                                DbConnector connector,

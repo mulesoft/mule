@@ -49,7 +49,7 @@ public class SelectJavaUdtTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void returnsMappedObject() throws Exception {
-    Message response = flowRunner("returnsUDT").run().getMessage();
+    Message response = flowRunner("returnsUDT").keepStreamsOpen().run().getMessage();
 
     assertRecords(response.getPayload().getValue(),
                   new Record(new Field("REGION_NAME", SOUTHWEST_MANAGER.getRegionName()),

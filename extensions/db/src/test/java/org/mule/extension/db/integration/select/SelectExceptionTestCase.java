@@ -6,7 +6,6 @@
  */
 package org.mule.extension.db.integration.select;
 
-import static java.lang.Boolean.FALSE;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -14,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.DerbyTestDatabase;
-import org.mule.runtime.api.message.Message;
+import org.mule.extension.db.internal.StatementStreamingResultSetCloser;
 import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.List;
@@ -24,7 +23,7 @@ import javax.sql.DataSource;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class SelectStreamingExceptionTestCase extends AbstractDbIntegrationTestCase {
+public class SelectExceptionTestCase extends AbstractDbIntegrationTestCase {
 
   private static final int POOL_CONNECTIONS = 2;
 
@@ -37,7 +36,7 @@ public class SelectStreamingExceptionTestCase extends AbstractDbIntegrationTestC
 
   @Override
   protected String[] getFlowConfigurationResources() {
-    return new String[] {"integration/select/select-streaming-exception-config.xml"};
+    return new String[] {"integration/select/select-exception-config.xml"};
   }
 
   @Override
@@ -49,7 +48,7 @@ public class SelectStreamingExceptionTestCase extends AbstractDbIntegrationTestC
   public void streamingException() throws Exception {
     for (int i = 0; i < POOL_CONNECTIONS + 1; ++i) {
       try {
-        flowRunner("selectStreamingException").run();
+        flowRunner("selectException").run();
         fail("Expected 'Table does not exist' exception.");
       } catch (MessagingException e) {
         assertThat("Iteration " + i, e.getMessage(), containsString("Table/View 'NOT_EXISTS' does not exist."));
@@ -59,7 +58,13 @@ public class SelectStreamingExceptionTestCase extends AbstractDbIntegrationTestC
 
   @Test
   public void selectExceptionClosesPreviousResultSets() throws Exception {
-    Message response = flowRunner("selectExceptionClosesPreviousResultSets").run().getMessage();
-    assertThat(response.getPayload().getValue(), is(FALSE));
+    try {
+      flowRunner("selectExceptionClosesPreviousResultSets").run().getMessage();
+      fail("Was expecting faillure");
+    } catch (MessagingException e) {
+      StatementStreamingResultSetCloser resultSetCloser =
+          muleContext.getRegistry().lookupObject(StatementStreamingResultSetCloser.class);
+      assertThat(resultSetCloser.getOpenResultSets(), is(0));
+    }
   }
 }
