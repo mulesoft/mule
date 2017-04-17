@@ -74,15 +74,15 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
                                                           String responseBuilderParameterName, Message message) {
     ImmutableMap.Builder<String, Object> mapBuilder =
         ImmutableMap.<String, Object>builder().put(responseBuilderParameterName, httpListenerResponseBuilder);
-    if (message.getAttributes() instanceof HttpResponseAttributes) {
-      HttpResponseAttributes httpResponseAttributes = (HttpResponseAttributes) message.getAttributes();
+    if (message.getAttributes().getValue() instanceof HttpResponseAttributes) {
+      HttpResponseAttributes httpResponseAttributes = (HttpResponseAttributes) message.getAttributes().getValue();
       httpListenerResponseBuilder.setBody(message.getPayload());
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
       httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
       return mapBuilder.build();
-    } else if (message.getAttributes() instanceof HttpPolicyResponseAttributes) {
-      HttpPolicyResponseAttributes httpResponseAttributes = (HttpPolicyResponseAttributes) message.getAttributes();
+    } else if (message.getAttributes().getValue() instanceof HttpPolicyResponseAttributes) {
+      HttpPolicyResponseAttributes httpResponseAttributes = (HttpPolicyResponseAttributes) message.getAttributes().getValue();
       httpListenerResponseBuilder.setBody(message.getPayload());
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
       httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode());

@@ -21,7 +21,6 @@ import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -205,8 +204,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
                                                  fromType(event.getParameters().getClass())));
 
       Message message = event.getMessage();
-      Attributes attributes = message.getAttributes();
-      contextBuilder.addBinding(ATTRIBUTES, new TypedValue<>(attributes, fromType(attributes.getClass())));
+      contextBuilder.addBinding(ATTRIBUTES, message.getAttributes());
       contextBuilder.addBinding(PAYLOAD, message.getPayload());
       contextBuilder.addBinding(DATA_TYPE, new TypedValue<>(message.getPayload().getDataType(), fromType(DataType.class)));
       Error error = event.getError().isPresent() ? event.getError().get() : null;

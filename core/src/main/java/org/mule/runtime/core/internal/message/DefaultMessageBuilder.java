@@ -24,8 +24,8 @@ import static org.mule.runtime.core.util.ObjectUtils.getInt;
 import static org.mule.runtime.core.util.ObjectUtils.getLong;
 import static org.mule.runtime.core.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.util.ObjectUtils.getString;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
@@ -60,11 +60,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DefaultMessageBuilder
-    implements InternalMessage.Builder, InternalMessage.PayloadBuilder, InternalMessage.CollectionBuilder {
+    implements InternalMessage.Builder, InternalMessage.PayloadBuilder, InternalMessage.AttributesBuilder,
+    InternalMessage.CollectionBuilder {
 
   private Object payload;
   private DataType dataType;
-  private Attributes attributes = NULL_ATTRIBUTES;
+  private Object attributes = NULL_ATTRIBUTES;
+  private DataType attributesDataType;
 
   private ExceptionPayload exceptionPayload;
 
@@ -99,7 +101,8 @@ public class DefaultMessageBuilder
     requireNonNull(message);
     this.payload = message.getPayload().getValue();
     this.dataType = message.getPayload().getDataType();
-    this.attributes = message.getAttributes();
+    this.attributes = message.getAttributes().getValue();
+    this.attributesDataType = message.getAttributes().getDataType();
 
     if (message instanceof InternalMessage) {
       copyMessageAttributes((InternalMessage) message);
@@ -115,6 +118,12 @@ public class DefaultMessageBuilder
   @Override
   public InternalMessage.Builder payload(Object payload) {
     this.payload = payload;
+    return this;
+  }
+
+  @Override
+  public InternalMessage.Builder mediaType(MediaType mediaType) {
+    this.dataType = DataType.builder().mediaType(mediaType).build();
     return this;
   }
 
@@ -152,14 +161,20 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.Builder mediaType(MediaType mediaType) {
-    this.dataType = DataType.builder().mediaType(mediaType).build();
+  public InternalMessage.Builder nullAttributes() {
+    this.attributes = NULL_ATTRIBUTES;
     return this;
   }
 
   @Override
-  public InternalMessage.Builder attributes(Attributes attributes) {
+  public InternalMessage.Builder attributes(Object attributes) {
     this.attributes = attributes;
+    return this;
+  }
+
+  @Override
+  public InternalMessage.Builder attributesMediaType(MediaType mediaType) {
+    this.attributesDataType = DataType.builder().mediaType(mediaType).build();
     return this;
   }
 
@@ -274,7 +289,8 @@ public class DefaultMessageBuilder
 
   @Override
   public InternalMessage build() {
-    return new MessageImplementation(new TypedValue(payload, resolveDataType()), attributes,
+    return new MessageImplementation(new TypedValue(payload, resolveDataType()),
+                                     new TypedValue(attributes, resolveAttributesDataType()),
                                      inboundProperties, outboundProperties, inboundAttachments,
                                      outboundAttachments, exceptionPayload);
   }
@@ -284,6 +300,14 @@ public class DefaultMessageBuilder
       return DataType.fromObject(payload);
     } else {
       return DataType.builder(dataType).fromObject(payload).build();
+    }
+  }
+
+  private DataType resolveAttributesDataType() {
+    if (attributesDataType == null) {
+      return DataType.fromObject(attributes);
+    } else {
+      return DataType.builder(attributesDataType).fromObject(attributes).build();
     }
   }
 
@@ -313,19 +337,18 @@ public class DefaultMessageBuilder
     private transient Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
     private transient TypedValue typedValue;
-    //TODO: MULE-10774 - Make attributes a TypedValue
-    private Attributes attributes;
+    private TypedValue typedAttributes;
 
     private Map<String, TypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>();
     private Map<String, TypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>();
 
-    private MessageImplementation(TypedValue typedValue, Attributes attributes,
+    private MessageImplementation(TypedValue typedValue, TypedValue typedAttributes,
                                   Map<String, TypedValue<Serializable>> inboundProperties,
                                   Map<String, TypedValue<Serializable>> outboundProperties,
                                   Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments,
                                   ExceptionPayload exceptionPayload) {
       this.typedValue = typedValue;
-      this.attributes = attributes;
+      this.typedAttributes = typedAttributes;
       this.inboundMap.putAll(inboundProperties);
       this.outboundMap.putAll(outboundProperties);
       this.inboundAttachments = inboundAttachments;
@@ -353,9 +376,9 @@ public class DefaultMessageBuilder
       buf.append(LINE_SEPARATOR);
       buf.append("  payload=").append(getPayload().getDataType().getType().getName());
       buf.append(LINE_SEPARATOR);
-      buf.append("  attributes=").append(getAttributes().toString());
-      buf.append(LINE_SEPARATOR);
       buf.append("  mediaType=").append(getPayload().getDataType().getMediaType());
+      buf.append(LINE_SEPARATOR);
+      buf.append("  attributes=").append(getAttributes().getValue().toString());
       buf.append(LINE_SEPARATOR);
       buf.append("  exceptionPayload=").append(defaultIfNull(exceptionPayload, NOT_SET));
       buf.append(LINE_SEPARATOR);
@@ -560,8 +583,8 @@ public class DefaultMessageBuilder
     }
 
     @Override
-    public Attributes getAttributes() {
-      return attributes;
+    public TypedValue getAttributes() {
+      return typedAttributes;
     }
 
     @Override

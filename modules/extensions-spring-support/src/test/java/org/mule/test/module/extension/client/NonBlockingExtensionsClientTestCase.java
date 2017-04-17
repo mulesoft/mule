@@ -24,7 +24,7 @@ import ru.yandex.qatools.allure.annotations.Stories;
 public class NonBlockingExtensionsClientTestCase extends ExtensionsClientTestCase {
 
   @Override
-  <T, A extends Attributes> Result<T, A> doExecute(String extension, String operation, OperationParameters params)
+  <T, A> Result<T, A> doExecute(String extension, String operation, OperationParameters params)
       throws Throwable {
     CompletableFuture<Result<T, A>> future = client.executeAsync(extension, operation, params);
     try {

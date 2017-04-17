@@ -6,18 +6,20 @@
  */
 package org.mule.test.http.policy;
 
-import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParametersFactory;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
@@ -34,7 +36,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
 
   private final HttpListenerPolicyPointcutParametersFactory factory = new HttpListenerPolicyPointcutParametersFactory();
   private final HttpRequestAttributes httpAttributes = mock(HttpRequestAttributes.class);
-  private final Attributes attributes = mock(Attributes.class);
+  private final TypedValue attributes = new TypedValue(mock(Attributes.class), OBJECT);
 
   @Test
   public void supportsHttpListener() {
@@ -65,7 +67,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
     when(httpAttributes.getRequestPath()).thenReturn(TEST_REQUEST_PATH);
     when(httpAttributes.getMethod()).thenReturn(TEST_METHOD);
     HttpListenerPolicyPointcutParameters policyPointcutParameters = (HttpListenerPolicyPointcutParameters) factory
-        .createPolicyPointcutParameters(FLOW_NAME, HTTP_LISTENER_COMPONENT_IDENTIFIER, httpAttributes);
+        .createPolicyPointcutParameters(FLOW_NAME, HTTP_LISTENER_COMPONENT_IDENTIFIER, new TypedValue<>(httpAttributes, OBJECT));
     assertThat(policyPointcutParameters.getComponentIdentifier(), is(HTTP_LISTENER_COMPONENT_IDENTIFIER));
     assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
     assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));

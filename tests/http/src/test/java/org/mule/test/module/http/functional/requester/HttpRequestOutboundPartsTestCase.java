@@ -155,7 +155,7 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
 
     Event response = flowRunner("requestFlowTls").withPayload(TEST_MESSAGE).withVariable(PARTS, partsToSend).run();
 
-    assertThat((HttpResponseAttributes) response.getMessage().getAttributes(), hasStatusCode(OK.getStatusCode()));
+    assertThat((HttpResponseAttributes) response.getMessage().getAttributes().getValue(), hasStatusCode(OK.getStatusCode()));
   }
 
   private DefaultMultiPartPayload getPayload() {

@@ -22,10 +22,10 @@ import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
 import org.mule.runtime.api.message.Message;
 
+import java.util.List;
+
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
-
-import java.util.List;
 
 @Features(FTP_EXTENSION)
 public class FtpListTestCase extends CommonFtpConnectorTestCase {
@@ -65,7 +65,7 @@ public class FtpListTestCase extends CommonFtpConnectorTestCase {
     assertThat(assertListedFiles(messages), is(true));
 
     List<Message> subDirectories = messages.stream()
-        .filter(message -> ((FileAttributes) message.getAttributes()).isDirectory())
+        .filter(message -> ((FileAttributes) message.getAttributes().getValue()).isDirectory())
         .collect(toList());
 
     assertThat(subDirectories, hasSize(1));
@@ -99,7 +99,7 @@ public class FtpListTestCase extends CommonFtpConnectorTestCase {
 
     assertThat(messages, hasSize(1));
 
-    FileAttributes file = (FileAttributes) messages.get(0).getAttributes();
+    FileAttributes file = (FileAttributes) messages.get(0).getAttributes().getValue();
     assertThat(file.isDirectory(), is(true));
     assertThat(file.getName(), equalTo(SUB_DIRECTORY_NAME));
   }
@@ -108,7 +108,7 @@ public class FtpListTestCase extends CommonFtpConnectorTestCase {
     boolean directoryWasFound = false;
 
     for (Message message : messages) {
-      FileAttributes attributes = (FileAttributes) message.getAttributes();
+      FileAttributes attributes = (FileAttributes) message.getAttributes().getValue();
       if (attributes.isDirectory()) {
         assertThat("two directories found", directoryWasFound, is(false));
         directoryWasFound = true;

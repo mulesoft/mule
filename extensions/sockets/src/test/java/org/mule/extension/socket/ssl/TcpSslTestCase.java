@@ -31,14 +31,14 @@ public class TcpSslTestCase extends SocketExtensionTestCase {
   @Test
   public void sendAndReceiveOverSSLConfiguredGlobally() throws Exception {
     Message muleMessage = sendStringAndAssertResponse("ssl-send-and-receive-global-tls");
-    assertClientAutenticathed((SocketAttributes) muleMessage.getAttributes());
+    assertClientAutenticathed((SocketAttributes) muleMessage.getAttributes().getValue());
   }
 
   @Test
   public void sendAndReceiveOverSSL() throws Exception {
     Message muleMessage = sendStringAndAssertResponse("ssl-send-and-receive");
     // trust-store not configured for listenerTlsContext
-    assertClientNotAutenticathed((SocketAttributes) muleMessage.getAttributes());
+    assertClientNotAutenticathed((SocketAttributes) muleMessage.getAttributes().getValue());
 
   }
 
@@ -47,7 +47,7 @@ public class TcpSslTestCase extends SocketExtensionTestCase {
     Message message;
     for (int i = 0; i < REPETITIONS; i++) {
       message = sendStringAndAssertResponse("ssl-send-and-receive-global-tls");
-      assertClientAutenticathed((SocketAttributes) message.getAttributes());
+      assertClientAutenticathed((SocketAttributes) message.getAttributes().getValue());
 
     }
   }

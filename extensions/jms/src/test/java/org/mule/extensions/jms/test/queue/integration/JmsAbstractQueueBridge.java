@@ -59,7 +59,7 @@ public abstract class JmsAbstractQueueBridge extends JmsAbstractTestCase {
     assertThat(message, hasPayload(equalTo(BRIDGED_PREFIX + FIRST_MESSAGE)));
     assertThat(message.getAttributes(), not(nullValue()));
 
-    JmsMessageProperties properties = ((JmsAttributes) message.getAttributes()).getProperties();
+    JmsMessageProperties properties = ((JmsAttributes) message.getAttributes().getValue()).getProperties();
     assertThat(properties, not(nullValue()));
     assertThat(properties.getUserProperties().get(PROPERTY_KEY_VALUE), is(equalTo(PROPERTY_VALUE_VALUE)));
   }

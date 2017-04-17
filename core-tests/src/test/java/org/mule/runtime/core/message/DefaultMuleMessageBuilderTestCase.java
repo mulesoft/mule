@@ -62,7 +62,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
     assertThat(message.getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(message.getPayload().getDataType().getType(), equalTo(String.class));
     assertThat(message.getPayload().getDataType().getMediaType(), is(HTML_STRING_UTF8));
-    assertThat(message.getAttributes(), is(TEST_ATTR));
+    assertThat(message.getAttributes().getValue(), is(TEST_ATTR));
+    // FIXME: what about attributes' data type?
   }
 
   @Test
@@ -75,7 +76,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
     assertThat(messageCopy.getPayload().getValue(), is(true));
     assertThat(messageCopy.getPayload().getDataType(), is(BOOLEAN));
-    assertThat(messageCopy.getAttributes(), is(TEST_ATTR_2));
+    assertThat(messageCopy.getAttributes().getValue(), is(TEST_ATTR_2));
+    // FIXME: what about attributes' data type?
   }
 
   @Test
@@ -84,7 +86,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
     assertThat(message.getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(message.getPayload().getDataType(), is(STRING));
-    assertThat(message.getAttributes(), is(TEST_ATTR));
+    assertThat(message.getAttributes().getValue(), is(TEST_ATTR));
   }
 
   @Test
@@ -131,7 +133,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
     assertThat(messageCopy.getPayload().getValue(), is(true));
     assertThat(messageCopy.getPayload().getDataType(), is(BOOLEAN));
-    assertThat(messageCopy.getAttributes(), is(TEST_ATTR_2));
+    assertThat(messageCopy.getAttributes().getValue(), is(TEST_ATTR_2));
+    // FIXME: what about attributes' data type?
   }
 
   @Test
@@ -283,7 +286,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   private void assertTestMessage(Message message) {
     assertThat(message.getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(message.getPayload().getDataType(), is(TEXT_STRING));
-    assertThat(message.getAttributes(), is(TEST_ATTR));
+    assertThat(message.getAttributes().getValue(), is(TEST_ATTR));
   }
 
 }

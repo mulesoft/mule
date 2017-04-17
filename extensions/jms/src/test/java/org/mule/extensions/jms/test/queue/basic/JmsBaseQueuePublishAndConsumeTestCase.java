@@ -90,7 +90,7 @@ public abstract class JmsBaseQueuePublishAndConsumeTestCase extends JmsAbstractT
     publish(payload);
     Message message = consume();
     assertThat(message, hasPayload(equalTo(payload)));
-    assertHeaders((JmsAttributes) message.getAttributes(),
+    assertHeaders((JmsAttributes) message.getAttributes().getValue(),
                   new JmsDestination(destination, QUEUE), PERSISTENT,
                   4, true, true, null, null, null,
                   false);

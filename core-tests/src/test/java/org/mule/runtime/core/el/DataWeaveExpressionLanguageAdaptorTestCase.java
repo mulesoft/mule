@@ -6,21 +6,6 @@
  */
 package org.mule.runtime.core.el;
 
-import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
-import static org.mule.runtime.api.metadata.DataType.OBJECT;
-import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.api.metadata.DataType.fromType;
-import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ATTRIBUTES;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.DATA_TYPE;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ERROR;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.FLOW;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PARAMETERS;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PAYLOAD;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PROPERTIES;
-import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.VARIABLES;
-import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
-import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
 import static java.util.Optional.empty;
 import static org.apache.commons.lang.SystemUtils.FILE_SEPARATOR;
 import static org.hamcrest.Matchers.containsString;
@@ -36,6 +21,22 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ATTRIBUTES;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.DATA_TYPE;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.ERROR;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.FLOW;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PARAMETERS;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PAYLOAD;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PROPERTIES;
+import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.VARIABLES;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
@@ -51,13 +52,14 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.message.BaseAttributes;
 
+import com.google.common.collect.Sets;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
-import com.google.common.collect.Sets;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -150,7 +152,9 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
     when(event.getMessage()).thenReturn(message);
     TypedValue payload = new TypedValue<>("hey", STRING);
+    TypedValue attributes = new TypedValue<>(null, OBJECT);
     when(message.getPayload()).thenReturn(payload);
+    when(message.getAttributes()).thenReturn(attributes);
 
     TypedValue result = expressionLanguage.evaluate(PAYLOAD, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(equalTo(payload.getValue())));
@@ -163,7 +167,9 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
     when(event.getMessage()).thenReturn(message);
     TypedValue payload = new TypedValue<>("hey", STRING);
+    TypedValue attributes = new TypedValue<>(null, OBJECT);
     when(message.getPayload()).thenReturn(payload);
+    when(message.getAttributes()).thenReturn(attributes);
 
     TypedValue result = expressionLanguage.evaluate(DATA_TYPE, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(equalTo(STRING)));
@@ -298,6 +304,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     Event event = mock(Event.class, RETURNS_DEEP_STUBS);
     doReturn(error).when(event).getError();
     when(event.getMessage().getPayload()).thenReturn(new TypedValue<>(null, OBJECT));
+    when(event.getMessage().getAttributes()).thenReturn(new TypedValue<>(null, OBJECT));
     return event;
   }
 

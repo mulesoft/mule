@@ -59,8 +59,8 @@ public class SecureHttpPollingFunctionalTestCase extends MuleArtifactFunctionalT
     // This seems a little odd that we forward the exception to the outbound endpoint, but I guess users
     // can just add a filter
     assertThat(result, not(nullValue()));
-    assertThat(result.getAttributes(), instanceOf(HttpResponseAttributes.class));
-    assertThat(((HttpResponseAttributes) result.getAttributes()).getStatusCode(), is(401));
+    assertThat(result.getAttributes().getValue(), instanceOf(HttpResponseAttributes.class));
+    assertThat(((HttpResponseAttributes) result.getAttributes().getValue()).getStatusCode(), is(401));
     assertThat(latch.await(1000, MILLISECONDS), is(true));
   }
 }

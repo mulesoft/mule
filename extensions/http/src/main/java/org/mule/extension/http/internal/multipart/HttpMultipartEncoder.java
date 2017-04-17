@@ -112,7 +112,7 @@ public class HttpMultipartEncoder {
 
   public static Collection<HttpPart> createFrom(MultiPartPayload multiPartPayload, Transformer objectToByteArray) {
     return multiPartPayload.getParts().stream().map(message -> {
-      PartAttributes partAttributes = (PartAttributes) message.getAttributes();
+      PartAttributes partAttributes = (PartAttributes) message.getAttributes().getValue();
       TypedValue<Object> payload = message.getPayload();
       String name = partAttributes.getName();
       byte[] data;

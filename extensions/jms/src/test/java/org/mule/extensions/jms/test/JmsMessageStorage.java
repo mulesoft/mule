@@ -38,7 +38,7 @@ public class JmsMessageStorage implements Callable {
     Message message = pollMuleMessage();
     return Result.<TypedValue<Object>, JmsAttributes>builder()
         .output(message.getPayload())
-        .attributes((JmsAttributes) message.getAttributes())
+        .attributes((JmsAttributes) message.getAttributes().getValue())
         .build();
   }
 

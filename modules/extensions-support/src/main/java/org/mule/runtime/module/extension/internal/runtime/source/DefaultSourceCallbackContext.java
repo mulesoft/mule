@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.util.Optional.ofNullable;
-import org.mule.runtime.api.message.Attributes;
+
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
@@ -63,7 +63,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContext {
    * {@inheritDoc}
    */
   @Override
-  public <T, A extends Attributes> SourceCallback<T, A> getSourceCallback() {
+  public <T, A> SourceCallback<T, A> getSourceCallback() {
     return sourceCallback;
   }
 }

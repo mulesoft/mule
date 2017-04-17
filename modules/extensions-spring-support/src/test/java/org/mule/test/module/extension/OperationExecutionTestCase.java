@@ -170,8 +170,8 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
 
   private void assertEnemyMessage(HeisenbergExtension heisenberg, int index, Message enemyMessage) {
     assertThat(enemyMessage.getPayload().getValue(), is(heisenberg.getEnemies().get(index)));
-    assertThat(enemyMessage.getAttributes(), is(instanceOf(IntegerAttributes.class)));
-    assertThat(((IntegerAttributes) enemyMessage.getAttributes()).getValue(), is(index));
+    assertThat(enemyMessage.getAttributes().getValue(), is(instanceOf(IntegerAttributes.class)));
+    assertThat(((IntegerAttributes) enemyMessage.getAttributes().getValue()).getValue(), is(index));
   }
 
   @Test

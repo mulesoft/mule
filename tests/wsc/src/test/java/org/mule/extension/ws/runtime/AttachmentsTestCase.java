@@ -80,7 +80,7 @@ public abstract class AttachmentsTestCase extends AbstractSoapServiceTestCase {
   @Step("Checks that the response body is correct and references the correct attachment")
   private void assertDownloadedAttachmentBody(Message bodyPart, Message attachmentPart) throws Exception {
     // We need to format the expected response with the content id of the attachment.
-    String name = ((PartAttributes) attachmentPart.getAttributes()).getName();
+    String name = ((PartAttributes) attachmentPart.getAttributes().getValue()).getName();
     String responseResource = format(getResponseResource(DOWNLOAD_ATTACHMENT), name);
     assertSimilarXml(IOUtils.toString((InputStream) bodyPart.getPayload().getValue()), responseResource);
   }

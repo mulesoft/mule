@@ -80,7 +80,7 @@ public abstract class JmsBaseQueueRequestReplyTestCase extends JmsAbstractTestCa
     // Read the reply result
     Message firstReply = firstRequestReply.get();
     assertThat(firstReply, hasPayload(equalTo(FIRST_RESPONSE)));
-    assertThat(firstReply.getAttributes(), not(nullValue()));
+    assertThat(firstReply.getAttributes().getValue(), not(nullValue()));
   }
 
   @Test
@@ -106,7 +106,7 @@ public abstract class JmsBaseQueueRequestReplyTestCase extends JmsAbstractTestCa
     // Read the reply result
     Message firstReply = firstRequestReply.get();
     assertThat(firstReply, hasPayload(equalTo(FIRST_RESPONSE)));
-    assertThat(firstReply.getAttributes(), not(nullValue()));
+    assertThat(firstReply.getAttributes().getValue(), not(nullValue()));
   }
 
   @Test
@@ -145,10 +145,10 @@ public abstract class JmsBaseQueueRequestReplyTestCase extends JmsAbstractTestCa
     assertThat(secondReplyDestination, is(equalTo(REPLY_TO_DESTINATION)));
 
     assertThat(firstReply, hasPayload(equalTo(FIRST_RESPONSE)));
-    assertThat(firstReply.getAttributes(), not(nullValue()));
+    assertThat(firstReply.getAttributes().getValue(), not(nullValue()));
 
     assertThat(secondReply, hasPayload(equalTo(SECOND_RESPONSE)));
-    assertThat(secondReply.getAttributes(), not(nullValue()));
+    assertThat(secondReply.getAttributes().getValue(), not(nullValue()));
   }
 
   private void reply(String replyDestination, String message) throws Exception {

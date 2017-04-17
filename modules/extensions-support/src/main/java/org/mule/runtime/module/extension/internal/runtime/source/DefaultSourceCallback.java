@@ -11,9 +11,9 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
+
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.util.Preconditions;
@@ -45,7 +45,7 @@ import java.util.function.Supplier;
  * @param <A> the generic type of the attributes of the generated results
  * @since 4.0
  */
-class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T, A> {
+class DefaultSourceCallback<T, A> implements SourceCallback<T, A> {
 
   private static final String UNABLE_TO_START_TX_ERROR_MSG_TEMPLATE =
       "Unable to start a transaction from the Source '%s' of the extension '%s' without a %s";
@@ -56,7 +56,7 @@ class DefaultSourceCallback<T, A extends Attributes> implements SourceCallback<T
    * @param <T> the generic type of the output values of the generated results
    * @param <A> the generic type of the attributes of the generated results
    */
-  static class Builder<T, A extends Attributes> {
+  static class Builder<T, A> {
 
     private Builder() {}
 

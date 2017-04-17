@@ -18,7 +18,6 @@ import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.api.Event;
 
 import java.io.IOException;
-import java.io.Serializable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -68,7 +67,7 @@ public class HttpRequestMultipartTestCase extends AbstractHttpRequestTestCase {
 
   private void testWithPath(String path) throws Exception {
     Event response = flowRunner("requestFlow").withVariable("requestPath", path).run();
-    Serializable attributes = response.getMessage().getAttributes();
+    Object attributes = response.getMessage().getAttributes().getValue();
     assertThat(attributes, instanceOf(HttpResponseAttributes.class));
     assertThat(((MultiPartPayload) response.getMessage().getPayload().getValue()), hasSize(1));
   }

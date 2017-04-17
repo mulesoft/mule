@@ -60,7 +60,7 @@ public class DefaultMultiPartPayload implements Serializable, MultiPartPayload {
     final Builder<Message> builder = ImmutableList.builder();
 
     for (Message part : parts) {
-      if (!(part.getAttributes() instanceof PartAttributes)) {
+      if (!(part.getAttributes().getValue() instanceof PartAttributes)) {
         throw new IllegalArgumentException("Body parts may only have 'PartAttributes' as attributes.");
       }
 
@@ -132,7 +132,7 @@ public class DefaultMultiPartPayload implements Serializable, MultiPartPayload {
   }
 
   private PartAttributes getPartAttributes(Message message) {
-    return (PartAttributes) message.getAttributes();
+    return (PartAttributes) message.getAttributes().getValue();
   }
 
   @Override

@@ -22,7 +22,7 @@ import ru.yandex.qatools.allure.annotations.Stories;
 public class BlockingExtensionsClientTestCase extends ExtensionsClientTestCase {
 
   @Override
-  <T, A extends Attributes> Result<T, A> doExecute(String extension, String operation, OperationParameters params)
+  <T, A> Result<T, A> doExecute(String extension, String operation, OperationParameters params)
       throws MuleException {
     return client.execute(extension, operation, params);
   }

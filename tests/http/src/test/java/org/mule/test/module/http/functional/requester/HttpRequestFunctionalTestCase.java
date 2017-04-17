@@ -66,13 +66,13 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void responseStatusCodeIsSetAsInboundProperty() throws Exception {
     Event event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
-    assertThat((HttpResponseAttributes) event.getMessage().getAttributes(), hasStatusCode(OK.getStatusCode()));
+    assertThat((HttpResponseAttributes) event.getMessage().getAttributes().getValue(), hasStatusCode(OK.getStatusCode()));
   }
 
   @Test
   public void responseHeadersAreMappedInAttributes() throws Exception {
     Event event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
-    HttpResponseAttributes responseAttributes = (HttpResponseAttributes) event.getMessage().getAttributes();
+    HttpResponseAttributes responseAttributes = (HttpResponseAttributes) event.getMessage().getAttributes().getValue();
     assertThat(responseAttributes.getHeaders(), hasEntry(TEST_HEADER_NAME.toLowerCase(), TEST_HEADER_VALUE));
   }
 

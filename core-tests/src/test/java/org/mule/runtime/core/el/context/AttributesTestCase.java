@@ -13,6 +13,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.ATTRIBUTES;
 import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
@@ -37,7 +39,7 @@ public class AttributesTestCase extends AbstractELTestCase {
   @Test
   public void attributes() throws Exception {
     Attributes attributes = NULL_ATTRIBUTES;
-    when(message.getAttributes()).thenReturn(attributes);
+    when(message.getAttributes()).thenReturn(new TypedValue<>(attributes, DataType.OBJECT));
     assertThat(evaluate(ATTRIBUTES, event), equalTo(attributes));
   }
 
