@@ -10,16 +10,17 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
+import org.mule.runtime.extension.internal.property.TransactionalActionModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 
 import java.util.HashMap;
@@ -185,13 +186,24 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   }
 
   private OperationTransactionalAction getTransactionalAction() {
-    OperationTransactionalAction action = getParameter(TRANSACTIONAL_ACTION_PARAMETER_NAME);
-    if (action == null) {
+    try {
+      Optional<ParameterModel> transactionalParameter = getTransactionalActionParameter();
+      if (transactionalParameter.isPresent()) {
+        return getParameter(transactionalParameter.get().getName());
+      } else {
+        throw new NoSuchElementException();
+      }
+    } catch (NoSuchElementException e) {
       throw new IllegalArgumentException(format("Operation '%s' from extension '%s' is transactional but no transactional action defined",
                                                 componentModel.getName(),
                                                 extensionModel.getName()));
     }
+  }
 
-    return action;
+  private Optional<ParameterModel> getTransactionalActionParameter() {
+    return componentModel.getAllParameterModels()
+        .stream()
+        .filter(p -> p.getModelProperty(TransactionalActionModelProperty.class).isPresent())
+        .findAny();
   }
 }

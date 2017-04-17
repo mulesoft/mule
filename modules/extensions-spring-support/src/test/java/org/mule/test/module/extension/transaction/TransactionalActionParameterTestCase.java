@@ -6,39 +6,21 @@
  */
 package org.mule.test.module.extension.transaction;
 
-import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.mule.runtime.extension.api.tx.OperationTransactionalAction.JOIN_IF_POSSIBLE;
+import static org.mule.runtime.extension.api.tx.OperationTransactionalAction.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.tx.SourceTransactionalAction.ALWAYS_BEGIN;
-import static org.mule.runtime.extension.api.tx.SourceTransactionalAction.NONE;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
-import org.mule.test.runner.RunnerDelegateTo;
 import org.mule.test.transactional.TransactionalSourceWithTXParameters;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
-import java.util.Collection;
-
-@RunnerDelegateTo(Parameterized.class)
 public class TransactionalActionParameterTestCase extends AbstractExtensionFunctionalTestCase {
-
-  @Parameterized.Parameter
-  public String flowName;
-
-  @Parameterized.Parameter(1)
-  public SourceTransactionalAction transactionalAction;
-
-  @Parameterized.Parameters(name = "{0} - Excepted: {1}")
-  public static Collection<Object[]> data() {
-    return asList(new Object[][] {
-        {"alwaysBeginTxAction", ALWAYS_BEGIN},
-        {"defaultTxAction", NONE}
-    });
-  }
 
   @Override
   protected String getConfigFile() {
@@ -46,7 +28,25 @@ public class TransactionalActionParameterTestCase extends AbstractExtensionFunct
   }
 
   @Test
-  public void injectSourceTransactionalAction() throws Exception {
+  public void injectAlwaysBeginSourceTransactionalAction() throws Exception {
+    assertSourceTransactionalAction("alwaysBeginTxAction", ALWAYS_BEGIN);
+  }
+
+  @Test
+  public void injectDefaultOperationTransactionalAction() throws Exception {
+    OperationTransactionalAction value =
+        (OperationTransactionalAction) flowRunner("injectInOperationDefaultValue").run().getMessage().getPayload().getValue();
+    assertThat(value, is(JOIN_IF_POSSIBLE));
+  }
+
+  @Test
+  public void injectInOperationJoinNotSupported() throws Exception {
+    OperationTransactionalAction value =
+        (OperationTransactionalAction) flowRunner("injectInOperationJoinNotSupported").run().getMessage().getPayload().getValue();
+    assertThat(value, is(NOT_SUPPORTED));
+  }
+
+  private void assertSourceTransactionalAction(String flowName, SourceTransactionalAction transactionalAction) throws Exception {
     Reference<SourceTransactionalAction> sourceTransactionalAction = new Reference<>();
     TransactionalSourceWithTXParameters.responseCallback = tx -> sourceTransactionalAction.set((SourceTransactionalAction) tx);
     startFlow(flowName);

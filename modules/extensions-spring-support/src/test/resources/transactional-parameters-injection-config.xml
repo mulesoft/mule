@@ -23,4 +23,12 @@
         <logger />
     </flow>
 
+    <flow name="injectInOperationJoinNotSupported">
+        <tx:inject-transactional-action action="NOT_SUPPORTED"/>
+    </flow>
+
+    <flow name="injectInOperationDefaultValue">
+        <tx:inject-transactional-action/>
+    </flow>
+
 </mule>
