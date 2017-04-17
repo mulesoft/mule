@@ -204,6 +204,7 @@
                 <exclude>org.mule.runtime:mule-message-metadata-model</exclude>
                 <!--extensions API-->
                 <exclude>org.mule.runtime:mule-extensions-api</exclude>
+                <exclude>org.mule.runtime:mule-extensions-soap-api</exclude>
                 <exclude>org.mule.runtime:mule-extensions-api-persistence</exclude>
                 <exclude>org.mule.runtime:mule-extensions-api-dsql</exclude>
                 <!--Services-->
@@ -219,6 +220,7 @@
                 <exclude>org.mule.runtime:mule-module-artifact</exclude>
                 <exclude>org.mule.runtime:mule-module-builders</exclude>
                 <exclude>org.mule.runtime:mule-module-extensions-support</exclude>
+                <exclude>org.mule.runtime:mule-module-extensions-soap-support</exclude>
                 <exclude>org.mule.runtime:mule-module-extensions-spring-support</exclude>
                 <exclude>org.mule.runtime:mule-module-extensions-xml-support</exclude>
                 <exclude>org.mule.modules:mule-module-http-ext</exclude>

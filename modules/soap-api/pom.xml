@@ -34,6 +34,7 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-soap-api</artifactId>
             <version>${muleExtensionsSoapApiVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
