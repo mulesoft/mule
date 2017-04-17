@@ -33,7 +33,7 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -69,7 +69,7 @@ public class IMAPOperations {
    */
   @Summary("List all the emails in the given POP3 Mailbox Folder")
   @OutputResolver(output = EmailMetadataResolver.class)
-  public PagingProvider<MailboxConnection, Result<Object, IMAPEmailAttributes>> listImap(@UseConfig IMAPConfiguration config,
+  public PagingProvider<MailboxConnection, Result<Object, IMAPEmailAttributes>> listImap(@Config IMAPConfiguration config,
                                                                                          @Connection MailboxConnection connection,
                                                                                          @Optional(
                                                                                              defaultValue = INBOX_FOLDER) String mailboxFolder,

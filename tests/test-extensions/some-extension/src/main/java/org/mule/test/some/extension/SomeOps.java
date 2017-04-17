@@ -8,11 +8,11 @@
 package org.mule.test.some.extension;
 
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 
 public class SomeOps {
 
-  public void someOp(@Connection String conn, @UseConfig SomeExtension ext) {
+  public void someOp(@Connection String conn, @Config SomeExtension ext) {
 
   }
 }

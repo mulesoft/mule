@@ -30,7 +30,7 @@ import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -68,7 +68,7 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
   @Connection
   private ListenerConnection connection;
 
-  @UseConfig
+  @Config
   private ListenerConfig config;
 
   private AtomicBoolean stopRequested = new AtomicBoolean(false);

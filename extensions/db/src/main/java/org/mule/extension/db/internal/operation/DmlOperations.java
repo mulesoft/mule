@@ -43,7 +43,7 @@ import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
@@ -83,7 +83,7 @@ public class DmlOperations extends BaseDbOperations {
       tab = ADVANCED_TAB) QueryDefinition query,
                                              @Optional(defaultValue = "false") @Expression(NOT_SUPPORTED) @Placement(
                                                  tab = ADVANCED_TAB) @DisplayName("Stream Response") boolean streaming,
-                                             @UseConfig DbConnector connector,
+                                             @Config DbConnector connector,
                                              @Connection DbConnection connection)
       throws SQLException {
 
@@ -112,7 +112,7 @@ public class DmlOperations extends BaseDbOperations {
    */
   public StatementResult insert(@ParameterGroup(name = QUERY_GROUP) @Placement(tab = ADVANCED_TAB) QueryDefinition query,
                                 @ParameterGroup(name = AUTO_GENERATE_KEYS) AutoGenerateKeysAttributes autoGenerateKeysAttributes,
-                                @UseConfig DbConnector connector,
+                                @Config DbConnector connector,
                                 @Connection DbConnection connection)
       throws SQLException {
 
@@ -132,7 +132,7 @@ public class DmlOperations extends BaseDbOperations {
    */
   public StatementResult update(@ParameterGroup(name = QUERY_GROUP) QueryDefinition query,
                                 @ParameterGroup(name = AUTO_GENERATE_KEYS) AutoGenerateKeysAttributes autoGenerateKeysAttributes,
-                                @UseConfig DbConnector connector,
+                                @Config DbConnector connector,
                                 @Connection DbConnection connection)
       throws SQLException {
 
@@ -150,7 +150,7 @@ public class DmlOperations extends BaseDbOperations {
    * @throws SQLException if an error is produced
    */
   public int delete(@ParameterGroup(name = QUERY_GROUP) QueryDefinition query,
-                    @UseConfig DbConnector connector,
+                    @Config DbConnector connector,
                     @Connection DbConnection connection)
       throws SQLException {
 
@@ -176,7 +176,7 @@ public class DmlOperations extends BaseDbOperations {
                                                                        defaultValue = "false") @Expression(NOT_SUPPORTED) boolean streaming,
                                                                    @ParameterGroup(
                                                                        name = AUTO_GENERATE_KEYS) AutoGenerateKeysAttributes autoGenerateKeysAttributes,
-                                                                   @UseConfig DbConnector connector,
+                                                                   @Config DbConnector connector,
                                                                    @Connection DbConnection connection)
       throws SQLException {
 

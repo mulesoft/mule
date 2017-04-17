@@ -28,7 +28,7 @@ import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.ExternalLibs;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
@@ -181,7 +181,7 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
   }
 
   Optional<ExtensionParameter> getConfigParameter(WithParameters element) {
-    return element.getParametersAnnotatedWith(UseConfig.class).stream().findFirst();
+    return element.getParametersAnnotatedWith(Config.class).stream().findFirst();
   }
 
   Optional<ExtensionParameter> getConnectionParameter(WithParameters element) {

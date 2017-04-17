@@ -24,7 +24,7 @@ import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -82,16 +82,16 @@ public class HeisenbergOperations implements Disposable {
 
   @DataTypeParameters
   @Streaming
-  public String sayMyName(@UseConfig HeisenbergExtension config) {
+  public String sayMyName(@Config HeisenbergExtension config) {
     return config.getPersonalInfo().getName();
   }
 
-  public void die(@UseConfig HeisenbergExtension config) {
+  public void die(@Config HeisenbergExtension config) {
     config.setEndingHealth(HealthStatus.DEAD);
   }
 
   @DataTypeParameters
-  public Result<String, IntegerAttributes> getEnemy(@UseConfig HeisenbergExtension config,
+  public Result<String, IntegerAttributes> getEnemy(@Config HeisenbergExtension config,
                                                     @Optional(defaultValue = "0") int index) {
     Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
     org.mule.runtime.api.metadata.DataType dt =
@@ -101,7 +101,7 @@ public class HeisenbergOperations implements Disposable {
         .mediaType(dt.getMediaType()).attributes(new IntegerAttributes(index)).build();
   }
 
-  public List<Result<String, IntegerAttributes>> getAllEnemies(@UseConfig HeisenbergExtension config) {
+  public List<Result<String, IntegerAttributes>> getAllEnemies(@Config HeisenbergExtension config) {
     List<Result<String, IntegerAttributes>> enemies = new ArrayList<>(config.getEnemies().size());
     for (int i = 0; i < config.getEnemies().size(); i++) {
       enemies.add(Result.<String, IntegerAttributes>builder()
@@ -168,7 +168,7 @@ public class HeisenbergOperations implements Disposable {
     return String.format("%s, my name is %s and I'm %d years old", greeting, info.getName(), info.getAge());
   }
 
-  public BarberPreferences getBarberPreferences(@UseConfig HeisenbergExtension config) {
+  public BarberPreferences getBarberPreferences(@Config HeisenbergExtension config) {
     return config.getBarberPreferences();
   }
 

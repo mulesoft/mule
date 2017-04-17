@@ -10,7 +10,7 @@ package org.mule.test.parameter.resolver.extension.extension;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -24,7 +24,7 @@ public class SomeSource extends Source<String, Attributes> {
   @Parameter
   public static Literal<String> literalString;
 
-  @UseConfig
+  @Config
   public static ParameterResolverExtension extension;
 
   @Override

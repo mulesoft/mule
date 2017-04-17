@@ -33,7 +33,7 @@ import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -78,7 +78,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                       @Placement(order = 3) @ParameterGroup(name = REQUEST_SETTINGS) HttpRequesterRequestBuilder requestBuilder,
                       @ParameterGroup(name = OTHER_SETTINGS) OutputSettings outputSettings,
                       @Connection HttpExtensionClient client,
-                      @UseConfig HttpRequesterConfig config,
+                      @Config HttpRequesterConfig config,
                       CompletionCallback<Object, HttpResponseAttributes> callback) {
     try {
       HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : new HttpRequesterRequestBuilder();

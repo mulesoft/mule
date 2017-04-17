@@ -7,9 +7,9 @@
 
 package org.mule.test.implicit.exclusive.config.extension.extension;
 
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 
 public class BlaOperations {
 
-  public void bla(@UseConfig BlaConfig bla) {}
+  public void bla(@Config BlaConfig bla) {}
 }

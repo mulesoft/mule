@@ -44,7 +44,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -84,7 +84,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
   @Inject
   private JmsSessionManager sessionManager;
 
-  @UseConfig
+  @Config
   private JmsConfig config;
 
   @Connection

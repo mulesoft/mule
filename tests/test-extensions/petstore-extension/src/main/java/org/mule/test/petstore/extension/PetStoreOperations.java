@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
 import java.io.InputStream;
@@ -26,7 +26,7 @@ import java.util.concurrent.CountDownLatch;
 
 public class PetStoreOperations {
 
-  public List<String> getPets(@Connection PetStoreClient client, @UseConfig PetStoreConnector config, String ownerName) {
+  public List<String> getPets(@Connection PetStoreClient client, @Config PetStoreConnector config, String ownerName) {
     return client.getPets(ownerName, config);
   }
 
@@ -71,7 +71,7 @@ public class PetStoreOperations {
     return client;
   }
 
-  public PetCage getCage(@UseConfig PetStoreConnector config) {
+  public PetCage getCage(@Config PetStoreConnector config) {
     return config.getCage();
   }
 

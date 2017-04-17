@@ -27,7 +27,7 @@ import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -64,7 +64,7 @@ public final class FileOperations extends BaseFileSystemOperations {
    */
   @Summary("List all the files from given directory")
   @Throws(FileListErrorTypeProvider.class)
-  public List<Result<InputStream, LocalFileAttributes>> list(@UseConfig FileConnectorConfig config,
+  public List<Result<InputStream, LocalFileAttributes>> list(@Config FileConnectorConfig config,
                                                              @Connection LocalFileSystem fileSystem,
                                                              String directoryPath,
                                                              @Optional(defaultValue = "false") boolean recursive,
@@ -99,7 +99,7 @@ public final class FileOperations extends BaseFileSystemOperations {
   @DataTypeParameters
   @Summary("Obtains the content and metadata of a file at a given path")
   @Throws(FileReadErrorTypeProvider.class)
-  public Result<InputStream, LocalFileAttributes> read(@UseConfig FileConnectorConfig config,
+  public Result<InputStream, LocalFileAttributes> read(@Config FileConnectorConfig config,
                                                        @Connection FileSystem fileSystem,
                                                        @DisplayName("File Path") String path,
                                                        MediaType mediaType,
@@ -133,7 +133,7 @@ public final class FileOperations extends BaseFileSystemOperations {
    */
   @Summary("Writes the given \"Content\" in the file pointed by \"Path\"")
   @Throws(FileWriteErrorTypeProvider.class)
-  public void write(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String path,
+  public void write(@Config FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String path,
                     @Content @Summary("Content to be written into the file") InputStream content,
                     @Optional @Summary("Encoding when trying to write a String file. If not set, defaults to the configuration one or the Mule default") @Placement(
                         tab = ADVANCED_TAB) String encoding,
@@ -167,7 +167,7 @@ public final class FileOperations extends BaseFileSystemOperations {
    */
   @Summary("Copies a file")
   @Throws(FileCopyErrorTypeProvider.class)
-  public void copy(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, String sourcePath,
+  public void copy(@Config FileConnectorConfig config, @Connection FileSystem fileSystem, String sourcePath,
                    String targetPath, @Optional(defaultValue = "true") boolean createParentDirectories,
                    @Optional(defaultValue = "false") boolean overwrite, @Optional String renameTo) {
     super.doCopy(config, fileSystem, sourcePath, targetPath, createParentDirectories, overwrite, renameTo);
@@ -197,7 +197,7 @@ public final class FileOperations extends BaseFileSystemOperations {
    */
   @Summary("Moves a file")
   @Throws(FileCopyErrorTypeProvider.class)
-  public void move(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, String sourcePath,
+  public void move(@Config FileConnectorConfig config, @Connection FileSystem fileSystem, String sourcePath,
                    String targetPath, @Optional(defaultValue = "true") boolean createParentDirectories,
                    @Optional(defaultValue = "false") boolean overwrite, @Optional String renameTo) {
     super.doMove(config, fileSystem, sourcePath, targetPath, createParentDirectories, overwrite, renameTo);

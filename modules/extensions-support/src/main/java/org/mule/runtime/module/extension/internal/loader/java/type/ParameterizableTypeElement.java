@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toList;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 
 import com.google.common.collect.ImmutableList;
 
@@ -32,7 +32,7 @@ public interface ParameterizableTypeElement extends Type, WithParameters {
   default List<ExtensionParameter> getParameters() {
     return ImmutableList.<ExtensionParameter>builder().addAll(getAnnotatedFields(Parameter.class))
         .addAll(getAnnotatedFields(ParameterGroup.class)).addAll(getAnnotatedFields(Connection.class))
-        .addAll(getAnnotatedFields(UseConfig.class)).build();
+        .addAll(getAnnotatedFields(Config.class)).build();
   }
 
   /**

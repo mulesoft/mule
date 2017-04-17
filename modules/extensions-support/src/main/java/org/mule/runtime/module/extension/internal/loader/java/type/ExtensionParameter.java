@@ -18,7 +18,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
@@ -47,7 +47,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
    */
   default boolean shouldBeAdvertised() {
     return !(assignableFromAny(getType().getDeclaringClass(), IMPLICIT_ARGUMENT_TYPES)
-        || (isAnnotatedWith(UseConfig.class) || isAnnotatedWith(Connection.class)));
+        || (isAnnotatedWith(Config.class) || isAnnotatedWith(Connection.class)));
   }
 
   /**

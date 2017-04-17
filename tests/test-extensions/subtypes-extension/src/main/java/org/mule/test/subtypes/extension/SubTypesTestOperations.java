@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.test.vegan.extension.VeganCookBook;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class SubTypesTestOperations {
     return door;
   }
 
-  public SubTypesMappingConnector configRetriever(@UseConfig SubTypesMappingConnector config) {
+  public SubTypesMappingConnector configRetriever(@Config SubTypesMappingConnector config) {
     return config;
   }
 

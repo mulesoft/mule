@@ -7,13 +7,13 @@
 
 package org.foo.hello;
 
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 
 public class PrivilegedOperation {
 
   public PrivilegedOperation() {}
 
-  public String printMessage(@UseConfig PrivilegedExtension config) {
+  public String printMessage(@Config PrivilegedExtension config) {
     System.out.println("Test privileged extension says: " + config.getMessage());
     return config.getMessage();
   }

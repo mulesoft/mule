@@ -26,7 +26,7 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -61,7 +61,7 @@ public class POP3Operations {
    */
   @Summary("List all the emails in the given POP3 Mailbox Folder")
   @OutputResolver(output = EmailMetadataResolver.class)
-  public PagingProvider<MailboxConnection, Result<Object, POP3EmailAttributes>> listPop3(@UseConfig POP3Configuration config,
+  public PagingProvider<MailboxConnection, Result<Object, POP3EmailAttributes>> listPop3(@Config POP3Configuration config,
                                                                                          @Connection MailboxConnection connection,
                                                                                          @Optional(
                                                                                              defaultValue = INBOX_FOLDER) String mailboxFolder,

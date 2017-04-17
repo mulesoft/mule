@@ -8,11 +8,11 @@
 package org.mule.test.implicit.config.extension.extension;
 
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 
 public class ImplicitOperations {
 
-  public ImplicitConfigExtension getConfig(@UseConfig ImplicitConfigExtension config) {
+  public ImplicitConfigExtension getConfig(@Config ImplicitConfigExtension config) {
     return config;
   }
 

@@ -7,11 +7,11 @@
 
 package org.mule.test.implicit.exclusive.config.extension.extension;
 
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 
 public class BleOperations {
 
-  public int ble(@UseConfig ConfigWithNumber ble) {
+  public int ble(@Config ConfigWithNumber ble) {
     return ble.getNumber();
   }
 }

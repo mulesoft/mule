@@ -12,7 +12,7 @@ import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.extension.validation.api.Validator;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import com.google.common.cache.CacheBuilder;
@@ -47,7 +47,7 @@ public final class CustomValidatorOperation extends ValidationSupport {
 
   public void customValidator(@Placement(order = 0) @ParameterGroup(name = "Validator") CustomValidatorFactory source,
                               @Placement(order = 1) @ParameterGroup(name = ERROR_GROUP) ValidationOptions options,
-                              @UseConfig ValidationExtension config)
+                              @Config ValidationExtension config)
       throws Exception {
     source.setMuleContext(config.getMuleContext());
     Validator validator = validatorCache.getUnchecked(source);

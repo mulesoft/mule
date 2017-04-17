@@ -15,7 +15,7 @@ import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.query.Query;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 
@@ -40,7 +40,7 @@ public class DdlOperations extends BaseDbOperations {
   @DisplayName("Execute DDL")
   public int executeDdl(@DisplayName(SQL_QUERY_TEXT) @Text String sql,
                         @ParameterGroup(name = QUERY_SETTINGS) QuerySettings settings,
-                        @UseConfig DbConnector connector,
+                        @Config DbConnector connector,
                         @Connection DbConnection connection)
       throws SQLException {
 

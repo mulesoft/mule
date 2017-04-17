@@ -22,7 +22,7 @@ import org.mule.runtime.core.util.store.ObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
@@ -52,7 +52,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
    * Listener configuration to be used instead of localCallbackUrl. Note that if using this you must also provide a
    * localCallbackConfigPath separately.
    */
-  @UseConfig
+  @Config
   @Optional
   private HttpListenerConfig localCallbackConfig;
 

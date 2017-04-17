@@ -13,7 +13,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.UseConfig;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -37,7 +37,7 @@ public class SocketOperations {
    * @throws ConnectionException if the connection couldn't be established, if the remote host was unavailable.
    */
   public Result<InputStream, SocketAttributes> sendAndReceive(@Connection RequesterConnection connection,
-                                                              @UseConfig RequesterConfig config,
+                                                              @Config RequesterConfig config,
                                                               @Content Object content,
                                                               @Optional @Summary("Encoding to use when the data to serialize is of String type") String outputEncoding)
       throws ConnectionException, IOException {
@@ -61,7 +61,7 @@ public class SocketOperations {
    * @throws ConnectionException if the connection couldn't be established, if the remote host was unavailable.
    */
   public void send(@Connection RequesterConnection connection,
-                   @UseConfig RequesterConfig config,
+                   @Config RequesterConfig config,
                    @Content Object content,
                    @Optional @Summary("Encoding to use when the data to serialize is of String type") String outputEncoding)
       throws ConnectionException, IOException {
