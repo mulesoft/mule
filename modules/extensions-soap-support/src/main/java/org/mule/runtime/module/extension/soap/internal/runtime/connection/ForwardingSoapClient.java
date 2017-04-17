@@ -44,9 +44,9 @@ public class ForwardingSoapClient {
   ForwardingSoapClient(SoapService service, SoapServiceProvider serviceProvider) {
     this.serviceProvider = serviceProvider;
     this.clientsCache = CacheBuilder.<WebServiceDefinition, SoapClient>newBuilder()
-      .expireAfterAccess(1, MINUTES)
-      .removalListener(new ForwardingClientRemovalListener())
-      .build(new SoapClientCacheLoader(service));
+        .expireAfterAccess(1, MINUTES)
+        .removalListener(new ForwardingClientRemovalListener())
+        .build(new SoapClientCacheLoader(service));
   }
 
   /**
@@ -59,7 +59,7 @@ public class ForwardingSoapClient {
   public SoapClient getSoapClient(String id) throws MuleException {
     List<WebServiceDefinition> webServiceDefinitions = serviceProvider.getWebServiceDefinitions();
     WebServiceDefinition wsd = webServiceDefinitions.stream().filter(ws -> ws.getServiceId().equals(id)).findAny()
-      .orElseThrow(() -> new IllegalArgumentException("Could not find a soap client id [" + id + "]"));
+        .orElseThrow(() -> new IllegalArgumentException("Could not find a soap client id [" + id + "]"));
     try {
       return clientsCache.get(wsd);
     } catch (ExecutionException e) {
@@ -89,9 +89,9 @@ public class ForwardingSoapClient {
     public SoapClient load(WebServiceDefinition definition) throws Exception {
       SoapClientFactory clientFactory = service.getClientFactory();
       SoapClientConfigurationBuilder configurationBuilder = builder()
-        .withService(definition.getService())
-        .withPort(definition.getPort())
-        .withWsdlLocation(definition.getWsdlUrl().toString());
+          .withService(definition.getService())
+          .withPort(definition.getPort())
+          .withWsdlLocation(definition.getWsdlUrl().toString());
       if (definition.getAddress() != null) {
         configurationBuilder.withAddress(definition.getAddress().toString());
       }
@@ -115,7 +115,9 @@ public class ForwardingSoapClient {
         }
       } catch (Exception e) {
         throw new MuleRuntimeException(
-          createStaticMessage("A problem occurred while disconnecting client: '%s'", client.toString()), e);
+                                       createStaticMessage("A problem occurred while disconnecting client: '%s'",
+                                                           client.toString()),
+                                       e);
       }
     }
   }

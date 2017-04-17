@@ -8,7 +8,6 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactExtensionManagerConfigurationBuilder.META_INF_FOLDER;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
@@ -80,7 +79,7 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
         params.put(TYPE_PROPERTY_NAME, extensionManifest.getDescriberManifest().getProperties().get("type"));
         params.put(VERSION, extensionManifest.getVersion());
         ClassLoader cl = artifactPlugin.getArtifactClassLoader().getClassLoader();
-        extensions.add(new DefaultJavaExtensionModelLoader().loadExtensionModel(cl, getDefault(emptySet()), params));
+        extensions.add(new DefaultJavaExtensionModelLoader().loadExtensionModel(cl, getDefault(extensions), params));
       } else {
         discoverExtensionThroughJsonDescriber(artifactPlugin, extensions);
       }
