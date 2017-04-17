@@ -15,6 +15,7 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.test.transactional.connection.TestTransactionalConnection;
 
 import java.io.IOException;
@@ -47,6 +48,11 @@ public class TransactionalOperations {
                                    @Content TestTransactionalConnection transactionalConnection) {
     checkArgument(transactionalConnection != null, "The transactionalConnection can't be null");
     checkState(connection.getConnectionId() == transactionalConnection.getConnectionId(), "The connection is not the same");
+  }
+
+  public OperationTransactionalAction injectTransactionalAction(@Connection TestTransactionalConnection connection,
+                                                                OperationTransactionalAction action) {
+    return action;
   }
 
   public PagingProvider<TestTransactionalConnection, Integer> pagedTransactionalOperation() throws Exception {

@@ -24,6 +24,9 @@ public interface SourceElement extends ParameterizableTypeElement {
    */
   List<Type> getSuperClassGenerics();
 
+  @Override
+  Class<? extends Source> getDeclaringClass();
+
   //TODO: MULE-9220 not more than one
   Optional<MethodElement> getOnResponseMethod();
 
