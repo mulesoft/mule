@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
 import org.mule.runtime.module.extension.internal.runtime.EventedExecutionContext;
@@ -20,6 +21,8 @@ public class FlowListenerArgumentResolver implements ArgumentResolver<FlowListen
 
   @Override
   public FlowListener resolve(ExecutionContext executionContext) {
-    return new DefaultFlowListener(((EventedExecutionContext) executionContext).getEvent());
+    return new DefaultFlowListener(executionContext.getExtensionModel(),
+                                   (OperationModel) executionContext.getComponentModel(),
+                                   ((EventedExecutionContext) executionContext).getEvent());
   }
 }

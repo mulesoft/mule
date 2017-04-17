@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
@@ -31,6 +33,9 @@ public class DefaultFlowListener implements FlowListener {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFlowListener.class);
 
+  private final ExtensionModel extensionModel;
+  private final OperationModel operationModel;
+
   private Consumer<Message> successConsumer;
   private Consumer<Exception> errorConsumer;
   private Runnable onComplete;
@@ -40,7 +45,9 @@ public class DefaultFlowListener implements FlowListener {
    *
    * @param event the event on which the operation is being executed.
    */
-  public DefaultFlowListener(Event event) {
+  public DefaultFlowListener(ExtensionModel extensionModel, OperationModel operationModel, Event event) {
+    this.extensionModel = extensionModel;
+    this.operationModel = operationModel;
     from(event.getContext().getResponsePublisher()).doAfterTerminate((responseEvent, t) -> onTerminate(responseEvent, t))
         .subscribe();
   }
@@ -78,14 +85,16 @@ public class DefaultFlowListener implements FlowListener {
         try {
           successConsumer.accept(event.getMessage());
         } catch (Exception e) {
-          LOGGER.warn("Exception found while execution onSuccess FlowListener", e);
+          LOGGER.warn("Operation " + operationModel.getName() + " from extension " + extensionModel.getName()
+              + " threw exception while executing the onSuccess FlowListener", e);
         }
       } else if (error != null && errorConsumer != null) {
         Exception exception = error instanceof Exception ? (Exception) error : new MessagingException(event, error);
         try {
           errorConsumer.accept(exception);
         } catch (Exception e) {
-          LOGGER.warn("Exception found while execution onError FlowListener", e);
+          LOGGER.warn("Operation " + operationModel.getName() + " from extension " + extensionModel.getName()
+              + " threw exception while executing the onError FlowListener", e);
         }
       }
     } finally {
@@ -93,7 +102,8 @@ public class DefaultFlowListener implements FlowListener {
         try {
           onComplete.run();
         } catch (Exception e) {
-          LOGGER.warn("Exception found while execution onCompete FlowListener", e);
+          LOGGER.warn("Operation " + operationModel.getName() + " from extension " + extensionModel.getName()
+              + " threw exception while executing the onComplete FlowListener", e);
         }
       }
     }
