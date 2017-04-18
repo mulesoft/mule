@@ -1,0 +1,27 @@
+{
+  "name": "File Common Plugin",
+  "minMuleVersion": "4.0.0",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "maven",
+    "attributes": {
+      "exportedPackages": [
+        "org.mule.extension.file.common",
+        "org.mule.extension.file.common.api",
+        "org.mule.extension.file.common.api.command",
+        "org.mule.extension.file.common.api.exceptions",
+        "org.mule.extension.file.common.api.lock",
+        "org.mule.extension.file.common.api.matcher",
+        "org.mule.extension.file.common.api.metadata",
+        "org.mule.extension.file.common.api.stream",
+        "org.mule.extension.file.common.api.util",
+        "org.apache.commons.io.input"
+      ],
+      "exportedResources": [
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "maven",
+    "attributes": {}
+  }
+}
