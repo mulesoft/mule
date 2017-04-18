@@ -51,7 +51,11 @@ abstract class AbstractEventContext implements EventContext {
   private void initCompletionProcessor() {
     responseProcessor = MonoProcessor.create();
     completionProcessor = MonoProcessor.create();
-    completionProcessor.doFinally(e -> LOGGER.debug(this + " execution completed.")).subscribe();
+    completionProcessor.doFinally(e -> {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(this + " execution completed.");
+      }
+    }).subscribe();
     // When there are no child contexts response triggers completion directly.
     completionSubscriberDisposable = Mono.<Void>whenDelayError(completionCallback,
                                                                responseProcessor.then())
@@ -86,7 +90,9 @@ abstract class AbstractEventContext implements EventContext {
   @Override
   public final void success() {
     synchronized (this) {
-      LOGGER.debug(this + " response completed with no result.");
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(this + " response completed with no result.");
+      }
       responseProcessor.onComplete();
     }
   }
@@ -97,7 +103,9 @@ abstract class AbstractEventContext implements EventContext {
   @Override
   public final void success(Event event) {
     synchronized (this) {
-      LOGGER.debug(this + " response completed with result.");
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(this + " response completed with result.");
+      }
       responseProcessor.onNext(event);
     }
   }
@@ -108,7 +116,9 @@ abstract class AbstractEventContext implements EventContext {
   @Override
   public final void error(Throwable throwable) {
     synchronized (this) {
-      LOGGER.debug(this + " response completed with error.");
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(this + " response completed with error.");
+      }
       responseProcessor.onError(throwable);
     }
   }
