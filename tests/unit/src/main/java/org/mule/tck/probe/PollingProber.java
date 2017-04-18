@@ -6,6 +6,8 @@
  */
 package org.mule.tck.probe;
 
+import java.util.function.BooleanSupplier;
+
 public class PollingProber implements Prober {
 
   public static final long DEFAULT_TIMEOUT = 1000;
@@ -13,6 +15,10 @@ public class PollingProber implements Prober {
 
   private final long timeoutMillis;
   private final long pollDelayMillis;
+
+  public static void check(long timeoutMillis, long pollDelayMillis, BooleanSupplier probe) {
+    new PollingProber(timeoutMillis, pollDelayMillis).check(new JUnitLambdaProbe(probe));
+  }
 
   public PollingProber() {
     this(DEFAULT_TIMEOUT, DEFAULT_POLLING_INTERVAL);

@@ -14,6 +14,7 @@ import static org.junit.Assert.fail;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
@@ -41,12 +42,14 @@ public class FlowListenerOperationExecutionTestCase extends AbstractExtensionFun
     assertThat(message.getPayload().getValue(), is(instanceOf(Banana.class)));
     final Banana banana = (Banana) message.getPayload().getValue();
 
-    assertThat(banana.isPeeled(), is(true));
-    assertThat(banana.isBitten(), is(true));
+    check(() -> {
+      assertThat(banana.isPeeled(), is(true));
+      assertThat(banana.isBitten(), is(true));
 
-    assertThat(config.getBananasCount(), is(1));
-    assertThat(config.getNonBananasCount(), is(0));
-    assertThat(config.getExceptionCount(), is(0));
+      assertThat(config.getBananasCount(), is(1));
+      assertThat(config.getNonBananasCount(), is(0));
+      assertThat(config.getExceptionCount(), is(0));
+    });
   }
 
   @Test
@@ -55,9 +58,11 @@ public class FlowListenerOperationExecutionTestCase extends AbstractExtensionFun
 
     assertThat(message.getPayload().getValue(), is(not(instanceOf(Fruit.class))));
 
-    assertThat(config.getBananasCount(), is(0));
-    assertThat(config.getNonBananasCount(), is(1));
-    assertThat(config.getExceptionCount(), is(0));
+    check(() -> {
+      assertThat(config.getBananasCount(), is(0));
+      assertThat(config.getNonBananasCount(), is(1));
+      assertThat(config.getExceptionCount(), is(0));
+    });
   }
 
   @Test
@@ -68,5 +73,12 @@ public class FlowListenerOperationExecutionTestCase extends AbstractExtensionFun
     } catch (MessagingException e) {
       assertThat(config.getExceptionCount(), is(1));
     }
+  }
+
+  private void check(Runnable probe) {
+    PollingProber.check(5000, 100, () -> {
+      probe.run();
+      return true;
+    });
   }
 }
