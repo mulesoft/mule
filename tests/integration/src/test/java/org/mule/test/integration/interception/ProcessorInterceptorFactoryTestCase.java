@@ -102,7 +102,7 @@ public class ProcessorInterceptorFactoryTestCase extends AbstractIntegrationTest
 
   public static class HasInjectedAttributesInterceptor implements ProcessorInterceptor {
 
-    private static final LinkedList<InterceptionParameters> interceptionParameters = new LinkedList<>();
+    private static final List<InterceptionParameters> interceptionParameters = new LinkedList<>();
 
     private MuleExpressionLanguage expressionEvaluator;
     private LockFactory lockFactory;
@@ -117,7 +117,7 @@ public class ProcessorInterceptorFactoryTestCase extends AbstractIntegrationTest
 
     @Override
     public void before(Map<String, Object> parameters, InterceptionEvent event) {
-      interceptionParameters.addLast(new InterceptionParameters(parameters, event));
+      interceptionParameters.add(new InterceptionParameters(parameters, event));
       assertThat(expressionEvaluator, not(nullValue()));
       assertThat(lockFactory, not(nullValue()));
       assertThat(httpService, not(nullValue()));
