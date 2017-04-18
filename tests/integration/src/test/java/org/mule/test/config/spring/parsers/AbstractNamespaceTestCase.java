@@ -9,16 +9,21 @@ package org.mule.test.config.spring.parsers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.test.AbstractIntegrationTestCase;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.core.util.ClassUtils;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.test.config.spring.parsers.beans.AbstractBean;
 
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public abstract class AbstractNamespaceTestCase extends AbstractIntegrationTestCase {
+
+  private static final Logger LOGGER = getLogger(AbstractNamespaceTestCase.class);
 
   @Test
   public void testParse() {
@@ -29,14 +34,14 @@ public abstract class AbstractNamespaceTestCase extends AbstractIntegrationTestC
     Object bean = muleContext.getRegistry().lookupObject(name);
     assertNotNull(name + " bean missing", bean);
     assertTrue(bean.getClass().equals(clazz));
-    logger.debug("found bean " + name + "/" + ClassUtils.getSimpleName(bean.getClass()));
+    LOGGER.debug("found bean " + name + "/" + ClassUtils.getSimpleName(bean.getClass()));
     return bean;
   }
 
   protected Object assertContentExists(Object object, Class clazz) {
     assertNotNull(ClassUtils.getSimpleName(clazz) + " content missing", object);
     assertTrue(clazz.isAssignableFrom(object.getClass()));
-    logger.debug("found content " + ClassUtils.getSimpleName(object.getClass()));
+    LOGGER.debug("found content " + ClassUtils.getSimpleName(object.getClass()));
     return object;
   }
 

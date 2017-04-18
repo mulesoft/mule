@@ -8,6 +8,8 @@ package org.mule.test.module.scripting;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.util.IOUtils;
@@ -16,7 +18,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 
+import org.slf4j.Logger;
+
 public abstract class AbstractRefreshableBeanTestCase extends MuleArtifactFunctionalTestCase {
+
+  private static final Logger LOGGER = getLogger(AbstractRefreshableBeanTestCase.class);
 
   protected static final int WAIT_TIME = 1000;
 
@@ -30,7 +36,7 @@ public abstract class AbstractRefreshableBeanTestCase extends MuleArtifactFuncti
   protected String nameToPath(String name) {
     URL url = IOUtils.getResourceAsUrl(name, getClass());
     String path = url.getFile();
-    logger.info(url + " -> " + path);
+    LOGGER.info(url + " -> " + path);
     return path;
   }
 

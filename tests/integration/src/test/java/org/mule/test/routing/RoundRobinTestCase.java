@@ -7,6 +7,8 @@
 package org.mule.test.routing;
 
 import static org.junit.Assert.assertNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -15,8 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class RoundRobinTestCase extends AbstractIntegrationTestCase {
+
+  private static final Logger LOGGER = getLogger(RoundRobinTestCase.class);
 
   private static final int NUMBER_OF_MESSAGES = 10;
   private static final int NUMBER_OF_WRITERS = 10;
@@ -48,7 +53,7 @@ public class RoundRobinTestCase extends AbstractIntegrationTestCase {
       String path = "test://output" + j;
       Message msg = client.request(path, 0).getRight().get();
       assertNotNull(msg);
-      logger.debug(path + ": " + getPayloadAsString(msg));
+      LOGGER.debug(path + ": " + getPayloadAsString(msg));
       j = (j + 1) % NUMBER_OF_ENDPOINTS;
     }
   }
@@ -67,7 +72,7 @@ public class RoundRobinTestCase extends AbstractIntegrationTestCase {
         try {
           flowRunner("test-router").withPayload("Writer " + id + " Message " + i).run();
         } catch (Exception ex) {
-          logger.info("Unexpected exception dispatching message", ex);
+          LOGGER.info("Unexpected exception dispatching message", ex);
         }
       }
     }

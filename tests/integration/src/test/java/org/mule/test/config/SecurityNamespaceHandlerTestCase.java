@@ -8,19 +8,24 @@ package org.mule.test.config;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.test.AbstractIntegrationTestCase;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.functional.security.MockEncryptionStrategy;
 import org.mule.functional.security.TestSingleUserSecurityProvider;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.Iterator;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class SecurityNamespaceHandlerTestCase extends AbstractIntegrationTestCase {
+
+  private static final Logger LOGGER = getLogger(SecurityNamespaceHandlerTestCase.class);
 
   @Override
   protected String getConfigFile() {
@@ -39,10 +44,10 @@ public class SecurityNamespaceHandlerTestCase extends AbstractIntegrationTestCas
 
   private void verifyEncryptionStrategy(SecurityManager securityManager, String name, Class clazz) {
     Iterator strategies = securityManager.getEncryptionStrategies().iterator();
-    logger.debug("Listing strategies");
+    LOGGER.debug("Listing strategies");
     while (strategies.hasNext()) {
       EncryptionStrategy strategy = (EncryptionStrategy) strategies.next();
-      logger.debug(strategy.getName() + " / " + strategy.toString() + " / " + strategy.getClass());
+      LOGGER.debug(strategy.getName() + " / " + strategy.toString() + " / " + strategy.getClass());
     }
     assertNotNull(name, securityManager.getEncryptionStrategy(name));
     assertTrue(securityManager.getEncryptionStrategy(name).getClass().equals(clazz));

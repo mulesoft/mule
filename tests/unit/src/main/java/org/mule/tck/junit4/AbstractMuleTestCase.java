@@ -10,7 +10,10 @@ import static java.lang.System.getProperty;
 import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.StringMessageUtils;
@@ -35,7 +38,6 @@ import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule test cases. This implementation provides services to test code for
@@ -70,7 +72,7 @@ public abstract class AbstractMuleTestCase {
     System.setProperty(TESTING_MODE_PROPERTY_NAME, StringUtils.EMPTY);
   }
 
-  protected final transient Logger logger = LoggerFactory.getLogger(this.getClass());
+  private static final Logger LOGGER = getLogger(AbstractMuleTestCase.class);
 
   /**
    * Should be set to a string message describing any prerequisites not met.
@@ -147,8 +149,7 @@ public abstract class AbstractMuleTestCase {
 
   public boolean isOffline(String method) {
     if (offline) {
-      logger.warn(StringMessageUtils.getBoilerPlate(
-                                                    "Working offline cannot run test: " + method, '=', 80));
+      LOGGER.warn(getBoilerPlate("Working offline cannot run test: " + method, '=', 80));
     }
 
     return offline;
@@ -303,7 +304,6 @@ public abstract class AbstractMuleTestCase {
   }
 
   private static final transient String THREAD_RESULT_LINE = StringUtils.repeat('-', 80);
-  private static final transient Logger LOGGER = LoggerFactory.getLogger(AbstractMuleTestCase.class);
 
   private static void logThreadsResult(String result) {
     LOGGER.warn(String.format("\n%s\n%s\n%s\n", THREAD_RESULT_LINE, result, THREAD_RESULT_LINE));

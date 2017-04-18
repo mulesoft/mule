@@ -13,6 +13,8 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
@@ -26,8 +28,11 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTestCase {
+
+  private static final Logger LOGGER = getLogger(DefaultSchedulerMessageSourceTestCase.class);
 
   @Test
   public void simplePoll() throws Exception {
@@ -76,7 +81,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
   @After
   public void after() throws MuleException {
     stopIfNeeded(schedulerMessageSource);
-    disposeIfNeeded(schedulerMessageSource, logger);
+    disposeIfNeeded(schedulerMessageSource, LOGGER);
   }
 
   private DefaultSchedulerMessageSource createMessageSource() throws Exception {

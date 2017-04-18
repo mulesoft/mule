@@ -17,6 +17,7 @@ import static org.mule.runtime.core.util.FileUtils.newFile;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -36,7 +37,6 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -49,6 +49,7 @@ import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -71,12 +72,14 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext} instance and tools for manage it.
  */
 public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
+  private static final Logger LOGGER = getLogger(AbstractMuleContextTestCase.class);
   public static final String WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY = "workingDirectory";
   public static final String REACTOR_BLOCK_TIMEOUT_EXCEPTION_MESSAGE = "Timeout on Mono blocking read";
 
@@ -227,7 +230,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
         DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
         String workingDirectory = this.workingDirectory.getRoot().getAbsolutePath();
-        logger.info("Using working directory for test: " + workingDirectory);
+        LOGGER.info("Using working directory for test: " + workingDirectory);
         muleConfiguration.setWorkingDirectory(workingDirectory);
         contextBuilder.setMuleConfiguration(muleConfiguration);
         contextBuilder.setExecutionClassLoader(executionClassLoader);
@@ -322,7 +325,12 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   public static void disposeContext() throws RegistrationException, MuleException {
     try {
       if (muleContext != null && !(muleContext.isDisposed() || muleContext.isDisposing())) {
-        muleContext.dispose();
+        try {
+          muleContext.dispose();
+        } catch (IllegalStateException e) {
+          // Ignore
+          LOGGER.warn(e + " : " + e.getMessage());
+        }
 
         verifyAndStopSchedulers();
 

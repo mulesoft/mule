@@ -9,13 +9,14 @@
 
 package org.mule.test.http;
 
-import static org.mule.runtime.core.internal.connection.ConnectionProviderWrapper.unwrapProviderWrapper;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.internal.connection.ConnectionProviderWrapper.unwrapProviderWrapper;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.runtime.core.exception.MessagingException;
@@ -41,11 +42,15 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
+
 import ru.yandex.qatools.allure.annotations.Features;
 
 @RunnerDelegateTo(Parameterized.class)
 @Features(HTTP_EXTENSION)
 public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
+
+  private static final Logger LOGGER = getLogger(HttpRequestProxyConfigTestCase.class);
 
   private static final String PROXY_HOST = "localhost";
   private static final String PROXY_USERNAME = "theUsername";
@@ -155,14 +160,14 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
         latch.release();
       } catch (IOException e) {
         /* Ignore */
-        logger.error("Exception while configuring MockProxy", e);
+        LOGGER.error("Exception while configuring MockProxy", e);
       } finally {
         if (serverSocket != null) {
           try {
             serverSocket.close();
           } catch (IOException e) {
             /* Ignore */
-            logger.error("Exception while closing MockProxy", e);
+            LOGGER.error("Exception while closing MockProxy", e);
           }
         }
       }

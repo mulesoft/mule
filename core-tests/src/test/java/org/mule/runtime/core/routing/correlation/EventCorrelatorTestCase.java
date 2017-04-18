@@ -12,6 +12,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -20,12 +21,12 @@ import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.routing.EventGroup;
 import org.mule.runtime.core.util.store.PartitionedInMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -42,7 +43,6 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -52,7 +52,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
   public static final String TEST_GROUP_ID = "groupId";
   public static final boolean USE_PERSISTENT_STORE = false;
 
-  private static final Logger logger = LoggerFactory.getLogger(EventCorrelatorTestCase.class);
+  private static final Logger LOGGER = getLogger(EventCorrelatorTestCase.class);
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private EventCorrelatorCallback mockEventCorrelatorCallback;
@@ -144,7 +144,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
           try {
             return !memoryObjectStore.contains(TEST_GROUP_ID, "prefix.eventGroups");
           } catch (ObjectStoreException e) {
-            logger.debug("Could not access object store.");
+            LOGGER.debug("Could not access object store.");
             return false;
           }
         }

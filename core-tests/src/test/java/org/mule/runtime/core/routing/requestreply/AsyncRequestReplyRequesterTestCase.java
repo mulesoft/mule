@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -30,6 +31,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
+import org.mule.runtime.core.routing.correlation.EventCorrelatorTestCase;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -45,8 +47,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestCase implements ExceptionListener {
+
+  private static final Logger LOGGER = getLogger(EventCorrelatorTestCase.class);
 
   private Scheduler scheduler;
 
@@ -193,7 +198,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
           // Can't assert same because we copy event for async currently
           assertEquals(testEvent().getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
           count.incrementAndGet();
-          logger.debug("Finished " + count.get());
+          LOGGER.debug("Finished " + count.get());
         } catch (Exception e) {
           throw new RuntimeException(e);
         }
@@ -211,7 +216,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   @After
   public void after() throws MuleException {
     stopIfNeeded(asyncMP);
-    disposeIfNeeded(asyncMP, logger);
+    disposeIfNeeded(asyncMP, LOGGER);
   }
 
   protected AsyncDelegateMessageProcessor createAsyncMessageProcessor(SensingNullMessageProcessor target) {

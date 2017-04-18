@@ -8,6 +8,8 @@ package org.mule.test.module.spring.security;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
@@ -16,8 +18,11 @@ import org.mule.runtime.module.spring.security.SpringProviderAdapter;
 import java.util.Iterator;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class SpringSecurityNamespaceHandlerTestCase extends MuleArtifactFunctionalTestCase {
+
+  private static final Logger LOGGER = getLogger(SpringSecurityNamespaceHandlerTestCase.class);
 
   @Override
   protected String getConfigFile() {
@@ -39,7 +44,7 @@ public class SpringSecurityNamespaceHandlerTestCase extends MuleArtifactFunction
     Iterator<SecurityProvider> providers = muleContext.getSecurityManager().getProviders().iterator();
     while (providers.hasNext()) {
       SecurityProvider provider = providers.next();
-      logger.debug(provider.getName());
+      LOGGER.debug(provider.getName());
     }
     knownProperties(getProvider("customProvider"));
     knownProperties(getProvider("willOverwriteName"));

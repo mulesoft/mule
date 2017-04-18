@@ -9,18 +9,22 @@ package org.mule.runtime.core.registry;
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
+import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class RequestContextTestCase extends AbstractMuleTestCase {
+
+  private static final Logger LOGGER = getLogger(RequestContextTestCase.class);
 
   @Test
   public void testSetExceptionPayloadAcrossThreads() throws InterruptedException, MuleException {
@@ -65,7 +69,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
         setCurrentEvent(event);
         success.set(true);
       } catch (RuntimeException e) {
-        logger.error("error in thread", e);
+        LOGGER.error("error in thread", e);
       }
     }
   }

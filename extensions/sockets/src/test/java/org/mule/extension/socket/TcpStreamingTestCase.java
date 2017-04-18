@@ -11,6 +11,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalStreamingTestComponent;
 
@@ -22,11 +24,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TcpStreamingTestCase extends SocketExtensionTestCase {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(TcpStreamingTestCase.class);
+  private static final Logger LOGGER = getLogger(TcpStreamingTestCase.class);
   public static final String TEST_MESSAGE = "Test TCP Request";
   public static final String RESULT = "Received stream; length: %d; 'Test...uest'";
   private static int SINGLE_ITERATION = 1;
@@ -67,7 +68,7 @@ public class TcpStreamingTestCase extends SocketExtensionTestCase {
           latch.countDown();
         }
       } catch (Exception e) {
-        logger.error(e.getMessage(), e);
+        LOGGER.error(e.getMessage(), e);
       }
     };
 

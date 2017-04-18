@@ -13,13 +13,15 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.interceptor.Interceptor;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.component.AbstractComponent;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -28,8 +30,11 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class InterceptorTestCase extends AbstractMuleContextTestCase {
+
+  private static final Logger LOGGER = getLogger(InterceptorTestCase.class);
 
   private final String BEFORE = "Before";
   private final String AFTER = "After";
@@ -195,7 +200,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
   @After
   public void after() throws MuleException {
     stopIfNeeded(flow);
-    disposeIfNeeded(flow, logger);
+    disposeIfNeeded(flow, LOGGER);
   }
 
   class TestComponent extends AbstractComponent {
