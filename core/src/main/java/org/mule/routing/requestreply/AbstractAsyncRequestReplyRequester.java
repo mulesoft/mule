@@ -80,24 +80,27 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         {
             return processNext(event);
         }
-
-        locks.put(getAsyncReplyCorrelationId(event), createEventLock());
-
-        sendAsyncRequest(event);
-
-        MuleEvent resultEvent = receiveAsyncReply(event);
-
-        if (resultEvent != null)
+        else
         {
-            // If result has MULE_SESSION property then merge session properties returned with existing
-            // session properties. See MULE-5852
-            if (resultEvent.getMessage().getInboundProperty(MuleProperties.MULE_SESSION_PROPERTY) != null)
+            locks.put(getAsyncReplyCorrelationId(event), createEventLock());
+
+            sendAsyncRequest(event);
+
+            MuleEvent resultEvent = receiveAsyncReply(event);
+
+            if (resultEvent != null)
             {
-                event.getSession().merge(resultEvent.getSession());
+                // If result has MULE_SESSION property then merge session properties returned with existing
+                // session properties. See MULE-5852
+                if (resultEvent.getMessage().getInboundProperty(MuleProperties.MULE_SESSION_PROPERTY) != null)
+                {
+                    event.getSession().merge(resultEvent.getSession());
+                }
+                resultEvent = org.mule.RequestContext.setEvent(new DefaultMuleEvent(resultEvent.getMessage(),
+                    event));
             }
-            resultEvent = org.mule.RequestContext.setEvent(new DefaultMuleEvent(resultEvent.getMessage(), event));
+            return resultEvent;
         }
-        return resultEvent;
     }
 
     /**
@@ -192,6 +195,10 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         else
         {
             correlationId = event.getFlowConstruct().getMessageInfoMapping().getCorrelationId(event.getMessage());
+        }
+        if (event.getMessage().getCorrelationSequence() > 0)
+        {
+            correlationId += event.getMessage().getCorrelationSequence();
         }
         return correlationId;
     }
