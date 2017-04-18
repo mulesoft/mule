@@ -6,7 +6,10 @@
  */
 package org.mule.transformers.xml;
 
+import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractTransformerTestCase;
+
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.w3c.dom.Document;
@@ -22,6 +25,14 @@ public abstract class AbstractXmlTransformerTestCase extends AbstractTransformer
         super();
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setXSLTVersion("2.0");
+        try
+        {
+            XMLUnit.getTransformerFactory();
+        }
+        catch (TransformerFactoryConfigurationError e)
+        {
+            XMLUnit.setTransformerFactory(XMLUtils.TRANSFORMER_FACTORY_JDK5);
+        }
     }
 
     @Override
