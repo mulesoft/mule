@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -34,9 +35,12 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
+import org.slf4j.Logger;
 
 public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTestCase
 {
+    private static final Logger LOGGER = getLogger(AjaxFunctionalJsonBindingsTestCase.class);
+
     public AjaxFunctionalJsonBindingsTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -83,7 +87,7 @@ public class AjaxFunctionalJsonBindingsTestCase extends AbstractServiceAndFlowTe
         }
         catch (IllegalStateException e)
         {
-            logger.info("caught an IllegalStateException during tearDown", e);
+            LOGGER.info("caught an IllegalStateException during tearDown", e);
         }
         catch(Exception e1)
         {

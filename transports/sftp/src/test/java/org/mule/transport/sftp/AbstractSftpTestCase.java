@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_DISPATCHED;
 import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_SENT;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
@@ -53,12 +54,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Rule;
+import org.slf4j.Logger;
 
 /**
  * @author Lennart Häggkvist, Magnus Larsson Date: Jun 8, 2009
  */
 public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCase
 {
+    private static final Logger LOGGER = getLogger(AbstractSftpTestCase.class);
     private static final String HOST = "localhost";
     private static final String USER = "muletest1";
     private static final String PASSWORD = "muletest1";
@@ -150,13 +153,13 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
             }
             catch (Exception e)
             {
-                if (logger.isDebugEnabled()) logger.debug("Failed delete directory " + path, e);
+                if (LOGGER.isDebugEnabled()) LOGGER.debug("Failed delete directory " + path, e);
             }
 
         }
         catch (Exception e)
         {
-            if (logger.isDebugEnabled()) logger.debug("Failed to recursivly delete directory " + path, e);
+            if (LOGGER.isDebugEnabled()) LOGGER.debug("Failed to recursivly delete directory " + path, e);
         }
     }
 
@@ -355,7 +358,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
 
-                if (logger.isInfoEnabled()) logger.info("called " + loopCount.incrementAndGet() + " times");
+                if (LOGGER.isInfoEnabled()) LOGGER.info("called " + loopCount.incrementAndGet() + " times");
 
                 InputStream sftpInputStream = (InputStream) context.getMessage().getPayload();
                 BufferedInputStream bif = new BufferedInputStream(sftpInputStream);
@@ -397,7 +400,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
                 @Override
                 public void handleException(Exception e, RollbackSourceCallback rollbackMethod)
                 {
-                    if (logger.isInfoEnabled()) logger.info("expected exception occurred: " + e, e);
+                    if (LOGGER.isInfoEnabled()) LOGGER.info("expected exception occurred: " + e, e);
                     exceptionHolder.value = e;
                     latch.countDown();
                 }
@@ -417,7 +420,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
                         @Override
                         public MuleEvent handleException(Exception e, MuleEvent event)
                         {
-                            if (logger.isInfoEnabled()) logger.info("expected exception occurred: " + e, e);
+                            if (LOGGER.isInfoEnabled()) LOGGER.info("expected exception occurred: " + e, e);
                             exceptionHolder.value = e;
                             latch.countDown();
                             return event;
@@ -450,9 +453,9 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         props.put(SftpConnector.PROPERTY_FILENAME, filename);
         props.put(SftpConnector.PROPERTY_ORIGINAL_FILENAME, filename);
 
-        if (logger.isInfoEnabled())
+        if (LOGGER.isInfoEnabled())
         {
-            logger.info(StringMessageUtils.getBoilerPlate("Note! If this test fails due to timeout please add '-Dmule.test.timeoutSecs=XX' to the mvn command!"));
+            LOGGER.info(StringMessageUtils.getBoilerPlate("Note! If this test fails due to timeout please add '-Dmule.test.timeoutSecs=XX' to the mvn command!"));
         }
 
         executeBaseAssertionsBeforeCall();
@@ -492,10 +495,10 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
     {
 
         // Make sure that the file we received had the same size as the one we sent
-        if (logger.isInfoEnabled())
+        if (LOGGER.isInfoEnabled())
         {
-            logger.info("Sent size: " + sendSize);
-            logger.info("Received size: " + receivedSize);
+            LOGGER.info("Sent size: " + sendSize);
+            LOGGER.info("Received size: " + receivedSize);
         }
 
         assertEquals("The received file should have the same size as the sent file", sendSize, receivedSize);
@@ -565,7 +568,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
             }
             catch (Exception e)
             {
-                logger.error("Error '" + e.getMessage() + "' occured while stopping the service "
+                LOGGER.error("Error '" + e.getMessage() + "' occured while stopping the service "
                              + serviceName + ". Perhaps the service did not exist in the config?");
                 throw e;
             }
@@ -606,8 +609,8 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
             }
             catch (IOException e)
             {
-                if (logger.isErrorEnabled())
-                    logger.error("Failed to recursivly delete endpoint " + endpointName, e);
+                if (LOGGER.isErrorEnabled())
+                    LOGGER.error("Failed to recursivly delete endpoint " + endpointName, e);
             }
 
             String path = getPathByEndpoint(client, endpointName);
@@ -616,7 +619,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         finally
         {
             client.disconnect();
-            if (logger.isDebugEnabled()) logger.debug("Done init endpoint directory: " + endpointName);
+            if (LOGGER.isDebugEnabled()) LOGGER.debug("Done init endpoint directory: " + endpointName);
         }
     }
 
@@ -661,8 +664,8 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
                         if ((action == MESSAGE_DISPATCHED || action == MESSAGE_SENT)
                             && endpoint.equals(p.getOutboundEndpoint()))
                         {
-                            if (logger.isDebugEnabled())
-                                logger.debug("Expected notification received on " + p.getOutboundEndpoint()
+                            if (LOGGER.isDebugEnabled())
+                                LOGGER.debug("Expected notification received on " + p.getOutboundEndpoint()
                                              + " (action: " + action + "), time to countdown the latch");
                             latch.countDown();
                         }
@@ -693,10 +696,10 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
                 TEST_MESSAGE, headers);
 
             // Wait for the delivery to occur...
-            if (logger.isDebugEnabled()) logger.debug("Waiting for file to be delivered to the endpoint...");
+            if (LOGGER.isDebugEnabled()) LOGGER.debug("Waiting for file to be delivered to the endpoint...");
             boolean workDone = latch.await(p.getTimeout(), TimeUnit.MILLISECONDS);
-            if (logger.isDebugEnabled())
-                logger.debug((workDone)
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug((workDone)
                                        ? "File delivered, continue..."
                                        : "No file delivered, timeout occurred!");
 
@@ -759,8 +762,8 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
                 public void handleException(Exception e, RollbackSourceCallback rollbackMethod)
                 {
                     exceptionHolder.value = e;
-                    if (logger.isDebugEnabled())
-                        logger.debug("Expected exception occurred: " + e.getMessage()
+                    if (LOGGER.isDebugEnabled())
+                        LOGGER.debug("Expected exception occurred: " + e.getMessage()
                                      + ", time to countdown the latch");
                     latch.countDown();
                 }
@@ -778,8 +781,8 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
                 public MuleEvent handleException(Exception e, MuleEvent event)
                 {
                     exceptionHolder.value = e;
-                    if (logger.isDebugEnabled())
-                        logger.debug("Expected exception occurred: " + e.getMessage()
+                    if (LOGGER.isDebugEnabled())
+                        LOGGER.debug("Expected exception occurred: " + e.getMessage()
                                      + ", time to countdown the latch");
                     latch.countDown();
                     return event;
@@ -816,10 +819,10 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
                 TEST_MESSAGE, headers);
 
             // Wait for the exception to occur...
-            if (logger.isDebugEnabled()) logger.debug("Waiting for an exception to occur...");
+            if (LOGGER.isDebugEnabled()) LOGGER.debug("Waiting for an exception to occur...");
             boolean workDone = latch.await(p.getTimeout(), TimeUnit.MILLISECONDS);
-            if (logger.isDebugEnabled())
-                logger.debug((workDone)
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug((workDone)
                                        ? "Exception occurred, continue..."
                                        : "No exception, instead a timeout occurred!");
 
@@ -1253,7 +1256,7 @@ public abstract class AbstractSftpTestCase extends AbstractServiceAndFlowTestCas
         while (connectorItr.hasNext())
         {
             Map.Entry<String, Connector> pairs = connectorItr.next();
-            logger.debug("checking connector : " + pairs.getKey());
+            LOGGER.debug("checking connector : " + pairs.getKey());
             assertTrue(pairs.getKey() + " is not started", pairs.getValue().isStarted());
         }
 

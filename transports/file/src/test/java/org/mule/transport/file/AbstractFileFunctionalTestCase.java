@@ -9,6 +9,7 @@ package org.mule.transport.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -25,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
 
 /**
  * We are careful here to access the file system in a generic way. This means setting
@@ -34,6 +36,8 @@ public abstract class AbstractFileFunctionalTestCase extends AbstractServiceAndF
 {
     public static final String TEST_MESSAGE = "Test file contents";
     public static final String TARGET_FILE = "TARGET_FILE";
+
+    private static final Logger LOGGER = getLogger(AbstractFileFunctionalTestCase.class);
 
     protected File tmpDir;
 
@@ -74,7 +78,7 @@ public abstract class AbstractFileFunctionalTestCase extends AbstractServiceAndF
         FileConnector connector = (FileConnector) muleContext.getRegistry().lookupConnector(
             "receiveConnector");
         connector.setReadFromDirectory(tmpDir.getAbsolutePath());
-        logger.debug("Directory is " + connector.getReadFromDirectory());
+        LOGGER.debug("Directory is " + connector.getReadFromDirectory());
 
         waitForFileSystem();
         return target;
@@ -90,7 +94,7 @@ public abstract class AbstractFileFunctionalTestCase extends AbstractServiceAndF
     protected File createAndPopulateTempFile(String prefix, String suffix) throws Exception
     {
         File target = File.createTempFile(prefix, suffix, tmpDir);
-        logger.info("Created temporary file: " + target.getAbsolutePath());
+        LOGGER.info("Created temporary file: " + target.getAbsolutePath());
 
         Writer out = new FileWriter(target);
         out.write(TEST_MESSAGE);

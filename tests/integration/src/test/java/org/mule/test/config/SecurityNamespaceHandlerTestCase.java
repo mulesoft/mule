@@ -8,6 +8,7 @@ package org.mule.test.config;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.EncryptionStrategy;
 import org.mule.api.security.SecurityManager;
@@ -20,9 +21,13 @@ import org.mule.tck.security.TestSingleUserSecurityProvider;
 import java.util.Iterator;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SecurityNamespaceHandlerTestCase extends FunctionalTestCase
 {
+    private static final Logger LOGGER = getLogger(SecurityNamespaceHandlerTestCase.class);
+
     @Override
     protected String getConfigFile()
     {
@@ -43,11 +48,11 @@ public class SecurityNamespaceHandlerTestCase extends FunctionalTestCase
     private void verifyEncryptionStrategy(SecurityManager securityManager, String name, Class clazz)
     {
         Iterator strategies = securityManager.getEncryptionStrategies().iterator();
-        logger.debug("Listing strategies");
+        LOGGER.debug("Listing strategies");
         while (strategies.hasNext())
         {
             EncryptionStrategy strategy = (EncryptionStrategy) strategies.next();
-            logger.debug(strategy.getName() + " / " + strategy.toString() + " / " + strategy.getClass());
+            LOGGER.debug(strategy.getName() + " / " + strategy.toString() + " / " + strategy.getClass());
         }
         assertNotNull(name, securityManager.getEncryptionStrategy(name));
         assertTrue(securityManager.getEncryptionStrategy(name).getClass().equals(clazz));

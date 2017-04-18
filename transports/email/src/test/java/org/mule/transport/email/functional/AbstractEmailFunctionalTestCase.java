@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
@@ -27,7 +28,9 @@ import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
-import org.junit.Rule;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
@@ -35,9 +38,9 @@ import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+
+import org.junit.Rule;
+import org.slf4j.Logger;
 
 public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -52,6 +55,8 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
     protected static final String DEFAULT_MESSAGE = "Test email message";
     protected static final String DEFAULT_PASSWORD = "password";
     protected static final String DEFAULT_PROCESSED_MAILBOX = "processed";
+
+    private static final Logger LOGGER = getLogger(AbstractEmailFunctionalTestCase.class);
 
     private String protocol;
     private boolean isMimeMessage;
@@ -240,7 +245,7 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
 
     private void startServer() throws Exception
     {
-        logger.debug("starting server on port " + port);
+        LOGGER.debug("starting server on port " + port);
 
         setup = new ServerSetup(port, null, protocol);
         if(addSmtp)
@@ -265,7 +270,7 @@ public abstract class AbstractEmailFunctionalTestCase extends AbstractServiceAnd
         {
             generateAndStoreEmail();
         }
-        logger.debug("server started for protocol " + protocol);
+        LOGGER.debug("server started for protocol " + protocol);
     }
 
     /**

@@ -8,6 +8,7 @@ package org.mule.transport.file;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 
 /**
  * We are careful here to access the file sstem in a generic way.  This means setting directories
@@ -28,6 +30,8 @@ import org.junit.Test;
  */
 public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
 {
+    private static final Logger LOGGER = getLogger(FileFunctionalTestCase.class);
+
     public FileFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -59,7 +63,7 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
         File target = initForRequest();
         MuleClient client = muleContext.getClient();
         String url = fileToUrl(target) + "?connector=receiveConnector";
-        logger.debug(url);
+        LOGGER.debug(url);
         MuleMessage message = client.request(url, 100000);
         checkReceivedMessage(message);
     }

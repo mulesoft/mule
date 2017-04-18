@@ -18,9 +18,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
+import org.slf4j.Logger;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class ParallelXsltTransformerTestCase extends AbstractMuleContextTestCase
 {
+    private static final Logger LOGGER = getLogger(ParallelXsltTransformerTestCase.class);
     private String srcData;
     private String resultData;
     private Collection<Object> actualResults = new ConcurrentLinkedQueue<Object>();
@@ -95,9 +99,9 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleContextTestCase
 
         checkResult();
 
-        if (logger.isDebugEnabled())
+        if (LOGGER.isDebugEnabled())
         {
-            logger.debug("Parallel transformations in " + getParallelThreadCount() + " threads with "
+            LOGGER.debug("Parallel transformations in " + getParallelThreadCount() + " threads with "
                          + getCallsPerThread() + " calls/thread took " + (endTime - startTime) + " ms.");
         }
     }

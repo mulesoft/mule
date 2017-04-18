@@ -8,6 +8,7 @@ package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -18,9 +19,11 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
 
 public class ManySendsMule1758TestCase extends AbstractServiceAndFlowTestCase
 {
+    private static final Logger LOGGER = getLogger(ManySendsMule1758TestCase.class);
     private static int NUM_MESSAGES = 3000;
 
     @Parameters
@@ -53,12 +56,12 @@ public class ManySendsMule1758TestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = muleContext.getClient();
         for (int i = 0; i < NUM_MESSAGES; ++i)
         {
-            logger.debug("Message " + i);
+            LOGGER.debug("Message " + i);
             MuleMessage response = client.send("vm://s-in", "Marco", null);
             assertNotNull("Response is null", response);
             assertEquals("Polo", response.getPayload());
         }
         long now = System.currentTimeMillis();
-        logger.info("Total time " + ((now - then) / 1000.0) + "s; per message " + ((now - then) / (1.0 * NUM_MESSAGES)) + "ms");
+        LOGGER.info("Total time " + ((now - then) / 1000.0) + "s; per message " + ((now - then) / (1.0 * NUM_MESSAGES)) + "ms");
     }
 }

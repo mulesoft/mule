@@ -9,6 +9,7 @@ package org.mule.transport.multicast;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -18,10 +19,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
 {
     public static final String MESSAGE = "hello";
+
+    private static final Logger LOGGER = getLogger(MulticastConnectorFunctionalTestCase.class);
 
     @Override
     protected String getConfigFile()
@@ -35,7 +39,7 @@ public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
         final int numberOfMessages = 2;
         MuleClient client = muleContext.getClient();
 
-        logger.debug("sending messages");
+        LOGGER.debug("sending messages");
         for (int sentPackets = 0; sentPackets < numberOfMessages; sentPackets++)
         {
             String msg = MESSAGE + sentPackets;
@@ -45,7 +49,7 @@ public class MulticastConnectorFunctionalTestCase extends FunctionalTestCase
         int broadcastMessages = numberOfMessages * 3; //3 components
         Set<String> receivedMessages = new HashSet<String>(broadcastMessages);
 
-        logger.debug("receiving messages");
+        LOGGER.debug("receiving messages");
         int receivedPackets = 0;
         for (; receivedPackets < broadcastMessages; receivedPackets++)
         {

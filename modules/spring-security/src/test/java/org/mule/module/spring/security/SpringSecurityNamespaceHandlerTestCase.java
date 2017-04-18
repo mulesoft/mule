@@ -8,6 +8,7 @@ package org.mule.module.spring.security;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.security.SecurityManager;
 import org.mule.api.security.SecurityProvider;
@@ -16,9 +17,12 @@ import org.mule.tck.junit4.FunctionalTestCase;
 import java.util.Iterator;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class SpringSecurityNamespaceHandlerTestCase extends FunctionalTestCase
 {
+    private static final Logger LOGGER = getLogger(SpringSecurityNamespaceHandlerTestCase.class);
+
     @Override
     protected String getConfigFile()
     {
@@ -44,8 +48,8 @@ public class SpringSecurityNamespaceHandlerTestCase extends FunctionalTestCase
         while (providers.hasNext())
         {
             SecurityProvider provider = providers.next();
-            logger.debug(provider);
-            logger.debug(provider.getName());
+            LOGGER.debug(String.valueOf(provider));
+            LOGGER.debug(provider.getName());
         }
         knownProperties(getProvider("customProvider"));
         knownProperties(getProvider("willOverwriteName"));

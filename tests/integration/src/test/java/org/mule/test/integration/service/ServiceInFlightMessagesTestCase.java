@@ -8,6 +8,7 @@ package org.mule.test.integration.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -22,11 +23,14 @@ import java.io.File;
 import org.apache.commons.io.FileUtils;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
 {
     protected static final int WAIT_TIME_MILLIS = 500;
     protected static final int NUM_MESSAGES = 500;
+
+    private static final Logger LOGGER = getLogger(ServiceInFlightMessagesTestCase.class);
 
     @Override
     protected String getConfigFile()
@@ -189,7 +193,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
      */
     protected synchronized void assertNoLostMessages(int numMessages, Service service) throws Exception
     {
-        logger.info("SEDA Queue: " + getSedaQueueSize(service) + ", Outbound endpoint: "
+        LOGGER.info("SEDA Queue: " + getSedaQueueSize(service) + ", Outbound endpoint: "
                     + getOutSize());
         assertEquals(numMessages, getOutSize() + getSedaQueueSize(service));
     }

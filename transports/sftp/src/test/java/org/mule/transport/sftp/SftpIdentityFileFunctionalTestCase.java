@@ -9,6 +9,7 @@ package org.mule.transport.sftp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
@@ -27,6 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
 
 /**
  * <code>LargeFileReceiveFunctionalTestCase</code> tests receiving a large file
@@ -36,6 +38,7 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class SftpIdentityFileFunctionalTestCase extends AbstractSftpTestCase
 {
+    private static final Logger LOGGER = getLogger(SftpIdentityFileFunctionalTestCase.class);
     private static final int DEFAULT_TIMEOUT = 10000;
 
     // Increase this to be a little larger than expected download time
@@ -77,7 +80,7 @@ public class SftpIdentityFileFunctionalTestCase extends AbstractSftpTestCase
             {
                 try
                 {
-                    logger.info("called " + loopCount.incrementAndGet() + " times");
+                    LOGGER.info("called " + loopCount.incrementAndGet() + " times");
                     // without this we may have problems with the many repeats
                     if (1 == latch.getCount())
                     {
@@ -88,7 +91,7 @@ public class SftpIdentityFileFunctionalTestCase extends AbstractSftpTestCase
                 }
                 catch (Exception e)
                 {
-                    logger.error(e.getMessage(), e);
+                    LOGGER.error(e.getMessage(), e);
                 }
             }
         };

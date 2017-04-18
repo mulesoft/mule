@@ -10,12 +10,17 @@ package org.mule.module.db.integration.config;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
+
+
 import org.mule.api.MuleContext;
 import org.mule.tck.junit4.FunctionalTestCase;
 
+import org.slf4j.Logger;
+
 public class AbstractConfigurationErrorTestCase extends FunctionalTestCase
 {
-
+    private static final Logger LOGGER = getLogger(AbstractConfigurationErrorTestCase.class);
     private Exception exception;
 
     public AbstractConfigurationErrorTestCase()
@@ -32,7 +37,7 @@ public class AbstractConfigurationErrorTestCase extends FunctionalTestCase
         }
         catch (Exception e)
         {
-            logger.error("Configuration error detected", e);
+            LOGGER.error("Configuration error detected", e);
             exception = e;
             return null;
         }
