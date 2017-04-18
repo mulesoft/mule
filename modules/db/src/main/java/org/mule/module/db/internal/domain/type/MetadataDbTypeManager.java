@@ -101,7 +101,16 @@ public class MetadataDbTypeManager implements DbTypeManager
                 Number data_type = (Number) typeRecord.get(METADATA_TYPE_ID_COLUMN);
                 String type_name = (String) typeRecord.get(METADATA_TYPE_NAME_COLUMN);
 
-                ResolvedDbType resolvedDbType = new ResolvedDbType(data_type.intValue(), type_name);
+                ResolvedDbType resolvedDbType = null;
+
+                if (data_type.intValue() == Types.CLOB)
+                {
+                    resolvedDbType = new ClobResolvedDataType(data_type.intValue(), type_name);
+                }
+                else
+                {
+                    resolvedDbType = new ResolvedDbType(data_type.intValue(), type_name);
+                }
 
                 if (!isUserDefinedType(resolvedDbType))
                 {
