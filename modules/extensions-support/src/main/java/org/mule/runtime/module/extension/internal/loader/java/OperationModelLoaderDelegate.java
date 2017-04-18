@@ -25,13 +25,11 @@ import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
-import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExtendingOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.InterceptingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
@@ -126,7 +124,6 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
         } else {
           final MetadataType outputType = getMethodReturnType(method, loader.getTypeLoader());
           operation.withOutput().ofType(outputType);
-          processInterceptingOperation(operationMethod, operation);
 
           handleByteStreaming(method, operation, outputType);
         }
@@ -188,12 +185,6 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private void addExecutionType(OperationDeclarer operationDeclarer, MethodElement operationMethod) {
     operationMethod.getAnnotation(Execution.class).ifPresent(a -> operationDeclarer.withExecutionType(a.value()));
-  }
-
-  private void processInterceptingOperation(MethodElement operationMethod, OperationDeclarer operation) {
-    if (InterceptingCallback.class.isAssignableFrom(operationMethod.getReturnType())) {
-      operation.withModelProperty(new InterceptingModelProperty());
-    }
   }
 
   private void checkOperationIsNotAnExtension(Class<?> operationType) {

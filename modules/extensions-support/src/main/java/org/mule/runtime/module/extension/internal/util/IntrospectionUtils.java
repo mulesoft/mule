@@ -23,6 +23,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllSuperTypes;
 import static org.reflections.ReflectionUtils.withName;
+import static org.springframework.core.ResolvableType.forMethodReturnType;
 import static org.springframework.core.ResolvableType.forType;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -66,18 +67,17 @@ import org.mule.runtime.extension.api.declaration.type.annotation.LiteralTypeAnn
 import org.mule.runtime.extension.api.declaration.type.annotation.ParameterResolverTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
+import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LiteralModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterResolverTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.TypedValueTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 
 import com.google.common.collect.ImmutableList;
 
@@ -271,12 +271,8 @@ public final class IntrospectionUtils {
   }
 
   public static ResolvableType getMethodType(Method method) {
-    ResolvableType methodType = getMethodResolvableType(method);
-    if (isInterceptingCallback(methodType)) {
-      methodType = unwrapGenericFromClass(InterceptingCallback.class, methodType, 0);
-    }
-
-    return methodType;
+    checkArgument(method != null, "Can't introspect a null method");
+    return forMethodReturnType(method);
   }
 
   public static ResolvableType unwrapGenericFromClass(Class<?> clazz, ResolvableType type, int genericIndex) {
@@ -315,17 +311,8 @@ public final class IntrospectionUtils {
         || Disposable.class.isAssignableFrom(type);
   }
 
-  private static boolean isInterceptingCallback(ResolvableType type) {
-    return InterceptingCallback.class.isAssignableFrom(type.getRawClass());
-  }
-
   private static boolean isPagingProvider(ResolvableType type) {
     return PagingProvider.class.isAssignableFrom(type.getRawClass());
-  }
-
-  private static ResolvableType getMethodResolvableType(Method method) {
-    checkArgument(method != null, "Can't introspect a null method");
-    return ResolvableType.forMethodReturnType(method);
   }
 
   private static BaseTypeBuilder typeBuilder() {

@@ -32,7 +32,6 @@ import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.core.util.CollectionUtils;
-import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -162,18 +161,6 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void unwrapInterceptingCallbackGeneric() {
-    ResolvableType type = unwrapGenericFromClass(InterceptingCallback.class, forType(TestInterceptingCallback.class), 0);
-    assertThat(type.getRawClass(), equalTo(Banana.class));
-  }
-
-  @Test
-  public void unwrapInterceptingCallbackGenericFromParentClass() {
-    ResolvableType type = unwrapGenericFromClass(InterceptingCallback.class, forType(InterceptingCallbackWithParent.class), 0);
-    assertThat(type.getRawClass(), equalTo(Banana.class));
-  }
-
-  @Test
   public void unwrapPagingProviderGenericFromParentClass() {
     ResolvableType type = unwrapGenericFromClass(PagingProvider.class, forType(TestPagingProvider.class), 1);
     assertThat(type.getRawClass(), equalTo(Banana.class));
@@ -276,20 +263,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     assertMessageType(((ArrayType) returnType).getType(), is(instanceOf(StringType.class)), is(instanceOf(ObjectType.class)));
   }
 
-  private class InterceptingCallbackWithParent extends TestInterceptingCallback {
-
-  }
-
-
-  private class TestInterceptingCallback implements InterceptingCallback<Banana> {
-
-    @Override
-    public Banana getResult() throws Exception {
-      return new Banana();
-    }
-  }
-
-  private class TestPagingProvider extends InterceptingCallbackWithParent implements PagingProvider<Object, Banana> {
+  private class TestPagingProvider implements PagingProvider<Object, Banana> {
 
     @Override
     public List<Banana> getPage(Object connection) {
