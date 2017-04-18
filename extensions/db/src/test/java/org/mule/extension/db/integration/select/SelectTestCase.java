@@ -7,31 +7,20 @@
 
 package org.mule.extension.db.integration.select;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.extension.db.integration.TestRecordUtil.assertMessageContains;
-import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.extension.db.integration.TestRecordUtil.getAllPlanetRecords;
 import static org.mule.extension.db.integration.TestRecordUtil.getEarthRecord;
 import static org.mule.extension.db.integration.TestRecordUtil.getMarsRecord;
 import static org.mule.extension.db.integration.TestRecordUtil.getVenusRecord;
 import static org.mule.extension.db.integration.model.Planet.MARS;
-
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Planet;
 import org.mule.extension.db.integration.model.Record;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.exception.MessagingException;
 
-import java.util.Iterator;
-import java.util.List;
-
-import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -48,72 +37,45 @@ public class SelectTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void select() throws Exception {
-    Message response = flowRunner("select").run().getMessage();
+    Message response = flowRunner("select").keepStreamsOpen().run().getMessage();
     assertMessageContains(response, getAllPlanetRecords());
   }
 
   @Test
   public void fixedParam() throws Exception {
-    Message response = flowRunner("fixedParam").run().getMessage();
+    Message response = flowRunner("fixedParam").keepStreamsOpen().run().getMessage();
     assertMessageContains(response, getMarsRecord());
   }
 
   @Test
   public void expressionAndFixedParamMixed() throws Exception {
-    Message response = flowRunner("expressionAndFixedParamMixed").run().getMessage();
+    Message response = flowRunner("expressionAndFixedParamMixed").keepStreamsOpen().run().getMessage();
     assertMessageContains(response, getEarthRecord());
   }
 
   @Test
   public void dynamicQuery() throws Exception {
-    Message response = flowRunner("dynamicQuery").run().getMessage();
+    Message response = flowRunner("dynamicQuery").keepStreamsOpen().run().getMessage();
     assertMessageContains(response, getAllPlanetRecords());
   }
 
   @Test
   public void maxRows() throws Exception {
-    Message response = flowRunner("selectMaxRows").run().getMessage();
-    assertMessageContains(response, getVenusRecord(), getEarthRecord());
-  }
-
-  @Test
-  public void limitsStreamedRows() throws Exception {
-    Message response = flowRunner("selectMaxStreamedRows").run().getMessage();
+    Message response = flowRunner("selectMaxRows").keepStreamsOpen().run().getMessage();
     assertMessageContains(response, getVenusRecord(), getEarthRecord());
   }
 
   @Test
   public void namedParameter() throws Exception {
-    Message response = flowRunner("selectParameterizedQuery").withPayload(MARS.getName()).run().getMessage();
+    Message response = flowRunner("selectParameterizedQuery").withPayload(MARS.getName()).keepStreamsOpen().run().getMessage();
     assertMessageContains(response, getMarsRecord());
-  }
-
-  @Test
-  public void chunksStreamedRecords() throws Exception {
-    Message response = flowRunner("selectStreamingChunks").run().getMessage();
-
-    List<Planet> chunks = (List<Planet>) response.getPayload().getValue();
-    assertThat(chunks, hasSize(2));
-    assertThat(chunks.get(0), is(instanceOf(List.class)));
-    assertRecords(chunks.get(0), getVenusRecord(), getEarthRecord());
-    assertThat(chunks.get(1), is(instanceOf(List.class)));
-    assertRecords(chunks.get(1), getMarsRecord());
-  }
-
-  @Test
-  public void streamsRecords() throws Exception {
-    Event event = flowRunner("selectStreaming").run();
-    Message response = event.getMessage();
-
-    assertThat(response.getPayload().getValue(), CoreMatchers.is(instanceOf(Iterator.class)));
-    assertRecords(event.getVariable("records").getValue(), getAllPlanetRecords());
   }
 
   @Test
   public void returnsAliasInResultSet() throws Exception {
     final String nameFieldAlias = "PLANETNAME";
 
-    Message response = flowRunner("usesAlias").run().getMessage();
+    Message response = flowRunner("usesAlias").keepStreamsOpen().run().getMessage();
     assertMessageContains(response, new Record[] {
         new Record(new Field(nameFieldAlias, Planet.VENUS.getName())),
         new Record(new Field(nameFieldAlias, Planet.EARTH.getName())),
@@ -123,8 +85,7 @@ public class SelectTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void missingSQL() throws Exception {
-    expectedException.expect(MessagingException.class);
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    expectedException.expectMessage(containsString("sql query cannot be blank"));
     flowRunner("missingSQL").run();
   }
 }

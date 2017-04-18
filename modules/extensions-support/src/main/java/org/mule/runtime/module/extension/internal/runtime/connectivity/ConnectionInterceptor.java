@@ -29,7 +29,7 @@ import javax.inject.Inject;
 public final class ConnectionInterceptor implements Interceptor {
 
   @Inject
-  private ExtensionsConnectionAdapter connectionAdapter;
+  private ExtensionConnectionSupplier connectionAdapter;
 
   /**
    * Adds a {@code Connection} as a parameter in the {@code operationContext}, following the considerations in this type's

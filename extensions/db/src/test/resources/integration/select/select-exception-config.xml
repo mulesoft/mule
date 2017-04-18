@@ -5,26 +5,25 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <flow name="selectStreamingException">
-        <dbn:select config-ref="pooledJdbcConfig" streaming="true">
+    <flow name="selectException">
+        <dbn:select config-ref="pooledJdbcConfig">
             <dbn:sql>select * from NOT_EXISTS order by ID</dbn:sql>
         </dbn:select>
+        <foreach>
+            <logger />
+        </foreach>
     </flow>
 
     <flow name="selectExceptionClosesPreviousResultSets">
         <try transactionalAction="ALWAYS_BEGIN">
-            <dbn:select config-ref="pooledJdbcConfig" target="planets" streaming="true">
+            <dbn:select config-ref="pooledJdbcConfig">
                 <dbn:sql>select * from PLANET order by ID</dbn:sql>
             </dbn:select>
+            <expression-component>#[mel:payload.next()]</expression-component>
             <dbn:select config-ref="pooledJdbcConfig">
                 <dbn:sql>select * from NOT_EXISTS order by ID</dbn:sql>
             </dbn:select>
+            <expression-component>#[mel:payload.next()]</expression-component>
         </try>
-        <set-payload value="#[true]"/>
-        <error-handler>
-            <on-error-continue>
-                <set-payload value="#[mel:planets.payload.value.hasNext()]"/>
-            </on-error-continue>
-        </error-handler>
     </flow>
 </mule>

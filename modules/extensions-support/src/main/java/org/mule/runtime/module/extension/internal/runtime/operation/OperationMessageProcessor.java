@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
@@ -220,6 +222,10 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     }
 
     return true;
+  }
+
+  protected Optional<String> getTarget() {
+    return isTargetPresent() ? of(target) : empty();
   }
 
   @Override

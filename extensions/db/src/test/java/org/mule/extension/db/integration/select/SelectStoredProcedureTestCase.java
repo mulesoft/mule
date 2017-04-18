@@ -31,7 +31,7 @@ public class SelectStoredProcedureTestCase extends AbstractDbIntegrationTestCase
 
   @Test
   public void selectsFromStoredProcedure() throws Exception {
-    Message response = flowRunner("selectStoredProcedure").run().getMessage();
+    Message response = flowRunner("selectStoredProcedure").keepStreamsOpen().run().getMessage();
     assertMessageContains(response, getAllPlanetRecords());
   }
 

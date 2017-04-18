@@ -37,20 +37,6 @@
         </db:select>
     </flow>
 
-    <flow name="selectMaxStreamedRows">
-        <db:select maxRows="2">
-            <db:sql>select * from PLANET order by ID</db:sql>
-        </db:select>
-
-        <set-variable variableName="records" value="#[mel:new ArrayList()]"/>
-
-        <foreach>
-            <expression-component>mel:flowVars['records'].add(payload)</expression-component>
-        </foreach>
-
-        <set-payload value="#[mel:flowVars['records']]"/>
-    </flow>
-
     <flow name="selectParameterizedQuery">
         <db:select>
             <db:sql>select * from PLANET where name = :name</db:sql>
@@ -58,32 +44,6 @@
                 #[{'name' : payload}]
             </db:input-parameters>
         </db:select>
-    </flow>
-
-    <flow name="selectStreamingChunks">
-        <db:select streaming="true">
-            <db:sql>select * from PLANET order by ID</db:sql>
-        </db:select>
-
-        <set-variable variableName="records" value="#[mel:new ArrayList()]"/>
-
-        <foreach batchSize="2">
-            <expression-component>mel:flowVars['records'].add(payload)</expression-component>
-        </foreach>
-
-        <set-payload value="#[records]"/>
-    </flow>
-
-    <flow name="selectStreaming">
-        <db:select streaming="true">
-            <db:sql>select * from PLANET order by ID</db:sql>
-        </db:select>
-
-        <set-variable variableName="records" value="#[mel:new ArrayList()]"/>
-
-        <foreach>
-            <expression-component>mel:flowVars['records'].add(payload)</expression-component>
-        </foreach>
     </flow>
 
     <flow name="usesAlias">
@@ -94,6 +54,9 @@
 
     <flow name="missingSQL">
         <db:select />
+        <foreach>
+            <logger />
+        </foreach>
     </flow>
 
 </mule>

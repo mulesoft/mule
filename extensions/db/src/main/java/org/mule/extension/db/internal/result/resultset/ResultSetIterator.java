@@ -7,10 +7,8 @@
 
 package org.mule.extension.db.internal.result.resultset;
 
-import org.mule.extension.db.internal.domain.connection.DbConnection;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.db.internal.result.row.RowHandler;
-import org.mule.runtime.core.api.Closeable;
-import org.mule.runtime.api.exception.MuleException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,31 +17,22 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
  * Iterates a {@link ResultSet} to provide rows streaming
  */
-public class ResultSetIterator implements Iterator<Map<String, Object>>, Closeable {
+public class ResultSetIterator implements Iterator<Map<String, Object>> {
 
-  protected static final Logger LOGGER = LoggerFactory.getLogger(ResultSetIterator.class);
+  protected static final Logger LOGGER = getLogger(ResultSetIterator.class);
 
   private final ResultSet resultSet;
   private final RowHandler rowHandler;
-  private final StreamingResultSetCloser streamingResultSetCloser;
-  private DbConnection connection;
   private Boolean cachedNext = null;
 
-  public ResultSetIterator(DbConnection connection, ResultSet resultSet, RowHandler rowHandler,
-                           StreamingResultSetCloser streamingResultSetCloser) {
-    if (connection == null) {
-      throw new NullPointerException();
-    }
+  public ResultSetIterator(ResultSet resultSet, RowHandler rowHandler) {
     this.resultSet = resultSet;
     this.rowHandler = rowHandler;
-    this.streamingResultSetCloser = streamingResultSetCloser;
-    this.connection = connection;
   }
 
   @Override
@@ -56,16 +45,6 @@ public class ResultSetIterator implements Iterator<Map<String, Object>>, Closeab
       } catch (SQLException e) {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Unable to determine if there are more records", e);
-        }
-      }
-
-      if (!result) {
-        try {
-          close();
-        } catch (MuleException e) {
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Error closing resultSet", e);
-          }
         }
       }
     } else {
@@ -95,14 +74,5 @@ public class ResultSetIterator implements Iterator<Map<String, Object>>, Closeab
   @Override
   public void remove() {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void close() throws MuleException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Closing resultSet");
-    }
-
-    streamingResultSetCloser.close(connection, resultSet);
   }
 }

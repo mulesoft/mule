@@ -29,13 +29,13 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import javax.transaction.TransactionManager;
 
-public class ExtensionsConnectionAdapterTestCase extends AbstractMuleContextTestCase {
+public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTestCase {
 
-  private ExtensionsConnectionAdapter adapter;
+  private ExtensionConnectionSupplier adapter;
 
   @Override
   protected void doSetUp() throws Exception {
-    adapter = muleContext.getRegistry().lookupObject(ExtensionsConnectionAdapter.class);
+    adapter = muleContext.getRegistry().lookupObject(ExtensionConnectionSupplier.class);
   }
 
   @Override

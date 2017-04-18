@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.IntStream;
 
 /**
  * Closes a {@link ResultSet} once it has been processed
@@ -136,5 +137,9 @@ public class StatementStreamingResultSetCloser extends AbstractStreamingResultSe
 
   protected int getLocksCount() {
     return connectionLocks.size();
+  }
+
+  public int getOpenResultSets() {
+    return connectionResultSets.values().stream().flatMapToInt(set -> IntStream.of(set.size())).sum();
   }
 }

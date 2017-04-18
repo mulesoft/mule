@@ -35,10 +35,6 @@ public class TestRecordUtil {
     return new Record[] {getVenusRecord(), getEarthRecord(), getMarsRecord()};
   }
 
-  public static Record[] getAllAlienRecords() {
-    return new Record[] {getMonguitoRecord(), getEtRecord()};
-  }
-
   public static void assertMessageContains(Message message, Record... records) {
     assertRecords(message.getPayload().getValue(), records);
   }
