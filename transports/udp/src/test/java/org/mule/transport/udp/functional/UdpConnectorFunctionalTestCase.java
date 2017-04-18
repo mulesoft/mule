@@ -7,6 +7,7 @@
 package org.mule.transport.udp.functional;
 
 import static org.junit.Assert.fail;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -19,6 +20,7 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
 
 public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -29,6 +31,9 @@ public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCa
     public static final long MIN_PAUSE_PERIOD = 10;
     public static final long BETWEEN_BATCH_PAUSE = 5000;
 
+
+    private static final Logger LOGGER = getLogger(UdpConnectorFunctionalTestCase.class);
+    
     public UdpConnectorFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -58,7 +63,7 @@ public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCa
             ok = doTestSome(TOTAL_MESSAGE_COUNT, TOTAL_MESSAGE_COUNT / numberOfBatches);
             if (!ok)
             {
-                logger.warn("UDP failed to send " + TOTAL_MESSAGE_COUNT + " messages in " + numberOfBatches + " batches");
+                LOGGER.warn("UDP failed to send " + TOTAL_MESSAGE_COUNT + " messages in " + numberOfBatches + " batches");
 
                 // clean out the system
                 try
@@ -79,7 +84,7 @@ public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCa
                     // discard old messages
                     dropped++;
                 }
-                logger.info("Cleaned out " + dropped + " messages");
+                LOGGER.info("Cleaned out " + dropped + " messages");
             }
         }
 
@@ -89,7 +94,7 @@ public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCa
         }
         else
         {
-            logger.info("Required " + numberOfBatches + " batches before UDP 100% OK ("
+            LOGGER.info("Required " + numberOfBatches + " batches before UDP 100% OK ("
                     + TOTAL_MESSAGE_COUNT + " messages)");
         }
     }
@@ -102,7 +107,7 @@ public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCa
      */
     protected boolean doTestSome(int numberOfMessages, int burst) throws Exception
     {
-        logger.info("Trying " + numberOfMessages + " messages in batches of " + burst);
+        LOGGER.info("Trying " + numberOfMessages + " messages in batches of " + burst);
         MuleClient client = muleContext.getClient();
 
         int burstCount = 0;
@@ -134,7 +139,7 @@ public class UdpConnectorFunctionalTestCase extends AbstractServiceAndFlowTestCa
         boolean ok = receivedPayloads.size() == numberOfMessages;
         if (!ok)
         {
-            logger.info("Received " + receivedPayloads.size() + " messages");
+            LOGGER.info("Received " + receivedPayloads.size() + " messages");
         }
         return ok;
     }

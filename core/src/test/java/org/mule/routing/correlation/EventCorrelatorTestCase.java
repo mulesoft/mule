@@ -14,6 +14,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.DefaultMessageCollection;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -52,7 +54,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
     public static final String TEST_GROUP_ID = "groupId";
     public static final boolean USE_PERSISTENT_STORE = false;
 
-    private static final Logger logger = LoggerFactory.getLogger(EventCorrelatorTestCase.class);
+    private static final Logger LOGGER = getLogger(EventCorrelatorTestCase.class);
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private EventCorrelatorCallback mockEventCorrelatorCallback;
@@ -165,7 +167,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
                     }
                     catch (ObjectStoreException e)
                     {
-                        logger.debug("Could not access object store.");
+                        LOGGER.debug("Could not access object store.");
                         return false;
                     }
                 }

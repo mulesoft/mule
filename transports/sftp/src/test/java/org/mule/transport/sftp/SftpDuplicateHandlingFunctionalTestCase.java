@@ -9,6 +9,7 @@ package org.mule.transport.sftp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.DispatchException;
@@ -19,12 +20,14 @@ import java.util.Collection;
 import org.apache.commons.lang.NotImplementedException;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
 
 /**
  * Test the archive features.
  */
 public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCase
 {
+    private static final Logger LOGGER = getLogger(SftpDuplicateHandlingFunctionalTestCase.class);
     private static final long TIMEOUT = 10000;
 
     // Size of the generated stream - 2 Mb
@@ -39,9 +42,9 @@ public class SftpDuplicateHandlingFunctionalTestCase extends AbstractSftpTestCas
         setDisposeContextPerClass(true);
 
         // Increase the timeout of the test to 300 s
-        logger.info("Timeout was set to: " + System.getProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "-1"));
+        LOGGER.info("Timeout was set to: " + System.getProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "-1"));
         System.setProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "300000");
-        logger.info("Timeout is now set to: " + System.getProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "-1"));
+        LOGGER.info("Timeout is now set to: " + System.getProperty(TEST_TIMEOUT_SYSTEM_PROPERTY, "-1"));
     }
 
     @Parameters

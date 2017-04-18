@@ -17,9 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RoundRobinTestCase extends FunctionalTestCase
 {
+    private static final Logger logger = LoggerFactory.getLogger(RoundRobinTestCase.class);
     private static final int NUMBER_OF_MESSAGES = 10;
     private static final int NUMBER_OF_WRITERS = 10;
     private static final int NUMBER_OF_ENDPOINTS = 5;

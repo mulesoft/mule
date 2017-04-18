@@ -6,9 +6,12 @@
  */
 package org.mule.config.spring.parsers;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.config.spring.parsers.beans.OrphanBean;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 
 /**
  * This constructs a <em>temporary</em> bean whose contents are injected into a parent map by
@@ -17,6 +20,8 @@ import org.junit.Test;
  */
 public class MapEntryCombinerTestCase extends AbstractNamespaceTestCase
 {
+    private static final Logger LOGGER = getLogger(MapEntryCombinerTestCase.class);
+
     @Override
     protected String getConfigFile()
     {
@@ -27,7 +32,7 @@ public class MapEntryCombinerTestCase extends AbstractNamespaceTestCase
     public void testProperties()
     {
         OrphanBean bean = (OrphanBean) assertBeanExists("checkProps", OrphanBean.class);
-        logger.info("Map size: " + bean.getMap().size());
+        LOGGER.info("Map size: " + bean.getMap().size());
         assertMapEntryExists(bean.getMap(), "0", 0);
     }
 
@@ -35,7 +40,7 @@ public class MapEntryCombinerTestCase extends AbstractNamespaceTestCase
     public void testCombinedMap()
     {
         OrphanBean bean = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
-        logger.info("Map size: " + bean.getMap().size());
+        LOGGER.info("Map size: " + bean.getMap().size());
         for (int i = 0; i < 6; ++i)
         {
             assertMapEntryExists(bean.getMap(), Integer.toString(i+1), i+1);
@@ -46,7 +51,7 @@ public class MapEntryCombinerTestCase extends AbstractNamespaceTestCase
     public void testReversedOrder()
     {
         OrphanBean bean = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);
-        logger.info("Map size: " + bean.getMap().size());
+        LOGGER.info("Map size: " + bean.getMap().size());
         for (int i = 0; i < 2; ++i)
         {
             assertMapEntryExists(bean.getMap(), Integer.toString(i+1), i+1);

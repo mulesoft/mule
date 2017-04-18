@@ -9,6 +9,7 @@ package org.mule.registry;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -37,10 +38,11 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class RequestContextTestCase extends AbstractMuleTestCase
 {
-
+    private static final Logger LOGGER = getLogger(RequestContextTestCase.class);
     private boolean threadSafeEvent;
     private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
 
@@ -97,7 +99,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
             }
             catch (RuntimeException e)
             {
-                logger.error("error in thread", e);
+                LOGGER.error("error in thread", e);
             }
         }
 

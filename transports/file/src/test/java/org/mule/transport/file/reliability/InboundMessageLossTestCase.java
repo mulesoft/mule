@@ -199,7 +199,6 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
         });
     }
 
-    @Ignore("MULE-6926: Flaky Test")
     @Test
     public void testRollbackExceptionStrategyConsumesMessage() throws Exception
     {

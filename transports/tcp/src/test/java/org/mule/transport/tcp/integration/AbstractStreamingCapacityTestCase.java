@@ -9,6 +9,7 @@ package org.mule.transport.tcp.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
@@ -23,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 
 /**
  * IMPORTANT - DO NOT RUN THIS TEST IN AN IDE WITH LOG LEVEL OF DEBUG. USE INFO TO
@@ -36,6 +38,7 @@ public abstract class AbstractStreamingCapacityTestCase extends AbstractServiceA
     public static final long ONE_GB = ONE_KB * ONE_MB;
     public static final int MESSAGES = 21;
 
+    private static final Logger LOGGER = getLogger(AbstractStreamingCapacityTestCase.class);
     private long size;
 
     public AbstractStreamingCapacityTestCase(ConfigVariant variant, String configResources, long size)
@@ -63,7 +66,7 @@ public abstract class AbstractStreamingCapacityTestCase extends AbstractServiceA
                 }
                 catch (Exception e)
                 {
-                    logger.error(e.getMessage(), e);
+                    LOGGER.error(e.getMessage(), e);
                 }
             }
         };
@@ -89,7 +92,7 @@ public abstract class AbstractStreamingCapacityTestCase extends AbstractServiceA
 
         // if we assume 1MB/sec then we need at least...
         long pause = Math.max(size / ONE_MB, 60 * 10) + 10;
-        logger.info("Waiting for up to " + pause + " seconds");
+        LOGGER.info("Waiting for up to " + pause + " seconds");
 
         latch.await(pause, TimeUnit.SECONDS);
         assertEquals(stream.summary(), message.get());
@@ -102,11 +105,11 @@ public abstract class AbstractStreamingCapacityTestCase extends AbstractServiceA
         long delta = freeStart - freeEnd;
         long timeEnd = System.currentTimeMillis();
         double speed = size / (double) (timeEnd - timeStart) * 1000 / ONE_MB;
-        logger.info("Transfer speed " + speed + " MB/s (" + size + " B in " + (timeEnd - timeStart) + " ms)");
+        LOGGER.info("Transfer speed " + speed + " MB/s (" + size + " B in " + (timeEnd - timeStart) + " ms)");
 
         double expectPercent = 10.5; // add a little more wiggle room than 10%, we have seen 10.0x% before
         double usePercent = 100.0 * delta / size;
-        logger.info("Memory delta " + delta + " B = " + usePercent + "%");
+        LOGGER.info("Memory delta " + delta + " B = " + usePercent + "%");
 
         String assertMessage = String.format("Expected memory usage to be lower than %f%% but was %f%%",
             Double.valueOf(expectPercent), Double.valueOf(usePercent));

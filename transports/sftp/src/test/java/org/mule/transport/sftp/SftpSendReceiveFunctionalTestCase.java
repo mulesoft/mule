@@ -8,6 +8,7 @@ package org.mule.transport.sftp;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
@@ -25,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
 
 /**
  * <code>SendReceiveFunctionalTestCase</code> tests sending an receiving multiple
@@ -32,6 +34,7 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class SftpSendReceiveFunctionalTestCase extends AbstractSftpTestCase
 {
+    private static final Logger LOGGER = getLogger(SftpSendReceiveFunctionalTestCase.class);
     private static final long TIMEOUT = 30000;
 
     private ArrayList<String> sendFiles;
@@ -98,7 +101,7 @@ public class SftpSendReceiveFunctionalTestCase extends AbstractSftpTestCase
             @Override
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
-                logger.info("called " + loopCount.incrementAndGet() + " times");
+                LOGGER.info("called " + loopCount.incrementAndGet() + " times");
 
                 SftpInputStream inputStream = (SftpInputStream) context.getMessage().getPayload();
                 String o = IOUtils.toString(inputStream);
@@ -128,8 +131,8 @@ public class SftpSendReceiveFunctionalTestCase extends AbstractSftpTestCase
 
         latch.await(TIMEOUT, TimeUnit.MILLISECONDS);
 
-        logger.debug("Number of files sent: " + sendFiles.size());
-        logger.debug("Number of files received: " + receiveFiles.size());
+        LOGGER.debug("Number of files sent: " + sendFiles.size());
+        LOGGER.debug("Number of files received: " + receiveFiles.size());
 
         // This makes sure we received the same number of files we sent, and that
         // the content was a match (since only matched content gets on the

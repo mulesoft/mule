@@ -6,6 +6,11 @@
  */
 package org.mule.test.integration.client;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.junit.Ignore;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -19,14 +24,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.slf4j.Logger;
 
 @Ignore("Requires tools.jar in the classpath")
 public class MuleClientWSDLExternalTestCase extends AbstractMuleContextTestCase
 {
+    private static final Logger LOGGER = getLogger(MuleClientWSDLExternalTestCase.class);
 
     @Test
     public void testRequestResponse() throws Throwable
@@ -57,7 +60,7 @@ public class MuleClientWSDLExternalTestCase extends AbstractMuleContextTestCase
 
         if (result != null)
         {
-            logger.debug("The quote for " + input + " is: " + result.getPayload());
+            LOGGER.debug("The quote for " + input + " is: " + result.getPayload());
         }
 
         assertNotNull(result);

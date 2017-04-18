@@ -19,10 +19,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MuleClientJmsTestCase extends FunctionalTestCase
 {
     public static final int INTERATIONS = 1;
+
+    private static final Logger logger = LoggerFactory.getLogger(MuleClientJmsTestCase.class);
 
     @Override
     protected String getConfigFile()

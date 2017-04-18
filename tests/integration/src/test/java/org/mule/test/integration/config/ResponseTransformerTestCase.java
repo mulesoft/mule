@@ -6,6 +6,10 @@
  */
 package org.mule.test.integration.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -17,12 +21,12 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import org.slf4j.Logger;
 
 public class ResponseTransformerTestCase extends AbstractServiceAndFlowTestCase
 {
+    private static final Logger LOGGER = getLogger(ResponseTransformerTestCase.class);
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -54,7 +58,7 @@ public class ResponseTransformerTestCase extends AbstractServiceAndFlowTestCase
         for (int count = 1; iterator.hasNext(); count++)
         {
             Transformer transformer = iterator.next();
-            logger.debug(transformer);
+            LOGGER.debug(String.valueOf(transformer));
             assertEquals(prefix + count, transformer.getName());
         }
     }

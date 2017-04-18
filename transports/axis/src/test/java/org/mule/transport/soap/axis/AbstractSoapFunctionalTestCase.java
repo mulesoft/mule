@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -25,9 +26,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 {
+    private static final Logger LOGGER = getLogger(AbstractSoapFunctionalTestCase.class);
+
     protected abstract String getRequestResponseEndpoint();
 
     protected abstract String getReceiveEndpoint();
@@ -167,9 +171,9 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send(getWsdlEndpoint(), null, props);
         assertNotNull(result);
-        if (logger.isDebugEnabled())
+        if (LOGGER.isDebugEnabled())
         {
-            logger.debug(result.getPayloadAsString());
+            LOGGER.debug(result.getPayloadAsString());
         }
 
         String location = getWsdlEndpoint();
@@ -179,9 +183,9 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
             location = location.substring(0, location.length() - 1);
         }
 
-        if (logger.isDebugEnabled())
+        if (LOGGER.isDebugEnabled())
         {
-            logger.debug(result.getPayloadAsString());
+            LOGGER.debug(result.getPayloadAsString());
         }
         System.out.println(result.getPayloadAsString());
         if (result.getPayloadAsString().indexOf("location=\"" + location) == -1)

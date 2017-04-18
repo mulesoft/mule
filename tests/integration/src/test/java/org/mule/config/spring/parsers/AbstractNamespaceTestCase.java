@@ -6,21 +6,23 @@
  */
 package org.mule.config.spring.parsers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.config.spring.parsers.beans.AbstractBean;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.ClassUtils;
 
 import java.util.List;
 import java.util.Map;
-
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.slf4j.Logger;
 
 public abstract class AbstractNamespaceTestCase extends FunctionalTestCase
 {
+    private static final Logger LOGGER = getLogger(AbstractNamespaceTestCase.class);
 
     @Test
     public void testParse()
@@ -33,7 +35,7 @@ public abstract class AbstractNamespaceTestCase extends FunctionalTestCase
         Object bean = muleContext.getRegistry().lookupObject(name);
         assertNotNull(name + " bean missing", bean);
         assertTrue(bean.getClass().equals(clazz));
-        logger.debug("found bean " + name + "/" + ClassUtils.getSimpleName(bean.getClass()));
+        LOGGER.debug("found bean " + name + "/" + ClassUtils.getSimpleName(bean.getClass()));
         return bean;
     }
 
@@ -41,7 +43,7 @@ public abstract class AbstractNamespaceTestCase extends FunctionalTestCase
     {
         assertNotNull(ClassUtils.getSimpleName(clazz) + " content missing", object);
         assertTrue(clazz.isAssignableFrom(object.getClass()));
-        logger.debug("found content " + ClassUtils.getSimpleName(object.getClass()));
+        LOGGER.debug("found content " + ClassUtils.getSimpleName(object.getClass()));
         return object;
     }
 

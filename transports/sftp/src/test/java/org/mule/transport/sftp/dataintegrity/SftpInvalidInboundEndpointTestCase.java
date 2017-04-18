@@ -9,6 +9,7 @@ package org.mule.transport.sftp.dataintegrity;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -20,9 +21,11 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.transport.sftp.SftpConnector;
+import org.slf4j.Logger;
 
 public class SftpInvalidInboundEndpointTestCase extends AbstractSftpDataIntegrityTestCase
 {
+    private static final Logger LOGGER = getLogger(SftpInvalidInboundEndpointTestCase.class);
     private static final int NO_OF_INVALID_ATTEMPTS = 50;
 
     public SftpInvalidInboundEndpointTestCase(ConfigVariant variant, String configResources)
@@ -57,8 +60,8 @@ public class SftpInvalidInboundEndpointTestCase extends AbstractSftpDataIntegrit
         // machine
         for (int i = 0; i < NO_OF_INVALID_ATTEMPTS; i++)
         {
-            if (logger.isDebugEnabled())
-                logger.debug("CreateSftpClient invalid atempt #" + i + " of " + NO_OF_INVALID_ATTEMPTS);
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("CreateSftpClient invalid atempt #" + i + " of " + NO_OF_INVALID_ATTEMPTS);
             try
             {
                 c.createSftpClient(ep);
