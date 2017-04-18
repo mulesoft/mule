@@ -7,6 +7,7 @@
 package org.mule.runtime.module.launcher.log4j2;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelector.STATUS_LOGGER;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleBase;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -50,13 +51,8 @@ public class MuleLoggerContextFactory {
     if (classLoader instanceof ArtifactClassLoader) {
       final ArtifactClassLoader artifactClassLoader = (ArtifactClassLoader) classLoader;
 
-      artifactClassLoader.addShutdownListener(new ShutdownListener() {
-
-        @Override
-        public void execute() {
-          selector.destroyLoggersFor(ArtifactAwareContextSelector.resolveLoggerContextClassLoader(classLoader));
-        }
-      });
+      artifactClassLoader.addShutdownListener(() -> selector
+          .destroyLoggersFor(ArtifactAwareContextSelector.resolveLoggerContextClassLoader(classLoader)));
     }
 
     return loggerContext;
@@ -85,22 +81,21 @@ public class MuleLoggerContextFactory {
       if (appDescriptor.getLogConfigFile() == null) {
         appLogConfig = getLogConfig(muleCL);
       } else if (!appDescriptor.getLogConfigFile().exists()) {
-        ArtifactAwareContextSelector.logger
+        STATUS_LOGGER
             .warn("Configured 'log.configFile' in app descriptor points to a non-existant file. Using default configuration.");
         appLogConfig = getLogConfig(muleCL);
       } else {
         appLogConfig = appDescriptor.getLogConfigFile().toURI();
       }
     } catch (Exception e) {
-      ArtifactAwareContextSelector.logger.warn(
-                                               "{} while looking for 'log.configFile' entry in app descriptor: {}. Using default configuration.",
-                                               e.getClass().getName(), e.getMessage());
+      STATUS_LOGGER.warn("{} while looking for 'log.configFile' entry in app descriptor: {}. Using default configuration.",
+                         e.getClass().getName(), e.getMessage());
       appLogConfig = getLogConfig(muleCL);
     }
 
-    if (appLogConfig != null && ArtifactAwareContextSelector.logger.isInfoEnabled()) {
-      ArtifactAwareContextSelector.logger.info("Found logging config for application '{}' at '{}'", muleCL.getArtifactId(),
-                                               appLogConfig);
+    if (appLogConfig != null && STATUS_LOGGER.isInfoEnabled()) {
+      STATUS_LOGGER.info("Found logging config for application '{}' at '{}'", muleCL.getArtifactId(),
+                         appLogConfig);
     }
 
     return appLogConfig;
