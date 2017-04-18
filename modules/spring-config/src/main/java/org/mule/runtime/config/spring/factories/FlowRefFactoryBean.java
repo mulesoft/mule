@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.processor.AnnotatedProcessor;
 import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChain;
 
 import java.util.Map;
@@ -45,7 +46,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     implements FactoryBean<Processor>, ApplicationContextAware, MuleContextAware, Initialisable, Disposable {
 
   private abstract class FlowRefMessageProcessor
-      implements Processor, AnnotatedObject, FlowConstructAware {
+      implements AnnotatedProcessor, FlowConstructAware {
 
     protected FlowConstruct flowConstruct;
 
