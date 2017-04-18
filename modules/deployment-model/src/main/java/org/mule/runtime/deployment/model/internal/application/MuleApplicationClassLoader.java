@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.deployment.model.internal.application;
 
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.deployment.model.api.application.ApplicationClassLoader;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
@@ -48,5 +52,21 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
     // Always the first element corresponds to the application's classes folder
     ClassLoaderModel classLoaderModel = this.<ApplicationDescriptor>getArtifactDescriptor().getClassLoaderModel();
     return new String[] {classLoaderModel.getUrls()[0].getFile()};
+  }
+
+  /**
+   * Resolves the plugin classloader of the thread context classloader artifact.
+   * <p>
+   * If that classloader doesn't contain plugins, the current context classloader is returned.
+   * 
+   * @return the plugin classloader of the current thread context artifact.
+   */
+  public static List<ClassLoader> resolveContextArtifactPluginClassLoaders() {
+    if (currentThread().getContextClassLoader() instanceof MuleApplicationClassLoader) {
+      return ((MuleApplicationClassLoader) currentThread().getContextClassLoader()).getArtifactPluginClassLoaders().stream()
+          .map(acl -> acl.getClassLoader()).collect(toList());
+    } else {
+      return singletonList(currentThread().getContextClassLoader());
+    }
   }
 }

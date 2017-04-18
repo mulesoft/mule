@@ -6,11 +6,8 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.beanutils.BeanUtils.copyProperty;
 import static org.mule.runtime.api.meta.AnnotatedObject.PROPERTY_NAME;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
@@ -28,6 +25,7 @@ import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttribut
 import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
 import static org.mule.runtime.config.spring.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
 import static org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser.processMetadataAnnotationsHelper;
+import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
@@ -42,7 +40,6 @@ import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import com.google.common.collect.ImmutableSet;
@@ -101,15 +98,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
 
   // TODO MULE-9728 - Provide a mechanism to hook per transport in the endpoint address parsing
   private BeanDefinitionPostProcessor resolvePostProcessor() {
-    List<ClassLoader> artifactPluginClassLoaders;
-    if (currentThread().getContextClassLoader() instanceof MuleApplicationClassLoader) {
-      artifactPluginClassLoaders = ((MuleApplicationClassLoader) currentThread().getContextClassLoader())
-          .getArtifactPluginClassLoaders().stream().map(acl -> acl.getClassLoader()).collect(toList());
-    } else {
-      artifactPluginClassLoaders = singletonList(currentThread().getContextClassLoader());
-    }
-
-    for (ClassLoader classLoader : artifactPluginClassLoaders) {
+    for (ClassLoader classLoader : resolveContextArtifactPluginClassLoaders()) {
       try {
         return (BeanDefinitionPostProcessor) ClassUtils.getClass(classLoader, TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS)
             .newInstance();
