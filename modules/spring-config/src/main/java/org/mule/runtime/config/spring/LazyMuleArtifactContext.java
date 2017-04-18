@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SE
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
@@ -63,10 +64,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
    */
   public LazyMuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
                                  ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
-                                 Map<String, String> artifactProperties, ArtifactType artifactType)
+                                 Map<String, String> artifactProperties, ArtifactType artifactType,
+                                 List<ClassLoader> pluginsClassLoaders)
       throws BeansException {
     super(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController, artifactProperties,
-          artifactType);
+          artifactType, pluginsClassLoaders);
   }
 
   @Override

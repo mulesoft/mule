@@ -14,6 +14,7 @@ import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.forExt
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newObjectValue;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
+import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.mule.runtime.extension.api.ExtensionConstants.DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
@@ -38,6 +39,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -142,10 +144,9 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
     Document document = noValidationDocumentLoader().loadDocument(context.getExtensions(), name, resource);
 
-    return new XmlApplicationParser(new XmlApplicationServiceRegistry(new SpiServiceRegistry(), context))
-        .parse(document.getDocumentElement())
-        .orElseThrow(
-                     () -> new MuleRuntimeException(createStaticMessage("Could not load load a Configuration from the given resource")));
+    return new XmlApplicationParser(new XmlApplicationServiceRegistry(new SpiServiceRegistry(), context),
+                                    resolveContextArtifactPluginClassLoaders()).parse(document.getDocumentElement())
+                                        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not load load a Configuration from the given resource")));
   }
 
   private ArtifactDeclaration declareArtifact(ConfigLine configLine) {

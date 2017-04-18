@@ -8,6 +8,8 @@ package org.mule.runtime.config.builders;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
+
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.config.spring.MuleArtifactContext;
 import org.mule.runtime.config.spring.OptionalObjectsController;
@@ -74,6 +76,7 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
     super.doConfigure(muleContext);
   }
 
+  @Override
   protected ConfigResource[] loadConfigResources(String[] configs) throws ConfigurationException {
     try {
       artifactConfigResources = new ConfigResource[configs.length];
@@ -91,8 +94,9 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
                                                            ArtifactDeclaration artifactDeclaration,
                                                            OptionalObjectsController optionalObjectsController) {
     Resource[] artifactConfigServletContextResources = preProcessResources(artifactConfigResources);
+
     return new MuleArtifactContext(muleContext, artifactConfigServletContextResources, artifactDeclaration,
-                                   optionalObjectsController, emptyMap(), APP);
+                                   optionalObjectsController, emptyMap(), APP, resolveContextArtifactPluginClassLoaders());
   }
 
   private Resource[] preProcessResources(ConfigResource[] configResources) {
@@ -161,6 +165,7 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
       return this.path;
     }
 
+    @Override
     public InputStream getInputStream() throws IOException {
       InputStream is = getServletContextInputStream();
       if (is == null) {
@@ -188,6 +193,7 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
       return ClassUtils.getDefaultClassLoader().getResourceAsStream(classpathPath);
     }
 
+    @Override
     public String getDescription() {
       return path;
     }

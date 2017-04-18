@@ -9,6 +9,8 @@ package org.mule.runtime.config.spring;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
+
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -143,10 +145,11 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                            OptionalObjectsController optionalObjectsController) {
     if (enableLazyInit) {
       return new LazyMuleArtifactContext(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
-                                         getArtifactProperties(), artifactType);
+                                         getArtifactProperties(), artifactType, resolveContextArtifactPluginClassLoaders());
     }
+
     return new MuleArtifactContext(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
-                                   getArtifactProperties(), artifactType);
+                                   getArtifactProperties(), artifactType, resolveContextArtifactPluginClassLoaders());
   }
 
 

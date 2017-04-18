@@ -8,14 +8,14 @@ package org.mule.runtime.core.config.bootstrap;
 
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.ALL;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
-import org.mule.runtime.core.api.MuleContext;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.core.util.PropertiesUtils;
 
@@ -84,8 +84,7 @@ import org.slf4j.LoggerFactory;
  * is specified. If no 'returnClass' is specified the default in the transformer will be used.
  * <p/>
  * Note that all objects defined have to have a default constructor. They can implement injection interfaces such as
- * {@link org.mule.runtime.core.api.context.MuleContextAware} and lifecycle interfaces such as
- * {@link Initialisable}.
+ * {@link org.mule.runtime.core.api.context.MuleContextAware} and lifecycle interfaces such as {@link Initialisable}.
  *
  * @since 3.7.0
  */
@@ -295,7 +294,8 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
 
   private void registerTransformers(List<TransformerBootstrapProperty> props) throws Exception {
     for (TransformerBootstrapProperty bootstrapProperty : props) {
-      final Class<? extends Transformer> transformerClass = getClass(bootstrapProperty.getClassName());
+      final Class<? extends Transformer> transformerClass =
+          bootstrapProperty.getService().forName(bootstrapProperty.getClassName());
       try {
         Class<?> returnClass = null;
         String returnClassString = bootstrapProperty.getReturnClassName();
@@ -321,10 +321,6 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
   protected abstract void doRegisterTransformer(TransformerBootstrapProperty bootstrapProperty, Class<?> returnClass,
                                                 Class<? extends Transformer> transformerClass)
       throws Exception;
-
-  protected Class getClass(String className) throws ClassNotFoundException {
-    return ClassUtils.loadClass(className, getClass());
-  }
 
   protected abstract void registerTransformers() throws MuleException;
 

@@ -12,6 +12,7 @@ import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -23,6 +24,7 @@ import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -70,6 +72,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.w3c.dom.Document;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -181,7 +185,8 @@ final class XmlExtensionLoaderDelegate {
 
 
     Document moduleDocument = getModuleDocument(context, resource);
-    XmlApplicationParser xmlApplicationParser = new XmlApplicationParser(new SpiServiceRegistry());
+    XmlApplicationParser xmlApplicationParser =
+        new XmlApplicationParser(new SpiServiceRegistry(), singletonList(currentThread().getContextClassLoader()));
     Optional<ConfigLine> parseModule = xmlApplicationParser.parse(moduleDocument.getDocumentElement());
     if (!parseModule.isPresent()) {
       // This happens in org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser.configLineFromElement()
