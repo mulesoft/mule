@@ -26,8 +26,10 @@
         <module>file-extension-common</module>
         <module>launcher</module>
         <module>http-api</module>
-        <module>oauth-api</module>
+        <module>http-policy-api</module>
         <module>jboss-transactions</module>
+        <module>oauth-api</module>
+        <module>policy-api</module>
         <module>reboot</module>
         <module>schedulers</module>
         <module>scripting</module>

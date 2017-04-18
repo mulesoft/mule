@@ -44,6 +44,8 @@ import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
@@ -71,6 +73,8 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.size.SmallTest;
+import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
+
 import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
 
 import java.util.Map;
@@ -303,14 +307,10 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
   @Test
   public void executeWithPolicy() throws Exception {
-    ComponentIdentifier componentIdentifier =
-        ComponentIdentifier.builder().withNamespace(EXTENSION_NAMESPACE).withName(OPERATION_NAME).build();
-    when(extensionModel.getName()).thenReturn(componentIdentifier.getNamespace());
-    when(operationModel.getName()).thenReturn(componentIdentifier.getName());
 
     messageProcessor.process(event);
 
-    verify(mockPolicyManager).createOperationPolicy(eq(componentIdentifier), same(event), any(Map.class),
+    verify(mockPolicyManager).createOperationPolicy(eq(messageProcessor.getLocation()), same(event), any(Map.class),
                                                     any(OperationExecutionFunction.class));
     verify(mockOperationPolicy).process(same(event));
   }

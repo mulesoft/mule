@@ -4,23 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.http.api.policy;
+package org.mule.test.http.policy;
 
-import static org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory.PATH_PARAMETER_NAME;
-import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory.PATH_PARAMETER_NAME;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 
@@ -28,10 +31,9 @@ import ru.yandex.qatools.allure.annotations.Features;
 public class HttpRequestPolicyPointcutParametersFactoryTestCase extends AbstractMuleTestCase {
 
   private static final ComponentIdentifier HTTP_REQUEST_COMPONENT_IDENTIFIER =
-      builder().withNamespace("http").withName("request").build();
+      builder().withNamespace("httpn").withName("request").build();
   private static final String TEST_REQUEST_PATH = "test-request-path";
   private static final String TEST_METHOD = "PUT";
-  private static final String FLOW_NAME = "flow-name";
 
   private final HttpRequestPolicyPointcutParametersFactory factory = new HttpRequestPolicyPointcutParametersFactory();
 
@@ -45,26 +47,28 @@ public class HttpRequestPolicyPointcutParametersFactoryTestCase extends Abstract
   @Test
   public void doesNotSupportHttpListener() {
     assertThat(factory
-        .supportsOperationIdentifier(builder().withNamespace("http").withName("listener").build()),
+        .supportsOperationIdentifier(builder().withNamespace("httpn").withName("listener").build()),
                is(false));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void failIfFlowNameIsEmpty() {
-    factory.createPolicyPointcutParameters("", HTTP_REQUEST_COMPONENT_IDENTIFIER, emptyMap());
+  @Test(expected = NullPointerException.class)
+  public void failIfComponentLocationIsNull() {
+    factory.createPolicyPointcutParameters(null, emptyMap());
   }
 
   @Test
   public void policyPointcutParameters() {
+    ComponentLocation componentLocation = mock(ComponentLocation.class);
     Map<String, Object> parametersMap =
         ImmutableMap.<String, Object>builder().put(HttpRequestPolicyPointcutParametersFactory.METHOD_PARAMETER_NAME, TEST_METHOD)
             .put(PATH_PARAMETER_NAME, TEST_REQUEST_PATH).build();
-    HttpRequestPolicyPointcutParameters policyPointcutParameters = (HttpRequestPolicyPointcutParameters) factory
-        .createPolicyPointcutParameters(FLOW_NAME, HTTP_REQUEST_COMPONENT_IDENTIFIER, parametersMap);
-    assertThat(policyPointcutParameters.getComponentIdentifier(), is(HTTP_REQUEST_COMPONENT_IDENTIFIER));
+
+    HttpRequestPolicyPointcutParameters policyPointcutParameters =
+        (HttpRequestPolicyPointcutParameters) factory.createPolicyPointcutParameters(componentLocation, parametersMap);
+
+    assertThat(policyPointcutParameters.getComponentLocation(), is(componentLocation));
     assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
     assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
-    assertThat(policyPointcutParameters.getFlowName(), is(FLOW_NAME));
   }
 
 }

@@ -18,6 +18,7 @@ import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParametersFactory;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -29,12 +30,12 @@ import ru.yandex.qatools.allure.annotations.Features;
 public class HttpListenerPolicyPointcutParametersFactoryTestCase extends AbstractMuleTestCase {
 
   private static final ComponentIdentifier HTTP_LISTENER_COMPONENT_IDENTIFIER =
-      builder().withNamespace("http").withName("listener").build();
+      builder().withNamespace("httpn").withName("listener").build();
   private static final String TEST_REQUEST_PATH = "test-request-path";
   private static final String TEST_METHOD = "PUT";
-  private static final String FLOW_NAME = "flow-name";
 
   private final HttpListenerPolicyPointcutParametersFactory factory = new HttpListenerPolicyPointcutParametersFactory();
+  private final ComponentLocation componentLocation = mock(ComponentLocation.class);
   private final HttpRequestAttributes httpAttributes = mock(HttpRequestAttributes.class);
   private final TypedValue attributes = new TypedValue(mock(Attributes.class), OBJECT);
 
@@ -42,33 +43,36 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
   public void supportsHttpListener() {
     assertThat(factory
         .supportsSourceIdentifier(HTTP_LISTENER_COMPONENT_IDENTIFIER),
-               is(true));;
+               is(true));
   }
 
   @Test
   public void doesNotSupportHttpRequester() {
     assertThat(factory
-        .supportsSourceIdentifier(ComponentIdentifier.builder().withNamespace("http").withName("request").build()),
-               is(false));;
+        .supportsSourceIdentifier(ComponentIdentifier.builder().withNamespace("httpn").withName("request").build()),
+               is(false));
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void failIfAttributesIsNotHttpRequestAttributes() {
-    factory.createPolicyPointcutParameters(FLOW_NAME, HTTP_LISTENER_COMPONENT_IDENTIFIER, attributes);
+    factory.createPolicyPointcutParameters(componentLocation, attributes);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void failIfFlowNameIsEmpty() {
-    factory.createPolicyPointcutParameters("", HTTP_LISTENER_COMPONENT_IDENTIFIER, attributes);
+  @Test(expected = NullPointerException.class)
+  public void failIfComponentLocationIsNull() {
+    factory.createPolicyPointcutParameters(null, attributes);
   }
 
   @Test
   public void policyPointcutParameters() {
     when(httpAttributes.getRequestPath()).thenReturn(TEST_REQUEST_PATH);
     when(httpAttributes.getMethod()).thenReturn(TEST_METHOD);
-    HttpListenerPolicyPointcutParameters policyPointcutParameters = (HttpListenerPolicyPointcutParameters) factory
-        .createPolicyPointcutParameters(FLOW_NAME, HTTP_LISTENER_COMPONENT_IDENTIFIER, new TypedValue<>(httpAttributes, OBJECT));
-    assertThat(policyPointcutParameters.getComponentIdentifier(), is(HTTP_LISTENER_COMPONENT_IDENTIFIER));
+
+    HttpListenerPolicyPointcutParameters policyPointcutParameters =
+        (HttpListenerPolicyPointcutParameters) factory.createPolicyPointcutParameters(componentLocation,
+                                                                                      new TypedValue<>(httpAttributes, OBJECT));
+
+    assertThat(policyPointcutParameters.getComponentLocation(), is(componentLocation));
     assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
     assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
   }

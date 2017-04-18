@@ -193,6 +193,8 @@
         <muleEmbeddedApiVersion>1.0.0-SNAPSHOT</muleEmbeddedApiVersion>
         <muleExtensionsApiVersion>1.0.0-SNAPSHOT</muleExtensionsApiVersion>
         <muleExtensionsSoapApiVersion>1.0.0-SNAPSHOT</muleExtensionsSoapApiVersion>
+        <muleHttpPolicyApiVersion>1.0.0-SNAPSHOT</muleHttpPolicyApiVersion>
+        <mulePolicyApiVersion>1.0.0-SNAPSHOT</mulePolicyApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <muleApiVersion>1.0.0-SNAPSHOT</muleApiVersion>
         <muleMetadataModelVersion>1.0.0-SNAPSHOT</muleMetadataModelVersion>
@@ -1269,6 +1271,16 @@
                 <groupId>org.mule.runtime</groupId>
                 <artifactId>mule-extensions-api-persistence</artifactId>
                 <version>${muleExtensionsApiVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-module-policy-api</artifactId>
+                <version>${mulePolicyApiVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-module-http-policy-api</artifactId>
+                <version>${muleHttpPolicyApiVersion}</version>
             </dependency>
 
             <dependency>

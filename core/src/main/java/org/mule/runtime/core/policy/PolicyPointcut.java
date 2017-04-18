@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.policy;
 
+import org.mule.runtime.policy.api.PolicyPointcutParameters;
+
 /**
  * Provides a way to select which policies must be applied based on a given request.
  *
