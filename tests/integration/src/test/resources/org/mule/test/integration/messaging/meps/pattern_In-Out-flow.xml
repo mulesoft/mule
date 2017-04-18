@@ -27,7 +27,7 @@
         <!-- Note: auto formating this file might break the test if the script's indentation is not preserved. -->
         <script:component>
             <script:script engine="groovy">
-                if (message.getAttributes().getHeaders().get("foo"))
+                if (message.getAttributes().getValue().getHeaders().get("foo"))
                     return "foo header received"
                 else
                     return "foo header not received"
