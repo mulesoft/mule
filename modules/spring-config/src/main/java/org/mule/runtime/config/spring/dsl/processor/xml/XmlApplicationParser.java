@@ -20,6 +20,11 @@ import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +35,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
 
 /**
  * Simple parser that transforms an XML document to a set of {@link org.mule.runtime.config.spring.dsl.processor.ConfigLine}
@@ -60,6 +60,8 @@ public class XmlApplicationParser {
 
   public XmlApplicationParser(ServiceRegistry serviceRegistry, List<ClassLoader> pluginsClassLoaders) {
     final Builder<XmlNamespaceInfoProvider> namespaceInfoProvidersBuilder = ImmutableList.builder();
+    namespaceInfoProvidersBuilder
+        .addAll(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class, XmlNamespaceInfoProvider.class.getClassLoader()));
     for (ClassLoader pluginClassLoader : pluginsClassLoaders) {
       namespaceInfoProvidersBuilder.addAll(serviceRegistry.lookupProviders(XmlNamespaceInfoProvider.class, pluginClassLoader));
     }
