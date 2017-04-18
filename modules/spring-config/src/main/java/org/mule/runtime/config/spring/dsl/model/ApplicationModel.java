@@ -127,7 +127,7 @@ public class ApplicationModel {
   public static final String TRANSPORT_NAMESPACE = "transports";
   public static final String JMS_NAMESPACE = "jms";
   public static final String VM_NAMESPACE = "vm";
-  public static final String HTTP_NAMESPACE = "http";
+  public static final String HTTP_TRANSPORT_NAMESPACE = "http-transport";
   public static final String BATCH_NAMESPACE = "batch";
   public static final String PARSER_TEST_NAMESPACE = "parsers-test";
   public static final String PROPERTY_PLACEHOLDER_ELEMENT = "property-placeholder";
@@ -252,19 +252,19 @@ public class ApplicationModel {
           .add(builder().withNamespace(TRANSPORT_NAMESPACE).withName("outbound-endpoint").build())
           .add(builder().withNamespace(JMS_NAMESPACE).withName("inbound-endpoint").build())
           .add(builder().withNamespace(VM_NAMESPACE).withName("inbound-endpoint").build())
-          .add(builder().withNamespace(HTTP_NAMESPACE).withName("inbound-endpoint").build())
-          .add(builder().withNamespace(HTTP_NAMESPACE).withName("set-cookie").build())
-          .add(builder().withNamespace(HTTP_NAMESPACE).withName("header").build())
-          .add(builder().withNamespace(HTTP_NAMESPACE)
+          .add(builder().withNamespace(HTTP_TRANSPORT_NAMESPACE).withName("inbound-endpoint").build())
+          .add(builder().withNamespace(HTTP_TRANSPORT_NAMESPACE).withName("set-cookie").build())
+          .add(builder().withNamespace(HTTP_TRANSPORT_NAMESPACE).withName("header").build())
+          .add(builder().withNamespace(HTTP_TRANSPORT_NAMESPACE)
               .withName("http-response-to-object-transformer")
               .build())
-          .add(builder().withNamespace(HTTP_NAMESPACE)
+          .add(builder().withNamespace(HTTP_TRANSPORT_NAMESPACE)
               .withName("http-response-to-string-transformer")
               .build())
-          .add(builder().withNamespace(HTTP_NAMESPACE)
+          .add(builder().withNamespace(HTTP_TRANSPORT_NAMESPACE)
               .withName("message-to-http-response-transformer")
               .build())
-          .add(builder().withNamespace(HTTP_NAMESPACE)
+          .add(builder().withNamespace(HTTP_TRANSPORT_NAMESPACE)
               .withName("object-to-http-request-transformer")
               .build())
           .add(builder().withNamespace(BATCH_NAMESPACE).withName("step").build())
