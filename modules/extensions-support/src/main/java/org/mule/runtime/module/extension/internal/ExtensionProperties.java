@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal;
 import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
-import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 
 /**
@@ -34,11 +33,6 @@ public class ExtensionProperties {
    * component will use to notify completion or failure
    */
   public static final String COMPLETION_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "COMPLETION_CALLBACK_CONTEXT_PARAM";
-
-  /**
-   * The key of an execution context variable on which the {@link InterceptingCallback} is stored
-   */
-  public static final String INTERCEPTING_CALLBACK_PARAM = PROPERTY_PREFIX + "INTERCEPTING_CALLBACK_PARAM";
 
   /**
    * The name of a parameter that allows configuring the mimeType that should be applied

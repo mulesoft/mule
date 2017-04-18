@@ -349,7 +349,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   @Test
-  public void interceptingOperationWithoutAttributes() {
+  public void flowListeningOperationWithoutAttributes() {
     setLoader(loaderFor(VeganExtension.class));
     ExtensionDeclarer declarer = declareExtension();
     final ExtensionDeclaration declaration = declarer.getDeclaration();
