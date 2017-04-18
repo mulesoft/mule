@@ -155,6 +155,7 @@ import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.runtime.core.object.SingletonObjectFactory;
+import org.mule.runtime.core.processor.AnnotatedProcessor;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.InvokerMessageProcessor;
@@ -494,7 +495,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                            fromSimpleReferenceParameter(PROCESSING_STRATEGY_ATTRIBUTE).build())
             .build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(FLOW_REF)
-        .withTypeDefinition(fromType(Processor.class))
+        .withTypeDefinition(fromType(AnnotatedProcessor.class))
         .withObjectFactoryType(FlowRefFactoryBean.class)
         .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
         .build());

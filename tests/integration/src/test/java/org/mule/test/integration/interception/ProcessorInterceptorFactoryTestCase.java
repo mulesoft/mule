@@ -10,7 +10,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.test.allure.AllureConstants.InterceptonApi.ComponentInterceptionStory.COMPONENT_INTERCEPTION_STORY;
+import static org.mule.test.allure.AllureConstants.InterceptonApi.INTERCEPTION_API;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
@@ -22,15 +23,20 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.service.http.api.HttpService;
 import org.mule.test.AbstractIntegrationTestCase;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
 import org.junit.Before;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Description;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
+@Features(INTERCEPTION_API)
+@Stories(COMPONENT_INTERCEPTION_STORY)
 public class ProcessorInterceptorFactoryTestCase extends AbstractIntegrationTestCase {
 
   @Override
@@ -58,13 +64,23 @@ public class ProcessorInterceptorFactoryTestCase extends AbstractIntegrationTest
 
   @Before
   public void before() {
-    HasInjectedAttributesInterceptor.intercepted.set(false);
+    HasInjectedAttributesInterceptor.interceptionParameters.clear();
   }
 
+  @Description("Logger, flow-ref and splitter components are intercepted in order and the parameters are correctly sent")
   @Test
   public void injection() throws Exception {
     flowRunner("injectionInterceptionTest").run();
-    assertThat(HasInjectedAttributesInterceptor.intercepted.get(), is(true));
+    assertThat(HasInjectedAttributesInterceptor.interceptionParameters.size(), is(3));
+    List<InterceptionParameters> interceptionParameters = HasInjectedAttributesInterceptor.interceptionParameters;
+
+    InterceptionParameters loggerInterceptionParameter = interceptionParameters.get(0);
+    InterceptionParameters flowRefInterceptionParameter = interceptionParameters.get(1);
+    InterceptionParameters splitterInterceptionParameter = interceptionParameters.get(2);
+
+    assertThat(loggerInterceptionParameter.getParameters().isEmpty(), is(true));
+    assertThat(flowRefInterceptionParameter.getParameters().get("name"), is("anotherFlow"));
+    assertThat(splitterInterceptionParameter.getParameters().get("expression"), nullValue());
   }
 
   public static class HasInjectedAttributesInterceptorFactory implements ProcessorInterceptorFactory {
@@ -86,7 +102,7 @@ public class ProcessorInterceptorFactoryTestCase extends AbstractIntegrationTest
 
   public static class HasInjectedAttributesInterceptor implements ProcessorInterceptor {
 
-    public static final AtomicBoolean intercepted = new AtomicBoolean(false);
+    private static final List<InterceptionParameters> interceptionParameters = new LinkedList<>();
 
     private MuleExpressionLanguage expressionEvaluator;
     private LockFactory lockFactory;
@@ -101,10 +117,29 @@ public class ProcessorInterceptorFactoryTestCase extends AbstractIntegrationTest
 
     @Override
     public void before(Map<String, Object> parameters, InterceptionEvent event) {
-      intercepted.set(true);
+      interceptionParameters.add(new InterceptionParameters(parameters, event));
       assertThat(expressionEvaluator, not(nullValue()));
       assertThat(lockFactory, not(nullValue()));
       assertThat(httpService, not(nullValue()));
+    }
+  }
+
+  public static class InterceptionParameters {
+
+    private Map<String, Object> parameters;
+    private InterceptionEvent event;
+
+    public InterceptionParameters(Map<String, Object> parameters, InterceptionEvent event) {
+      this.parameters = parameters;
+      this.event = event;
+    }
+
+    public Map<String, Object> getParameters() {
+      return parameters;
+    }
+
+    public InterceptionEvent getEvent() {
+      return event;
     }
   }
 

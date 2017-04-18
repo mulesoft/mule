@@ -257,11 +257,23 @@ public interface AllureConstants {
 
   interface MuleDsl {
 
-    String MULE_DSL = "MULE DSL";
+    String MULE_DSL = "Mule DSL";
 
     interface DslParsingStory {
 
       String DSL_PARSING_STORY = "Mule DSL Parsing";
+
+    }
+
+  }
+
+  interface InterceptonApi {
+
+    String INTERCEPTION_API = "Interception API";
+
+    interface ComponentInterceptionStory {
+
+      String COMPONENT_INTERCEPTION_STORY = "Component Interception Story";
 
     }
 
