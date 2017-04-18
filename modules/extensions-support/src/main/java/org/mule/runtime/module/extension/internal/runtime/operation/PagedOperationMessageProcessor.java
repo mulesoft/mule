@@ -13,7 +13,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.internal.streaming.object.iterator.Consumer;
 import org.mule.runtime.core.internal.streaming.object.iterator.ConsumerStreamingIterator;
 import org.mule.runtime.core.internal.streaming.object.iterator.ListConsumer;
@@ -31,7 +30,8 @@ import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProvid
 import reactor.core.publisher.Mono;
 
 /**
- * A specialization of {@link OperationMessageProcessor} which also implements {@link InterceptingMessageProcessor}.
+ * A specialization of {@link OperationMessageProcessor} which supports auto paging by the means of a
+ * {@link ConsumerStreamingIterator}
  *
  * @since 4.0
  */

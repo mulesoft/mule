@@ -20,7 +20,6 @@ import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.InterceptingModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -89,11 +88,8 @@ public final class OperationMessageProcessorBuilder {
             ParametersResolver.fromValues(parameters, muleContext).getParametersAsResolverSet(operationModel, muleContext);
         OperationMessageProcessor processor;
         ExtensionManager extensionManager = muleContext.getExtensionManager();
-        if (operationModel.getModelProperty(InterceptingModelProperty.class).isPresent()) {
-          processor = new InterceptingOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target,
-                                                                resolverSet, cursorProviderFactory, extensionManager,
-                                                                policyManager);
-        } else if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
+
+        if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
           processor =
               new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
                                                  cursorProviderFactory, extensionManager, policyManager,
