@@ -8,6 +8,7 @@ package org.mule.module.xml.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -18,11 +19,14 @@ import java.util.Random;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
 
 public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
     public static final int MAX_COUNT = 100;
     public static final String STRING_MESSAGE = "Hello world";
+
+    private static final Logger LOGGER = getLogger(XmlFilterFunctionalTestCase.class);
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -40,7 +44,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
     @Test
     public void testNotXml() throws Exception
     {
-        logger.debug("not xml");
+        LOGGER.debug("not xml");
         MuleClient client = muleContext.getClient();
         client.dispatch("in", STRING_MESSAGE, null);
         MuleMessage response = client.request("notxml", TIMEOUT);
@@ -52,14 +56,14 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
     @Test
     public void testOther() throws Exception
     {
-        logger.debug("other");
+        LOGGER.debug("other");
         doTestXml("other", getResourceAsString("org/mule/issues/many-sends-mule-1758-test-service.xml"));
     }
 
     @Test
     public void testSelf() throws Exception
     {
-        logger.debug("self");
+        LOGGER.debug("self");
         doTestXml("self", getConfigAsString());
     }
 

@@ -23,7 +23,8 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase
 {
@@ -31,7 +32,7 @@ public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase
     private static final String FILE_PATH = "./test/testfile.txt";
     private File file;
 
-    private static final Logger logger = LoggerFactory.getLogger(FlowSyncAsyncProcessingStrategyTestCase.class);
+    private static final Logger LOGGER = getLogger(FlowSyncAsyncProcessingStrategyTestCase.class);
 
     @Override
     protected String getConfigFile()
@@ -87,7 +88,7 @@ public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase
                 }
                 catch (IOException e)
                 {
-                    logger.debug("Could not read from file.");
+                    LOGGER.debug("Could not read from file.");
                 }
                 return "Part 2Part 1".equals(output);
             }

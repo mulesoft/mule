@@ -6,6 +6,8 @@
  */
 package org.mule.tck.junit4;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -63,6 +65,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext}
@@ -70,6 +73,7 @@ import org.junit.rules.TemporaryFolder;
  */
 public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
 {
+    private static final Logger LOGGER = getLogger(AbstractMuleContextTestCase.class);
     public static final String TEST_PAYLOAD = "test";
     public static final String WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY = "workingDirectory";
 
@@ -243,7 +247,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
             MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
             DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
             String workingDirectory = this.workingDirectory.getRoot().getAbsolutePath();
-            logger.info("Using working directory for test: " + workingDirectory);
+            LOGGER.info("Using working directory for test: " + workingDirectory);
             muleConfiguration.setWorkingDirectory(workingDirectory);
             contextBuilder.setMuleConfiguration(muleConfiguration);
             configureMuleContext(contextBuilder);
@@ -317,7 +321,16 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         {
             if (muleContext != null && !(muleContext.isDisposed() || muleContext.isDisposing()))
             {
-                muleContext.dispose();
+                try
+                {
+                    muleContext.dispose();
+                }
+                catch (IllegalStateException e)
+                {
+                    // Ignore
+                    LOGGER.warn(e + " : " + e.getMessage());
+                }
+
 
                 MuleConfiguration configuration = muleContext.getConfiguration();
 

@@ -6,6 +6,8 @@
  */
 package org.mule.transport.jdbc.store;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import java.io.Serializable;
 
 import org.apache.commons.dbutils.QueryRunner;
@@ -13,9 +15,11 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.store.ObjectStore;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.util.store.AbstractObjectStoreContractTestCase;
+import org.slf4j.Logger;
 
 public class JdbcObjectStoreTestCase extends AbstractObjectStoreContractTestCase
 {
+    private static final Logger LOGGER = getLogger(JdbcObjectStoreTestCase.class);
 
     public JdbcObjectStoreTestCase()
     {
@@ -46,7 +50,7 @@ public class JdbcObjectStoreTestCase extends AbstractObjectStoreContractTestCase
         {
         }
         
-        logger.debug("Table created");
+        LOGGER.debug("Table created");
     }
 
     @Override

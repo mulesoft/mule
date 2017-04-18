@@ -9,6 +9,7 @@ package org.mule.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -20,6 +21,7 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
 
 /**
  * This is a simplified version of
@@ -34,6 +36,8 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
     public static final String SERIALIZED = "<org.mule.issues.MulticastRouterMule2136TestCase_-Parent>\n"
                                             + "  <child/>\n"
                                             + "</org.mule.issues.MulticastRouterMule2136TestCase_-Parent>";
+
+    private static final Logger LOGGER = getLogger(MulticastRouterMule2136TestCase.class);
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -93,7 +97,7 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
 
             if (i % tenth == 0)
             {
-                logger.info("Iteration " + i);
+                LOGGER.info("Iteration " + i);
             }
         }
     }

@@ -6,6 +6,12 @@
  */
 package org.mule.test.integration.transport.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.context.notification.ServerNotification;
@@ -28,14 +34,12 @@ import java.util.Collection;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.slf4j.Logger;
 
 public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase implements FunctionalTestNotificationListener
 {
+    private static final Logger LOGGER = getLogger(FileFunctionalTestCase.class);
+
     @ClassRule
     public static SystemProperty filePollOnlyOnPrimaryNode = new SystemProperty(FileMessageReceiver.MULE_TRANSPORT_FILE_SINGLEPOLLINSTANCE,"true");
 
@@ -125,7 +129,7 @@ public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase imple
     {
         synchronized (this)
         {
-            logger.debug("received notification: " + notification);
+            LOGGER.debug("received notification: " + notification);
             // save the received message data for verification
             this.receivedData = ((FunctionalTestNotification) notification).getReplyMessage();
         }

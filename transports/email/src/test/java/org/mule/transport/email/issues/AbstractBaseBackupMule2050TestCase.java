@@ -6,19 +6,21 @@
  */
 package org.mule.transport.email.issues;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.api.transport.Connector;
 import org.mule.transport.email.AbstractRetrieveMailConnector;
 import org.mule.transport.email.connectors.ImapConnectorTestCase;
 import org.mule.util.FileUtils;
+import org.slf4j.Logger;
 
 import java.io.File;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 public abstract class AbstractBaseBackupMule2050TestCase extends ImapConnectorTestCase
 {
-
+    private static final Logger LOGGER = getLogger(AbstractBaseBackupMule2050TestCase.class);
     private boolean backupEnabled;
 
     public AbstractBaseBackupMule2050TestCase(boolean backupEnabled)
@@ -48,7 +50,7 @@ public abstract class AbstractBaseBackupMule2050TestCase extends ImapConnectorTe
 
     protected void debug(File dir)
     {
-        logger.debug(dir.getAbsolutePath() + " exists? " + dir.exists());
+        LOGGER.debug(dir.getAbsolutePath() + " exists? " + dir.exists());
     }
 
 }

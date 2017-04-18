@@ -6,6 +6,9 @@
  */
 package org.mule.transport.email.connectors;
 
+import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.api.MuleEventContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
@@ -23,8 +26,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
+import org.slf4j.Logger;
 
 /**
  * Given an endpoint ({@link #getTestEndpointURI()}) this waits for up to 10 seconds,
@@ -35,6 +37,8 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
 {
     public static final int POLL_PERIOD_MS = 2000;
     public static final int WAIT_PERIOD_MS = 4 * POLL_PERIOD_MS;
+
+    private static final Logger LOGGER = getLogger(AbstractReceivingMailConnectorTestCase.class);
 
     protected AbstractReceivingMailConnectorTestCase(String protocol)
     {
@@ -53,16 +57,16 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
             {
                 try
                 {
-                    logger.debug("woot - event received");
-                    logger.debug("context: " + context);
-                    logger.debug("component: " + component);
+                    LOGGER.debug("woot - event received");
+                    LOGGER.debug("context: " + context);
+                    LOGGER.debug("component: " + component);
                     assertMessageOk(context.getMessage().getOriginalPayload());
                     countDown.countDown();
                 }
                 catch (Exception e)
                 {
                     // counter will not be incremented
-                    logger.error(e.getMessage(), e);
+                    LOGGER.error(e.getMessage(), e);
                 }
             }
         });
@@ -78,7 +82,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
             muleContext.start();
         }
 
-        logger.debug("waiting for count down");
+        LOGGER.debug("waiting for count down");
         assertTrue(countDown.await(WAIT_PERIOD_MS, TimeUnit.MILLISECONDS));
     }
 

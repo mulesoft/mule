@@ -9,6 +9,7 @@ package org.mule.transport.sftp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
@@ -29,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
 
 /**
  * <code>SftpPoolingFunctionalTestCase</code> tests sending an receiving multiple
@@ -36,6 +38,7 @@ import org.junit.runners.Parameterized.Parameters;
  */
 public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
 {
+    private static final Logger LOGGER = getLogger(SftpPoolingFunctionalTestCase.class);
     private static final long TIMEOUT = 30000;
 
     private List<String> sendFiles;
@@ -97,7 +100,7 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
                 SftpInputStream inputStream = null;
                 try
                 {
-                    logger.info("called " + loopCount.incrementAndGet() + " times. Filename = " + filename);
+                    LOGGER.info("called " + loopCount.incrementAndGet() + " times. Filename = " + filename);
 
                     // This is not thread safe! (it should be safe if
                     // synchronous="true" is used)
@@ -110,7 +113,7 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
                     String o = IOUtils.toString(inputStream);
                     if (sendFiles.contains(o))
                     {
-                        logger.info("The received file was added. Received: '" + o + "'");
+                        LOGGER.info("The received file was added. Received: '" + o + "'");
                         receiveFiles.add(o);
                     }
                     else
@@ -122,7 +125,7 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
                 }
                 catch (IOException e)
                 {
-                    logger.error("Error occured while processing callback for file=" + filename, e);
+                    LOGGER.error("Error occured while processing callback for file=" + filename, e);
                     throw e;
                 }
                 finally
@@ -148,8 +151,8 @@ public class SftpPoolingFunctionalTestCase extends AbstractSftpTestCase
 
         latch.await(TIMEOUT, TimeUnit.MILLISECONDS);
 
-        logger.debug("Number of files sent: " + sendFiles.size());
-        logger.debug("Number of files received: " + receiveFiles.size());
+        LOGGER.debug("Number of files sent: " + sendFiles.size());
+        LOGGER.debug("Number of files received: " + receiveFiles.size());
 
         // This makes sure we received the same number of files we sent, and that
         // the content was a match (since only matched content gets on the

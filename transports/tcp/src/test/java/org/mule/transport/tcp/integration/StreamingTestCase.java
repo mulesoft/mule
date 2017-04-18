@@ -9,6 +9,7 @@ package org.mule.transport.tcp.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.client.MuleClient;
@@ -29,12 +30,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
 
 /**
  * This test is more about testing the streaming model than the TCP provider, really.
  */
 public class StreamingTestCase extends AbstractServiceAndFlowTestCase
 {
+    private static final Logger LOGGER = getLogger(StreamingTestCase.class);
     public static final int TIMEOUT = 300000;
     public static final String TEST_MESSAGE = "Test TCP Request";
     public static final String RESULT = "Received stream; length: 16; 'Test...uest'";
@@ -73,7 +76,7 @@ public class StreamingTestCase extends AbstractServiceAndFlowTestCase
             {
                 try
                 {
-                    logger.info("called " + loopCount.incrementAndGet() + " times");
+                    LOGGER.info("called " + loopCount.incrementAndGet() + " times");
                     FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) component;
                     // without this we may have problems with the many repeats
                     if (1 == latch.getCount())
@@ -85,7 +88,7 @@ public class StreamingTestCase extends AbstractServiceAndFlowTestCase
                 }
                 catch (Exception e)
                 {
-                    logger.error(e.getMessage(), e);
+                    LOGGER.error(e.getMessage(), e);
                 }
             }
         };

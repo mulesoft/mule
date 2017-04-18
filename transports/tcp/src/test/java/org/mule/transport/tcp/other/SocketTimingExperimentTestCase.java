@@ -6,16 +6,17 @@
  */
 package org.mule.transport.tcp.other;
 
+import static org.junit.Assert.assertEquals;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import org.slf4j.Logger;
 
 /**
  * This was an attempt to understand the issue we saw with HTTP closing early.
@@ -23,7 +24,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class SocketTimingExperimentTestCase extends AbstractMuleTestCase
 {
-
+    private static final Logger LOGGER = getLogger(SocketTimingExperimentTestCase.class);
     private static int MAX_COUNT = 3;
     private static int SERVER_PORT = 60323;
     private static String LOCALHOST = "localhost";
@@ -34,20 +35,20 @@ public class SocketTimingExperimentTestCase extends AbstractMuleTestCase
         try
         {
             boolean expectBadClient = expectBadClient();
-            logger.info("Expected bad client: " + expectBadClient);
+            LOGGER.info("Expected bad client: " + expectBadClient);
         }
         catch (Exception e)
         {
-            logger.info(e);
+            LOGGER.warn("Exception: ",e);
         }
         try
         {
             boolean expectBadServer = expectBadServer();
-            logger.info("Expected bad server: " + expectBadServer);
+            LOGGER.info("Expected bad server: " + expectBadServer);
         }
         catch (Exception e)
         {
-            logger.info(e);
+            LOGGER.warn("Exception: ", e);
         }
     }
 

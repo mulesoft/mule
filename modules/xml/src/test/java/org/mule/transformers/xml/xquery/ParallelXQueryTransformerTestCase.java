@@ -6,6 +6,8 @@
  */
 package org.mule.transformers.xml.xquery;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.RequestContext;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -19,9 +21,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCase
 {
+    private static final Logger LOGGER = getLogger(ParallelXQueryTransformerTestCase.class);
     private String srcData;
     private String resultData;
     private ConcurrentLinkedQueue<Object> actualResults = new ConcurrentLinkedQueue<Object>();
@@ -107,9 +111,9 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCa
 
         checkResult();
 
-        if (logger.isDebugEnabled())
+        if (LOGGER.isDebugEnabled())
         {
-            logger.debug("Parallel transformations in " + getParallelThreadCount() + " threads with "
+            LOGGER.debug("Parallel transformations in " + getParallelThreadCount() + " threads with "
                          + getCallsPerThread() + " calls/thread took " + (endTime - startTime) + " ms.");
         }
     }
