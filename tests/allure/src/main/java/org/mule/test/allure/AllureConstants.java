@@ -255,5 +255,17 @@ public interface AllureConstants {
 
   }
 
+  interface MuleDsl {
+
+    String MULE_DSL = "MULE DSL";
+
+    interface DslParsingStory {
+
+      String DSL_PARSING_STORY = "Mule DSL Parsing";
+
+    }
+
+  }
+
 }
 

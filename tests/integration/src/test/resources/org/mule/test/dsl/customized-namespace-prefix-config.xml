@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/httpn"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="99999"/>
+    </http:request-config>
+
+    <flow name="flow">
+        <http:request method="POST" path="foo" config-ref="requestConfig"/>
+    </flow>
+
+</mule>
