@@ -30,7 +30,6 @@ import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
 
@@ -97,8 +96,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
   private DependencyResolver dependencyResolver;
   private ArtifactClassificationTypeResolver artifactClassificationTypeResolver;
-  private DefaultExtensionManager extensionManager = new DefaultExtensionManager();
-  private PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver(extensionManager);
+  private PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver();
 
   /**
    * Creates an instance of the classifier.

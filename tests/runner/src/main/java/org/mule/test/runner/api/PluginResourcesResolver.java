@@ -8,22 +8,24 @@
 package org.mule.test.runner.api;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-
-import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.util.PropertiesUtils;
-import org.mule.runtime.extension.api.manifest.ExtensionManifest;
+import static java.lang.String.format;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_FOLDER;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
+import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,20 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PluginResourcesResolver {
 
-  private static final String PLUGIN_PROPERTIES = "plugin.properties";
-  private static final String COMMA_CHARACTER = ",";
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-  private final ExtensionManager extensionManager;
-
-  /**
-   * Creates an instance of the resolver.
-   *
-   * @param extensionManager {@link ExtensionManager} to be used
-   */
-  public PluginResourcesResolver(ExtensionManager extensionManager) {
-    checkNotNull(extensionManager, "extensionManager cannot be null");
-    this.extensionManager = extensionManager;
-  }
 
   /**
    * Resolves for the given {@link PluginUrlClassification} the resources exported.
@@ -56,38 +45,45 @@ public class PluginResourcesResolver {
    * @return {@link PluginUrlClassification} with the resources resolved
    */
   public PluginUrlClassification resolvePluginResourcesFor(PluginUrlClassification pluginUrlClassification) {
-    Set<String> exportPackages;
-    Set<String> exportResources;
+    final Set<String> exportPackages = newHashSet();
+    final Set<String> exportResources = newHashSet();
 
     try (URLClassLoader classLoader = new URLClassLoader(pluginUrlClassification.getUrls().toArray(new URL[0]), null)) {
-      URL manifestUrl = classLoader.findResource("META-INF/" + EXTENSION_MANIFEST_FILE_NAME);
-      if (manifestUrl != null) {
-        logger.debug("Plugin '{}' has extension descriptor therefore it will be handled as an extension",
-                     pluginUrlClassification.getName());
-        ExtensionManifest extensionManifest = extensionManager.parseExtensionManifestXml(manifestUrl);
-        exportPackages = newHashSet(extensionManifest.getExportedPackages());
-        // TODO(pablo.kraan): MULE-12189 - this is an ugly hack to make test pass. It will be fixed soon
-        exportPackages.remove("org.mule.tck.message");
-        exportPackages.remove("org.mule.tck.testmodels.fruit");
-        exportPackages.remove("org.mule.tck.testmodels.fruit.peel");
-        exportPackages.remove("org.mule.tck.testmodels.fruit.seed");
-        exportResources = newHashSet(extensionManifest.getExportedResources());
-      } else {
-        logger.debug("Plugin '{}' will be handled as standard plugin", pluginUrlClassification.getName());
-        URL pluginPropertiesUrl = classLoader.getResource(PLUGIN_PROPERTIES);
-        if (pluginPropertiesUrl == null) {
-          throw new IllegalStateException(PLUGIN_PROPERTIES + " couldn't be found for plugin: " +
+      logger.debug("Loading plugin '{}' descriptor", pluginUrlClassification.getName());
+      URL pluginJsonUrl = classLoader.findResource("META-INF/" + MULE_PLUGIN_JSON);
+      if (pluginJsonUrl == null) {
+        pluginJsonUrl = classLoader.getResource(MULE_ARTIFACT_FOLDER + "/" + MULE_PLUGIN_JSON);
+        if (pluginJsonUrl == null) {
+          throw new IllegalStateException(MULE_PLUGIN_JSON + " couldn't be found for plugin: " +
               pluginUrlClassification.getName());
         }
-        Properties pluginProperties;
-        try {
-          pluginProperties = PropertiesUtils.loadProperties(pluginPropertiesUrl);
-        } catch (IOException e) {
-          throw new RuntimeException("Error while reading plugin properties: " + pluginPropertiesUrl);
-        }
-        exportPackages = newHashSet(pluginProperties.getProperty(EXPORTED_CLASS_PACKAGES_PROPERTY).split(COMMA_CHARACTER));
-        exportResources = newHashSet(pluginProperties.getProperty(EXPORTED_RESOURCE_PROPERTY).split(COMMA_CHARACTER));
       }
+
+      MulePluginModel mulePluginModel;
+      try (InputStream stream = pluginJsonUrl.openStream()) {
+        mulePluginModel = new MulePluginModelJsonSerializer().deserialize(IOUtils.toString(stream));
+      } catch (IOException e) {
+        throw new IllegalArgumentException(format("Could not read extension describer on plugin '%s'", pluginJsonUrl),
+                                           e);
+      }
+
+      mulePluginModel.getClassLoaderModelLoaderDescriptor().ifPresent(
+                                                                      classLoaderModelDescriptor -> {
+                                                                        exportPackages
+                                                                            .addAll((List<String>) classLoaderModelDescriptor
+                                                                                .getAttributes().getOrDefault(EXPORTED_PACKAGES,
+                                                                                                              new ArrayList<>()));
+                                                                        exportResources
+                                                                            .addAll((List<String>) classLoaderModelDescriptor
+                                                                                .getAttributes().getOrDefault(EXPORTED_RESOURCES,
+                                                                                                              new ArrayList<>()));
+                                                                      });
+
+      // TODO(pablo.kraan): MULE-12189 - this is an ugly hack to make test pass. It will be fixed soon
+      exportPackages.remove("org.mule.tck.message");
+      exportPackages.remove("org.mule.tck.testmodels.fruit");
+      exportPackages.remove("org.mule.tck.testmodels.fruit.peel");
+      exportPackages.remove("org.mule.tck.testmodels.fruit.seed");
 
       return new PluginUrlClassification(pluginUrlClassification.getName(), pluginUrlClassification.getUrls(),
                                          pluginUrlClassification.getExportClasses(),
