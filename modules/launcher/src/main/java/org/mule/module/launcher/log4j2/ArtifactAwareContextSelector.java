@@ -6,6 +6,8 @@
  */
 package org.mule.module.launcher.log4j2;
 
+import static java.lang.ClassLoader.getSystemClassLoader;
+
 import org.mule.api.lifecycle.Disposable;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 
@@ -48,6 +50,7 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable
 {
 
     static final StatusLogger logger = StatusLogger.getLogger();
+    private static final ClassLoader SYSTEM_CLASSLOADER = getSystemClassLoader();
 
     private LoggerContextCache cache = new LoggerContextCache(this, getClass().getClassLoader());
 
@@ -100,7 +103,7 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable
         ClassLoader loggerClassLoader = classLoader == null ? Thread.currentThread().getContextClassLoader() : classLoader;
         if (!(loggerClassLoader instanceof ArtifactClassLoader))
         {
-            loggerClassLoader = loggerClassLoader.getSystemClassLoader();
+            loggerClassLoader = SYSTEM_CLASSLOADER;
         }
         return loggerClassLoader;
     }
