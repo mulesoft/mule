@@ -12,6 +12,7 @@ import static java.lang.System.getProperties;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -32,12 +33,12 @@ import org.mule.runtime.api.artifact.ArtifactProperties;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.spring.dsl.model.extension.xml.MacroExpansionModuleModel;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.config.artifact.DefaultArtifactProperties;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
@@ -290,7 +291,7 @@ public class ApplicationModel {
    * @throws Exception when the application configuration has semantic errors.
    */
   public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration) throws Exception {
-    this(artifactConfig, artifactDeclaration, empty(), of(new ComponentBuildingDefinitionRegistry()));
+    this(artifactConfig, artifactDeclaration, emptySet(), of(new ComponentBuildingDefinitionRegistry()));
   }
 
   /**
@@ -300,23 +301,24 @@ public class ApplicationModel {
    *
    * @param artifactConfig the mule artifact configuration content.
    * @param artifactDeclaration an {@link ArtifactDeclaration}
+   * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to type componentModels
    * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in
    *        this model to their definitions
    * @throws Exception when the application configuration has semantic errors.
    */
   // TODO: MULE-9638 remove this optional
   public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration,
-                          Optional<ExtensionManager> extensionManager,
+                          Set<ExtensionModel> extensionModels,
                           Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry)
       throws Exception {
 
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     configurePropertyPlaceholderResolver(artifactConfig);
     convertConfigFileToComponentModel(artifactConfig);
-    convertArtifactDeclarationToComponentModel(extensionManager, artifactDeclaration);
+    convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration);
     validateModel(componentBuildingDefinitionRegistry);
     createEffectiveModel();
-    expandModules(extensionManager);
+    expandModules(extensionModels);
     resolveComponentTypes();
     executeOnEveryMuleComponentTree(new ComponentLocationVisitor());
   }
@@ -363,11 +365,11 @@ public class ApplicationModel {
     });
   }
 
-  private void convertArtifactDeclarationToComponentModel(Optional<ExtensionManager> extensionManager,
+  private void convertArtifactDeclarationToComponentModel(Set<ExtensionModel> extensionModels,
                                                           ArtifactDeclaration artifactDeclaration) {
-    if (artifactDeclaration != null && extensionManager.isPresent()) {
+    if (artifactDeclaration != null && !extensionModels.isEmpty()) {
       DslElementModelFactory elementFactory = DslElementModelFactory
-          .getDefault(DslResolvingContext.getDefault(extensionManager.get().getExtensions()));
+          .getDefault(DslResolvingContext.getDefault(extensionModels));
 
       ComponentModel rootComponent = new ComponentModel.Builder()
           .setIdentifier(ComponentIdentifier.builder().withNamespace(CORE_PREFIX).withName(CORE_PREFIX).build()).build();
@@ -787,10 +789,10 @@ public class ApplicationModel {
    * it's responsibility of this object to properly initialize and expand every global element/operation into the concrete set of
    * message processors
    *
-   * @param extensionManager extensions that will be used to check if the element has to be expanded.
+   * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to check if the element has to be expanded.
    */
-  private void expandModules(Optional<ExtensionManager> extensionManager) {
-    extensionManager.ifPresent(manager -> new MacroExpansionModuleModel(this, manager.getExtensions()).expand());
+  private void expandModules(Set<ExtensionModel> extensionModels) {
+    new MacroExpansionModuleModel(this, extensionModels).expand();
   }
 
   /**

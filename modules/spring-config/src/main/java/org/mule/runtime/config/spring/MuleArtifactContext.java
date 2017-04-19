@@ -32,6 +32,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
@@ -70,6 +71,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -230,9 +232,10 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
         applicationConfigBuilder.addConfigFile(new ConfigFile(getFilename(springResource), asList(mainConfigLine)));
       }
       applicationConfigBuilder.setApplicationName(muleContext.getConfiguration().getId());
+      Set<ExtensionModel> extensions =
+          muleContext.getExtensionManager() != null ? muleContext.getExtensionManager().getExtensions() : emptySet();
       applicationModel = new ApplicationModel(applicationConfigBuilder.build(), artifactDeclaration,
-                                              ofNullable(muleContext.getExtensionManager()),
-                                              of(componentBuildingDefinitionRegistry));
+                                              extensions, of(componentBuildingDefinitionRegistry));
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }

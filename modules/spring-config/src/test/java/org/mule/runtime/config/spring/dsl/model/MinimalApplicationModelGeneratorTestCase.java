@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.model;
 
+import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -171,7 +172,7 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     coreComponentBuildingDefinitionProvider.getComponentBuildingDefinitions()
         .stream().forEach(componentBuildingDefinitionRegistry::register);
     return new MinimalApplicationModelGenerator(new ApplicationModel(new ArtifactConfig.Builder().addConfigFile(configFile)
-        .build(), new ArtifactDeclaration(), Optional.empty(), Optional.of(componentBuildingDefinitionRegistry)),
+        .build(), new ArtifactDeclaration(), emptySet(), Optional.of(componentBuildingDefinitionRegistry)),
                                                 componentBuildingDefinitionRegistry);
   }
 
