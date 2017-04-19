@@ -6,6 +6,8 @@
  */
 package org.mule.module.launcher.log4j2;
 
+import static java.lang.ClassLoader.getSystemClassLoader;
+
 import org.mule.logging.LogConfigChangeSubject;
 import org.mule.module.launcher.application.ApplicationClassLoader;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
@@ -40,6 +42,7 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject
 {
 
     private final LoggerContextConfigurer loggerContextConfigurer = new LoggerContextConfigurer();
+    private static final int SYSTEM_CLASSLOADER_HASH_CODE = getSystemClassLoader().hashCode();
 
     private final URI configFile;
     private final boolean standlone;
@@ -60,7 +63,7 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject
         configFile = configLocn;
         this.contextSelector = contextSelector;
         this.standlone = standalone;
-        ownerClassLoaderHash = ownerClassLoader != null ? ownerClassLoader.hashCode() : getClass().getClassLoader().getSystemClassLoader().hashCode();
+        ownerClassLoaderHash = ownerClassLoader != null ? ownerClassLoader.hashCode() : SYSTEM_CLASSLOADER_HASH_CODE;
 
         if (ownerClassLoader instanceof ArtifactClassLoader)
         {
