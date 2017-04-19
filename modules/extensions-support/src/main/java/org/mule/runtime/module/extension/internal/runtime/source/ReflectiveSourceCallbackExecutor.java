@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOURCE_CALLBACK_CONTEXT_PARAM;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -18,12 +16,14 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveMethodComponentExecutor;
 
+import com.google.common.collect.ImmutableList;
+
 import java.lang.reflect.Method;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,26 +43,28 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
 
   /**
    * Creates a new instance
-   *
-   * @param extensionModel the {@link ExtensionModel} of the owning component
+   *  @param extensionModel the {@link ExtensionModel} of the owning component
    * @param configurationInstance an {@link Optional} {@link ConfigurationInstance} in case the component requires a config
    * @param sourceModel the model of the {@code source}
    * @param source a {@link Source} instance
    * @param method the method to be executed
    * @param muleContext the current {@link MuleContext}
+   * @param sourceCallbackModel
    */
   public ReflectiveSourceCallbackExecutor(ExtensionModel extensionModel,
                                           Optional<ConfigurationInstance> configurationInstance,
                                           SourceModel sourceModel,
                                           Object source,
                                           Method method,
-                                          MuleContext muleContext) {
+                                          MuleContext muleContext,
+                                          SourceCallbackModelProperty sourceCallbackModel) {
 
     this.extensionModel = extensionModel;
     this.configurationInstance = configurationInstance;
     this.sourceModel = sourceModel;
     this.muleContext = muleContext;
-    executor = new ReflectiveMethodComponentExecutor<>(getAllGroups(sourceModel), method, source);
+
+    executor = new ReflectiveMethodComponentExecutor<>(getAllGroups(sourceModel, method, sourceCallbackModel), method, source);
   }
 
   /**
@@ -86,15 +88,15 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
     return executionContext;
   }
 
-  private List<ParameterGroupModel> getAllGroups(SourceModel model) {
-    List<ParameterGroupModel> all = new LinkedList<>();
-    List<ParameterGroupModel> callbackParameters = new LinkedList<>();
+  private List<ParameterGroupModel> getAllGroups(SourceModel model, Method method,
+                                                 SourceCallbackModelProperty sourceCallbackModel) {
 
-    all.addAll(model.getParameterGroupModels());
-    model.getSuccessCallback().ifPresent(callback -> callbackParameters.addAll(callback.getParameterGroupModels()));
-    model.getErrorCallback().ifPresent(callback -> callbackParameters.addAll(callback.getParameterGroupModels()));
-    all.addAll(callbackParameters.stream().distinct().collect(toList()));
+    List<ParameterGroupModel> callbackParameters = sourceCallbackModel.getOnSuccessMethod().filter(method::equals)
+        .map(m -> sourceModel.getSuccessCallback().get().getParameterGroupModels())
+        .orElseGet(() -> sourceModel.getErrorCallback().get().getParameterGroupModels());
 
-    return unmodifiableList(all);
+    return ImmutableList.<ParameterGroupModel>builder()
+        .addAll(model.getParameterGroupModels())
+        .addAll(callbackParameters).build();
   }
 }

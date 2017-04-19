@@ -35,8 +35,8 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.util.func.CheckedRunnable;
-import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -51,8 +51,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
-import org.apache.commons.collections.CollectionUtils;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -61,6 +59,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
+
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * An adapter for {@link Source} which acts as a bridge with {@link ExtensionMessageSource}. It also propagates lifecycle and
@@ -121,17 +121,16 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
   }
 
   private SourceCompletionHandlerFactory doCreateCompletionHandler(SourceCallbackModelProperty modelProperty) {
-    final SourceCallbackExecutor onSuccessExecutor =
-        getMethodExecutor(modelProperty.getOnSuccessMethod());
-    final SourceCallbackExecutor onErrorExecutor = getMethodExecutor(modelProperty.getOnErrorMethod());
+    final SourceCallbackExecutor onSuccessExecutor = getMethodExecutor(modelProperty.getOnSuccessMethod(), modelProperty);
+    final SourceCallbackExecutor onErrorExecutor = getMethodExecutor(modelProperty.getOnErrorMethod(), modelProperty);
 
     return context -> new DefaultSourceCompletionHandler(onSuccessExecutor, onErrorExecutor, context);
   }
 
-  private SourceCallbackExecutor getMethodExecutor(Optional<Method> method) {
+  private SourceCallbackExecutor getMethodExecutor(Optional<Method> method, SourceCallbackModelProperty sourceCallbackModel) {
     return method.map(m -> (SourceCallbackExecutor) new ReflectiveSourceCallbackExecutor(extensionModel, configurationInstance,
                                                                                          sourceModel, source, m,
-                                                                                         muleContext))
+                                                                                         muleContext, sourceCallbackModel))
         .orElse(new NullSourceCallbackExecutor());
   }
 

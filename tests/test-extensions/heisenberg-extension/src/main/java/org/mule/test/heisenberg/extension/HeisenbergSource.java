@@ -61,6 +61,12 @@ public class HeisenbergSource extends Source<String, Attributes> {
   @Optional(defaultValue = "1")
   private int corePoolSize;
 
+  public static boolean receivedGroupOnSource;
+
+  public HeisenbergSource() {
+    receivedGroupOnSource = false;
+  }
+
   @Override
   public void onStart(SourceCallback<String, Attributes> sourceCallback) throws MuleException {
     checkArgument(heisenberg != null, "config not injected");
@@ -76,13 +82,17 @@ public class HeisenbergSource extends Source<String, Attributes> {
   }
 
   @OnSuccess
-  public void onResponse(@Optional(defaultValue = "#[payload]") Long payment, @Optional String sameNameParameter,
-                         @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin) {
+  public void onSuccess(@Optional(defaultValue = "#[payload]") Long payment, @Optional String sameNameParameter,
+                        @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin) {
+
+    receivedGroupOnSource = ricin != null && ricin.getNextDoor().getAddress() != null;
     heisenberg.setMoney(heisenberg.getMoney().add(BigDecimal.valueOf(payment)));
   }
 
   @OnError
-  public void onError(Error error, @Optional String sameNameParameter, @Optional Methylamine methylamine) {
+  public void onError(Error error, @Optional String sameNameParameter, @Optional Methylamine methylamine,
+                      @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin) {
+    receivedGroupOnSource = ricin != null && ricin.getNextDoor().getAddress() != null;
     heisenberg.setMoney(BigDecimal.valueOf(-1));
   }
 

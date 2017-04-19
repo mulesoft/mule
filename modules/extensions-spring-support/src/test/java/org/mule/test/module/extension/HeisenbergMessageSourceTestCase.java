@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.heisenberg.extension.HeisenbergSource;
 
 import java.math.BigDecimal;
 
@@ -21,7 +22,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class MessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
+public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   public static final int TIMEOUT_MILLIS = 5000;
   public static final int POLL_DELAY_MILLIS = 100;
@@ -37,6 +38,7 @@ public class MessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
   @Before
   public void setUp() throws Exception {
     sourceTimesStarted = 0;
+    HeisenbergSource.receivedGroupOnSource = false;
   }
 
   @Test
@@ -45,7 +47,8 @@ public class MessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
     HeisenbergExtension heisenberg = locateConfig();
 
     new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
-        .check(new JUnitLambdaProbe(() -> new BigDecimal(POLL_DELAY_MILLIS).compareTo(heisenberg.getMoney()) < 0));
+        .check(new JUnitLambdaProbe(() -> HeisenbergSource.receivedGroupOnSource
+            && new BigDecimal(POLL_DELAY_MILLIS).compareTo(heisenberg.getMoney()) < 0));
   }
 
   @Test
@@ -54,9 +57,9 @@ public class MessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
     HeisenbergExtension heisenberg = locateConfig();
 
     new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
-        .check(new JUnitLambdaProbe(() -> heisenberg.getMoney().longValue() == -1));
+        .check(new JUnitLambdaProbe(() -> HeisenbergSource.receivedGroupOnSource
+            && heisenberg.getMoney().longValue() == -1));
   }
-
 
   @Test
   public void enrichExceptionOnStart() throws Exception {

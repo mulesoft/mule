@@ -25,13 +25,21 @@
     </heisenberg:config>
 
     <flow name="source" initialState="stopped">
-        <heisenberg:listen-payments initialBatchNumber="0"/>
+        <heisenberg:listen-payments initialBatchNumber="0">
+            <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:next-door>
+        </heisenberg:listen-payments>
 
         <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
     </flow>
 
     <flow name="sourceFailed" initialState="stopped">
-        <heisenberg:listen-payments initialBatchNumber="0"/>
+        <heisenberg:listen-payments initialBatchNumber="0">
+            <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
+                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+            </heisenberg:next-door>
+        </heisenberg:listen-payments>
 
         <!--invalid expression results in exception-->
         <set-payload value="#[mel:new java.lang.Long.valueOf('100')]"/>
