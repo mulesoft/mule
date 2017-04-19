@@ -20,6 +20,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.mvel2.CompileException;
@@ -441,18 +443,18 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   }
 
   protected Event createMockEvent(DataType dataType) {
-    return createMockEvent("foo", DataType.STRING);
+    return createMockEvent("foo", STRING);
   }
 
   protected Event createMockEventWithAttributes(DataType dataType) {
     HashMap<String, String> attributes = new HashMap<>();
     attributes.put("one", "number 1");
     attributes.put("two", "number 2");
-    return createMockEvent("foo", DataType.STRING, attributes, DataType.OBJECT);
+    return createMockEvent("foo", STRING, attributes, OBJECT);
   }
 
   protected Event createMockEvent(String payload, DataType dataType) {
-    return createMockEvent(payload, dataType, NULL_ATTRIBUTES, DataType.OBJECT);
+    return createMockEvent(payload, dataType, NULL_ATTRIBUTES, OBJECT);
   }
 
   protected Event createMockEvent(String payload, DataType dataType, Object attributes, DataType attributesDataType) {
@@ -467,11 +469,11 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   }
 
   protected Event createMockEvent() {
-    return createMockEvent(DataType.STRING);
+    return createMockEvent(STRING);
   }
 
   protected Event createMockEventWithAttributes() {
-    return createMockEventWithAttributes(DataType.STRING);
+    return createMockEventWithAttributes(STRING);
   }
 
   public static enum Variant {
