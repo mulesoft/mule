@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-using-bye"
+        minMuleVersion="4.0.0"
+        
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:module-bye="http://www.mulesoft.org/schema/mule/module-bye"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/module-bye http://www.mulesoft.org/schema/mule/module-bye/current/mule-module-bye.xsd">
+
+    <operation name="adios">
+        <body>
+            <module-bye:say-bye/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+</module>

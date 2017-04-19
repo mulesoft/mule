@@ -12,6 +12,7 @@ import static java.util.stream.Stream.concat;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -123,15 +124,15 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
 
     Set<ArtifactPluginDescriptor> pluginDescriptors = createArtifactPluginDescriptors(descriptor);
 
-    Set<ArtifactPluginDescriptor> applicationPluginDescriptors =
+    List<ArtifactPluginDescriptor> applicationPluginDescriptors =
         concat(artifactPluginRepository.getContainerArtifactPluginDescriptors().stream()
             .filter(containerPluginDescriptor -> !pluginDescriptors.stream()
                 .filter(appPluginDescriptor -> appPluginDescriptor.getName().equals(containerPluginDescriptor.getName()))
                 .findAny().isPresent()),
                pluginDescriptors.stream())
-                   .collect(Collectors.toSet());
+                   .collect(Collectors.toList());
 
-    Set<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
+    List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver.resolve(applicationPluginDescriptors);
 
     ApplicationClassLoaderBuilder artifactClassLoaderBuilder =
@@ -181,15 +182,19 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
   }
 
   private List<ArtifactPlugin> createArtifactPluginList(MuleDeployableArtifactClassLoader applicationClassLoader,
-                                                        Set<ArtifactPluginDescriptor> plugins) {
+                                                        List<ArtifactPluginDescriptor> plugins) {
     return plugins.stream()
         .map(artifactPluginDescriptor -> new DefaultArtifactPlugin(getArtifactPluginId(applicationClassLoader.getArtifactId(),
                                                                                        artifactPluginDescriptor.getName()),
                                                                    artifactPluginDescriptor, applicationClassLoader
                                                                        .getArtifactPluginClassLoaders().stream()
-                                                                       .filter(artifactClassLoader -> artifactClassLoader
+                                                                       .filter(artifactClassLoader -> {
+                                                                         final String artifactPluginDescriptorName = PLUGIN_CLASSLOADER_IDENTIFIER
+                                                                           + artifactPluginDescriptor.getName();
+                                                                         return artifactClassLoader
                                                                            .getArtifactId()
-                                                                           .endsWith(artifactPluginDescriptor.getName()))
+                                                                           .endsWith(artifactPluginDescriptorName);
+                                                                       })
                                                                        .findFirst().get()))
         .collect(toList());
   }

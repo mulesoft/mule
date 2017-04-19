@@ -36,6 +36,7 @@ import java.util.Set;
  */
 public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtifactClassLoaderBuilder> {
 
+  public static final String PLUGIN_CLASSLOADER_IDENTIFIER = "/plugin/";
   protected final ArtifactClassLoaderFactory artifactPluginClassLoaderFactory;
   private Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
   private String artifactId = UUID.getUUID();
@@ -174,7 +175,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     checkArgument(!isEmpty(parentArtifactId), "parentArtifactId cannot be empty");
     checkArgument(!isEmpty(pluginName), "pluginName cannot be empty");
 
-    return parentArtifactId + "/plugin/" + pluginName;
+    return parentArtifactId + PLUGIN_CLASSLOADER_IDENTIFIER + pluginName;
   }
 
 }

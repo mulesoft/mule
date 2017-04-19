@@ -54,16 +54,16 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
   }
 
   @Override
-  public Set<ArtifactPluginDescriptor> resolve(Set<ArtifactPluginDescriptor> descriptors) {
+  public List<ArtifactPluginDescriptor> resolve(List<ArtifactPluginDescriptor> descriptors) {
 
-    Set<ArtifactPluginDescriptor> resolvedPlugins = resolvePluginsDependencies(descriptors);
+    List<ArtifactPluginDescriptor> resolvedPlugins = resolvePluginsDependencies(descriptors);
 
     verifyPluginExportedPackages(resolvedPlugins);
 
     return resolvedPlugins;
   }
 
-  private Set<ArtifactPluginDescriptor> resolvePluginsDependencies(Set<ArtifactPluginDescriptor> descriptors) {
+  private List<ArtifactPluginDescriptor> resolvePluginsDependencies(List<ArtifactPluginDescriptor> descriptors) {
     Set<BundleDescriptor> knownPlugins =
         descriptors.stream().map(ArtifactPluginDescriptor::getBundleDescriptor).collect(Collectors.toSet());
     descriptors = getArtifactsWithDependencies(descriptors, knownPlugins);
@@ -100,10 +100,10 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
       throw new PluginResolutionError(createResolutionErrorMessage(unresolvedPlugins, resolvedPlugins));
     }
 
-    return new HashSet<>(resolvedPlugins);
+    return resolvedPlugins;
   }
 
-  private void verifyPluginExportedPackages(Set<ArtifactPluginDescriptor> plugins) {
+  private void verifyPluginExportedPackages(List<ArtifactPluginDescriptor> plugins) {
     final Map<String, List<String>> exportedPackages = new HashMap<>();
 
     boolean error = false;
@@ -135,13 +135,13 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
    * @return the plugins that were obtained initially plus all the ones that were found.
    * @throws DependencyNotFoundException if any dependency wasn't found properly
    */
-  private Set<ArtifactPluginDescriptor> getArtifactsWithDependencies(Set<ArtifactPluginDescriptor> pluginDescriptors,
-                                                                     Set<BundleDescriptor> visited) {
-    Set<ArtifactPluginDescriptor> pluginDescriptorsWithDependences = new HashSet<>();
+  private List<ArtifactPluginDescriptor> getArtifactsWithDependencies(List<ArtifactPluginDescriptor> pluginDescriptors,
+                                                                      Set<BundleDescriptor> visited) {
+    List<ArtifactPluginDescriptor> pluginDescriptorsWithDependences = new ArrayList<>();
     pluginDescriptorsWithDependences.addAll(pluginDescriptors);
 
     if (!pluginDescriptors.isEmpty()) {
-      Set<ArtifactPluginDescriptor> foundDependencies = new HashSet<>();
+      List<ArtifactPluginDescriptor> foundDependencies = new ArrayList<>();
       pluginDescriptors.stream()
           .filter(pluginDescriptor -> !pluginDescriptor.getClassLoaderModel().getDependencies().isEmpty())
           .filter(pluginDescriptor -> pluginDescriptor.getBundleDescriptor().isPlugin())

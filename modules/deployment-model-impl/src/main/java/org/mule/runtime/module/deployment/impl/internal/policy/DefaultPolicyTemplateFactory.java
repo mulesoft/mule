@@ -26,7 +26,7 @@ import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -56,9 +56,9 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
   @Override
   public PolicyTemplate createArtifact(Application application, PolicyTemplateDescriptor descriptor) {
     MuleDeployableArtifactClassLoader policyClassLoader;
-    Set<ArtifactPluginDescriptor> artifactPluginDescriptors =
+    List<ArtifactPluginDescriptor> artifactPluginDescriptors =
         getArtifactPluginDescriptors(application.getDescriptor().getPlugins(), descriptor);
-    Set<ArtifactPluginDescriptor> resolveArtifactPluginDescriptors =
+    List<ArtifactPluginDescriptor> resolveArtifactPluginDescriptors =
         pluginDependenciesResolver.resolve(artifactPluginDescriptors);
     try {
       policyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
@@ -78,9 +78,9 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     return policy;
   }
 
-  private Set<ArtifactPluginDescriptor> getArtifactPluginDescriptors(Set<ArtifactPluginDescriptor> appPlugins,
-                                                                     PolicyTemplateDescriptor descriptor) {
-    Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
+  private List<ArtifactPluginDescriptor> getArtifactPluginDescriptors(Set<ArtifactPluginDescriptor> appPlugins,
+                                                                      PolicyTemplateDescriptor descriptor) {
+    List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
     for (ArtifactPluginDescriptor policyPluginDescriptor : descriptor.getPlugins()) {
       Optional<ArtifactPluginDescriptor> appPluginDescriptor =
           findPlugin(appPlugins, policyPluginDescriptor.getBundleDescriptor());
@@ -113,7 +113,7 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
   }
 
   private List<ArtifactPlugin> createArtifactPluginList(MuleDeployableArtifactClassLoader policyClassLoader,
-                                                        Set<ArtifactPluginDescriptor> plugins) {
+                                                        List<ArtifactPluginDescriptor> plugins) {
     return plugins.stream()
         .map(artifactPluginDescriptor -> new DefaultArtifactPlugin(getArtifactPluginId(policyClassLoader.getArtifactId(),
                                                                                        artifactPluginDescriptor.getName()),
