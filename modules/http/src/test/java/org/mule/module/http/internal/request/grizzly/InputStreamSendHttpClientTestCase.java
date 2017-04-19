@@ -19,6 +19,7 @@ import org.mule.module.http.internal.ParameterMap;
 import org.mule.module.http.internal.domain.request.DefaultHttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.request.HttpClientConfiguration;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -34,7 +35,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class InputStreamSendHttpClientTest
+public class InputStreamSendHttpClientTestCase extends AbstractMuleTestCase
 {
 
     @Rule
@@ -87,6 +88,7 @@ public class InputStreamSendHttpClientTest
     {
         HttpClientConfiguration configuration = new HttpClientConfiguration.Builder().setUsePersistentConnections(true)
                                                                                      .setMaxConnections(1)
+                                                                                     .setResponseBufferSize(1024)
                                                                                      .setConnectionIdleTimeout(-1)
                                                                                      .build();
         httpClient = new GrizzlyHttpClient(configuration);

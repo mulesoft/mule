@@ -40,7 +40,7 @@ public class IOStrategyTransportCustomizer implements TransportCustomizer
     @Override
     public void customize(TCPNIOTransport transport, FilterChainBuilder filterChainBuilder)
     {
-        transport.setIOStrategy(FlowWorkManagerIOStrategy.getInstance());
+        transport.setIOStrategy(WorkerThreadIOStrategy.getInstance());
         transport.setWorkerThreadPoolConfig(WorkerThreadIOStrategy.getInstance().createDefaultWorkerPoolConfig(transport));
 
         customizePoolSize(transport);

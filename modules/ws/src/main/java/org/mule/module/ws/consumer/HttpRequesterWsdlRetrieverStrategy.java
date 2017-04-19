@@ -10,7 +10,6 @@ package org.mule.module.ws.consumer;
 import static java.lang.String.format;
 import static org.mule.module.http.internal.request.HttpAuthenticationType.BASIC;
 import static org.mule.util.concurrent.ThreadNameHelper.getPrefix;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.module.http.api.requester.proxy.ProxyConfig;
@@ -43,6 +42,7 @@ public class HttpRequesterWsdlRetrieverStrategy implements WsdlRetrieverStrategy
     private static final int DEFAULT_SELECTOR_RUNNERS_COUNT = 1;
     private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
     private static final int DEFAULT_CONNECTION_TIMEOUT = 60 * 1000;
+    private static final int DEFAULT_RESPONSE_BUFFER_SIZE = 10240;
     private static final Boolean DEFAULT_FOLLOW_REDIRECTS = Boolean.TRUE;
     private static final Boolean DEFAULT_USE_PERSISTENT_CONNECTION = Boolean.TRUE;
     private static final String HTTP_METHOD_WSDL_RETRIEVAL = "GET";
@@ -109,6 +109,7 @@ public class HttpRequesterWsdlRetrieverStrategy implements WsdlRetrieverStrategy
                                                                                      .setMaxConnections(DEFAULT_CONNECTIONS)
                                                                                      .setUsePersistentConnections(DEFAULT_USE_PERSISTENT_CONNECTION)
                                                                                      .setConnectionIdleTimeout(DEFAULT_CONNECTION_IDLE_TIMEOUT)
+                                                                                     .setResponseBufferSize(DEFAULT_RESPONSE_BUFFER_SIZE)
                                                                                      .setThreadNamePrefix(threadNamePrefix)
                                                                                      .setOwnerName(WSDL_RETRIEVER)
                                                                                      .setMaxWorkerPoolSize(MINIMUM_WORKER_MAX_POOL_SIZE)
