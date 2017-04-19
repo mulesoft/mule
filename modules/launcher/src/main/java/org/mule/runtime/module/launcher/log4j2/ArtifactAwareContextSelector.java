@@ -49,7 +49,7 @@ import org.apache.logging.log4j.status.StatusLogger;
  */
 class ArtifactAwareContextSelector implements ContextSelector, Disposable {
 
-  static final StatusLogger STATUS_LOGGER = StatusLogger.getLogger();
+  static final StatusLogger LOGGER = StatusLogger.getLogger();
   private static final ClassLoader SYSTEM_CLASSLOADER = getSystemClassLoader();
 
   private LoggerContextCache cache = new LoggerContextCache(this, getClass().getClassLoader());

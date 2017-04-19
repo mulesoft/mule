@@ -7,7 +7,7 @@
 package org.mule.runtime.module.launcher.log4j2;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelector.STATUS_LOGGER;
+import static org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelector.LOGGER;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleBase;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -81,21 +81,20 @@ public class MuleLoggerContextFactory {
       if (appDescriptor.getLogConfigFile() == null) {
         appLogConfig = getLogConfig(muleCL);
       } else if (!appDescriptor.getLogConfigFile().exists()) {
-        STATUS_LOGGER
+        LOGGER
             .warn("Configured 'log.configFile' in app descriptor points to a non-existant file. Using default configuration.");
         appLogConfig = getLogConfig(muleCL);
       } else {
         appLogConfig = appDescriptor.getLogConfigFile().toURI();
       }
     } catch (Exception e) {
-      STATUS_LOGGER.warn("{} while looking for 'log.configFile' entry in app descriptor: {}. Using default configuration.",
-                         e.getClass().getName(), e.getMessage());
+      LOGGER.warn("{} while looking for 'log.configFile' entry in app descriptor: {}. Using default configuration.",
+                  e.getClass().getName(), e.getMessage());
       appLogConfig = getLogConfig(muleCL);
     }
 
-    if (appLogConfig != null && STATUS_LOGGER.isInfoEnabled()) {
-      STATUS_LOGGER.info("Found logging config for application '{}' at '{}'", muleCL.getArtifactId(),
-                         appLogConfig);
+    if (appLogConfig != null && LOGGER.isInfoEnabled()) {
+      LOGGER.info("Found logging config for application '{}' at '{}'", muleCL.getArtifactId(), appLogConfig);
     }
 
     return appLogConfig;
