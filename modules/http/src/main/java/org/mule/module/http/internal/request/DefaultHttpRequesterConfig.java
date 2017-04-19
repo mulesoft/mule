@@ -42,6 +42,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
     private static final int UNLIMITED_CONNECTIONS = -1;
     private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
     private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
+    private static final int DEFAULT_RESPONSE_BUFFER_SIZE =  10 * 1024;
 
     private HttpConstants.Protocols protocol = HTTP;
     private String name;
@@ -65,6 +66,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
     private int maxConnections = UNLIMITED_CONNECTIONS;
     private boolean usePersistentConnections = true;
     private int connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
+    private int responseBufferSize = DEFAULT_RESPONSE_BUFFER_SIZE;
 
     private boolean enableCookies = false;
     private CookieManager cookieManager;
@@ -114,6 +116,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
                 .setMaxConnections(maxConnections)
                 .setUsePersistentConnections(usePersistentConnections)
                 .setConnectionIdleTimeout(connectionIdleTimeout)
+                .setResponseBufferSize(responseBufferSize)
                 .setThreadNamePrefix(threadNamePrefix)
                 .setOwnerName(name)
                 .build();
@@ -344,6 +347,11 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
         started = true;
     }
 
+    public int getMaxConnections()
+    {
+        return maxConnections;
+    }
+
     public void setMaxConnections(int maxConnections)
     {
         this.maxConnections = maxConnections;
@@ -354,9 +362,24 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
         this.usePersistentConnections = usePersistentConnections;
     }
 
+    public int getConnectionIdleTimeout()
+    {
+        return connectionIdleTimeout;
+    }
+
     public void setConnectionIdleTimeout(int connectionIdleTimeout)
     {
         this.connectionIdleTimeout = connectionIdleTimeout;
+    }
+
+    public int getResponseBufferSize()
+    {
+        return responseBufferSize;
+    }
+
+    public void setResponseBufferSize(int responseBufferSize)
+    {
+        this.responseBufferSize = responseBufferSize;
     }
 
     public boolean isEnableCookies()
