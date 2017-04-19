@@ -10,7 +10,6 @@ import static java.io.File.separator;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
-import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -67,7 +66,6 @@ import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN
 import static org.mule.runtime.deployment.model.api.domain.Domain.DOMAIN_CONFIG_FILE;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_POM;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
@@ -87,6 +85,15 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
@@ -123,7 +130,6 @@ import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibrary
 import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
@@ -166,16 +172,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
 public class DeploymentServiceTestCase extends AbstractMuleTestCase {
@@ -1662,19 +1658,28 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
   }
 
-  private MuleArtifactLoaderDescriptor createBundleDescriptorLoader(BundleDescriptor bundleDescriptor) {
-    Map<String, Object> attributes = new HashMap();
-    attributes.put(VERSION, bundleDescriptor.getVersion());
-    attributes.put(GROUP_ID, bundleDescriptor.getGroupId());
-    attributes.put(ARTIFACT_ID, bundleDescriptor.getArtifactId());
-    attributes.put(CLASSIFIER, bundleDescriptor.getClassifier());
-    attributes.put(TYPE, bundleDescriptor.getType());
-
-    return new MuleArtifactLoaderDescriptor("MAVEN", attributes);
-  }
-
   @Test
   public void deploysWithExtensionXmlPlugin() throws Exception {
+    final ArtifactPluginFileBuilder byeXmlExtensionPlugin = getByeXmlPlugin();
+
+    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPlugin")
+        .definedBy("app-with-extension-xml-plugin-module-bye.xml").dependingOn(byeXmlExtensionPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    final DefaultDomainManager domainManager = new DefaultDomainManager();
+    domainManager.addDomain(createDefaultDomain());
+
+    TestApplicationFactory appFactory =
+        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
+                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
+
+    deploymentService.setAppFactory(appFactory);
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+  }
+
+  private ArtifactPluginFileBuilder getByeXmlPlugin() {
     String moduleFileName = "module-bye.xml";
     String extensionName = "bye-extension";
     String moduleDestination = "org/mule/module/" + moduleFileName;
@@ -1684,16 +1689,32 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     builder.withClassLoaderModelDescriber().setId(MAVEN);
     builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MAVEN));
 
-    final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
+    return new ArtifactPluginFileBuilder(extensionName)
         .containingResource("module-byeSource.xml", moduleDestination)
-        .containingResource("module-bye-pom.xml",
-                            get("META-INF", "maven", "org.mule.extension", "mule-module-bye", MULE_PLUGIN_POM).toString())
+        .describedBy(builder.build());
+  }
+
+  @Test
+  public void deploysWithExtensionXmlPluginWithXmlDependencies() throws Exception {
+    final ArtifactPluginFileBuilder byeXmlExtensionPlugin = getByeXmlPlugin();
+    String moduleFileName = "module-using-bye.xml";
+    String extensionName = "using-bye-extension";
+    String moduleDestination = "org/mule/module/" + moduleFileName;
+    MulePluginModelBuilder builder =
+        new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
+    builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
+                                                                                                  moduleDestination);
+    builder.withClassLoaderModelDescriber().addProperty(EXPORTED_PACKAGES, asList("org.foo")).setId(MAVEN);
+    builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MAVEN));
+
+    final ArtifactPluginFileBuilder usingByeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
+        .containingResource("module-using-byeSource.xml", moduleDestination)
+        .dependingOn(byeXmlExtensionPlugin)
         .describedBy(builder.build());
 
-    File artifactFile = byeXmlExtensionPlugin.getArtifactFile();
-
-    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPlugin")
-        .definedBy("app-with-extension-xml-plugin-module-bye.xml").dependingOn(byeXmlExtensionPlugin);
+    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPluginWithXmlDependencies")
+        .definedBy("app-with-extension-xml-plugin-module-using-bye.xml")
+        .dependingOn(usingByeXmlExtensionPlugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     final DefaultDomainManager domainManager = new DefaultDomainManager();

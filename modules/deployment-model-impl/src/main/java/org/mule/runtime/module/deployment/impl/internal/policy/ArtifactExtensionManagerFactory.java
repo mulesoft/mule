@@ -65,7 +65,6 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
   public ExtensionManager create(MuleContext muleContext) {
     final ExtensionManager extensionManager = extensionManagerFactory.create(muleContext);
     final Set<ExtensionModel> extensions = new HashSet<>();
-    //TODO MULE-10355: generating the ExtensionModels *must* be done in an ordered way, sorting them by dependencies.
     for (ArtifactPlugin artifactPlugin : artifactPlugins) {
       URL manifestUrl =
           artifactPlugin.getArtifactClassLoader().findResource(META_INF_FOLDER + "/" + EXTENSION_MANIFEST_FILE_NAME);

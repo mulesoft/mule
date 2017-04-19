@@ -7,6 +7,7 @@
 package org.mule.runtime.deployment.model.internal.tooling;
 
 import static java.lang.String.format;
+import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.PLUGIN_CLASSLOADER_IDENTIFIER;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.artifact.DependencyNotFoundException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -59,7 +60,7 @@ public class ToolingPluginArtifactClassLoader implements ArtifactClassLoader {
                                                            List<ArtifactClassLoader> artifactPluginClassLoaders) {
     return artifactPluginClassLoaders.stream()
         .filter(artifactClassLoader -> artifactClassLoader.getArtifactId()
-            .endsWith("/plugin/" + artifactPluginDescriptor.getName()))
+            .endsWith(PLUGIN_CLASSLOADER_IDENTIFIER + artifactPluginDescriptor.getName()))
         .findFirst()
         .orElseThrow(() -> new DependencyNotFoundException(format("Cannot generate a tooling ClassLoader as the region ClassLoader is missing the plugin '%s'",
                                                                   artifactPluginDescriptor.getName())));

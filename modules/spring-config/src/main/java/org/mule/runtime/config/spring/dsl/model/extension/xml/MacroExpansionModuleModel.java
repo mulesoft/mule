@@ -17,7 +17,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -44,11 +43,6 @@ import java.util.stream.Collectors;
  * This object works by handling {@link ComponentModel}s directly, consuming the {@link GlobalElementComponentModelModelProperty}
  * for the "config" elements while the {@link OperationComponentModelModelProperty} for the operations (aka: {@link Processor}s in
  * the XML file).
- * <p/>
- * TODO(fernandezlautaro) MULE-10355: the following comment must be deleted once implemented. Bear in mind that at the moment, the
- * current implementation assumes there will not be dependencies among macro expansions, the following example WONT work until
- * MULE-10355 is done: B depends on A, the application uses B, which means that the macro expanded app must expand B elements,
- * discover that are A ones, and expand A elements as well.
  *
  * @since 4.0
  */
@@ -82,11 +76,8 @@ public class MacroExpansionModuleModel {
   /**
    * Goes through the entire xml mule application looking for the message processors that can be expanded, and then takes care of
    * the global elements.
-   * <p/>
-   * TODO(fernandezlautaro) MULE-10355: current implementation works for <module/> within <module/>, but it has BigO(N^N). This one will be solved when the {@link ExtensionModel}s for the XML scenario will be queried asking for its dependencies thru a {@link ModelProperty} to sort them properly
    */
   public void expand() {
-    //TODO MULE-10355: this for that works N^N will be deleted once is implemented
     for (int i = 0; i < extensions.size(); i++) {
       for (ExtensionModel extensionModel : extensions) {
         expand(extensionModel);
