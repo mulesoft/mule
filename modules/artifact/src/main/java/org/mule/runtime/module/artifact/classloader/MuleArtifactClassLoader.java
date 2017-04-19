@@ -83,6 +83,16 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   @Override
   public void dispose() {
+    try {
+      createResourceReleaserInstance().release();
+    } catch (Exception e) {
+      logger.error("Cannot create resource releaser instance", e);
+    }
+    super.dispose();
+    shutdownListeners();
+  }
+
+  private void shutdownListeners() {
     for (ShutdownListener listener : shutdownListeners) {
       try {
         listener.execute();
@@ -93,14 +103,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
     // Clean up references to shutdown listeners in order to avoid class loader leaks
     shutdownListeners.clear();
-
-    try {
-      createResourceReleaserInstance().release();
-    } catch (Exception e) {
-      logger.error("Cannot create resource releaser instance", e);
-    }
-
-    super.dispose();
   }
 
   public void setResourceReleaserClassLocation(String resourceReleaserClassLocation) {

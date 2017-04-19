@@ -185,7 +185,7 @@ final class LoggerContextConfigurer {
       // If the artifact logging is configured using the global config file and there is no file appender for the artifact, then
       // configure a default one
       if (isUrlInsideDirectory(context.getConfigFile(), MuleContainerBootstrapUtils.getMuleConfDir())) {
-        if (!hasFileAppender(context)) {
+        if (!context.isStopping() && !hasFileAppender(context)) {
           addDefaultAppender(context, logFile.getAbsolutePath());
           removeConsoleAppender(context);
         }
