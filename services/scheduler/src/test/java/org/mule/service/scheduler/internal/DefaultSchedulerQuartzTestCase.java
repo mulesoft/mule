@@ -6,9 +6,6 @@
  */
 package org.mule.service.scheduler.internal;
 
-import static org.mule.service.scheduler.ThreadType.CUSTOM;
-import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
-import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SchedulerServiceStory.QUARTZ_TASK_SCHEDULING;
 import static java.lang.System.nanoTime;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
@@ -24,6 +21,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.verify;
+import static org.mule.service.scheduler.ThreadType.CUSTOM;
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
+import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SchedulerServiceStory.QUARTZ_TASK_SCHEDULING;
 
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -44,6 +44,7 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
+
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -60,7 +61,8 @@ public class DefaultSchedulerQuartzTestCase extends BaseDefaultSchedulerTestCase
   public void before() throws SchedulerException {
     super.before();
     executor = new DefaultScheduler(DefaultSchedulerQuartzTestCase.class.getSimpleName(), sharedExecutor, 1,
-                                    sharedScheduledExecutor, sharedQuartzScheduler, CUSTOM, EMPTY_SHUTDOWN_CALLBACK);
+                                    sharedScheduledExecutor, sharedQuartzScheduler, CUSTOM.CPU_INTENSIVE, 5000,
+                                    EMPTY_SHUTDOWN_CALLBACK);
   }
 
   @Override

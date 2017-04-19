@@ -125,8 +125,8 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
   @Override
   public void beginMonitoring() {
     // TODO: Change the executor type when MULE-8870 is implemented
-    executor =
-        muleContext.getSchedulerService().ioScheduler(config().withName(getPrefix(muleContext) + "extension.expiration.manager"));
+    executor = muleContext.getSchedulerService()
+        .ioScheduler(config().withName(getPrefix(muleContext) + "extension.expiration.manager").withShutdownTimeout(30, SECONDS));
     scheduledMonitoring = executor.scheduleWithFixedDelay(() -> expire(), frequency, frequency, timeUnit);
   }
 
@@ -173,7 +173,7 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
   @Override
   public void stopMonitoring() {
     scheduledMonitoring.cancel(false);
-    executor.stop(30, SECONDS);
+    executor.stop();
   }
 
   private boolean stopChecking() {

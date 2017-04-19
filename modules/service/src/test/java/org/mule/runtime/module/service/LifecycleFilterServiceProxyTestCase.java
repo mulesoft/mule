@@ -32,7 +32,7 @@ public class LifecycleFilterServiceProxyTestCase extends AbstractMuleTestCase {
 
     StartableService service = mock(StartableService.class);
 
-    final Startable serviceProxy = (Startable) LifecycleFilterServiceProxy.createServiceProxy(service);
+    final Startable serviceProxy = (Startable) LifecycleFilterServiceProxy.createLifecycleFilterServiceProxy(service);
 
     expected.expect(UnsupportedOperationException.class);
     serviceProxy.start();
@@ -42,7 +42,7 @@ public class LifecycleFilterServiceProxyTestCase extends AbstractMuleTestCase {
   public void avoidsStopExecution() throws Exception {
     StoppableService service = mock(StoppableService.class);
 
-    final Stoppable serviceProxy = (Stoppable) LifecycleFilterServiceProxy.createServiceProxy(service);
+    final Stoppable serviceProxy = (Stoppable) LifecycleFilterServiceProxy.createLifecycleFilterServiceProxy(service);
 
     expected.expect(UnsupportedOperationException.class);
     serviceProxy.stop();
@@ -55,7 +55,7 @@ public class LifecycleFilterServiceProxyTestCase extends AbstractMuleTestCase {
     doThrow(checkedException).when(checkExceptionService).execute();
 
     final CheckedExceptionService checkedExceptionServiceProxy =
-        (CheckedExceptionService) LifecycleFilterServiceProxy.createServiceProxy(checkExceptionService);
+        (CheckedExceptionService) LifecycleFilterServiceProxy.createLifecycleFilterServiceProxy(checkExceptionService);
 
     expected.expect(is(checkedException));
     checkedExceptionServiceProxy.execute();
@@ -68,7 +68,7 @@ public class LifecycleFilterServiceProxyTestCase extends AbstractMuleTestCase {
     doThrow(uncheckedException).when(uncheckedExceptionService).execute();
 
     final UncheckedExceptionService uncheckedExceptionServiceProxy =
-        (UncheckedExceptionService) LifecycleFilterServiceProxy.createServiceProxy(uncheckedExceptionService);
+        (UncheckedExceptionService) LifecycleFilterServiceProxy.createLifecycleFilterServiceProxy(uncheckedExceptionService);
 
     expected.expect(is(uncheckedException));
     uncheckedExceptionServiceProxy.execute();

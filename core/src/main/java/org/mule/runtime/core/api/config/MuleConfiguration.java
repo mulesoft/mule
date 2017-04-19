@@ -48,6 +48,9 @@ public interface MuleConfiguration {
   @Deprecated
   int getDefaultQueueTimeout();
 
+  /**
+   * @return The graceful shutdown timeout (in millis) used when stopping a mule application cleanly without message loss.
+   */
   int getShutdownTimeout();
 
   /**

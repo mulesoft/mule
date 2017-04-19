@@ -37,7 +37,7 @@ import org.quartz.impl.StdSchedulerFactory;
 
 public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
 
-  protected static final int DELTA_MILLIS = 30;
+  protected static final int DELTA_MILLIS = 50;
   protected static final int EXECUTOR_TIMEOUT_SECS = 1;
 
   protected static final Runnable EMPTY_RUNNABLE = () -> {
@@ -103,7 +103,7 @@ public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
 
   protected ScheduledExecutorService createExecutor() {
     return new DefaultScheduler(BaseDefaultSchedulerTestCase.class.getSimpleName(), sharedExecutor, 1, sharedScheduledExecutor,
-                                sharedQuartzScheduler, CUSTOM, EMPTY_SHUTDOWN_CALLBACK);
+                                sharedQuartzScheduler, CUSTOM, 5000, EMPTY_SHUTDOWN_CALLBACK);
   }
 
   protected boolean awaitLatch(final CountDownLatch latch) {

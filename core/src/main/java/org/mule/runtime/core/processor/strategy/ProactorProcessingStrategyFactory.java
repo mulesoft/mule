@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
@@ -75,8 +74,7 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
                                             () -> muleContext.getSchedulerService()
                                                 .cpuIntensiveScheduler(config()
                                                     .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
-                                            scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
-                                                                        MILLISECONDS),
+                                            scheduler -> scheduler.stop(),
                                             maxConcurrency,
                                             () -> muleContext.getSchedulerService()
                                                 .customScheduler(config()
@@ -150,6 +148,7 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
           .transform(processor).publishOn(fromExecutorService(getExecutorService(getCpuLightScheduler())));
     }
 
+    @Override
     protected ExecutorService getExecutorService(Scheduler scheduler) {
       return new ConditionalExecutorServiceDecorator(scheduler, scheduleOverridePredicate());
     }
@@ -159,6 +158,7 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
      *
      * @return preficate that determines if task should be scheduled or processed in the current thread.
      */
+    @Override
     protected Predicate<Scheduler> scheduleOverridePredicate() {
       return scheduler -> false;
     }

@@ -34,9 +34,9 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
   }
 
   @Override
-  public void stop(long gracefulShutdownTimeout, TimeUnit unit) {
+  public void stop() {
     this.stopped = true;
-    decorated.stop(gracefulShutdownTimeout, unit);
+    decorated.stop();
     ownerService.stoppedScheduler(this);
   }
 

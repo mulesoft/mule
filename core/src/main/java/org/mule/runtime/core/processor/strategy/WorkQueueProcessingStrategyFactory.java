@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static reactor.core.publisher.Flux.from;
@@ -58,8 +57,7 @@ public class WorkQueueProcessingStrategyFactory extends AbstractRingBufferProces
     return new WorkQueueProcessingStrategy(() -> muleContext.getSchedulerService()
         .ioScheduler(config().withName(schedulersNamePrefix + "." + BLOCKING.name())),
                                            maxConcurrency,
-                                           scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
-                                                                       MILLISECONDS),
+                                           scheduler -> scheduler.stop(),
                                            () -> muleContext.getSchedulerService().customScheduler(config()
                                                .withName(schedulersNamePrefix + "." + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
                                                .withMaxConcurrentTasks(getSubscriberCount() + 1)),

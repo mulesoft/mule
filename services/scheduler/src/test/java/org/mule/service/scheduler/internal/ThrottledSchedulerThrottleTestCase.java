@@ -6,32 +6,49 @@
  */
 package org.mule.service.scheduler.internal;
 
-import static org.mule.service.scheduler.ThreadType.CUSTOM;
-import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
-import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SchedulerServiceStory.THROTTLING;
 import static java.lang.Thread.sleep;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.service.scheduler.ThreadType.CUSTOM;
 
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.quartz.SchedulerException;
+
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features(SCHEDULER_SERVICE)
-@Stories(THROTTLING)
+@Features("Scheduler Throttling")
 public class ThrottledSchedulerThrottleTestCase extends BaseDefaultSchedulerTestCase {
 
   private static final int THROTTLE_SIZE = 2;
+  private ExecutorService outerExecutor;
+
+  @Override
+  @Before
+  public void before() throws SchedulerException {
+    super.before();
+    outerExecutor = newSingleThreadExecutor();
+  }
+
+  @Override
+  @After
+  public void after() throws SchedulerException, InterruptedException {
+    outerExecutor.shutdownNow();
+    outerExecutor.awaitTermination(5, SECONDS);
+    super.after();
+  }
 
   @Test
   @Description("Tests that a task submitted in excess of 'maxConcurrentTasks' waits until another task finishes before executing.")
@@ -45,8 +62,7 @@ public class ThrottledSchedulerThrottleTestCase extends BaseDefaultSchedulerTest
       });
     }
 
-    final ExecutorService executor = Executors.newSingleThreadExecutor();
-    final Future<?> throttledSubmission = executor.submit(() -> {
+    final Future<?> throttledSubmission = outerExecutor.submit(() -> {
       scheduler.execute(() -> {
         // Nothing to do
       });
@@ -66,7 +82,7 @@ public class ThrottledSchedulerThrottleTestCase extends BaseDefaultSchedulerTest
   @Override
   protected ScheduledExecutorService createExecutor() {
     return new ThrottledScheduler(BaseDefaultSchedulerTestCase.class.getSimpleName(), sharedExecutor, 1, sharedScheduledExecutor,
-                                  sharedQuartzScheduler, CUSTOM, THROTTLE_SIZE, EMPTY_SHUTDOWN_CALLBACK);
+                                  sharedQuartzScheduler, CUSTOM, THROTTLE_SIZE, 5000, EMPTY_SHUTDOWN_CALLBACK);
   }
 
 }

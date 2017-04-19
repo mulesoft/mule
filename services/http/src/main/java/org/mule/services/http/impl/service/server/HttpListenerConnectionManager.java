@@ -9,7 +9,6 @@ package org.mule.services.http.impl.service.server;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Runtime.getRuntime;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.services.http.impl.service.server.grizzly.IdleExecutor.IDLE_TIMEOUT_THREADS_PREFIX_NAME;
 
@@ -86,9 +85,9 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
   @Override
   public synchronized void dispose() {
     httpServerManager.dispose();
-    idleTimeoutScheduler.stop(5, SECONDS);
-    workerScheduler.stop(5, SECONDS);
-    selectorScheduler.stop(5, SECONDS);
+    idleTimeoutScheduler.stop();
+    workerScheduler.stop();
+    selectorScheduler.stop();
   }
 
   @Override

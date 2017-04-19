@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static org.mule.runtime.config.spring.InjectParamsServiceProxy.createInjectProviderParamsServiceProxy;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_LOCAL_USER_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
@@ -53,6 +54,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAUL
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+
 import org.mule.runtime.api.artifact.ArtifactProperties;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -295,7 +297,12 @@ class SpringMuleContextServiceConfigurator {
     if (customServiceClass.isPresent()) {
       beanDefinition = getBeanDefinitionBuilder(customServiceClass.get()).getBeanDefinition();
     } else if (customServiceImpl.isPresent()) {
-      beanDefinition = getConstantObjectBeanDefinition(customServiceImpl.get());
+      if (customServiceImpl.get() instanceof Service) {
+        beanDefinition = getConstantObjectBeanDefinition(createInjectProviderParamsServiceProxy((Service) customServiceImpl.get(),
+                                                                                                muleContext));
+      } else {
+        beanDefinition = getConstantObjectBeanDefinition(customServiceImpl.get());
+      }
     } else {
       throw new IllegalStateException("A custom service must define a service class or instance");
     }

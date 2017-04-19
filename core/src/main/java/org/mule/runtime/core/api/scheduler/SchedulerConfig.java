@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.api.scheduler;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.DEFAULT;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Provides a fluent way of customizing a {@link Scheduler} obtained through the {@link SchedulerService}.
@@ -50,6 +52,7 @@ public class SchedulerConfig {
   private Integer maxConcurrentTasks;
   private String schedulerName;
   private RejectionAction rejectionAction = DEFAULT;
+  private Long shutdownTimeoutMillis;
 
   /**
    * Sets the max tasks that can be run at the same time for the target {@link Scheduler}.
@@ -111,5 +114,29 @@ public class SchedulerConfig {
    */
   public RejectionAction getRejectionAction() {
     return rejectionAction;
+  }
+
+  /**
+   * Sets the graceful shutdown timeout to use when stopping the target {@link Scheduler}.
+   * 
+   * @param shutdownTimeout the value of the timeout to use when gracefully stopping the target {@link Scheduler}.
+   * @param shutdownTimeoutUnit the unit of the timeout to use when gracefully stopping the target {@link Scheduler}.
+   * @return the updated configuration
+   */
+  public SchedulerConfig withShutdownTimeout(long shutdownTimeout, TimeUnit shutdownTimeoutUnit) {
+    if (shutdownTimeout < 0) {
+      throw new IllegalArgumentException(format("'shutdownTimeout' must be a possitive long. %d passed", shutdownTimeout));
+    }
+    requireNonNull(shutdownTimeoutUnit);
+
+    this.shutdownTimeoutMillis = shutdownTimeoutUnit.toMillis(shutdownTimeout);
+    return this;
+  }
+
+  /**
+   * @return the timeout to use when gracefully stopping the target {@link Scheduler}, in millis.
+   */
+  public Long getShutdownTimeoutMillis() {
+    return shutdownTimeoutMillis;
   }
 }

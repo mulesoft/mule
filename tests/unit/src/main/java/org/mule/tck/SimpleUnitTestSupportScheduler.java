@@ -15,7 +15,6 @@ import java.util.concurrent.RunnableScheduledFuture;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -37,7 +36,7 @@ public class SimpleUnitTestSupportScheduler extends ScheduledThreadPoolExecutor 
   }
 
   @Override
-  public void stop(long gracefulShutdownTimeoutSecs, TimeUnit unit) {
+  public void stop() {
     // Nothing to do. The lifecycle of this pool is managed by the UnitTestSchedulerService that instantiated this
   }
 

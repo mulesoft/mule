@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
@@ -44,8 +43,7 @@ public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStra
                                              () -> muleContext.getSchedulerService()
                                                  .cpuIntensiveScheduler(config()
                                                      .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
-                                             scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
-                                                                         MILLISECONDS),
+                                             scheduler -> scheduler.stop(),
                                              getMaxConcurrency(),
                                              () -> muleContext.getSchedulerService()
                                                  .customScheduler(config()

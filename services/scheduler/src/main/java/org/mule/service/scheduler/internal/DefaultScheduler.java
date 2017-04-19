@@ -20,6 +20,7 @@ import static org.mule.service.scheduler.internal.QuartzCronJob.JOB_TASK_KEY;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -49,7 +50,6 @@ import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Proxy for a {@link ScheduledExecutorService} that adds tracking of the source of the dispatched tasks.
@@ -63,7 +63,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
    */
   private static final long FORCEFUL_SHUTDOWN_TIMEOUT_SECS = 5;
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultScheduler.class);
+  private static final Logger logger = getLogger(DefaultScheduler.class);
 
   private final AtomicInteger idGenerator = new AtomicInteger(0);
 
@@ -88,7 +88,9 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   private volatile boolean shutdown = false;
 
-  private Consumer<Scheduler> shutdownCallback;
+  private final long shutdownTimeoutMillis;
+
+  private final Consumer<Scheduler> shutdownCallback;
 
   /**
    * @param name the name of this scheduler
@@ -99,10 +101,12 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
    * @param quartzScheduler the quartz object that will handle tasks scheduled with cron expressions. This will not execute the
    *        actual tasks, but will dispatch it to the {@code executor} at the appropriate time.
    * @param threadsType The {@link ThreadType} that matches with the {@link Thread}s managed by this {@link Scheduler}.
-   * @param EMPTY_SHUTDOWN_CALLBACK a callback to be invoked when this scheduler is stopped/shutdown.
+   * @param shutdownTimeoutMillis the time in millis to wait for the gracefule stop of this scheduler
+   * @param shutdownCallback a callback to be invoked when this scheduler is stopped/shutdown.
    */
   DefaultScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
-                   org.quartz.Scheduler quartzScheduler, ThreadType threadsType, Consumer<Scheduler> shutdownCallback) {
+                   org.quartz.Scheduler quartzScheduler, ThreadType threadsType, long shutdownTimeoutMillis,
+                   Consumer<Scheduler> shutdownCallback) {
     this.name = name + "@" + toHexString(hashCode());
     scheduledTasks = new ConcurrentHashMap<>(workers, 1.00f, getRuntime().availableProcessors());
     cancelledBeforeFireTasks = newKeySet();
@@ -110,6 +114,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     this.scheduledExecutor = scheduledExecutor;
     this.quartzScheduler = quartzScheduler;
     this.threadType = threadsType;
+    this.shutdownTimeoutMillis = shutdownTimeoutMillis;
     this.shutdownCallback = shutdownCallback;
   }
 
@@ -302,18 +307,18 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
   }
 
   @Override
-  public void stop(long gracefulShutdownTimeout, TimeUnit unit) {
+  public void stop() {
     // Disable new tasks from being submitted
     shutdown();
     try {
       // Wait a while for existing tasks to terminate
-      if (!awaitTermination(gracefulShutdownTimeout, unit)) {
+      if (!awaitTermination(shutdownTimeoutMillis, MILLISECONDS)) {
         // Cancel currently executing tasks and return list of pending tasks
         List<Runnable> cancelledJobs = shutdownNow();
         // Wait a while for tasks to respond to being cancelled
         if (!awaitTermination(FORCEFUL_SHUTDOWN_TIMEOUT_SECS, SECONDS)) {
-          logger.warn("Scheduler " + this.toString() + " did not shutdown gracefully after " + gracefulShutdownTimeout
-              + " " + unit.toString() + ".");
+          logger.warn("Scheduler " + this.toString() + " did not shutdown gracefully after " + shutdownTimeoutMillis
+              + " " + MILLISECONDS.toString() + ".");
         } else {
           if (!cancelledJobs.isEmpty()) {
             logger.warn("Scheduler " + this.toString() + " terminated.");

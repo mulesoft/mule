@@ -73,7 +73,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
     schedulerMessageSource.stop();
     schedulerMessageSource.dispose();
 
-    verify(pollScheduler).stop(anyLong(), any());
+    verify(pollScheduler).stop();
   }
 
   private DefaultSchedulerMessageSource schedulerMessageSource;

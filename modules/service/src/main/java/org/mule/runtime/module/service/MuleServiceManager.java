@@ -9,28 +9,29 @@ package org.mule.runtime.module.service;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableList;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.service.LifecycleFilterServiceProxy.createServiceProxy;
-import org.mule.runtime.api.service.Service;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
+import static org.mule.runtime.module.service.LifecycleFilterServiceProxy.createLifecycleFilterServiceProxy;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.lifecycle.StartException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.service.Service;
+import org.mule.runtime.core.api.lifecycle.StartException;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Service manager to use in the Mule container.
  */
 public class MuleServiceManager implements ServiceManager {
 
-  private static final Logger logger = LoggerFactory.getLogger(MuleServiceManager.class);
+  private static final Logger logger = getLogger(MuleServiceManager.class);
 
   private final ServiceDiscoverer serviceDiscoverer;
   private List<Service> registeredServices = new ArrayList<>();
@@ -66,7 +67,7 @@ public class MuleServiceManager implements ServiceManager {
   private List<Service> wrapServices(List<Service> registeredServices) {
     final List<Service> result = new ArrayList<>(registeredServices.size());
     for (Service registeredService : registeredServices) {
-      final Service serviceProxy = createServiceProxy(registeredService);
+      final Service serviceProxy = createLifecycleFilterServiceProxy(registeredService);
       result.add(serviceProxy);
     }
 
