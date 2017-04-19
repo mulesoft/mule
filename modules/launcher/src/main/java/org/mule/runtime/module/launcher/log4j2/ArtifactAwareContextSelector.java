@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static java.lang.ClassLoader.getSystemClassLoader;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -47,7 +49,8 @@ import org.apache.logging.log4j.status.StatusLogger;
  */
 class ArtifactAwareContextSelector implements ContextSelector, Disposable {
 
-  static final StatusLogger logger = StatusLogger.getLogger();
+  static final StatusLogger LOGGER = StatusLogger.getLogger();
+  private static final ClassLoader SYSTEM_CLASSLOADER = getSystemClassLoader();
 
   private LoggerContextCache cache = new LoggerContextCache(this, getClass().getClassLoader());
 
@@ -98,11 +101,11 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
     }
 
     if (!(loggerClassLoader instanceof ArtifactClassLoader)) {
-      return loggerClassLoader.getSystemClassLoader();
+      return SYSTEM_CLASSLOADER;
     } else if (isRegionClassLoaderMember(loggerClassLoader)) {
       loggerClassLoader = loggerClassLoader.getParent();
     } else if (!(loggerClassLoader instanceof RegionClassLoader) && !(loggerClassLoader instanceof MuleSharedDomainClassLoader)) {
-      return loggerClassLoader.getSystemClassLoader();
+      return SYSTEM_CLASSLOADER;
     }
 
     return loggerClassLoader;
