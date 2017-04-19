@@ -10,6 +10,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.deployment.model.api.application.ApplicationClassLoader;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
@@ -19,6 +20,8 @@ import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassL
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
 
@@ -62,11 +65,33 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
    * @return the plugin classloader of the current thread context artifact.
    */
   public static List<ClassLoader> resolveContextArtifactPluginClassLoaders() {
-    if (currentThread().getContextClassLoader() instanceof MuleApplicationClassLoader) {
-      return ((MuleApplicationClassLoader) currentThread().getContextClassLoader()).getArtifactPluginClassLoaders().stream()
-          .map(acl -> acl.getClassLoader()).collect(toList());
-    } else {
+    // TODO MULE-12254
+    // When running the tests, the classloader hierarchy is build with the launcher, but when executing here we are with the
+    // container.
+    // This is why this reflection bloat is required.
+
+    final Method getArtifactPluginClassLoaders;
+    try {
+      getArtifactPluginClassLoaders =
+          currentThread().getContextClassLoader().getClass().getMethod("getArtifactPluginClassLoaders");
+    } catch (NoSuchMethodException | SecurityException e) {
       return singletonList(currentThread().getContextClassLoader());
     }
+
+    final List artifactPluginClassLoaders;
+    try {
+      artifactPluginClassLoaders = (List) getArtifactPluginClassLoaders.invoke(currentThread().getContextClassLoader());
+    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new MuleRuntimeException(e);
+    }
+
+    return (List<ClassLoader>) artifactPluginClassLoaders.stream().map(acl -> {
+      try {
+        return acl.getClass().getMethod("getClassLoader").invoke(acl);
+      } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+          | SecurityException e) {
+        throw new MuleRuntimeException(e);
+      }
+    }).collect(toList());
   }
 }
