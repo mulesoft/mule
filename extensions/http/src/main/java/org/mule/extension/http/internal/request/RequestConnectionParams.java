@@ -95,7 +95,7 @@ public final class RequestConnectionParams {
   @Optional(defaultValue = DEFAULT_RESPONSE_BUFFER_SIZE)
   @Expression(NOT_SUPPORTED)
   @Placement(tab = ADVANCED_TAB, order = 4)
-  private Integer responseBufferSize;
+  private int responseBufferSize;
 
   @Parameter
   @Optional
@@ -128,7 +128,7 @@ public final class RequestConnectionParams {
     return connectionIdleTimeout;
   }
 
-  public Integer getResponseBufferSize() {
+  public int getResponseBufferSize() {
     return responseBufferSize;
   }
 
@@ -160,7 +160,7 @@ public final class RequestConnectionParams {
     this.connectionIdleTimeout = connectionIdleTimeout;
   }
 
-  public void setResponseBufferSize(Integer responseBufferSize) {
+  public void setResponseBufferSize(int responseBufferSize) {
     this.responseBufferSize = responseBufferSize;
   }
 
