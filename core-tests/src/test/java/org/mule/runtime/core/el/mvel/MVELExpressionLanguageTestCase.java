@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.mvel2.CompileException;
@@ -61,6 +62,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -163,21 +165,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   }
 
   @Test
-  public void testEvaluateStringMuleEventMapOfStringObject() throws Exception {
+  public void testEvaluateMapOfStringObject() throws Exception {
     Event event = createMockEvent();
-
-    // Literals
-    assertEquals("hi", evaluate("'hi'", event));
-    assertEquals(4, evaluate("2*2", event));
-
-    // Static context
-    assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone", event));
-    assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version", event));
-    assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name", event));
-
-    // Event context
-    assertEquals("myFlow", evaluate("flow.name", event));
-    assertEquals("foo", evaluate("message.payload", event));
 
     // Custom variables (via method param)
     assertEquals(1, evaluate("foo", Collections.<String, Object>singletonMap("foo", 1)));
@@ -188,38 +177,17 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   public void testEvaluateStringMuleMessage() throws Exception {
     Event event = createMockEvent();
 
-    // Literals
-    assertEquals("hi", evaluate("'hi'", event));
-    assertEquals(4, evaluate("2*2", event));
-
-    // Static context
-    assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone", event));
-    assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version", event));
-    assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name", event));
-
     // Event context
     assertEquals("foo", evaluate("message.payload", event));
   }
 
   @Test
-  public void testEvaluateStringMuleMessageMapOfStringObject() throws Exception {
-    Event event = createMockEvent();
-
-    // Literals
-    assertEquals("hi", evaluate("'hi'", event));
-    assertEquals(4, evaluate("2*2", event));
-
-    // Static context
-    assertEquals(Calendar.getInstance().getTimeZone(), evaluate("server.timeZone", event));
-    assertEquals(MuleManifest.getProductVersion(), evaluate("mule.version", event));
-    assertEquals(muleContext.getConfiguration().getId(), evaluate("app.name", event));
+  public void testEvaluateAttributes() throws Exception {
+    Event event = createMockEventWithAttributes();
 
     // Event context
-    assertEquals("foo", evaluate("message.payload", event));
-
-    // Custom variables (via method param)
-    assertEquals(1, evaluate("foo", Collections.<String, Object>singletonMap("foo", 1)));
-    assertEquals("bar", evaluate("foo", Collections.<String, Object>singletonMap("foo", "bar")));
+    assertEquals("number 1", evaluate("attributes.one", event));
+    assertEquals("number 2", evaluate("attributes.two", event));
   }
 
   @Test
@@ -476,10 +444,22 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     return createMockEvent("foo", DataType.STRING);
   }
 
+  protected Event createMockEventWithAttributes(DataType dataType) {
+    HashMap<String,String> attributes = new HashMap<>();
+    attributes.put("one", "number 1");
+    attributes.put("two", "number 2");
+    return createMockEvent("foo", DataType.STRING, attributes, DataType.OBJECT);
+  }
+
   protected Event createMockEvent(String payload, DataType dataType) {
+    return createMockEvent(payload, dataType, NULL_ATTRIBUTES, DataType.OBJECT);
+  }
+
+  protected Event createMockEvent(String payload, DataType dataType, Object attributes, DataType attributesDataType) {
     Event event = mock(Event.class);
     InternalMessage message = mock(InternalMessage.class);
     when(message.getPayload()).thenReturn(new TypedValue<Object>(payload, dataType));
+    when(message.getAttributes()).thenReturn(new TypedValue<Object>(attributes, attributesDataType));
     when(event.getMessage()).thenReturn(message);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
@@ -488,6 +468,10 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   protected Event createMockEvent() {
     return createMockEvent(DataType.STRING);
+  }
+
+  protected Event createMockEventWithAttributes() {
+    return createMockEventWithAttributes(DataType.STRING);
   }
 
   public static enum Variant {
