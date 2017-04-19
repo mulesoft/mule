@@ -1960,7 +1960,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void deploysApplicationWithPluginDependingOnPlugin() throws Exception { //TODO lautaro este puede ser uno
+  public void deploysApplicationWithPluginDependingOnPlugin() throws Exception {
 
     ArtifactPluginFileBuilder dependantPlugin =
         new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
