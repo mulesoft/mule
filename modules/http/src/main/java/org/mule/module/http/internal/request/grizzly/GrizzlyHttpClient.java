@@ -24,7 +24,6 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManager;
-import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleUtils;
 import org.mule.config.i18n.CoreMessages;
@@ -104,6 +103,7 @@ public class GrizzlyHttpClient implements HttpClient
     private int maxConnections;
     private boolean usePersistentConnections;
     private int connectionIdleTimeout;
+    private int responseBufferSize;
     private String threadNamePrefix;
     private final Integer kernelCoreSize;
     private final Integer maxKernelCoreSize;
@@ -123,6 +123,7 @@ public class GrizzlyHttpClient implements HttpClient
         this.maxConnections = config.getMaxConnections();
         this.usePersistentConnections = config.isUsePersistentConnections();
         this.connectionIdleTimeout = config.getConnectionIdleTimeout();
+        this.responseBufferSize = config.getResponseBufferSize();
         this.threadNamePrefix = config.getThreadNamePrefix();
         this.ownerName = config.getOwnerName();
         this.kernelCoreSize = config.getKernelCoreSize();
@@ -274,7 +275,7 @@ public class GrizzlyHttpClient implements HttpClient
     {
         Request grizzlyRequest= createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
         PipedOutputStream outPipe = new PipedOutputStream();
-        PipedInputStream inPipe = new PipedInputStream(outPipe);
+        PipedInputStream inPipe = new PipedInputStream(outPipe, responseBufferSize);
         BodyDeferringAsyncHandler asyncHandler = new BodyDeferringAsyncHandler(outPipe);
         asyncHttpClient.executeRequest(grizzlyRequest, asyncHandler);
         try
@@ -311,7 +312,7 @@ public class GrizzlyHttpClient implements HttpClient
         {
             PipedOutputStream outPipe = new PipedOutputStream();
             asyncHttpClient.executeRequest(createGrizzlyRequest(request, responseTimeout, followRedirects, authentication),
-                                           new WorkManagerSourceBodyDeferringAsyncHandler(completionHandler, workManager, outPipe));
+                                           new WorkManagerBodyDeferringAsyncHandler(completionHandler, workManager, outPipe));
         }
         catch (Exception e)
         {
@@ -516,7 +517,7 @@ public class GrizzlyHttpClient implements HttpClient
         asyncHttpClient.close();
     }
 
-    private class WorkManagerSourceBodyDeferringAsyncHandler implements AsyncHandler<Response>, WorkManagerSource
+    private class WorkManagerBodyDeferringAsyncHandler implements AsyncHandler<Response>
     {
         private volatile Response response;
         private final OutputStream output;
@@ -526,12 +527,12 @@ public class GrizzlyHttpClient implements HttpClient
         private final Response.ResponseBuilder responseBuilder = new Response.ResponseBuilder();
         private final AtomicBoolean handled = new AtomicBoolean(false);
 
-        public WorkManagerSourceBodyDeferringAsyncHandler(CompletionHandler<HttpResponse, Exception> completionHandler, WorkManager workManager, PipedOutputStream output) throws IOException
+        public WorkManagerBodyDeferringAsyncHandler(CompletionHandler<HttpResponse, Exception> completionHandler, WorkManager workManager, PipedOutputStream output) throws IOException
         {
             this.output = output;
             this.workManager = workManager;
             this.completionHandler = completionHandler;
-            this.input = new PipedInputStream(output);
+            this.input = new PipedInputStream(output, responseBufferSize);
         }
 
         public void onThrowable(Throwable t)
@@ -591,12 +592,6 @@ public class GrizzlyHttpClient implements HttpClient
             return null;
         }
 
-        @Override
-        public WorkManager getWorkManager() throws MuleException
-        {
-            return workManager;
-        }
-
         private void handleIfNecessary()
         {
             if (!handled.getAndSet(true))
@@ -627,7 +622,7 @@ public class GrizzlyHttpClient implements HttpClient
     {
         Request grizzlyRequest = createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
         PipedOutputStream outPipe = new PipedOutputStream();
-        PipedInputStream inPipe = new PipedInputStream(outPipe);
+        PipedInputStream inPipe = new PipedInputStream(outPipe, responseBufferSize);
         BodyDeferringAsyncHandler asyncHandler = new BodyDeferringAsyncHandler(outPipe);
         asyncHttpClient.executeRequest(grizzlyRequest, asyncHandler);
         try

@@ -19,6 +19,7 @@ public class HttpClientConfiguration
     private final int maxConnections;
     private final boolean usePersistentConnections;
     private final int connectionIdleTimeout;
+    private final int responseBufferSize;
     private final String threadNamePrefix;
     private final String ownerName;
     private final Integer maxWorkerPoolSize;
@@ -28,7 +29,7 @@ public class HttpClientConfiguration
     private final Integer selectorRunnersCount;
 
     private HttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties,
-            int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix, String ownerName,
+            int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout, int responseBufferSize, String threadNamePrefix, String ownerName,
             Integer maxWorkerPoolSize, Integer workerCoreSize, Integer maxKernelPoolSize, Integer kernelCoreSize, Integer selectorRunnersCount)
     {
         this.tlsContextFactory = tlsContextFactory;
@@ -37,6 +38,7 @@ public class HttpClientConfiguration
         this.maxConnections = maxConnections;
         this.usePersistentConnections = usePersistentConnections;
         this.connectionIdleTimeout = connectionIdleTimeout;
+        this.responseBufferSize = responseBufferSize;
         this.threadNamePrefix = threadNamePrefix;
         this.ownerName = ownerName;
         this.maxWorkerPoolSize = maxWorkerPoolSize;
@@ -74,6 +76,10 @@ public class HttpClientConfiguration
     public int getConnectionIdleTimeout()
     {
         return connectionIdleTimeout;
+    }
+
+    public int getResponseBufferSize() {
+        return responseBufferSize;
     }
 
     public String getThreadNamePrefix()
@@ -119,6 +125,7 @@ public class HttpClientConfiguration
         private int maxConnections;
         private boolean usePersistentConnections;
         private int connectionIdleTimeout;
+        private int responseBufferSize;
         private String threadNamePrefix;
         private String ownerName;
         private Integer maxWorkerPoolSize;
@@ -160,6 +167,11 @@ public class HttpClientConfiguration
         public Builder setConnectionIdleTimeout(int connectionIdleTimeout)
         {
             this.connectionIdleTimeout = connectionIdleTimeout;
+            return this;
+        }
+
+        public Builder setResponseBufferSize(int responseBufferSize) {
+            this.responseBufferSize = responseBufferSize;
             return this;
         }
 
@@ -208,7 +220,7 @@ public class HttpClientConfiguration
         public HttpClientConfiguration build()
         {
             return new HttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
-                    usePersistentConnections, connectionIdleTimeout, threadNamePrefix, ownerName,
+                    usePersistentConnections, connectionIdleTimeout, responseBufferSize, threadNamePrefix, ownerName,
                     maxWorkerPoolSize, workerCoreSize, maxKernelPoolSize, kernelCoreSize, selectorRunnersCount);
         }
     }
