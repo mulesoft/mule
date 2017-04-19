@@ -445,7 +445,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   }
 
   protected Event createMockEventWithAttributes(DataType dataType) {
-    HashMap<String,String> attributes = new HashMap<>();
+    HashMap<String, String> attributes = new HashMap<>();
     attributes.put("one", "number 1");
     attributes.put("two", "number 2");
     return createMockEvent("foo", DataType.STRING, attributes, DataType.OBJECT);
