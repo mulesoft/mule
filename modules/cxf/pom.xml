@@ -13,6 +13,7 @@
 
     <properties>
         <skipExportTests>false</skipExportTests>
+        <activemq.version>5.9.0</activemq.version>
     </properties>
 
     <build>
@@ -823,5 +824,12 @@
             <artifactId>activemq-broker</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-all</artifactId>
+            <version>${activemq.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 </project>

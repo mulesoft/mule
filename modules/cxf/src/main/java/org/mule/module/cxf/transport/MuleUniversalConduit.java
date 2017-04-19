@@ -139,10 +139,13 @@ public class MuleUniversalConduit extends AbstractConduit
         {
             public void write(MuleEvent event, OutputStream out) throws IOException
             {
-                out.write(cache.toByteArray());
-                
-                delegating.setOutputStream(out);
-                
+                synchronized (delegating.getOutputStream())
+                {
+                    out.write(cache.toByteArray());
+
+                    delegating.setOutputStream(out);
+                }
+
                 // resume writing!
                 message.getInterceptorChain().doIntercept(message);
             }
