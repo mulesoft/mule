@@ -23,6 +23,7 @@ import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoader implements ApplicationClassLoader {
@@ -85,13 +86,19 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
       throw new MuleRuntimeException(e);
     }
 
-    return (List<ClassLoader>) artifactPluginClassLoaders.stream().map(acl -> {
-      try {
-        return acl.getClass().getMethod("getClassLoader").invoke(acl);
-      } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
-          | SecurityException e) {
-        throw new MuleRuntimeException(e);
-      }
-    }).collect(toList());
+    final List<ClassLoader> classLoaders =
+        new ArrayList<ClassLoader>((List<ClassLoader>) artifactPluginClassLoaders.stream().map(acl -> {
+          try {
+            return acl.getClass().getMethod("getClassLoader").invoke(acl);
+          } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+              | SecurityException e) {
+            throw new MuleRuntimeException(e);
+          }
+        }).collect(toList()));
+
+    // TODO MULE-12255 Don't add the context classlaoder, it won't be needed when the test namespace parser is in a plugin rather
+    // than in the app.
+    classLoaders.add(currentThread().getContextClassLoader());
+    return classLoaders;
   }
 }
