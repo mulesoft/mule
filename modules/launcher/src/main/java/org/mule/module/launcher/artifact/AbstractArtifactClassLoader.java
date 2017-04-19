@@ -61,6 +61,22 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
     @Override
     public void dispose()
     {
+
+        try
+        {
+            createResourceReleaserInstance().release();
+        }
+        catch (Exception e)
+        {
+            logger.error(e);
+        }
+
+        super.dispose();
+        shutdownListeners();
+    }
+
+    private void shutdownListeners ()
+    {
         for (ShutdownListener listener : shutdownListeners)
         {
             try
@@ -75,17 +91,6 @@ public abstract class AbstractArtifactClassLoader extends FineGrainedControlClas
 
         // Clean up references to shutdown listeners in order to avoid class loader leaks
         shutdownListeners.clear();
-
-        try
-        {
-            createResourceReleaserInstance().release();
-        }
-        catch (Exception e)
-        {
-            logger.error(e);
-        }
-
-        super.dispose();
     }
 
     public void setResourceReleaserClassLocation(String resourceReleaserClassLocation)
