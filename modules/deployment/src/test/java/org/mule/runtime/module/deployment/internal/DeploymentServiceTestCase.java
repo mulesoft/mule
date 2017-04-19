@@ -1701,16 +1701,16 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     String extensionName = "using-bye-extension";
     String moduleDestination = "org/mule/module/" + moduleFileName;
     MulePluginModelBuilder builder =
-      new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
+        new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
     builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
                                                                                                   moduleDestination);
     builder.withClassLoaderModelDescriber().addProperty(EXPORTED_PACKAGES, asList("org.foo")).setId(MAVEN);
     builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MAVEN));
 
     final ArtifactPluginFileBuilder usingByeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
-      .containingResource("module-using-byeSource.xml", moduleDestination)
-      .dependingOn(byeXmlExtensionPlugin)
-      .describedBy(builder.build());
+        .containingResource("module-using-byeSource.xml", moduleDestination)
+        .dependingOn(byeXmlExtensionPlugin)
+        .describedBy(builder.build());
 
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPluginWithXmlDependencies")
         .definedBy("app-with-extension-xml-plugin-module-using-bye.xml")

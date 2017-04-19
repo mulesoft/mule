@@ -189,11 +189,12 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
                                                                    artifactPluginDescriptor, applicationClassLoader
                                                                        .getArtifactPluginClassLoaders().stream()
                                                                        .filter(artifactClassLoader -> {
-                                                                         final String artifactPluginDescriptorName = PLUGIN_CLASSLOADER_IDENTIFIER
-                                                                           + artifactPluginDescriptor.getName();
+                                                                         final String artifactPluginDescriptorName =
+                                                                             PLUGIN_CLASSLOADER_IDENTIFIER
+                                                                                 + artifactPluginDescriptor.getName();
                                                                          return artifactClassLoader
-                                                                           .getArtifactId()
-                                                                           .endsWith(artifactPluginDescriptorName);
+                                                                             .getArtifactId()
+                                                                             .endsWith(artifactPluginDescriptorName);
                                                                        })
                                                                        .findFirst().get()))
         .collect(toList());
