@@ -13,15 +13,15 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 
-import java.io.InputStream;
-import java.util.List;
-import java.util.Set;
-
 import org.springframework.beans.factory.xml.DocumentLoader;
 import org.w3c.dom.Document;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
+
+import java.io.InputStream;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Loads a mule configuration file into a {@link Document} object.
@@ -141,9 +141,10 @@ public class XmlConfigurationDocumentLoader {
     if (!errors.isEmpty()) {
       final String subMessage = format(errors.size() == 1 ? "was '%s' error" : "were '%s' errors", errors.size());
       final StringBuilder sb =
-          new StringBuilder("There " + subMessage + " while parsing the given file" + (filename.isEmpty() ? "." : " '%s'."));
+          new StringBuilder("There " + subMessage + " while parsing the given file"
+              + (filename.isEmpty() ? "." : " '" + filename + "'."));
       sb.append(lineSeparator()).append("Full list:");
-      errors.stream().forEach(error -> sb.append(lineSeparator()).append(error));
+      errors.forEach(error -> sb.append(lineSeparator()).append(error));
       sb.append(lineSeparator());
       throw new MuleRuntimeException(createStaticMessage(sb.toString()));
     }
