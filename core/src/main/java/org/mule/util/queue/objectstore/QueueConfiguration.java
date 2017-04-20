@@ -59,7 +59,7 @@ public class QueueConfiguration implements org.mule.util.queue.QueueConfiguratio
             return false;
         }
         QueueConfiguration other = (QueueConfiguration) obj;
-        return capacity == other.capacity && objectStore.equals(other);
+        return capacity == other.capacity && objectStore.equals(other.objectStore);
     }
 
     public boolean isPersistent()
