@@ -38,7 +38,9 @@ public class ModuleWithGlobalElementTestCase extends AbstractModuleWithHttpTestC
             new String[] {MODULE_GLOBAL_ELEMENT_XML, MODULE_GLOBAL_ELEMENT_PROXY_XML}},
         //nested^2 modules scenario
         {"flows/nested/flows-using-module-global-elements-another-proxy.xml",
-            new String[] {MODULE_GLOBAL_ELEMENT_XML, MODULE_GLOBAL_ELEMENT_PROXY_XML, MODULE_GLOBAL_ELEMENT_ANOTHER_PROXY_XML}}
+            new String[] {MODULE_GLOBAL_ELEMENT_XML, MODULE_GLOBAL_ELEMENT_PROXY_XML, MODULE_GLOBAL_ELEMENT_ANOTHER_PROXY_XML}},
+        //using literals and expressions that will be resolved accordingly scenario
+        {"flows/flows-using-module-global-elements-with-expressions.xml", new String[] {MODULE_GLOBAL_ELEMENT_XML}}
     });
   }
 
