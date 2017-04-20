@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="outConfig" host="localhost" port="${httpPort}" />
+    <http:request-config name="inConfig" host="localhost" port="${port}" />
+    <http:listener-config name="listenerConfig" host="localhost" port="${port}" />
+
+    <flow name="outboundProperties">
+        <http:request config-ref="outConfig" path="testPath" method="POST"/>
+    </flow>
+
+    <flow name="inboundProperties">
+        <http:request config-ref="inConfig" path="test" method="GET"/>
+    </flow>
+
+    <flow name="test">
+        <http:listener config-ref="listenerConfig" path="test">
+            <http:response-builder>
+                <http:header headerName="header" value="customValue1"/>
+                <http:header headerName="header" value="customValue2"/>
+            </http:response-builder>
+        </http:listener>
+        <set-payload value="done"/>
+    </flow>
+
+</mule>
