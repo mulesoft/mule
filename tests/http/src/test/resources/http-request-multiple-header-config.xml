@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:request-config name="outConfig">
+        <httpn:request-connection host="localhost" port="${httpPort}" />
+    </httpn:request-config>
+    <httpn:request-config name="inConfig">
+        <httpn:request-connection host="localhost" port="${port}" />
+    </httpn:request-config>
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port}" />
+    </httpn:listener-config>
+
+    <flow name="out">
+        <httpn:request config-ref="outConfig" path="testPath" method="POST">
+            <httpn:headers>#[{'multipleHeader':'1', 'multipleHeader':'2', 'multipleHeader':'3'}]</httpn:headers>
+        </httpn:request>
+    </flow>
+
+    <flow name="in">
+        <httpn:request config-ref="inConfig" path="test" method="GET"/>
+    </flow>
+
+    <flow name="test">
+        <httpn:listener config-ref="listenerConfig" path="test">
+            <httpn:response>
+                <httpn:headers>#[{'multipleHeader':'1', 'multipleHeader':'2', 'multipleHeader':'3'}]</httpn:headers>
+            </httpn:response>
+        </httpn:listener>
+        <set-payload value="done"/>
+    </flow>
+
+</mule>
