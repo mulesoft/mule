@@ -71,6 +71,7 @@ public class Repository {
   private static final String USER_HOME = "user.home";
   private static final String M2_REPO = "/.m2/repository";
   public static final String MULE_SERVICE = "mule-service";
+  private static final String MAVEN_REPO_LOCAL = "maven.repo.local";
   private static String userHome = getProperty(USER_HOME);
   private static final String MAVEN_REPOSITORY_FOLDER = userHome + M2_REPO;
 
@@ -98,7 +99,7 @@ public class Repository {
     session.setOffline(repositories.isEmpty());
     session.setIgnoreArtifactDescriptorRepositories(true);
 
-    File mavenLocalRepositoryLocation = new File(MAVEN_REPOSITORY_FOLDER);
+    File mavenLocalRepositoryLocation = new File(getProperty(MAVEN_REPO_LOCAL, MAVEN_REPOSITORY_FOLDER));
     system = newRepositorySystem(mavenLocalRepositoryLocation, session);
   }
 
