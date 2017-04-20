@@ -6,10 +6,10 @@
  */
 package org.mule.services.http.impl.service.server;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.services.http.impl.service.server.grizzly.DefaultMethodRequestMatcher.getMethodsListRepresentation;
 import static org.mule.services.http.impl.service.server.grizzly.HttpParser.normalizePathWithSpacesOrEncodedSpaces;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
@@ -96,8 +96,8 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
                                                                 final RequestHandler requestHandler) {
       pathMapSearchCache.invalidateAll();
       String requestMatcherPath = normalizePathWithSpacesOrEncodedSpaces(requestMatcher.getPath());
-      Preconditions.checkArgument(requestMatcherPath.startsWith(SLASH) || requestMatcherPath.equals(WILDCARD_CHARACTER),
-                                  "path parameter must start with /");
+      checkArgument(requestMatcherPath.startsWith(SLASH) || requestMatcherPath.equals(WILDCARD_CHARACTER),
+                    "path parameter must start with /");
       validateCollision(requestMatcher);
       List<String> matcherMethods = requestMatcher.getMethodRequestMatcher().getMethods();
       paths.add(getMethodAndPath(getMethodsListRepresentation(matcherMethods), requestMatcherPath));
@@ -181,7 +181,7 @@ public class HttpListenerRegistry implements RequestHandlerProvider {
 
     public RequestHandler findRequestHandler(final HttpRequest request) {
       final String path = normalizePathWithSpacesOrEncodedSpaces(request.getPath());
-      Preconditions.checkArgument(path.startsWith(SLASH), "path parameter must start with /");
+      checkArgument(path.startsWith(SLASH), "path parameter must start with /");
       Stack<PathMap> foundPaths = findPossibleRequestHandlersFromCache(path);
       boolean methodNotAllowed = false;
       RequestHandlerMatcherPair requestHandlerMatcherPair = null;

@@ -11,6 +11,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -224,5 +225,11 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     } catch (InitialisationException e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  @Override
+  public void start() throws MuleException {
+    super.start();
+    startIfNeeded(connectionProviderResolver);
   }
 }

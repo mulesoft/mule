@@ -92,7 +92,7 @@ public class HeisenbergSource extends Source<String, Attributes> {
   @OnError
   public void onError(Error error, @Optional String sameNameParameter, @Optional Methylamine methylamine,
                       @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin) {
-    receivedGroupOnSource = ricin != null && ricin.getNextDoor().getAddress() != null;
+    receivedGroupOnSource = ricin != null && ricin.getNextDoor() != null && ricin.getNextDoor().getAddress() != null;
     heisenberg.setMoney(BigDecimal.valueOf(-1));
   }
 

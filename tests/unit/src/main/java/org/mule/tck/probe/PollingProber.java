@@ -6,7 +6,7 @@
  */
 package org.mule.tck.probe;
 
-import java.util.function.BooleanSupplier;
+import org.mule.runtime.core.util.func.CheckedSupplier;
 
 public class PollingProber implements Prober {
 
@@ -16,7 +16,7 @@ public class PollingProber implements Prober {
   private final long timeoutMillis;
   private final long pollDelayMillis;
 
-  public static void check(long timeoutMillis, long pollDelayMillis, BooleanSupplier probe) {
+  public static void check(long timeoutMillis, long pollDelayMillis, CheckedSupplier<Boolean> probe) {
     new PollingProber(timeoutMillis, pollDelayMillis).check(new JUnitLambdaProbe(probe));
   }
 

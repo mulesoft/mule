@@ -6,15 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
-import static com.google.common.collect.ImmutableList.copyOf;
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
-
+import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
+import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.Config;
-
-import com.google.common.collect.ImmutableList;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -30,16 +28,18 @@ public interface ParameterizableTypeElement extends Type, WithParameters {
    * {@inheritDoc}
    */
   default List<ExtensionParameter> getParameters() {
-    return ImmutableList.<ExtensionParameter>builder().addAll(getAnnotatedFields(Parameter.class))
-        .addAll(getAnnotatedFields(ParameterGroup.class)).addAll(getAnnotatedFields(Connection.class))
-        .addAll(getAnnotatedFields(Config.class)).build();
+    return unmodifiableList(getAnnotatedFields(Parameter.class,
+                                               OAuthParameter.class,
+                                               ParameterGroup.class,
+                                               Connection.class,
+                                               Config.class));
   }
 
   /**
    * {@inheritDoc}
    */
   default List<ExtensionParameter> getParameterGroups() {
-    return copyOf(getAnnotatedFields(ParameterGroup.class));
+    return unmodifiableList(getAnnotatedFields(ParameterGroup.class));
   }
 
   /**

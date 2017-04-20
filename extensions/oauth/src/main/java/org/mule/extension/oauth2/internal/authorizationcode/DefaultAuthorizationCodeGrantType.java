@@ -18,7 +18,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.util.store.ObjectStoreToMapAdapter;
+import org.mule.runtime.core.util.store.SimpleObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -171,7 +171,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
   private OAuthAuthorizationCodeDancerBuilder configDancer(OAuthService oauthService) throws InitialisationException {
     OAuthAuthorizationCodeDancerBuilder dancerBuilder =
         oauthService.authorizationCodeGrantTypeDancerBuilder(lockId -> muleContext.getLockFactory().createLock(lockId),
-                                                             new ObjectStoreToMapAdapter(tokenManager.getObjectStore()),
+                                                             new SimpleObjectStoreToMapAdapter(tokenManager.getObjectStore()),
                                                              muleContext.getExpressionManager());
     try {
       if (localCallbackConfig != null && localCallbackUrl != null) {

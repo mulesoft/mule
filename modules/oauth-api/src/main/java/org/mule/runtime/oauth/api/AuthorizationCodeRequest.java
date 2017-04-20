@@ -47,7 +47,7 @@ public interface AuthorizationCodeRequest {
 
   /**
    * @return state kept between the authentication request and the callback done by the OAuth authorization server to the external
-   *         callback url..
+   *         callback url.
    */
   Optional<String> getState();
 }

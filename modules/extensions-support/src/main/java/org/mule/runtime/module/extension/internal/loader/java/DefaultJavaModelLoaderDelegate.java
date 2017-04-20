@@ -37,7 +37,7 @@ import org.mule.runtime.module.extension.internal.loader.java.contributor.Parame
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterTypeUnwrapperContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.LiteralModelProperty;
+import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterResolverTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.TypedValueTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;

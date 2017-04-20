@@ -16,7 +16,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.util.store.ObjectStoreToMapAdapter;
+import org.mule.runtime.core.util.store.SimpleObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -51,7 +51,7 @@ public class ClientCredentialsGrantType extends AbstractGrantType {
 
       OAuthClientCredentialsDancerBuilder dancerBuilder =
           oauthService.clientCredentialsGrantTypeDancerBuilder(lockId -> muleContext.getLockFactory().createLock(lockId),
-                                                               new ObjectStoreToMapAdapter(tokenManager.getObjectStore()),
+                                                               new SimpleObjectStoreToMapAdapter(tokenManager.getObjectStore()),
                                                                muleContext.getExpressionManager());
       dancerBuilder.encodeClientCredentialsInBody(encodeClientCredentialsInBody);
       dancerBuilder.clientCredentials(getClientId(), getClientSecret());

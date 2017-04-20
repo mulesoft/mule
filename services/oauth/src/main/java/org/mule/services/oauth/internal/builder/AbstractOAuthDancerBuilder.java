@@ -76,34 +76,33 @@ public abstract class AbstractOAuthDancerBuilder<D> implements OAuthDancerBuilde
 
   @Override
   public OAuthDancerBuilder tokenUrl(HttpClient httpClient, String tokenUrl) {
-    this.httpClientFactory = () -> {
-      return new HttpClient() {
+    this.httpClientFactory = () -> new HttpClient() {
 
-        @Override
-        public void stop() {
-          // Nothing to do. The lifecycle of this object is handled by whoever passed me the client.
-        }
+      @Override
+      public void stop() {
+        // Nothing to do. The lifecycle of this object is handled by whoever passed me the client.
+      }
 
-        @Override
-        public void start() {
-          // Nothing to do. The lifecycle of this object is handled by whoever passed me the client.
-        }
+      @Override
+      public void start() {
+        // Nothing to do. The lifecycle of this object is handled by whoever passed me the client.
+      }
 
-        @Override
-        public void send(HttpRequest request, int responseTimeout, boolean followRedirects,
-                         HttpRequestAuthentication authentication,
-                         ResponseHandler handler) {
-          httpClient.send(request, responseTimeout, followRedirects, authentication, handler);
-        }
+      @Override
+      public void send(HttpRequest request, int responseTimeout, boolean followRedirects,
+                       HttpRequestAuthentication authentication,
+                       ResponseHandler handler) {
+        httpClient.send(request, responseTimeout, followRedirects, authentication, handler);
+      }
 
-        @Override
-        public HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects,
-                                 HttpRequestAuthentication authentication)
-            throws IOException, TimeoutException {
-          return httpClient.send(request, responseTimeout, followRedirects, authentication);
-        }
-      };
+      @Override
+      public HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects,
+                               HttpRequestAuthentication authentication)
+          throws IOException, TimeoutException {
+        return httpClient.send(request, responseTimeout, followRedirects, authentication);
+      }
     };
+
     this.tokenUrl = tokenUrl;
     return this;
   }

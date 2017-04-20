@@ -26,9 +26,7 @@ import javax.inject.Inject;
  * @param <T>
  * @since 4.0
  */
-public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolver<TypedValue<T>> implements Initialisable
-
-{
+public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolver<TypedValue<T>> implements Initialisable {
 
   private final Class<T> expectedClass;
   private TypeSafeTransformer typeSafeTransformer;

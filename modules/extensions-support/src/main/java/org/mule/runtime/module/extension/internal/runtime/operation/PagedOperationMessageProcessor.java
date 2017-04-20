@@ -37,7 +37,7 @@ import reactor.core.publisher.Mono;
  */
 public class PagedOperationMessageProcessor extends OperationMessageProcessor {
 
-  private final ExtensionConnectionSupplier connectionAdapter;
+  private final ExtensionConnectionSupplier connectionSupplier;
 
   public PagedOperationMessageProcessor(ExtensionModel extensionModel,
                                         OperationModel operationModel,
@@ -47,14 +47,14 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
                                         CursorProviderFactory cursorProviderFactory,
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
-                                        ExtensionConnectionSupplier connectionAdapter) {
+                                        ExtensionConnectionSupplier connectionSupplier) {
     super(extensionModel, operationModel, configurationProvider, target, resolverSet, cursorProviderFactory,
           extensionManager, policyManager);
-    this.connectionAdapter = connectionAdapter;
+    this.connectionSupplier = connectionSupplier;
   }
 
   @Override
-  protected Mono<Event> doProcess(Event event, ExecutionContextAdapter operationContext) {
+  protected Mono<Event> doProcess(Event event, ExecutionContextAdapter<OperationModel> operationContext) {
     try {
       Event resultEvent = super.doProcess(event, operationContext).block();
       PagingProvider<?, ?> pagingProvider = getTarget()
@@ -67,7 +67,7 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
 
       Producer<?> producer =
           new PagingProviderProducer(pagingProvider, (ConfigurationInstance) operationContext.getConfiguration().get(),
-                                     operationContext, connectionAdapter);
+                                     operationContext, connectionSupplier);
       Consumer<?> consumer = new ListConsumer(producer);
 
       return just(returnDelegate.asReturnValue(new ConsumerStreamingIterator<>(consumer), operationContext));

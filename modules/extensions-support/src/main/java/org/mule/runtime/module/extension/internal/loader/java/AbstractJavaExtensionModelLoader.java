@@ -27,6 +27,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescr
 import org.mule.runtime.module.extension.internal.loader.enricher.ImportedTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaConfigurationDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaExportedTypesDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.JavaOAuthDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaXmlDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterLayoutOrderDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
@@ -74,6 +75,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new ImportedTypesDeclarationEnricher(),
                                                                                                new JavaConfigurationDeclarationEnricher(),
                                                                                                new JavaExportedTypesDeclarationEnricher(),
+                                                                                               new JavaOAuthDeclarationEnricher(),
                                                                                                new SubTypesDeclarationEnricher(),
                                                                                                new ExtensionDescriptionsEnricher(),
                                                                                                new ParameterLayoutOrderDeclarationEnricher()));

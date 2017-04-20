@@ -142,7 +142,8 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
         Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
 
         OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent) -> {
-          ExecutionContextAdapter operationContext = createExecutionContext(configuration, parameters, operationEvent);
+          ExecutionContextAdapter<OperationModel> operationContext =
+              createExecutionContext(configuration, parameters, operationEvent);
           return doProcess(operationEvent, operationContext).block();
         };
 
@@ -159,7 +160,8 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     return from(publisher).flatMap(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
       Optional<ConfigurationInstance> configuration = getConfiguration(event);
       Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
-      ExecutionContextAdapter operationContext = createExecutionContext(configuration, operationParameters, event);
+      ExecutionContextAdapter<OperationModel> operationContext =
+          createExecutionContext(configuration, operationParameters, event);
 
       // TODO: MULE-11184 - it shouldn't be necessary to create the MessagingException here.
       return doProcess(event, operationContext).mapError(e -> !(e instanceof MessagingException),
@@ -169,7 +171,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     })));
   }
 
-  protected Mono<Event> doProcess(Event event, ExecutionContextAdapter operationContext) {
+  protected Mono<Event> doProcess(Event event, ExecutionContextAdapter<OperationModel> operationContext) {
     return executeOperation(operationContext)
         .map(value -> returnDelegate.asReturnValue(value, operationContext))
         .otherwiseIfEmpty(fromCallable(() -> returnDelegate.asReturnValue(null, operationContext)))

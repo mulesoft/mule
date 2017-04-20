@@ -15,9 +15,12 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthManager;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
@@ -34,20 +37,24 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
 
   private final ConnectionProviderModel providerModel;
   private final ExtensionModel extensionModel;
+  private final ExtensionsOAuthManager oauthManager;
 
   private PoolingProfile poolingProfile = null;
   private RetryPolicyTemplate retryPolicyTemplate = null;
   private boolean disableValidation = false;
-  private ResolverSet resolverSet;
 
   @Inject
   private MuleContext muleContext;
 
-  public ConnectionProviderObjectFactory(ConnectionProviderModel providerModel, MuleContext muleContext,
-                                         ExtensionModel extensionModel) {
+
+  public ConnectionProviderObjectFactory(ConnectionProviderModel providerModel,
+                                         ExtensionModel extensionModel,
+                                         ExtensionsOAuthManager oauthManager,
+                                         MuleContext muleContext) {
     super(muleContext);
     this.providerModel = providerModel;
     this.extensionModel = extensionModel;
+    this.oauthManager = oauthManager;
   }
 
   @Override
@@ -61,6 +68,11 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
                                                         disableValidation, retryPolicyTemplate,
                                                         connectionManager, extensionModel,
                                                         muleContext);
+    } else if (providerModel.getModelProperty(OAuthModelProperty.class).isPresent()) {
+      builder = new OAuthConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
+                                                         disableValidation, retryPolicyTemplate,
+                                                         oauthManager, connectionManager, extensionModel,
+                                                         muleContext);
     } else {
       builder = new DefaultConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
                                                            disableValidation, retryPolicyTemplate,

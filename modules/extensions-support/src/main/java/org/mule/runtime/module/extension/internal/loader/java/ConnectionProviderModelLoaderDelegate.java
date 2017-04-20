@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
@@ -17,6 +18,9 @@ import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConnectionProviderDeclarer;
+import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
+import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
@@ -91,9 +95,24 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
       managementType = CACHED;
     }
 
+    parseOAuthGrantType(providerType, providerDeclarer);
+
     providerDeclarer.withConnectionManagementType(managementType);
     connectionProviderDeclarers.put(providerClass, providerDeclarer);
     ParameterDeclarationContext context = new ParameterDeclarationContext(CONNECTION_PROVIDER, providerDeclarer.getDeclaration());
     loader.getFieldParametersLoader().declare(providerDeclarer, providerType.getParameters(), context);
+  }
+
+  private void parseOAuthGrantType(ConnectionProviderElement providerType, ConnectionProviderDeclarer providerDeclarer) {
+    providerType.getAnnotation(AuthorizationCode.class).ifPresent(a -> {
+      AuthorizationCodeGrantType grantType = new AuthorizationCodeGrantType(a.accessTokenUrl(),
+                                                                            a.authorizationUrl(),
+                                                                            a.accessTokenExpr(),
+                                                                            a.expirationRegex(),
+                                                                            a.refreshTokenExpr(),
+                                                                            a.defaultScopes());
+
+      providerDeclarer.withModelProperty(new OAuthModelProperty(asList(grantType)));
+    });
   }
 }

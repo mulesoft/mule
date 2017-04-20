@@ -158,6 +158,7 @@ public class MuleProperties {
   public static final String OBJECT_CLUSTER_CONFIGURATION = "_muleClusterConfiguration";
   public static final String OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR = "_muleConnectorMessageProcessorLocator";
   public static final String OBJECT_EXTENSION_MANAGER = "_muleExtensionManager";
+  public static final String OBJECT_EXTENSION_OAUTH_MANAGER = "extensions.oauth.manager";
   public static final String OBJECT_TIME_SUPPLIER = "_muleTimeSupplier";
   public static final String OBJECT_CONNECTION_MANAGER = "_muleConnectionManager";
   public static final String OBJECT_METADATA_SERVICE = "_muleMetadataService";

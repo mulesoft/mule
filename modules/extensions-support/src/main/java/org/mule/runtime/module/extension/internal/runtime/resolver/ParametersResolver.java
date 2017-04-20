@@ -116,14 +116,12 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     ResolverSet resolverSet =
         getParametersAsResolverSet(model, getFlatParameters(inlineGroups, model.getAllParameterModels()), muleContext);
     for (ParameterGroupModel group : inlineGroups) {
-      String containerName = getContainerName(group.getModelProperty(ParameterGroupModelProperty.class)
-          .map(mp -> mp.getDescriptor().getContainer())
-          .orElseThrow(() -> new IllegalArgumentException(
-                                                          format("Missing ParameterGroup information for group '%s'",
-                                                                 group.getName()))));
+      String groupKey = group.getModelProperty(ParameterGroupModelProperty.class)
+          .map(mp -> getContainerName(mp.getDescriptor().getContainer()))
+          .orElseGet(() -> group.getName());
 
-      if (parameters.containsKey(containerName)) {
-        resolverSet.add(containerName, toValueResolver(parameters.get(containerName), group.getModelProperties()));
+      if (parameters.containsKey(groupKey)) {
+        resolverSet.add(groupKey, toValueResolver(parameters.get(groupKey), group.getModelProperties()));
       }
     }
     return resolverSet;

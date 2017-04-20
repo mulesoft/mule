@@ -44,6 +44,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -55,6 +57,7 @@ import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -151,6 +154,29 @@ public class MuleExtensionUtils {
                                                                         ConfigurationModel configurationModel) {
     return ImmutableList.<ConnectionProviderModel>builder().addAll(configurationModel.getConnectionProviders())
         .addAll(extensionModel.getConnectionProviders()).build();
+  }
+
+  /**
+   * Whether at least one {@link ConnectionProviderModel} in the given {@cod extensionModel}
+   * supports OAuth authentication
+   *
+   * @param extensionModel a {@link ExtensionModel}
+   * @return {@code true} if a {@link ConnectionProviderModel} exist which is OAuth enabled
+   */
+  public static boolean supportsOAuth(ExtensionModel extensionModel) {
+    Reference<ConnectionProviderModel> connectionProvider = new Reference<>();
+    new IdempotentExtensionWalker() {
+
+      @Override
+      protected void onConnectionProvider(ConnectionProviderModel model) {
+        if (model.getModelProperty(OAuthModelProperty.class).isPresent()) {
+          connectionProvider.set(model);
+          stop();
+        }
+      }
+    }.walk(extensionModel);
+
+    return connectionProvider.get() != null;
   }
 
   /**

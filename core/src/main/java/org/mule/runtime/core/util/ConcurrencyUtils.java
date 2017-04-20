@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
+import org.mule.runtime.core.util.func.CheckedRunnable;
 import org.mule.runtime.core.util.func.CheckedSupplier;
 
 import java.util.concurrent.locks.Lock;
@@ -43,6 +44,22 @@ public class ConcurrencyUtils {
     lock.lock();
     try {
       return supplier.get();
+    } finally {
+      safeUnlock(lock);
+    }
+  }
+
+  /**
+   * Execute the given {@code delegate} between the boundaries of
+   * the given {@code lock}. It guarantees that the lock is released
+   *
+   * @param lock     a {@link Lock}
+   * @param delegate a {@link CheckedRunnable}
+   */
+  public static void withLock(Lock lock, CheckedRunnable delegate) {
+    lock.lock();
+    try {
+      delegate.run();
     } finally {
       safeUnlock(lock);
     }

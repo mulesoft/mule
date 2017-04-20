@@ -23,10 +23,10 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
   List<FieldElement> getFields();
 
   /**
-   * @param annotation class that the fields of this type should be annoted with
+   * @param annotations classes that the fields of this type should be annotated with
    * @return A list of {@link FieldElement} that represent the list of {@link Field} that the {@link Type} declares and are
    *         annotated with the given annotation
    */
-  List<FieldElement> getAnnotatedFields(Class<? extends Annotation> annotation);
+  List<FieldElement> getAnnotatedFields(Class<? extends Annotation>... annotations);
 
 }

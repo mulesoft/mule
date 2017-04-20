@@ -38,7 +38,7 @@ public final class ImportedTypesDeclarationEnricher extends AbstractAnnotatedDec
     ExtensionDeclarer descriptor = extensionLoadingContext.getExtensionDeclarer();
     ExtensionDeclaration extensionDeclaration = descriptor.getDeclaration();
 
-    final Optional<ImplementingTypeModelProperty> implementingType = extractExtensionType(extensionDeclaration);
+    final Optional<ImplementingTypeModelProperty> implementingType = extractImplementingTypeProperty(extensionDeclaration);
     if (!implementingType.isPresent()) {
       return;
     }

@@ -26,6 +26,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.internal.loader.validator.ParameterModelValidator;
@@ -80,6 +81,7 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
     when(validParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
     when(validParameterModel.getModelProperty(QNameModelProperty.class)).thenReturn(Optional.empty());
     when(validParameterModel.getModelProperty(InfrastructureParameterModelProperty.class)).thenReturn(Optional.empty());
+    when(validParameterModel.getModelProperty(OAuthParameterModelProperty.class)).thenReturn(Optional.empty());
     when(validParameterModel.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(validParameterModel.getRole()).thenReturn(BEHAVIOUR);
     when(validParameterModel.getLayoutModel()).thenReturn(Optional.empty());
@@ -87,6 +89,7 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
     when(invalidParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
     when(invalidParameterModel.getModelProperty(QNameModelProperty.class)).thenReturn(Optional.empty());
     when(invalidParameterModel.getModelProperty(InfrastructureParameterModelProperty.class)).thenReturn(Optional.empty());
+    when(invalidParameterModel.getModelProperty(OAuthParameterModelProperty.class)).thenReturn(Optional.empty());
     when(invalidParameterModel.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(invalidParameterModel.getRole()).thenReturn(BEHAVIOUR);
     when(invalidParameterModel.getLayoutModel()).thenReturn(Optional.empty());

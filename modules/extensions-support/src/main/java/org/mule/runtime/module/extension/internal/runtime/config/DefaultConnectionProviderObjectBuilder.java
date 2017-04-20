@@ -29,7 +29,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
  *
  * @since 4.0
  */
-public final class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProviderObjectBuilder<C> {
+public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProviderObjectBuilder<C> {
 
   DefaultConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
                                          ConnectionManagerAdapter connectionManager,
@@ -47,18 +47,33 @@ public final class DefaultConnectionProviderObjectBuilder<C> extends ConnectionP
   }
 
   @Override
-  public ConnectionProvider<C> build(ResolverSetResult result) throws MuleException {
+  public final ConnectionProvider<C> build(ResolverSetResult result) throws MuleException {
+    ConnectionProvider<C> provider = doBuild(result);
+
+    provider = applyConnectionManagement(provider);
+    provider = applyErrorHandling(provider);
+    return provider;
+  }
+
+  protected ConnectionProvider<C> doBuild(ResolverSetResult result) throws MuleException {
     ConnectionProvider<C> provider = super.build(result);
     injectConfigName(providerModel, provider, ownerConfigName);
 
+    return provider;
+  }
+
+  private ConnectionProvider<C> applyErrorHandling(ConnectionProvider<C> provider) {
+    provider = new ErrorTypeHandlerConnectionProviderWrapper<>(provider, muleContext, extensionModel, retryPolicyTemplate);
+    return provider;
+  }
+
+  private ConnectionProvider<C> applyConnectionManagement(ConnectionProvider<C> provider) {
     final ConnectionManagementType connectionManagementType = providerModel.getConnectionManagementType();
     if (connectionManagementType == POOLING) {
       provider = new PoolingConnectionProviderWrapper<>(provider, poolingProfile, disableValidation, retryPolicyTemplate);
     } else {
       provider = new ReconnectableConnectionProviderWrapper<>(provider, disableValidation, retryPolicyTemplate);
     }
-
-    provider = new ErrorTypeHandlerConnectionProviderWrapper<>(provider, muleContext, extensionModel, retryPolicyTemplate);
     return provider;
   }
 

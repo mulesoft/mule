@@ -62,7 +62,7 @@ public class DynamicMetadataDeclarationEnricher extends AbstractAnnotatedDeclara
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
     Optional<ImplementingTypeModelProperty> implementingType =
-        extractExtensionType(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
+        extractImplementingTypeProperty(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
     if (implementingType.isPresent()) {
       extensionType = implementingType.get().getType();
       typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(currentThread().getContextClassLoader());

@@ -88,22 +88,6 @@ public class IMAPOperations {
   }
 
   /**
-   * Marks a single email as READ changing it's state in the specified mailbox folder.
-   * <p>
-   * This operation can targets a single email.
-   *
-   * @param connection The corresponding {@link MailboxConnection} instance.
-   * @param mailboxFolder Folder where the emails are going to be marked as read
-   * @param emailId Email ID Number of the email to mark as read.
-   */
-  @Throws(EmailMarkingErrorTypeProvider.class)
-  public void markAsRead(@Connection MailboxConnection connection,
-                         @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
-                         @Summary("Email ID Number of the email to mark as read") @DisplayName("Email ID") long emailId) {
-    setFlagCommand.setByUID(connection, mailboxFolder, SEEN, emailId);
-  }
-
-  /**
    * Marks an incoming email as DELETED, this way the marked email(s) are scheduled for deletion when the folder closes, this
    * means that the email is not physically eliminated from the mailbox folder, but it's state changes.
    * <p>
@@ -122,6 +106,22 @@ public class IMAPOperations {
                             @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
                             @Summary("Email ID Number of the email to mark as deleted") @DisplayName("Email ID") long emailId) {
     setFlagCommand.setByUID(connection, mailboxFolder, DELETED, emailId);
+  }
+
+  /**
+   * Marks a single email as READ changing it's state in the specified mailbox folder.
+   * <p>
+   * This operation can targets a single email.
+   *
+   * @param connection The corresponding {@link MailboxConnection} instance.
+   * @param mailboxFolder Folder where the emails are going to be marked as read
+   * @param emailId Email ID Number of the email to mark as read.
+   */
+  @Throws(EmailMarkingErrorTypeProvider.class)
+  public void markAsRead(@Connection MailboxConnection connection,
+                         @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
+                         @Summary("Email ID Number of the email to mark as read") @DisplayName("Email ID") long emailId) {
+    setFlagCommand.setByUID(connection, mailboxFolder, SEEN, emailId);
   }
 
   /**

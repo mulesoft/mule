@@ -11,6 +11,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -24,6 +25,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
@@ -39,6 +41,7 @@ public final class OperationMessageProcessorBuilder {
   private final PolicyManager policyManager;
   private final MuleContext muleContext;
   private final ExtensionConnectionSupplier extensionConnectionSupplier;
+  private final ExtensionsOAuthManager oauthManager;
 
   private ConfigurationProvider configurationProvider;
   private Map<String, ?> parameters;
@@ -59,10 +62,15 @@ public final class OperationMessageProcessorBuilder {
     this.operationModel = operationModel;
     this.policyManager = policyManager;
     this.muleContext = muleContext;
+    extensionConnectionSupplier = lookup(ExtensionConnectionSupplier.class);
+    oauthManager = lookup(ExtensionsOAuthManager.class);
+  }
+
+  private <T> T lookup(Class<T> type) {
     try {
-      extensionConnectionSupplier = muleContext.getRegistry().lookupObject(ExtensionConnectionSupplier.class);
+      return muleContext.getRegistry().lookupObject(type);
     } catch (RegistrationException e) {
-      throw new MuleRuntimeException(createStaticMessage(ExtensionConnectionSupplier.class.getName() + " Not Found"), e);
+      throw new MuleRuntimeException(createStaticMessage(type.getName() + " Not Found"), e);
     }
   }
 
@@ -111,6 +119,11 @@ public final class OperationMessageProcessorBuilder {
               new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
                                                  cursorProviderFactory, extensionManager, policyManager,
                                                  extensionConnectionSupplier);
+        } else if (supportsOAuth(extensionModel)) {
+          processor =
+              new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
+                                                 cursorProviderFactory, extensionManager, policyManager,
+                                                 oauthManager);
         } else {
           processor = new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
                                                     cursorProviderFactory, extensionManager, policyManager);

@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 
 public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDancerBuilder<AuthorizationCodeOAuthDancer>
@@ -53,7 +54,7 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
   private String state;
   private String authorizationUrl;
 
-  private Map<String, String> customParameters = emptyMap();
+  private Supplier<Map<String, String>> customParameters = () -> emptyMap();
 
   private Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> beforeDanceCallback = r -> null;
   private BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterDanceCallback = (vars, ctx) -> {
@@ -86,7 +87,7 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
 
   @Override
   public OAuthAuthorizationCodeDancerBuilder localCallback(URL localCallbackUrl, TlsContextFactory tlsContextFactory) {
-    localCallbackServerFactory = (serversManager) -> {
+    localCallbackServerFactory = serversManager -> {
       final HttpServerConfiguration.Builder serverConfigBuilder = new HttpServerConfiguration.Builder();
       serverConfigBuilder.setHost(localCallbackUrl.getHost()).setPort(localCallbackUrl.getPort());
       serverConfigBuilder.setTlsContextFactory(tlsContextFactory);
@@ -103,50 +104,49 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
 
   @Override
   public OAuthAuthorizationCodeDancerBuilder localCallback(HttpServer server, String localCallbackConfigPath) {
-    localCallbackServerFactory = (serversManager) -> {
-      return new HttpServer() {
+    localCallbackServerFactory = (serversManager) -> new HttpServer() {
 
-        @Override
-        public void stop() {
-          // Nothing to do. The lifecycle of this object is handled by whoever passed me the client.
-        }
+      @Override
+      public void stop() {
+        // Nothing to do. The lifecycle of this object is handled by whoever passed me the client.
+      }
 
-        @Override
-        public void start() throws IOException {
-          // Nothing to do. The lifecycle of this object is handled by whoever passed me the client.
-        }
+      @Override
+      public void start() throws IOException {
+        // Nothing to do. The lifecycle of this object is handled by whoever passed me the client.
+      }
 
-        @Override
-        public boolean isStopping() {
-          return server.isStopping();
-        }
+      @Override
+      public boolean isStopping() {
+        return server.isStopping();
+      }
 
-        @Override
-        public boolean isStopped() {
-          return server.isStopped();
-        }
+      @Override
+      public boolean isStopped() {
+        return server.isStopped();
+      }
 
-        @Override
-        public ServerAddress getServerAddress() {
-          return server.getServerAddress();
-        }
+      @Override
+      public ServerAddress getServerAddress() {
+        return server.getServerAddress();
+      }
 
-        @Override
-        public void dispose() {
-          // Nothing to do. The lifecycle of this object is handled by whoever passed me the client.
-        }
+      @Override
+      public void dispose() {
+        // Nothing to do. The lifecycle of this object is handled by whoever passed me the client.
+      }
 
-        @Override
-        public RequestHandlerManager addRequestHandler(String path, RequestHandler requestHandler) {
-          return server.addRequestHandler(localCallbackConfigPath, requestHandler);
-        }
+      @Override
+      public RequestHandlerManager addRequestHandler(String path, RequestHandler requestHandler) {
+        return server.addRequestHandler(localCallbackConfigPath, requestHandler);
+      }
 
-        @Override
-        public RequestHandlerManager addRequestHandler(Collection<String> methods, String path, RequestHandler requestHandler) {
-          return server.addRequestHandler(methods, localCallbackConfigPath, requestHandler);
-        }
-      };
+      @Override
+      public RequestHandlerManager addRequestHandler(Collection<String> methods, String path, RequestHandler requestHandler) {
+        return server.addRequestHandler(methods, localCallbackConfigPath, requestHandler);
+      }
     };
+
     localCallbackUrlPath = localCallbackConfigPath;
     return this;
   }
@@ -165,6 +165,12 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
 
   @Override
   public OAuthAuthorizationCodeDancerBuilder customParameters(Map<String, String> customParameters) {
+    requireNonNull(customParameters, "customParameters cannot be null");
+    return customParameters(() -> customParameters);
+  }
+
+  @Override
+  public OAuthAuthorizationCodeDancerBuilder customParameters(Supplier<Map<String, String>> customParameters) {
     requireNonNull(customParameters, "customParameters cannot be null");
     this.customParameters = customParameters;
     return this;
