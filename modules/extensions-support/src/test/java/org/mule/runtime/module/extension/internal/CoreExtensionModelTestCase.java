@@ -454,6 +454,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(type.isRequired(), is(false));
   }
 
+  //TODO: MULE-12224 - Provide support for scope as top level elements
   @Test
   public void errorHandler() {
     final ScopeModel errorHandlerModel = (ScopeModel) coreExtensionModel.getOperationModel("error-handler").get();
@@ -483,6 +484,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     verifyOnError("on-error-propagate");
   }
 
+  //TODO: MULE-12265 - Provide support for "exclusive scopes"
   void verifyOnError(String name) {
     final ScopeModel continueModel = (ScopeModel) coreExtensionModel.getOperationModel(name).get();
 
