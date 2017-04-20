@@ -137,7 +137,8 @@
                 "format": "java",
                 "type": "Boolean",
                 "annotations": {
-                  "typeId": "boolean"
+                  "typeId": "java.lang.Boolean",
+                  "default": "true"
                 }
               },
               "hasDynamicType": false,
@@ -247,7 +248,8 @@
                 "format": "java",
                 "type": "Boolean",
                 "annotations": {
-                  "typeId": "boolean"
+                  "typeId": "java.lang.Boolean",
+                  "default": "true"
                 }
               },
               "hasDynamicType": false,
@@ -1550,7 +1552,8 @@
                     "type": "Boolean",
                     "annotations": {
                       "int": {},
-                      "typeId": "boolean"
+                      "typeId": "java.lang.Boolean",
+                      "default": "true"
                     }
                   },
                   "hasDynamicType": false,
@@ -1693,7 +1696,8 @@
                 "format": "java",
                 "type": "Boolean",
                 "annotations": {
-                  "typeId": "boolean"
+                  "typeId": "java.lang.Boolean",
+                  "default": "true"
                 }
               },
               "hasDynamicType": false,
@@ -1830,7 +1834,7 @@
       "name": "try",
       "kind": "scope",
       "blocking": true,
-      "executionType": "CPU_LITE",
+      "executionType": "BLOCKING",
       "errors": [],
       "output": {
         "type": {
@@ -1904,7 +1908,8 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1
+                "order": 1,
+                "tabName": "Transactions"
               },
               "name": "transactionalAction",
               "description": "The action to take regarding transactions. By default nothing will be done.",
@@ -1940,7 +1945,8 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2
+                "order": 2,
+                "tabName": "Transactions"
               },
               "name": "transactionType",
               "description": "Transaction type supported. Availability will depend on the runtime version, though LOCAL is always available.",
@@ -2004,35 +2010,7 @@
       "requiresConnection": false,
       "parameterGroupModels": [
         {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": false,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "name": "name",
-              "description": "The name of this error handler.",
-              "modelProperties": {}
-            }
-          ],
+          "parameters": [],
           "exclusiveParametersModels": [],
           "showInDsl": false,
           "name": "General",
@@ -2094,10 +2072,36 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "Union",
+                "of": [
+                  {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "ANY",
+                          "REDELIVERY_EXHAUSTED",
+                          "TRANSFORMATION",
+                          "EXPRESSION",
+                          "SECURITY",
+                          "ROUTING",
+                          "CONNECTIVITY",
+                          "RETRY_EXHAUSTED"
+                        ]
+                      }
+                    }
+                  }
+                ]
               },
               "hasDynamicType": false,
               "required": false,
@@ -2150,7 +2154,8 @@
                 "format": "java",
                 "type": "Boolean",
                 "annotations": {
-                  "typeId": "boolean"
+                  "typeId": "java.lang.Boolean",
+                  "default": "true"
                 }
               },
               "hasDynamicType": false,
@@ -2178,7 +2183,8 @@
                 "format": "java",
                 "type": "Boolean",
                 "annotations": {
-                  "typeId": "boolean"
+                  "typeId": "java.lang.Boolean",
+                  "default": "true"
                 }
               },
               "hasDynamicType": false,
@@ -2263,10 +2269,36 @@
             {
               "type": {
                 "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
+                "type": "Union",
+                "of": [
+                  {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String",
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "ANY",
+                          "REDELIVERY_EXHAUSTED",
+                          "TRANSFORMATION",
+                          "EXPRESSION",
+                          "SECURITY",
+                          "ROUTING",
+                          "CONNECTIVITY",
+                          "RETRY_EXHAUSTED"
+                        ]
+                      }
+                    }
+                  }
+                ]
               },
               "hasDynamicType": false,
               "required": false,
@@ -2319,7 +2351,8 @@
                 "format": "java",
                 "type": "Boolean",
                 "annotations": {
-                  "typeId": "boolean"
+                  "typeId": "java.lang.Boolean",
+                  "default": "true"
                 }
               },
               "hasDynamicType": false,
@@ -2347,7 +2380,8 @@
                 "format": "java",
                 "type": "Boolean",
                 "annotations": {
-                  "typeId": "boolean"
+                  "typeId": "java.lang.Boolean",
+                  "default": "true"
                 }
               },
               "hasDynamicType": false,

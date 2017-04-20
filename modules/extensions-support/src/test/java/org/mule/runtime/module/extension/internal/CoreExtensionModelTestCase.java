@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal;
 
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -26,7 +27,10 @@ import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.config.MuleManifest.getVendorName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.getMuleExtensionModel;
+import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.model.impl.DefaultAnyType;
 import org.mule.metadata.api.model.impl.DefaultArrayType;
 import org.mule.metadata.api.model.impl.DefaultBooleanType;
@@ -434,7 +438,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     final ScopeModel tryModel = (ScopeModel) coreExtensionModel.getOperationModel("try").get();
 
     assertThat(tryModel.getErrorModels(), empty());
-    assertThat(tryModel.getExecutionType(), is(CPU_LITE));
+    assertThat(tryModel.getExecutionType(), is(BLOCKING));
 
     assertAssociatedProcessorsChangeOutput(tryModel);
 
@@ -465,13 +469,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertAssociatedProcessorsChangeOutput(errorHandlerModel);
 
     List<ParameterModel> allParameterModels = errorHandlerModel.getAllParameterModels();
-    assertThat(allParameterModels, hasSize(1));
-
-    ParameterModel name = allParameterModels.get(0);
-    assertThat(name.getName(), is("name"));
-    assertThat(name.getType(), is(instanceOf(DefaultStringType.class)));
-    assertThat(name.getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(name.isRequired(), is(false));
+    assertThat(allParameterModels, hasSize(0));
   }
 
   @Test
@@ -498,7 +496,20 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
     ParameterModel type = allParameterModels.get(0);
     assertThat(type.getName(), is("type"));
-    assertThat(type.getType(), is(instanceOf(DefaultStringType.class)));
+    assertThat(type.getType(), is(instanceOf(UnionType.class)));
+    List<MetadataType> types = ((UnionType) type.getType()).getTypes();
+    assertThat(types, hasSize(2));
+    assertThat(types.get(0), is(instanceOf(DefaultStringType.class)));
+    assertThat(types.get(1), is(instanceOf(DefaultStringType.class)));
+    assertThat(types.get(1).getAnnotation(EnumAnnotation.class).get().getValues(), arrayContainingInAnyOrder(
+                                                                                                             "ANY",
+                                                                                                             "REDELIVERY_EXHAUSTED",
+                                                                                                             "TRANSFORMATION",
+                                                                                                             "EXPRESSION",
+                                                                                                             "SECURITY",
+                                                                                                             "ROUTING",
+                                                                                                             "CONNECTIVITY",
+                                                                                                             "RETRY_EXHAUSTED"));
     assertThat(type.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(type.isRequired(), is(false));
 
