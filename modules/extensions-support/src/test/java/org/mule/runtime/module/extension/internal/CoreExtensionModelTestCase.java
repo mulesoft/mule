@@ -92,7 +92,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
-    assertThat(coreExtensionModel.getOperationModels(), hasSize(11));
+    assertThat(coreExtensionModel.getOperationModels(), hasSize(15));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
 
     assertThat(coreExtensionModel.getErrorModels(),
@@ -429,6 +429,97 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(asyncModel.getAllParameterModels(), hasSize(0));
   }
 
+  @Test
+  public void tryScope() {
+    final ScopeModel tryModel = (ScopeModel) coreExtensionModel.getOperationModel("try").get();
+
+    assertThat(tryModel.getErrorModels(), empty());
+    assertThat(tryModel.getExecutionType(), is(CPU_LITE));
+
+    assertAssociatedProcessorsChangeOutput(tryModel);
+
+    List<ParameterModel> allParameterModels = tryModel.getAllParameterModels();
+    assertThat(allParameterModels, hasSize(2));
+
+    ParameterModel action = allParameterModels.get(0);
+    assertThat(action.getName(), is("transactionalAction"));
+    assertThat(action.getType(), is(instanceOf(DefaultStringType.class)));
+    assertThat(action.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(action.isRequired(), is(false));
+
+    ParameterModel type = allParameterModels.get(1);
+    assertThat(type.getName(), is("transactionType"));
+    assertThat(type.getType(), is(instanceOf(DefaultStringType.class)));
+    assertThat(type.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(type.isRequired(), is(false));
+  }
+
+  @Test
+  public void errorHandler() {
+    final ScopeModel errorHandlerModel = (ScopeModel) coreExtensionModel.getOperationModel("error-handler").get();
+
+    assertThat(errorHandlerModel.getErrorModels(), empty());
+    assertThat(errorHandlerModel.getExecutionType(), is(CPU_LITE));
+
+    assertAssociatedProcessorsChangeOutput(errorHandlerModel);
+
+    List<ParameterModel> allParameterModels = errorHandlerModel.getAllParameterModels();
+    assertThat(allParameterModels, hasSize(1));
+
+    ParameterModel name = allParameterModels.get(0);
+    assertThat(name.getName(), is("name"));
+    assertThat(name.getType(), is(instanceOf(DefaultStringType.class)));
+    assertThat(name.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(name.isRequired(), is(false));
+  }
+
+  @Test
+  public void onErrorContinue() {
+    verifyOnError("on-error-continue");
+  }
+
+  @Test
+  public void onErrorPropagate() {
+    verifyOnError("on-error-propagate");
+  }
+
+  void verifyOnError(String name) {
+    final ScopeModel continueModel = (ScopeModel) coreExtensionModel.getOperationModel(name).get();
+
+    assertThat(continueModel.getErrorModels(), empty());
+    assertThat(continueModel.getExecutionType(), is(CPU_LITE));
+
+    assertAssociatedProcessorsChangeOutput(continueModel);
+
+    List<ParameterModel> allParameterModels = continueModel.getAllParameterModels();
+    assertThat(allParameterModels, hasSize(4));
+
+    ParameterModel type = allParameterModels.get(0);
+    assertThat(type.getName(), is("type"));
+    assertThat(type.getType(), is(instanceOf(DefaultStringType.class)));
+    assertThat(type.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(type.isRequired(), is(false));
+
+    ParameterModel when = allParameterModels.get(1);
+    assertThat(when.getName(), is("when"));
+    assertThat(when.getType(), is(instanceOf(DefaultStringType.class)));
+    assertThat(when.getExpressionSupport(), is(SUPPORTED));
+    assertThat(when.isRequired(), is(false));
+
+    ParameterModel log = allParameterModels.get(2);
+    assertThat(log.getName(), is("logException"));
+    assertThat(log.getType(), is(instanceOf(DefaultBooleanType.class)));
+    assertThat(log.getExpressionSupport(), is(SUPPORTED));
+    assertThat(log.isRequired(), is(false));
+
+    ParameterModel notifications = allParameterModels.get(3);
+    assertThat(notifications.getName(), is("enableNotifications"));
+    assertThat(notifications.getType(), is(instanceOf(DefaultBooleanType.class)));
+    assertThat(notifications.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(notifications.isRequired(), is(false));
+    assertThat(notifications.getDefaultValue(), is("true"));
+  }
+
   /**
    * The operation returns its input as the output.
    * 
@@ -456,7 +547,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   }
 
   /**
-   * The operation breturns the result of one of its routes, keeping the attributes of the result message.
+   * The operation returns the result of one of its routes, keeping the attributes of the result message.
    * 
    * @param model the model to assert on
    */
