@@ -48,8 +48,8 @@ public enum AckMode implements JmsAckMode {
 
   private InternalAckMode ackMode;
 
-  AckMode(InternalAckMode none) {
-    this.ackMode = none;
+  AckMode(InternalAckMode ackMode) {
+    this.ackMode = ackMode;
   }
 
   @Override

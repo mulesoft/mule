@@ -28,7 +28,7 @@ import javax.jms.Session;
  *
  * @since 4.0
  */
-public class JmsTransactionalConnection extends JmsConnection implements TransactionalConnection {
+public final class JmsTransactionalConnection extends JmsConnection implements TransactionalConnection {
 
   private static final Logger LOGGER = getLogger(JmsTransactionalConnection.class);
   private static final String COMMIT = "Commit";

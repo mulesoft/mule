@@ -73,7 +73,7 @@ public final class JmsCommons {
     try {
       if (ackMode.equals(NONE)) {
         if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Automatically performing an ACK over the message, since InternalAckMode was NONE");
+          LOGGER.debug("Automatically performing an ACK over the message, since AckMode was NONE");
         }
         receivedMessage.acknowledge();
 
@@ -82,7 +82,7 @@ public final class JmsCommons {
           LOGGER.debug("Registering pending ACK on session: " + session.getAckId());
         }
         String id = session.getAckId()
-            .orElseThrow(() -> new IllegalArgumentException("An AckId is required when MANUAL InternalAckMode is set"));
+            .orElseThrow(() -> new IllegalArgumentException("An AckId is required when MANUAL AckMode is set"));
 
         messageSessionManager.registerMessageForAck(id, receivedMessage, session.get(), jmsLock);
       }

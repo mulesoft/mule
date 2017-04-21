@@ -42,8 +42,8 @@ public enum ConsumerAckMode implements JmsAckMode {
 
   private InternalAckMode ackMode;
 
-  ConsumerAckMode(InternalAckMode none) {
-    this.ackMode = none;
+  ConsumerAckMode(InternalAckMode ackMode) {
+    this.ackMode = ackMode;
   }
 
   @Override

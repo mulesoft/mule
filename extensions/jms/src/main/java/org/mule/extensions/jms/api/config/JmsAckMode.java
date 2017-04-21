@@ -8,7 +8,16 @@ package org.mule.extensions.jms.api.config;
 
 import org.mule.extensions.jms.internal.config.InternalAckMode;
 
+/**
+ * Interface to be implemented in enums representing Acknowledgement modes and give their representation in
+ * the {@link InternalAckMode}
+ *
+ * @since 4.0
+ */
 public interface JmsAckMode {
 
+  /**
+   * @return The {@link InternalAckMode} of the current enum value.
+   */
   InternalAckMode getInternalAckMode();
 }
