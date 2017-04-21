@@ -28,7 +28,7 @@ public class NotificationUtils
 
     public static void addMessageProcessorPathElements(List<MessageProcessor> processors, MessageProcessorPathElement parentElement)
     {
-        if (processors == null)
+        if (processors == null || parentElement == null)
         {
             return;
         }
@@ -47,7 +47,7 @@ public class NotificationUtils
                 {
                     messageProcessorPathElement = parentElement;
                 }
-                if (mp instanceof MessageProcessorContainer)
+                if (messageProcessorPathElement != null && mp instanceof MessageProcessorContainer)
                 {
                     ((MessageProcessorContainer) mp).addMessageProcessorPathElements(messageProcessorPathElement);
                 }
