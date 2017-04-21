@@ -15,8 +15,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
+
 import org.mule.functional.functional.SkeletonSource;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -29,6 +30,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
@@ -38,11 +40,13 @@ import org.mule.test.AbstractIntegrationTestCase;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 
@@ -74,7 +78,8 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
   @Test
   public void schedulerCustomName() {
     SchedulerService schedulerService = muleContext.getSchedulerService();
-    final Scheduler ioScheduler = schedulerService.ioScheduler(config().withName("myPreciousScheduler"));
+    final Scheduler ioScheduler =
+        schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig().withName("myPreciousScheduler"));
     assertThat(ioScheduler.getName(),
                startsWith("myPreciousScheduler"));
     ioScheduler.shutdownNow();
@@ -183,6 +188,10 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     public static Latch latch = new Latch();
 
     @Inject
+    @Named(OBJECT_SCHEDULER_BASE_CONFIG)
+    private SchedulerConfig config;
+
+    @Inject
     private SchedulerService schedulerService;
 
     private volatile Scheduler scheduler;
@@ -190,7 +199,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     @Override
     public void initialise() throws InitialisationException {
       latch = new Latch();
-      scheduler = schedulerService.customScheduler(config().withMaxConcurrentTasks(CUSTOM_SCHEDULER_SIZE));
+      scheduler = schedulerService.customScheduler(config.withMaxConcurrentTasks(CUSTOM_SCHEDULER_SIZE));
     }
 
     @Override

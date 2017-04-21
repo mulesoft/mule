@@ -173,6 +173,7 @@ public class MuleProperties {
   public static final String OBJECT_TRANSFORMATION_SERVICE = "_muleTransformationService";
   public static final String OBJECT_COMPONENT_INITIAL_STATE_MANAGER = ComponentInitialStateManager.SERVICE_ID;
   public static final String DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY = "_muleDefaultTlsContextFactory";
+  public static final String OBJECT_SCHEDULER_BASE_CONFIG = "_muleSchedulerBaseConfig";
 
   // Not currently used as these need to be instance variables of the MuleContext.
   public static final String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";

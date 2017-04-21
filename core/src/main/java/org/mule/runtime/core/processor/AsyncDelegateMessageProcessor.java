@@ -91,7 +91,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public void start() throws MuleException {
-    scheduler = schedulerService.cpuLightScheduler(config().withName(getPrefix(muleContext) + name));
+    scheduler = schedulerService.cpuLightScheduler(muleContext.getSchedulerBaseConfig().withName(getPrefix(muleContext) + name));
     super.start();
   }
 

@@ -14,6 +14,7 @@ import static java.util.Collections.synchronizedList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.DEFAULT;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.WAIT;
@@ -29,7 +30,6 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.service.scheduler.ThreadType;
@@ -51,6 +51,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
@@ -121,52 +122,22 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     return doCpuIntensiveScheduler(config());
   }
 
-  @Inject
-  public Scheduler cpuLightScheduler(MuleContext context) {
-    return doCpuLightScheduler(config().withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS));
-  }
-
-  @Inject
-  public Scheduler ioScheduler(MuleContext context) {
-    return doIoScheduler(config().withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS));
-  }
-
-  @Inject
-  public Scheduler cpuIntensiveScheduler(MuleContext context) {
-    return doCpuIntensiveScheduler(config().withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS));
-  }
-
   @Override
-  public Scheduler cpuLightScheduler(SchedulerConfig config) {
+  @Inject
+  public Scheduler cpuLightScheduler(@Named(OBJECT_SCHEDULER_BASE_CONFIG) SchedulerConfig config) {
     return doCpuLightScheduler(config);
   }
 
   @Override
-  public Scheduler ioScheduler(SchedulerConfig config) {
+  @Inject
+  public Scheduler ioScheduler(@Named(OBJECT_SCHEDULER_BASE_CONFIG) SchedulerConfig config) {
     return doIoScheduler(config);
   }
 
   @Override
-  public Scheduler cpuIntensiveScheduler(SchedulerConfig config) {
+  @Inject
+  public Scheduler cpuIntensiveScheduler(@Named(OBJECT_SCHEDULER_BASE_CONFIG) SchedulerConfig config) {
     return doCpuIntensiveScheduler(config);
-  }
-
-  @Inject
-  public Scheduler cpuLightScheduler(SchedulerConfig config, MuleContext context) {
-    return doCpuLightScheduler(config.getShutdownTimeoutMillis() == null
-        ? config.withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS) : config);
-  }
-
-  @Inject
-  public Scheduler ioScheduler(SchedulerConfig config, MuleContext context) {
-    return doIoScheduler(config.getShutdownTimeoutMillis() == null
-        ? config.withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS) : config);
-  }
-
-  @Inject
-  public Scheduler cpuIntensiveScheduler(SchedulerConfig config, MuleContext context) {
-    return doCpuIntensiveScheduler(config.getShutdownTimeoutMillis() == null
-        ? config.withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS) : config);
   }
 
   private Scheduler doCpuLightScheduler(SchedulerConfig config) {
@@ -230,25 +201,15 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
   }
 
   @Override
-  public Scheduler customScheduler(SchedulerConfig config) {
+  @Inject
+  public Scheduler customScheduler(@Named(OBJECT_SCHEDULER_BASE_CONFIG) SchedulerConfig config) {
     return doCustomScheduler(config);
   }
 
   @Override
-  public Scheduler customScheduler(SchedulerConfig config, int queueSize) {
+  @Inject
+  public Scheduler customScheduler(@Named(OBJECT_SCHEDULER_BASE_CONFIG) SchedulerConfig config, int queueSize) {
     return doCustomScheduler(config, queueSize);
-  }
-
-  @Inject
-  public Scheduler customScheduler(SchedulerConfig config, MuleContext context) {
-    return doCustomScheduler(config.getShutdownTimeoutMillis() == null
-        ? config.withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS) : config);
-  }
-
-  @Inject
-  public Scheduler customScheduler(SchedulerConfig config, int queueSize, MuleContext context) {
-    return doCustomScheduler(config.getShutdownTimeoutMillis() == null
-        ? config.withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS) : config, queueSize);
   }
 
   private Scheduler doCustomScheduler(SchedulerConfig config) {

@@ -6,14 +6,16 @@
  */
 package org.mule.services.http.impl.service;
 
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
@@ -24,6 +26,7 @@ import org.mule.services.http.impl.service.client.GrizzlyHttpClient;
 import org.mule.services.http.impl.service.server.HttpListenerConnectionManager;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.slf4j.Logger;
 
@@ -41,7 +44,7 @@ public class HttpServiceImplementation implements HttpService, Startable, Stoppa
 
   public HttpServiceImplementation(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
-    connectionManager = new HttpListenerConnectionManager(schedulerService, 5000);
+    connectionManager = new HttpListenerConnectionManager(schedulerService, config());
   }
 
   @Override
@@ -52,12 +55,12 @@ public class HttpServiceImplementation implements HttpService, Startable, Stoppa
 
   @Override
   public HttpClientFactory getClientFactory() {
-    return config -> new GrizzlyHttpClient(config, schedulerService, 5000);
+    return config -> new GrizzlyHttpClient(config, schedulerService, config());
   }
 
   @Inject
-  public HttpClientFactory getClientFactory(MuleContext context) {
-    return config -> new GrizzlyHttpClient(config, schedulerService, context.getConfiguration().getShutdownTimeout());
+  public HttpClientFactory getClientFactory(@Named(OBJECT_SCHEDULER_BASE_CONFIG) SchedulerConfig schedulersConfig) {
+    return config -> new GrizzlyHttpClient(config, schedulerService, schedulersConfig);
   }
 
   @Override

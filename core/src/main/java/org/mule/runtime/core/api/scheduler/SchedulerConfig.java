@@ -49,10 +49,25 @@ public class SchedulerConfig {
     return new SchedulerConfig();
   }
 
-  private Integer maxConcurrentTasks;
-  private String schedulerName;
-  private RejectionAction rejectionAction = DEFAULT;
-  private Long shutdownTimeoutMillis;
+  private final Integer maxConcurrentTasks;
+  private final String schedulerName;
+  private final RejectionAction rejectionAction;
+  private final Long shutdownTimeoutMillis;
+
+  private SchedulerConfig() {
+    this.maxConcurrentTasks = null;
+    this.schedulerName = null;
+    this.rejectionAction = DEFAULT;
+    this.shutdownTimeoutMillis = null;
+  }
+
+  private SchedulerConfig(Integer maxConcurrentTasks, String schedulerName, RejectionAction rejectionAction,
+                          Long shutdownTimeoutMillis) {
+    this.maxConcurrentTasks = maxConcurrentTasks;
+    this.schedulerName = schedulerName;
+    this.rejectionAction = rejectionAction;
+    this.shutdownTimeoutMillis = shutdownTimeoutMillis;
+  }
 
   /**
    * Sets the max tasks that can be run at the same time for the target {@link Scheduler}.
@@ -64,8 +79,7 @@ public class SchedulerConfig {
    * @return the updated configuration.
    */
   public SchedulerConfig withMaxConcurrentTasks(int maxConcurrentTasks) {
-    this.maxConcurrentTasks = maxConcurrentTasks;
-    return this;
+    return new SchedulerConfig(maxConcurrentTasks, schedulerName, rejectionAction, shutdownTimeoutMillis);
   }
 
   /**
@@ -82,8 +96,7 @@ public class SchedulerConfig {
    * @return the updated configuration.
    */
   public SchedulerConfig withName(String schedulerName) {
-    this.schedulerName = schedulerName;
-    return this;
+    return new SchedulerConfig(maxConcurrentTasks, schedulerName, rejectionAction, shutdownTimeoutMillis);
   }
 
   /**
@@ -105,8 +118,7 @@ public class SchedulerConfig {
    */
   public SchedulerConfig withRejectionAction(RejectionAction rejectionAction) {
     requireNonNull(rejectionAction);
-    this.rejectionAction = rejectionAction;
-    return this;
+    return new SchedulerConfig(maxConcurrentTasks, schedulerName, rejectionAction, shutdownTimeoutMillis);
   }
 
   /**
@@ -129,8 +141,7 @@ public class SchedulerConfig {
     }
     requireNonNull(shutdownTimeoutUnit);
 
-    this.shutdownTimeoutMillis = shutdownTimeoutUnit.toMillis(shutdownTimeout);
-    return this;
+    return new SchedulerConfig(maxConcurrentTasks, schedulerName, rejectionAction, shutdownTimeoutUnit.toMillis(shutdownTimeout));
   }
 
   /**

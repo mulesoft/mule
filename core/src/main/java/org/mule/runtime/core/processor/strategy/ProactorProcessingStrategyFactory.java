@@ -9,7 +9,6 @@ package org.mule.runtime.core.processor.strategy;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
@@ -68,16 +67,17 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
       return new ReactorProcessingStrategyFactory().create(muleContext, schedulersNamePrefix);
     } else {
       return new ProactorProcessingStrategy(() -> muleContext.getSchedulerService()
-          .cpuLightScheduler(config().withName(schedulersNamePrefix + "." + CPU_LITE.name())),
+          .cpuLightScheduler(muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + CPU_LITE.name())),
                                             () -> muleContext.getSchedulerService()
-                                                .ioScheduler(config().withName(schedulersNamePrefix + "." + BLOCKING.name())),
+                                                .ioScheduler(muleContext.getSchedulerBaseConfig()
+                                                    .withName(schedulersNamePrefix + "." + BLOCKING.name())),
                                             () -> muleContext.getSchedulerService()
-                                                .cpuIntensiveScheduler(config()
+                                                .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                     .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
                                             scheduler -> scheduler.stop(),
                                             maxConcurrency,
                                             () -> muleContext.getSchedulerService()
-                                                .customScheduler(config()
+                                                .customScheduler(muleContext.getSchedulerBaseConfig()
                                                     .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
                                                     .withMaxConcurrentTasks(getSubscriberCount() + 1)),
                                             getBufferSize(),

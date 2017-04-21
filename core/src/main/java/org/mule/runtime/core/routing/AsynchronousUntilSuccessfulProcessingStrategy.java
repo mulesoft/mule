@@ -9,7 +9,6 @@ package org.mule.runtime.core.routing;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 import static org.mule.runtime.core.util.StringUtils.DASH;
@@ -28,12 +27,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.util.queue.objectstore.QueueKey;
@@ -72,7 +71,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
 
   @Override
   public void start() {
-    pool = muleContext.getSchedulerService().ioScheduler(config()
+    pool = muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig()
         .withName(format("%s%s.%s", getPrefix(getUntilSuccessfulConfiguration().getMuleContext()),
                          getUntilSuccessfulConfiguration().getFlowConstruct().getName(), "until-successful")));
 

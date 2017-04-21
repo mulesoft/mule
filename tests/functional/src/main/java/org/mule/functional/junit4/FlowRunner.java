@@ -8,7 +8,6 @@ package org.mule.functional.junit4;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 
 import org.mule.functional.functional.FlowAssert;
@@ -188,7 +187,8 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
    */
   public void dispatchAsync() throws Exception {
     Flow flow = (Flow) getFlowConstruct();
-    scheduler = muleContext.getSchedulerService().ioScheduler(config().withShutdownTimeout(0, SECONDS));
+    scheduler =
+        muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig().withShutdownTimeout(0, SECONDS));
     try {
       scheduler.submit(() -> txExecutionTemplate.execute(getFlowDispatchCallback(flow)));
     } catch (Exception e) {

@@ -12,9 +12,7 @@ import static com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderCon
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.service.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.service.http.api.HttpHeaders.Values.CLOSE;
 
@@ -22,6 +20,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -92,14 +91,14 @@ public class GrizzlyHttpClient implements HttpClient {
   private Scheduler selectorScheduler;
   private Scheduler workerScheduler;
   private final SchedulerService schedulerService;
-  private final long schedulersTimeoutMillis;
+  private final SchedulerConfig schedulersConfig;
   private final String ownerName;
   private AsyncHttpClient asyncHttpClient;
   private SSLContext sslContext;
   private final TlsContextFactory defaultTlsContextFactory = TlsContextFactory.builder().buildDefault();
 
 
-  public GrizzlyHttpClient(HttpClientConfiguration config, SchedulerService schedulerService, long schedulersTimeoutMillis) {
+  public GrizzlyHttpClient(HttpClientConfiguration config, SchedulerService schedulerService, SchedulerConfig schedulersConfig) {
     this.tlsContextFactory = config.getTlsContextFactory();
     this.proxyConfig = config.getProxyConfig();
     this.clientSocketProperties = config.getClientSocketProperties();
@@ -111,14 +110,14 @@ public class GrizzlyHttpClient implements HttpClient {
     this.ownerName = config.getOwnerName();
 
     this.schedulerService = schedulerService;
-    this.schedulersTimeoutMillis = schedulersTimeoutMillis;
+    this.schedulersConfig = schedulersConfig;
   }
 
   @Override
   public void start() {
-    selectorScheduler = schedulerService.customScheduler(config().withMaxConcurrentTasks(getRuntime().availableProcessors() + 1)
-        .withShutdownTimeout(schedulersTimeoutMillis, MILLISECONDS).withName(threadNamePrefix), MAX_VALUE);
-    workerScheduler = schedulerService.ioScheduler(config().withShutdownTimeout(schedulersTimeoutMillis, MILLISECONDS));
+    selectorScheduler = schedulerService.customScheduler(schedulersConfig
+        .withMaxConcurrentTasks(getRuntime().availableProcessors() + 1).withName(threadNamePrefix), MAX_VALUE);
+    workerScheduler = schedulerService.ioScheduler(schedulersConfig);
 
     AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
     builder.setAllowPoolingConnections(true);

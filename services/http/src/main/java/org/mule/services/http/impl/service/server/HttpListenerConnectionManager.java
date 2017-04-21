@@ -9,8 +9,6 @@ package org.mule.services.http.impl.service.server;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Runtime.getRuntime;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.services.http.impl.service.server.grizzly.IdleExecutor.IDLE_TIMEOUT_THREADS_PREFIX_NAME;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -20,6 +18,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.NetworkUtils;
@@ -47,7 +46,7 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
   private static final String LISTENER_THREAD_NAME_PREFIX = "http.listener";
 
   private final SchedulerService schedulerService;
-  private final long schedulersTimeoutMillis;
+  private final SchedulerConfig schedulersConfig;
   private Scheduler selectorScheduler;
   private Scheduler workerScheduler;
   private Scheduler idleTimeoutScheduler;
@@ -56,9 +55,9 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
 
   private AtomicBoolean initialized = new AtomicBoolean(false);
 
-  public HttpListenerConnectionManager(SchedulerService schedulerService, long schedulersTimeoutMillis) {
+  public HttpListenerConnectionManager(SchedulerService schedulerService, SchedulerConfig schedulersConfig) {
     this.schedulerService = schedulerService;
-    this.schedulersTimeoutMillis = schedulersTimeoutMillis;
+    this.schedulersConfig = schedulersConfig;
   }
 
   @Override
@@ -71,12 +70,11 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
     TcpServerSocketProperties tcpServerSocketProperties = new DefaultTcpServerSocketProperties();
 
     try {
-      selectorScheduler = schedulerService
-          .customScheduler(config().withMaxConcurrentTasks(getRuntime().availableProcessors() + 1)
-              .withShutdownTimeout(schedulersTimeoutMillis, MILLISECONDS).withName(LISTENER_THREAD_NAME_PREFIX), MAX_VALUE);
-      workerScheduler = schedulerService.ioScheduler(config().withShutdownTimeout(schedulersTimeoutMillis, MILLISECONDS));
+      selectorScheduler = schedulerService.customScheduler(schedulersConfig
+          .withMaxConcurrentTasks(getRuntime().availableProcessors() + 1).withName(LISTENER_THREAD_NAME_PREFIX), MAX_VALUE);
+      workerScheduler = schedulerService.ioScheduler(schedulersConfig);
       idleTimeoutScheduler =
-          schedulerService.ioScheduler(config().withName(LISTENER_THREAD_NAME_PREFIX + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
+          schedulerService.ioScheduler(schedulersConfig.withName(LISTENER_THREAD_NAME_PREFIX + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
       httpServerManager = new GrizzlyServerManager(selectorScheduler, workerScheduler, idleTimeoutScheduler, httpListenerRegistry,
                                                    tcpServerSocketProperties);
     } catch (IOException e) {

@@ -9,7 +9,6 @@ package org.mule.extension.socket.api.source;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static org.mule.extension.socket.internal.SocketUtils.WORK;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 
 import org.mule.extension.socket.api.SocketAttributes;
@@ -83,11 +82,12 @@ public final class SocketListener extends Source<InputStream, SocketAttributes> 
   @Override
   public void onStart(SourceCallback<InputStream, SocketAttributes> sourceCallback) throws MuleException {
     workManager = schedulerService
-        .ioScheduler(config().withName(format("%s%s.socket.worker", getPrefix(muleContext), flowConstruct.getName())));
+        .ioScheduler(muleContext.getSchedulerBaseConfig()
+            .withName(format("%s%s.socket.worker", getPrefix(muleContext), flowConstruct.getName())));
 
     stopRequested.set(false);
 
-    listenerExecutor = schedulerService.customScheduler(config().withMaxConcurrentTasks(1)
+    listenerExecutor = schedulerService.customScheduler(muleContext.getSchedulerBaseConfig().withMaxConcurrentTasks(1)
         .withName(format("%s%s.socket.listener", getPrefix(muleContext), flowConstruct.getName())));
     submittedListenerTask = listenerExecutor.submit(() -> listen(sourceCallback));
   }

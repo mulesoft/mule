@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CON
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSOR_INTERCEPTOR_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
@@ -81,6 +82,7 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
@@ -607,6 +609,11 @@ public class DefaultMuleContext implements MuleContext {
     }
 
     return this.schedulerService;
+  }
+
+  @Override
+  public SchedulerConfig getSchedulerBaseConfig() {
+    return ((SchedulerConfig) this.getRegistry().lookupObject(OBJECT_SCHEDULER_BASE_CONFIG));
   }
 
   @Override

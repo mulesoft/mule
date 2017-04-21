@@ -28,6 +28,7 @@ import org.mule.runtime.core.api.locator.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
@@ -159,6 +160,8 @@ public interface MuleContext extends Lifecycle {
 
   SchedulerService getSchedulerService();
 
+  SchedulerConfig getSchedulerBaseConfig();
+
   /**
    * Sets the queue manager used by mule for queuing events. This is used for service queues
    *
@@ -289,8 +292,7 @@ public interface MuleContext extends Lifecycle {
   SingleResourceTransactionFactoryManager getTransactionFactoryManager();
 
   /**
-   * @return a non null {@link DataTypeConversionResolver} instance to resolve implicit data type
-   *         conversions
+   * @return a non null {@link DataTypeConversionResolver} instance to resolve implicit data type conversions
    */
   DataTypeConversionResolver getDataTypeConverterResolver();
 
