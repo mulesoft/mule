@@ -68,6 +68,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       if (exception.handled()) {
         sink.next(event);
       } else {
+        exception.setProcessedEvent(event);
         sink.error(exception);
       }
     });

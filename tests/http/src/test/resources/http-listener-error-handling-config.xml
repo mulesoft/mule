@@ -2,9 +2,11 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <configuration>
         <expression-language>
@@ -34,6 +36,21 @@
             <on-error-continue>
                 <set-payload value="Error."/>
             </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="exceptionPropagationFlow">
+        <httpn:listener config-ref="listenerConfig" path="/exceptionPropagation">
+            <httpn:error-response>
+                <httpn:headers>#[{'headerName':myHeader}]</httpn:headers>
+            </httpn:error-response>
+        </httpn:listener>
+        <test:component throwException="true"/>
+        <error-handler>
+            <on-error-propagate>
+                <set-payload value="#['An error occurred: ' ++ error.description]"/>
+                <set-variable variableName="myHeader" value="headerValue"/>
+            </on-error-propagate>
         </error-handler>
     </flow>
 

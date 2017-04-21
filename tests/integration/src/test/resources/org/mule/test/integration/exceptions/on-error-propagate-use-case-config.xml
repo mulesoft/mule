@@ -57,4 +57,15 @@
         </error-handler>
     </flow>
 
+    <flow name="onErrorPropagateMessage">
+        <append-string-transformer message=" apt1"/>
+        <custom-processor class="org.mule.test.integration.exceptions.OnErrorPropagateTestCase$FailingProcessor"/>
+        <error-handler>
+            <on-error-propagate>
+                <set-payload value="propagated"/>
+                <set-variable variableName="myVar" value="aValue"/>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+
 </mule>
