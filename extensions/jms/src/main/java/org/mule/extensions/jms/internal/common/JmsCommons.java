@@ -8,19 +8,19 @@ package org.mule.extensions.jms.internal.common;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.extensions.jms.api.message.MessageBuilder.BODY_CONTENT_TYPE_JMS_PROPERTY;
+import static org.mule.extensions.jms.api.message.MessageBuilder.BODY_ENCODING_JMS_PROPERTY;
 import static org.mule.extensions.jms.internal.config.InternalAckMode.MANUAL;
 import static org.mule.extensions.jms.internal.config.InternalAckMode.NONE;
 import static org.mule.extensions.jms.internal.config.InternalAckMode.TRANSACTED;
-import static org.mule.extensions.jms.api.message.MessageBuilder.BODY_CONTENT_TYPE_JMS_PROPERTY;
-import static org.mule.extensions.jms.api.message.MessageBuilder.BODY_ENCODING_JMS_PROPERTY;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.JmsSessionManager;
 import org.mule.extensions.jms.api.config.JmsAckMode;
-import org.mule.extensions.jms.internal.config.InternalAckMode;
 import org.mule.extensions.jms.api.connection.JmsConnection;
 import org.mule.extensions.jms.api.connection.JmsSession;
 import org.mule.extensions.jms.api.exception.JmsAckException;
 import org.mule.extensions.jms.api.source.JmsListenerLock;
+import org.mule.extensions.jms.internal.config.InternalAckMode;
 
 import org.slf4j.Logger;
 
@@ -92,7 +92,7 @@ public final class JmsCommons {
   }
 
   /**
-   * Utility method to create new {@link JmsSession} from over a
+   * Utility method to create new {@link JmsSession} from a given {@link JmsConnection}
    *
    * @param jmsConnection the connection from where create a new {@link JmsSession}
    * @param ackMode the {@link InternalAckMode} to use
@@ -104,11 +104,11 @@ public final class JmsCommons {
   public static JmsSession createJmsSession(JmsConnection jmsConnection, InternalAckMode ackMode, boolean isTopic,
                                             JmsSessionManager jmsSessionManager)
       throws JMSException {
-    Optional<JmsSession> currentSession = jmsSessionManager.getCurrentSession();
+    Optional<JmsSession> transactedSession = jmsSessionManager.getTransactedSession();
     JmsSession session;
 
-    if (currentSession.isPresent()) {
-      session = currentSession.get();
+    if (transactedSession.isPresent()) {
+      session = transactedSession.get();
     } else {
       switch (jmsSessionManager.getTransactionStatus()) {
         case STARTED:

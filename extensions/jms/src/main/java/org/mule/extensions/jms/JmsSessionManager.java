@@ -49,7 +49,6 @@ public class JmsSessionManager {
    * @throws IllegalArgumentException if no Session was registered with the given AckId
    */
   public void registerMessageForAck(String ackId, Message message, Session session, JmsListenerLock jmsLock) {
-
     if (!pendingSessions.containsKey(ackId)) {
       pendingSessions.put(ackId, new SessionInformation(message, session, jmsLock));
     }
@@ -131,17 +130,17 @@ public class JmsSessionManager {
   }
 
   /**
-   * @return the {@link Optional} {@link JmsSession} of the current {@link Thread}
-   */
-  public Optional<JmsSession> getCurrentSession() {
-    return ofNullable(currentSession.get());
-  }
-
-  /**
    * Unbinds the current {@link JmsSession}, if there is one, of the current {@link Thread}
    */
   public void unbindSession() {
     currentSession.remove();
+  }
+
+  /**
+   * @return the {@link Optional} {@link JmsSession} of the current {@link Thread}
+   */
+  public Optional<JmsSession> getTransactedSession() {
+    return ofNullable(currentSession.get());
   }
 
   /**

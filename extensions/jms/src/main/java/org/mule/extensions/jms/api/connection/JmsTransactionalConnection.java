@@ -65,9 +65,9 @@ public class JmsTransactionalConnection extends JmsConnection implements Transac
   }
 
   private void executeTransactionAction(String action, SessionAction transactionalAction) throws JMSException {
-    Optional<JmsSession> currentSession = jmsSessionManager.getCurrentSession();
-    if (currentSession.isPresent()) {
-      Session jmsSession = currentSession.get().get();
+    Optional<JmsSession> transactedSession = jmsSessionManager.getTransactedSession();
+    if (transactedSession.isPresent()) {
+      Session jmsSession = transactedSession.get().get();
 
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("JMS Transaction " + action + " over Session [" + jmsSession + "]");
