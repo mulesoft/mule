@@ -13,7 +13,15 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.extensions.jms.api.connection.JmsSpecification;
 import org.mule.extensions.jms.api.exception.JmsIllegalBodyException;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.util.IOUtils;
+
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,11 +42,6 @@ import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
-
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <code>JmsMessageUtils</code> contains helper method for dealing with JMS
@@ -66,6 +69,11 @@ public class JmsMessageUtils {
 
     } else if (object instanceof InputStream) {
       return inputStreamToMessage((InputStream) object, session);
+
+      // TODO MULE-12270 : SDK Should provide a generic way to handle CursorStreamProviders
+    } else if (object instanceof CursorStreamProvider) {
+      CursorStream value = ((CursorStreamProvider) object).openCursor();
+      return stringToMessage(IOUtils.toString(value), session);
 
     } else if (object instanceof List<?>) {
       return listToMessage((List<?>) object, session);

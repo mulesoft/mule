@@ -8,8 +8,6 @@ package org.mule.extensions.jms.test.ack;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.junit.After;
-import org.junit.Rule;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.test.JmsAbstractTestCase;
@@ -19,6 +17,9 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
+
+import org.junit.After;
+import org.junit.Rule;
 
 import java.util.function.BooleanSupplier;
 

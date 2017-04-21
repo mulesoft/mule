@@ -7,7 +7,7 @@
 package org.mule.extensions.jms.api.source;
 
 import org.mule.extensions.jms.JmsSessionManager;
-import org.mule.extensions.jms.api.config.AckMode;
+import org.mule.extensions.jms.internal.config.InternalAckMode;
 import org.mule.extensions.jms.api.config.JmsConfig;
 import org.mule.extensions.jms.api.connection.JmsSession;
 import org.mule.extensions.jms.api.message.JmsAttributes;
@@ -23,7 +23,7 @@ import javax.jms.Message;
  */
 final class JmsMessageListenerFactory {
 
-  private final AckMode ackMode;
+  private final InternalAckMode ackMode;
   private final String encoding;
   private final String contentType;
   private JmsConfig config;
@@ -43,7 +43,7 @@ final class JmsMessageListenerFactory {
    * @param jmsSupport     JMS Support that communicates the used specification
    * @param sourceCallback callback use to dispatch the {@link Message} to the mule flow
    */
-  JmsMessageListenerFactory(AckMode ackMode, String encoding, String contentType, JmsConfig config,
+  JmsMessageListenerFactory(InternalAckMode ackMode, String encoding, String contentType, JmsConfig config,
                             JmsSessionManager sessionManager, JmsSupport jmsSupport,
                             SourceCallback<Object, JmsAttributes> sourceCallback) {
     this.ackMode = ackMode;

@@ -20,6 +20,7 @@ import org.mule.extensions.jms.api.exception.JmsSessionRecoverErrorTypeProvider;
 import org.mule.extensions.jms.api.exception.JmsSessionRecoverException;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+
 import org.slf4j.Logger;
 
 import javax.inject.Inject;

@@ -7,10 +7,12 @@
 package org.mule.extensions.jms;
 
 import static java.util.Optional.ofNullable;
+import static org.mule.extensions.jms.TransactionStatus.NONE;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.api.config.AckMode;
+import org.mule.extensions.jms.api.connection.JmsSession;
 import org.mule.extensions.jms.api.source.JmsListener;
 import org.mule.extensions.jms.api.source.JmsListenerLock;
+import org.mule.extensions.jms.internal.config.InternalAckMode;
 
 import org.slf4j.Logger;
 
@@ -25,7 +27,7 @@ import javax.jms.Session;
 /**
  * Manager that takes the responsibility of register the session information to be able to execute a manual
  * acknowledgement or a recover over a {@link Session}.
- * This is used when the {@link AckMode} is configured in {@link AckMode#MANUAL}
+ * This is used when the {@link InternalAckMode} is configured in {@link InternalAckMode#MANUAL}
  *
  * @since 4.0
  */
@@ -34,9 +36,12 @@ public class JmsSessionManager {
   private static final Logger LOGGER = getLogger(JmsSessionManager.class);
   private final Map<String, SessionInformation> pendingSessions = new HashMap<>();
 
+  private ThreadLocal<JmsSession> currentSession = new ThreadLocal<>();
+  private ThreadLocal<TransactionStatus> transactionStatus = new ThreadLocal<>();
+
   /**
    * Registers the {@link Message} to the {@link Session} using the {@code ackId} in order to being
-   * able later to perform a {@link AckMode#MANUAL} ACK
+   * able later to perform a {@link InternalAckMode#MANUAL} ACK
    *
    * @param ackId   the id associated to the {@link Session} used to create the {@link Message}
    * @param message the {@link Message} to use for executing the {@link Message#acknowledge}
@@ -44,6 +49,7 @@ public class JmsSessionManager {
    * @throws IllegalArgumentException if no Session was registered with the given AckId
    */
   public void registerMessageForAck(String ackId, Message message, Session session, JmsListenerLock jmsLock) {
+
     if (!pendingSessions.containsKey(ackId)) {
       pendingSessions.put(ackId, new SessionInformation(message, session, jmsLock));
     }
@@ -114,6 +120,45 @@ public class JmsSessionManager {
 
   private Optional<SessionInformation> getSessionInformation(String ackId) {
     return ofNullable(pendingSessions.remove(ackId));
+  }
+
+  /**
+   * Binds the given {@link JmsSession} to the current {@link Thread}
+   * @param session session to bind
+   */
+  public void bindToTransaction(JmsSession session) {
+    currentSession.set(session);
+  }
+
+  /**
+   * @return the {@link Optional} {@link JmsSession} of the current {@link Thread}
+   */
+  public Optional<JmsSession> getCurrentSession() {
+    return ofNullable(currentSession.get());
+  }
+
+  /**
+   * Unbinds the current {@link JmsSession}, if there is one, of the current {@link Thread}
+   */
+  public void unbindSession() {
+    currentSession.remove();
+  }
+
+  /**
+   * @return The status of the transaction.
+   * - {@link TransactionStatus#NONE} means that there is no started transaction for the current {@link Thread}
+   * - {@link TransactionStatus#STARTED} means that there is a transaction being executed in the current {@link Thread}
+   */
+  public TransactionStatus getTransactionStatus() {
+    TransactionStatus transactionStatus = this.transactionStatus.get();
+    return transactionStatus != null ? transactionStatus : NONE;
+  }
+
+  /**
+   * @param transactionStatus The new {@link TransactionStatus}
+   */
+  public void changeTransactionStatus(TransactionStatus transactionStatus) {
+    this.transactionStatus.set(transactionStatus);
   }
 
   private class SessionInformation {

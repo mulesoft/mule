@@ -13,7 +13,7 @@ import org.mule.extensions.jms.internal.config.InternalAckMode;
 import javax.jms.Session;
 
 /**
- * Declares the kind of Acknowledgement mode supported.
+ * Declares the kind of Acknowledgement mode supported for consumer operations.
  *
  * AUTO: Mule ACKs the message only if the flow is finished successfully.
  * MANUAL: This is JMS {@link Session#CLIENT_ACKNOWLEDGE} mode. The user must do the ack manually within the flow.
@@ -22,13 +22,7 @@ import javax.jms.Session;
  *
  * @since 4.0
  */
-public enum AckMode implements JmsAckMode {
-
-  /**
-   * Mule automatically ACKs the message upon reception
-   */
-  NONE(InternalAckMode.NONE),
-
+public enum ConsumerAckMode implements JmsAckMode {
   /**
    * This is JMS {@link Session#AUTO_ACKNOWLEDGE} mode.
    * The session automatically acknowledges the receipt when it successfully delivered the message
@@ -48,7 +42,7 @@ public enum AckMode implements JmsAckMode {
 
   private InternalAckMode ackMode;
 
-  AckMode(InternalAckMode none) {
+  ConsumerAckMode(InternalAckMode none) {
     this.ackMode = none;
   }
 

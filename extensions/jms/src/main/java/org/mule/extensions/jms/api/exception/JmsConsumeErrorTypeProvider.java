@@ -10,9 +10,9 @@ import static org.mule.extensions.jms.api.exception.JmsErrors.ACK;
 import static org.mule.extensions.jms.api.exception.JmsErrors.CONSUMING;
 import static org.mule.extensions.jms.api.exception.JmsErrors.DESTINATION_NOT_FOUND;
 import static org.mule.extensions.jms.api.exception.JmsErrors.TIMEOUT;
-import org.mule.extensions.jms.api.config.AckMode;
+import org.mule.extensions.jms.api.config.ConsumerAckMode;
 import org.mule.extensions.jms.api.config.JmsConfig;
-import org.mule.extensions.jms.api.connection.JmsConnection;
+import org.mule.extensions.jms.api.connection.JmsTransactionalConnection;
 import org.mule.extensions.jms.api.destination.ConsumerType;
 import org.mule.extensions.jms.api.operation.JmsConsume;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Errors that can be thrown in the
- * {@link JmsConsume#consume(JmsConnection, JmsConfig, String, ConsumerType, AckMode, String, String, String, Long, TimeUnit)}
+ * {@link JmsConsume#consume(JmsTransactionalConnection, JmsConfig, String, ConsumerType, ConsumerAckMode, String, String, String, Long, TimeUnit)}
  * operation operation.
  *
  * @since 4.0

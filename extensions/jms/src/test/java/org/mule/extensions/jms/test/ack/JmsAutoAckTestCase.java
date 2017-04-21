@@ -21,7 +21,7 @@ import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features(JMS_EXTENSION)
-@Stories("Manual Acknowledgement over sessions")
+@Stories("Automatic Acknowledgement over sessions")
 public class JmsAutoAckTestCase extends JmsAbstractAckTestCase {
 
   @Override

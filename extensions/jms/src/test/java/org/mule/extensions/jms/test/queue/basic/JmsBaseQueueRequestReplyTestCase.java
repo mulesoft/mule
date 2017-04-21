@@ -17,18 +17,18 @@ import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import org.mule.extensions.jms.test.JmsAbstractTestCase;
 import org.mule.runtime.api.message.Message;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+
 public abstract class JmsBaseQueueRequestReplyTestCase extends JmsAbstractTestCase {
 
-  protected static final String DEFAULT_OPERATIONS_CONFIG = "operations/jms-default-queue-operations.xml";
-  protected static final String PUBLISH_CONSUME_OPERATIONS_CONFIG = "operations/jms-queue-request-reply.xml";
+  static final String DEFAULT_OPERATIONS_CONFIG = "operations/jms-default-queue-operations.xml";
+  static final String PUBLISH_CONSUME_OPERATIONS_CONFIG = "operations/jms-queue-request-reply.xml";
 
   private static final String REQUEST_REPLY_EXPLICIT_DEST_FLOW = "request-reply-explicit-destination";
   private static final String REQUEST_REPLY_TEMP_DEST_FLOW = "request-reply-temp-destination";
@@ -39,7 +39,6 @@ public abstract class JmsBaseQueueRequestReplyTestCase extends JmsAbstractTestCa
   private static final String SECOND_RESPONSE = "Second Response";
 
   private static final String REPLY_TO_DESTINATION_VAR = "replyToDestination";
-  private static final String REPLY_TO_DESTINATION = "replyQueue";
 
   private ExecutorService executor;
 
@@ -59,12 +58,13 @@ public abstract class JmsBaseQueueRequestReplyTestCase extends JmsAbstractTestCa
   @Description("Checks that a message can be sent and then wait for the reply to an explicit replyTo destination")
   public void requestReplyExplicitReplyDestination() throws Exception {
     destination = newDestination("first_requestReplyExplicitReplyDestination");
+    String replyDestination = newDestination("replyDestination");
 
     // Publish initial requests and wait for responses in the same reply queue
     Future<Message> firstRequestReply = executor
         .submit(() -> flowRunner(REQUEST_REPLY_EXPLICIT_DEST_FLOW)
             .withVariable(DESTINATION_VAR, destination)
-            .withVariable(REPLY_TO_DESTINATION_VAR, REPLY_TO_DESTINATION)
+            .withVariable(REPLY_TO_DESTINATION_VAR, replyDestination)
             .withPayload(FIRST_MESSAGE)
             .run()
             .getMessage());
@@ -73,9 +73,9 @@ public abstract class JmsBaseQueueRequestReplyTestCase extends JmsAbstractTestCa
     Message firstMessage = consume(destination, emptyMap(), -1);
     assertThat(firstMessage, hasPayload(equalTo(FIRST_MESSAGE)));
     String firstReplyDestination = getReplyDestination(firstMessage);
-    assertThat(firstReplyDestination, is(equalTo(REPLY_TO_DESTINATION)));
+    assertThat(firstReplyDestination, is(equalTo(replyDestination)));
 
-    reply(REPLY_TO_DESTINATION, FIRST_RESPONSE);
+    reply(replyDestination, FIRST_RESPONSE);
 
     // Read the reply result
     Message firstReply = firstRequestReply.get();
@@ -114,13 +114,15 @@ public abstract class JmsBaseQueueRequestReplyTestCase extends JmsAbstractTestCa
   public void requestReplyExplicitPreSentReply() throws Exception {
     final String firstDestination = newDestination("first_requestReplyExplicitPreSentReply");
 
-    reply(REPLY_TO_DESTINATION, FIRST_RESPONSE);
-    reply(REPLY_TO_DESTINATION, SECOND_RESPONSE);
+    String replyDestination = newDestination("replyDestination");
+
+    reply(replyDestination, FIRST_RESPONSE);
+    reply(replyDestination, SECOND_RESPONSE);
 
     // Publish initial requests and wait for responses in the same reply queue
     Message firstReply = flowRunner(REQUEST_REPLY_EXPLICIT_DEST_FLOW)
         .withVariable(DESTINATION_VAR, firstDestination)
-        .withVariable(REPLY_TO_DESTINATION_VAR, REPLY_TO_DESTINATION)
+        .withVariable(REPLY_TO_DESTINATION_VAR, replyDestination)
         .withPayload(FIRST_MESSAGE)
         .run()
         .getMessage();
@@ -128,7 +130,7 @@ public abstract class JmsBaseQueueRequestReplyTestCase extends JmsAbstractTestCa
     final String secondDestination = newDestination("second_requestReplyExplicitPreSentReply");
     Message secondReply = flowRunner(REQUEST_REPLY_EXPLICIT_DEST_FLOW)
         .withVariable(DESTINATION_VAR, secondDestination)
-        .withVariable(REPLY_TO_DESTINATION_VAR, REPLY_TO_DESTINATION)
+        .withVariable(REPLY_TO_DESTINATION_VAR, replyDestination)
         .withPayload(SECOND_MESSAGE)
         .run()
         .getMessage();
@@ -137,12 +139,12 @@ public abstract class JmsBaseQueueRequestReplyTestCase extends JmsAbstractTestCa
     Message firstMessage = consume(firstDestination, emptyMap(), -1);
     assertThat(firstMessage, hasPayload(equalTo(FIRST_MESSAGE)));
     String firstReplyDestination = getReplyDestination(firstMessage);
-    assertThat(firstReplyDestination, is(equalTo(REPLY_TO_DESTINATION)));
+    assertThat(firstReplyDestination, is(equalTo(replyDestination)));
 
     Message secondMessage = consume(secondDestination, emptyMap(), -1);
     assertThat(secondMessage, hasPayload(equalTo(SECOND_MESSAGE)));
     String secondReplyDestination = getReplyDestination(secondMessage);
-    assertThat(secondReplyDestination, is(equalTo(REPLY_TO_DESTINATION)));
+    assertThat(secondReplyDestination, is(equalTo(replyDestination)));
 
     assertThat(firstReply, hasPayload(equalTo(FIRST_RESPONSE)));
     assertThat(firstReply.getAttributes().getValue(), not(nullValue()));

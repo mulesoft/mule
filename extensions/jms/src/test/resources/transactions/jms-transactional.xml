@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+      http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+
+    <flow name="publisher">
+        <jms:publish config-ref="config" destination="#[destination]"/>
+    </flow>
+
+    <flow name="consumer">
+        <jms:consume config-ref="config" destination="#[destination]" maximumWait="#[maximumWait]"/>
+    </flow>
+
+    <flow name="executionWrapper">
+        <try>
+            <try transactionalAction="ALWAYS_BEGIN">
+                <flow-ref name="#[variables.flowName]"/>
+                <choice>
+                    <when expression="#[variables.rollback]">
+                        <test:throw exception="java.lang.RuntimeException" error="ROUTING"/>
+                    </when>
+                    <otherwise>
+                        <logger level="TRACE" message="NOTHING TO DO"/>
+                    </otherwise>
+                </choice>
+            </try>
+        </try>
+        <error-handler>
+            <on-error-continue type="ROUTING"/>
+            <on-error-propagate type="ANY"/>
+        </error-handler>
+    </flow>
+    
+    <flow name="txPublish">
+        <jms:publish config-ref="config" destination="#[publishDestination]" />
+    </flow>
+
+    <flow name="txConsume">
+        <jms:consume config-ref="config" destination="#[consumeDestination]" maximumWait="1000"/>
+    </flow>
+
+    <flow name="txConsumeAndPublish">
+        <jms:consume config-ref="config" destination="#[consumeDestination]"/>
+        <jms:publish config-ref="config" destination="#[publishDestination]"/>
+    </flow>
+    
+    <flow name="txSubscriberWithPublish" initialState="stopped">
+        <jms:listener config-ref="config" destination="${destination}" transactionalAction="ALWAYS_BEGIN" numberOfConsumers="1"/>
+        <jms:publish config-ref="config" destination="${publishDestination}"/>
+    </flow>
+</mule>

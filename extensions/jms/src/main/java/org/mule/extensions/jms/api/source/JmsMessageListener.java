@@ -13,9 +13,10 @@ import static org.mule.extensions.jms.internal.common.JmsCommons.evaluateMessage
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageContentType;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageEncoding;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveOverride;
+import static org.mule.extensions.jms.internal.config.InternalAckMode.TRANSACTED;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extensions.jms.JmsSessionManager;
-import org.mule.extensions.jms.api.config.AckMode;
+import org.mule.extensions.jms.internal.config.InternalAckMode;
 import org.mule.extensions.jms.api.config.JmsConfig;
 import org.mule.extensions.jms.api.connection.JmsSession;
 import org.mule.extensions.jms.api.exception.JmsExtensionException;
@@ -45,7 +46,7 @@ public final class JmsMessageListener implements MessageListener {
   private final JmsSession session;
   private final SourceCallback<Object, JmsAttributes> sourceCallback;
   private final JmsListenerLock jmsLock;
-  private final AckMode ackMode;
+  private final InternalAckMode ackMode;
   private final String encoding;
   private final String contentType;
   private final JmsConfig config;
@@ -67,7 +68,7 @@ public final class JmsMessageListener implements MessageListener {
    * @param contentType    Default contentType if the consumed message doesn't provide one
    */
   JmsMessageListener(JmsSession session, JmsConfig config, JmsListenerLock jmsLock, JmsSessionManager sessionManager,
-                     SourceCallback<Object, JmsAttributes> sourceCallback, JmsSupport jmsSupport, AckMode ackMode,
+                     SourceCallback<Object, JmsAttributes> sourceCallback, JmsSupport jmsSupport, InternalAckMode ackMode,
                      String encoding, String contentType) {
     this.session = session;
     this.sourceCallback = sourceCallback;
@@ -86,6 +87,9 @@ public final class JmsMessageListener implements MessageListener {
   @Override
   public void onMessage(Message message) {
     SourceCallbackContext context = sourceCallback.createContext();
+    if (ackMode.equals(TRANSACTED)) {
+      sessionManager.bindToTransaction(session);
+    }
     evaluateAckAction(message);
     saveReplyToDestination(message, context);
     context.addVariable(JMS_LOCK_VAR, jmsLock);
