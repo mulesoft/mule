@@ -21,8 +21,11 @@ import org.mule.runtime.module.artifact.classloader.DisposableClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
+import com.google.common.collect.ImmutableList;
+
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Given an {@link ArtifactPluginDescriptor} as a starting point, it will generate a {@link ArtifactClassLoader} capable of
@@ -91,7 +94,11 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
   @Override
   public ArtifactClassLoader build() throws IOException {
     setArtifactDescriptor(new ArtifactDescriptor(TOOLING_EXTENSION_MODEL));
-    this.addArtifactPluginDescriptors(artifactPluginDescriptor);
+    List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
+        pluginDependenciesResolver
+            .resolve(ImmutableList.<ArtifactPluginDescriptor>builder().add(artifactPluginDescriptor).build());
+    this.addArtifactPluginDescriptors(resolvedArtifactPluginDescriptors
+        .toArray(new ArtifactPluginDescriptor[resolvedArtifactPluginDescriptors.size()]));
     ArtifactClassLoader ownerArtifactClassLoader = super.build();
     ClassLoader parent = ownerArtifactClassLoader.getClassLoader().getParent();
     if (!(parent instanceof RegionClassLoader)) {

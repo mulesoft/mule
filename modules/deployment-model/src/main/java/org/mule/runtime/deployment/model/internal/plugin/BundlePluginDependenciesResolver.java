@@ -7,10 +7,9 @@
 
 package org.mule.runtime.deployment.model.internal.plugin;
 
+import static java.lang.String.format;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.descriptor.BundleDescriptorUtils.isCompatibleVersion;
-import org.mule.runtime.deployment.model.api.artifact.DependenciesProvider;
-import org.mule.runtime.deployment.model.api.artifact.DependencyNotFoundException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
@@ -36,7 +35,6 @@ import java.util.stream.Collectors;
 public class BundlePluginDependenciesResolver implements PluginDependenciesResolver {
 
   private final ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory;
-  private final DependenciesProvider dependenciesProvider;
 
   /**
    * Assembly the complete list of artifacts, while sorting them in a lexicographic order by name to then resolve sanitize the
@@ -45,12 +43,9 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
    *
    * @param artifactDescriptorFactory factory to create {@link ArtifactPluginDescriptor} when there's a missing dependency to
    *        resolve
-   * @param dependenciesProvider resolver for missing dependencies.
    */
-  public BundlePluginDependenciesResolver(ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory,
-                                          DependenciesProvider dependenciesProvider) {
+  public BundlePluginDependenciesResolver(ArtifactDescriptorFactory<ArtifactPluginDescriptor> artifactDescriptorFactory) {
     this.artifactDescriptorFactory = artifactDescriptorFactory;
-    this.dependenciesProvider = dependenciesProvider;
   }
 
   @Override
@@ -127,13 +122,11 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
   }
 
   /**
-   * Goes over the elements in the {@code pluginDescriptors} collection looking if it hasn't been resolved yet. If it hasn't then
-   * it looks it up through the {@link DependenciesProvider} and then creates an {@link ArtifactPluginDescriptor}.
+   * Goes over the elements in the {@code pluginDescriptors} collection looking if it hasn't been resolved yet.
    *
    * @param pluginDescriptors plugins to validate.
    * @param visited plugins that are already resolved (by either the container or application initially, or by the resolver).
    * @return the plugins that were obtained initially plus all the ones that were found.
-   * @throws DependencyNotFoundException if any dependency wasn't found properly
    */
   private List<ArtifactPluginDescriptor> getArtifactsWithDependencies(List<ArtifactPluginDescriptor> pluginDescriptors,
                                                                       Set<BundleDescriptor> visited) {
@@ -152,7 +145,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                   if (dependency.getBundleUrl() != null) {
                     mulePluginLocation = new File(dependency.getBundleUrl().getFile());
                   } else {
-                    mulePluginLocation = dependenciesProvider.resolve(dependency.getDescriptor());
+                    throw new PluginResolutionError(format("Bundle URL should have been resolved for %s.",
+                                                           dependency.getDescriptor()));
                   }
                   ArtifactPluginDescriptor artifactPluginDescriptor = artifactDescriptorFactory.create(mulePluginLocation);
                   artifactPluginDescriptor.setBundleDescriptor(dependency.getDescriptor());

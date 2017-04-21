@@ -14,8 +14,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import org.mule.runtime.deployment.model.api.artifact.DependencyNotFoundException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.internal.plugin.PluginResolutionError;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -53,7 +53,7 @@ public class ToolingPluginArtifactClassLoaderTestCase extends AbstractMuleTestCa
     pluginArtifactClassLoader = spy(new TestToolingPluginClassLoader(artifactPluginDescriptor));
   }
 
-  @Test(expected = DependencyNotFoundException.class)
+  @Test(expected = PluginResolutionError.class)
   public void createClassLoaderWithEmptyPluginList() {
     new ToolingPluginArtifactClassLoader(regionClassLoader, artifactPluginDescriptor);
   }
