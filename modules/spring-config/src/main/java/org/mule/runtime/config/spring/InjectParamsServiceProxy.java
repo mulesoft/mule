@@ -22,10 +22,12 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Proxies a {@link Service} instance to automatically {@link Inject} parameters for invocations of implementation methods.
@@ -57,8 +59,13 @@ public class InjectParamsServiceProxy extends ServiceInvocationHandler {
     } else {
       final List<Object> augmentedArgs = args == null ? new ArrayList<>() : new ArrayList<>(asList(args));
 
-      for (int j = method.getParameterTypes().length; j < injectable.getParameterTypes().length; ++j) {
-        augmentedArgs.add(context.getRegistry().lookupObject(injectable.getParameterTypes()[j]));
+      for (int j = method.getParameters().length; j < injectable.getParameters().length; ++j) {
+        final Parameter parameter = injectable.getParameters()[j];
+        if (parameter.isAnnotationPresent(Named.class)) {
+          augmentedArgs.add(context.getRegistry().lookupObject(parameter.getAnnotation(Named.class).value()));
+        } else {
+          augmentedArgs.add(context.getRegistry().lookupObject(parameter.getType()));
+        }
       }
 
       return doInvoke(proxy, injectable, augmentedArgs.toArray());
@@ -72,7 +79,7 @@ public class InjectParamsServiceProxy extends ServiceInvocationHandler {
       if (isPublic(serviceImplMethod.getModifiers())
           && serviceImplMethod.getName().equals(method.getName())
           && serviceImplMethod.getAnnotationsByType(Inject.class).length > 0
-          && equivalentParams(method.getParameterTypes(), serviceImplMethod.getParameterTypes())) {
+          && equivalentParams(method.getParameters(), serviceImplMethod.getParameters())) {
         if (candidate != null) {
           throw new IllegalDependencyInjectionException(format("More than one invocation candidate for for method '%s' in service '%s'",
                                                                method.getName(), getService().getName()));
@@ -83,19 +90,20 @@ public class InjectParamsServiceProxy extends ServiceInvocationHandler {
     return candidate;
   }
 
-  private boolean equivalentParams(Class<?>[] invocationParamTypes, Class<?>[] serviceImplParamTypes)
+  private boolean equivalentParams(Parameter[] invocationParams, Parameter[] serviceImplParams)
       throws RegistrationException {
     int i = 0;
-    for (Class<?> invocationParamType : invocationParamTypes) {
-      if (!serviceImplParamTypes[i].equals(invocationParamType)) {
+    for (Parameter invocationParam : invocationParams) {
+      if (!serviceImplParams[i].getType().equals(invocationParam.getType())) {
         return false;
       }
       ++i;
     }
 
     // Check that the remaining parameters are injectable
-    for (int j = i; j < serviceImplParamTypes.length; ++j) {
-      if (context.getRegistry().lookupObject(serviceImplParamTypes[j]) == null) {
+    for (int j = i; j < serviceImplParams.length; ++j) {
+      if (!serviceImplParams[j].isAnnotationPresent(Named.class)
+          && context.getRegistry().lookupObject(serviceImplParams[j].getType()) == null) {
         return false;
       }
     }

@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.config.spring.InjectParamsServiceProxy.createInjectProviderParamsServiceProxy;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.container.api.ServiceInvocationHandler;
@@ -22,6 +23,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.lang.reflect.Method;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,6 +50,17 @@ public class InjectParamsServiceProxyTestCase extends AbstractMuleContextTestCas
   @Test
   public void augmentedInvocation() throws Exception {
     BaseService service = new AugmentedMethodService();
+
+    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
+
+    serviceProxy.augmented();
+
+    assertThat(augmentedParam, sameInstance(muleContext));
+  }
+
+  @Test
+  public void namedAugmentedInvocation() throws Exception {
+    BaseService service = new NamedAugmentedMethodService();
 
     final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
 
@@ -173,6 +186,22 @@ public class InjectParamsServiceProxyTestCase extends AbstractMuleContextTestCas
     @Inject
     public void augmented(MuleContext context) {
       augmentedParam = context;
+    }
+  }
+
+  public class NamedAugmentedMethodService implements BaseService {
+
+    @Override
+    public String getName() {
+      return "NamedAugmentedMethodService";
+    }
+
+    @Override
+    public void augmented() {}
+
+    @Inject
+    public void augmented(@Named(OBJECT_MULE_CONTEXT) Object param) {
+      augmentedParam = param;
     }
   }
 
