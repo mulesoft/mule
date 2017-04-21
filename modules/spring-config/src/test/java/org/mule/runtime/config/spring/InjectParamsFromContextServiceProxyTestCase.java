@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.lang.String.format;
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.config.spring.InjectParamsServiceProxy.createInjectProviderParamsServiceProxy;
+import static org.mule.runtime.config.spring.InjectParamsFromContextServiceProxy.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
+import static org.mule.runtime.config.spring.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 
 import org.mule.runtime.api.service.Service;
@@ -19,6 +21,7 @@ import org.mule.runtime.container.api.ServiceInvocationHandler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.lang.reflect.Method;
 
@@ -29,7 +32,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class InjectParamsServiceProxyTestCase extends AbstractMuleContextTestCase {
+@SmallTest
+public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
@@ -111,8 +115,7 @@ public class InjectParamsServiceProxyTestCase extends AbstractMuleContextTestCas
     final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
 
     expected.expect(IllegalDependencyInjectionException.class);
-    expected
-        .expectMessage("More than one invocation candidate for for method 'augmented' in service 'AmbiguousAugmentedMethodService'");
+    expected.expectMessage(format(MANY_CANDIDATES_ERROR_MSG_TEMPLATE, "augmented", "AmbiguousAugmentedMethodService"));
     serviceProxy.augmented();
 
     assertThat(augmentedParam, nullValue());

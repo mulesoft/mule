@@ -38,6 +38,9 @@ public abstract class ServiceInvocationHandler implements InvocationHandler {
     this.service = service;
   }
 
+  /**
+   * @return the methods declared in the implementation of the proxied service.
+   */
   protected Method[] getServiceImplementationDeclaredMethods() {
     if (isProxyClass(getService().getClass()) && getInvocationHandler(getService()) instanceof ServiceInvocationHandler) {
       return ((ServiceInvocationHandler) getInvocationHandler(getService())).getServiceImplementationDeclaredMethods();
@@ -46,6 +49,11 @@ public abstract class ServiceInvocationHandler implements InvocationHandler {
     }
   }
 
+  /**
+   * Performs the actual invocaiton on the proxied {@link Service}, or delegates the call to an inner proxy.
+   * 
+   * See {@link InvocationHandler#invoke(Object, Method, Object[])}
+   */
   protected Object doInvoke(Object proxy, Method method, Object[] args) throws Throwable {
     if (isProxyClass(getService().getClass()) && getInvocationHandler(getService()) instanceof ServiceInvocationHandler) {
       return ((ServiceInvocationHandler) getInvocationHandler(getService())).invoke(getService(), method, args);
@@ -60,6 +68,9 @@ public abstract class ServiceInvocationHandler implements InvocationHandler {
     }
   }
 
+  /**
+   * The proxied {@link Service}.
+   */
   protected Service getService() {
     return service;
   }

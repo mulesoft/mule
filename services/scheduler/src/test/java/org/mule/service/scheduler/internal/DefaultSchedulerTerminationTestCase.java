@@ -127,7 +127,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
 
     // Due to how threads are scheduled, the termination state of the executor may become available after the getter of the future
     // returns.
-    new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
+    terminationProber().check(new JUnitLambdaProbe(() -> {
       assertThat(executor, terminatedMatcher);
       return true;
     }));
@@ -191,7 +191,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
 
     // Due to how threads are scheduled, the termination state of the executor may become available after the getter of the future
     // returns.
-    new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
+    terminationProber().check(new JUnitLambdaProbe(() -> {
       assertThat(executor, terminatedMatcher);
       return true;
     }));
@@ -216,7 +216,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
     executor.shutdown();
     // Due to how threads are scheduled, the termination state of the executor may become available after the getter of the future
     // returns.
-    new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
+    terminationProber().check(new JUnitLambdaProbe(() -> {
       assertThat(executor, terminatedMatcher);
       return true;
     }));
@@ -267,7 +267,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
 
     sharedExecutor.submit(() -> executor.stop());
 
-    new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
+    terminationProber().check(new JUnitLambdaProbe(() -> {
       assertThat(executor, terminatedMatcher);
       return true;
     }));
@@ -294,7 +294,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
       auxExecutor.submit(() -> executor.stop());
       latch2.countDown();
 
-      new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
+      terminationProber().check(new JUnitLambdaProbe(() -> {
         assertThat(executor, terminatedMatcher);
         return true;
       }));
@@ -323,7 +323,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
       auxExecutor.submit(() -> executor.stop());
       latch2.countDown();
 
-      new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
+      terminationProber().check(new JUnitLambdaProbe(() -> {
         assertThat(executor, terminatedMatcher);
         return true;
       }));
@@ -355,7 +355,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
       latch1.countDown();
       latch2.countDown();
 
-      new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
+      terminationProber().check(new JUnitLambdaProbe(() -> {
         assertThat(executor, terminatedMatcher);
         return true;
       }));
@@ -386,7 +386,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
       latch1.countDown();
       latch2.countDown();
 
-      new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
+      terminationProber().check(new JUnitLambdaProbe(() -> {
         assertThat(executor, terminatedMatcher);
         return true;
       }));
@@ -409,7 +409,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
     try {
       final long stopReqNanos = nanoTime();
       auxExecutor.submit(() -> executor.stop());
-      new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
+      terminationProber().check(new JUnitLambdaProbe(() -> {
         assertThat(executor, terminatedMatcher);
         return true;
       }));
@@ -431,7 +431,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
     try {
       final long stopReqNanos = nanoTime();
       auxExecutor.submit(() -> executor.stop());
-      new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
+      terminationProber().check(new JUnitLambdaProbe(() -> {
         assertThat(executor, terminatedMatcher);
         return true;
       }));
@@ -467,7 +467,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
 
     executor.stop();
 
-    new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
+    terminationProber().check(new JUnitLambdaProbe(() -> {
       assertThat(taskThread.get(), is(not(nullValue())));
       assertThat(executor, terminatedMatcher);
       return true;
@@ -499,7 +499,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
 
     executor.stop();
 
-    new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
+    terminationProber().check(new JUnitLambdaProbe(() -> {
       assertThat(taskThread.get(), is(not(nullValue())));
       assertThat(executor, terminatedMatcher);
       return true;
@@ -545,7 +545,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
     assertThat(taskThread.get(), is(not(nullValue())));
     assertThat(pendingTaskThread.get(), is(nullValue()));
 
-    new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
+    terminationProber().check(new JUnitLambdaProbe(() -> {
       assertThat(executor, terminatedMatcher);
       return true;
     }));
@@ -582,12 +582,16 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
 
     executor.stop();
 
-    new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
+    terminationProber().check(new JUnitLambdaProbe(() -> {
       assertThat(taskThread.get(), is(not(nullValue())));
       assertThat(pendingTaskThread.get(), is(nullValue()));
       assertThat(executor, terminatedMatcher);
       return true;
     }));
+  }
+
+  private PollingProber terminationProber() {
+    return new PollingProber(500, 50);
   }
 
   private static Matcher<ExecutorService> isTerminated() {

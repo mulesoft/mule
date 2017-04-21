@@ -613,7 +613,7 @@ public class DefaultMuleContext implements MuleContext {
 
   @Override
   public SchedulerConfig getSchedulerBaseConfig() {
-    return ((SchedulerConfig) this.getRegistry().lookupObject(OBJECT_SCHEDULER_BASE_CONFIG));
+    return this.getRegistry().lookupObject(OBJECT_SCHEDULER_BASE_CONFIG);
   }
 
   @Override

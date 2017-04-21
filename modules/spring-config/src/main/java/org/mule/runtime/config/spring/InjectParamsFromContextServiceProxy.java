@@ -34,7 +34,10 @@ import javax.inject.Named;
  * 
  * @since 4.0
  */
-public class InjectParamsServiceProxy extends ServiceInvocationHandler {
+public class InjectParamsFromContextServiceProxy extends ServiceInvocationHandler {
+
+  public static final String MANY_CANDIDATES_ERROR_MSG_TEMPLATE =
+      "More than one invocation candidate for for method '%s' in service '%s'";
 
   private final MuleContext context;
 
@@ -44,7 +47,7 @@ public class InjectParamsServiceProxy extends ServiceInvocationHandler {
    * @param service service instance to wrap. Non null.
    * @param context the {@link MuleContext} to use for resolving injectable parameters. Non null.
    */
-  public InjectParamsServiceProxy(Service service, MuleContext context) {
+  public InjectParamsFromContextServiceProxy(Service service, MuleContext context) {
     super(service);
     checkArgument(context != null, "context cannot be null");
     this.context = context;
@@ -59,8 +62,8 @@ public class InjectParamsServiceProxy extends ServiceInvocationHandler {
     } else {
       final List<Object> augmentedArgs = args == null ? new ArrayList<>() : new ArrayList<>(asList(args));
 
-      for (int j = method.getParameters().length; j < injectable.getParameters().length; ++j) {
-        final Parameter parameter = injectable.getParameters()[j];
+      for (int i = method.getParameters().length; i < injectable.getParameters().length; ++i) {
+        final Parameter parameter = injectable.getParameters()[i];
         if (parameter.isAnnotationPresent(Named.class)) {
           augmentedArgs.add(context.getRegistry().lookupObject(parameter.getAnnotation(Named.class).value()));
         } else {
@@ -81,8 +84,8 @@ public class InjectParamsServiceProxy extends ServiceInvocationHandler {
           && serviceImplMethod.getAnnotationsByType(Inject.class).length > 0
           && equivalentParams(method.getParameters(), serviceImplMethod.getParameters())) {
         if (candidate != null) {
-          throw new IllegalDependencyInjectionException(format("More than one invocation candidate for for method '%s' in service '%s'",
-                                                               method.getName(), getService().getName()));
+          throw new IllegalDependencyInjectionException(format(MANY_CANDIDATES_ERROR_MSG_TEMPLATE, method.getName(),
+                                                               getService().getName()));
         }
         candidate = serviceImplMethod;
       }
@@ -111,8 +114,6 @@ public class InjectParamsServiceProxy extends ServiceInvocationHandler {
     return true;
   }
 
-
-
   /**
    * Creates a proxy for the provided service instance.
    *
@@ -123,7 +124,7 @@ public class InjectParamsServiceProxy extends ServiceInvocationHandler {
   public static Service createInjectProviderParamsServiceProxy(Service service, MuleContext context) {
     checkArgument(service != null, "service cannot be null");
     checkArgument(context != null, "context cannot be null");
-    InvocationHandler handler = new InjectParamsServiceProxy(service, context);
+    InvocationHandler handler = new InjectParamsFromContextServiceProxy(service, context);
 
     return (Service) newProxyInstance(service.getClass().getClassLoader(), findImplementedInterfaces(service.getClass()),
                                       handler);

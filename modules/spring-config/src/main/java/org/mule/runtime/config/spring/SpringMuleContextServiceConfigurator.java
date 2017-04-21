@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
-import static org.mule.runtime.config.spring.InjectParamsServiceProxy.createInjectProviderParamsServiceProxy;
+import static org.mule.runtime.config.spring.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_LOCAL_USER_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
