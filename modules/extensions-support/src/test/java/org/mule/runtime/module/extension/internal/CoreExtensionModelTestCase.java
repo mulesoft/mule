@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal;
 
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -26,7 +27,10 @@ import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.config.MuleManifest.getVendorName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.getMuleExtensionModel;
+import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.model.impl.DefaultAnyType;
 import org.mule.metadata.api.model.impl.DefaultArrayType;
 import org.mule.metadata.api.model.impl.DefaultBooleanType;
@@ -92,7 +96,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
-    assertThat(coreExtensionModel.getOperationModels(), hasSize(11));
+    assertThat(coreExtensionModel.getOperationModels(), hasSize(15));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
 
     assertThat(coreExtensionModel.getErrorModels(),
@@ -429,6 +433,106 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(asyncModel.getAllParameterModels(), hasSize(0));
   }
 
+  @Test
+  public void tryScope() {
+    final ScopeModel tryModel = (ScopeModel) coreExtensionModel.getOperationModel("try").get();
+
+    assertThat(tryModel.getErrorModels(), empty());
+    assertThat(tryModel.getExecutionType(), is(BLOCKING));
+
+    assertAssociatedProcessorsChangeOutput(tryModel);
+
+    List<ParameterModel> allParameterModels = tryModel.getAllParameterModels();
+    assertThat(allParameterModels, hasSize(2));
+
+    ParameterModel action = allParameterModels.get(0);
+    assertThat(action.getName(), is("transactionalAction"));
+    assertThat(action.getType(), is(instanceOf(DefaultStringType.class)));
+    assertThat(action.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(action.isRequired(), is(false));
+
+    ParameterModel type = allParameterModels.get(1);
+    assertThat(type.getName(), is("transactionType"));
+    assertThat(type.getType(), is(instanceOf(DefaultStringType.class)));
+    assertThat(type.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(type.isRequired(), is(false));
+  }
+
+  //TODO: MULE-12224 - Provide support for scope as top level elements
+  @Test
+  public void errorHandler() {
+    final ScopeModel errorHandlerModel = (ScopeModel) coreExtensionModel.getOperationModel("error-handler").get();
+
+    assertThat(errorHandlerModel.getErrorModels(), empty());
+    assertThat(errorHandlerModel.getExecutionType(), is(CPU_LITE));
+
+    assertAssociatedProcessorsChangeOutput(errorHandlerModel);
+
+    List<ParameterModel> allParameterModels = errorHandlerModel.getAllParameterModels();
+    assertThat(allParameterModels, hasSize(0));
+  }
+
+  @Test
+  public void onErrorContinue() {
+    verifyOnError("on-error-continue");
+  }
+
+  @Test
+  public void onErrorPropagate() {
+    verifyOnError("on-error-propagate");
+  }
+
+  //TODO: MULE-12265 - Provide support for "exclusive scopes"
+  void verifyOnError(String name) {
+    final ScopeModel continueModel = (ScopeModel) coreExtensionModel.getOperationModel(name).get();
+
+    assertThat(continueModel.getErrorModels(), empty());
+    assertThat(continueModel.getExecutionType(), is(CPU_LITE));
+
+    assertAssociatedProcessorsChangeOutput(continueModel);
+
+    List<ParameterModel> allParameterModels = continueModel.getAllParameterModels();
+    assertThat(allParameterModels, hasSize(4));
+
+    ParameterModel type = allParameterModels.get(0);
+    assertThat(type.getName(), is("type"));
+    assertThat(type.getType(), is(instanceOf(UnionType.class)));
+    List<MetadataType> types = ((UnionType) type.getType()).getTypes();
+    assertThat(types, hasSize(2));
+    assertThat(types.get(0), is(instanceOf(DefaultStringType.class)));
+    assertThat(types.get(1), is(instanceOf(DefaultStringType.class)));
+    assertThat(types.get(1).getAnnotation(EnumAnnotation.class).get().getValues(), arrayContainingInAnyOrder(
+                                                                                                             "ANY",
+                                                                                                             "REDELIVERY_EXHAUSTED",
+                                                                                                             "TRANSFORMATION",
+                                                                                                             "EXPRESSION",
+                                                                                                             "SECURITY",
+                                                                                                             "ROUTING",
+                                                                                                             "CONNECTIVITY",
+                                                                                                             "RETRY_EXHAUSTED"));
+    assertThat(type.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(type.isRequired(), is(false));
+
+    ParameterModel when = allParameterModels.get(1);
+    assertThat(when.getName(), is("when"));
+    assertThat(when.getType(), is(instanceOf(DefaultStringType.class)));
+    assertThat(when.getExpressionSupport(), is(SUPPORTED));
+    assertThat(when.isRequired(), is(false));
+
+    ParameterModel log = allParameterModels.get(2);
+    assertThat(log.getName(), is("logException"));
+    assertThat(log.getType(), is(instanceOf(DefaultBooleanType.class)));
+    assertThat(log.getExpressionSupport(), is(SUPPORTED));
+    assertThat(log.isRequired(), is(false));
+
+    ParameterModel notifications = allParameterModels.get(3);
+    assertThat(notifications.getName(), is("enableNotifications"));
+    assertThat(notifications.getType(), is(instanceOf(DefaultBooleanType.class)));
+    assertThat(notifications.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(notifications.isRequired(), is(false));
+    assertThat(notifications.getDefaultValue(), is("true"));
+  }
+
   /**
    * The operation returns its input as the output.
    * 
@@ -456,7 +560,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   }
 
   /**
-   * The operation breturns the result of one of its routes, keeping the attributes of the result message.
+   * The operation returns the result of one of its routes, keeping the attributes of the result message.
    * 
    * @param model the model to assert on
    */
