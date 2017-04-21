@@ -28,7 +28,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 /**
- * Proxies a {@link Service} instance to augment invocations of implementation methods with {@link Inject} annotations.
+ * Proxies a {@link Service} instance to automatically {@link Inject} parameters for invocations of implementation methods.
  */
 public class InjectParamsServiceProxy extends ServiceInvocationHandler {
 
@@ -48,6 +48,22 @@ public class InjectParamsServiceProxy extends ServiceInvocationHandler {
 
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    Method injectable = resolveInjectableMethod(method);
+
+    if (injectable == null) {
+      return doInvoke(proxy, method, args);
+    } else {
+      final List<Object> augmentedArgs = args == null ? new ArrayList<>() : new ArrayList<>(asList(args));
+
+      for (int j = method.getParameterTypes().length; j < injectable.getParameterTypes().length; ++j) {
+        augmentedArgs.add(context.getRegistry().lookupObject(injectable.getParameterTypes()[j]));
+      }
+
+      return doInvoke(proxy, injectable, augmentedArgs.toArray());
+    }
+  }
+
+  private Method resolveInjectableMethod(Method method) throws RegistrationException {
     Method candidate = null;
 
     for (Method serviceImplMethod : getServiceImplementationDeclaredMethods()) {
@@ -62,18 +78,7 @@ public class InjectParamsServiceProxy extends ServiceInvocationHandler {
         candidate = serviceImplMethod;
       }
     }
-
-    if (candidate == null) {
-      return doInvoke(proxy, method, args);
-    } else {
-      final List<Object> augmentedArgs = args == null ? new ArrayList<>() : new ArrayList<>(asList(args));
-
-      for (int j = method.getParameterTypes().length; j < candidate.getParameterTypes().length; ++j) {
-        augmentedArgs.add(context.getRegistry().lookupObject(candidate.getParameterTypes()[j]));
-      }
-
-      return doInvoke(proxy, candidate, augmentedArgs.toArray());
-    }
+    return candidate;
   }
 
   private boolean equivalentParams(Class<?>[] invocationParamTypes, Class<?>[] serviceImplParamTypes)

@@ -14,6 +14,7 @@ import static java.util.Collections.synchronizedList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.DEFAULT;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.WAIT;
 import static org.mule.service.scheduler.ThreadType.CPU_INTENSIVE;
@@ -107,94 +108,68 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
   @Override
   public Scheduler cpuLightScheduler() {
-    return doCpuLightScheduler(DEFAULT_SHUTDOWN_TIMEOUT_MILLIS);
+    return doCpuLightScheduler(config());
   }
 
   @Override
   public Scheduler ioScheduler() {
-    return doIoScheduler(DEFAULT_SHUTDOWN_TIMEOUT_MILLIS);
+    return doIoScheduler(config());
   }
 
   @Override
   public Scheduler cpuIntensiveScheduler() {
-    return doCpuIntensiveScheduler(DEFAULT_SHUTDOWN_TIMEOUT_MILLIS);
+    return doCpuIntensiveScheduler(config());
   }
 
   @Inject
   public Scheduler cpuLightScheduler(MuleContext context) {
-    return doCpuLightScheduler(context.getConfiguration().getShutdownTimeout());
+    return doCpuLightScheduler(config().withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS));
   }
 
   @Inject
   public Scheduler ioScheduler(MuleContext context) {
-    return doIoScheduler(context.getConfiguration().getShutdownTimeout());
+    return doIoScheduler(config().withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS));
   }
 
   @Inject
   public Scheduler cpuIntensiveScheduler(MuleContext context) {
-    return doCpuIntensiveScheduler(context.getConfiguration().getShutdownTimeout());
-  }
-
-  private Scheduler doCpuLightScheduler(long shutdownTimeoutMillis) {
-    checkStarted();
-    final DefaultScheduler scheduler =
-        new DefaultScheduler(resolveSchedulerCreationLocation(CPU_LIGHT_THREADS_NAME), cpuLightExecutor, 4 * cores,
-                             scheduledExecutor, quartzScheduler, CPU_LIGHT, shutdownTimeoutMillis,
-                             schr -> activeSchedulers.remove(schr));
-    activeSchedulers.add(scheduler);
-    return scheduler;
-  }
-
-  private Scheduler doIoScheduler(long shutdownTimeoutMillis) {
-    checkStarted();
-    final DefaultScheduler scheduler = new DefaultScheduler(resolveSchedulerCreationLocation(IO_THREADS_NAME), ioExecutor,
-                                                            cores * cores, scheduledExecutor, quartzScheduler, IO,
-                                                            shutdownTimeoutMillis, schr -> activeSchedulers.remove(schr));
-    activeSchedulers.add(scheduler);
-    return scheduler;
-  }
-
-  private Scheduler doCpuIntensiveScheduler(long shutdownTimeoutMillis) {
-    checkStarted();
-    final DefaultScheduler scheduler =
-        new DefaultScheduler(resolveSchedulerCreationLocation(COMPUTATION_THREADS_NAME), computationExecutor, 4 * cores,
-                             scheduledExecutor, quartzScheduler, CPU_INTENSIVE, shutdownTimeoutMillis,
-                             schr -> activeSchedulers.remove(schr));
-    activeSchedulers.add(scheduler);
-    return scheduler;
+    return doCpuIntensiveScheduler(config().withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS));
   }
 
   @Override
   public Scheduler cpuLightScheduler(SchedulerConfig config) {
-    return doCpuLightScheduler(config, DEFAULT_SHUTDOWN_TIMEOUT_MILLIS);
+    return doCpuLightScheduler(config);
   }
 
   @Override
   public Scheduler ioScheduler(SchedulerConfig config) {
-    return doIoScheduler(config, DEFAULT_SHUTDOWN_TIMEOUT_MILLIS);
+    return doIoScheduler(config);
   }
 
   @Override
   public Scheduler cpuIntensiveScheduler(SchedulerConfig config) {
-    return doCpuIntensiveScheduler(config, DEFAULT_SHUTDOWN_TIMEOUT_MILLIS);
+    return doCpuIntensiveScheduler(config);
   }
 
   @Inject
   public Scheduler cpuLightScheduler(SchedulerConfig config, MuleContext context) {
-    return doCpuLightScheduler(config, context.getConfiguration().getShutdownTimeout());
+    return doCpuLightScheduler(config.getShutdownTimeoutMillis() == null
+        ? config.withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS) : config);
   }
 
   @Inject
   public Scheduler ioScheduler(SchedulerConfig config, MuleContext context) {
-    return doIoScheduler(config, context.getConfiguration().getShutdownTimeout());
+    return doIoScheduler(config.getShutdownTimeoutMillis() == null
+        ? config.withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS) : config);
   }
 
   @Inject
   public Scheduler cpuIntensiveScheduler(SchedulerConfig config, MuleContext context) {
-    return doCpuIntensiveScheduler(config, context.getConfiguration().getShutdownTimeout());
+    return doCpuIntensiveScheduler(config.getShutdownTimeoutMillis() == null
+        ? config.withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS) : config);
   }
 
-  private Scheduler doCpuLightScheduler(SchedulerConfig config, long shutdownTimeoutMillis) {
+  private Scheduler doCpuLightScheduler(SchedulerConfig config) {
     checkStarted();
     if (config.getRejectionAction() != DEFAULT) {
       throw new IllegalArgumentException("Only custom schedulers may define waitDispatchingToBusyScheduler");
@@ -204,17 +179,17 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     if (config.getMaxConcurrentTasks() != null) {
       scheduler =
           new ThrottledScheduler(schedulerName, cpuLightExecutor, 4 * cores, scheduledExecutor, quartzScheduler, CPU_LIGHT,
-                                 config.getMaxConcurrentTasks(), resolveStopTimeout(config, shutdownTimeoutMillis),
+                                 config.getMaxConcurrentTasks(), resolveStopTimeout(config),
                                  schr -> activeSchedulers.remove(schr));
     } else {
       scheduler = new DefaultScheduler(schedulerName, cpuLightExecutor, 4 * cores, scheduledExecutor, quartzScheduler, CPU_LIGHT,
-                                       resolveStopTimeout(config, shutdownTimeoutMillis), schr -> activeSchedulers.remove(schr));
+                                       resolveStopTimeout(config), schr -> activeSchedulers.remove(schr));
     }
     activeSchedulers.add(scheduler);
     return scheduler;
   }
 
-  private Scheduler doIoScheduler(SchedulerConfig config, long shutdownTimeoutMillis) {
+  private Scheduler doIoScheduler(SchedulerConfig config) {
     checkStarted();
     if (config.getRejectionAction() != DEFAULT) {
       throw new IllegalArgumentException("Only custom schedulers may define waitDispatchingToBusyScheduler");
@@ -223,17 +198,17 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     Scheduler scheduler;
     if (config.getMaxConcurrentTasks() != null) {
       scheduler = new ThrottledScheduler(schedulerName, ioExecutor, cores * cores, scheduledExecutor, quartzScheduler, IO,
-                                         config.getMaxConcurrentTasks(), resolveStopTimeout(config, shutdownTimeoutMillis),
+                                         config.getMaxConcurrentTasks(), resolveStopTimeout(config),
                                          schr -> activeSchedulers.remove(schr));
     } else {
       scheduler = new DefaultScheduler(schedulerName, ioExecutor, cores * cores, scheduledExecutor, quartzScheduler, IO,
-                                       resolveStopTimeout(config, shutdownTimeoutMillis), schr -> activeSchedulers.remove(schr));
+                                       resolveStopTimeout(config), schr -> activeSchedulers.remove(schr));
     }
     activeSchedulers.add(scheduler);
     return scheduler;
   }
 
-  private Scheduler doCpuIntensiveScheduler(SchedulerConfig config, long shutdownTimeoutMillis) {
+  private Scheduler doCpuIntensiveScheduler(SchedulerConfig config) {
     checkStarted();
     if (config.getRejectionAction() != DEFAULT) {
       throw new IllegalArgumentException("Only custom schedulers may define waitDispatchingToBusyScheduler");
@@ -243,12 +218,12 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     if (config.getMaxConcurrentTasks() != null) {
       scheduler = new ThrottledScheduler(schedulerName, computationExecutor, 4 * cores, scheduledExecutor, quartzScheduler,
                                          CPU_INTENSIVE, config.getMaxConcurrentTasks(),
-                                         resolveStopTimeout(config, shutdownTimeoutMillis),
+                                         resolveStopTimeout(config),
                                          schr -> activeSchedulers.remove(schr));
     } else {
       scheduler =
           new DefaultScheduler(schedulerName, computationExecutor, 4 * cores, scheduledExecutor, quartzScheduler, CPU_INTENSIVE,
-                               resolveStopTimeout(config, shutdownTimeoutMillis), schr -> activeSchedulers.remove(schr));
+                               resolveStopTimeout(config), schr -> activeSchedulers.remove(schr));
     }
     activeSchedulers.add(scheduler);
     return scheduler;
@@ -256,25 +231,27 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
   @Override
   public Scheduler customScheduler(SchedulerConfig config) {
-    return doCustomScheduler(config, DEFAULT_SHUTDOWN_TIMEOUT_MILLIS);
+    return doCustomScheduler(config);
   }
 
   @Override
   public Scheduler customScheduler(SchedulerConfig config, int queueSize) {
-    return doCustomScheduler(config, queueSize, DEFAULT_SHUTDOWN_TIMEOUT_MILLIS);
+    return doCustomScheduler(config, queueSize);
   }
 
   @Inject
   public Scheduler customScheduler(SchedulerConfig config, MuleContext context) {
-    return doCustomScheduler(config, context.getConfiguration().getShutdownTimeout());
+    return doCustomScheduler(config.getShutdownTimeoutMillis() == null
+        ? config.withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS) : config);
   }
 
   @Inject
   public Scheduler customScheduler(SchedulerConfig config, int queueSize, MuleContext context) {
-    return doCustomScheduler(config, queueSize, context.getConfiguration().getShutdownTimeout());
+    return doCustomScheduler(config.getShutdownTimeoutMillis() == null
+        ? config.withShutdownTimeout(context.getConfiguration().getShutdownTimeout(), MILLISECONDS) : config, queueSize);
   }
 
-  private Scheduler doCustomScheduler(SchedulerConfig config, long shutdownTimeoutMillis) {
+  private Scheduler doCustomScheduler(SchedulerConfig config) {
     checkStarted();
     if (config.getMaxConcurrentTasks() == null) {
       throw new IllegalArgumentException("Custom schedulers must define a thread pool size");
@@ -288,13 +265,13 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
     final DefaultScheduler customScheduler =
         new CustomScheduler(resolveSchedulerName(config, CUSTOM_THREADS_NAME), executor, cores,
-                            scheduledExecutor, quartzScheduler, CUSTOM, resolveStopTimeout(config, shutdownTimeoutMillis),
+                            scheduledExecutor, quartzScheduler, CUSTOM, resolveStopTimeout(config),
                             schr -> activeSchedulers.remove(schr));
     activeSchedulers.add(customScheduler);
     return customScheduler;
   }
 
-  private Scheduler doCustomScheduler(SchedulerConfig config, int queueSize, long shutdownTimeoutMillis) {
+  private Scheduler doCustomScheduler(SchedulerConfig config, int queueSize) {
     checkStarted();
     if (config.getMaxConcurrentTasks() == null) {
       throw new IllegalArgumentException("Custom schedulers must define a thread pool size");
@@ -308,15 +285,15 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
 
     final DefaultScheduler customScheduler =
         new CustomScheduler(resolveSchedulerName(config, CUSTOM_THREADS_NAME), executor, cores, scheduledExecutor,
-                            quartzScheduler, CUSTOM, resolveStopTimeout(config, shutdownTimeoutMillis),
+                            quartzScheduler, CUSTOM, resolveStopTimeout(config),
                             schr -> activeSchedulers.remove(schr));
     customSchedulersExecutors.add(customScheduler);
     activeSchedulers.add(customScheduler);
     return customScheduler;
   }
 
-  private long resolveStopTimeout(SchedulerConfig config, long shutdownTimeoutMillis) {
-    return config.getShutdownTimeoutMillis() != null ? config.getShutdownTimeoutMillis() : shutdownTimeoutMillis;
+  private long resolveStopTimeout(SchedulerConfig config) {
+    return config.getShutdownTimeoutMillis() != null ? config.getShutdownTimeoutMillis() : DEFAULT_SHUTDOWN_TIMEOUT_MILLIS;
   }
 
   private String resolveSchedulerName(SchedulerConfig config, String prefix) {
@@ -373,7 +350,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     final StackTraceElement[] stackTrace = new Throwable().getStackTrace();
 
     StackTraceElement ste = stackTrace[i++];
-    // We have to go deep enough, right before the 2 proxy calls
+    // We have to go deep enough, right before the proxy calls
     while (skip(ste) && i < stackTrace.length) {
       ste = stackTrace[i++];
     }

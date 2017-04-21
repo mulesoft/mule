@@ -10,11 +10,12 @@ package org.mule.runtime.module.service;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.module.service.LifecycleFilterServiceProxy.createLifecycleFilterServiceProxy;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -32,7 +33,7 @@ public class LifecycleFilterServiceProxyTestCase extends AbstractMuleTestCase {
 
     StartableService service = mock(StartableService.class);
 
-    final Startable serviceProxy = (Startable) LifecycleFilterServiceProxy.createLifecycleFilterServiceProxy(service);
+    final Startable serviceProxy = (Startable) createLifecycleFilterServiceProxy(service);
 
     expected.expect(UnsupportedOperationException.class);
     serviceProxy.start();
@@ -42,7 +43,7 @@ public class LifecycleFilterServiceProxyTestCase extends AbstractMuleTestCase {
   public void avoidsStopExecution() throws Exception {
     StoppableService service = mock(StoppableService.class);
 
-    final Stoppable serviceProxy = (Stoppable) LifecycleFilterServiceProxy.createLifecycleFilterServiceProxy(service);
+    final Stoppable serviceProxy = (Stoppable) createLifecycleFilterServiceProxy(service);
 
     expected.expect(UnsupportedOperationException.class);
     serviceProxy.stop();
@@ -55,7 +56,7 @@ public class LifecycleFilterServiceProxyTestCase extends AbstractMuleTestCase {
     doThrow(checkedException).when(checkExceptionService).execute();
 
     final CheckedExceptionService checkedExceptionServiceProxy =
-        (CheckedExceptionService) LifecycleFilterServiceProxy.createLifecycleFilterServiceProxy(checkExceptionService);
+        (CheckedExceptionService) createLifecycleFilterServiceProxy(checkExceptionService);
 
     expected.expect(is(checkedException));
     checkedExceptionServiceProxy.execute();
@@ -68,7 +69,7 @@ public class LifecycleFilterServiceProxyTestCase extends AbstractMuleTestCase {
     doThrow(uncheckedException).when(uncheckedExceptionService).execute();
 
     final UncheckedExceptionService uncheckedExceptionServiceProxy =
-        (UncheckedExceptionService) LifecycleFilterServiceProxy.createLifecycleFilterServiceProxy(uncheckedExceptionService);
+        (UncheckedExceptionService) createLifecycleFilterServiceProxy(uncheckedExceptionService);
 
     expected.expect(is(uncheckedException));
     uncheckedExceptionServiceProxy.execute();
