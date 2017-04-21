@@ -42,9 +42,9 @@ public abstract class AbstractOAuthDancerBuilder<D> implements OAuthDancerBuilde
   protected Supplier<HttpClient> httpClientFactory;
 
   protected Charset encoding = UTF_8;
-  protected String responseAccessTokenExpr = "#[(payload match /.*\"access_token\"[ ]*:[ ]*\"([^\\\"]*)\".*/)[1]]";
-  protected String responseRefreshTokenExpr = "#[(payload match /.*\"refresh_token\"[ ]*:[ ]*\"([^\\\"]*)\".*/)[1]]";
-  protected String responseExpiresInExpr = "#[(payload match /.*\"expires_in\"[ ]*:[ ]*\"([^\\\"]*)\".*/)[1]]";
+  protected String responseAccessTokenExpr = "#[payload.access_token]";
+  protected String responseRefreshTokenExpr = "#[payload.refresh_token]";
+  protected String responseExpiresInExpr = "#[payload.expires_in]";
   protected String scopes = null;
   protected Map<String, String> customParametersExtractorsExprs;
 
