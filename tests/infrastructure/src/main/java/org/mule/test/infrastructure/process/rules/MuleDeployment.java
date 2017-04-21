@@ -6,12 +6,15 @@
  */
 package org.mule.test.infrastructure.process.rules;
 
+import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
 import static com.jayway.awaitility.Awaitility.await;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -76,6 +79,7 @@ public class MuleDeployment extends MuleInstallation {
   private static final String DEFAULT_DEPLOYMENT_TIMEOUT = "60000";
   private static final boolean STOP_ON_EXIT = parseBoolean(getProperty("mule.test.stopOnExit", "true"));
   private static final boolean DEBUGGING_ENABLED = parseBoolean(getProperty("mule.test.debug", "false"));
+  private static final String REMOTE_REPOSITORIES = getProperty("mule.test.repositories", "");
   private static final String DEBUG_PORT = "5005";
   private static Logger logger = LoggerFactory.getLogger(MuleDeployment.class);
   private static PollingProber prober;
@@ -278,6 +282,9 @@ public class MuleDeployment extends MuleInstallation {
       logger.info("Starting Mule Server");
       if (DEBUGGING_ENABLED) {
         setupDebugging();
+      }
+      if (isNotEmpty(REMOTE_REPOSITORIES)) {
+        mule.addConfProperty(format("-D%s=%s", MULE_REMOTE_REPOSITORIES_PROPERTY, REMOTE_REPOSITORIES));
       }
       resolvePropertiesUsingLambdas();
       mule.start(toArray(properties));
