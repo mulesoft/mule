@@ -19,49 +19,76 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Builds messages supporting the legacy API
+ * Builds messages supporting the legacy message API
  *
  * @deprecated tests should not access properties, attachments or exception payload using the old API.
  */
 @Deprecated
 public class TestLegacyMessageBuilder implements Message.Builder {
 
-
   private Message.Builder builder;
 
   public TestLegacyMessageBuilder() {}
 
+  /**
+   * Create a new builder initialized from an existent message
+   *
+   * @param message message to initialize the builder state. Non null.
+   */
   public TestLegacyMessageBuilder(Message message) {
     builder = Message.builder(message);
   }
 
   @Override
   public TestLegacyMessageBuilder nullPayload() {
-    builder = Message.builder().nullPayload();
+    if (builder == null) {
+      builder = Message.builder().nullPayload();
+    } else {
+      builder.nullPayload();
+    }
+
+
     return this;
   }
 
   @Override
   public TestLegacyMessageBuilder payload(Object value) {
-    builder = Message.builder().payload(value);
+    if (builder == null) {
+      builder = Message.builder().payload(value);
+    } else {
+      builder.payload(value);
+    }
+
     return this;
   }
 
   @Override
   public TestLegacyMessageBuilder streamPayload(Iterator value, Class<?> itemType) {
-    builder = Message.builder().streamPayload(value, itemType);
+    if (builder == null) {
+      builder = Message.builder().streamPayload(value, itemType);
+    } else {
+      builder.streamPayload(value, itemType);
+    }
     return this;
   }
 
   @Override
   public TestLegacyMessageBuilder collectionPayload(Collection value, Class<?> itemType) {
-    builder = Message.builder().collectionPayload(value, itemType);
+    if (builder == null) {
+      builder = Message.builder().collectionPayload(value, itemType);
+    } else {
+      builder.collectionPayload(value, itemType);
+    }
     return this;
   }
 
   @Override
   public TestLegacyMessageBuilder collectionPayload(Object[] value) {
-    builder = Message.builder().collectionPayload(value);
+    if (builder == null) {
+      builder = Message.builder().collectionPayload(value);
+    } else {
+      builder.collectionPayload(value);
+    }
     return this;
   }
 

@@ -271,6 +271,7 @@ public class TestEventBuilder {
   }
 
   private void setInboundProperties(Message.Builder messageBuilder, Map<String, Serializable> inboundProperties) {
+    // TODO(pablo.kraan): MULE-12280 - remove methods that use the legacy message API once all the tests using it are migrated
     try {
       Method inboundPropertiesMethod = messageBuilder.getClass().getMethod("inboundProperties", Map.class);
       inboundPropertiesMethod.invoke(messageBuilder, inboundProperties);
