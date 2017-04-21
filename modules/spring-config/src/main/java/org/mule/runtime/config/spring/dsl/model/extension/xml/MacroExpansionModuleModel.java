@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.dsl.model.extension.xml;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
@@ -24,7 +25,9 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -151,8 +154,16 @@ public class MacroExpansionModuleModel {
         ComponentIdentifier identifier = configRefModel.getIdentifier();
 
         if (extensionModel.getXmlDslModel().getPrefix().equals(identifier.getNamespace())) {
+
+          Map<String, String> propertiesMap = extractParameters(configRefModel,
+                                                                extensionModel
+                                                                    .getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME)
+                                                                    .get()
+                                                                    .getAllParameterModels());
+          final Map<String, String> literalsParameters = getLiteralParameters(propertiesMap, emptyMap());
+
           List<ComponentModel> replacementGlobalElements =
-              createGlobalElementsInstance(configRefModel, moduleComponentModels, moduleGlobalElementsNames);
+              createGlobalElementsInstance(configRefModel, moduleComponentModels, moduleGlobalElementsNames, literalsParameters);
           componentModelsToReplaceByIndex.put(configRefModel, replacementGlobalElements);
         }
       }
@@ -166,11 +177,13 @@ public class MacroExpansionModuleModel {
 
   private List<ComponentModel> createGlobalElementsInstance(ComponentModel configRefModel,
                                                             List<ComponentModel> moduleGlobalElements,
-                                                            Set<String> moduleGlobalElementsNames) {
+                                                            Set<String> moduleGlobalElementsNames,
+                                                            Map<String, String> literalsParameters) {
+
     List<ComponentModel> globalElementsModel = new ArrayList<>();
     globalElementsModel.addAll(moduleGlobalElements.stream()
         .map(globalElementModel -> copyComponentModel(globalElementModel, configRefModel.getNameAttribute(),
-                                                      moduleGlobalElementsNames))
+                                                      moduleGlobalElementsNames, literalsParameters))
         .collect(Collectors.toList()));
 
     ComponentModel muleRootElement = configRefModel.getParent();
@@ -227,8 +240,10 @@ public class MacroExpansionModuleModel {
     processorChainBuilder.addChildComponentModel(propertiesComponentModel);
     processorChainBuilder.addChildComponentModel(parametersComponentModel);
 
+    final Map<String, String> literalsParameters = getLiteralParameters(propertiesMap, parametersMap);
     for (ComponentModel bodyProcessor : bodyProcessors) {
-      processorChainBuilder.addChildComponentModel(copyComponentModel(bodyProcessor, configRefName, moduleGlobalElementsNames));
+      processorChainBuilder.addChildComponentModel(copyComponentModel(bodyProcessor, configRefName, moduleGlobalElementsNames,
+                                                                      literalsParameters));
     }
     for (Map.Entry<String, Object> customAttributeEntry : operationRefModel.getCustomAttributes().entrySet()) {
       processorChainBuilder.addCustomAttribute(customAttributeEntry.getKey(), customAttributeEntry.getValue());
@@ -238,6 +253,41 @@ public class MacroExpansionModuleModel {
       processorChainModelChild.setParent(processorChainModel);
     }
     return processorChainModel;
+  }
+
+  /**
+   * @param propertiesMap <property>s that are feed in the current usage of the <module/>
+   * @param parametersMap <param>s that are feed in the current usage of the <module/>
+   * @return a {@link Map} of <property>s and <parameter>s that could be replaced by their literal values, see {@link #copyComponentModel(ComponentModel, String, Set, Map)}
+   */
+  private Map<String, String> getLiteralParameters(Map<String, String> propertiesMap, Map<String, String> parametersMap) {
+    final Map<String, String> literalsParameters = propertiesMap.entrySet().stream()
+        .filter(entry -> !isExpression(entry.getValue()))
+        .collect(Collectors.toMap(e -> getReplaceableExpression(e.getKey(), DataWeaveExpressionLanguageAdaptor.PROPERTIES),
+                                  Map.Entry::getValue));
+    literalsParameters.putAll(
+                              parametersMap.entrySet().stream()
+                                  .filter(entry -> !isExpression(entry.getValue()))
+                                  .collect(Collectors.toMap(
+                                                            e -> getReplaceableExpression(e.getKey(),
+                                                                                          DataWeaveExpressionLanguageAdaptor.PARAMETERS),
+                                                            Map.Entry::getValue)));
+    return literalsParameters;
+  }
+
+  /**
+   * Assembly an expression to validate if the macro expansion of the current <module> can be directly replaced by the literals value
+   *
+   * @param name of the parameter (either a <property> or a <parameter>)
+   * @param prefix binding to append for the expression to be replaced in the <module>'s code
+   * @return the expression that access a variable through a direct binding (aka: a "static expression", as it doesn't use the {@link Event})
+   */
+  private String getReplaceableExpression(String name, String prefix) {
+    return "#[" + prefix + "." + name + "]";
+  }
+
+  private boolean isExpression(String value) {
+    return value.startsWith("#[") && value.endsWith("]");
   }
 
   private ComponentModel getParameterChild(Map<String, String> parameters, String wrapperParameters, String entryParameter) {
@@ -335,11 +385,15 @@ public class MacroExpansionModuleModel {
    * @param modelToCopy original source of truth that comes from the <module/>
    * @param configRefName name of the configuration being used in the Mule application
    * @param moduleGlobalElementsNames names of the <module/>s global component that will be macro expanded in the Mule application
+   * @param literalsParameters {@link Map} with all he <property>s and <parameter>s that were feed with a literal value in the Mule
+   *     application's code.
    * @return a transformed {@link ComponentModel} from the {@code modelToCopy}, where the global element's attributes has been
-   * updated accordingly (both global components updates plus the line number, and so on)
+   * updated accordingly (both global components updates plus the line number, and so on). If the value for some parameter can be
+   * optimized by replacing it for the literal's value, it will be done as well using the {@code literalsParameters}
    */
   private ComponentModel copyComponentModel(ComponentModel modelToCopy, String configRefName,
-                                            Set<String> moduleGlobalElementsNames) {
+                                            Set<String> moduleGlobalElementsNames,
+                                            Map<String, String> literalsParameters) {
     ComponentModel.Builder operationReplacementModel = new ComponentModel.Builder();
     operationReplacementModel
         .setIdentifier(modelToCopy.getIdentifier())
@@ -349,12 +403,13 @@ public class MacroExpansionModuleModel {
     }
     for (Map.Entry<String, String> entry : modelToCopy.getParameters().entrySet()) {
       String value = calculateAttributeValue(configRefName, moduleGlobalElementsNames, entry.getValue());
-      operationReplacementModel.addParameter(entry.getKey(), value, false);
+      final String optimizedValue = literalsParameters.getOrDefault(value, value);
+      operationReplacementModel.addParameter(entry.getKey(), optimizedValue, false);
     }
     for (ComponentModel operationChildModel : modelToCopy.getInnerComponents()) {
       operationReplacementModel.addChildComponentModel(
                                                        copyComponentModel(operationChildModel, configRefName,
-                                                                          moduleGlobalElementsNames));
+                                                                          moduleGlobalElementsNames, literalsParameters));
     }
     ComponentModel componentModel = operationReplacementModel.build();
     for (ComponentModel child : componentModel.getInnerComponents()) {

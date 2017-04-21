@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:module-global-element="http://www.mulesoft.org/schema/mule/module-global-element"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/module-global-element http://www.mulesoft.org/schema/mule/module-global-element/module-global-element.xsd">
+
+    <module-global-element:config name="la-plata-config-using-literals" someUserConfig="userLP" somePassConfig="passLP" port="${httpPort}" protocolConfig="HTTP"/>
+    <module-global-element:config name="gonnet-config-using-expressions" someUserConfig="#['userGonnet']" somePassConfig="#['passGonnet']" port="#['${httpPort}']" protocolConfig="HTTP"/>
+
+    <flow name="testHttpDoLogin">
+        <module-global-element:do-login config-ref="la-plata-config-using-literals" someUser="#['userLP']" somePass="#['passLP']" />
+    </flow>
+
+    <flow name="testHttpDontLogin">
+        <module-global-element:do-login config-ref="la-plata-config-using-literals" someUser="#['userGonnet']" somePass="#['passGonnet']"/>
+    </flow>
+
+    <flow name="testHttpDoLoginGonnet">
+        <module-global-element:do-login config-ref="gonnet-config-using-expressions" someUser="#['userGonnet']" somePass="#['passGonnet']"/>
+    </flow>
+</mule>

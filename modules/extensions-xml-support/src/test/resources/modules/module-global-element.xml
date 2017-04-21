@@ -13,9 +13,15 @@
     <property name="someUserConfig" type="string" defaultValue="some-username"/>
     <property name="somePassConfig" type="string" defaultValue="some-password"/>
     <property name="port" type="string"/>
+    <!-- Due to the nature some extensions won't support expressions (see usages of org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED)
+    on some attributes, as it happens to be the case with the protocol in the HTTP extension (see org.mule.extension.http.internal.request.RequestConnectionParams.protocol),
+    the 'protocolConfig' property is added to show that when macro expanding modules, those parameters (either <property>s or <parameter>s)
+    will be replaced with the actual value IF that value is a literal.
+    That implies that the protocol using the expression #[properties.protocolConfig] will be replaced by HTTP (default value). -->
+    <property name="protocolConfig" type="string" defaultValue="HTTP"/>
 
     <httpn:request-config name="simple-config" basePath="/basic-auth/">
-        <httpn:request-connection host="localhost" protocol="HTTP" port="#[properties.port]">
+        <httpn:request-connection host="localhost" protocol="#[properties.protocolConfig]" port="#[properties.port]">
             <httpn:authentication>
                 <httpn:basic-authentication username="#[properties.someUserConfig]" password="#[properties.somePassConfig]"/>
             </httpn:authentication>
