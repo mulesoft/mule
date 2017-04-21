@@ -11,9 +11,8 @@
     </httpn:request-config>
 
     <httpn:request-config name="requestConfigHttp">
-        <httpn:request-connection host="localhost"/>
+        <httpn:request-connection host="localhost" responseBufferSize="${bufferSize}" connectionIdleTimeout="${idleTimeout}" maxConnections="${maxConnections}" />
     </httpn:request-config>
-
 
     <httpn:request-config name="requestConfigHttps">
         <httpn:request-connection protocol="HTTPS" host="localhost"/>

@@ -25,6 +25,9 @@ import org.mule.service.http.api.HttpConstants;
  */
 public final class RequestConnectionParams {
 
+  public static final String DEFAULT_MAX_CONNECTIONS = "-1";
+  public static final String DEFAULT_CONNECTION_IDLE_TIMEOUT = "30000";
+  public static final String DEFAULT_RESPONSE_BUFFER_SIZE = "10240";
   /**
    * Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP
    * communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user can customize the
@@ -70,7 +73,7 @@ public final class RequestConnectionParams {
    * unlimited.
    */
   @Parameter
-  @Optional(defaultValue = "-1")
+  @Optional(defaultValue = DEFAULT_MAX_CONNECTIONS)
   @Expression(NOT_SUPPORTED)
   @Placement(tab = ADVANCED_TAB, order = 2)
   private Integer maxConnections;
@@ -80,16 +83,25 @@ public final class RequestConnectionParams {
    * when persistent connections are enabled.
    */
   @Parameter
-  @Optional(defaultValue = "30000")
+  @Optional(defaultValue = DEFAULT_CONNECTION_IDLE_TIMEOUT)
   @Expression(NOT_SUPPORTED)
   @Placement(tab = ADVANCED_TAB, order = 3)
   private Integer connectionIdleTimeout;
+
+  /**
+   * The space in bytes for the buffer where the HTTP response will be stored.
+   */
+  @Parameter
+  @Optional(defaultValue = DEFAULT_RESPONSE_BUFFER_SIZE)
+  @Expression(NOT_SUPPORTED)
+  @Placement(tab = ADVANCED_TAB, order = 4)
+  private int responseBufferSize;
 
   @Parameter
   @Optional
   @NullSafe
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED_TAB, order = 4)
+  @Placement(tab = ADVANCED_TAB, order = 5)
   private TcpClientSocketProperties clientSocketProperties;
 
   public HttpConstants.Protocols getProtocol() {
@@ -114,6 +126,10 @@ public final class RequestConnectionParams {
 
   public Integer getConnectionIdleTimeout() {
     return connectionIdleTimeout;
+  }
+
+  public int getResponseBufferSize() {
+    return responseBufferSize;
   }
 
   public TcpClientSocketProperties getClientSocketProperties() {
@@ -142,6 +158,10 @@ public final class RequestConnectionParams {
 
   public void setConnectionIdleTimeout(Integer connectionIdleTimeout) {
     this.connectionIdleTimeout = connectionIdleTimeout;
+  }
+
+  public void setResponseBufferSize(int responseBufferSize) {
+    this.responseBufferSize = responseBufferSize;
   }
 
   public void setClientSocketProperties(TcpClientSocketProperties clientSocketProperties) {
