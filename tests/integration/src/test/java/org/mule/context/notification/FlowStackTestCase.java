@@ -481,6 +481,18 @@ public class FlowStackTestCase extends FunctionalTestCase
     }
 
     @Test
+    public void flowForEachRepeatedInterceptingMessageProcessor() throws Exception
+    {
+        muleContext.getClient().send("vm://in-flowForEachRepeatedInterceptingMessageProcessor", new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+
+        assertThat(stackToAssert, not(nullValue()));
+
+        assertStackElements(stackToAssert,
+                isFlowStackElement("flow", "/flow/processors/0"),
+                isFlowStackElement("flowForEachRepeatedInterceptingMessageProcessor", "/flowForEachRepeatedInterceptingMessageProcessor/processors/0/3"));
+    }
+
+    @Test
     public void flowForEachFilter() throws Exception
     {
         muleContext.getClient().send("vm://in-flowForEachFilter", new DefaultMuleMessage(TEST_MESSAGE, muleContext));

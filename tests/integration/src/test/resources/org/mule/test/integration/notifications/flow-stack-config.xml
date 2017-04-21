@@ -331,6 +331,16 @@
         </foreach>
     </flow>
 
+    <flow name="flowForEachRepeatedInterceptingMessageProcessor">
+        <vm:inbound-endpoint path="in-flowForEachRepeatedInterceptingMessageProcessor" exchange-pattern="request-response"/>
+        <foreach collection="#[[[['foo']], [['bar']]]]">
+            <collection-splitter />
+            <flow-ref name="flow"/>
+            <collection-splitter />
+            <flow-ref name="flow"/>
+        </foreach>
+    </flow>
+
     <!-- For Each + Filter -->
 
     <flow name="flowForEachFilter">
