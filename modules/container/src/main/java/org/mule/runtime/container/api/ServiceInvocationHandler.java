@@ -50,7 +50,7 @@ public abstract class ServiceInvocationHandler implements InvocationHandler {
   }
 
   /**
-   * Performs the actual invocaiton on the proxied {@link Service}, or delegates the call to an inner proxy.
+   * Performs the actual invocation on the proxied {@link Service}, or delegates the call to an inner proxy.
    * 
    * See {@link InvocationHandler#invoke(Object, Method, Object[])}
    */
