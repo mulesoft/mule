@@ -47,12 +47,13 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
     @Override
     public MessageProcessorPathElement addChild(MessageProcessor mp)
     {
+        if (alreadyAddedChild(mp))
+        {
+            return null;
+        }
         int size = children.size();
         DefaultMessageProcessorPathElement result = new DefaultMessageProcessorPathElement(mp, String.valueOf(size));
-        if (!alreadyAddedChild(mp))
-        {
-            addChild(result);
-        }
+        addChild(result);
         return result;
     }
 
