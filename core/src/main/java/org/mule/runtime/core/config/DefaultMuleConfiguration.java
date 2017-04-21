@@ -508,7 +508,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     return maxQueueTransactionFilesSizeInMegabytes;
   }
 
-  public void setShutdownTimeout(int shutdownTimeout) {
+  public void setShutdownTimeout(long shutdownTimeout) {
     if (verifyContextNotStarted()) {
       this.shutdownTimeout = shutdownTimeout;
     }

@@ -29,6 +29,8 @@ import javax.inject.Inject;
 
 /**
  * Proxies a {@link Service} instance to automatically {@link Inject} parameters for invocations of implementation methods.
+ * 
+ * @since 4.0
  */
 public class InjectParamsServiceProxy extends ServiceInvocationHandler {
 
