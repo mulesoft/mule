@@ -14,7 +14,6 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFac
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
-import org.mule.runtime.deployment.model.internal.artifact.DefaultDependenciesProvider;
 import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
@@ -72,8 +71,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
     ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, applicationPluginRepository);
     final DefaultClassLoaderManager artifactClassLoaderManager = new DefaultClassLoaderManager();
-    PluginDependenciesResolver pluginDependenciesResolver =
-        new BundlePluginDependenciesResolver(artifactPluginDescriptorFactory, new DefaultDependenciesProvider());
+    PluginDependenciesResolver pluginDependenciesResolver = new BundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
 
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
         new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory,

@@ -18,7 +18,6 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFac
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
-import org.mule.runtime.deployment.model.internal.artifact.DefaultDependenciesProvider;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.deployment.model.internal.plugin.BundlePluginDependenciesResolver;
@@ -136,9 +135,7 @@ public class MuleArtifactResourcesRegistry {
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, artifactPluginRepository);
     DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()));
-    DefaultDependenciesProvider dependenciesProvider = new DefaultDependenciesProvider();
-    pluginDependenciesResolver =
-        new BundlePluginDependenciesResolver(artifactPluginDescriptorFactory, dependenciesProvider);
+    pluginDependenciesResolver = new BundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
     applicationClassLoaderBuilderFactory =
         new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, this.artifactPluginClassLoaderFactory);
     ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory = new ServiceClassLoaderFactory();

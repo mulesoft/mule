@@ -8,9 +8,8 @@ package org.mule.runtime.deployment.model.internal.tooling;
 
 import static java.lang.String.format;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.PLUGIN_CLASSLOADER_IDENTIFIER;
-import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.deployment.model.api.artifact.DependencyNotFoundException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.internal.plugin.PluginResolutionError;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
@@ -41,7 +40,6 @@ public class ToolingPluginArtifactClassLoader implements ArtifactClassLoader {
    *
    * @param regionClassLoader class loader used to execute the {@link #dispose()} properly.
    * @param artifactPluginDescriptor descriptor to look for within the {@link RegionClassLoader}.
-   * @throws DependencyNotFoundException if the plugin is not within the {@link RegionClassLoader}.
    */
   public ToolingPluginArtifactClassLoader(RegionClassLoader regionClassLoader,
                                           ArtifactPluginDescriptor artifactPluginDescriptor) {
@@ -54,7 +52,7 @@ public class ToolingPluginArtifactClassLoader implements ArtifactClassLoader {
    * @param artifactPluginDescriptor to look for within the collection of {@link ArtifactClassLoader}s
    * @param artifactPluginClassLoaders plugins class loaders to look for, at least one of them must contain the {@code pluginDescriptor}.
    * @return the {@link ArtifactClassLoader} that was generated for the {@code artifactPluginDescriptor}
-   * @throws DeploymentException if the plugin wasn't found in the collection of {@code artifactPluginClassLoaders}
+   * @throws PluginResolutionError if the plugin wasn't found in the collection of {@code artifactPluginClassLoaders}
    */
   private ArtifactClassLoader getPluginArtifactClassLoader(ArtifactPluginDescriptor artifactPluginDescriptor,
                                                            List<ArtifactClassLoader> artifactPluginClassLoaders) {
@@ -62,8 +60,8 @@ public class ToolingPluginArtifactClassLoader implements ArtifactClassLoader {
         .filter(artifactClassLoader -> artifactClassLoader.getArtifactId()
             .endsWith(PLUGIN_CLASSLOADER_IDENTIFIER + artifactPluginDescriptor.getName()))
         .findFirst()
-        .orElseThrow(() -> new DependencyNotFoundException(format("Cannot generate a tooling ClassLoader as the region ClassLoader is missing the plugin '%s'",
-                                                                  artifactPluginDescriptor.getName())));
+        .orElseThrow(() -> new PluginResolutionError(format("Cannot generate a tooling ClassLoader as the region ClassLoader is missing the plugin '%s'",
+                                                            artifactPluginDescriptor.getName())));
   }
 
   @Override

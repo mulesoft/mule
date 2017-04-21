@@ -17,10 +17,6 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
@@ -36,12 +32,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCase {
 
   private static final String FOO_PLUGIN = "foo";
   private static final String BAZ_PLUGIN = "baz";
   private static final String BAR_PLUGIN = "bar";
-  public static final String DEPENDENCY_PROVIDER_ERROR_MESSAGE = "The '%s' cannot be found.";
+  public static final String DEPENDENCY_PROVIDER_ERROR_MESSAGE = "Bundle URL should have been resolved for %s.";
 
   private static final BundleDescriptor FOO_BUNDLE_DESCRIPTOR = createTestBundleDescriptor(FOO_PLUGIN, "1.0");
   private static final BundleDescriptor BAZ_BUNDLE_DESCRIPTOR = createTestBundleDescriptor(BAZ_PLUGIN, "1.0");
@@ -64,9 +65,7 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
   private final ArtifactPluginDescriptor barPlugin = new ArtifactPluginDescriptor(BAR_PLUGIN);
   private final ArtifactPluginDescriptor bazPlugin = new ArtifactPluginDescriptor(BAZ_PLUGIN);
   private final PluginDependenciesResolver dependenciesResolver =
-      new BundlePluginDependenciesResolver(mock(ArtifactDescriptorFactory.class), artifactName -> {
-        throw new PluginResolutionError(format(DEPENDENCY_PROVIDER_ERROR_MESSAGE, artifactName));
-      });
+      new BundlePluginDependenciesResolver(mock(ArtifactDescriptorFactory.class));
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
