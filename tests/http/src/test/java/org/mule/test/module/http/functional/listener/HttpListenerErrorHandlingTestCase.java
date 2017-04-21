@@ -46,7 +46,8 @@ public class HttpListenerErrorHandlingTestCase extends AbstractHttpListenerError
   public void propagatedExceptionHasCorrectMessage() throws Exception {
     final Response response = Get(getUrl("exceptionPropagation")).execute();
     final HttpResponse httpResponse = response.returnResponse();
-    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("An error occurred: Functional Test Service Exception"));
+    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()),
+               is("An error occurred: Functional Test Service Exception"));
     assertThat(httpResponse.getFirstHeader("headername").getValue(), is("headerValue"));
   }
 
