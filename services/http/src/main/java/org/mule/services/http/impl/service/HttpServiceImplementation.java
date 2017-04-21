@@ -8,10 +8,12 @@ package org.mule.services.http.impl.service;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
@@ -21,8 +23,9 @@ import org.mule.service.http.api.server.HttpServerFactory;
 import org.mule.services.http.impl.service.client.GrizzlyHttpClient;
 import org.mule.services.http.impl.service.server.HttpListenerConnectionManager;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link HttpService} that uses Grizzly to create {@link HttpServer}s and its Async HTTP Client provider to
@@ -30,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpServiceImplementation implements HttpService, Startable, Stoppable {
 
-  private static final Logger logger = LoggerFactory.getLogger(HttpServiceImplementation.class);
+  private static final Logger logger = getLogger(HttpServiceImplementation.class);
 
   protected final SchedulerService schedulerService;
 
@@ -38,7 +41,7 @@ public class HttpServiceImplementation implements HttpService, Startable, Stoppa
 
   public HttpServiceImplementation(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
-    connectionManager = new HttpListenerConnectionManager(schedulerService);
+    connectionManager = new HttpListenerConnectionManager(schedulerService, 5000);
   }
 
   @Override
@@ -49,7 +52,12 @@ public class HttpServiceImplementation implements HttpService, Startable, Stoppa
 
   @Override
   public HttpClientFactory getClientFactory() {
-    return config -> new GrizzlyHttpClient(config, schedulerService);
+    return config -> new GrizzlyHttpClient(config, schedulerService, 5000);
+  }
+
+  @Inject
+  public HttpClientFactory getClientFactory(MuleContext context) {
+    return config -> new GrizzlyHttpClient(config, schedulerService, context.getConfiguration().getShutdownTimeout());
   }
 
   @Override

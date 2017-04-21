@@ -51,7 +51,7 @@ public interface MuleConfiguration {
   /**
    * @return The graceful shutdown timeout (in millis) used when stopping a mule application cleanly without message loss.
    */
-  int getShutdownTimeout();
+  long getShutdownTimeout();
 
   /**
    * The approximated maximum space in megabytes used by the transaction log files for transactional persistent queues.

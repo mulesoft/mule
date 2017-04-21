@@ -9,6 +9,7 @@ package org.mule.services.http.impl.service.server;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Runtime.getRuntime;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.services.http.impl.service.server.grizzly.IdleExecutor.IDLE_TIMEOUT_THREADS_PREFIX_NAME;
 
@@ -45,17 +46,19 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
       "A server in port(%s) already exists for ip(%s) or one overlapping it (0.0.0.0).";
   private static final String LISTENER_THREAD_NAME_PREFIX = "http.listener";
 
-  private SchedulerService schedulerService;
+  private final SchedulerService schedulerService;
+  private final long schedulersTimeoutMillis;
   private Scheduler selectorScheduler;
   private Scheduler workerScheduler;
   private Scheduler idleTimeoutScheduler;
-  private HttpListenerRegistry httpListenerRegistry = new HttpListenerRegistry();
+  private final HttpListenerRegistry httpListenerRegistry = new HttpListenerRegistry();
   private HttpServerManager httpServerManager;
 
   private AtomicBoolean initialized = new AtomicBoolean(false);
 
-  public HttpListenerConnectionManager(SchedulerService schedulerService) {
+  public HttpListenerConnectionManager(SchedulerService schedulerService, long schedulersTimeoutMillis) {
     this.schedulerService = schedulerService;
+    this.schedulersTimeoutMillis = schedulersTimeoutMillis;
   }
 
   @Override
@@ -70,8 +73,8 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
     try {
       selectorScheduler = schedulerService
           .customScheduler(config().withMaxConcurrentTasks(getRuntime().availableProcessors() + 1)
-              .withName(LISTENER_THREAD_NAME_PREFIX), MAX_VALUE);
-      workerScheduler = schedulerService.ioScheduler();
+              .withShutdownTimeout(schedulersTimeoutMillis, MILLISECONDS).withName(LISTENER_THREAD_NAME_PREFIX), MAX_VALUE);
+      workerScheduler = schedulerService.ioScheduler(config().withShutdownTimeout(schedulersTimeoutMillis, MILLISECONDS));
       idleTimeoutScheduler =
           schedulerService.ioScheduler(config().withName(LISTENER_THREAD_NAME_PREFIX + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
       httpServerManager = new GrizzlyServerManager(selectorScheduler, workerScheduler, idleTimeoutScheduler, httpListenerRegistry,

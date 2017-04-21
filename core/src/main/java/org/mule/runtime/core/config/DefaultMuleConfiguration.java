@@ -8,6 +8,7 @@ package org.mule.runtime.core.config;
 
 import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleBase;
 import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleHome;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.MuleContext;
@@ -82,7 +83,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   /**
    * The default graceful shutdown timeout used when shutting stopping mule cleanly without message loss.
    */
-  private int shutdownTimeout = 5000;
+  private long shutdownTimeout = 5000;
 
   /**
    * Where Mule stores any runtime files to disk. Note that in container mode each app will have its working dir set one level
@@ -497,7 +498,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   }
 
   @Override
-  public int getShutdownTimeout() {
+  public long getShutdownTimeout() {
     return shutdownTimeout;
   }
 
@@ -622,7 +623,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     result = prime * result + ((encoding == null) ? 0 : encoding.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + responseTimeout;
-    result = prime * result + shutdownTimeout;
+    result = prime * result + new Long(shutdownTimeout).hashCode();
     result = prime * result + (synchronous ? 1231 : 1237);
     result = prime * result + ((systemModelType == null) ? 0 : systemModelType.hashCode());
     result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());

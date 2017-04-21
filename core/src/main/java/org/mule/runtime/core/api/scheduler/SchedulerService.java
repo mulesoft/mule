@@ -24,6 +24,9 @@ import java.util.concurrent.SynchronousQueue;
  * The {@link Scheduler}s returned by methods in the implementations must provide access the the thread pools in the Mule Runtime
  * that have the expected tuning configuration. Each {@link Scheduler} will have its own lifecycle, managed by its user and NOT
  * this service.
+ * <p>
+ * Implementations may receive extra parameters in the implementation that are resolved against the current context's registry, if
+ * available.
  *
  * @since 4.0
  */

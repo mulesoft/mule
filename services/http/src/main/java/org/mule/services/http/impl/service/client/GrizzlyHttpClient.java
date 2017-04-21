@@ -11,6 +11,8 @@ import static com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderCon
 import static com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig.Property.TRANSPORT_CUSTOMIZER;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Runtime.getRuntime;
+import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.service.http.api.HttpHeaders.Names.CONNECTION;
@@ -81,22 +83,23 @@ public class GrizzlyHttpClient implements HttpClient {
 
   private final ProxyConfig proxyConfig;
   private final TcpClientSocketProperties clientSocketProperties;
-  private int maxConnections;
-  private boolean usePersistentConnections;
-  private int connectionIdleTimeout;
+  private final int maxConnections;
+  private final boolean usePersistentConnections;
+  private final int connectionIdleTimeout;
   private int responseBufferSize;
 
-  private String threadNamePrefix;
+  private final String threadNamePrefix;
   private Scheduler selectorScheduler;
   private Scheduler workerScheduler;
-  private SchedulerService schedulerService;
-  private String ownerName;
+  private final SchedulerService schedulerService;
+  private final long schedulersTimeoutMillis;
+  private final String ownerName;
   private AsyncHttpClient asyncHttpClient;
   private SSLContext sslContext;
-  private TlsContextFactory defaultTlsContextFactory = TlsContextFactory.builder().buildDefault();
+  private final TlsContextFactory defaultTlsContextFactory = TlsContextFactory.builder().buildDefault();
 
 
-  public GrizzlyHttpClient(HttpClientConfiguration config, SchedulerService schedulerService) {
+  public GrizzlyHttpClient(HttpClientConfiguration config, SchedulerService schedulerService, long schedulersTimeoutMillis) {
     this.tlsContextFactory = config.getTlsContextFactory();
     this.proxyConfig = config.getProxyConfig();
     this.clientSocketProperties = config.getClientSocketProperties();
@@ -108,14 +111,14 @@ public class GrizzlyHttpClient implements HttpClient {
     this.ownerName = config.getOwnerName();
 
     this.schedulerService = schedulerService;
+    this.schedulersTimeoutMillis = schedulersTimeoutMillis;
   }
 
   @Override
   public void start() {
-    selectorScheduler = schedulerService
-        .customScheduler(config().withMaxConcurrentTasks(getRuntime().availableProcessors() + 1).withName(threadNamePrefix),
-                         MAX_VALUE);
-    workerScheduler = schedulerService.ioScheduler();
+    selectorScheduler = schedulerService.customScheduler(config().withMaxConcurrentTasks(getRuntime().availableProcessors() + 1)
+        .withShutdownTimeout(schedulersTimeoutMillis, MILLISECONDS).withName(threadNamePrefix), MAX_VALUE);
+    workerScheduler = schedulerService.ioScheduler(config().withShutdownTimeout(schedulersTimeoutMillis, MILLISECONDS));
 
     AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
     builder.setAllowPoolingConnections(true);
@@ -149,9 +152,9 @@ public class GrizzlyHttpClient implements HttpClient {
       TlsContextTrustStoreConfiguration trustStoreConfiguration = tlsContextFactory.getTrustStoreConfiguration();
 
       if (trustStoreConfiguration != null && trustStoreConfiguration.isInsecure()) {
-        logger.warn(String.format(
-                                  "TLS configuration for requester %s has been set to use an insecure trust store. This means no certificate validations will be performed, rendering connections vulnerable to attacks. Use at own risk.",
-                                  ownerName));
+        logger
+            .warn(format("TLS configuration for requester %s has been set to use an insecure trust store. This means no certificate validations will be performed, rendering connections vulnerable to attacks. Use at own risk.",
+                         ownerName));
         // This disables hostname verification
         builder.setAcceptAnyCertificate(true);
       }
