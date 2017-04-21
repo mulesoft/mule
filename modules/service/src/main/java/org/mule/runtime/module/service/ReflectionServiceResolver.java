@@ -7,7 +7,9 @@
 
 package org.mule.runtime.module.service;
 
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
@@ -18,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Resolves {@link Service} instances given a set of {@link ServiceProvider} instances.
@@ -81,11 +82,11 @@ public class ReflectionServiceResolver implements ServiceResolver {
       continueResolution = resolvedServiceProviders.size() > initialResolvedCount;
     }
 
-    if (unresolvedServiceProviders.size() != 0) {
+    if (!unresolvedServiceProviders.isEmpty()) {
       throw new ServiceResolutionError("Unable to resolve core service dependencies: " + unresolvedServiceProviders);
     }
 
-    return registeredServices.values().stream().map(s -> s.getService()).collect(Collectors.toList());
+    return registeredServices.values().stream().map(s -> s.getService()).collect(toList());
   }
 
   private List<DependencyAwareServiceProvider> createDependencyAwareServiceProviders(List<ServiceProvider> serviceProviders) {

@@ -22,7 +22,7 @@ public class MockScheduler extends ScheduledThreadPoolExecutor implements Schedu
   }
 
   @Override
-  public void stop(long gracefulShutdownTimeoutSecs, TimeUnit unit) {
+  public void stop() {
     // Nothing to do.
   }
 

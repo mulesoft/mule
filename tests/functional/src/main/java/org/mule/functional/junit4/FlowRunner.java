@@ -9,6 +9,7 @@ package org.mule.functional.junit4;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+
 import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -26,6 +27,7 @@ import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.collections.Transformer;
+
 import reactor.core.publisher.MonoProcessor;
 
 /**
@@ -49,7 +51,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
    * Initializes this flow runner.
    *
    * @param muleContext the context of the mule application
-   * @param flowName    the name of the flow to run events through
+   * @param flowName the name of the flow to run events through
    */
   public FlowRunner(MuleContext muleContext, String flowName) {
     super(muleContext);
@@ -59,7 +61,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
   /**
    * Configures the flow to run inside a transaction.
    *
-   * @param action  The action to do at the start of the transactional block. See {@link TransactionConfig} constants.
+   * @param action The action to do at the start of the transactional block. See {@link TransactionConfig} constants.
    * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
    * @return this {@link FlowRunner}
    */
@@ -73,8 +75,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
   }
 
   /**
-   * Makes all open {@link Cursor cursors} to not be closed when the executed flow is finished
-   * but when the test is disposed
+   * Makes all open {@link Cursor cursors} to not be closed when the executed flow is finished but when the test is disposed
    *
    * @return {@code this} {@link FlowRunner}
    */
@@ -186,7 +187,8 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
    */
   public void dispatchAsync() throws Exception {
     Flow flow = (Flow) getFlowConstruct();
-    scheduler = muleContext.getSchedulerService().ioScheduler();
+    scheduler =
+        muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig().withShutdownTimeout(0, SECONDS));
     try {
       scheduler.submit(() -> txExecutionTemplate.execute(getFlowDispatchCallback(flow)));
     } catch (Exception e) {
@@ -241,7 +243,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
   @Override
   public void dispose() {
     if (scheduler != null) {
-      scheduler.stop(0, SECONDS);
+      scheduler.stop();
     }
 
     externalCompletionCallback.onComplete();

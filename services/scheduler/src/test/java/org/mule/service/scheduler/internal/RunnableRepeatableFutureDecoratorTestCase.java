@@ -7,7 +7,6 @@
 package org.mule.service.scheduler.internal;
 
 import static java.lang.Thread.currentThread;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
@@ -37,7 +36,7 @@ public class RunnableRepeatableFutureDecoratorTestCase extends BaseDefaultSchedu
   @Override
   @After
   public void after() throws SchedulerException, InterruptedException {
-    scheduler.stop(5, SECONDS);
+    scheduler.stop();
     scheduler = null;
     super.after();
   }

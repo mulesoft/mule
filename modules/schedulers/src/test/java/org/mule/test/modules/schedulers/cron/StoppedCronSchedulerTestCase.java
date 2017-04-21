@@ -8,6 +8,7 @@ package org.mule.test.modules.schedulers.cron;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.source.SchedulerMessageSource;
 import org.mule.runtime.core.api.construct.Flow;
@@ -34,7 +35,7 @@ public class StoppedCronSchedulerTestCase extends MuleArtifactFunctionalTestCase
   @Test
   public void test() throws Exception {
     runSchedulersOnce(() -> {
-      new PollingProber().check(new JUnitLambdaProbe(() -> {
+      new PollingProber(RECEIVE_TIMEOUT, 200).check(new JUnitLambdaProbe(() -> {
         assertThat(foo.size(), greaterThanOrEqualTo(1));
         return true;
       }));

@@ -11,15 +11,14 @@ import static java.lang.String.format;
 import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.Files.walkFileTree;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.extension.file.api.FileEventType.CREATE;
 import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
 import static org.mule.extension.file.common.api.FileDisplayConstants.MATCH_WITH;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+
 import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
@@ -42,10 +41,10 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -54,8 +53,6 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,6 +76,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Listens for near real-time events that happens on files contained inside a directory or on the directory itself. The events are
@@ -223,7 +223,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
 
     matcher = predicateBuilder != null ? predicateBuilder.build() : new NullFilePayloadPredicate();
 
-    listenerExecutor = schedulerService.customScheduler(config().withMaxConcurrentTasks(1)
+    listenerExecutor = schedulerService.customScheduler(muleContext.getSchedulerBaseConfig().withMaxConcurrentTasks(1)
         .withName(format("%s%s.file.listener", getPrefix(muleContext), flowConstruct.getName())));
 
     submittedListenerTask = listenerExecutor.submit(() -> listen(sourceCallback));
@@ -366,7 +366,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
 
   private void shutdownScheduler() {
     if (listenerExecutor != null) {
-      listenerExecutor.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+      listenerExecutor.stop();
     }
   }
 

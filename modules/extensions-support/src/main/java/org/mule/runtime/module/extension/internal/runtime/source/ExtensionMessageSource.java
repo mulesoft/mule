@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -18,6 +17,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -53,10 +53,12 @@ import org.mule.runtime.module.extension.internal.runtime.ValueResolvingExceptio
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
-import org.slf4j.Logger;
+
+import java.util.Optional;
 
 import javax.inject.Inject;
-import java.util.Optional;
+
+import org.slf4j.Logger;
 
 /**
  * A {@link MessageSource} which connects the Extensions API with the Mule runtime by connecting a {@link Source} with a flow
@@ -223,14 +225,14 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private void stopSchedulers() {
     if (retryScheduler != null) {
       try {
-        retryScheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+        retryScheduler.stop();
       } finally {
         retryScheduler = null;
       }
     }
     if (flowTriggerScheduler != null) {
       try {
-        flowTriggerScheduler.stop(muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+        flowTriggerScheduler.stop();
       } finally {
         flowTriggerScheduler = null;
       }

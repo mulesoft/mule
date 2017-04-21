@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -56,13 +54,13 @@ public class WorkQueueProcessingStrategyFactory extends AbstractRingBufferProces
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new WorkQueueProcessingStrategy(() -> muleContext.getSchedulerService()
-        .ioScheduler(config().withName(schedulersNamePrefix + "." + BLOCKING.name())),
+        .ioScheduler(muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + BLOCKING.name())),
                                            maxConcurrency,
-                                           scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
-                                                                       MILLISECONDS),
-                                           () -> muleContext.getSchedulerService().customScheduler(config()
-                                               .withName(schedulersNamePrefix + "." + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
-                                               .withMaxConcurrentTasks(getSubscriberCount() + 1)),
+                                           scheduler -> scheduler.stop(),
+                                           () -> muleContext.getSchedulerService()
+                                               .customScheduler(muleContext.getSchedulerBaseConfig()
+                                                   .withName(schedulersNamePrefix + "." + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
+                                                   .withMaxConcurrentTasks(getSubscriberCount() + 1)),
                                            getBufferSize(),
                                            getSubscriberCount(),
                                            getWaitStrategy(),

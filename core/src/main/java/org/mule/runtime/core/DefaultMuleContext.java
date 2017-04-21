@@ -9,6 +9,7 @@ package org.mule.runtime.core;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.SystemUtils.JAVA_VERSION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CONFIGURATION;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_COMPONENT_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
@@ -19,6 +20,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CON
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSOR_INTERCEPTOR_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
@@ -41,6 +43,7 @@ import static org.mule.runtime.core.util.ExceptionUtils.getRootCauseException;
 import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.unwrap;
+
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
@@ -52,7 +55,6 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.lock.LockFactory;
-import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
@@ -60,7 +62,6 @@ import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.connector.SchedulerController;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -81,6 +82,7 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
@@ -133,6 +135,7 @@ import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContext {
@@ -341,7 +344,7 @@ public class DefaultMuleContext implements MuleContext {
       throw new MuleRuntimeException(objectIsNull("queueManager"));
     }
 
-    componentInitialStateManager = muleRegistryHelper.get(MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER);
+    componentInitialStateManager = muleRegistryHelper.get(OBJECT_COMPONENT_INITIAL_STATE_MANAGER);
     startDate = System.currentTimeMillis();
 
     startIfNeeded(extensionManager);
@@ -369,7 +372,7 @@ public class DefaultMuleContext implements MuleContext {
     for (Pipeline pipeline : this.getRegistry().lookupObjects(Pipeline.class)) {
       if (pipeline.getLifecycleState().isStarted()) {
         MessageSource messageSource = pipeline.getMessageSource();
-        if (messageSource != null && componentInitialStateManager.mustStartMessageSource((AnnotatedObject) messageSource)) {
+        if (messageSource != null && componentInitialStateManager.mustStartMessageSource(messageSource)) {
           startMessageSource(messageSource);
         }
       }
@@ -606,6 +609,11 @@ public class DefaultMuleContext implements MuleContext {
     }
 
     return this.schedulerService;
+  }
+
+  @Override
+  public SchedulerConfig getSchedulerBaseConfig() {
+    return this.getRegistry().lookupObject(OBJECT_SCHEDULER_BASE_CONFIG);
   }
 
   @Override

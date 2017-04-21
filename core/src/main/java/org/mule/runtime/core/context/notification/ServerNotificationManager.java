@@ -8,7 +8,6 @@ package org.mule.runtime.core.context.notification;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -186,14 +185,12 @@ public class ServerNotificationManager implements Initialisable, Disposable, Ser
   public void dispose() {
     disposeLock.writeLock().lock();
     try {
-      final int shutdownTimeout = muleContext.getConfiguration().getShutdownTimeout();
-
       if (notificationsLiteScheduler != null) {
-        notificationsLiteScheduler.stop(shutdownTimeout, MILLISECONDS);
+        notificationsLiteScheduler.stop();
         notificationsLiteScheduler = null;
       }
       if (notificationsIoScheduler != null) {
-        notificationsIoScheduler.stop(shutdownTimeout, MILLISECONDS);
+        notificationsIoScheduler.stop();
         notificationsIoScheduler = null;
       }
 

@@ -33,6 +33,7 @@ import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKIN
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -134,7 +135,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     when(muleConfiguration.isContainerMode()).thenReturn(false);
     when(muleConfiguration.getId()).thenReturn(randomNumeric(3));
-    when(muleConfiguration.getShutdownTimeout()).thenReturn(1000);
+    when(muleConfiguration.getShutdownTimeout()).thenReturn(1000L);
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     when(muleContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
     when(muleContext.getExceptionContextProviders()).thenReturn(singletonList(exceptionContextProvider));

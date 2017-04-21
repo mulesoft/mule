@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.api.scheduler;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.DEFAULT;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Provides a fluent way of customizing a {@link Scheduler} obtained through the {@link SchedulerService}.
@@ -47,9 +49,25 @@ public class SchedulerConfig {
     return new SchedulerConfig();
   }
 
-  private Integer maxConcurrentTasks;
-  private String schedulerName;
-  private RejectionAction rejectionAction = DEFAULT;
+  private final Integer maxConcurrentTasks;
+  private final String schedulerName;
+  private final RejectionAction rejectionAction;
+  private final Long shutdownTimeoutMillis;
+
+  private SchedulerConfig() {
+    this.maxConcurrentTasks = null;
+    this.schedulerName = null;
+    this.rejectionAction = DEFAULT;
+    this.shutdownTimeoutMillis = null;
+  }
+
+  private SchedulerConfig(Integer maxConcurrentTasks, String schedulerName, RejectionAction rejectionAction,
+                          Long shutdownTimeoutMillis) {
+    this.maxConcurrentTasks = maxConcurrentTasks;
+    this.schedulerName = schedulerName;
+    this.rejectionAction = rejectionAction;
+    this.shutdownTimeoutMillis = shutdownTimeoutMillis;
+  }
 
   /**
    * Sets the max tasks that can be run at the same time for the target {@link Scheduler}.
@@ -61,8 +79,7 @@ public class SchedulerConfig {
    * @return the updated configuration.
    */
   public SchedulerConfig withMaxConcurrentTasks(int maxConcurrentTasks) {
-    this.maxConcurrentTasks = maxConcurrentTasks;
-    return this;
+    return new SchedulerConfig(maxConcurrentTasks, schedulerName, rejectionAction, shutdownTimeoutMillis);
   }
 
   /**
@@ -79,8 +96,7 @@ public class SchedulerConfig {
    * @return the updated configuration.
    */
   public SchedulerConfig withName(String schedulerName) {
-    this.schedulerName = schedulerName;
-    return this;
+    return new SchedulerConfig(maxConcurrentTasks, schedulerName, rejectionAction, shutdownTimeoutMillis);
   }
 
   /**
@@ -102,8 +118,7 @@ public class SchedulerConfig {
    */
   public SchedulerConfig withRejectionAction(RejectionAction rejectionAction) {
     requireNonNull(rejectionAction);
-    this.rejectionAction = rejectionAction;
-    return this;
+    return new SchedulerConfig(maxConcurrentTasks, schedulerName, rejectionAction, shutdownTimeoutMillis);
   }
 
   /**
@@ -111,5 +126,29 @@ public class SchedulerConfig {
    */
   public RejectionAction getRejectionAction() {
     return rejectionAction;
+  }
+
+  /**
+   * Sets the graceful shutdown timeout to use when stopping the target {@link Scheduler}.
+   * 
+   * @param shutdownTimeout the value of the timeout to use when gracefully stopping the target {@link Scheduler}, expressed in
+   *        the provided timeunit.
+   * @param shutdownTimeoutUnit the unit of the timeout to use when gracefully stopping the target {@link Scheduler}.
+   * @return the updated configuration
+   */
+  public SchedulerConfig withShutdownTimeout(long shutdownTimeout, TimeUnit shutdownTimeoutUnit) {
+    if (shutdownTimeout < 0) {
+      throw new IllegalArgumentException(format("'shutdownTimeout' must be a possitive long. %d passed", shutdownTimeout));
+    }
+    requireNonNull(shutdownTimeoutUnit);
+
+    return new SchedulerConfig(maxConcurrentTasks, schedulerName, rejectionAction, shutdownTimeoutUnit.toMillis(shutdownTimeout));
+  }
+
+  /**
+   * @return the timeout to use when gracefully stopping the target {@link Scheduler}, in millis.
+   */
+  public Long getShutdownTimeoutMillis() {
+    return shutdownTimeoutMillis;
   }
 }

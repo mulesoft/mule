@@ -11,15 +11,16 @@ import static com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderCon
 import static com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig.Property.TRANSPORT_CUSTOMIZER;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Runtime.getRuntime;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.service.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.service.http.api.HttpHeaders.Values.CLOSE;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -39,6 +40,21 @@ import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
 import org.mule.service.http.api.tcp.TcpClientSocketProperties;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.net.ssl.SSLContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.ning.http.client.AsyncHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -56,21 +72,6 @@ import com.ning.http.client.multipart.ByteArrayPart;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.net.ssl.SSLContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class GrizzlyHttpClient implements HttpClient {
 
   private static final int MAX_CONNECTION_LIFETIME = 30 * 60 * 1000;
@@ -81,22 +82,23 @@ public class GrizzlyHttpClient implements HttpClient {
 
   private final ProxyConfig proxyConfig;
   private final TcpClientSocketProperties clientSocketProperties;
-  private int maxConnections;
-  private boolean usePersistentConnections;
-  private int connectionIdleTimeout;
+  private final int maxConnections;
+  private final boolean usePersistentConnections;
+  private final int connectionIdleTimeout;
   private int responseBufferSize;
 
-  private String threadNamePrefix;
+  private final String threadNamePrefix;
   private Scheduler selectorScheduler;
   private Scheduler workerScheduler;
-  private SchedulerService schedulerService;
-  private String ownerName;
+  private final SchedulerService schedulerService;
+  private final SchedulerConfig schedulersConfig;
+  private final String ownerName;
   private AsyncHttpClient asyncHttpClient;
   private SSLContext sslContext;
-  private TlsContextFactory defaultTlsContextFactory = TlsContextFactory.builder().buildDefault();
+  private final TlsContextFactory defaultTlsContextFactory = TlsContextFactory.builder().buildDefault();
 
 
-  public GrizzlyHttpClient(HttpClientConfiguration config, SchedulerService schedulerService) {
+  public GrizzlyHttpClient(HttpClientConfiguration config, SchedulerService schedulerService, SchedulerConfig schedulersConfig) {
     this.tlsContextFactory = config.getTlsContextFactory();
     this.proxyConfig = config.getProxyConfig();
     this.clientSocketProperties = config.getClientSocketProperties();
@@ -108,14 +110,14 @@ public class GrizzlyHttpClient implements HttpClient {
     this.ownerName = config.getOwnerName();
 
     this.schedulerService = schedulerService;
+    this.schedulersConfig = schedulersConfig;
   }
 
   @Override
   public void start() {
-    selectorScheduler = schedulerService
-        .customScheduler(config().withMaxConcurrentTasks(getRuntime().availableProcessors() + 1).withName(threadNamePrefix),
-                         MAX_VALUE);
-    workerScheduler = schedulerService.ioScheduler();
+    selectorScheduler = schedulerService.customScheduler(schedulersConfig
+        .withMaxConcurrentTasks(getRuntime().availableProcessors() + 1).withName(threadNamePrefix), MAX_VALUE);
+    workerScheduler = schedulerService.ioScheduler(schedulersConfig);
 
     AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
     builder.setAllowPoolingConnections(true);
@@ -149,9 +151,9 @@ public class GrizzlyHttpClient implements HttpClient {
       TlsContextTrustStoreConfiguration trustStoreConfiguration = tlsContextFactory.getTrustStoreConfiguration();
 
       if (trustStoreConfiguration != null && trustStoreConfiguration.isInsecure()) {
-        logger.warn(String.format(
-                                  "TLS configuration for requester %s has been set to use an insecure trust store. This means no certificate validations will be performed, rendering connections vulnerable to attacks. Use at own risk.",
-                                  ownerName));
+        logger
+            .warn(format("TLS configuration for requester %s has been set to use an insecure trust store. This means no certificate validations will be performed, rendering connections vulnerable to attacks. Use at own risk.",
+                         ownerName));
         // This disables hostname verification
         builder.setAcceptAnyCertificate(true);
       }
@@ -395,8 +397,8 @@ public class GrizzlyHttpClient implements HttpClient {
   @Override
   public void stop() {
     asyncHttpClient.close();
-    workerScheduler.stop(5, SECONDS);
-    selectorScheduler.stop(5, SECONDS);
+    workerScheduler.stop();
+    selectorScheduler.stop();
   }
 
   private class ResponseBodyDeferringAsyncHandler implements AsyncHandler<Response> {

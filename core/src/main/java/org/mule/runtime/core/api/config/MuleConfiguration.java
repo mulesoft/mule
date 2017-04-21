@@ -48,7 +48,10 @@ public interface MuleConfiguration {
   @Deprecated
   int getDefaultQueueTimeout();
 
-  int getShutdownTimeout();
+  /**
+   * @return The graceful shutdown timeout (in millis) used when stopping a mule application cleanly without message loss.
+   */
+  long getShutdownTimeout();
 
   /**
    * The approximated maximum space in megabytes used by the transaction log files for transactional persistent queues.

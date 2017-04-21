@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static org.mule.runtime.config.spring.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_LOCAL_USER_OBJECT_STORE_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
@@ -39,6 +40,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANA
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSOR_INTERCEPTOR_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SERIALIZER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
@@ -50,9 +52,11 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+
 import org.mule.runtime.api.artifact.ArtifactProperties;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -223,6 +227,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_COMPONENT_INITIAL_STATE_MANAGER, getBeanDefinition(DefaultComponentInitialStateManager.class))
       .put(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class))
       .put(OBJECT_TRANSFORMATION_SERVICE, getBeanDefinition(TransformationService.class))
+      .put(OBJECT_SCHEDULER_BASE_CONFIG, getConstantObjectBeanDefinition(config()))
       .build();
 
   private final SpringConfigurationComponentLocator componentLocator;
@@ -295,7 +300,12 @@ class SpringMuleContextServiceConfigurator {
     if (customServiceClass.isPresent()) {
       beanDefinition = getBeanDefinitionBuilder(customServiceClass.get()).getBeanDefinition();
     } else if (customServiceImpl.isPresent()) {
-      beanDefinition = getConstantObjectBeanDefinition(customServiceImpl.get());
+      if (customServiceImpl.get() instanceof Service) {
+        beanDefinition = getConstantObjectBeanDefinition(createInjectProviderParamsServiceProxy((Service) customServiceImpl.get(),
+                                                                                                muleContext));
+      } else {
+        beanDefinition = getConstantObjectBeanDefinition(customServiceImpl.get());
+      }
     } else {
       throw new IllegalStateException("A custom service must define a service class or instance");
     }

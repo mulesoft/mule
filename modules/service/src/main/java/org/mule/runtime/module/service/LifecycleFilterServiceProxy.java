@@ -4,27 +4,25 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.service;
 
-import static org.mule.runtime.core.util.ClassUtils.findImplementedInterfaces;
+import static java.lang.reflect.Proxy.newProxyInstance;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.api.service.Service;
+import static org.mule.runtime.core.util.ClassUtils.findImplementedInterfaces;
+
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.service.Service;
+import org.mule.runtime.container.api.ServiceInvocationHandler;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 
 /**
  * Proxies a {@link Service} instance to filter invocations of lifecycle methods from {@link Startable} and {@link Stoppable}
  * interfaces.
  */
-public class LifecycleFilterServiceProxy implements InvocationHandler {
-
-  private final Service service;
+public class LifecycleFilterServiceProxy extends ServiceInvocationHandler {
 
   /**
    * Creates a new proxy for the provided service instance.
@@ -32,8 +30,7 @@ public class LifecycleFilterServiceProxy implements InvocationHandler {
    * @param service service instance to wrap. Non null.
    */
   public LifecycleFilterServiceProxy(Service service) {
-    checkArgument(service != null, "service cannot be null");
-    this.service = service;
+    super(service);
   }
 
   @Override
@@ -42,13 +39,7 @@ public class LifecycleFilterServiceProxy implements InvocationHandler {
       throw new UnsupportedOperationException("Cannot invoke lifecycle methods on a service instance");
     }
 
-    try {
-      return method.invoke(service, args);
-    } catch (InvocationTargetException ite) {
-      // Unwrap target exception to ensure InvocationTargetException (in case of unchecked exceptions) or
-      // UndeclaredThrowableException (in case of checked exceptions) is not thrown by Service instead of target exception.
-      throw ite.getTargetException();
-    }
+    return doInvoke(proxy, method, args);
   }
 
   /**
@@ -57,11 +48,11 @@ public class LifecycleFilterServiceProxy implements InvocationHandler {
    * @param service service to wrap. Non null.
    * @return a new proxy instance.
    */
-  public static Service createServiceProxy(Service service) {
+  public static Service createLifecycleFilterServiceProxy(Service service) {
     checkArgument(service != null, "service cannot be null");
     InvocationHandler handler = new LifecycleFilterServiceProxy(service);
 
-    return (Service) Proxy.newProxyInstance(service.getClass().getClassLoader(), findImplementedInterfaces(service.getClass()),
-                                            handler);
+    return (Service) newProxyInstance(service.getClass().getClassLoader(), findImplementedInterfaces(service.getClass()),
+                                      handler);
   }
 }

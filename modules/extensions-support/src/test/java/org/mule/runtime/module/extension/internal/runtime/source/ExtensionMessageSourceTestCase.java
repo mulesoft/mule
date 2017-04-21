@@ -21,7 +21,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -45,17 +44,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -99,8 +88,21 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
-import javax.resource.spi.work.Work;
 import java.io.IOException;
+
+import javax.resource.spi.work.Work;
+
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase {
@@ -291,8 +293,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
     messageSource.onException(new ConnectionException(ERROR_MESSAGE));
     verify(source).onStop();
-    verify(ioScheduler, never()).stop(anyLong(), any());
-    verify(cpuLightScheduler, never()).stop(anyLong(), any());
+    verify(ioScheduler, never()).stop();
+    verify(cpuLightScheduler, never()).stop();
     verify(source, times(2)).onStart(sourceCallback);
     handleMessage();
   }

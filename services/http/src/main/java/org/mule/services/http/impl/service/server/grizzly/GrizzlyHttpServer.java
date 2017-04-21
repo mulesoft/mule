@@ -6,7 +6,6 @@
  */
 package org.mule.services.http.impl.service.server.grizzly;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.RequestHandler;
@@ -53,8 +52,7 @@ public class GrizzlyHttpServer implements HttpServer, Supplier<ExecutorService> 
     serverConnection = transport.bind(serverAddress.getIp(), serverAddress.getPort());
     serverConnection.addCloseListener((closeable, type) -> {
       try {
-        // TODO MULE-11115 Add a stop() method to Scheduler
-        scheduler.stop(5000, MILLISECONDS);
+        scheduler.stop();
       } finally {
         scheduler = null;
       }

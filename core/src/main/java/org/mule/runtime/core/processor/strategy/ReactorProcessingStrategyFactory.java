@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
@@ -17,7 +16,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import java.util.concurrent.ExecutorService;
@@ -38,10 +36,9 @@ public class ReactorProcessingStrategyFactory extends AbstractRingBufferProcessi
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService().cpuLightScheduler(),
-                                         scheduler -> scheduler.stop(muleContext.getConfiguration().getShutdownTimeout(),
-                                                                     MILLISECONDS),
+                                         scheduler -> scheduler.stop(),
                                          () -> muleContext.getSchedulerService()
-                                             .customScheduler(SchedulerConfig.config()
+                                             .customScheduler(muleContext.getSchedulerBaseConfig()
                                                  .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
                                                  .withMaxConcurrentTasks(getSubscriberCount() + 1)),
 

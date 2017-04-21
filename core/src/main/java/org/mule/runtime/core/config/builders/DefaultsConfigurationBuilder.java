@@ -25,6 +25,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEX
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
@@ -32,28 +33,29 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 
-import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.core.config.bootstrap.SimpleRegistryBootstrap;
-import org.mule.runtime.core.internal.connector.MuleConnectorOperationLocator;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
+import org.mule.runtime.core.internal.connector.MuleConnectorOperationLocator;
+import org.mule.runtime.core.internal.lock.MuleLockFactory;
+import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.core.security.DefaultMuleSecurityManager;
-import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.core.util.DefaultStreamCloserService;
-import org.mule.runtime.core.internal.lock.MuleLockFactory;
-import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.util.queue.DelegateQueueManager;
 import org.mule.runtime.core.util.queue.QueueManager;
 import org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean;
@@ -118,6 +120,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_TIME_SUPPLIER, new TimeSupplier(), muleContext);
     registerObject(OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager(muleContext), muleContext);
     registerObject(OBJECT_METADATA_SERVICE, new MuleMetadataService(), muleContext);
+    registerObject(OBJECT_SCHEDULER_BASE_CONFIG, config(), muleContext);
   }
 
   protected void registerObject(String serviceId, Object serviceImpl, MuleContext muleContext) throws RegistrationException {

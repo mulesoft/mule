@@ -41,12 +41,13 @@ public class ThrottledScheduler extends DefaultScheduler {
    *        actual tasks, but will dispatch it to the {@code executor} at the appropriate time.
    * @param threadsType The {@link ThreadType} that matches with the {@link Thread}s managed by this {@link Scheduler}.
    * @param maxConcurrentTasks how many tasks can be running at the same time for this {@link Scheduler}.
-   * @param EMPTY_SHUTDOWN_CALLBACK a callback to be invoked when this scheduler is stopped/shutdown.
+   * @param shutdownTimeoutMillis the time in millis to wait for the gracefule stop of this scheduler
+   * @param shutdownCallback a callback to be invoked when this scheduler is stopped/shutdown.
    */
   ThrottledScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
                      org.quartz.Scheduler quartzScheduler, ThreadType threadsType, int maxConcurrentTasks,
-                     Consumer<Scheduler> shutdownCallback) {
-    super(name, executor, workers, scheduledExecutor, quartzScheduler, threadsType, shutdownCallback);
+                     long shutdownTimeoutMillis, Consumer<Scheduler> shutdownCallback) {
+    super(name, executor, workers, scheduledExecutor, quartzScheduler, threadsType, shutdownTimeoutMillis, shutdownCallback);
     this.maxConcurrentTasks = maxConcurrentTasks;
   }
 

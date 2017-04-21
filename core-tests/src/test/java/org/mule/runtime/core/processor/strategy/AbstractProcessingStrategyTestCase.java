@@ -40,7 +40,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -50,6 +49,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiveProcessorTestCase {
@@ -393,7 +393,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     }
 
     @Override
-    public void stop(long gracefulShutdownTimeoutSecs, TimeUnit unit) {
+    public void stop() {
       // Nothing to do.
     }
 

@@ -34,6 +34,9 @@ public interface SchedulerService extends Service {
    * by the Mule runtime cpu-light executor, which is shared by all {@link Scheduler}s returned by this method.
    * <p>
    * A task is considered {@code cpu-light} if it doesn't block at any time and its duration is less than 10 milliseconds.
+   * <p>
+   * Implementations must get the appropriate config from the runtime context to build the target {@link Scheduler}. This method
+   * must act only as a delegate of {@link #cpuLightScheduler(SchedulerConfig)}.
    * 
    * @return a scheduler that runs {@code cpu-light} tasks.
    */
@@ -44,6 +47,9 @@ public interface SchedulerService extends Service {
    * backed by the Mule runtime blocking I/O executor, which is shared by all {@link Scheduler}s returned by this method.
    * <p>
    * A task is considered {@code blocking I/O} if it spends most of it's clock duration blocked due to I/O operations.
+   * <p>
+   * Implementations must get the appropriate config from the runtime context to build the target {@link Scheduler}. This method
+   * must act only as a delegate of {@link #ioScheduler(SchedulerConfig)}.
    * 
    * @return a scheduler that runs {@code blocking I/O} tasks.
    */
@@ -56,6 +62,9 @@ public interface SchedulerService extends Service {
    * <p>
    * A task is considered a {@code CPU intensive} if its duration is more than 10 milliseconds and less than 20% of its clock time
    * is due to blocking.
+   * <p>
+   * Implementations must get the appropriate config from the runtime context to build the target {@link Scheduler}. This method
+   * must act only as a delegate of {@link #cpuIntensiveScheduler(SchedulerConfig)}.
    * 
    * @return a scheduler that runs {@code CPU intensive} tasks.
    */
