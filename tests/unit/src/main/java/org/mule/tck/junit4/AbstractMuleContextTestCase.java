@@ -540,7 +540,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * @return representation of the message payload of the required class
    * @throws Exception if there is an unexpected error obtaining the payload representation
    */
-  protected <T> T getPayload(InternalMessage message, Class<T> clazz) throws Exception {
+  protected <T> T getPayload(Message message, Class<T> clazz) throws Exception {
     return (T) getPayload(message, DataType.fromType(clazz));
   }
 

@@ -14,9 +14,9 @@ import static org.mule.extension.validation.ValidationTestCase.VALID_EMAIL;
 import static org.mule.extension.validation.ValidationTestCase.VALID_URL;
 import static org.mule.runtime.api.message.Message.of;
 import org.mule.extension.validation.api.NumberType;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.common.collect.ImmutableList;
@@ -56,13 +56,13 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
 
     assertValid(expression, event);
 
-    event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload("TRUE").build()).build();
+    event = Event.builder(event).message(Message.builder(event.getMessage()).payload("TRUE").build()).build();
     assertValid(expression, event);
 
     event = Event.builder(event).addVariable("caseSensitive", true).build();
     assertInvalid(expression, event);
 
-    event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload("tTrue").build()).build();
+    event = Event.builder(event).message(Message.builder(event.getMessage()).payload("tTrue").build()).build();
     assertInvalid(expression, event);
   }
 

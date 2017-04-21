@@ -33,7 +33,6 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractIntegra
    */
   @Test
   public void testSpringBeanServiceLifecycle() throws Exception {
-    // TODO(pablo.kraan): MERGE - is this correct to have initialise and setFlowConstruct as expected phases?
     String expectedLifeCycle =
         "[setProperty, setMuleContext, springInitialize, initialise, setFlowConstruct, start, stop, dispose, springDestroy]";
 
@@ -49,7 +48,6 @@ public class LifecycleTrackerComponentFunctionalTestCase extends AbstractIntegra
    */
   @Test
   public void testSpringBeanService2Lifecycle() throws Exception {
-    // TODO(pablo.kraan): MERGE - is this correct to have initialise and setFlowConstruct as expected phases?
     String expectedLifeCycle = "[setProperty, setMuleContext, initialise, setFlowConstruct, start, stop, dispose]";
 
     testComponentLifecycle("SpringBeanService2", expectedLifeCycle);

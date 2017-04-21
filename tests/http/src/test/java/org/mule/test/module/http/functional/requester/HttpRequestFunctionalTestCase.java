@@ -6,18 +6,17 @@
  */
 package org.mule.test.module.http.functional.requester;
 
-import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
+import static org.mule.functional.junit4.TestLegacyMessageUtils.getInboundProperty;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -86,7 +85,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   public void previousInboundPropertiesAreCleared() throws Exception {
     Event event =
         flowRunner("requestFlow").withPayload(TEST_MESSAGE).withInboundProperty("TestInboundProperty", "TestValue").run();
-    assertThat(((InternalMessage) event.getMessage()).getInboundProperty("TestInboundProperty"), nullValue());
+    assertThat(getInboundProperty(event.getMessage(), "TestInboundProperty"), nullValue());
   }
 
   @Override

@@ -14,7 +14,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.MessagingException;
@@ -57,7 +56,7 @@ public class ExceptionStrategyReturnMessageTestCase extends AbstractIntegrationT
     @Override
     public Event handleException(MessagingException exception, Event event) {
       Event result = super.handleException(exception, event);
-      result = Event.builder(result).message(InternalMessage.builder(event.getMessage()).payload("Ka-boom!").build()).build();
+      result = Event.builder(result).message(Message.builder(event.getMessage()).payload("Ka-boom!").build()).build();
       exception.setHandled(true);
       return result;
     }

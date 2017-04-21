@@ -7,10 +7,10 @@
 package org.mule.issues;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.functional.junit4.TestLegacyMessageUtils.getOutboundProperty;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -63,7 +63,7 @@ public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCas
 
     public static synchronized void process(Message msg) {
       messageCount++;
-      String where = ((InternalMessage) msg).getOutboundProperty("where");
+      String where = getOutboundProperty(msg, "where");
       if (where == null) {
         where = "location_" + counter++;
       }

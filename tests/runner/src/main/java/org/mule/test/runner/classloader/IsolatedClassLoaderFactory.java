@@ -20,6 +20,7 @@ import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
+import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
@@ -91,17 +92,17 @@ public class IsolatedClassLoaderFactory {
     ClassLoaderLookupPolicy childClassLoaderLookupPolicy;
     DefaultModuleRepository moduleRepository =
         new DefaultModuleRepository(new ContainerModuleDiscoverer(ContainerClassLoaderFactory.class.getClassLoader()));
-    try (final TestContainerClassLoaderFactory testContainerClassLoaderFactory =
+    final TestContainerClassLoaderFactory testContainerClassLoaderFactory =
         new TestContainerClassLoaderFactory(extraBootPackages, artifactsUrlClassification.getContainerUrls().toArray(new URL[0]),
-                                            moduleRepository)) {
+                                            moduleRepository);
 
-      containerClassLoader =
-          createContainerArtifactClassLoader(testContainerClassLoaderFactory, artifactsUrlClassification);
+    containerClassLoader =
+        createContainerArtifactClassLoader(testContainerClassLoaderFactory, artifactsUrlClassification);
 
-      childClassLoaderLookupPolicy =
-          testContainerClassLoaderFactory.getContainerClassLoaderLookupPolicy(containerClassLoader.getClassLoader());
+    childClassLoaderLookupPolicy =
+        testContainerClassLoaderFactory.getContainerClassLoaderLookupPolicy(containerClassLoader.getClassLoader());
 
-    }
+
     List<ArtifactClassLoader> serviceArtifactClassLoaders =
         createServiceClassLoaders(containerClassLoader.getClassLoader(), childClassLoaderLookupPolicy,
                                   artifactsUrlClassification);
@@ -119,6 +120,11 @@ public class IsolatedClassLoaderFactory {
         logClassLoaderUrls("PLUGIN (" + pluginUrlClassification.getName() + ")", pluginUrlClassification.getUrls());
 
         String artifactId = getArtifactPluginId(regionClassLoader.getArtifactId(), pluginUrlClassification.getName());
+
+        ClassLoaderLookupPolicy pluginLookupPolicy =
+            extendLookupPolicyForPrivilegedAccess(childClassLoaderLookupPolicy, moduleRepository, testContainerClassLoaderFactory,
+                                                  pluginUrlClassification);
+
         MuleArtifactClassLoader pluginCL =
             new MuleArtifactClassLoader(artifactId,
                                         new ArtifactDescriptor(pluginUrlClassification.getName()),
@@ -127,7 +133,7 @@ public class IsolatedClassLoaderFactory {
                                         pluginLookupPolicyGenerator.createLookupPolicy(pluginUrlClassification,
                                                                                        artifactsUrlClassification
                                                                                            .getPluginUrlClassifications(),
-                                                                                       childClassLoaderLookupPolicy));
+                                                                                       pluginLookupPolicy));
         pluginsArtifactClassLoaders.add(pluginCL);
 
         ArtifactClassLoaderFilter filter = createArtifactClassLoaderFilter(pluginUrlClassification);
@@ -161,6 +167,34 @@ public class IsolatedClassLoaderFactory {
 
     return new ArtifactClassLoaderHolder(containerClassLoader, serviceArtifactClassLoaders, pluginsArtifactClassLoaders,
                                          appClassLoader);
+  }
+
+  private ClassLoaderLookupPolicy extendLookupPolicyForPrivilegedAccess(ClassLoaderLookupPolicy childClassLoaderLookupPolicy,
+                                                                        DefaultModuleRepository moduleRepository,
+                                                                        TestContainerClassLoaderFactory testContainerClassLoaderFactory,
+                                                                        PluginUrlClassification pluginUrlClassification) {
+    ContainerOnlyLookupStrategy containerOnlyLookupStrategy =
+        new ContainerOnlyLookupStrategy(testContainerClassLoaderFactory.getContainerClassLoader().getClassLoader());
+
+    Map<String, LookupStrategy> privilegedLookupStrategies = new HashMap<>();
+    for (MuleModule module : moduleRepository.getModules()) {
+      if (hasPrivilegedApiAccess(pluginUrlClassification, module)) {
+        for (String packageName : module.getPrivilegedExportedPackages()) {
+          privilegedLookupStrategies.put(packageName, containerOnlyLookupStrategy);
+        }
+      }
+    }
+
+    if (privilegedLookupStrategies.isEmpty()) {
+      return childClassLoaderLookupPolicy;
+    } else {
+      return childClassLoaderLookupPolicy.extend(privilegedLookupStrategies);
+    }
+  }
+
+  private boolean hasPrivilegedApiAccess(PluginUrlClassification pluginUrlClassification, MuleModule module) {
+    return module.getPrivilegedArtifacts().stream()
+        .filter(artifact -> pluginUrlClassification.getName().contains(":" + artifact + ":")).findFirst().isPresent();
   }
 
   /**
@@ -238,8 +272,9 @@ public class IsolatedClassLoaderFactory {
         .create(testContainerClassLoaderFactory.getBootPackages(), muleModules);
 
     logClassLoaderUrls("CONTAINER", artifactsUrlClassification.getContainerUrls());
-    return testContainerClassLoaderFactory
+    ArtifactClassLoader containerClassLoader = testContainerClassLoaderFactory
         .createContainerClassLoader(new FilteringArtifactClassLoader(launcherArtifact, filteredClassLoaderLauncher, emptyList()));
+    return containerClassLoader;
   }
 
   /**

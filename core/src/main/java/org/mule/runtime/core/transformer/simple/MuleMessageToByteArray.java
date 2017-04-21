@@ -12,7 +12,9 @@ import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
 
-/** TODO */
+/**
+ * Serializes a {@link org.mule.runtime.api.message.Message} into a byte array.
+ */
 public class MuleMessageToByteArray extends AbstractMessageTransformer {
 
   public MuleMessageToByteArray() {
@@ -22,6 +24,6 @@ public class MuleMessageToByteArray extends AbstractMessageTransformer {
 
   @Override
   public Object transformMessage(Event event, Charset outputEncoding) {
-    return muleContext.getObjectSerializer().getExternalProtocol().serialize(event.getMessage());
+    return muleContext.getObjectSerializer().getInternalProtocol().serialize(event.getMessage());
   }
 }

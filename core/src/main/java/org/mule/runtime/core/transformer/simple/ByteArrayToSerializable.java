@@ -8,7 +8,7 @@ package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -35,20 +35,24 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
 
   @Override
   public Object doTransform(Object src, Charset encoding) throws TransformerException {
-    ObjectSerializer serializer = muleContext.getObjectSerializer();
+    SerializationProtocol externalProtocol = getSerializationProtocol();
     try {
       final Object result;
       if (src instanceof byte[]) {
-        result = serializer.getExternalProtocol().deserialize((byte[]) src);
+        result = externalProtocol.deserialize((byte[]) src);
       } else if (src instanceof CursorStreamProvider) {
-        result = serializer.getExternalProtocol().deserialize(((CursorStreamProvider) src).openCursor());
+        result = externalProtocol.deserialize(((CursorStreamProvider) src).openCursor());
       } else {
-        result = serializer.getExternalProtocol().deserialize((InputStream) src);
+        result = externalProtocol.deserialize((InputStream) src);
       }
       return result;
     } catch (Exception e) {
       throw new TransformerException(CoreMessages.transformFailed("byte[]", "Object"), this, e);
     }
+  }
+
+  protected SerializationProtocol getSerializationProtocol() {
+    return muleContext.getObjectSerializer().getExternalProtocol();
   }
 
   @Override

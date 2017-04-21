@@ -7,6 +7,7 @@
 
 package org.foo.hello;
 
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -26,7 +27,7 @@ public class PrivilegedExtension {
 
   public PrivilegedExtension() {
     // Moved to the constructor as same code in the operation does not show any error in the log
-    new DefaultLocalMuleClient(null);
+    InternalMessage.builder().payload("privileged");
   }
 
   public String getMessage() {

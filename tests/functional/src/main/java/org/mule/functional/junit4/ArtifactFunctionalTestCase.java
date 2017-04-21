@@ -224,7 +224,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   /**
    * Defines a {@link ClassLoaderRepository} with all the class loaders configured in the {@link ArtifactFunctionalTestCase} class.
    */
-  private static class TestClassLoaderRepository implements ClassLoaderRepository {
+  protected static class TestClassLoaderRepository implements ClassLoaderRepository {
 
     private Map<String, ClassLoader> classLoaders = new HashMap<>();
 

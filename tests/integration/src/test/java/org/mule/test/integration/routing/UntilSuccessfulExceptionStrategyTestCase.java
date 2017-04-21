@@ -9,10 +9,10 @@ package org.mule.test.integration.routing;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
+import org.mule.functional.junit4.TestLegacyMessageBuilder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -74,7 +74,7 @@ public class UntilSuccessfulExceptionStrategyTestCase extends AbstractIntegratio
         if (!latch.await(TIMEOUT, TimeUnit.SECONDS)) {
           RuntimeException exception = new RuntimeException();
           event = Event.builder(event)
-              .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception))
+              .message(new TestLegacyMessageBuilder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception))
                   .build())
               .error(createErrorMock(exception)).build();
         }
