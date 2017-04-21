@@ -23,7 +23,7 @@ import java.util.List;
 
 public class DomainContextBuilder {
 
-  private String domainConfig;
+  private String[] domainConfig;
   private MuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder() {
 
     @Override
@@ -34,7 +34,7 @@ public class DomainContextBuilder {
     }
   };
 
-  public DomainContextBuilder setDomainConfig(String domainConfig) {
+  public DomainContextBuilder setDomainConfig(String... domainConfig) {
     this.domainConfig = domainConfig;
     return this;
   }
@@ -54,7 +54,7 @@ public class DomainContextBuilder {
     builders.add(new TestServicesConfigurationBuilder());
   }
 
-  protected ConfigurationBuilder getDomainBuilder(String configResource) throws Exception {
-    return new SpringXmlConfigurationBuilder(configResource, emptyMap(), DOMAIN);
+  protected ConfigurationBuilder getDomainBuilder(String[] configResources) throws Exception {
+    return new SpringXmlConfigurationBuilder(configResources, emptyMap(), DOMAIN);
   }
 }

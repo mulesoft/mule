@@ -11,6 +11,8 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_C
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_NAMESPACE;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
@@ -54,6 +56,7 @@ public class XmlApplicationParser {
   private final Cache<String, String> namespaceCache;
 
   static {
+    predefinedNamespace.put(DOMAIN_NAMESPACE, DOMAIN_PREFIX);
     predefinedNamespace.put("http://www.springframework.org/schema/beans", SPRING_NAMESPACE);
     predefinedNamespace.put("http://www.springframework.org/schema/context", SPRING_CONTEXT_NAMESPACE);
   }
