@@ -10,19 +10,17 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.List;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 public class ModuleWithMultipleGlobalElementsTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
@@ -35,8 +33,8 @@ public class ModuleWithMultipleGlobalElementsTestCase extends AbstractXmlExtensi
   @Rule
   public SystemProperty workingDir = new SystemProperty("workingDir", temporaryFolder.getRoot().getAbsolutePath());
 
-  @Before
-  public void setUp() throws Exception {
+  @BeforeClass
+  public static void setUp() throws Exception {
     if (!temporaryFolder.getRoot().exists()) {
       temporaryFolder.getRoot().mkdir();
     }
@@ -44,8 +42,8 @@ public class ModuleWithMultipleGlobalElementsTestCase extends AbstractXmlExtensi
     temporaryFolder.newFolder(SUB_DIRECTORY_NAME_B);
   }
 
-  @After
-  public void tearDown() {
+  @AfterClass
+  public static void tearDown() {
     temporaryFolder.delete();
   }
 

@@ -55,6 +55,7 @@
                                 maxConnections="-1"
                                 port="49020"
                                 protocol="HTTP"
+                                responseBufferSize="10240"
                                 usePersistentConnections="true">
             <httpn:authentication>
             <httpn:basic-authentication password="pass" preemptive="true" username="user"/>
