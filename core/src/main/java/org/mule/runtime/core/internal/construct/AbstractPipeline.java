@@ -249,9 +249,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     } else {
       return me -> Mono.defer(() -> Mono.from(getExceptionListener().apply(me)))
           .doOnNext(event -> event.getContext().success(event))
-          .doOnError(throwable -> {
-            me.getEvent().getContext().error(throwable);
-          })
+          .doOnError(throwable -> me.getEvent().getContext().error(throwable))
           .subscribe();
     }
   }

@@ -251,11 +251,28 @@ public abstract class AbstractMuleTestCase {
   private Event _testEvent;
   private Event _nullPayloadEvent;
 
+  /**
+   * Creates and caches a test {@link Event} instance for the scope of the current test method.
+   *
+   * @return test event.
+   * @throws MuleException
+   */
   protected Event testEvent() throws MuleException {
     if (_testEvent == null) {
-      _testEvent = eventBuilder().message(of(TEST_PAYLOAD)).build();
+      _testEvent = newEvent();
     }
     return _testEvent;
+  }
+
+  /**
+   * Create a new {@link Event} for each invocation. Useful if multiple distinct event instances are needed in a single test
+   * method.
+   * 
+   * @return new test event.
+   * @throws MuleException
+   */
+  protected Event newEvent() throws MuleException {
+    return eventBuilder().message(of(TEST_PAYLOAD)).build();
   }
 
   protected Event nullPayloadEvent() throws MuleException {

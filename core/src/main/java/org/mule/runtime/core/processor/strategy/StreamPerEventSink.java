@@ -39,7 +39,7 @@ class StreamPerEventSink implements Sink {
 
   @Override
   public void accept(Event event) {
-    eventConsumer.accept(event);
-    just(event).transform(processor).subscribe();
+    just(event).doOnNext(request -> eventConsumer.accept(request)).transform(processor).doOnError(throwable -> {
+    }).subscribe();
   }
 }

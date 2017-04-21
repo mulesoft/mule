@@ -71,7 +71,7 @@ public class FlowListenerOperationExecutionTestCase extends AbstractExtensionFun
       flowRunner("listenAndFail").run();
       fail("Flow should have failed");
     } catch (MessagingException e) {
-      assertThat(config.getExceptionCount(), is(1));
+      check(() -> assertThat(config.getExceptionCount(), is(1)));
     }
   }
 

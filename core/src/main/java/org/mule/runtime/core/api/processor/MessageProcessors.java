@@ -9,13 +9,15 @@ package org.mule.runtime.core.api.processor;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder.*;
 import static reactor.core.publisher.Mono.empty;
+import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.rx.Exceptions;
+import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder;
 
@@ -64,8 +66,7 @@ public class MessageProcessors {
 
   /**
    * Creates a new explicit {@link MessageProcessorChain} from one or more {@link Processor}'s. Note that this performs chains
-   * construction but wil not inject {@link MuleContext} or {@link FlowConstruct} or perform any lifecycle. An explicit chain
-   * differs in that it has a {@link MessageProcessorPathElement} associated with.
+   * construction but wil not inject {@link MuleContext} or {@link FlowConstruct} or perform any lifecycle.
    *
    * @param processors list of processors to construct chains from.
    * @return new {@link MessageProcessorChain} instance.
@@ -80,8 +81,7 @@ public class MessageProcessors {
 
   /**
    * Creates a new explicit {@link MessageProcessorChain} from a {@link List} of {@link Processor}'s. Note that this performs
-   * chains construction but wil not inject {@link MuleContext} or {@link FlowConstruct} or perform any lifecycle. An explicit
-   * chain differs in that it has a {@link MessageProcessorPathElement} associated with.
+   * chains construction but wil not inject {@link MuleContext} or {@link FlowConstruct} or perform any lifecycle.
    *
    * @param processors list of processors to construct chains from.
    * @return new {@link MessageProcessorChain} instance.
@@ -94,9 +94,19 @@ public class MessageProcessors {
     }
   }
 
-  public static Event processToApply(Event event, Processor processor) throws MuleException {
+  public static Event processToApply(Event event, ReactiveProcessor processor) throws MuleException {
     try {
-      return just(event).transform(processor).otherwise(Exceptions.EventDroppedException.class, ede -> empty()).block();
+      return just(event).transform(processor).otherwise(EventDroppedException.class, mde -> empty()).block();
+    } catch (Throwable e) {
+      throw rxExceptionToMuleException(e);
+    }
+  }
+
+  public static Event processToApply(Event event, Flow flow) throws MuleException {
+    try {
+      just(event).transform(flow).doOnError(throwable -> {
+      }).subscribe();
+      return from(event.getContext().getResponsePublisher()).block();
     } catch (Throwable e) {
       throw rxExceptionToMuleException(e);
     }

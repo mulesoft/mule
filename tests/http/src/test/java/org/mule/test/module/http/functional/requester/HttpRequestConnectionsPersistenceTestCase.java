@@ -7,11 +7,13 @@
 package org.mule.test.module.http.functional.requester;
 
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.probe.JUnitProbe;
@@ -26,6 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.io.EndPoint;
 import org.eclipse.jetty.server.Request;
 import org.junit.Test;
+import org.reactivestreams.Processor;
+import reactor.core.publisher.MonoProcessor;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features(HTTP_EXTENSION)
@@ -65,11 +69,15 @@ public class HttpRequestConnectionsPersistenceTestCase extends AbstractHttpReque
   @Test
   public void nonPersistentConnections() throws Exception {
     Flow flow = (Flow) getFlowConstruct("nonPersistent");
-    Event response = flow.process(testEvent());
-    //verify that the connection is released shortly
+    // Use external EventContext completion to prevent Flow from closing streaming cursor when it completes.
+    Processor<Void, Void> completion = MonoProcessor.create();
+    Event response =
+        flow.process(Event.builder(DefaultEventContext.create(flow, "", null, completion)).message(of(TEST_PAYLOAD)).build());
+    // verify that the connection is released shortly
     new PollingProber(SMALL_TIMEOUT_MILLIS, SMALL_POLL_DELAY_MILLIS).check(probe);
-    //verify the stream is still available
+    // verify the stream is still available
     assertThat(response.getMessage(), hasPayload(is(DEFAULT_RESPONSE)));
+    completion.onComplete();
   }
 
   private void ensureConnectionIsOpen() {
