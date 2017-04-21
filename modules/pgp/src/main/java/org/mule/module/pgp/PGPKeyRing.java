@@ -11,9 +11,12 @@ import org.bouncycastle.openpgp.PGPSecretKey;
 
 public interface PGPKeyRing
 {
-    public abstract String getSecretPassphrase();
+    String getSecretPassphrase();
 
-    public abstract PGPSecretKey getSecretKey() throws Exception;
+    PGPSecretKey getSecretKey() throws Exception;
 
-    public abstract PGPPublicKey getPublicKey(String principalId);
+    PGPPublicKey getPublicKey(String principalId);
+
+    String getAvailablePrincipals ();
+
 }
