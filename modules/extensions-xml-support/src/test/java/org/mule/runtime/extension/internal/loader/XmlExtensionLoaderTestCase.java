@@ -104,10 +104,11 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getConfigurationModels().size(), is(1));
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
     assertThat(configurationModel.getName(), is(CONFIG_NAME));
-    assertThat(configurationModel.getAllParameterModels().size(), is(3));
+    assertThat(configurationModel.getAllParameterModels().size(), is(4));
     assertThat(configurationModel.getAllParameterModels().get(0).getName(), is("someUserConfig"));
     assertThat(configurationModel.getAllParameterModels().get(1).getName(), is("somePassConfig"));
     assertThat(configurationModel.getAllParameterModels().get(2).getName(), is("port"));
+    assertThat(configurationModel.getAllParameterModels().get(3).getName(), is("protocolConfig"));
 
     Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
         configurationModel.getModelProperty(GlobalElementComponentModelModelProperty.class);
