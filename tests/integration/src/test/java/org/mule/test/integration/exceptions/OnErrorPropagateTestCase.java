@@ -6,6 +6,8 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -19,6 +21,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -62,7 +65,16 @@ public class OnErrorPropagateTestCase extends AbstractIntegrationTestCase {
     verifyFlow("onErrorPropagateTypeMatchSeveral", false);
     anyPath = muleContext.getClient().request("queue://any", RECEIVE_TIMEOUT).getRight();
     assertThat(anyPath.isPresent(), is(false));
+  }
 
+  @Test
+  public void propagateErrorAndMessage() throws Exception {
+    MessagingException me = flowRunner("onErrorPropagateMessage").runExpectingException();
+    Event errorEvent = me.getEvent();
+    assertThat(errorEvent.getError().isPresent(), is(true));
+    assertThat(errorEvent.getError().get().getCause(), is(instanceOf(RoutingException.class)));
+    assertThat(errorEvent.getVariable("myVar").getValue(), is("aValue"));
+    assertThat(errorEvent.getMessage(), hasPayload(equalTo("propagated")));
   }
 
   private void verifyFlow(String flowName, Object payload) throws InterruptedException {

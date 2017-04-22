@@ -6,9 +6,12 @@
  */
 package org.mule.test.module.http.functional.listener;
 
+import static org.apache.http.client.fluent.Request.Get;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
-import static org.apache.http.client.fluent.Request.Get;
+import org.mule.runtime.core.util.IOUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Response;
@@ -37,6 +40,15 @@ public class HttpListenerErrorHandlingTestCase extends AbstractHttpListenerError
     final Response response = Get(getUrl("exceptionBuildingResponse")).execute();
     final HttpResponse httpResponse = response.returnResponse();
     assertExceptionStrategyExecuted(httpResponse);
+  }
+
+  @Test
+  public void propagatedExceptionHasCorrectMessage() throws Exception {
+    final Response response = Get(getUrl("exceptionPropagation")).execute();
+    final HttpResponse httpResponse = response.returnResponse();
+    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()),
+               is("An error occurred: Functional Test Service Exception"));
+    assertThat(httpResponse.getFirstHeader("headername").getValue(), is("headerValue"));
   }
 
 }
