@@ -8,23 +8,19 @@ package org.mule.functional.junit4;
 
 import static org.mockito.Mockito.spy;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.internal.message.InternalMessage.Builder;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.GroupCorrelation;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -149,38 +145,6 @@ public class TestEventBuilder {
    * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
    */
   @Deprecated
-  public TestEventBuilder withOutboundAttachment(String key, DataHandler value) {
-    outboundAttachments.put(key, new DataHandlerAttachment(value));
-
-    return this;
-  }
-
-  /**
-   * Prepares an attachment with the given key and value to be sent in the product.
-   *
-   * @param key         the key of the attachment to add
-   * @param object      the content of the attachment to add
-   * @param contentType the content type of the attachment to add. Note that the charset attribute can be specifed too i.e.
-   *                    text/plain;charset=UTF-8
-   * @return this {@link TestEventBuilder}
-   * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
-   */
-  @Deprecated
-  public TestEventBuilder withOutboundAttachment(String key, Object object, MediaType contentType) {
-    outboundAttachments.put(key, new ObjectAttachment(object, contentType));
-
-    return this;
-  }
-
-  /**
-   * Prepares an attachment with the given key and value to be sent in the product.
-   *
-   * @param key   the key of the attachment to add
-   * @param value the {@link DataHandler} for the attachment to add
-   * @return this {@link TestEventBuilder}
-   * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
-   */
-  @Deprecated
   public TestEventBuilder withInboundAttachment(String key, DataHandler value) {
     inboundAttachments.put(key, value);
 
@@ -269,15 +233,16 @@ public class TestEventBuilder {
   /**
    * Produces an event with the specified configuration.
    *
-   * @param muleContext the context of the mule application
    * @param flow        the recipient for the event to be built.
    * @return an event with the specified configuration.
    */
-  public Event build(MuleContext muleContext, FlowConstruct flow) {
-    final Builder messageBuilder;
+  public Event build(FlowConstruct flow) {
+    final Message.Builder messageBuilder;
 
-    messageBuilder = InternalMessage.builder().payload(payload).mediaType(mediaType).inboundProperties(inboundProperties)
-        .outboundProperties(outboundProperties).inboundAttachments(inboundAttachments);
+    messageBuilder = Message.builder().payload(payload).mediaType(mediaType);
+
+    setInboundProperties(messageBuilder, inboundProperties);
+    setOutboundProperties(messageBuilder, outboundProperties);
 
     if (attributes != null) {
       messageBuilder.attributes(attributes);
@@ -305,47 +270,27 @@ public class TestEventBuilder {
     return (Event) spyTransformer.transform(event);
   }
 
+  private void setInboundProperties(Message.Builder messageBuilder, Map<String, Serializable> inboundProperties) {
+    // TODO(pablo.kraan): MULE-12280 - remove methods that use the legacy message API once all the tests using it are migrated
+    try {
+      Method inboundPropertiesMethod = messageBuilder.getClass().getMethod("inboundProperties", Map.class);
+      inboundPropertiesMethod.invoke(messageBuilder, inboundProperties);
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  private void setOutboundProperties(Message.Builder messageBuilder, Map<String, Serializable> outboundProperties) {
+    try {
+      Method outboundPropertiesMethod = messageBuilder.getClass().getMethod("outboundProperties", Map.class);
+      outboundPropertiesMethod.invoke(messageBuilder, outboundProperties);
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
   private interface Attachment {
 
     Event addOutboundTo(Event event, String key);
-  }
-
-
-  private class DataHandlerAttachment implements Attachment {
-
-    private DataHandler dataHandler;
-
-    public DataHandlerAttachment(DataHandler dataHandler) {
-      this.dataHandler = dataHandler;
-    }
-
-    @Override
-    public Event addOutboundTo(Event event, String key) {
-      return Event.builder(event)
-          .message(InternalMessage.builder(event.getMessage()).addOutboundAttachment(key, dataHandler).build()).build();
-    }
-  }
-
-
-  private class ObjectAttachment implements Attachment {
-
-    private Object object;
-    private MediaType contentType;
-
-    public ObjectAttachment(Object object, MediaType contentType) {
-      this.object = object;
-      this.contentType = contentType;
-    }
-
-    @Override
-    public Event addOutboundTo(Event event, String key) {
-      try {
-        return Event.builder(event).message(InternalMessage.builder(event.getMessage())
-            .addOutboundAttachment(key, IOUtils.toDataHandler(key, object, contentType))
-            .build()).build();
-      } catch (Exception e) {
-        throw new MuleRuntimeException(e);
-      }
-    }
   }
 }

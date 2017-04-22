@@ -19,10 +19,9 @@ import org.mule.runtime.core.expression.transformers.ExpressionArgument;
 import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.Test;
-
 import groovyjarjarasm.asm.ClassWriter;
 import groovyjarjarasm.asm.Opcodes;
+import org.junit.Test;
 
 public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase {
 

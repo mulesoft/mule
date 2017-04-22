@@ -32,7 +32,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -91,13 +90,12 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   @Test
   public void operationWithReturnValueOnTarget() throws Exception {
     FlowRunner runner = flowRunner("sayMyNameOnTarget").withPayload(EMPTY_STRING);
-    runner.spyObjects();
 
     Event responseEvent = runner.run();
 
     assertThat(responseEvent.getMessage().getPayload().getValue(), is(EMPTY_STRING));
 
-    InternalMessage responseMessage = (InternalMessage) responseEvent.getVariable("myFace").getValue();
+    Message responseMessage = (Message) responseEvent.getVariable("myFace").getValue();
     assertThat(responseMessage.getPayload().getValue(), is(HEISENBERG));
   }
 

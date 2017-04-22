@@ -6,9 +6,9 @@
  */
 package org.mule.test.filters;
 
+import static org.mule.functional.junit4.TestLegacyMessageUtils.getInboundProperty;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,7 +22,7 @@ public class FilterCounter implements Filter {
    */
   @Override
   public boolean accept(Message message, Event.Builder builder) {
-    if ("true".equals(((InternalMessage) message).getInboundProperty("pass"))) {
+    if ("true".equals(getInboundProperty(message, "pass"))) {
       counter.incrementAndGet();
       return true;
     }
@@ -30,7 +30,6 @@ public class FilterCounter implements Filter {
   }
 
   public boolean test(int arg0) {
-    // TODO Auto-generated method stub
     return false;
   }
 

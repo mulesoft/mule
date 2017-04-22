@@ -312,9 +312,22 @@ public class DefaultMessageBuilder
   }
 
   /**
+   * Provides access to the class that implements {@link org.mule.runtime.api.message.Message} which is constructed using the
+   * builder.
+   * <p/>
+   * This method is required to be able to add a custom serializer for the message implementation without having to expose the
+   * class in the API.
+   *
+   * @return the class used to implement {@link org.mule.runtime.api.message.Message}
+   */
+  public static Class getMessageImplementationClass() {
+    return MessageImplementation.class;
+  }
+
+  /**
    * <code>MuleMessageImplementation</code> is a wrapper that contains a payload and properties associated with the payload.
    */
-  public static class MessageImplementation implements InternalMessage, DeserializationPostInitialisable {
+  private static class MessageImplementation implements InternalMessage, DeserializationPostInitialisable {
 
     private static final String NOT_SET = "<not set>";
 

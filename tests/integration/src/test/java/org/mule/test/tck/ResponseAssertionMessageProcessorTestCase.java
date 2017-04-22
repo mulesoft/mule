@@ -9,7 +9,6 @@ package org.mule.test.tck;
 import static java.util.Optional.empty;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
-
 import org.mule.functional.functional.ResponseAssertionMessageProcessor;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.tck.SensingNullMessageProcessor;

@@ -10,8 +10,8 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -53,8 +53,8 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void dynamicFlowRefWithScatterGather() throws Exception {
-    List<InternalMessage> messageList =
-        (List<InternalMessage>) flowRunner("flow2").withPayload("0").withVariable("letter", "SG").run().getMessage()
+    List<Message> messageList =
+        (List<Message>) flowRunner("flow2").withPayload("0").withVariable("letter", "SG").run().getMessage()
             .getPayload().getValue();
 
     List payloads = messageList.stream().map(msg -> msg.getPayload().getValue()).collect(toList());

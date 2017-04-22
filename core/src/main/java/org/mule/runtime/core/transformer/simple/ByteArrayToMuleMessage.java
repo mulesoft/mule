@@ -7,12 +7,20 @@
 package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.serialization.SerializationProtocol;
 
-/** TODO */
+/**
+ * Deserializes a {@link org.mule.runtime.api.message.Message} stored on a byte array.
+ */
 public class ByteArrayToMuleMessage extends ByteArrayToSerializable {
 
   public ByteArrayToMuleMessage() {
     super();
     setReturnDataType(DataType.MULE_MESSAGE);
+  }
+
+  @Override
+  protected SerializationProtocol getSerializationProtocol() {
+    return muleContext.getObjectSerializer().getInternalProtocol();
   }
 }

@@ -41,6 +41,7 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
   private final Set<String> extraBootPackages;
   private final URL[] urls;
   private final URLClassLoader classLoader;
+  private ArtifactClassLoader containerClassLoader;
 
   /**
    * Factory class that extends the default way to create a container {@link ArtifactClassLoader} in order to support the
@@ -101,12 +102,16 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
                                                           ArtifactDescriptor artifactDescriptor) {
     final ArtifactDescriptor containerDescriptor = new ArtifactDescriptor("mule");
 
-    final ArtifactClassLoader containerClassLoader =
+    containerClassLoader =
         new MuleArtifactClassLoader(containerDescriptor.getName(), containerDescriptor, urls, parentClassLoader,
                                     containerLookupPolicy);
 
     return createContainerFilteringClassLoader(withContextClassLoader(classLoader, () -> discoverModules()),
                                                containerClassLoader);
+  }
+
+  public ArtifactClassLoader getContainerClassLoader() {
+    return containerClassLoader;
   }
 
   /**

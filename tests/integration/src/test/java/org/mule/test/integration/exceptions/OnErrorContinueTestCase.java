@@ -6,13 +6,12 @@
  */
 package org.mule.test.integration.exceptions;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.service.http.api.HttpConstants.Method.POST;
-import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
@@ -20,7 +19,6 @@ import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.util.IOUtils;
@@ -205,7 +203,7 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
       NewsResponse newsResponse = new NewsResponse();
       newsResponse.setUserId(newsRequest.getUserId());
       newsResponse.setTitle("News title");
-      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(newsResponse).build()).build();
+      return Event.builder(event).message(Message.builder(event.getMessage()).payload(newsResponse).build()).build();
     }
 
     private NewsRequest handleInputStream(InputStream payload) throws IOException {
@@ -233,7 +231,7 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
         throw new DefaultMuleException(e);
       }
 
-      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(writer.toString()).build()).build();
+      return Event.builder(event).message(Message.builder(event.getMessage()).payload(writer.toString()).build()).build();
     }
   }
 

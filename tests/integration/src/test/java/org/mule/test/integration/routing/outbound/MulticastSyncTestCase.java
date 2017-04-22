@@ -12,10 +12,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.api.message.Message;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.List;
 
@@ -35,9 +34,8 @@ public class MulticastSyncTestCase extends AbstractIntegrationTestCase {
 
     assertNotNull(result);
     assertTrue(result.getPayload().getValue() instanceof List);
-    List<Fruit> results =
-        ((List<InternalMessage>) result.getPayload().getValue()).stream().map(msg -> (Fruit) msg.getPayload().getValue())
-            .collect(toList());
+    List<Fruit> results = ((List<Message>) result.getPayload().getValue()).stream()
+        .map(msg -> (Fruit) msg.getPayload().getValue()).collect(toList());
     assertEquals(3, results.size());
 
     assertTrue(results.contains(apple));

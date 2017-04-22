@@ -9,9 +9,9 @@ package org.mule.test.integration.exceptions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.mule.functional.junit4.TestLegacyMessageUtils.getOutboundProperty;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.After;
@@ -51,7 +51,7 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractIntegrat
       msg = client.request("test://out", 5000).getRight().get();
 
       assertNotNull(msg);
-      assertEquals("bar", ((InternalMessage) msg).getOutboundProperty("prop"));
+      assertEquals("bar", getOutboundProperty(msg, "prop"));
     }
   }
 

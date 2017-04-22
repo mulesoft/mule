@@ -19,7 +19,6 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -95,15 +94,12 @@ public class MuleConfigurationConfigurator extends AbstractAnnotatedObjectFactor
 
   private void applyDefaultIfNoObjectSerializerSet(DefaultMuleConfiguration configuration) {
     ObjectSerializer configuredSerializer = config.getDefaultObjectSerializer();
-    if (configuredSerializer == null) {
-      configuredSerializer = new JavaObjectSerializer();
-      ((MuleContextAware) configuredSerializer).setMuleContext(muleContext);
-      config.setDefaultObjectSerializer(configuredSerializer);
-    }
 
-    configuration.setDefaultObjectSerializer(configuredSerializer);
-    if (muleContext instanceof DefaultMuleContext) {
-      ((DefaultMuleContext) muleContext).setObjectSerializer(configuredSerializer);
+    if (configuredSerializer != null) {
+      configuration.setDefaultObjectSerializer(configuredSerializer);
+      if (muleContext instanceof DefaultMuleContext) {
+        ((DefaultMuleContext) muleContext).setObjectSerializer(configuredSerializer);
+      }
     }
   }
 

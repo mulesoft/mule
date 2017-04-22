@@ -8,10 +8,10 @@ package org.mule.test.module.scripting.transformer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.functional.junit4.TestLegacyMessageUtils.getOutboundProperty;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.internal.message.InternalMessage;
 
 import org.junit.Test;
 
@@ -81,6 +81,6 @@ public class GroovyScriptTransformerFunctionalTestCase extends MuleArtifactFunct
     Message response = flowRunner("transformByAssigningProperty").withPayload("hello").run().getMessage();
     assertNotNull(response);
     assertEquals("hello", response.getPayload().getValue());
-    assertEquals("bar", ((InternalMessage) response).getOutboundProperty("foo"));
+    assertEquals("bar", getOutboundProperty(response, "foo"));
   }
 }

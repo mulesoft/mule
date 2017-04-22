@@ -11,18 +11,19 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.functional.junit4.TestLegacyMessageUtils.getInboundProperty;
+import static org.mule.functional.junit4.TestLegacyMessageUtils.getOutboundProperty;
+import org.mule.functional.junit4.TestLegacyMessageBuilder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.test.AbstractIntegrationTestCase;
 
-import org.junit.Test;
-
 import com.eaio.uuid.UUID;
+
+import org.junit.Test;
 
 public class FlowAsyncBeforeAfterOutboundTestCase extends AbstractIntegrationTestCase {
 
@@ -58,12 +59,12 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends AbstractIntegrationTes
     assertThat(msgAsync, not(nullValue()));
     assertThat(msgOut, not(nullValue()));
 
-    assertThat(((InternalMessage) msgOut).getInboundProperty("request-response-thread"),
-               equalTo(((InternalMessage) msgSync).getInboundProperty("request-response-thread")));
-    assertThat(((InternalMessage) msgSync).getOutboundProperty("request-response-thread"),
-               not(equalTo(((InternalMessage) msgAsync).getOutboundProperty("async-thread"))));
-    assertThat(((InternalMessage) msgOut).getOutboundProperty("request-response-thread"),
-               not(equalTo(((InternalMessage) msgAsync).getOutboundProperty("async-thread"))));
+    assertThat(getInboundProperty(msgOut, "request-response-thread"),
+               equalTo(getInboundProperty(msgSync, "request-response-thread")));
+    assertThat(getOutboundProperty(msgSync, "request-response-thread"),
+               not(equalTo(getOutboundProperty(msgAsync, "async-thread"))));
+    assertThat(getOutboundProperty(msgOut, "request-response-thread"),
+               not(equalTo(getOutboundProperty(msgAsync, "async-thread"))));
   }
 
   public static class ThreadSensingMessageProcessor implements Processor {
@@ -80,10 +81,8 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends AbstractIntegrationTes
         taskTokenInThread.set(requestTaskToken);
       }
 
-      return Event.builder(event)
-          .message(InternalMessage.builder(event.getMessage())
-              .addOutboundProperty((String) event.getVariable("property-name").getValue(), requestTaskToken).build())
-          .build();
+      return Event.builder(event).message(new TestLegacyMessageBuilder(event.getMessage())
+          .addOutboundProperty((String) event.getVariable("property-name").getValue(), requestTaskToken).build()).build();
     }
 
     protected String generateTaskToken() {

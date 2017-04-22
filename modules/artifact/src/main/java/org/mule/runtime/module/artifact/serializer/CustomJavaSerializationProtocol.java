@@ -9,8 +9,11 @@ package org.mule.runtime.module.artifact.serializer;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.core.api.serialization.SerializationException;
+import static org.mule.runtime.core.util.IOUtils.toByteArray;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.serialization.AbstractSerializationProtocol;
+import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 
 import java.io.ByteArrayOutputStream;
@@ -44,6 +47,13 @@ public class CustomJavaSerializationProtocol extends AbstractSerializationProtoc
    */
   @Override
   protected byte[] doSerialize(Object object) throws Exception {
+    //TODO: MULE-11939
+    if (object instanceof CursorStreamProvider) {
+      try (CursorStream cursor = ((CursorStreamProvider) object).openCursor()) {
+        object = toByteArray(cursor);
+      }
+    }
+
     validateForSerialization(object);
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream(512);

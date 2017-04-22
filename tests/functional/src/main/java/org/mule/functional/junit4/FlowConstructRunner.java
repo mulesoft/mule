@@ -127,38 +127,6 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
    */
   @Deprecated
-  public R withOutboundAttachment(String key, DataHandler value) {
-    eventBuilder.withOutboundAttachment(key, value);
-
-    return (R) this;
-  }
-
-  /**
-   * Prepares an attachment with the given key and value to be sent in the {@link Message} to the configured flow.
-   *
-   * @param key the key of the attachment to add
-   * @param object the content of the attachment to add
-   * @param contentType the content type of the attachment to add. Note that the charset attribute can be specifed too i.e.
-   *        text/plain;charset=UTF-8
-   * @return this {@link FlowRunner}
-   * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
-   */
-  @Deprecated
-  public R withOutboundAttachment(String key, Object object, MediaType contentType) {
-    eventBuilder.withOutboundAttachment(key, object, contentType);
-
-    return (R) this;
-  }
-
-  /**
-   * Prepares an attachment with the given key and value to be sent in the {@link Message} to the configured flow.
-   *
-   * @param key the key of the attachment to add
-   * @param value the {@link DataHandler} for the attachment to add
-   * @return this {@link FlowRunner}
-   * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
-   */
-  @Deprecated
   public R withInboundAttachment(String key, DataHandler value) {
     eventBuilder.withInboundAttachment(key, value);
 
@@ -260,7 +228,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
 
   private void doBuildEvent() {
     FlowConstruct flow = getFlowConstruct();
-    requestEvent = eventBuilder.build(muleContext, flow);
+    requestEvent = eventBuilder.build(flow);
   }
 
   protected FlowConstruct getFlowConstruct() {
