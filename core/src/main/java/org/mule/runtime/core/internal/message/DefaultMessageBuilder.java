@@ -315,7 +315,7 @@ public class DefaultMessageBuilder
    * Provides access to the class that implements {@link org.mule.runtime.api.message.Message} which is constructed using the
    * builder.
    * <p/>
-   * This method is required to be able to add custom a serializer for the message implementation without having to expose the
+   * This method is required to be able to add a custom serializer for the message implementation without having to expose the
    * class in the API.
    *
    * @return the class used to implement {@link org.mule.runtime.api.message.Message}
