@@ -28,7 +28,9 @@ public class TestLegacyMessageBuilder implements Message.Builder {
 
   private Message.Builder builder;
 
-  public TestLegacyMessageBuilder() {}
+  public TestLegacyMessageBuilder() {
+    builder = Message.builder().nullPayload();
+  }
 
   /**
    * Create a new builder initialized from an existent message
@@ -41,54 +43,36 @@ public class TestLegacyMessageBuilder implements Message.Builder {
 
   @Override
   public TestLegacyMessageBuilder nullPayload() {
-    if (builder == null) {
-      builder = Message.builder().nullPayload();
-    } else {
-      builder.nullPayload();
-    }
-
+    builder.nullPayload();
 
     return this;
   }
 
   @Override
   public TestLegacyMessageBuilder payload(Object value) {
-    if (builder == null) {
-      builder = Message.builder().payload(value);
-    } else {
-      builder.payload(value);
-    }
+    builder.payload(value);
 
     return this;
   }
 
   @Override
   public TestLegacyMessageBuilder streamPayload(Iterator value, Class<?> itemType) {
-    if (builder == null) {
-      builder = Message.builder().streamPayload(value, itemType);
-    } else {
-      builder.streamPayload(value, itemType);
-    }
+    builder.streamPayload(value, itemType);
+
     return this;
   }
 
   @Override
   public TestLegacyMessageBuilder collectionPayload(Collection value, Class<?> itemType) {
-    if (builder == null) {
-      builder = Message.builder().collectionPayload(value, itemType);
-    } else {
-      builder.collectionPayload(value, itemType);
-    }
+    builder.collectionPayload(value, itemType);
+
     return this;
   }
 
   @Override
   public TestLegacyMessageBuilder collectionPayload(Object[] value) {
-    if (builder == null) {
-      builder = Message.builder().collectionPayload(value);
-    } else {
-      builder.collectionPayload(value);
-    }
+    builder.collectionPayload(value);
+
     return this;
   }
 
