@@ -82,7 +82,7 @@ public class ThrottledSchedulerThrottleTestCase extends BaseDefaultSchedulerTest
   @Override
   protected ScheduledExecutorService createExecutor() {
     return new ThrottledScheduler(BaseDefaultSchedulerTestCase.class.getSimpleName(), sharedExecutor, 1, sharedScheduledExecutor,
-                                  sharedQuartzScheduler, CUSTOM, THROTTLE_SIZE, 5000, EMPTY_SHUTDOWN_CALLBACK);
+                                  sharedQuartzScheduler, CUSTOM, THROTTLE_SIZE, () -> 5000L, EMPTY_SHUTDOWN_CALLBACK);
   }
 
 }

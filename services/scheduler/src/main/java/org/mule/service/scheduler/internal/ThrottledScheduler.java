@@ -18,6 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Extension of {@link DefaultScheduler} that has a limit on the tasks that can be run at the same time.
@@ -46,7 +47,7 @@ public class ThrottledScheduler extends DefaultScheduler {
    */
   ThrottledScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
                      org.quartz.Scheduler quartzScheduler, ThreadType threadsType, int maxConcurrentTasks,
-                     long shutdownTimeoutMillis, Consumer<Scheduler> shutdownCallback) {
+                     Supplier<Long> shutdownTimeoutMillis, Consumer<Scheduler> shutdownCallback) {
     super(name, executor, workers, scheduledExecutor, quartzScheduler, threadsType, shutdownTimeoutMillis, shutdownCallback);
     this.maxConcurrentTasks = maxConcurrentTasks;
   }
