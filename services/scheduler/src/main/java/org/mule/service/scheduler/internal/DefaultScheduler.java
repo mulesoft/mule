@@ -44,6 +44,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
@@ -88,7 +89,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   private volatile boolean shutdown = false;
 
-  private final long shutdownTimeoutMillis;
+  private final Supplier<Long> shutdownTimeoutMillis;
 
   private final Consumer<Scheduler> shutdownCallback;
 
@@ -105,7 +106,7 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
    * @param shutdownCallback a callback to be invoked when this scheduler is stopped/shutdown.
    */
   DefaultScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
-                   org.quartz.Scheduler quartzScheduler, ThreadType threadsType, long shutdownTimeoutMillis,
+                   org.quartz.Scheduler quartzScheduler, ThreadType threadsType, Supplier<Long> shutdownTimeoutMillis,
                    Consumer<Scheduler> shutdownCallback) {
     this.name = name + "@" + toHexString(hashCode());
     scheduledTasks = new ConcurrentHashMap<>(workers, 1.00f, getRuntime().availableProcessors());
@@ -312,13 +313,14 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
     shutdown();
     try {
       // Wait a while for existing tasks to terminate
-      if (!awaitTermination(shutdownTimeoutMillis, MILLISECONDS)) {
+      final Long timeout = shutdownTimeoutMillis.get();
+      if (!awaitTermination(timeout, MILLISECONDS)) {
         // Cancel currently executing tasks and return list of pending tasks
         List<Runnable> cancelledJobs = shutdownNow();
         // Wait a while for tasks to respond to being cancelled
         if (!awaitTermination(FORCEFUL_SHUTDOWN_TIMEOUT_SECS, SECONDS)) {
-          logger.warn("Scheduler " + this.toString() + " did not shutdown gracefully after " + shutdownTimeoutMillis
-              + " " + MILLISECONDS.toString() + ".");
+          logger.warn("Scheduler " + this.toString() + " did not shutdown gracefully after " + timeout + " "
+              + MILLISECONDS.toString() + ".");
         } else {
           if (!cancelledJobs.isEmpty()) {
             logger.warn("Scheduler " + this.toString() + " terminated.");

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.config;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleBase;
 import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleHome;
 
@@ -510,6 +511,9 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
   public void setShutdownTimeout(long shutdownTimeout) {
     if (verifyContextNotStarted()) {
+      if (shutdownTimeout < 0) {
+        throw new IllegalArgumentException(format("'shutdownTimeout' must be a possitive long. %d passed", shutdownTimeout));
+      }
       this.shutdownTimeout = shutdownTimeout;
     }
   }

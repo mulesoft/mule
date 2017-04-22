@@ -6,10 +6,12 @@
  */
 package org.mule.test.service.scheduler;
 
+import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -26,6 +28,8 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
@@ -33,10 +37,13 @@ import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.test.AbstractIntegrationTestCase;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
@@ -76,6 +83,17 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
   }
 
   @Test
+  public void customSchedulerDefaultName() {
+    SchedulerService schedulerService = muleContext.getSchedulerService();
+    final Scheduler ioScheduler =
+        schedulerService.customScheduler(muleContext.getSchedulerBaseConfig().withMaxConcurrentTasks(1));
+    assertThat(ioScheduler.getName(),
+               startsWith("SchedulerService_custom@" + SchedulerServiceTestCase.class.getName()
+                   + ".customSchedulerDefaultName:"));
+    ioScheduler.shutdownNow();
+  }
+
+  @Test
   public void schedulerCustomName() {
     SchedulerService schedulerService = muleContext.getSchedulerService();
     final Scheduler ioScheduler =
@@ -83,6 +101,41 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     assertThat(ioScheduler.getName(),
                startsWith("myPreciousScheduler"));
     ioScheduler.shutdownNow();
+  }
+
+  @Test
+  public void configTimeoutChange() {
+    Scheduler scheduler = muleContext.getSchedulerService().cpuLightScheduler();
+
+    Latch testLatch = new Latch();
+    scheduler.submit(() -> {
+      try {
+        testLatch.await();
+      } catch (InterruptedException e) {
+        currentThread().interrupt();
+      }
+    });
+
+    final long stopRequestTime = currentTimeMillis();
+    scheduler.stop();
+
+    assertThat("gracefultShutdown flag in test not honored", muleContext.getConfiguration().getShutdownTimeout(), is(0L));
+    // check for the actual timeout plus some margin
+    assertThat(currentTimeMillis() - stopRequestTime, lessThan(1000L));
+  }
+
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(new AbstractConfigurationBuilder() {
+
+      @Override
+      protected void doConfigure(MuleContext muleContext) throws Exception {
+        // Set an arbitrarily high value. This will be overridden by the context builder wen checking for the graceful shutdown
+        // flag of the test.
+        ((DefaultMuleConfiguration) muleContext.getConfiguration()).setShutdownTimeout(10000);
+      }
+    });
   }
 
   @Test

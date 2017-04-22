@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.config.builders;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.DefaultMuleContext.LOCAL_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 import static org.mule.runtime.core.DefaultMuleContext.LOCAL_TRANSIENT_OBJECT_STORE_KEY;
@@ -120,7 +121,9 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_TIME_SUPPLIER, new TimeSupplier(), muleContext);
     registerObject(OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager(muleContext), muleContext);
     registerObject(OBJECT_METADATA_SERVICE, new MuleMetadataService(), muleContext);
-    registerObject(OBJECT_SCHEDULER_BASE_CONFIG, config(), muleContext);
+    registerObject(OBJECT_SCHEDULER_BASE_CONFIG,
+                   config().withShutdownTimeout(() -> muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
+                   muleContext);
   }
 
   protected void registerObject(String serviceId, Object serviceImpl, MuleContext muleContext) throws RegistrationException {

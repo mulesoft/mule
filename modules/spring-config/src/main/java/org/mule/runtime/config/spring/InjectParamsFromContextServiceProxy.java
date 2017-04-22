@@ -38,6 +38,8 @@ public class InjectParamsFromContextServiceProxy extends ServiceInvocationHandle
 
   public static final String MANY_CANDIDATES_ERROR_MSG_TEMPLATE =
       "More than one invocation candidate for for method '%s' in service '%s'";
+  public static final String NO_OBJECT_FOUND_FOR_PARAM =
+      "No object found in the registry for parameter '%s' of method '%s' in service '%s'";
 
   private final MuleContext context;
 
@@ -64,11 +66,18 @@ public class InjectParamsFromContextServiceProxy extends ServiceInvocationHandle
 
       for (int i = method.getParameters().length; i < injectable.getParameters().length; ++i) {
         final Parameter parameter = injectable.getParameters()[i];
+        Object arg;
         if (parameter.isAnnotationPresent(Named.class)) {
-          augmentedArgs.add(context.getRegistry().lookupObject(parameter.getAnnotation(Named.class).value()));
+          arg = context.getRegistry().lookupObject(parameter.getAnnotation(Named.class).value());
         } else {
-          augmentedArgs.add(context.getRegistry().lookupObject(parameter.getType()));
+          arg = context.getRegistry().lookupObject(parameter.getType());
         }
+        if (arg == null) {
+          throw new IllegalDependencyInjectionException(format(NO_OBJECT_FOUND_FOR_PARAM,
+                                                               parameter.getName(), injectable.getName(),
+                                                               getService().getName()));
+        }
+        augmentedArgs.add(arg);
       }
 
       return doInvoke(proxy, injectable, augmentedArgs.toArray());

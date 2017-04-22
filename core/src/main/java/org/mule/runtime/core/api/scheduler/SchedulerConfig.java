@@ -14,6 +14,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * Provides a fluent way of customizing a {@link Scheduler} obtained through the {@link SchedulerService}.
@@ -52,17 +53,17 @@ public class SchedulerConfig {
   private final Integer maxConcurrentTasks;
   private final String schedulerName;
   private final RejectionAction rejectionAction;
-  private final Long shutdownTimeoutMillis;
+  private final Supplier<Long> shutdownTimeoutMillis;
 
   private SchedulerConfig() {
     this.maxConcurrentTasks = null;
     this.schedulerName = null;
     this.rejectionAction = DEFAULT;
-    this.shutdownTimeoutMillis = null;
+    this.shutdownTimeoutMillis = () -> null;
   }
 
   private SchedulerConfig(Integer maxConcurrentTasks, String schedulerName, RejectionAction rejectionAction,
-                          Long shutdownTimeoutMillis) {
+                          Supplier<Long> shutdownTimeoutMillis) {
     this.maxConcurrentTasks = maxConcurrentTasks;
     this.schedulerName = schedulerName;
     this.rejectionAction = rejectionAction;
@@ -131,24 +132,45 @@ public class SchedulerConfig {
   /**
    * Sets the graceful shutdown timeout to use when stopping the target {@link Scheduler}.
    * 
+   * @param shutdownTimeoutSupplier a supplier of the value of the timeout to use when gracefully stopping the target
+   *        {@link Scheduler}, expressed in the provided {@link TimeUnit}.
+   * @param shutdownTimeoutUnit the unit of the timeout to use when gracefully stopping the target {@link Scheduler}.
+   * @return the updated configuration
+   */
+  public SchedulerConfig withShutdownTimeout(Supplier<Long> shutdownTimeoutSupplier, TimeUnit shutdownTimeoutUnit) {
+    requireNonNull(shutdownTimeoutUnit);
+
+    return new SchedulerConfig(maxConcurrentTasks, schedulerName, rejectionAction, () -> {
+      long shutdownTimeout = shutdownTimeoutSupplier.get();
+      validateTimeoutValue(shutdownTimeout);
+      return shutdownTimeoutUnit.toMillis(shutdownTimeout);
+    });
+  }
+
+  /**
+   * Sets the graceful shutdown timeout to use when stopping the target {@link Scheduler}.
+   * 
    * @param shutdownTimeout the value of the timeout to use when gracefully stopping the target {@link Scheduler}, expressed in
-   *        the provided timeunit.
+   *        the provided {@link TimeUnit}.
    * @param shutdownTimeoutUnit the unit of the timeout to use when gracefully stopping the target {@link Scheduler}.
    * @return the updated configuration
    */
   public SchedulerConfig withShutdownTimeout(long shutdownTimeout, TimeUnit shutdownTimeoutUnit) {
+    requireNonNull(shutdownTimeoutUnit);
+    validateTimeoutValue(shutdownTimeout);
+    return withShutdownTimeout(() -> shutdownTimeout, shutdownTimeoutUnit);
+  }
+
+  private void validateTimeoutValue(long shutdownTimeout) {
     if (shutdownTimeout < 0) {
       throw new IllegalArgumentException(format("'shutdownTimeout' must be a possitive long. %d passed", shutdownTimeout));
     }
-    requireNonNull(shutdownTimeoutUnit);
-
-    return new SchedulerConfig(maxConcurrentTasks, schedulerName, rejectionAction, shutdownTimeoutUnit.toMillis(shutdownTimeout));
   }
 
   /**
-   * @return the timeout to use when gracefully stopping the target {@link Scheduler}, in millis.
+   * @return a supplier of the timeout to use when gracefully stopping the target {@link Scheduler}, in millis.
    */
-  public Long getShutdownTimeoutMillis() {
+  public Supplier<Long> getShutdownTimeoutMillis() {
     return shutdownTimeoutMillis;
   }
 }

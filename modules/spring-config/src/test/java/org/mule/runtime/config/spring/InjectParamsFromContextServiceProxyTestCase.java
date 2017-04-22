@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.config.spring.InjectParamsFromContextServiceProxy.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
+import static org.mule.runtime.config.spring.InjectParamsFromContextServiceProxy.NO_OBJECT_FOUND_FOR_PARAM;
 import static org.mule.runtime.config.spring.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 
@@ -71,6 +72,18 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
     serviceProxy.augmented();
 
     assertThat(augmentedParam, sameInstance(muleContext));
+  }
+
+  @Test
+  public void invalidNamedAugmentedInvocation() throws Exception {
+    BaseService service = new InvalidNamedAugmentedMethodService();
+
+    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
+
+    expected.expect(IllegalDependencyInjectionException.class);
+    expected.expectMessage(format(NO_OBJECT_FOUND_FOR_PARAM, "param", "augmented", "InvalidNamedAugmentedMethodService"));
+
+    serviceProxy.augmented();
   }
 
   @Test
@@ -204,6 +217,22 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
 
     @Inject
     public void augmented(@Named(OBJECT_MULE_CONTEXT) Object param) {
+      augmentedParam = param;
+    }
+  }
+
+  public class InvalidNamedAugmentedMethodService implements BaseService {
+
+    @Override
+    public String getName() {
+      return "InvalidNamedAugmentedMethodService";
+    }
+
+    @Override
+    public void augmented() {}
+
+    @Inject
+    public void augmented(@Named("!@#$%&*_" + OBJECT_MULE_CONTEXT) Object param) {
       augmentedParam = param;
     }
   }

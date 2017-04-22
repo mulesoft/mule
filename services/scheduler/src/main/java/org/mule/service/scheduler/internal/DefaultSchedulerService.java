@@ -49,6 +49,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -253,8 +254,9 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     return customScheduler;
   }
 
-  private long resolveStopTimeout(SchedulerConfig config) {
-    return config.getShutdownTimeoutMillis() != null ? config.getShutdownTimeoutMillis() : DEFAULT_SHUTDOWN_TIMEOUT_MILLIS;
+  private Supplier<Long> resolveStopTimeout(SchedulerConfig config) {
+    return () -> config.getShutdownTimeoutMillis().get() != null ? config.getShutdownTimeoutMillis().get()
+        : DEFAULT_SHUTDOWN_TIMEOUT_MILLIS;
   }
 
   private String resolveSchedulerName(SchedulerConfig config, String prefix) {
@@ -284,7 +286,7 @@ public class DefaultSchedulerService implements SchedulerService, Startable, Sto
     private final ExecutorService executor;
 
     private CustomScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
-                            org.quartz.Scheduler quartzScheduler, ThreadType threadsType, long shutdownTimeoutMillis,
+                            org.quartz.Scheduler quartzScheduler, ThreadType threadsType, Supplier<Long> shutdownTimeoutMillis,
                             Consumer<Scheduler> shutdownCallback) {
       super(name, executor, workers, scheduledExecutor, quartzScheduler, threadsType, shutdownTimeoutMillis, shutdownCallback);
       this.executor = executor;

@@ -103,7 +103,7 @@ public class BaseDefaultSchedulerTestCase extends AbstractMuleTestCase {
 
   protected ScheduledExecutorService createExecutor() {
     return new DefaultScheduler(BaseDefaultSchedulerTestCase.class.getSimpleName(), sharedExecutor, 1, sharedScheduledExecutor,
-                                sharedQuartzScheduler, CUSTOM, 5000, EMPTY_SHUTDOWN_CALLBACK);
+                                sharedQuartzScheduler, CUSTOM, () -> 5000L, EMPTY_SHUTDOWN_CALLBACK);
   }
 
   protected boolean awaitLatch(final CountDownLatch latch) {
