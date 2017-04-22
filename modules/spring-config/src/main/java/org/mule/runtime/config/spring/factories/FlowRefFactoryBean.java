@@ -177,10 +177,11 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
             // If referenced processor is a Flow used a child EventContext and wait for completion else simply compose.
             if (referencedProcessor instanceof Flow) {
               Event childEvent = createChildEvent(event);
-              just(childEvent).transform(referencedProcessor)
-                  .doOnError(throwable -> {
-                  })
-                  .subscribe();
+              just(childEvent)
+                  .transform(referencedProcessor)
+                  // Use empty error handler to avoid reactor ErrorCallbackNotImplemented
+                  .subscribe(null, throwable -> {
+                  });
               return from(childEvent.getContext().getResponsePublisher())
                   .map(result -> builder(event.getContext(), result).build())
                   .doOnError(MessagingException.class,
@@ -296,8 +297,11 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
         public Publisher<Event> apply(Publisher<Event> publisher) {
           return from(publisher).flatMap(event -> {
             Event childEvent = createChildEvent(event);
-            just(childEvent).transform(referencedFlow).doOnError(throwable -> {
-            }).subscribe();
+            just(childEvent)
+                .transform(referencedFlow)
+                // Use empty error handler to avoid reactor ErrorCallbackNotImplemented
+                .subscribe(null, throwable -> {
+                });
             return from(childEvent.getContext().getResponsePublisher())
                 .map(result -> createParentEvent(event, result))
                 .doOnError(MessagingException.class,

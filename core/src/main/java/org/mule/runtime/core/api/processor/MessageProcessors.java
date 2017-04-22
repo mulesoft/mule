@@ -104,8 +104,11 @@ public class MessageProcessors {
 
   public static Event processToApply(Event event, Flow flow) throws MuleException {
     try {
-      just(event).transform(flow).doOnError(throwable -> {
-      }).subscribe();
+      just(event)
+          .transform(flow)
+          // Use empty error handler to avoid reactor ErrorCallbackNotImplemented
+          .subscribe(null, throwable -> {
+          });
       return from(event.getContext().getResponsePublisher()).block();
     } catch (Throwable e) {
       throw rxExceptionToMuleException(e);
