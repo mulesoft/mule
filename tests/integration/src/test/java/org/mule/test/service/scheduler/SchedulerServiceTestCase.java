@@ -120,7 +120,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     scheduler.stop();
 
     assertThat("gracefultShutdown flag in test not honored", muleContext.getConfiguration().getShutdownTimeout(), is(0L));
-    // check for The actual timeout plus some margin
+    // check for Tthe actual timeout plus some margin
     assertThat(currentTimeMillis() - stopRequestTime, lessThan(1000L));
   }
 
