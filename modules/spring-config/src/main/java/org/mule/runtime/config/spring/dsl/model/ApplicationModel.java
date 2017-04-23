@@ -63,7 +63,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.springframework.util.PropertyPlaceholderHelper;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
@@ -451,7 +450,7 @@ public class ApplicationModel {
    * @return the {@code ComponentModel} created from the element.
    */
   // TODO MULE-9638: remove once the old parsing mechanism is not needed anymore
-  public ComponentModel findComponentDefinitionModel(Element element) {
+  public ComponentModel findComponentDefinitionModel(Node element) {
     return innerFindComponentDefinitionModel(element, muleComponentModels);
   }
 
@@ -725,7 +724,7 @@ public class ApplicationModel {
     });
   }
 
-  private ComponentModel innerFindComponentDefinitionModel(Element element, List<ComponentModel> componentModels) {
+  private ComponentModel innerFindComponentDefinitionModel(Node element, List<ComponentModel> componentModels) {
     for (ComponentModel componentModel : componentModels) {
       if (from(componentModel).getNode().equals(element)) {
         return componentModel;

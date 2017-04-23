@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
@@ -155,7 +156,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
         if (shouldUseNewMechanism(element)) {
           ComponentModel parentComponentModel =
-              applicationModelSupplier.get().findComponentDefinitionModel((Element) element.getParentNode());
+              applicationModelSupplier.get().findComponentDefinitionModel(element.getParentNode());
           beanDefinitionFactory.resolveComponentRecursively(parentComponentModel, componentModel,
                                                             getReaderContext().getRegistry(), (resolvedComponent, registry) -> {
                                                               if (resolvedComponent.isRoot()) {
@@ -193,11 +194,17 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         } else {
           if (!element.getLocalName().equals(MULE_ROOT_ELEMENT) && !element.getLocalName().equals(MULE_DOMAIN_ROOT_ELEMENT)
               && !element.getLocalName().equals(POLICY_ROOT_ELEMENT)) {
+            if (handler == null) {
+              throw new NullPointerException(format("No namespace handler found for '%s' for Mule 3 parsing mechanism; OR "
+                  + "No componentModel forund for element '%s' for Mule 4 parsing mechanism",
+                                                    element.getNamespaceURI(), element.getNodeName()));
+            }
+
             ParserContext parserContext = new ParserContext(getReaderContext(), this, parent);
             finalChild = handler.parse(element, parserContext);
             currentDefinition = finalChild;
             ComponentModel parentComponentModel =
-                applicationModelSupplier.get().findComponentDefinitionModel((Element) element.getParentNode());
+                applicationModelSupplier.get().findComponentDefinitionModel(element.getParentNode());
             if (parentComponentModel != null) {
               finalChild =
                   adaptFilterBeanDefinitions(parentComponentModel,
@@ -379,7 +386,12 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         return POLICY_ROOT_ELEMENT;
       }
     } else {
-      return parentNode.getPrefix();
+      final ComponentModel componentDefinitionModel = applicationModelSupplier.get().findComponentDefinitionModel(parentNode);
+      if (componentDefinitionModel != null) {
+        return componentDefinitionModel.getIdentifier().getNamespace();
+      } else {
+        return parentNode.getPrefix();
+      }
     }
   }
 
