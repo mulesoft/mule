@@ -15,7 +15,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -64,7 +63,6 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
     }
     return flux.transform(processResponse())
         .doOnNext(result -> processFinally(result, null))
-        .doOnError(EventDroppedException.class, dme -> processFinally(dme.getEvent(), null))
         .onErrorResumeWith(MessagingException.class, exception -> {
           try {
             return Mono.just(processCatch(exception.getEvent(), exception));

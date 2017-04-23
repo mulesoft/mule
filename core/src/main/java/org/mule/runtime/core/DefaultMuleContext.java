@@ -81,7 +81,6 @@ import org.mule.runtime.core.api.locator.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
-import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
@@ -257,7 +256,7 @@ public class DefaultMuleContext implements MuleContext {
     // Ensure reactor operatorError hook is always registered.
     Hooks.onOperatorError((throwable, signal) -> {
       // Only apply hook for Event signals.
-      if (signal instanceof Event && !(throwable instanceof EventDroppedException)) {
+      if (signal instanceof Event) {
         throwable = unwrap(throwable);
         return throwable instanceof MessagingException ? throwable
             : new MessagingException((Event) signal, getRootCauseException(throwable));

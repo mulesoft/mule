@@ -7,11 +7,14 @@
 package org.mule.runtime.core.enricher;
 
 import static java.util.Collections.singletonList;
+import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
@@ -19,7 +22,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.StringUtils;
@@ -28,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 /**
  * The <code>Message Enricher</code> allows the current message to be augmented using data from a seperate resource.
@@ -60,7 +61,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
 
   @Override
   public Event process(Event event) throws MuleException {
-    return enrich(enrichmentProcessor.process(Event.builder(event).session(new DefaultMuleSession(event.getSession())).build()),
+    return enrich(enrichmentProcessor.process(builder(event).session(new DefaultMuleSession(event.getSession())).build()),
                   event);
   }
 
@@ -81,22 +82,24 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Pr
     }
 
     if (!StringUtils.isEmpty(targetExpressionArg)) {
-      Event.Builder eventBuilder = Event.builder(currentEvent);
+      Event.Builder eventBuilder = builder(currentEvent);
       expressionManager.enrich(targetExpressionArg, currentEvent, eventBuilder, flowConstruct, typedValue);
       return eventBuilder.build();
     } else {
-      return Event.builder(currentEvent).message(Message.builder(currentEvent.getMessage())
+      return builder(currentEvent).message(Message.builder(currentEvent.getMessage())
           .payload(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType()).build()).build();
     }
   }
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    return from(publisher).flatMap(event -> Mono.just(event)
-        .map(event1 -> Event.builder(event).session(new DefaultMuleSession(event.getSession())).build())
-        .transform(enrichmentProcessor)
-        .map(checkedFunction(response -> enrich(response, event)))
-        .otherwise(EventDroppedException.class, mde -> Mono.just(event)));
+    return from(publisher)
+        // Use flatMap and child context in order to handle null response and do nothing rather than complete response as empty
+        // if enrichment processor drops event due to a filter for example.
+        .flatMap(event -> from(processWithChildContext(builder(event).session(new DefaultMuleSession(event.getSession()))
+            .build(), enrichmentProcessor))
+                .map(checkedFunction(response -> enrich(response, event)))
+                .defaultIfEmpty(event));
   }
 
   protected Event enrich(final Event event, Event eventToEnrich) throws MuleException {

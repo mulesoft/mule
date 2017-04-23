@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.api.rx.Exceptions.newEventDroppedException;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -62,7 +61,7 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     if (unacceptedMessageProcessor == null) {
       return from(publisher).<Event>handle((event, sink) -> {
         Builder builder = Event.builder(event);
-        boolean accepted = false;
+        boolean accepted;
         try {
           accepted = accept(event, builder);
         } catch (Exception ex) {
@@ -75,7 +74,7 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
           if (isThrowOnUnaccepted()) {
             sink.error(filterUnacceptedException(builder.build()));
           } else {
-            sink.error(newEventDroppedException(event));
+            event.getContext().success();
           }
         }
       }).transform(applyNext());

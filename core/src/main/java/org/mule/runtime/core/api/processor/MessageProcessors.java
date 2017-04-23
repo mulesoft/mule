@@ -6,22 +6,26 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import static org.mule.runtime.core.DefaultEventContext.child;
+import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder.*;
-import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder;
 
 import java.util.List;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Some convenience methods for message processors.
@@ -96,7 +100,7 @@ public class MessageProcessors {
 
   public static Event processToApply(Event event, ReactiveProcessor processor) throws MuleException {
     try {
-      return just(event).transform(processor).otherwise(EventDroppedException.class, mde -> empty()).block();
+      return just(event).transform(processor).block();
     } catch (Throwable e) {
       throw rxExceptionToMuleException(e);
     }
@@ -113,6 +117,25 @@ public class MessageProcessors {
     } catch (Throwable e) {
       throw rxExceptionToMuleException(e);
     }
+  }
+
+  /**
+   * Process a {@link ReactiveProcessor} using a child {@link EventContext}. This is useful if it is necessary to performing
+   * processing in a scope and handle an empty result rather than complete the response for the whole Flow.
+   *
+   * @param event the event to process.
+   * @param processor the processor to process.
+   * @return the future result of processing processor.
+   */
+  public static Publisher<Event> processWithChildContext(Event event, ReactiveProcessor processor) {
+    EventContext child = child(event.getContext());
+    just(Event.builder(child, event).build())
+        .transform(processor)
+        .subscribe(result -> child.success(result),
+                   throwable -> child.error(throwable));
+    return from(child.getResponsePublisher())
+        .map(result -> Event.builder(event.getContext(), result).build())
+        .doOnError(MessagingException.class, me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()));
   }
 
 }
