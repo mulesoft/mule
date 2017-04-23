@@ -8,7 +8,7 @@ package org.mule.tck.junit4;
 
 import static java.util.Arrays.asList;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
-import static org.mule.tck.MuleTestUtils.processWithMonoAndBlock;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 
@@ -68,7 +68,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
         case BLOCKING:
           return processor.process(event);
         case NON_BLOCKING:
-          return processWithMonoAndBlock(event, processor);
+          return processToApply(event, processor);
         default:
           return null;
       }

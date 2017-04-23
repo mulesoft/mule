@@ -268,7 +268,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     for (int i = 0; i < STREAM_ITERATIONS; i++) {
       switch (mode) {
         case BLOCKING:
-          flow.process(testEvent());
+          flow.process(newEvent());
           latch.countDown();
           break;
         case NON_BLOCKING:
@@ -289,7 +289,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
       switch (mode) {
         case BLOCKING:
           try {
-            flow.process(testEvent());
+            flow.process(newEvent());
             fail("Unexpected success");
           } catch (Throwable t) {
             latch.countDown();
@@ -315,7 +315,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
       switch (mode) {
         case BLOCKING:
           try {
-            flow.process(testEvent());
+            flow.process(newEvent());
             sucessLatch.countDown();
           } catch (Throwable t) {
             errorLatch.countDown();

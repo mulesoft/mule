@@ -116,14 +116,4 @@ public final class MuleTestUtils {
     return null;
   }
 
-  public static Event processWithMonoAndBlock(Event event, Function<Publisher<Event>, Publisher<Event>> processor)
-      throws MuleException {
-    try {
-      return just(event).transform(processor).otherwise(EventDroppedException.class, mde -> empty())
-          .blockMillis(RECEIVE_TIMEOUT);
-    } catch (Throwable exception) {
-      throw rxExceptionToMuleException(exception);
-    }
-  }
-
 }

@@ -7,9 +7,12 @@
 package org.mule.runtime.config.spring.factories;
 
 import static java.util.Collections.singletonList;
+import static org.mule.runtime.core.DefaultEventContext.child;
+import static org.mule.runtime.core.api.Event.builder;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -21,12 +24,14 @@ import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AnnotatedProcessor;
 import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChain;
 
@@ -148,19 +153,41 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
         @Override
         public Event process(Event event) throws MuleException {
-          final Processor dynamicMessageProcessor = resolveReferencedProcessor(event);
-          // Because this is created dynamically annotations cannot be injected by Spring and so
-          // FlowRefMessageProcessor is not used here.
-          return ((Processor) event1 -> dynamicMessageProcessor.process(event1)).process(event);
+          try {
+            final Processor dynamicMessageProcessor = resolveReferencedProcessor(event);
+            // Because this is created dynamically annotations cannot be injected by Spring and so
+            // FlowRefMessageProcessor is not used here.
+            return createParentEvent(event, ((Processor) event1 -> dynamicMessageProcessor.process(event1))
+                .process(createChildEvent(event)));
+          } catch (MessagingException me) {
+            me.setProcessedEvent(createParentEvent(event, me.getEvent()));
+            throw me;
+          }
         }
 
         @Override
         public Publisher<Event> apply(Publisher<Event> publisher) {
           return from(publisher).flatMap(event -> {
+            Processor referencedProcessor;
             try {
-              return just(event).transform(resolveReferencedProcessor(event));
+              referencedProcessor = resolveReferencedProcessor(event);
             } catch (MuleException e) {
               return error(e);
+            }
+            // If referenced processor is a Flow used a child EventContext and wait for completion else simply compose.
+            if (referencedProcessor instanceof Flow) {
+              Event childEvent = createChildEvent(event);
+              just(childEvent)
+                  .transform(referencedProcessor)
+                  // Use empty error handler to avoid reactor ErrorCallbackNotImplemented
+                  .subscribe(null, throwable -> {
+                  });
+              return from(childEvent.getContext().getResponsePublisher())
+                  .map(result -> builder(event.getContext(), result).build())
+                  .doOnError(MessagingException.class,
+                             me -> me.setProcessedEvent(createParentEvent(event, me.getEvent())));
+            } else {
+              return just(event).transform(referencedProcessor);
             }
           });
         }
@@ -194,6 +221,14 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
       referenceCache.putIfAbsent(name, dynamicReference);
     }
     return referenceCache.get(name);
+  }
+
+  private Event createChildEvent(Event event) {
+    return builder(child(event.getContext()), event).build();
+  }
+
+  private Event createParentEvent(Event parent, Event result) {
+    return builder(parent.getContext(), result).build();
   }
 
   protected Processor getReferencedFlow(String name, FlowConstruct flowConstruct) throws MuleException {
@@ -240,7 +275,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     if (referencedFlow == null) {
       throw new MuleRuntimeException(CoreMessages.objectIsNull(name));
     }
-    if (referencedFlow instanceof FlowConstruct) {
+    if (referencedFlow instanceof Flow) {
       return new FlowRefMessageProcessor() {
 
         @Override
@@ -250,14 +285,29 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
         @Override
         public Event process(Event event) throws MuleException {
-          return referencedFlow.process(event);
+          try {
+            return createParentEvent(event, referencedFlow.process(createChildEvent(event)));
+          } catch (MessagingException me) {
+            me.setProcessedEvent(createParentEvent(event, me.getEvent()));
+            throw me;
+          }
         }
 
         @Override
         public Publisher<Event> apply(Publisher<Event> publisher) {
-          return from(publisher).transform(referencedFlow);
+          return from(publisher).flatMap(event -> {
+            Event childEvent = createChildEvent(event);
+            just(childEvent)
+                .transform(referencedFlow)
+                // Use empty error handler to avoid reactor ErrorCallbackNotImplemented
+                .subscribe(null, throwable -> {
+                });
+            return from(childEvent.getContext().getResponsePublisher())
+                .map(result -> createParentEvent(event, result))
+                .doOnError(MessagingException.class,
+                           me -> me.setProcessedEvent(createParentEvent(event, me.getEvent())));
+          });
         }
-
       };
     } else {
       if (referencedFlow instanceof AnnotatedObject) {

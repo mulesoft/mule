@@ -73,11 +73,7 @@ public class DefaultEventBuilder implements Event.Builder {
   }
 
   public DefaultEventBuilder(Event event) {
-    this(event.getContext(), event);
-  }
-
-  public DefaultEventBuilder(EventContext messageContext, Event event) {
-    this.context = messageContext;
+    this.context = event.getContext();
     this.originalEvent = event;
     this.message = event.getMessage();
     this.flow = event.getFlowConstruct();
@@ -90,10 +86,15 @@ public class DefaultEventBuilder implements Event.Builder {
     this.error = event.getError().orElse(null);
     this.notificationsEnabled = event.isNotificationsEnabled();
 
-    event.getVariableNames().forEach(key -> this.flowVariables
-        .put(key, event.getVariable(key)));
+    event.getVariableNames().forEach(key -> this.flowVariables.put(key, event.getVariable(key)));
     this.moduleProperties = event.getProperties();
     this.moduleParameters = event.getParameters();
+  }
+
+  public DefaultEventBuilder(EventContext messageContext, Event event) {
+    this(event);
+    this.context = messageContext;
+    this.modified = true;
   }
 
   @Override

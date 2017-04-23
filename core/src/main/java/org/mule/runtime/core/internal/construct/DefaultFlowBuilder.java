@@ -244,8 +244,7 @@ public class DefaultFlowBuilder implements Builder {
 
       // TODO MULE-10013
       // Create new event for current flow with current flowConstruct, replyToHandler etc.
-      event = Event.builder(DefaultEventContext.child(event.getContext()), event).flow(this)
-          .replyToHandler(replyToHandler).replyToDestination(replyToDestination).build();
+      event = Event.builder(event).flow(this).replyToHandler(replyToHandler).replyToDestination(replyToDestination).build();
       resetRequestContextEvent(event);
       return event;
     }
@@ -255,7 +254,7 @@ public class DefaultFlowBuilder implements Builder {
         Optional<Error> errorOptional = result.getError();
         // TODO MULE-10013
         // Create new event with original FlowConstruct, ReplyToHandler and synchronous
-        result = Event.builder(original.getContext(), result).flow(original.getFlowConstruct())
+        result = Event.builder(result).flow(original.getFlowConstruct())
             .replyToHandler(original.getReplyToHandler())
             .replyToDestination(original.getReplyToDestination())
             .error(errorOptional.orElse(null)).build();

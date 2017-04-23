@@ -198,17 +198,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
   }
 
   private ExecutionCallback<Event> getFlowRunCallback(final Flow flow) {
-    return () -> {
-      Event event = getOrBuildEvent();
-      try {
-        Event result = flow.process(event);
-        event.getContext().success(result);
-        return result;
-      } catch (Exception e) {
-        event.getContext().error(e);
-        throw e;
-      }
-    };
+    return () -> flow.process(getOrBuildEvent());
   }
 
   private ExecutionCallback<Event> getFlowDispatchCallback(final Flow flow) {
