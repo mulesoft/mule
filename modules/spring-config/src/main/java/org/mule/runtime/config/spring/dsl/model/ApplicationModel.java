@@ -28,6 +28,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
 
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
@@ -153,6 +154,8 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(MULE_ROOT_ELEMENT).build();
   public static final ComponentIdentifier MULE_DOMAIN_IDENTIFIER =
       builder().withNamespace(DOMAIN_PREFIX).withName(MULE_DOMAIN_ROOT_ELEMENT).build();
+  public static final ComponentIdentifier MULE_EE_DOMAIN_IDENTIFIER =
+      builder().withNamespace(EE_DOMAIN_PREFIX).withName(MULE_DOMAIN_ROOT_ELEMENT).build();
   public static final ComponentIdentifier POLICY_IDENTIFIER =
       builder().withNamespace(POLICY_ROOT_ELEMENT).withName(POLICY_ROOT_ELEMENT).build();
   public static final ComponentIdentifier SPRING_PROPERTY_IDENTIFIER =
@@ -572,7 +575,8 @@ public class ApplicationModel {
   private boolean isMuleConfigurationFile() {
     final ComponentIdentifier rootIdentifier = muleComponentModels.get(0).getIdentifier();
     return rootIdentifier.equals(MULE_IDENTIFIER)
-        || rootIdentifier.equals(MULE_DOMAIN_IDENTIFIER);
+        || rootIdentifier.equals(MULE_DOMAIN_IDENTIFIER)
+        || rootIdentifier.equals(MULE_EE_DOMAIN_IDENTIFIER);
   }
 
   private void validateErrorMappings() {

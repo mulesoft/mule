@@ -20,6 +20,7 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DOC_DESC
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.INTERCEPTOR_STACK_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_EE_DOMAIN_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
@@ -97,6 +98,7 @@ public class BeanDefinitionFactory {
       ImmutableSet.<ComponentIdentifier>builder()
           .add(MULE_IDENTIFIER)
           .add(MULE_DOMAIN_IDENTIFIER)
+          .add(MULE_EE_DOMAIN_IDENTIFIER)
           .add(ERROR_MAPPING_IDENTIFIER)
           .add(DESCRIPTION_IDENTIFIER)
           .add(ANNOTATIONS_ELEMENT_IDENTIFIER)

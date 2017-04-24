@@ -13,6 +13,8 @@ import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttribut
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
@@ -57,6 +59,7 @@ public class XmlApplicationParser {
 
   static {
     predefinedNamespace.put(DOMAIN_NAMESPACE, DOMAIN_PREFIX);
+    predefinedNamespace.put(EE_DOMAIN_NAMESPACE, EE_DOMAIN_PREFIX);
     predefinedNamespace.put("http://www.springframework.org/schema/beans", SPRING_NAMESPACE);
     predefinedNamespace.put("http://www.springframework.org/schema/context", SPRING_CONTEXT_NAMESPACE);
   }
