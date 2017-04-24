@@ -107,18 +107,19 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
   protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(String accessToken, String refreshToken) {
     configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody("{" + "\""
         + ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," + "\"" + EXPIRES_IN_PARAMETER
-        + "\":" + EXPIRES_IN + "," + "\"" + REFRESH_TOKEN_PARAMETER + "\":\"" + refreshToken + "\"}");
+        + "\":" + EXPIRES_IN + "," + "\"" + REFRESH_TOKEN_PARAMETER + "\":\"" + refreshToken + "\"}",
+                                                                                   MediaType.JSON.toRfcString());
   }
 
   protected void configureWireMockToExpectOfflineTokenPathRequestForAuthorizationCodeGrantType(String accessToken) {
     configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody("{" + "\""
         + ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," + "\"" + EXPIRES_IN_PARAMETER
-        + "\":" + EXPIRES_IN + "}");
+        + "\":" + EXPIRES_IN + "}", MediaType.JSON.toRfcString());
   }
 
-  protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody(String body) {
+  protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody(String body, String contentType) {
     wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH))
-        .willReturn(aResponse().withBody(body).withHeader(CONTENT_TYPE, MediaType.JSON.toRfcString())));
+        .willReturn(aResponse().withBody(body).withHeader(CONTENT_TYPE, contentType)));
   }
 
   protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeAndFail() {
@@ -139,7 +140,6 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
             + "\":\"" + accessToken + "\"," + "\"" + EXPIRES_IN_PARAMETER + "\":\"" + EXPIRES_IN + "\"}")
             .withHeader(CONTENT_TYPE, MediaType.JSON.toRfcString())));
   }
-
 
   protected void configureWireMockToExpectTokenPathRequestForClientCredentialsGrantTypeWithMapResponse(String accessToken) {
     configureWireMockToExpectTokenPathRequestForClientCredentialsGrantTypeWithMapResponse(accessToken,
