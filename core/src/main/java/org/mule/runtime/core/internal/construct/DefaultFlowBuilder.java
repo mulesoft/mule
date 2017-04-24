@@ -11,14 +11,11 @@ import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.rx.Exceptions.newEventDroppedException;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.fromCallable;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -229,10 +226,7 @@ public class DefaultFlowBuilder implements Builder {
                 .mapError(MessagingException.class, me -> {
                   me.setProcessedEvent(createReturnEventForParentFlowConstruct(me.getEvent(), event));
                   return me;
-                })
-                .otherwiseIfEmpty(fromCallable(() -> {
-                  throw newEventDroppedException(event);
-                }));
+                });
           });
     }
 

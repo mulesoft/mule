@@ -35,7 +35,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -238,7 +237,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         // After flow processing complete EventContext with response event, null event or error (after error handing).
         .doOnNext(response -> response.getContext().success(response))
         .doOnError(MessagingException.class, handleError())
-        .doOnError(EventDroppedException.class, ede -> ede.getEvent().getContext().success())
         .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
                    throwable -> LOGGER.error("Unhandled exception in async processing " + throwable));
   }

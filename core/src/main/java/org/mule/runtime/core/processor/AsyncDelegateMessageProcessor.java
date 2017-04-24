@@ -10,7 +10,6 @@ import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
@@ -19,7 +18,6 @@ import static org.mule.runtime.core.transaction.TransactionCoordination.isTransa
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-import static reactor.core.publisher.Mono.empty;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -37,7 +35,6 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
@@ -127,7 +124,6 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
                     .doOnNext(event -> fireAsyncCompleteNotification(event, flowConstruct, null))
                     .doOnError(MessagingException.class, e -> fireAsyncCompleteNotification(e.getEvent(), flowConstruct, e))
                     .onErrorResumeWith(MessagingException.class, messagingExceptionHandler)
-                    .onErrorResumeWith(EventDroppedException.class, mde -> empty())
                     .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
                                exception -> logger.error("Unhandled exception in async processing.",
                                                          exception))

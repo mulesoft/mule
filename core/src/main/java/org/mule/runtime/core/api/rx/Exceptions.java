@@ -7,10 +7,9 @@
 package org.mule.runtime.core.api.rx;
 
 import static reactor.core.Exceptions.unwrap;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.func.CheckedBiConsumer;
 import org.mule.runtime.core.util.func.CheckedBiFunction;
@@ -31,8 +30,7 @@ import java.util.function.Predicate;
  */
 public class Exceptions {
 
-  public static Predicate<Throwable> UNEXPECTED_EXCEPTION_PREDICATE =
-      throwable -> !(throwable instanceof EventDroppedException || throwable instanceof MessagingException);
+  public static Predicate<Throwable> UNEXPECTED_EXCEPTION_PREDICATE = throwable -> !(throwable instanceof MessagingException);
 
   /**
    * Adapt a {@link CheckedConsumer} to a {@link Consumer} propagating any exceptions thrown by the {@link CheckedConsumer} using
@@ -152,33 +150,6 @@ public class Exceptions {
       throw (RuntimeException) throwable;
     } else {
       throw new DefaultMuleException(throwable);
-    }
-  }
-
-  /**
-   * Returns an exception used to signal a dropped {@link Event} in a reactive stream. This exception does not extend
-   * {@link MuleException} or even call {@link Exception#Exception()} to avoid the overhead of filling-in the stack.
-   *
-   * This exception should only be thrown as part of reactive stream processing and needs to be explicitly handled using for
-   * example {@link reactor.core.publisher.Flux#onErrorResumeWith(Predicate, Function)} depending on the behaviuor required in the
-   * specific context. For example, in a {@link org.mule.runtime.core.routing.ScatterGatherRouter} a dropped message means one
-   * less item in the aggregated collection of messages, while a dropped message in a {@link Flow}
-   * means the source should recieve an empty response.
-   */
-  public static EventDroppedException newEventDroppedException(Event event) {
-    return new EventDroppedException(event);
-  }
-
-  public static final class EventDroppedException extends Exception {
-
-    private Event dropped;
-
-    private EventDroppedException(Event dropped) {
-      this.dropped = dropped;
-    }
-
-    public Event getEvent() {
-      return this.dropped;
     }
   }
 

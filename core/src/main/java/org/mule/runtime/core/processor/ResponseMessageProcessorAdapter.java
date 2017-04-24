@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -26,7 +27,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
-import org.mule.runtime.core.api.rx.Exceptions.EventDroppedException;
+import org.mule.runtime.core.session.DefaultMuleSession;
 
 import org.reactivestreams.Publisher;
 
@@ -80,9 +81,8 @@ public class ResponseMessageProcessorAdapter extends AbstractInterceptingMessage
     } else {
       return from(publisher)
           .transform(applyNext())
-          .concatMap(event -> just(event)
-              .transform(responseProcessor)
-              .onErrorResumeWith(EventDroppedException.class, ede -> just(event)));
+          // Use flatMap and child context in order to handle null response and continue with current event
+          .flatMap(event -> from(processWithChildContext(event, responseProcessor)).defaultIfEmpty(event));
     }
   }
 

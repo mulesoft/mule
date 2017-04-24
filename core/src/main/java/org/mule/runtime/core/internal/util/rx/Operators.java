@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
-import static org.mule.runtime.core.api.rx.Exceptions.newEventDroppedException;
 import org.mule.runtime.core.api.Event;
 
 import java.util.function.BiConsumer;
@@ -30,13 +29,13 @@ public final class Operators {
    * @return custom operator {@link BiConsumer} to be used with {@link reactor.core.publisher.Flux#handle(BiConsumer)}.
    */
   public static BiConsumer<Event, SynchronousSink<Event>> nullSafeMap(Function<Event, Event> mapper) {
-    return (t, sink) -> {
-      if (t != null) {
-        Event r = mapper.apply(t);
-        if (r != null) {
-          sink.next(r);
+    return (event, sink) -> {
+      if (event != null) {
+        Event result = mapper.apply(event);
+        if (result != null) {
+          sink.next(result);
         } else {
-          sink.error(newEventDroppedException(t));
+          event.getContext().success();
         }
       }
     };
@@ -50,13 +49,13 @@ public final class Operators {
    * @return custom operator {@link BiConsumer} to be used with {@link reactor.core.publisher.Flux#handle(BiConsumer)}.
    */
   public static BiConsumer<Event, SynchronousSink<Event>> echoOnNullMap(Function<Event, Event> mapper) {
-    return (t, sink) -> {
-      if (t != null) {
-        Event r = mapper.apply(t);
-        if (r != null) {
-          sink.next(r);
+    return (event, sink) -> {
+      if (event != null) {
+        Event result = mapper.apply(event);
+        if (result != null) {
+          sink.next(result);
         } else {
-          sink.next(t);
+          sink.next(event);
         }
       }
     };
