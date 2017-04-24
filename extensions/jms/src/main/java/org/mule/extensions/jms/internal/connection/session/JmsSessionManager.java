@@ -4,15 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms;
+package org.mule.extensions.jms.internal.connection.session;
 
 import static java.util.Optional.ofNullable;
-import static org.mule.extensions.jms.TransactionStatus.NONE;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.api.connection.JmsSession;
-import org.mule.extensions.jms.api.source.JmsListener;
-import org.mule.extensions.jms.api.source.JmsListenerLock;
 import org.mule.extensions.jms.internal.config.InternalAckMode;
+import org.mule.extensions.jms.internal.connection.JmsSession;
+import org.mule.extensions.jms.internal.source.JmsListener;
+import org.mule.extensions.jms.internal.source.JmsListenerLock;
 
 import org.slf4j.Logger;
 
@@ -31,13 +30,11 @@ import javax.jms.Session;
  *
  * @since 4.0
  */
-public class JmsSessionManager {
+final public class JmsSessionManager {
 
   private static final Logger LOGGER = getLogger(JmsSessionManager.class);
   private final Map<String, SessionInformation> pendingSessions = new HashMap<>();
-
-  private ThreadLocal<JmsSession> currentSession = new ThreadLocal<>();
-  private ThreadLocal<TransactionStatus> transactionStatus = new ThreadLocal<>();
+  private final ThreadLocal<TransactionInformation> transactionInformation = new ThreadLocal<>();
 
   /**
    * Registers the {@link Message} to the {@link Session} using the {@code ackId} in order to being
@@ -126,21 +123,21 @@ public class JmsSessionManager {
    * @param session session to bind
    */
   public void bindToTransaction(JmsSession session) {
-    currentSession.set(session);
+    getTransactionInformation().setJmsSession(session);
   }
 
   /**
    * Unbinds the current {@link JmsSession}, if there is one, of the current {@link Thread}
    */
   public void unbindSession() {
-    currentSession.remove();
+    transactionInformation.remove();
   }
 
   /**
    * @return the {@link Optional} {@link JmsSession} of the current {@link Thread}
    */
   public Optional<JmsSession> getTransactedSession() {
-    return ofNullable(currentSession.get());
+    return ofNullable(getTransactionInformation().getJmsSession());
   }
 
   /**
@@ -149,39 +146,23 @@ public class JmsSessionManager {
    * - {@link TransactionStatus#STARTED} means that there is a transaction being executed in the current {@link Thread}
    */
   public TransactionStatus getTransactionStatus() {
-    TransactionStatus transactionStatus = this.transactionStatus.get();
-    return transactionStatus != null ? transactionStatus : NONE;
+    TransactionStatus transactionStatus = getTransactionInformation().getTransactionStatus();
+    return transactionStatus != null ? transactionStatus : TransactionStatus.NONE;
   }
 
   /**
    * @param transactionStatus The new {@link TransactionStatus}
    */
   public void changeTransactionStatus(TransactionStatus transactionStatus) {
-    this.transactionStatus.set(transactionStatus);
+    getTransactionInformation().setTransactionStatus(transactionStatus);
   }
 
-  private class SessionInformation {
-
-    private Message message;
-    private Session session;
-    private JmsListenerLock jmsListenerLock;
-
-    SessionInformation(Message message, Session session, JmsListenerLock jmsListenerLock) {
-      this.message = message;
-      this.session = session;
-      this.jmsListenerLock = jmsListenerLock;
+  private TransactionInformation getTransactionInformation() {
+    TransactionInformation transactionInformation = this.transactionInformation.get();
+    if (transactionInformation == null) {
+      transactionInformation = new TransactionInformation();
+      this.transactionInformation.set(transactionInformation);
     }
-
-    Message getMessage() {
-      return message;
-    }
-
-    Session getSession() {
-      return session;
-    }
-
-    Optional<JmsListenerLock> getJmsListenerLock() {
-      return ofNullable(jmsListenerLock);
-    }
+    return transactionInformation;
   }
 }

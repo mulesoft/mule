@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.api.operation;
+package org.mule.extensions.jms.internal.operation;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.JmsSessionManager;
+import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
 import org.mule.extensions.jms.api.config.AckMode;
-import org.mule.extensions.jms.api.connection.JmsConnection;
-import org.mule.extensions.jms.api.connection.JmsSession;
+import org.mule.extensions.jms.internal.connection.JmsConnection;
+import org.mule.extensions.jms.internal.connection.JmsSession;
 import org.mule.extensions.jms.api.exception.JmsAckErrorTypeProvider;
 import org.mule.extensions.jms.api.exception.JmsAckException;
 import org.mule.extensions.jms.api.exception.JmsSessionRecoverErrorTypeProvider;

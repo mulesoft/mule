@@ -8,7 +8,7 @@ package org.mule.extensions.jms.api.exception;
 
 import static org.mule.extensions.jms.api.exception.JmsErrors.ACK;
 import com.google.common.collect.ImmutableSet;
-import org.mule.extensions.jms.api.operation.JmsAcknowledge;
+import org.mule.extensions.jms.internal.operation.JmsAcknowledge;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 

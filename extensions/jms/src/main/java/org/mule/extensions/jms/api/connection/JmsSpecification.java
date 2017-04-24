@@ -6,7 +6,7 @@
  */
 package org.mule.extensions.jms.api.connection;
 
-import org.mule.extensions.jms.JmsExtension;
+import org.mule.extensions.jms.internal.JmsExtension;
 
 /**
  * Versions of the JMS Spec supported by the {@link JmsExtension}

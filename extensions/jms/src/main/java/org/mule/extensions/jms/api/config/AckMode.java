@@ -6,21 +6,22 @@
  */
 package org.mule.extensions.jms.api.config;
 
-import org.mule.extensions.jms.api.operation.JmsConsume;
-import org.mule.extensions.jms.api.source.JmsListener;
+import org.mule.extensions.jms.internal.operation.JmsConsume;
+import org.mule.extensions.jms.internal.source.JmsListener;
 import org.mule.extensions.jms.internal.config.InternalAckMode;
 
 import javax.jms.Session;
 
 /**
  * Declares the kind of Acknowledgement mode supported.
+ * <ul>
+ *     <li><b>AUTO</b>: Mule ACKs the message only if the flow is finished successfully. </li>
+ *     <li><b>MANUAL</b>: This is JMS {@link Session#CLIENT_ACKNOWLEDGE} mode. The user must do the ack manually within the flow. </li>
+ *     <li><b>DUPS_OK</b>: JMS message is acked automatically but in a lazy fashion which may lead to duplicates. </li>
+ *     <li><b>NONE</b>: Mule automatically ACKs the message upon reception. </li>
+ * </ul>
  *
- * AUTO: Mule ACKs the message only if the flow is finished successfully.
- * MANUAL: This is JMS {@link Session#CLIENT_ACKNOWLEDGE} mode. The user must do the ack manually within the flow.
- * DUPS_OK: JMS message is acked automatically but in a lazy fashion which may lead to duplicates.
- * NONE: Mule automatically ACKs the message upon reception.
- *
- * @since 4.0
+ *  @since 4.0
  */
 public enum AckMode implements JmsAckMode {
 

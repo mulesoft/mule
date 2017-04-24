@@ -70,11 +70,6 @@ public class JmsMessageUtils {
     } else if (object instanceof InputStream) {
       return inputStreamToMessage((InputStream) object, session);
 
-      // TODO MULE-12270 : SDK Should provide a generic way to handle CursorStreamProviders
-    } else if (object instanceof CursorStreamProvider) {
-      CursorStream value = ((CursorStreamProvider) object).openCursor();
-      return stringToMessage(IOUtils.toString(value), session);
-
     } else if (object instanceof List<?>) {
       return listToMessage((List<?>) object, session);
 

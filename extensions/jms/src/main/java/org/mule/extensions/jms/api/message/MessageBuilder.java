@@ -14,10 +14,10 @@ import static org.mule.extensions.jms.internal.message.JMSXDefinedPropertiesName
 import static org.mule.extensions.jms.internal.message.JmsMessageUtils.encodeKey;
 import static org.mule.extensions.jms.internal.message.JmsMessageUtils.toMessage;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.api.config.JmsConfig;
 import org.mule.extensions.jms.api.config.JmsProducerConfig;
 import org.mule.extensions.jms.api.destination.JmsDestination;
 import org.mule.extensions.jms.api.exception.DestinationNotFoundException;
+import org.mule.extensions.jms.internal.config.JmsConfig;
 import org.mule.extensions.jms.internal.support.JmsSupport;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -28,14 +28,16 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+
 import org.slf4j.Logger;
+
+import java.nio.charset.Charset;
+import java.util.Map;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
-import java.nio.charset.Charset;
-import java.util.Map;
 
 /**
  * Enables the creation of an outgoing {@link Message}.

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.api.source;
+package org.mule.extensions.jms.internal.source;
 
 import static java.lang.String.format;
 import static org.mule.extensions.jms.api.connection.JmsSpecification.JMS_2_0;
@@ -18,13 +18,14 @@ import static org.mule.extensions.jms.internal.config.InternalAckMode.MANUAL;
 import static org.mule.extensions.jms.internal.config.InternalAckMode.TRANSACTED;
 import static org.mule.runtime.extension.api.tx.SourceTransactionalAction.ALWAYS_BEGIN;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.JmsSessionManager;
+import org.mule.extensions.jms.api.source.JmsListenerResponseBuilder;
+import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.internal.config.InternalAckMode;
-import org.mule.extensions.jms.api.config.JmsConfig;
+import org.mule.extensions.jms.internal.config.JmsConfig;
 import org.mule.extensions.jms.api.config.JmsConsumerConfig;
-import org.mule.extensions.jms.api.connection.JmsSession;
-import org.mule.extensions.jms.api.connection.JmsTransactionalConnection;
+import org.mule.extensions.jms.internal.connection.JmsSession;
+import org.mule.extensions.jms.internal.connection.JmsTransactionalConnection;
 import org.mule.extensions.jms.api.destination.ConsumerType;
 import org.mule.extensions.jms.api.destination.TopicConsumer;
 import org.mule.extensions.jms.api.exception.JmsExtensionException;

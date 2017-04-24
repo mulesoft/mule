@@ -4,13 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.api.connection;
+package org.mule.extensions.jms.internal.connection;
 
-import static org.mule.extensions.jms.TransactionStatus.NONE;
-import static org.mule.extensions.jms.TransactionStatus.STARTED;
+import static org.mule.extensions.jms.internal.connection.session.TransactionStatus.NONE;
+import static org.mule.extensions.jms.internal.connection.session.TransactionStatus.STARTED;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.JmsExtension;
-import org.mule.extensions.jms.JmsSessionManager;
+import org.mule.extensions.jms.internal.JmsExtension;
+import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
 import org.mule.extensions.jms.internal.support.JmsSupport;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 
@@ -44,7 +45,6 @@ public final class JmsTransactionalConnection extends JmsConnection implements T
    */
   @Override
   public void begin() throws Exception {
-    //Nothing to do here, JMS Transactions starts when the Session is created.
     jmsSessionManager.changeTransactionStatus(STARTED);
   }
 
@@ -66,21 +66,19 @@ public final class JmsTransactionalConnection extends JmsConnection implements T
 
   private void executeTransactionAction(String action, SessionAction transactionalAction) throws JMSException {
     Optional<JmsSession> transactedSession = jmsSessionManager.getTransactedSession();
-    if (transactedSession.isPresent()) {
-      Session jmsSession = transactedSession.get().get();
+    checkState(transactedSession.isPresent(), "Unable to " + action + " transaction, the TX Session doesn't exist.");
 
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("JMS Transaction " + action + " over Session [" + jmsSession + "]");
-      }
+    Session jmsSession = transactedSession.get().get();
 
-      try {
-        transactionalAction.execute(jmsSession);
-      } finally {
-        jmsSessionManager.changeTransactionStatus(NONE);
-        jmsSessionManager.unbindSession();
-      }
-    } else {
-      throw new IllegalStateException("Unable to " + action + " transaction, the TX Session doesn't exist.");
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("JMS Transaction " + action + " over Session [" + jmsSession + "]");
+    }
+
+    try {
+      transactionalAction.execute(jmsSession);
+    } finally {
+      jmsSessionManager.changeTransactionStatus(NONE);
+      jmsSessionManager.unbindSession();
     }
   }
 

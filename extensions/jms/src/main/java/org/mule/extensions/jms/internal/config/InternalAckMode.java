@@ -10,8 +10,8 @@ import static javax.jms.Session.AUTO_ACKNOWLEDGE;
 import static javax.jms.Session.CLIENT_ACKNOWLEDGE;
 import static javax.jms.Session.DUPS_OK_ACKNOWLEDGE;
 import static javax.jms.Session.SESSION_TRANSACTED;
-import org.mule.extensions.jms.api.operation.JmsConsume;
-import org.mule.extensions.jms.api.source.JmsListener;
+import org.mule.extensions.jms.internal.operation.JmsConsume;
+import org.mule.extensions.jms.internal.source.JmsListener;
 
 import javax.jms.Session;
 
