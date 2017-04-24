@@ -36,7 +36,7 @@ public interface SchedulerService extends Service {
    * A task is considered {@code cpu-light} if it doesn't block at any time and its duration is less than 10 milliseconds.
    * <p>
    * Implementations must get the appropriate config from the runtime context to build the target {@link Scheduler}. This method
-   * must act only as a delegate of {@link #cpuLightScheduler(SchedulerConfig)}.
+   * must act only as a delegate of {@link #cpuLightScheduler(SchedulerConfig, SchedulerPoolsConfigFactory)}.
    * 
    * @return a scheduler that runs {@code cpu-light} tasks.
    */
@@ -49,7 +49,7 @@ public interface SchedulerService extends Service {
    * A task is considered {@code blocking I/O} if it spends most of it's clock duration blocked due to I/O operations.
    * <p>
    * Implementations must get the appropriate config from the runtime context to build the target {@link Scheduler}. This method
-   * must act only as a delegate of {@link #ioScheduler(SchedulerConfig)}.
+   * must act only as a delegate of {@link #ioScheduler(SchedulerConfig, SchedulerPoolsConfigFactory)}.
    * 
    * @return a scheduler that runs {@code blocking I/O} tasks.
    */
@@ -64,7 +64,7 @@ public interface SchedulerService extends Service {
    * is due to blocking.
    * <p>
    * Implementations must get the appropriate config from the runtime context to build the target {@link Scheduler}. This method
-   * must act only as a delegate of {@link #cpuIntensiveScheduler(SchedulerConfig)}.
+   * must act only as a delegate of {@link #cpuIntensiveScheduler(SchedulerConfig, SchedulerPoolsConfigFactory)}.
    * 
    * @return a scheduler that runs {@code CPU intensive} tasks.
    */
@@ -117,10 +117,60 @@ public interface SchedulerService extends Service {
   Scheduler cpuIntensiveScheduler(SchedulerConfig config);
 
   /**
+   * Builds a fresh {@link Scheduler} for light CPU tasks. The returned {@link Scheduler} is backed by the Mule runtime cpu-light
+   * executor, which is shared by all {@link Scheduler}s returned by this method.
+   * <p>
+   * A task is considered {@code cpu-light} if it doesn't block at any time and its duration is less than 10 milliseconds.
+   * <p>
+   * If the provided {@code config} has {@code maxConcurrentTasks} set, exceeding tasks will block the caller, until a running
+   * task is finished.
+   * 
+   * @param config allows customization of the returned scheduler.
+   * @param poolsConfigFactory the configuration to use for the thread pools that the schedulers use.
+   * 
+   * @return a scheduler that runs {@code cpu-light} tasks.
+   */
+  Scheduler cpuLightScheduler(SchedulerConfig config, SchedulerPoolsConfigFactory poolsConfigFactory);
+
+  /**
+   * Builds a fresh {@link Scheduler} for blocking I/O tasks. The returned {@link Scheduler} is backed by the Mule runtime
+   * blocking I/O executor, which is shared by all {@link Scheduler}s returned by this method.
+   * <p>
+   * A task is considered {@code blocking I/O} if it spends most of it's clock duration blocked due to I/O operations.
+   * <p>
+   * If the provided {@code config} has {@code maxConcurrentTasks} set, exceeding tasks will block the caller, until a running
+   * task is finished.
+   * 
+   * @param config allows customization of the returned scheduler.
+   * @param poolsConfigFactory the configuration to use for the thread pools that the schedulers use.
+   * 
+   * @return a scheduler that runs {@code blocking I/O} tasks.
+   */
+  Scheduler ioScheduler(SchedulerConfig config, SchedulerPoolsConfigFactory poolsConfigFactory);
+
+  /**
+   * Builds a fresh {@link Scheduler} for heavy computation or CPU intensive tasks. The returned {@link Scheduler} is backed by
+   * the Mule runtime computation executor, which is shared by all {@link Scheduler}s returned by this method.
+   * <p>
+   * A task is considered a {@code CPU intensive} if its duration is more than 10 milliseconds and less than 20% of its clock time
+   * is due to blocking.
+   * <p>
+   * If the provided {@code config} has {@code maxConcurrentTasks} set, exceeding tasks will block the caller, until a running
+   * task is finished.
+   * 
+   * @param config allows customization of the returned scheduler.
+   * @param poolsConfigFactory the configuration to use for the thread pools that the schedulers use.
+   * 
+   * @return a scheduler that runs {@code CPU intensive} tasks.
+   */
+  Scheduler cpuIntensiveScheduler(SchedulerConfig config, SchedulerPoolsConfigFactory poolsConfigFactory);
+
+  /**
    * Builds a fresh {@link Scheduler} for custom tasks. The returned {@link Scheduler} is backed by an
    * {@link java.util.concurrent.ExecutorService} built with the given {@code corePoolSize} threads and a
    * {@link SynchronousQueue}.
    * 
+   * @param config allows customization of the returned scheduler.
    * @return a scheduler whose threads manage {@code custom} tasks.
    */
   Scheduler customScheduler(SchedulerConfig config);
@@ -130,6 +180,7 @@ public interface SchedulerService extends Service {
    * {@link java.util.concurrent.ExecutorService} built with the given {@code corePoolSize} threads and a
    * {@link LinkedBlockingQueue} with the given {@code queueSize}.
    * 
+   * @param config allows customization of the returned scheduler.
    * @return a scheduler whose threads manage {@code custom} tasks.
    */
   Scheduler customScheduler(SchedulerConfig config, int queueSize);

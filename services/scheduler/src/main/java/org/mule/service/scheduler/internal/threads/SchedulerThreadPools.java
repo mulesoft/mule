@@ -62,11 +62,11 @@ public class SchedulerThreadPools {
 
   private static final Logger logger = getLogger(SchedulerThreadPools.class);
 
-  private static final String CPU_LIGHT_THREADS_NAME = SchedulerService.class.getSimpleName() + "_" + CPU_LIGHT.getName();
-  private static final String IO_THREADS_NAME = SchedulerService.class.getSimpleName() + "_" + IO.getName();
-  private static final String COMPUTATION_THREADS_NAME = SchedulerService.class.getSimpleName() + "_" + CPU_INTENSIVE.getName();
-  private static final String TIMER_THREADS_NAME = SchedulerService.class.getSimpleName() + "_timer";
-  private static final String CUSTOM_THREADS_NAME = SchedulerService.class.getSimpleName() + "_" + CUSTOM.getName();
+  private static final String CPU_LIGHT_THREADS_NAME = CPU_LIGHT.getName();
+  private static final String IO_THREADS_NAME = IO.getName();
+  private static final String COMPUTATION_THREADS_NAME = CPU_INTENSIVE.getName();
+  private static final String TIMER_THREADS_NAME = "timer";
+  private static final String CUSTOM_THREADS_NAME = CUSTOM.getName();
 
   private String name;
   private SchedulerPoolsConfig threadPoolsConfig;
@@ -95,12 +95,12 @@ public class SchedulerThreadPools {
     this.threadPoolsConfig = threadPoolsConfig;
 
     schedulerGroup = new ThreadGroup(name);
-    cpuLightGroup = new ThreadGroup(schedulerGroup, CPU_LIGHT_THREADS_NAME);
-    ioGroup = new ThreadGroup(schedulerGroup, IO_THREADS_NAME);
-    computationGroup = new ThreadGroup(schedulerGroup, COMPUTATION_THREADS_NAME);
-    timerGroup = new ThreadGroup(schedulerGroup, TIMER_THREADS_NAME);
-    customGroup = new ThreadGroup(schedulerGroup, CUSTOM_THREADS_NAME);
-    customWaitGroup = new ThreadGroup(customGroup, CUSTOM_THREADS_NAME);
+    cpuLightGroup = new ThreadGroup(schedulerGroup, threadPoolsConfig.getThreadNamePrefix() + CPU_LIGHT_THREADS_NAME);
+    ioGroup = new ThreadGroup(schedulerGroup, threadPoolsConfig.getThreadNamePrefix() + IO_THREADS_NAME);
+    computationGroup = new ThreadGroup(schedulerGroup, threadPoolsConfig.getThreadNamePrefix() + COMPUTATION_THREADS_NAME);
+    timerGroup = new ThreadGroup(schedulerGroup, threadPoolsConfig.getThreadNamePrefix() + TIMER_THREADS_NAME);
+    customGroup = new ThreadGroup(schedulerGroup, threadPoolsConfig.getThreadNamePrefix() + CUSTOM_THREADS_NAME);
+    customWaitGroup = new ThreadGroup(customGroup, threadPoolsConfig.getThreadNamePrefix() + CUSTOM_THREADS_NAME);
 
     byCallerThreadGroupPolicy = new ByCallerThreadGroupPolicy(new HashSet<>(asList(ioGroup, customWaitGroup)), schedulerGroup);
   }
@@ -173,15 +173,17 @@ public class SchedulerThreadPools {
     final long startMillis = currentTimeMillis();
 
     // Stop the scheduled first to avoid it dispatching tasks to an already stopped executor
-    waitForExecutorTermination(startMillis, scheduledExecutor, TIMER_THREADS_NAME);
-    waitForExecutorTermination(startMillis, cpuLightExecutor, CPU_LIGHT_THREADS_NAME);
-    waitForExecutorTermination(startMillis, ioExecutor, IO_THREADS_NAME);
-    waitForExecutorTermination(startMillis, computationExecutor, COMPUTATION_THREADS_NAME);
+    waitForExecutorTermination(startMillis, scheduledExecutor, threadPoolsConfig.getThreadNamePrefix() + TIMER_THREADS_NAME);
+    waitForExecutorTermination(startMillis, cpuLightExecutor, threadPoolsConfig.getThreadNamePrefix() + CPU_LIGHT_THREADS_NAME);
+    waitForExecutorTermination(startMillis, ioExecutor, threadPoolsConfig.getThreadNamePrefix() + IO_THREADS_NAME);
+    waitForExecutorTermination(startMillis, computationExecutor,
+                               threadPoolsConfig.getThreadNamePrefix() + COMPUTATION_THREADS_NAME);
 
     // When graceful shutdown timeouts, forceful shutdown will remove the custom scheduler from the list.
     // In that case, not creating a new collection here will cause a ConcurrentModificationException.
     for (ExecutorService customSchedulerExecutor : new ArrayList<>(customSchedulersExecutors)) {
-      waitForExecutorTermination(startMillis, customSchedulerExecutor, COMPUTATION_THREADS_NAME);
+      waitForExecutorTermination(startMillis, customSchedulerExecutor,
+                                 threadPoolsConfig.getThreadNamePrefix() + CUSTOM_THREADS_NAME);
     }
 
     cpuLightExecutor = null;
@@ -196,8 +198,8 @@ public class SchedulerThreadPools {
     if (!executor.awaitTermination(threadPoolsConfig.getGracefulShutdownTimeout() - (currentTimeMillis() - startMillis),
                                    MILLISECONDS)) {
       final List<Runnable> cancelledJobs = executor.shutdownNow();
-      logger.warn("'" + executorLabel + "' " + executor.toString() + " of " + this.toString()
-          + " did not shutdown gracefully after " + threadPoolsConfig.getGracefulShutdownTimeout() + " milliseconds.");
+      logger.warn("'" + executorLabel + "' " + executor.toString() + " did not shutdown gracefully after "
+          + threadPoolsConfig.getGracefulShutdownTimeout() + " milliseconds.");
 
       if (logger.isDebugEnabled()) {
         logger.debug("The jobs " + cancelledJobs + " were cancelled.");
@@ -307,7 +309,7 @@ public class SchedulerThreadPools {
 
   public String resolveCpuLightSchedulerName(SchedulerConfig config) {
     if (config.getSchedulerName() == null) {
-      return resolveSchedulerCreationLocation(CPU_LIGHT_THREADS_NAME);
+      return resolveSchedulerCreationLocation(threadPoolsConfig.getThreadNamePrefix() + CPU_LIGHT_THREADS_NAME);
     } else {
       return config.getSchedulerName();
     }
@@ -315,7 +317,7 @@ public class SchedulerThreadPools {
 
   public String resolveIoSchedulerName(SchedulerConfig config) {
     if (config.getSchedulerName() == null) {
-      return resolveSchedulerCreationLocation(IO_THREADS_NAME);
+      return resolveSchedulerCreationLocation(threadPoolsConfig.getThreadNamePrefix() + IO_THREADS_NAME);
     } else {
       return config.getSchedulerName();
     }
@@ -323,7 +325,7 @@ public class SchedulerThreadPools {
 
   public String resolveComputationSchedulerName(SchedulerConfig config) {
     if (config.getSchedulerName() == null) {
-      return resolveSchedulerCreationLocation(COMPUTATION_THREADS_NAME);
+      return resolveSchedulerCreationLocation(threadPoolsConfig.getThreadNamePrefix() + COMPUTATION_THREADS_NAME);
     } else {
       return config.getSchedulerName();
     }
@@ -331,7 +333,7 @@ public class SchedulerThreadPools {
 
   public String resolveCustomSchedulerName(SchedulerConfig config) {
     if (config.getSchedulerName() == null) {
-      return resolveSchedulerCreationLocation(CUSTOM_THREADS_NAME);
+      return resolveSchedulerCreationLocation(threadPoolsConfig.getThreadNamePrefix() + CUSTOM_THREADS_NAME);
     } else {
       return config.getSchedulerName();
     }

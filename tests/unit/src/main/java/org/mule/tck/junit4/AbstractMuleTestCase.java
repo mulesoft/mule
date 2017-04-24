@@ -6,23 +6,25 @@
  */
 package org.mule.tck.junit4;
 
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static java.lang.Thread.getAllStackTraces;
+import static java.util.Collections.sort;
 import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.util.StringMessageUtils.getBoilerPlate;
+import static org.mule.runtime.core.util.SystemUtils.parsePropertyDefinitions;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.SystemUtils;
 import org.mule.tck.junit4.rule.WarningTimeout;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +64,7 @@ public abstract class AbstractMuleTestCase {
   static {
     String muleOpts = SystemUtils.getenv("MULE_TEST_OPTS");
     if (StringUtils.isNotBlank(muleOpts)) {
-      Map<String, String> parsedOpts = SystemUtils.parsePropertyDefinitions(muleOpts);
+      Map<String, String> parsedOpts = parsePropertyDefinitions(muleOpts);
       String optVerbose = parsedOpts.get("mule.verbose");
       verbose = Boolean.valueOf(optVerbose);
     } else {
@@ -181,7 +183,7 @@ public abstract class AbstractMuleTestCase {
 
   private void printTestHeader() {
     if (verbose) {
-      System.out.println(StringMessageUtils.getBoilerPlate(getTestHeader(), '=', 80));
+      System.out.println(getBoilerPlate(getTestHeader(), '=', 80));
     }
   }
 
@@ -223,12 +225,12 @@ public abstract class AbstractMuleTestCase {
 
   protected static List<String> collectThreadNames() {
     List<String> threadNames = new ArrayList<>();
-    for (Thread t : Thread.getAllStackTraces().keySet()) {
+    for (Thread t : getAllStackTraces().keySet()) {
       if (t.isAlive()) {
         threadNames.add(t.getName() + " - " + t.getId());
       }
     }
-    Collections.sort(threadNames);
+    sort(threadNames);
     return threadNames;
 
   }
@@ -294,17 +296,17 @@ public abstract class AbstractMuleTestCase {
     int filteredThreads = 0;
     StringBuilder builder = new StringBuilder();
     for (String threadName : currentThreads) {
-      if (!nameIn(threadName, "SchedulerService", "Finalizer", "Monitor Ctrl-Break", "Reference Handler", "Signal Dispatcher",
+      if (!nameIn(threadName, "[MuleRuntime]", "Finalizer", "Monitor Ctrl-Break", "Reference Handler", "Signal Dispatcher",
                   "main")) {
         builder.append("\n-> ").append(threadName);
         filteredThreads++;
       }
     }
     if (filteredThreads > 0) {
-      logThreadsResult(String.format("Hung threads count: %d. Test case: %s. Thread names:%s", filteredThreads, testCaseName,
-                                     builder.toString()));
+      logThreadsResult(format("Hung threads count: %d. Test case: %s. Thread names:%s", filteredThreads, testCaseName,
+                              builder.toString()));
     } else {
-      logThreadsResult(String.format("No hung threads. Test case: %s", testCaseName));
+      logThreadsResult(format("No hung threads. Test case: %s", testCaseName));
     }
   }
 
@@ -323,7 +325,7 @@ public abstract class AbstractMuleTestCase {
   private static final transient String THREAD_RESULT_LINE = StringUtils.repeat('-', 80);
 
   private static void logThreadsResult(String result) {
-    LOGGER.warn(String.format("\n%s\n%s\n%s\n", THREAD_RESULT_LINE, result, THREAD_RESULT_LINE));
+    LOGGER.warn(format("\n%s\n%s\n%s\n", THREAD_RESULT_LINE, result, THREAD_RESULT_LINE));
   }
 
 }

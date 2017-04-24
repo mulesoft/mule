@@ -115,7 +115,6 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-api-persistence</artifactId>
-            <version>${muleExtensionsApiVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
