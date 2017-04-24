@@ -12,8 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mule.module.pgp.i18n.PGPMessages.noPublicKeyForPrinciple;
+import static org.mule.module.pgp.i18n.PGPMessages.noPublicKeyForPrincipal;
 import static org.mule.module.pgp.i18n.PGPMessages.noSecretPassPhrase;
 import org.mule.api.security.CredentialsAccessor;
 import org.mule.api.security.CryptoFailureException;
@@ -113,7 +112,7 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
         }
         catch (CryptoFailureException cryptoFailureException)
         {
-            assertThat(cryptoFailureException.getMessage(), containsString(noPublicKeyForPrinciple(credentialAccessor.getCredentials(), keyManager.getAvailablePrincipals()).getMessage()));
+            assertThat(cryptoFailureException.getMessage(), containsString(noPublicKeyForPrincipal(credentialAccessor.getCredentials(), keyManager.getAvailablePrincipals()).getMessage()));
         }
     }
 

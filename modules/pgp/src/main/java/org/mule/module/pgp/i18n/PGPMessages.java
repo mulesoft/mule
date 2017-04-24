@@ -50,7 +50,7 @@ public class PGPMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 7, availableKeys);
     }
 
-    public static Message noPublicKeyForPrinciple(String principalId, String availablePrincipals)
+    public static Message noPublicKeyForPrincipal(String principalId, String availablePrincipals)
     {
         return factory.createMessage(BUNDLE_PATH, 8, principalId, availablePrincipals);
     }
