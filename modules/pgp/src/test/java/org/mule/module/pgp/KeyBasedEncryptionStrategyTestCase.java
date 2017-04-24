@@ -6,11 +6,20 @@
  */
 package org.mule.module.pgp;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mule.module.pgp.i18n.PGPMessages.noPublicKeyForPrincipal;
+import static org.mule.module.pgp.i18n.PGPMessages.noSecretPassPhrase;
+import org.mule.api.security.CredentialsAccessor;
+import org.mule.api.security.CryptoFailureException;
 import org.mule.util.IOUtils;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URL;
 
 import org.junit.Test;
@@ -89,4 +98,42 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
         kbStrategy.initialise();
         String result = new String(kbStrategy.encrypt(msg.getBytes(), cryptInfo));
     }
+
+    @Test
+    public void testInvalidPrincipal()
+    {
+        InputStream inputStream = mock(InputStream.class);
+        FakeCredentialAccessor credentialAccessor = new FakeCredentialAccessor("Invalid Principle <invalidPrinciple@mule.com>");
+        kbStrategy.setCredentialsAccessor(credentialAccessor);
+        try
+        {
+            kbStrategy.encrypt(inputStream, null);
+            fail("CryptoFailureException should be triggered because principal is wrong");
+        }
+        catch (CryptoFailureException cryptoFailureException)
+        {
+            assertThat(cryptoFailureException.getMessage(), containsString(noPublicKeyForPrincipal(credentialAccessor.getCredentials(), keyManager.getAvailablePrincipals()).getMessage()));
+        }
+    }
+
+    @Test
+    public void testNoDefinedSecretPassPhrase() throws Exception
+    {
+        InputStream inputStream = mock(InputStream.class);
+        PGPCryptInfo pgpCryptInfo = mock(PGPCryptInfo.class);
+        PGPKeyRing keyManager = mock (PGPKeyRing.class);
+        CredentialsAccessor credentialsAccessor = mock(CredentialsAccessor.class);
+        kbStrategy.setCredentialsAccessor(credentialsAccessor);
+        kbStrategy.setKeyManager(keyManager);
+        try
+        {
+            kbStrategy.decrypt(inputStream, pgpCryptInfo);
+            fail("CryptoFailureException should be triggered because secretPassPhrase is not defined");
+        }
+        catch (CryptoFailureException cryptoFailureException)
+        {
+            assertThat(cryptoFailureException.getMessage(), containsString(noSecretPassPhrase().getMessage()));
+        }
+    }
+
 }

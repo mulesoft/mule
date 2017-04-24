@@ -6,11 +6,14 @@
  */
 package org.mule.module.pgp;
 
+import static org.mule.module.pgp.i18n.PGPMessages.noSecretPassPhrase;
+import static org.mule.module.pgp.util.ValidatorUtil.validateNotNull;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.CredentialsAccessor;
 import org.mule.api.security.CryptoFailureException;
+import org.mule.module.pgp.exception.MissingPGPKeyException;
 import org.mule.module.pgp.i18n.PGPMessages;
 import org.mule.security.AbstractNamedEncryptionStrategy;
 import org.mule.util.SecurityUtils;
@@ -84,8 +87,15 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
             PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
             PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
             PGPSecretKey secretKey = this.keyManager.getSecretKey();
+            String secretPassPhrase = this.keyManager.getSecretPassphrase();
+
+            if (secretPassPhrase == null)
+            {
+                throw new CryptoFailureException(noSecretPassPhrase(), this);
+            }
+
             StreamTransformer transformer = new DecryptStreamTransformer(data, publicKey,
-                                                                         secretKey, this.keyManager.getSecretPassphrase(), provider);
+                                                                         secretKey, secretPassPhrase, provider);
             return new LazyTransformedInputStream(new TransformContinuouslyPolicy(), transformer);
         }
         catch (Exception e)
@@ -94,12 +104,14 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         }
     }
 
-    private PGPCryptInfo safeGetCryptInfo(Object cryptInfo)
+    private PGPCryptInfo safeGetCryptInfo(Object cryptInfo) throws MissingPGPKeyException
     {
         if (cryptInfo == null)
         {
             MuleEvent event = RequestContext.getEvent();
-            PGPPublicKey publicKey = keyManager.getPublicKey((String) this.getCredentialsAccessor().getCredentials(event));
+            String principalId = (String) this.getCredentialsAccessor().getCredentials(event);
+            PGPPublicKey publicKey = keyManager.getPublicKey(principalId);
+            validateNotNull(publicKey, PGPMessages.noPublicKeyForPrincipal(principalId, this.keyManager.getAvailablePrincipals()));
             this.checkKeyExpirity(publicKey);
             return new PGPCryptInfo(publicKey, false);
         }
