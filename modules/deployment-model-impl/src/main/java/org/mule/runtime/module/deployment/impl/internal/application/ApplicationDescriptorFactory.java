@@ -28,7 +28,6 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.container.api.MuleFoldersUtil;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -46,7 +45,6 @@ import org.mule.runtime.module.artifact.util.JarExplorer;
 import org.mule.runtime.module.artifact.util.JarInfo;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.LoaderNotFoundException;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
 import com.google.common.collect.ImmutableList;
@@ -89,12 +87,13 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
 
 
   public ApplicationDescriptorFactory(ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
-                                      ArtifactPluginRepository applicationPluginRepository) {
+                                      ArtifactPluginRepository applicationPluginRepository,
+                                      DescriptorLoaderRepository descriptorLoaderRepository) {
     checkArgument(artifactPluginDescriptorLoader != null, "ApplicationPluginDescriptorFactory cannot be null");
     checkArgument(applicationPluginRepository != null, "ApplicationPluginRepository cannot be null");
     this.applicationPluginRepository = applicationPluginRepository;
     this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
-    descriptorLoaderRepository = new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry());
+    this.descriptorLoaderRepository = descriptorLoaderRepository;
   }
 
   public ApplicationDescriptor create(File artifactFolder) throws ArtifactDescriptorCreateException {
@@ -130,7 +129,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     }
 
     try {
-      return bundleDescriptorLoader.load(appFolder, muleApplicationModel.getBundleDescriptorLoader().getAttributes());
+      return bundleDescriptorLoader.load(appFolder, muleApplicationModel.getBundleDescriptorLoader().getAttributes(), APP);
     } catch (InvalidDescriptorLoaderException e) {
       throw new ArtifactDescriptorCreateException(e);
     }
@@ -215,7 +214,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
 
     final ClassLoaderModel classLoaderModel;
     try {
-      classLoaderModel = classLoaderModelLoader.load(applicationFolder, classLoaderModelLoaderDescriptor.getAttributes());
+      classLoaderModel = classLoaderModelLoader.load(applicationFolder, classLoaderModelLoaderDescriptor.getAttributes(), APP);
     } catch (InvalidDescriptorLoaderException e) {
       throw new ArtifactDescriptorCreateException(e);
     }

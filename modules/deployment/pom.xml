@@ -40,6 +40,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-maven-client-impl</artifactId>
+            <version>${muleMavenClientImpl}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <!--for the extensions configuration builder-->
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>

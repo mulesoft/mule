@@ -1,0 +1,40 @@
+{
+  "title" : "Mule Config",
+  "type" : "object",
+  "properties" : {
+    "maven" : {
+      "type" : "object",
+      "properties" : {
+        "repositories" : {
+          "description" : "Map of maven repositories to access for fetching maven artifacts. If not defined and no settings.xml provided with remote repositories, then the mule runtime will work in offline mode",
+          "type" : "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "description": "URL to access the maven repository",
+                "type": "string"
+              },
+              "username": {
+                "description": "Username to access the repository",
+                "type": "string"
+              },
+              "password": {
+                "description": "Password to access the repository",
+                "type": "string"
+              }
+            },
+            "required" : ["url"]
+          }
+        },
+        "mavenSettingsLocation" : {
+          "description" : "Location of the maven settings.xml file. It can be a classpath reference in which case the file can be placed in the MULE_HOME/conf folder or an absolute path to the file. If defined, the repositories and proxies configured on it will be used by the runtime",
+          "type" : "string"
+        },
+        "repositoryLocation" : {
+          "description" : "Repository location for the mule runtime to use. If not provided it will be the MULE_HOME/repository folder"
+        }
+      }
+    }
+  }
+}
