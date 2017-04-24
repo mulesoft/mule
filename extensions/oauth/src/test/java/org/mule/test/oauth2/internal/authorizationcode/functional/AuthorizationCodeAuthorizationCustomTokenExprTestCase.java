@@ -25,11 +25,8 @@ import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Description;
 
-/**
- * This test checks that we can extract tokens from a text response (when the server omits a mime-type or uses text/plain),
- * as the default now is to read from a JSON.
- */
 public class AuthorizationCodeAuthorizationCustomTokenExprTestCase extends AbstractAuthorizationCodeBasicTestCase {
 
   @Rule
@@ -41,6 +38,7 @@ public class AuthorizationCodeAuthorizationCustomTokenExprTestCase extends Abstr
   }
 
   @Test
+  @Description("Can extract tokens from a text response instead of JSON (default). This happens when the server omits the mime-type or sets it to text/plain.")
   public void callToTokenUrlSuccess() throws Exception {
     configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(ACCESS_TOKEN, REFRESH_TOKEN);
     Get(getRedirectUrlWithOnCompleteUrlAndCodeQueryParams()).connectTimeout(REQUEST_TIMEOUT).socketTimeout(REQUEST_TIMEOUT)
