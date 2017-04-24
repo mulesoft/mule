@@ -89,6 +89,7 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
       return mapBuilder.build();
     } else {
+      httpListenerResponseBuilder.setBody(message.getPayload());
       return mapBuilder.build();
     }
   }
