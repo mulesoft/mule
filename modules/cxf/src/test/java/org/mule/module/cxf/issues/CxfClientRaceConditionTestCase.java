@@ -79,7 +79,7 @@ public class CxfClientRaceConditionTestCase extends FunctionalTestCase
     @Test
     public void testRaceConditionHTTP() throws Exception
     {
-        cxfHTTPTest(HTTP, HTTP_HOST, port1.getNumber(), HTTP_METHOD, HTTP_REQUEST_OPTIONS);
+        cxfHTTPTest(HTTP, HTTP_HOST, port1.getNumber(), HTTP_METHOD, HTTP_REQUEST_OPTIONS, EXPECTED_HTTP_MESSAGE);
     }
 
     @Test
@@ -105,7 +105,6 @@ public class CxfClientRaceConditionTestCase extends FunctionalTestCase
         MessageProducer producer = producerSession.createProducer(producerDestination);
         producer.setDeliveryMode(NON_PERSISTENT);
 
-        long errorCount = 0L;
         for (int i = 0; i < totalMessages; i++)
         {
             BytesMessage messageSend = producerSession.createBytesMessage();
@@ -113,16 +112,10 @@ public class CxfClientRaceConditionTestCase extends FunctionalTestCase
             Message messageReceived = consumer.receive(5000);
             ActiveMQBytesMessage bytesMessage = (ActiveMQBytesMessage) messageReceived;
             String messageBody = new String(bytesMessage.getContent().getData());
-            String expected = expectedMessage;
             String messageTrimmed = messageBody.trim();
 
-            if (expected.length() != messageTrimmed.length())
-            {
-                errorCount++;
-            }
+            assertThat(messageTrimmed, equalTo(expectedMessage));
         }
-
-        assertThat(errorCount, equalTo(0L));
 
         producer.close();
         producerSession.close();
@@ -133,10 +126,8 @@ public class CxfClientRaceConditionTestCase extends FunctionalTestCase
         consumerConnection.close();
     }
 
-    private void cxfHTTPTest(String protocol, String host, Integer port, String method, HttpRequestOptions options) throws MuleException
+    private void cxfHTTPTest(String protocol, String host, Integer port, String method, HttpRequestOptions options, String expectedMessage) throws MuleException
     {
-        long errorCount = 0;
-
         for (int i = 0; i < totalMessages; i++)
         {
 
@@ -144,13 +135,8 @@ public class CxfClientRaceConditionTestCase extends FunctionalTestCase
             MuleClient client = muleContext.getClient();
             MuleMessage message = client.send(protocol + "://" + host + ":" + port + "/" + method, request, options);
             String response = IOUtils.toString((PipedInputStream) message.getPayload());
-            if (EXPECTED_HTTP_MESSAGE.length() != response.length())
-            {
-                errorCount++;
-            }
+            assertThat(response, equalTo(expectedMessage));
         }
-
-        assertThat(errorCount, equalTo(0L));
     }
 
     @Override
