@@ -29,7 +29,13 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
   private final List<MuleContext> disposedContexts = new ArrayList<>();
   private MuleContext domainContext;
 
-  protected abstract String getDomainConfig();
+  protected String getDomainConfig() {
+    return null;
+  }
+
+  protected String[] getDomainConfigs() {
+    return new String[] {getDomainConfig()};
+  }
 
   public synchronized void disposeMuleContext(final MuleContext muleContext) {
     disposedContexts.add(muleContext);
@@ -59,7 +65,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
           builders.add(getBuilder());
         }
       }
-    }.setDomainConfig(getDomainConfig());
+    }.setDomainConfig(getDomainConfigs());
 
     domainContext = domainContextBuilder.build();
     ApplicationConfig[] applicationConfigs = getConfigResources();

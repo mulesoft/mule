@@ -6,23 +6,24 @@
  */
 package org.mule.test.config.spring.parsers;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.containsString;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 /**
  * A stripped-down version of FunctionalTestCase that allows us to test the parsing of a bad configuration.
  */
 public abstract class AbstractBadConfigTestCase extends MuleArtifactFunctionalTestCase {
 
-  protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+  @Rule
+  public ExpectedException expected = ExpectedException.none();
 
   @Override
   protected MuleContext createMuleContext() throws Exception {
@@ -30,13 +31,9 @@ public abstract class AbstractBadConfigTestCase extends MuleArtifactFunctionalTe
   }
 
   public void assertErrorContains(String phrase) throws Exception {
-    try {
-      parseConfig();
-      fail("expected error");
-    } catch (Exception e) {
-      logger.debug("Caught " + e);
-      assertTrue("Missing phrase '" + phrase + "' in '" + e.toString() + "'", e.toString().indexOf(phrase) > -1);
-    }
+    expected.expectMessage(containsString(phrase));
+
+    parseConfig();
   }
 
   protected void parseConfig() throws Exception {

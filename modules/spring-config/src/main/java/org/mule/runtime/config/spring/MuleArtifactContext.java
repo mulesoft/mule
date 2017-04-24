@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.join;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
@@ -205,6 +206,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   private void determineIfOnlyNewParsingMechanismCanBeUsed() {
     if (applicationModel.hasSpringConfig()) {
+      componentNotSupportedByNewParsers.add(buildFromStringRepresentation("spring:springConfig"));
       useNewParsingMechanism = false;
       return;
     }
@@ -325,7 +327,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     } else {
       // TODO MULE-9638 - Remove log line
       LOGGER
-          .info("Using mixed mechanism to load configuration since there are some components that were not yet migrated to the new mechanism: "
+          .warn("Using mixed mechanism to load configuration since there are some components that were not yet migrated to the new mechanism: "
               + getOldParsingMechanismComponentIdentifiers());
       beanDefinitionReader.loadBeanDefinitions(getConfigResources());
     }
@@ -370,7 +372,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   }
 
   protected String getOldParsingMechanismComponentIdentifiers() {
-    return join(componentNotSupportedByNewParsers.toArray(), ",");
+    return join(componentNotSupportedByNewParsers.stream().map(comp -> comp.getNamespace() + ":" + comp.getName()).toArray(),
+                ",");
   }
 
   @Override

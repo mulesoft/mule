@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
@@ -13,21 +14,26 @@ import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.config.spring.MuleArtifactContext.INNER_BEAN_PREFIX;
 import static org.mule.runtime.config.spring.MuleArtifactContext.postProcessBeanDefinition;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FLOW_REF_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_EE_DOMAIN_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.POLICY_ROOT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROPERTIES_ELEMENT;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FLOW_REF_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.util.XMLUtils.isLocalName;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
@@ -153,7 +159,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
         if (shouldUseNewMechanism(element)) {
           ComponentModel parentComponentModel =
-              applicationModelSupplier.get().findComponentDefinitionModel((Element) element.getParentNode());
+              applicationModelSupplier.get().findComponentDefinitionModel(element.getParentNode());
           beanDefinitionFactory.resolveComponentRecursively(parentComponentModel, componentModel,
                                                             getReaderContext().getRegistry(), (resolvedComponent, registry) -> {
                                                               if (resolvedComponent.isRoot()) {
@@ -191,11 +197,17 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
         } else {
           if (!element.getLocalName().equals(MULE_ROOT_ELEMENT) && !element.getLocalName().equals(MULE_DOMAIN_ROOT_ELEMENT)
               && !element.getLocalName().equals(POLICY_ROOT_ELEMENT)) {
+            if (handler == null) {
+              throw new NullPointerException(format("No namespace handler found for '%s' for Mule 3 parsing mechanism; OR "
+                  + "No componentModel found for element '%s' for Mule 4 parsing mechanism",
+                                                    element.getNamespaceURI(), element.getNodeName()));
+            }
+
             ParserContext parserContext = new ParserContext(getReaderContext(), this, parent);
             finalChild = handler.parse(element, parserContext);
             currentDefinition = finalChild;
             ComponentModel parentComponentModel =
-                applicationModelSupplier.get().findComponentDefinitionModel((Element) element.getParentNode());
+                applicationModelSupplier.get().findComponentDefinitionModel(element.getParentNode());
             if (parentComponentModel != null) {
               finalChild =
                   adaptFilterBeanDefinitions(parentComponentModel,
@@ -364,15 +376,27 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
 
   private boolean isMuleRootElement(ComponentIdentifier componentIdentifier) {
     return MULE_IDENTIFIER.equals(componentIdentifier) || MULE_DOMAIN_IDENTIFIER.equals(componentIdentifier) ||
-        POLICY_IDENTIFIER.equals(componentIdentifier);
+        MULE_EE_DOMAIN_IDENTIFIER.equals(componentIdentifier) || POLICY_IDENTIFIER.equals(componentIdentifier);
   }
 
   private String getNamespace(Node parentNode) {
     if (parentNode.getPrefix() == null) {
-      return parentNode.getNamespaceURI().equals(CORE_NAMESPACE) ? CORE_PREFIX
-          : POLICY_ROOT_ELEMENT;
+      if (parentNode.getNamespaceURI().equals(CORE_NAMESPACE)) {
+        return CORE_PREFIX;
+      } else if (parentNode.getNamespaceURI().equals(DOMAIN_NAMESPACE)) {
+        return DOMAIN_PREFIX;
+      } else if (parentNode.getNamespaceURI().equals(EE_DOMAIN_NAMESPACE)) {
+        return EE_DOMAIN_PREFIX;
+      } else {
+        return POLICY_ROOT_ELEMENT;
+      }
     } else {
-      return parentNode.getPrefix();
+      final ComponentModel componentDefinitionModel = applicationModelSupplier.get().findComponentDefinitionModel(parentNode);
+      if (componentDefinitionModel != null) {
+        return componentDefinitionModel.getIdentifier().getNamespace();
+      } else {
+        return parentNode.getPrefix();
+      }
     }
   }
 
