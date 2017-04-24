@@ -57,17 +57,27 @@ public class DelegatingOutputStream extends OutputStream
 
     public void write(byte[] b, int off, int len) throws IOException
     {
-        outputStream.write(b, off, len);
+        synchronized (outputStream)
+        {
+            outputStream.write(b, off, len);
+        }
+
     }
 
     public void write(byte[] b) throws IOException
     {
-        outputStream.write(b);
+        synchronized (outputStream)
+        {
+            outputStream.write(b);
+        }
     }
 
     public void write(int b) throws IOException
     {
-        outputStream.write(b);
+        synchronized (outputStream)
+        {
+            outputStream.write(b);
+        }
     }
     
 }
