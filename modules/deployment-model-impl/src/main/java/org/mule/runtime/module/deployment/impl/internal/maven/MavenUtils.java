@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
-import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.util.FileUtils.createFile;
 import static org.mule.runtime.core.util.JarUtils.getUrlWithinJar;
@@ -19,7 +18,6 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_POM;
 import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
-import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
@@ -47,18 +45,13 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.slf4j.Logger;
 
 /**
  * Provides utility methods to wrk with Maven
  */
 public class MavenUtils {
 
-  private static final Logger LOGGER = getLogger(MavenUtils.class);
-  private static final String USER_HOME = "user.home";
-  private static final String M2_REPO = "/.m2/repository";
   private static final String SHARED_LIBRARIES_ELEMENT = "sharedLibraries";
-  private static String userHome = getProperty(USER_HOME);
 
   /**
    * Returns the {@link Model} from a given artifact folder
@@ -192,26 +185,6 @@ public class MavenUtils {
                                                          artifactFolder.getName()));
     }
     return mulePluginPom;
-  }
-
-  // TODO - MULE-11910 - Improve aether maven repository configuration
-
-  /**
-   * @return a file pointing to the user local maven repository.
-   */
-  public static File getMavenLocalRepository() {
-    String localRepositoryProperty = getProperty("localRepository");
-    if (localRepositoryProperty == null) {
-      localRepositoryProperty = userHome + M2_REPO;
-      LOGGER.debug("System property 'localRepository' not set, using Maven default location: $USER_HOME{}", M2_REPO);
-    }
-
-    LOGGER.debug("Using Maven localRepository: '{}'", localRepositoryProperty);
-    File mavenLocalRepositoryLocation = new File(localRepositoryProperty);
-    if (!mavenLocalRepositoryLocation.exists()) {
-      throw new IllegalArgumentException("Maven repository location couldn't be found, please check your configuration");
-    }
-    return mavenLocalRepositoryLocation;
   }
 
   /**

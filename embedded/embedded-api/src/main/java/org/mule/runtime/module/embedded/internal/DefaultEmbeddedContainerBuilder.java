@@ -8,27 +8,38 @@ package org.mule.runtime.module.embedded.internal;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.module.embedded.internal.MavenUtils.loadUrls;
+import static java.util.stream.Collectors.toList;
+import static org.codehaus.plexus.util.FileUtils.fileWrite;
+import static org.mule.maven.client.api.BundleScope.PROVIDED;
+import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.module.embedded.internal.Serializer.serialize;
+import org.mule.maven.client.api.BundleDependency;
+import org.mule.maven.client.api.BundleDescriptor;
+import org.mule.maven.client.api.MavenClient;
+import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.maven.client.api.MavenConfiguration;
 import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
 import org.mule.runtime.module.embedded.api.ContainerInfo;
 import org.mule.runtime.module.embedded.api.EmbeddedContainer;
 import org.mule.runtime.module.embedded.internal.classloading.JdkOnlyClassLoader;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
 public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.EmbeddedContainerBuilder {
 
@@ -36,6 +47,7 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
   private URL containerBaseFolder;
   private ApplicationConfiguration applicationConfigruation;
   private String log4jConfigurationFile;
+  private MavenConfiguration mavenConfiguration;
 
   @Override
   public EmbeddedContainer.EmbeddedContainerBuilder withMuleVersion(String muleVersion) {
@@ -62,24 +74,37 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
   }
 
   @Override
+  public EmbeddedContainer.EmbeddedContainerBuilder withMavenConfiguration(MavenConfiguration mavenConfiguration) {
+    this.mavenConfiguration = mavenConfiguration;
+    return this;
+  }
+
+  @Override
   public EmbeddedContainer build() {
     checkState(muleVersion != null, "muleVersion cannot be null");
     checkState(containerBaseFolder != null, "containerBaseFolder cannot be null");
     checkState(applicationConfigruation != null, "application cannot be null");
+    checkState(mavenConfiguration != null, "mavenConfiguration cannot be null");
     try {
-      Repository repository = new Repository();
-
       JdkOnlyClassLoader jdkOnlyClassLoader = new JdkOnlyClassLoader();
 
-      MavenContainerClassLoaderFactory classLoaderFactory = new MavenContainerClassLoaderFactory(repository);
-      ClassLoader containerModulesClassLoader = classLoaderFactory.create(muleVersion, jdkOnlyClassLoader);
+      MavenClientProvider mavenClientProvider = discoverProvider(getClass().getClassLoader());
+      MavenClient mavenClient = mavenClientProvider.createMavenClient(mavenConfiguration);
+
+      MavenContainerClassLoaderFactory classLoaderFactory = new MavenContainerClassLoaderFactory(mavenClient);
+      ClassLoader containerModulesClassLoader = classLoaderFactory.create(muleVersion, jdkOnlyClassLoader, containerBaseFolder);
 
       List<URL> services = classLoaderFactory.getServices(muleVersion);
       ContainerInfo containerInfo = new ContainerInfo(muleVersion, containerBaseFolder, services);
+
+      if (mavenConfiguration != null) {
+        persistMavenConfiguration(containerBaseFolder, mavenConfiguration);
+      }
+
       ofNullable(log4jConfigurationFile).ifPresent(containerInfo::setLog4jConfigurationFile);
 
       ClassLoader embeddedControllerBootstrapClassLoader =
-          createEmbeddedImplClassLoader(containerModulesClassLoader, repository, muleVersion);
+          createEmbeddedImplClassLoader(containerModulesClassLoader, mavenClient, muleVersion);
 
       try {
         Class<?> controllerClass =
@@ -137,21 +162,58 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
     }
   }
 
-  private static ClassLoader createEmbeddedImplClassLoader(ClassLoader parentClassLoader, Repository repository,
+  private void persistMavenConfiguration(URL containerBaseFolder, MavenConfiguration mavenConfiguration) throws IOException {
+    File configurationFolder = new File(containerBaseFolder.getFile(), "conf");
+    if (!configurationFolder.exists()) {
+      if (!configurationFolder.mkdirs()) {
+        throw new IllegalArgumentException("Could not create MULE_HOME/conf folder in: " + configurationFolder.getAbsolutePath());
+      }
+    }
+
+    JsonObject rootObject = new JsonObject();
+    JsonObject muleRuntimeConfigObject = new JsonObject();
+    rootObject.add("muleRuntimeConfig", muleRuntimeConfigObject);
+    JsonObject mavenObject = new JsonObject();
+    muleRuntimeConfigObject.add("maven", mavenObject);
+    if (!mavenConfiguration.getMavenRemoteRepositories().isEmpty()) {
+      JsonArray repositoriesElement = new JsonArray();
+      mavenObject.add("repositories", repositoriesElement);
+      mavenConfiguration.getMavenRemoteRepositories().forEach(mavenRepo -> {
+        JsonObject repoObject = new JsonObject();
+        repositoriesElement.add(repoObject);
+        repoObject.addProperty("id", mavenRepo.getId());
+        repoObject.addProperty("url", mavenRepo.getUrl().toString());
+        mavenRepo.getAuthentication().ifPresent(authentication -> {
+          repoObject.addProperty("username", authentication.getUsername());
+          repoObject.addProperty("password", authentication.getPassword());
+        });
+      });
+    }
+    mavenObject.addProperty("repositoryLocation", mavenConfiguration.getLocalMavenRepositoryLocation().getAbsolutePath());
+    String muleConfigContent = new Gson().toJson(rootObject);
+    fileWrite(new File(configurationFolder, "mule-config.json"), muleConfigContent);
+  }
+
+  private static ClassLoader createEmbeddedImplClassLoader(ClassLoader parentClassLoader, MavenClient mavenClient,
                                                            String muleVersion)
       throws ArtifactResolutionException, MalformedURLException {
-    ArtifactRequest embeddedImplArtifactRequest =
-        new ArtifactRequest()
-            .setArtifact(new DefaultArtifact("org.mule.runtime", "mule-module-embedded-impl", "jar", muleVersion));
-    ArtifactResult artifactResult = repository.getSystem().resolveArtifact(repository.getSession(), embeddedImplArtifactRequest);
 
-    PreorderNodeListGenerator preorderNodeListGenerator =
-        repository.assemblyDependenciesForArtifact(artifactResult.getArtifact(), artifact -> true);
-    List<URL> embeddedUrls = loadUrls(preorderNodeListGenerator);
-    embeddedUrls.addAll(embeddedUrls);
-    embeddedUrls.add(artifactResult.getArtifact().getFile().toURI().toURL());
+    BundleDescriptor embeddedControllerImplDescriptor = new BundleDescriptor.Builder().setGroupId("org.mule.runtime")
+        .setArtifactId("mule-module-embedded-impl").setVersion(muleVersion).setType("jar").build();
 
-    URLClassLoader urlClassLoader = new URLClassLoader(embeddedUrls.toArray(new URL[0]), parentClassLoader);
+    BundleDependency embeddedBundleImplDependency = mavenClient.resolveBundleDescriptor(embeddedControllerImplDescriptor);
+
+    List<BundleDependency> embeddedImplDependencies =
+        mavenClient.resolveBundleDescriptorDependencies(false, embeddedControllerImplDescriptor);
+
+    List<URL> embeddedUrls = embeddedImplDependencies.stream()
+        .filter(bundleDependency -> !bundleDependency.getScope().equals(PROVIDED))
+        .map(BundleDependency::getBundleUrl)
+        .collect(toList());
+    embeddedUrls = new ArrayList<>(embeddedUrls);
+    embeddedUrls.add(embeddedBundleImplDependency.getBundleUrl());
+
+    URLClassLoader urlClassLoader = new URLClassLoader(embeddedUrls.toArray(new URL[embeddedUrls.size()]), parentClassLoader);
     return urlClassLoader;
   }
 

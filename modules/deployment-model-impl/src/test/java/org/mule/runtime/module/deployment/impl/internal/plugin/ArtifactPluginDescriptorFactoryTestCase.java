@@ -24,6 +24,8 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.TYPE;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
+import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.maven.client.api.MavenConfiguration;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -63,6 +65,8 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
   private final ClassLoaderFilterFactory classLoaderFilterFactory = mock(ClassLoaderFilterFactory.class);
   private final DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
   private ArtifactPluginDescriptorFactory descriptorFactory = new ArtifactPluginDescriptorFactory(descriptorLoaderRepository);
+  private MavenClientProvider mavenClientProvider =
+      MavenClientProvider.discoverProvider(ArtifactPluginDescriptorFactoryTestCase.class.getClassLoader());
 
   @Before
   public void setUp() throws Exception {
@@ -70,7 +74,10 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
         .thenReturn(NULL_CLASSLOADER_FILTER);
 
     when(descriptorLoaderRepository.get(MAVEN, PLUGIN, ClassLoaderModelLoader.class))
-        .thenReturn(new PluginMavenClassLoaderModelLoader());
+        .thenReturn(new PluginMavenClassLoaderModelLoader(mavenClientProvider.createMavenClient(MavenConfiguration
+            .newMavenConfigurationBuilder().withLocalMavenRepositoryLocation(mavenClientProvider.getLocalRepositorySuppliers()
+                .environmentMavenRepositorySupplier().get())
+            .build()), mavenClientProvider.getLocalRepositorySuppliers()));
 
     when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, PLUGIN, ClassLoaderModelLoader.class))
         .thenReturn(new FileSystemPolicyClassLoaderModelLoader());

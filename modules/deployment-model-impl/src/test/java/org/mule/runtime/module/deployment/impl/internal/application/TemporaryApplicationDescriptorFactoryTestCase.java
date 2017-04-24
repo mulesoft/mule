@@ -14,8 +14,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.container.api.MuleFoldersUtil;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -50,7 +52,8 @@ public class TemporaryApplicationDescriptorFactoryTestCase extends AbstractMuleT
 
     this.temporaryApplicationDescriptorFactory = new TemporaryApplicationDescriptorFactory(
                                                                                            artifactPluginDescriptorLoader,
-                                                                                           applicationPluginRepository);
+                                                                                           applicationPluginRepository,
+                                                                                           new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()));
 
     this.rootArtifactFolder = temporaryFolder.newFolder();
 

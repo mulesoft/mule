@@ -1,0 +1,13 @@
+{
+  "muleRuntimeConfig" : {
+    "maven" : {
+      "repositories": {
+        "mavenCentral": {
+          "url": "https://repo.maven.apache.org/maven2/",
+          "username": "username",
+          "password": "password"
+        }
+      }
+    }
+  }
+}

@@ -110,7 +110,7 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     }
 
     try {
-      return bundleDescriptorLoader.load(pluginFolder, mulePluginModel.getBundleDescriptorLoader().getAttributes());
+      return bundleDescriptorLoader.load(pluginFolder, mulePluginModel.getBundleDescriptorLoader().getAttributes(), PLUGIN);
     } catch (InvalidDescriptorLoaderException e) {
       throw new ArtifactDescriptorCreateException(e);
     }
@@ -129,7 +129,7 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
 
     final ClassLoaderModel classLoaderModel;
     try {
-      classLoaderModel = classLoaderModelLoader.load(pluginJarFile, classLoaderModelLoaderDescriptor.getAttributes());
+      classLoaderModel = classLoaderModelLoader.load(pluginJarFile, classLoaderModelLoaderDescriptor.getAttributes(), PLUGIN);
     } catch (InvalidDescriptorLoaderException e) {
       throw new ArtifactDescriptorCreateException(e);
     }

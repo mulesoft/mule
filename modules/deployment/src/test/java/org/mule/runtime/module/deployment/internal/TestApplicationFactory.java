@@ -23,6 +23,7 @@ import org.mule.runtime.module.deployment.impl.internal.application.ApplicationD
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.TestApplicationWrapper;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
+import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
@@ -62,14 +63,15 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
                                                                     DomainManager domainManager,
                                                                     ServiceRepository serviceRepository,
                                                                     ExtensionModelLoaderRepository extensionModelLoaderRepository,
-                                                                    ModuleRepository moduleRepository) {
+                                                                    ModuleRepository moduleRepository,
+                                                                    DescriptorLoaderRepository descriptorLoaderRepository) {
     ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory =
         new ArtifactPluginDescriptorFactory();
     ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader =
         new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
     TestEmptyApplicationPluginRepository applicationPluginRepository = new TestEmptyApplicationPluginRepository();
     ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, applicationPluginRepository);
+        new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, applicationPluginRepository, descriptorLoaderRepository);
     final DefaultClassLoaderManager artifactClassLoaderManager = new DefaultClassLoaderManager();
     PluginDependenciesResolver pluginDependenciesResolver = new BundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
 
