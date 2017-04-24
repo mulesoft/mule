@@ -18,20 +18,21 @@ import static java.util.Optional.of;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.maven.client.api.MavenConfiguration.newMavenConfigurationBuilder;
+import static org.mule.maven.client.api.RemoteRepository.newRemoteRepositoryBuilder;
 import static org.mule.runtime.api.deployment.management.ComponentInitialStateManager.DISABLE_SCHEDULER_SOURCES_PROPERTY;
 import static org.mule.runtime.core.util.UUID.getUUID;
 import static org.mule.runtime.module.embedded.api.EmbeddedContainer.builder;
-import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EMBEDDED_API;
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EmbeddedApiStory.CONFIGURATION;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.maven.client.api.MavenConfiguration;
 import org.mule.runtime.module.embedded.api.Application;
 import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
 import org.mule.runtime.module.embedded.api.DeploymentConfiguration;
 import org.mule.runtime.module.embedded.api.EmbeddedContainer;
 import org.mule.tck.junit4.rule.FreePortFinder;
-import org.mule.tck.junit4.rule.SystemProperty;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -40,12 +41,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -59,14 +62,12 @@ public class EmbeddedContainerTestCase {
 
   private static final String LOGGING_FILE = "app.log";
 
+  @ClassRule
+  public static TemporaryFolder localRepositoryFolder = new TemporaryFolder();
   @Rule
   public TemporaryFolder containerFolder = new TemporaryFolder();
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
-  @Rule
-  public SystemProperty repositoriesSystemProperty =
-      new SystemProperty(MULE_REMOTE_REPOSITORIES_PROPERTY,
-                         "https://repository.mulesoft.org/nexus/content/repositories/public/");
 
   @Description("Embedded runs an application depending on a connector")
   @Test
@@ -97,7 +98,7 @@ public class EmbeddedContainerTestCase {
   }
 
   @Description("Embedded runs an application with scheduler not started by using the " + DISABLE_SCHEDULER_SOURCES_PROPERTY
-      + " property in the " + ApplicationDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE + " + file")
+      + " property in the mule-artifact.properties file")
   @Test
   public void applicationWithSchedulersStoppedByDefaultUsingApplicationProperties() throws Exception {
     HashMap<String, String> applicationProperties = new HashMap<>();
@@ -180,9 +181,24 @@ public class EmbeddedContainerTestCase {
                         getClasspathResourceAsUri(applicaitonFolder + File.separator + "pom.xml").toURL(),
                         getClasspathResourceAsUri(applicaitonFolder + File.separator + "mule-application.json").toURL());
 
+    File localRepositoryUrl = MavenClientProvider.discoverProvider(this.getClass().getClassLoader()).getLocalRepositorySuppliers()
+        .environmentMavenRepositorySupplier().get();
+    MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder();
+    if (localRepositoryUrl != null) {
+      mavenConfigurationBuilder.withRemoteRepository(newRemoteRepositoryBuilder()
+          .withUrl(localRepositoryUrl.toURI().toURL())
+          .withId("local-repo-remote").build());
+    }
+
     EmbeddedContainer embeddedContainer = builder()
         .withMuleVersion("4.0.0-SNAPSHOT")
         .withContainerBaseFolder(containerFolder.newFolder().toURI().toURL())
+        .withMavenConfiguration(mavenConfigurationBuilder
+            .withLocalMavenRepositoryLocation(localRepositoryFolder.getRoot())
+            .withRemoteRepository(newRemoteRepositoryBuilder().withId("mulesoft-public")
+                .withUrl(new URL("https://repository.mulesoft.org/nexus/content/repositories/public"))
+                .build())
+            .build())
         .withLog4jConfigurationFile(log4JConfigurationFileOptional
             .orElse(getClass().getClassLoader().getResource("log4j2-default.xml").getFile()))
         .withApplicationConfiguration(ApplicationConfiguration.builder()

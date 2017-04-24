@@ -35,12 +35,14 @@ import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
 import static org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.container.api.MuleFoldersUtil;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
@@ -97,7 +99,8 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
     final ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-                                         applicationPluginRepository);
+                                         applicationPluginRepository,
+                                         createDescriptorLoaderRepository());
 
     ApplicationDescriptor desc = applicationDescriptorFactory.create(getAppFolder(APP_NAME));
 
@@ -105,6 +108,10 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     String config2Path = new File(getAppConfigFolder(APP_NAME), "mule/config2.xml").getAbsolutePath();
     assertThat(desc.getAbsoluteResourcePaths().length, equalTo(2));
     assertThat(desc.getAbsoluteResourcePaths(), arrayContainingInAnyOrder(config1Path, config2Path));
+  }
+
+  private ServiceRegistryDescriptorLoaderRepository createDescriptorLoaderRepository() {
+    return new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry());
   }
 
   @Test
@@ -120,7 +127,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
     final ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(pluginDescriptorFactory),
-                                         applicationPluginRepository);
+                                         applicationPluginRepository, createDescriptorLoaderRepository());
     final ArtifactPluginDescriptor expectedPluginDescriptor1 = mock(ArtifactPluginDescriptor.class);
     when(expectedPluginDescriptor1.getName()).thenReturn("plugin1");
     when(expectedPluginDescriptor1.getClassLoaderModel()).thenReturn(NULL_CLASSLOADER_MODEL);
@@ -148,7 +155,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
     final ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-                                         applicationPluginRepository);
+                                         applicationPluginRepository, createDescriptorLoaderRepository());
     ApplicationDescriptor desc = applicationDescriptorFactory.create(getAppFolder(APP_NAME));
 
     assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
@@ -170,7 +177,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
     final ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-                                         applicationPluginRepository);
+                                         applicationPluginRepository, createDescriptorLoaderRepository());
     ApplicationDescriptor desc = applicationDescriptorFactory.create(getAppFolder(APP_NAME));
 
     assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
@@ -330,7 +337,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
   private ApplicationDescriptor createApplicationDescriptor(String appPath) {
     final ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-                                         applicationPluginRepository);
+                                         applicationPluginRepository, createDescriptorLoaderRepository());
 
     File applicationFolder = getApplicationFolder(appPath);
 

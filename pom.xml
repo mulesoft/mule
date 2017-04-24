@@ -162,12 +162,14 @@
         <cxfVersion>2.7.18</cxfVersion>
         <derbyVersion>10.11.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
+        <everitJsonSchemaVersion>1.5.1</everitJsonSchemaVersion>
         <geronimoSpecsJ2eeVersion>2.0.0</geronimoSpecsJ2eeVersion>
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <greenmailVersion>1.5.0</greenmailVersion>
         <grizzlyVersion>2.3.29</grizzlyVersion>
         <groovyVersion>2.4.4</groovyVersion>
+        <gsonVersion>2.5</gsonVersion>
         <guavaVersion>18.0</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <jacksonVersion>1.9.11</jacksonVersion>
@@ -194,6 +196,8 @@
         <muleExtensionsApiVersion>1.0.0-SNAPSHOT</muleExtensionsApiVersion>
         <muleExtensionsSoapApiVersion>1.0.0-SNAPSHOT</muleExtensionsSoapApiVersion>
         <muleHttpPolicyApiVersion>1.0.0-SNAPSHOT</muleHttpPolicyApiVersion>
+        <muleMavenClientApi>1.0.0-SNAPSHOT</muleMavenClientApi>
+        <muleMavenClientImpl>1.0.0-SNAPSHOT</muleMavenClientImpl>
         <mulePolicyApiVersion>1.0.0-SNAPSHOT</mulePolicyApiVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <muleApiVersion>1.0.0-SNAPSHOT</muleApiVersion>
@@ -204,6 +208,7 @@
         <!-- TODO MULE-10771 -->
         <projectReactorVersion>3.0.5.RELEASE</projectReactorVersion>
         <reflectionsVersion>0.9.10</reflectionsVersion>
+        <typesafeConfigVersion>1.3.1</typesafeConfigVersion>
         <quartzVersion>2.2.3</quartzVersion>
         <rhinoVersion>1.7R4</rhinoVersion>
         <rhinoJsr223Version>1.1</rhinoJsr223Version>

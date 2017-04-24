@@ -40,6 +40,8 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.maven.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Controller class for the runtime. It spin ups a new container instance using a temporary folder and dynamically loading the
@@ -51,6 +53,7 @@ import org.apache.maven.model.Model;
  */
 public class EmbeddedController {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedController.class);
   private ApplicationConfiguration applicationConfiguration;
   private ContainerInfo containerInfo;
   private Application application;
@@ -166,7 +169,18 @@ public class EmbeddedController {
   public void stop() {
     executeWithinContainerClassLoader(() -> {
       deleteTree(new File(containerInfo.getContainerBaseFolder().getPath()));
-      application.stop();
+      try {
+        application.stop();
+      } catch (Exception e) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("failure stopping application", e);
+        }
+      }
+      try {
+        application.dispose();
+      } catch (Exception e) {
+        LOGGER.debug("failure disposing application", e);
+      }
     });
   }
 
