@@ -10,7 +10,7 @@ package org.mule.runtime.module.artifact.descriptor;
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
+import static java.util.Optional.of;
 
 import java.util.Optional;
 
@@ -152,11 +152,13 @@ public class BundleDescriptor {
     /**
      * Sets the classifier of the bundle.
      *
-     * @param classifier classifier of the bundle. Can by null
+     * @param classifier classifier of the bundle. Cannot be empty
      * @return the builder
      */
     public BundleDescriptor.Builder setClassifier(String classifier) {
-      bundleDependency.classifier = ofNullable(classifier);
+      validateIsNotEmpty(classifier, CLASSIFIER);
+      bundleDependency.classifier = of(classifier);
+
       return this;
     }
 

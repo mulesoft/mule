@@ -36,18 +36,15 @@ public class FileSystemPolicyClassLoaderModelLoader implements ClassLoaderModelL
   }
 
   /**
-   * Given a policy template's location it will build a {@link ClassLoaderModel} taking in account jars located inside the
-   * {@value LIB_DIR} folder and resources located inside the {@value CLASSES_DIR} folder.
+   * Given a policy template's location it will build a {@link ClassLoaderModel} taking in account jars located inside the {@value LIB_DIR}
+   * folder and resources located inside the {@value CLASSES_DIR} folder.
    *
    * @param artifactFolder {@link File} where the current plugin to work with.
    * @param attributes collection of attributes describing the loader. Non null.
-   * @param artifactType artifactType the type of the artifact of the descriptor to be loaded.
-   * 
    * @return a {@link ClassLoaderModel} loaded with all its dependencies and URLs
    */
   @Override
-  public ClassLoaderModel load(File artifactFolder, Map<String, Object> attributes, ArtifactType artifactType)
-      throws InvalidDescriptorLoaderException {
+  public ClassLoaderModel load(File artifactFolder, Map<String, Object> attributes) throws InvalidDescriptorLoaderException {
 
     final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
 

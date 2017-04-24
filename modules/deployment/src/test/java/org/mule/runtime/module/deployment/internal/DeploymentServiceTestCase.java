@@ -493,7 +493,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                                           new PolicyTemplateDescriptorFactory(
                                                                               muleArtifactResourcesRegistry
                                                                                   .getArtifactPluginDescriptorLoader(),
-                                                                              createDescriptorLoaderRepository()));
+                                                                              new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry())));
     // Reset test component state
     invocationCount = 0;
     policyParametrization = "";
@@ -1323,8 +1323,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestApplicationFactory appFactory =
         createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
-                                     createDescriptorLoaderRepository());
+                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
     appFactory.setFailOnStopApplication(true);
 
     deploymentService.setAppFactory(appFactory);
@@ -1350,8 +1349,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestApplicationFactory appFactory =
         createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
-                                     createDescriptorLoaderRepository());
+                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
     appFactory.setFailOnDisposeApplication(true);
     deploymentService.setAppFactory(appFactory);
     startDeployment();
@@ -1676,8 +1674,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestApplicationFactory appFactory =
         createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
-                                     createDescriptorLoaderRepository());
+                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
 
     deploymentService.setAppFactory(appFactory);
     startDeployment();
@@ -1728,17 +1725,12 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestApplicationFactory appFactory =
         createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
-                                     createDescriptorLoaderRepository());
+                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
 
     deploymentService.setAppFactory(appFactory);
     startDeployment();
 
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
-  }
-
-  private ServiceRegistryDescriptorLoaderRepository createDescriptorLoaderRepository() {
-    return new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry());
   }
 
   @Test
@@ -1769,8 +1761,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     TestApplicationFactory appFactory =
         createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
-                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
-                                     createDescriptorLoaderRepository());
+                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository);
 
     deploymentService.setAppFactory(appFactory);
     startDeployment();

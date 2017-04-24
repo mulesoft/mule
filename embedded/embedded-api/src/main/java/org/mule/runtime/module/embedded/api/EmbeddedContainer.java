@@ -7,7 +7,6 @@
 
 package org.mule.runtime.module.embedded.api;
 
-import org.mule.maven.client.api.MavenConfiguration;
 import org.mule.runtime.module.embedded.internal.DefaultEmbeddedContainerBuilder;
 
 import java.net.URL;
@@ -68,14 +67,6 @@ public interface EmbeddedContainer {
      * @return same builder
      */
     EmbeddedContainerBuilder withLog4jConfigurationFile(String log4JConfigurationFile);
-
-    /**
-     * Customizes the maven configuration for the execution.
-     *
-     * @param mavenConfiguration maven configuration.
-     * @return same buildeer
-     */
-    EmbeddedContainerBuilder withMavenConfiguration(MavenConfiguration mavenConfiguration);
 
     /**
      * @return creates a new {@link EmbeddedContainer} with the provided configuration.

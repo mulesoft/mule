@@ -14,7 +14,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.core.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.util.FileUtils.stringToFile;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.CLASSES_DIR;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.LIB_DIR;
@@ -46,7 +45,7 @@ public class FileSystemPolicyClassLoaderModelLoaderTestCase extends AbstractMule
     File file2 = new File(libFolder, "test2.jar");
     stringToFile(file2.getAbsolutePath(), "foo");
 
-    ClassLoaderModel classLoaderModel = classLoaderModelLoader.load(policyFolder, null, POLICY);
+    ClassLoaderModel classLoaderModel = classLoaderModelLoader.load(policyFolder, null);
 
     assertThat(classLoaderModel.getUrls().length, equalTo(3));
     assertThat(classLoaderModel.getUrls()[0], equalTo(classesFolder.toURI().toURL()));

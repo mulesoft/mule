@@ -14,6 +14,7 @@ import static org.mule.runtime.core.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_ARTIFACT;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_POLICY_JSON;
+
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
@@ -111,7 +112,7 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
     }
     try {
       return bundleDescriptorLoader.load(artifactFolder,
-                                         mulePolicyModel.getBundleDescriptorLoader().getAttributes(), POLICY);
+                                         mulePolicyModel.getBundleDescriptorLoader().getAttributes());
     } catch (InvalidDescriptorLoaderException e) {
       throw new ArtifactDescriptorCreateException(e);
     }
@@ -129,7 +130,7 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
 
     try {
       return classLoaderModelLoader
-          .load(artifactFolder, mulePolicyModel.getClassLoaderModelLoaderDescriptor().get().getAttributes(), POLICY);
+          .load(artifactFolder, mulePolicyModel.getClassLoaderModelLoaderDescriptor().get().getAttributes());
     } catch (InvalidDescriptorLoaderException e) {
       throw new ArtifactDescriptorCreateException(e);
     }

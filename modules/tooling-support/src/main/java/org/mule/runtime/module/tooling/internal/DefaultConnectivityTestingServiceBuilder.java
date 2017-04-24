@@ -6,16 +6,13 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
-import static org.mule.maven.client.api.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.addSharedLibraryDependency;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.createDeployablePomFile;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.updateArtifactPom;
-import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.util.UUID;
@@ -99,13 +96,7 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
       applicationDescriptor.setArtifactLocation(applicationFolder);
       createDeployablePomFile(applicationFolder, model);
       updateArtifactPom(applicationFolder, model);
-      MavenClientProvider mavenClientProvider = MavenClientProvider.discoverProvider(currentThread().getContextClassLoader());
-      applicationDescriptor
-          .setClassLoaderModel(new DeployableMavenClassLoaderModelLoader(mavenClientProvider
-              .createMavenClient(newMavenConfigurationBuilder()
-                  .withLocalMavenRepositoryLocation(mavenClientProvider.getLocalRepositorySuppliers()
-                      .environmentMavenRepositorySupplier().get())
-                  .build()), mavenClientProvider.getLocalRepositorySuppliers()).load(applicationFolder));
+      applicationDescriptor.setClassLoaderModel(new DeployableMavenClassLoaderModelLoader().load(applicationFolder, model));
       return defaultApplicationFactory.createAppFrom(applicationDescriptor);
     });
   }

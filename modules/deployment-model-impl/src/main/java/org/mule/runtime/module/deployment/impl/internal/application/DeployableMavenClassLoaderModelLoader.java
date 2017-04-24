@@ -12,12 +12,12 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.POLICY;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
+import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
-import org.mule.maven.client.api.LocalRepositorySupplierFactory;
-import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
@@ -27,10 +27,11 @@ import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
 import org.mule.runtime.module.artifact.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.util.JarInfo;
-import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader;
+import org.mule.runtime.module.deployment.impl.internal.artifact.MavenClassLoaderModelLoader;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -39,6 +40,8 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.eclipse.aether.resolution.DependencyResult;
+import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,34 +55,60 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoaderModelLoader {
+public class DeployableMavenClassLoaderModelLoader extends MavenClassLoaderModelLoader {
 
   public static final String ADD_TEST_DEPENDENCIES_KEY = "mule.embedded.maven.addTestDependenciesToAppClassPath";
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-  public DeployableMavenClassLoaderModelLoader(MavenClient mavenClient,
-                                               LocalRepositorySupplierFactory localRepositorySupplierFactory) {
-    super(mavenClient, localRepositorySupplierFactory);
-  }
 
   @Override
   public String getId() {
     return MAVEN;
   }
 
-  @Override
-  protected void addArtifactSpecificClassloaderConfiguration(File artifactFile, ClassLoaderModelBuilder classLoaderModelBuilder,
-                                                             Set<BundleDependency> dependencies) {
+  protected Set<BundleDependency> loadDependencies(DependencyResult dependencyResult, PreorderNodeListGenerator nlg) {
+    final Set<BundleDependency> dependencies = new HashSet<>();
+    nlg.getDependencies(true).stream()
+        .forEach(dependency -> {
+          final BundleDescriptor.Builder bundleDescriptorBuilder = new BundleDescriptor.Builder()
+              .setArtifactId(dependency.getArtifact().getArtifactId())
+              .setGroupId(dependency.getArtifact().getGroupId())
+              .setVersion(dependency.getArtifact().getVersion())
+              .setType(dependency.getArtifact().getExtension());
+
+          String classifier = dependency.getArtifact().getClassifier();
+          if (!isEmpty(classifier)) {
+            bundleDescriptorBuilder.setClassifier(classifier);
+          }
+
+          try {
+            BundleDependency.Builder builder = new BundleDependency.Builder()
+                .setDescriptor(bundleDescriptorBuilder.build())
+                .setScope(COMPILE);
+            if (!dependency.getScope().equalsIgnoreCase("provided")) {
+              builder.setBundleUrl(dependency.getArtifact().getFile().toURI().toURL());
+            }
+            dependencies.add(builder.build());
+          } catch (MalformedURLException e) {
+            throw new MuleRuntimeException(e);
+          }
+        });
+    return dependencies;
+  }
+
+  protected void loadUrls(File applicationFolder, ClassLoaderModelBuilder classLoaderModelBuilder,
+                          DependencyResult dependencyResult, PreorderNodeListGenerator nlg, Set<BundleDependency> dependencies) {
+    // Adding the exploded JAR root folder
     try {
-      classLoaderModelBuilder.containing(new File(artifactFile, "classes").toURL());
-      exportSharedLibrariesResourcesAndPackages(artifactFile, classLoaderModelBuilder, dependencies);
+      classLoaderModelBuilder.containing(new File(applicationFolder, "classes").toURL());
+      addDependenciesToClasspathUrls(classLoaderModelBuilder, dependencyResult);
+      exportSharedLibrariesResouresAndPackages(applicationFolder, classLoaderModelBuilder, dependencies);
     } catch (MalformedURLException e) {
       throw new MuleRuntimeException(e);
     }
   }
 
-  private void exportSharedLibrariesResourcesAndPackages(File applicationFolder, ClassLoaderModelBuilder classLoaderModelBuilder,
-                                                         Set<BundleDependency> dependencies) {
+  private void exportSharedLibrariesResouresAndPackages(File applicationFolder, ClassLoaderModelBuilder classLoaderModelBuilder,
+                                                        Set<BundleDependency> dependencies) {
     Model model = loadPomModel(applicationFolder);
     Build build = model.getBuild();
     if (build != null) {
@@ -120,6 +149,19 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
         });
       }
     }
+  }
+
+  private void addDependenciesToClasspathUrls(ClassLoaderModelBuilder classLoaderModelBuilder,
+                                              DependencyResult dependencyResult) {
+    dependencyResult.getArtifactResults().stream()
+        .filter(artifactResult -> !MULE_PLUGIN_CLASSIFIER.equals(artifactResult.getArtifact().getClassifier()))
+        .forEach(artifactResult -> {
+          try {
+            classLoaderModelBuilder.containing(artifactResult.getArtifact().getFile().toURL());
+          } catch (MalformedURLException e) {
+            throw new MuleRuntimeException(e);
+          }
+        });
   }
 
   private String getSharedLibraryAttribute(File applicationFolder, Xpp3Dom sharedLibraryDom, String attributeName) {

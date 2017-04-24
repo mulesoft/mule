@@ -5,14 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.deployment.impl.internal.maven;
+package org.mule.runtime.module.deployment.impl.internal.plugin;
 
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
-import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
-import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFromJar;
-import org.mule.runtime.core.config.bootstrap.ArtifactType;
+import org.apache.maven.model.Model;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
@@ -22,7 +17,11 @@ import org.mule.runtime.module.artifact.descriptor.InvalidDescriptorLoaderExcept
 import java.io.File;
 import java.util.Map;
 
-import org.apache.maven.model.Model;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
+import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFromJar;
 
 /**
  * Loads a {@link BundleDescriptor} using Maven to extract the relevant information from a Mule artifact's
@@ -41,14 +40,12 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
    *
    * @param artifactFile {@link File} with the content of the artifact to work with. Non null
    * @param attributes collection of attributes describing the loader. Non null.
-   * @param artifactType the type of the artifact of the descriptor to be loaded.
    * @return a locator of the coordinates of the current plugin
    * @throws ArtifactDescriptorCreateException if the plugin is missing the {@link ArtifactPluginDescriptor#MULE_PLUGIN_POM} or
    *         there's an issue while reading that file
    */
   @Override
-  public BundleDescriptor load(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
-      throws InvalidDescriptorLoaderException {
+  public BundleDescriptor load(File artifactFile, Map<String, Object> attributes) throws InvalidDescriptorLoaderException {
     Model model;
     if (artifactFile.isDirectory()) {
       model = getPomModelFolder(artifactFile);

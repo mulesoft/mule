@@ -11,11 +11,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
+import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -64,8 +63,7 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase {
     ApplicationDescriptor descriptor = new ApplicationDescriptor("app");
     ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
-                                         applicationPluginRepository,
-                                         new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()));
+                                         applicationPluginRepository);
     applicationDescriptorFactory.setApplicationProperties(descriptor, tempProps);
     Map<String, String> appProps = descriptor.getAppProperties();
     assertEquals("state", appProps.get("texas"));
