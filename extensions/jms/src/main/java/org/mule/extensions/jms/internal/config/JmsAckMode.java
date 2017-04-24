@@ -4,9 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.api.config;
-
-import org.mule.extensions.jms.internal.config.InternalAckMode;
+package org.mule.extensions.jms.internal.config;
 
 /**
  * Interface to be implemented in enums representing Acknowledgement modes and give their representation in

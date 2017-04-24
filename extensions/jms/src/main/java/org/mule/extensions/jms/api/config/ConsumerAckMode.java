@@ -6,6 +6,7 @@
  */
 package org.mule.extensions.jms.api.config;
 
+import org.mule.extensions.jms.internal.config.JmsAckMode;
 import org.mule.extensions.jms.internal.operation.JmsConsume;
 import org.mule.extensions.jms.internal.source.JmsListener;
 import org.mule.extensions.jms.internal.config.InternalAckMode;
