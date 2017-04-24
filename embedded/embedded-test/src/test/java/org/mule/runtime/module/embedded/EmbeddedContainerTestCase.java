@@ -26,6 +26,7 @@ import static org.mule.runtime.module.embedded.api.EmbeddedContainer.builder;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EMBEDDED_API;
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EmbeddedApiStory.CONFIGURATION;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.MavenConfiguration;
 import org.mule.runtime.module.embedded.api.Application;
@@ -52,6 +53,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -61,6 +63,7 @@ import ru.yandex.qatools.allure.annotations.Stories;
 public class EmbeddedContainerTestCase {
 
   private static final String LOGGING_FILE = "app.log";
+  private static final Logger LOGGER = getLogger(EmbeddedContainerTestCase.class);
 
   @ClassRule
   public static TemporaryFolder localRepositoryFolder = new TemporaryFolder();
@@ -185,16 +188,22 @@ public class EmbeddedContainerTestCase {
         .environmentMavenRepositorySupplier().get();
     MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder();
     if (localRepositoryUrl != null) {
+      LOGGER.info("Using local file repository as remote repository: " + localRepositoryUrl.getAbsolutePath());
       mavenConfigurationBuilder.withRemoteRepository(newRemoteRepositoryBuilder()
           .withUrl(localRepositoryUrl.toURI().toURL())
           .withId("local-repo-remote").build());
     }
+
+    LOGGER.info("Using folder as local repository: " + localRepositoryFolder.getRoot().getAbsolutePath());
 
     EmbeddedContainer embeddedContainer = builder()
         .withMuleVersion("4.0.0-SNAPSHOT")
         .withContainerBaseFolder(containerFolder.newFolder().toURI().toURL())
         .withMavenConfiguration(mavenConfigurationBuilder
             .withLocalMavenRepositoryLocation(localRepositoryFolder.getRoot())
+            .withRemoteRepository(newRemoteRepositoryBuilder().withId("maven-central")
+                .withUrl(new URL("https://repo.maven.apache.org/maven2/"))
+                .build())
             .withRemoteRepository(newRemoteRepositoryBuilder().withId("mulesoft-public")
                 .withUrl(new URL("https://repository.mulesoft.org/nexus/content/repositories/public"))
                 .build())
