@@ -279,17 +279,5 @@ public interface AllureConstants {
 
   }
 
-  interface RuntimeGlobalConfiguration {
-
-    String RUNTIME_GLOBAL_CONFIGURATION = "Runtime Global Configuration";
-
-    interface MavenGlobalConfiguration {
-
-      String MAVEN_GLOBAL_CONFIGURATION_STORY = "Maven Global Configuration Story";
-
-    }
-
-  }
-
 }
 

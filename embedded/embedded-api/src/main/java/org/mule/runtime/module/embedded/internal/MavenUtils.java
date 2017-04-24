@@ -7,11 +7,21 @@
 
 package org.mule.runtime.module.embedded.internal;
 
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
+
 import java.io.File;
 import java.io.FileReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // TODO MULE-11878 - consolidate with other aether usages in mule.
 public class MavenUtils {
@@ -26,6 +36,22 @@ public class MavenUtils {
       throw new RuntimeException(e);
     }
 
+  }
+
+  public static List<URL> loadUrls(PreorderNodeListGenerator nlg) {
+    return nlg.getArtifacts(false)
+        .stream()
+        .map(artifact -> getUrl(artifact.getFile())).collect(Collectors.toList());
+  }
+
+  private static URL getUrl(File file) {
+    try {
+      return file.toURI().toURL();
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(format("There was an issue obtaining the URL for the dependency file [%s]",
+                                        file.getAbsolutePath()),
+                                 e);
+    }
   }
 
 }

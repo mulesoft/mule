@@ -7,23 +7,28 @@
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.PLUGIN;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
-import org.mule.maven.client.api.LocalRepositorySupplierFactory;
-import org.mule.maven.client.api.MavenClient;
+import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.ClassLoaderModelBuilder;
-import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader;
+import org.mule.runtime.module.deployment.impl.internal.artifact.MavenClassLoaderModelLoader;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.aether.resolution.DependencyResult;
+import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,32 +42,62 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderModelLoader {
+public class PluginMavenClassLoaderModelLoader extends MavenClassLoaderModelLoader {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-  public PluginMavenClassLoaderModelLoader(MavenClient mavenClient,
-                                           LocalRepositorySupplierFactory localRepositorySupplierFactory) {
-    super(mavenClient, localRepositorySupplierFactory);
-  }
 
   @Override
   public String getId() {
     return MAVEN;
   }
 
-  @Override
-  protected void addArtifactSpecificClassloaderConfiguration(File artifactFile, ClassLoaderModelBuilder classLoaderModelBuilder,
-                                                             Set<BundleDependency> dependencies) {
-    classLoaderModelBuilder.containing(getUrl(artifactFile, artifactFile));
+  protected Set<BundleDependency> loadDependencies(DependencyResult dependencyResult, PreorderNodeListGenerator nlg) {
+    // Looking for all Mule plugin dependencies
+    final Set<BundleDependency> dependencies = new HashSet<>();
+    dependencyResult.getArtifactResults().stream()
+        .forEach(dependency -> {
+          BundleDescriptor.Builder builder = new BundleDescriptor.Builder()
+              .setArtifactId(dependency.getArtifact().getArtifactId())
+              .setGroupId(dependency.getArtifact().getGroupId())
+              .setVersion(dependency.getArtifact().getVersion())
+              .setType(dependency.getArtifact().getExtension());
+          if (!isEmpty(dependency.getArtifact().getClassifier())) {
+            builder = builder
+                .setClassifier(dependency.getArtifact().getClassifier());
+          }
+
+          try {
+            dependencies.add(new BundleDependency.Builder()
+                .setDescriptor(builder.build())
+                .setScope(COMPILE)
+                .setBundleUrl(dependency.getArtifact().getFile().toURL())
+                .build());
+          } catch (MalformedURLException e) {
+            throw new MuleRuntimeException(e);
+          }
+        });
+    return dependencies;
   }
 
-  private URL getUrl(File pluginFile, File file) {
+  protected void loadUrls(File pluginFolder, ClassLoaderModelBuilder classLoaderModelBuilder,
+                          DependencyResult dependencyResult, PreorderNodeListGenerator nlg, Set<BundleDependency> dependencies) {
+    // Adding the exploded JAR root folder
+    classLoaderModelBuilder.containing(getUrl(pluginFolder, pluginFolder));
+
+    nlg.getArtifacts(false).stream().forEach(artifact -> {
+      // Adding all needed jar's file dependencies
+      if (!MULE_PLUGIN_CLASSIFIER.equals(artifact.getClassifier())) {
+        classLoaderModelBuilder.containing(getUrl(pluginFolder, artifact.getFile()));
+      }
+    });
+  }
+
+  private URL getUrl(File pluginFolder, File file) {
     try {
       return file.toURI().toURL();
     } catch (MalformedURLException e) {
       throw new ArtifactDescriptorCreateException(format("There was an exception obtaining the URL for the plugin [%s], file [%s]",
-                                                         pluginFile.getAbsolutePath(), file.getAbsolutePath()),
+                                                         pluginFolder.getAbsolutePath(), file.getAbsolutePath()),
                                                   e);
     }
   }
