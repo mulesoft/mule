@@ -514,9 +514,9 @@ public class CoreMessages extends MessageFactory
         return transformFailed(from, to.getClass().getName());
     }
 
-    public static Message cryptoFailure()
+    public static Message cryptoFailure(String message)
     {
-        return factory.createMessage(BUNDLE_PATH, 112);
+        return factory.createMessage(BUNDLE_PATH, 112, message);
     }
 
     public static Message schemeNotCompatibleWithConnector(String scheme, Class<?> expectedClass)

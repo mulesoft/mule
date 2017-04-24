@@ -46,7 +46,7 @@ public class CryptoFailureException extends MuleException
 
     public CryptoFailureException(EncryptionStrategy strategy, Throwable cause)
     {
-        super(CoreMessages.cryptoFailure(), cause);
+        super(CoreMessages.cryptoFailure(cause.getMessage()), cause);
         String s = (strategy == null ? "null" : strategy.toString());
         addInfo("Encryption", s);
         this.encryptionStrategy = strategy;

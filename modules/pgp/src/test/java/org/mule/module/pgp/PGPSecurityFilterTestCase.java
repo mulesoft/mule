@@ -6,8 +6,10 @@
  */
 package org.mule.module.pgp;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -66,7 +68,7 @@ public class PGPSecurityFilterTestCase extends AbstractServiceAndFlowTestCase
         MuleMessage reply = muleContext.getClient().send("vm://echo", "An unsigned message", props);
         assertNotNull(reply.getExceptionPayload());
         ExceptionPayload excPayload = reply.getExceptionPayload();
-        assertEquals(MESSAGE_EXCEPTION, excPayload.getMessage());
+        assertThat(excPayload.getMessage(), containsString(MESSAGE_EXCEPTION));
     }
 
     private byte[] loadEncryptedMessage() throws IOException
