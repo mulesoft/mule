@@ -7,10 +7,14 @@
         xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
         xmlns:spring="http://www.springframework.org/schema/beans"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
         xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
-http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
 
     <spring:beans>
         <spring:bean name="amq-connection-factory"
@@ -24,6 +28,13 @@ http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/
                    specification="1.1">
     </jms:connector>
 
+    <flow name="cxf-test-http">
+		<http:listener path="httpTest" config-ref="listenerConfig"/>
+        <cxf:proxy-service soapVersion="1.2"/>
+        <cxf:proxy-client payload="body" enableMuleSoapHeaders="true" soapVersion="1.2" />
+    </flow>
+    
+    
     <flow name="cxf-test">
         <jms:inbound-endpoint exchange-pattern="one-way" queue="inboundTest" connector-ref="JMSConnectorLocal" />
 
