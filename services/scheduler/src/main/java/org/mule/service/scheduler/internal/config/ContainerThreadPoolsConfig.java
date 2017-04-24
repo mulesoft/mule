@@ -19,6 +19,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.scheduler.SchedulerPoolsConfig;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,10 +38,10 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public class ThreadPoolsConfig {
+public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
 
 
-  private static final Logger logger = getLogger(ThreadPoolsConfig.class);
+  private static final Logger logger = getLogger(ContainerThreadPoolsConfig.class);
 
   public static final String PROP_PREFIX = "org.mule.runtime.scheduler.";
   public static final String CPU_LIGHT_PREFIX = PROP_PREFIX + CPU_LIGHT.getName();
@@ -64,11 +65,11 @@ public class ThreadPoolsConfig {
    * @return The loaded configuration, or the default if the file is unavailable.
    * @throws MuleException for any trouble that happens while parsing the file.
    */
-  public static ThreadPoolsConfig loadThreadPoolsConfig() throws MuleException {
+  public static ContainerThreadPoolsConfig loadThreadPoolsConfig() throws MuleException {
     File muleHome =
         getProperty(MULE_HOME_DIRECTORY_PROPERTY) != null ? new File(getProperty(MULE_HOME_DIRECTORY_PROPERTY)) : null;
 
-    final ThreadPoolsConfig config = new ThreadPoolsConfig();
+    final ContainerThreadPoolsConfig config = new ContainerThreadPoolsConfig();
 
     if (muleHome == null) {
       logger.info("No " + MULE_HOME_DIRECTORY_PROPERTY + " defined. Using default values for thread pools.");
@@ -125,7 +126,7 @@ public class ThreadPoolsConfig {
     }
   }
 
-  private static int resolveExpression(Properties properties, String propName, ThreadPoolsConfig threadPoolsConfig,
+  private static int resolveExpression(Properties properties, String propName, ContainerThreadPoolsConfig threadPoolsConfig,
                                        ScriptEngine engine)
       throws DefaultMuleException {
     final String property = properties.getProperty(propName).trim().toLowerCase();
@@ -157,14 +158,11 @@ public class ThreadPoolsConfig {
   private int cpuIntensiveQueueSize = 1024;
   private int cpuIntensivePoolSize = 2 * cores;
 
-  private ThreadPoolsConfig() {
+  private ContainerThreadPoolsConfig() {
 
   }
 
-  /**
-   * @return the maximum time (in milliseconds) to wait until all tasks in all the runtime thread pools have completed execution
-   *         when stopping the scheduler service.
-   */
+  @Override
   public long getGracefulShutdownTimeout() {
     return gracefulShutdownTimeout;
   }
@@ -173,9 +171,7 @@ public class ThreadPoolsConfig {
     this.gracefulShutdownTimeout = gracefulShutdownTimeout;
   }
 
-  /**
-   * @return the number of threads to keep in the {@code cpu_lite} pool, even if they are idle.
-   */
+  @Override
   public int getCpuLightPoolSize() {
     return cpuLightPoolSize;
   }
@@ -184,9 +180,7 @@ public class ThreadPoolsConfig {
     this.cpuLightPoolSize = cpuLightPoolSize;
   }
 
-  /**
-   * @return the size of the queue to use for holding {@code cpu_lite} tasks before they are executed.
-   */
+  @Override
   public int getCpuLightQueueSize() {
     return cpuLightQueueSize;
   }
@@ -195,9 +189,7 @@ public class ThreadPoolsConfig {
     this.cpuLightQueueSize = cpuLightQueueSize;
   }
 
-  /**
-   * @return the number of threads to keep in the {@code I/O} pool.
-   */
+  @Override
   public int getIoCorePoolSize() {
     return ioCorePoolSize;
   }
@@ -206,9 +198,7 @@ public class ThreadPoolsConfig {
     this.ioCorePoolSize = ioCorePoolSize;
   }
 
-  /**
-   * @return the maximum number of threads to allow in the {@code I/O} pool.
-   */
+  @Override
   public int getIoMaxPoolSize() {
     return ioMaxPoolSize;
   }
@@ -217,9 +207,7 @@ public class ThreadPoolsConfig {
     this.ioMaxPoolSize = ioMaxPoolSize;
   }
 
-  /**
-   * @return the size of the queue to use for holding {@code I/O} tasks before they are executed.
-   */
+  @Override
   public int getIoQueueSize() {
     return ioQueueSize;
   }
@@ -228,10 +216,7 @@ public class ThreadPoolsConfig {
     this.ioQueueSize = ioQueueSize;
   }
 
-  /**
-   * @return when the number of threads in the {@code I/O} pool is greater than {@link #getIoCorePoolSize()}, this is the maximum
-   *         time (in milliseconds) that excess idle threads will wait for new tasks before terminating.
-   */
+  @Override
   public long getIoKeepAlive() {
     return ioKeepAlive;
   }
@@ -240,9 +225,7 @@ public class ThreadPoolsConfig {
     this.ioKeepAlive = ioKeepAlive;
   }
 
-  /**
-   * @return the number of threads to keep in the {@code cpu_intensive} pool, even if they are idle.
-   */
+  @Override
   public int getCpuIntensivePoolSize() {
     return cpuIntensivePoolSize;
   }
@@ -251,9 +234,7 @@ public class ThreadPoolsConfig {
     this.cpuIntensivePoolSize = cpuIntensivePoolSize;
   }
 
-  /**
-   * @return the size of the queue to use for holding {@code cpu_intensive} tasks before they are executed.
-   */
+  @Override
   public int getCpuIntensiveQueueSize() {
     return cpuIntensiveQueueSize;
   }
@@ -262,6 +243,7 @@ public class ThreadPoolsConfig {
     this.cpuIntensiveQueueSize = cpuIntensiveQueueSize;
   }
 
+  @Override
   public Properties defaultQuartzProperties(String name) {
     Properties factoryProperties = new Properties();
 

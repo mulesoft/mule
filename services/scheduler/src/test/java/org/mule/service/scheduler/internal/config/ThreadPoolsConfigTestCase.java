@@ -14,19 +14,20 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.CPU_INTENSIVE_PREFIX;
-import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.CPU_LIGHT_PREFIX;
-import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.IO_PREFIX;
-import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.PROP_PREFIX;
-import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.THREAD_POOL_KEEP_ALIVE;
-import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.THREAD_POOL_SIZE;
-import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.THREAD_POOL_SIZE_CORE;
-import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.THREAD_POOL_SIZE_MAX;
-import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.WORK_QUEUE_SIZE;
-import static org.mule.service.scheduler.internal.config.ThreadPoolsConfig.loadThreadPoolsConfig;
+import static org.mule.service.scheduler.internal.config.ContainerThreadPoolsConfig.CPU_INTENSIVE_PREFIX;
+import static org.mule.service.scheduler.internal.config.ContainerThreadPoolsConfig.CPU_LIGHT_PREFIX;
+import static org.mule.service.scheduler.internal.config.ContainerThreadPoolsConfig.IO_PREFIX;
+import static org.mule.service.scheduler.internal.config.ContainerThreadPoolsConfig.PROP_PREFIX;
+import static org.mule.service.scheduler.internal.config.ContainerThreadPoolsConfig.THREAD_POOL_KEEP_ALIVE;
+import static org.mule.service.scheduler.internal.config.ContainerThreadPoolsConfig.THREAD_POOL_SIZE;
+import static org.mule.service.scheduler.internal.config.ContainerThreadPoolsConfig.THREAD_POOL_SIZE_CORE;
+import static org.mule.service.scheduler.internal.config.ContainerThreadPoolsConfig.THREAD_POOL_SIZE_MAX;
+import static org.mule.service.scheduler.internal.config.ContainerThreadPoolsConfig.WORK_QUEUE_SIZE;
+import static org.mule.service.scheduler.internal.config.ContainerThreadPoolsConfig.loadThreadPoolsConfig;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.scheduler.SchedulerPoolsConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
@@ -85,7 +86,7 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
   public void noMuleHome() throws IOException, MuleException {
     clearProperty(MULE_HOME_DIRECTORY_PROPERTY);
 
-    final ThreadPoolsConfig config = loadThreadPoolsConfig();
+    final SchedulerPoolsConfig config = loadThreadPoolsConfig();
 
     assertThat(config.getGracefulShutdownTimeout(), is(15000l));
     assertThat(config.getCpuLightPoolSize(), is(2 * cores));
@@ -100,7 +101,7 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
 
   @Test
   public void noConfigFile() throws IOException, MuleException {
-    final ThreadPoolsConfig config = loadThreadPoolsConfig();
+    final SchedulerPoolsConfig config = loadThreadPoolsConfig();
 
     assertThat(config.getGracefulShutdownTimeout(), is(15000l));
     assertThat(config.getCpuLightPoolSize(), is(2 * cores));
@@ -118,7 +119,7 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
     final Properties props = buildDefaultConfigProps();
     props.store(new FileOutputStream(schedulerConfigFile), "defaultConfig");
 
-    final ThreadPoolsConfig config = loadThreadPoolsConfig();
+    final SchedulerPoolsConfig config = loadThreadPoolsConfig();
 
     assertThat(config.getGracefulShutdownTimeout(), is(15000l));
     assertThat(config.getCpuLightPoolSize(), is(2 * cores));
@@ -142,7 +143,7 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
     props.setProperty(CPU_INTENSIVE_PREFIX + "." + WORK_QUEUE_SIZE, "mem / ( 2*3*32) ");
     props.store(new FileOutputStream(schedulerConfigFile), "defaultConfigSpaced");
 
-    final ThreadPoolsConfig config = loadThreadPoolsConfig();
+    final SchedulerPoolsConfig config = loadThreadPoolsConfig();
 
     assertThat(config.getGracefulShutdownTimeout(), is(15000l));
     assertThat(config.getCpuLightPoolSize(), is(2 * cores));
@@ -162,7 +163,7 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
     props.setProperty(IO_PREFIX + "." + THREAD_POOL_SIZE_MAX, "mem / (2* 2.5 *32)");
     props.store(new FileOutputStream(schedulerConfigFile), "withDecimalsConfig");
 
-    final ThreadPoolsConfig config = loadThreadPoolsConfig();
+    final SchedulerPoolsConfig config = loadThreadPoolsConfig();
 
     assertThat(config.getCpuLightPoolSize(), is(cores / 2));
     assertThat(config.getIoMaxPoolSize(), is((int) (mem / (2 * 2.5 * 32))));
@@ -176,7 +177,7 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
     props.setProperty(CPU_INTENSIVE_PREFIX + "." + THREAD_POOL_SIZE, "cores - 1");
     props.store(new FileOutputStream(schedulerConfigFile), "withPlusAndMinusConfig");
 
-    final ThreadPoolsConfig config = loadThreadPoolsConfig();
+    final SchedulerPoolsConfig config = loadThreadPoolsConfig();
 
     assertThat(config.getCpuLightPoolSize(), is(2 * cores));
     assertThat(config.getIoMaxPoolSize(), is(2 + cores));
@@ -190,7 +191,7 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
     props.setProperty(IO_PREFIX + "." + THREAD_POOL_SIZE_MAX, "cores / 0.5");
     props.store(new FileOutputStream(schedulerConfigFile), "withMultiplyAndDivisionConfig");
 
-    final ThreadPoolsConfig config = loadThreadPoolsConfig();
+    final SchedulerPoolsConfig config = loadThreadPoolsConfig();
 
     assertThat(config.getCpuLightPoolSize(), is(2 * cores));
     assertThat(config.getIoMaxPoolSize(), is(2 * cores));
@@ -203,7 +204,7 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
     props.setProperty(IO_PREFIX + "." + WORK_QUEUE_SIZE, "(cores + 1) * 2");
     props.store(new FileOutputStream(schedulerConfigFile), "withParenthesisConfig");
 
-    final ThreadPoolsConfig config = loadThreadPoolsConfig();
+    final SchedulerPoolsConfig config = loadThreadPoolsConfig();
 
     assertThat(config.getCpuLightQueueSize(), is(2 * cores));
     assertThat(config.getIoQueueSize(), is(2 * (1 + cores)));
@@ -217,7 +218,7 @@ public class ThreadPoolsConfigTestCase extends AbstractMuleTestCase {
     props.setProperty(CPU_INTENSIVE_PREFIX + "." + THREAD_POOL_SIZE, "4");
     props.store(new FileOutputStream(schedulerConfigFile), "expressionConfigFixed");
 
-    final ThreadPoolsConfig config = loadThreadPoolsConfig();
+    final SchedulerPoolsConfig config = loadThreadPoolsConfig();
 
     assertThat(config.getCpuLightPoolSize(), is(2));
     assertThat(config.getIoMaxPoolSize(), is(8));
