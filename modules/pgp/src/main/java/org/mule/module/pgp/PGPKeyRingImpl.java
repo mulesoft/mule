@@ -6,12 +6,19 @@
  */
 package org.mule.module.pgp;
 
+import static java.lang.String.format;
+import static org.mule.module.pgp.i18n.PGPMessages.ambiguousPGPPrincipalExceptionMessage;
+import static org.mule.module.pgp.i18n.PGPMessages.noFileKeyFound;
+import static org.mule.module.pgp.i18n.PGPMessages.noSecretKeyDefined;
+import static org.mule.module.pgp.i18n.PGPMessages.noSecretKeyFoundButAvailable;
 import static org.mule.module.pgp.util.BouncyCastleUtil.KEY_FINGERPRINT_CALCULATOR;
+import static org.mule.module.pgp.util.ValidatorUtil.validateNotNull;
 
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.module.pgp.exception.MissingSecretPGPKeyException;
+import org.mule.module.pgp.exception.AmbiguousPGPPrincipalException;
+import org.mule.module.pgp.exception.MissingPGPKeyException;
 import org.mule.util.IOUtils;
 import org.mule.util.SecurityUtils;
 
@@ -32,6 +39,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 
 public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 {
+
     protected static final Log logger = LogFactory.getLog(PGPKeyRingImpl.class);
 
     private String publicKeyRingFileName;
@@ -44,7 +52,9 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 
     private PGPSecretKey secretKey;
 
-    private String secretPassphrase;
+    private String secretPassPhrase;
+
+    private StringBuilder availablePrincipals;
 
     public void initialise() throws InitialisationException
     {
@@ -59,52 +69,88 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 
             readPublicKeyRing();
         }
+        catch (MissingPGPKeyException | AmbiguousPGPPrincipalException exception)
+        {
+            throw new InitialisationException(exception, this);
+        }
         catch (Exception e)
         {
-            logger.error("Error in initialise:" + e.getMessage(), e);
+            logger.error("Error in Initialisation: " + e.getMessage(), e);
             throw new InitialisationException(CoreMessages.failedToCreate("PGPKeyRingImpl"), e, this);
         }
     }
 
     private void readPublicKeyRing() throws Exception
     {
-        InputStream in = IOUtils.getResourceAsStream(getPublicKeyRingFileName(), getClass());
-        PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(in, KEY_FINGERPRINT_CALCULATOR);
-        in.close();
+        InputStream inputStream = IOUtils.getResourceAsStream(getPublicKeyRingFileName(), getClass());
+        validateNotNull(inputStream, noFileKeyFound(getPublicKeyRingFileName()));
+        PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(inputStream, KEY_FINGERPRINT_CALCULATOR);
+        inputStream.close();
 
-        for (Iterator iterator = collection.getKeyRings(); iterator.hasNext();)
+        availablePrincipals = new StringBuilder();
+        Iterator keyRingsIterator = collection.getKeyRings();
+        while (keyRingsIterator.hasNext())
         {
-            PGPPublicKeyRing ring = (PGPPublicKeyRing) iterator.next();
+            PGPPublicKeyRing ring = (PGPPublicKeyRing) keyRingsIterator.next();
             String userID = "";
-            for (Iterator iterator2 = ring.getPublicKeys(); iterator2.hasNext();)
+            Iterator publicKeysIterator = ring.getPublicKeys();
+            while (publicKeysIterator.hasNext())
             {
-                PGPPublicKey publicKey = (PGPPublicKey) iterator2.next();
+                PGPPublicKey publicKey = (PGPPublicKey) publicKeysIterator.next();
                 Iterator userIDs = publicKey.getUserIDs();
                 if (userIDs.hasNext())
                 {
-                    userID = (String) userIDs.next();
+                    availablePrincipals.append("\nFor key: " + decimalToHexadecimal(publicKey.getKeyID()));
                 }
-                principalsKeyBundleMap.put(userID, publicKey);
+                while (userIDs.hasNext())
+                {
+                    userID = (String) userIDs.next();
+                    availablePrincipals.append("\n\t" + userID);
+                    if (! principalsKeyBundleMap.containsKey(userID))
+                    {
+                        principalsKeyBundleMap.put(userID, publicKey);
+                    }
+                    else
+                    {
+                        throw new AmbiguousPGPPrincipalException(ambiguousPGPPrincipalExceptionMessage(userID, decimalToHexadecimal(publicKey.getKeyID()), decimalToHexadecimal(principalsKeyBundleMap.get(userID).getKeyID())));
+                    }
+                }
             }
+            availablePrincipals.append("\n");
         }
+    }
+
+    private String decimalToHexadecimal(long decimal)
+    {
+        return format("%X", decimal);
+    }
+
+    public String getAvailablePrincipals ()
+    {
+        return availablePrincipals.toString();
     }
 
     private void readPrivateKeyBundle() throws Exception
     {
         if (getSecretKeyRingFileName() == null)
         {
-            throw new MissingSecretPGPKeyException("No secret key ring filename defined");
+            throw new MissingPGPKeyException(noSecretKeyDefined());
         }
-        
-        InputStream in = IOUtils.getResourceAsStream(getSecretKeyRingFileName(), getClass());
-        PGPSecretKeyRingCollection collection = new PGPSecretKeyRingCollection(in, KEY_FINGERPRINT_CALCULATOR);
-        in.close();
-        secretKey = collection.getSecretKey(Long.valueOf(getSecretAliasId()));
+
+        InputStream secretKeyInputStream = IOUtils.getResourceAsStream(getSecretKeyRingFileName(), getClass());
+        validateNotNull(secretKeyInputStream, noFileKeyFound(getSecretKeyRingFileName()));
+        PGPSecretKeyRingCollection collection = new PGPSecretKeyRingCollection(secretKeyInputStream, KEY_FINGERPRINT_CALCULATOR);
+        secretKeyInputStream.close();
+        String secretAliasId = getSecretAliasId();
+        if (secretAliasId != null)
+        {
+            secretKey = collection.getSecretKey(Long.valueOf(secretAliasId));
+        }
 
         if (secretKey == null)
         {
-            StringBuilder message = new StringBuilder();
-            message.append('\n');
+            StringBuilder availableKeys = new StringBuilder();
+            availableKeys.append('\n');
             Iterator iterator = collection.getKeyRings();
             while (iterator.hasNext())
             {
@@ -113,12 +159,12 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
                 while (secretKeysIterator.hasNext())
                 {
                     PGPSecretKey k = (PGPSecretKey) secretKeysIterator.next();
-                    message.append("Key: ");
-                    message.append(k.getKeyID());
-                    message.append('\n');
+                    availableKeys.append("Key: ");
+                    availableKeys.append(k.getKeyID());
+                    availableKeys.append('\n');
                 }
             }
-            throw new MissingSecretPGPKeyException(message.toString());
+            throw new MissingPGPKeyException(noSecretKeyFoundButAvailable(availableKeys.toString()));
         }
     }
 
@@ -144,12 +190,12 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 
     public String getSecretPassphrase()
     {
-        return secretPassphrase;
+        return secretPassPhrase;
     }
 
     public void setSecretPassphrase(String value)
     {
-        this.secretPassphrase = value;
+        this.secretPassPhrase = value;
     }
 
     public PGPSecretKey getSecretKey() throws Exception

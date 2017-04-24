@@ -50,6 +50,31 @@ public class PGPMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 7, availableKeys);
     }
 
+    public static Message noPublicKeyForPrincipal(String principalId, String availablePrincipals)
+    {
+        return factory.createMessage(BUNDLE_PATH, 8, principalId, availablePrincipals);
+    }
+
+    public static Message noFileKeyFound(String path)
+    {
+        return factory.createMessage(BUNDLE_PATH, 9, path);
+    }
+
+    public static Message noSecretKeyDefined()
+    {
+        return factory.createMessage(BUNDLE_PATH, 10);
+    }
+
+    public static Message noSecretPassPhrase()
+    {
+        return factory.createMessage(BUNDLE_PATH, 11);
+    }
+
+    public static Message ambiguousPGPPrincipalExceptionMessage(String principalId, String publicKey1, String publicKey2)
+    {
+        return factory.createMessage(BUNDLE_PATH, 12, principalId, publicKey1, publicKey2);
+    }
+
 }
 
 
