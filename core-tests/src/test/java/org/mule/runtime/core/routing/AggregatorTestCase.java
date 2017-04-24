@@ -10,6 +10,7 @@ import static java.util.Optional.of;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
@@ -45,7 +46,7 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
     router.setFlowConstruct(flow);
     router.initialise();
 
-    EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
+    EventContext context = DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR), "foo");
 
     Message message1 = Message.of("test event A");
     Message message2 = Message.of("test event B");

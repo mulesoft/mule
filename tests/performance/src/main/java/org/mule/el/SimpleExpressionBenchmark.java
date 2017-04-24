@@ -10,6 +10,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
@@ -34,7 +35,7 @@ public class SimpleExpressionBenchmark extends AbstractBenchmark {
   @Setup
   public void setup() throws MuleException {
     muleContext = createMuleContextWithServices();
-    event = Event.builder(create(createFlow(muleContext), "")).message(of(PAYLOAD)).build();
+    event = Event.builder(create(createFlow(muleContext), fromSingleComponent("test"))).message(of(PAYLOAD)).build();
   }
 
   @TearDown

@@ -8,6 +8,7 @@ package org.mule.runtime.core.mule.model;
 
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
@@ -115,7 +116,8 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextT
   private MuleEventContext createMuleEventContext(Object payload, Map<String, Serializable> inboundProperties) throws Exception {
     FlowConstruct flowConstruct = getTestFlow(muleContext);
     return new DefaultMuleEventContext(flowConstruct,
-                                       Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+                                       Event.builder(DefaultEventContext.create(flowConstruct,
+                                                                                fromSingleComponent(TEST_CONNECTOR)))
                                            .message(InternalMessage.builder().payload(payload)
                                                .inboundProperties(inboundProperties)
                                                .build())

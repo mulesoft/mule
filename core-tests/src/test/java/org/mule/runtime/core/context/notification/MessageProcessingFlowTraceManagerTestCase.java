@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.context.notification.MessageProcessingFlowTraceManager.FLOW_STACK_INFO_KEY;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
@@ -90,7 +91,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     when(nestedFlowConstruct.getName()).thenReturn(NESTED_FLOW_NAME);
     when(nestedFlowConstruct.getMuleContext()).thenReturn(context);
 
-    messageContext = create(rootFlowConstruct, "test");
+    messageContext = create(rootFlowConstruct, fromSingleComponent("test"));
   }
 
   @Test

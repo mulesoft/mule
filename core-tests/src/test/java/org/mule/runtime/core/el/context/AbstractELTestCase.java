@@ -8,6 +8,7 @@ package org.mule.runtime.core.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.mvel2.ImmutableElementException;
@@ -51,7 +52,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
   @Before
   public void setupMessageContext() throws Exception {
-    context = DefaultEventContext.create(flowConstruct, TEST_CONNECTOR);
+    context = DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR));
   }
 
   @Before

@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -50,7 +51,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setFlowConstruct(flow);
     router.initialise();
 
-    EventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
+    EventContext executionContext = DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR), "foo");
 
     Message message1 = Message.of("test event A");
     Message message2 = Message.of("test event B");
@@ -95,7 +96,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setFlowConstruct(flow);
     router.initialise();
 
-    EventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
+    EventContext executionContext = DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR), "foo");
     Message message1 = of("test event A");
 
     Event event1 =
@@ -124,7 +125,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setFlowConstruct(flow);
     router.initialise();
 
-    EventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
+    EventContext executionContext = DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR), "foo");
 
     Message message1 = of("test event A");
     Message message2 = of("test event B");

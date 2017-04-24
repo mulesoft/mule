@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
@@ -91,7 +92,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     when(muleContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
     pipeline = new TestPipeline(pipelineName, muleContext);
     when(muleContext.getTransformationService()).thenReturn(new TransformationService(muleContext));
-    context = DefaultEventContext.create(pipeline, TEST_CONNECTOR);
+    context = DefaultEventContext.create(pipeline, fromSingleComponent(TEST_CONNECTOR));
   }
 
   @After

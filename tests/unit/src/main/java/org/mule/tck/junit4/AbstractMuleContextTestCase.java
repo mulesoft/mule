@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.util.FileUtils.newFile;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
@@ -408,7 +409,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    */
   protected static Builder eventBuilder() throws MuleException {
     FlowConstruct flowConstruct = getTestFlow(muleContext);
-    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).flow(flowConstruct);
+    return Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR))).flow(flowConstruct);
   }
 
   protected boolean isStartContext() {

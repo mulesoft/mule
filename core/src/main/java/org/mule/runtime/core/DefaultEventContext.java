@@ -10,7 +10,7 @@ import static java.lang.System.identityHashCode;
 import static java.time.OffsetTime.now;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -39,28 +39,35 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * Builds a new execution context with the given parameters.
    *
    * @param flow the flow that processes events of this context.
-   * @param connectorName the name of the connector that received the first message for this context.
+   * @param location the location of the component that received the first message for this context.
    */
-  public static EventContext create(FlowConstruct flow, String connectorName) {
-    return create(flow, connectorName, null);
+  public static EventContext create(FlowConstruct flow, ComponentLocation location) {
+    return create(flow, location, null);
+  }
+
+  /**
+   * Builds a new execution context with the given parameters and an empty publisher.
+   *
+   * @param flow the flow that processes events of this context.
+   * @param location the location of the component that received the first message for this context.
+   * @param correlationId See {@link EventContext#getCorrelationId()}.
+   */
+  public static EventContext create(FlowConstruct flow, ComponentLocation location, String correlationId) {
+    return create(flow, location, correlationId, Mono.empty());
   }
 
   /**
    * Builds a new execution context with the given parameters.
    *
    * @param flow the flow that processes events of this context.
-   * @param connectorName the name of the connector that received the first message for this context.
+   * @param location the location of the component that received the first message for this context.
    * @param correlationId See {@link EventContext#getCorrelationId()}.
    * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
    *        {@link EventContext} to depend on completion of source.
    */
-  public static EventContext create(FlowConstruct flow, String connectorName, String correlationId,
+  public static EventContext create(FlowConstruct flow, ComponentLocation location, String correlationId,
                                     Publisher<Void> externalCompletionPublisher) {
-    return new DefaultEventContext(flow, connectorName, correlationId, externalCompletionPublisher);
-  }
-
-  public static EventContext create(FlowConstruct flow, String connectorName, String correlationId) {
-    return new DefaultEventContext(flow, connectorName, correlationId, Mono.empty());
+    return new DefaultEventContext(flow, location, correlationId, externalCompletionPublisher);
   }
 
   /**
@@ -88,6 +95,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   private final String serverId;
   private final String flowName;
   private final String connectorName;
+  private final String sourceName;
 
   private final ProcessingTime processingTime;
   private final ProcessorsTrace processorsTrace = new DefaultProcessorsTrace();
@@ -118,6 +126,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   @Override
+  public String getOriginatingSourceName() {
+    return sourceName;
+  }
+
+  @Override
   public ProcessingTime getProcessingTime() {
     return processingTime;
   }
@@ -141,19 +154,20 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * Builds a new execution context with the given parameters.
    *
    * @param flow the flow that processes events of this context.
-   * @param connectorName the name of the connector that received the first message for this context.
+   * @param location the location of the component that received the first message for this context.
    * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link Event} of this
    *        context, if available.
    * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
    *        {@link EventContext} to depend on completion of source.
    */
-  private DefaultEventContext(FlowConstruct flow, String connectorName, String correlationId,
+  private DefaultEventContext(FlowConstruct flow, ComponentLocation location, String correlationId,
                               Publisher<Void> externalCompletionPublisher) {
     super(externalCompletionPublisher);
     this.id = flow.getUniqueIdString();
     this.serverId = flow.getServerId();
     this.flowName = flow.getName();
-    this.connectorName = connectorName;
+    this.connectorName = location.getComponentIdentifier().getIdentifier().getNamespace();
+    this.sourceName = location.getComponentIdentifier().getIdentifier().getName();
     this.processingTime = ProcessingTime.newInstance(flow);
     this.correlationId = correlationId;
   }
@@ -198,6 +212,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     @Override
     public String getOriginatingConnectorName() {
       return parent.getOriginatingConnectorName();
+    }
+
+    @Override
+    public String getOriginatingSourceName() {
+      return parent.getOriginatingSourceName();
     }
 
     @Override

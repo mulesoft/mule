@@ -29,6 +29,7 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
@@ -1014,7 +1015,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   protected Event getTestEventUsingFlow(Object data) {
     Event event = mock(Event.class);
-    EventContext eventContext = DefaultEventContext.create(flow, "");
+    EventContext eventContext = DefaultEventContext.create(flow, fromSingleComponent("test"));
     Message message = of(data);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getMessage()).thenReturn(message);

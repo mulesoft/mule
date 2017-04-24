@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
@@ -47,8 +48,9 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
     when(flow.getUniqueIdString()).thenReturn(GENERATED_CORRELATION_ID);
     when(flow.getServerId()).thenReturn(SERVER_ID);
 
-    executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR);
-    executionContextWithCorrelation = DefaultEventContext.create(flow, TEST_CONNECTOR, CUSTOM_CORRELATION_ID);
+    executionContext = DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR));
+    executionContextWithCorrelation =
+        DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR), CUSTOM_CORRELATION_ID);
   }
 
   @Test

@@ -24,6 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -103,7 +104,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
     final Message mockMessage = Message.of("");
-    event = Event.builder(DefaultEventContext.create(mockFlow, TEST_CONNECTOR)).message(mockMessage).build();
+    event = Event.builder(DefaultEventContext.create(mockFlow, fromSingleComponent(TEST_CONNECTOR))).message(mockMessage).build();
     when(mockUntilSuccessfulConfiguration.getObjectStore()).thenReturn(objectStore);
     objectStore.clear();
     configureMockPoolToInvokeRunnableInNewThread();

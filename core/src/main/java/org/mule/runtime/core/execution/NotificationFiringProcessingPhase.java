@@ -31,7 +31,7 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
 
   private ConcurrentHashMap<ServerNotificationManager, NotificationHelper> notificationHelpers = new ConcurrentHashMap<>();
 
-  private MuleContext muleContext;
+  protected MuleContext muleContext;
 
   protected void fireNotification(Object source, Event event, FlowConstruct flow, int action) {
     try {

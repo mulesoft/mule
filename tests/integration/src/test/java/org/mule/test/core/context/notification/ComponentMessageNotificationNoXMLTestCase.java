@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -71,7 +72,8 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleConte
   public void testComponentNotificationNotRegistered() throws Exception {
     assertFalse(componentListener.isNotified());
 
-    component.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(of("test data")).build());
+    component.process(Event.builder(DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR)))
+        .message(of("test data")).build());
 
     assertFalse(componentListener.isNotified());
     assertFalse(componentListener.isBefore());
@@ -85,7 +87,7 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleConte
 
     assertFalse(componentListener.isNotified());
 
-    component.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+    component.process(Event.builder(DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR)))
         .message(of("test data"))
         .build());
 

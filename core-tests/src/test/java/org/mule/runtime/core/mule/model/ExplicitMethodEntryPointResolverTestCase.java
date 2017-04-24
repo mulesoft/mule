@@ -9,6 +9,7 @@ package org.mule.runtime.core.mule.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleEventContext;
@@ -37,7 +38,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testMethodSetPass() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("someBusinessMethod");
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
         .message(of("blah"))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
@@ -51,7 +52,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("someBusinessMethod");
     resolver.addMethod("someSetter");
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
         .message(of("blah"))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
@@ -65,7 +66,8 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("noMethod");
     resolver.addMethod("noMethod2");
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(of("blah")).build();
+    final Event event =
+        Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR))).message(of("blah")).build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result =
         resolver.invoke(new MultiplePayloadsTestObject(), eventContext, Event.builder(eventContext.getEvent()));
@@ -76,7 +78,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testNoMethodSet() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     try {
-      final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+      final Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
           .message(of("blah"))
           .build();
       MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
@@ -98,7 +100,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testMethodPropertyParameterAssignableFromPayload() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("wash");
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
         .message(of(new Apple()))
         .build();
     MuleEventContext ctx = new DefaultMuleEventContext(flowConstruct, event);
@@ -116,7 +118,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testMethodPropertyParameterNull() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("someOtherBusinessMethod");
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
         .message(of(new Object[] {null, "blah"}))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);

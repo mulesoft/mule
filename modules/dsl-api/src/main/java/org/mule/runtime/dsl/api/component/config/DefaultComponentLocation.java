@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.dsl.api.component.config;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.LocationPart;
@@ -52,6 +55,18 @@ public class DefaultComponentLocation implements ComponentLocation {
   private LinkedList<DefaultLocationPart> parts;
   private String location;
   private Lock lock = new ReentrantLock();
+
+  public static DefaultComponentLocation fromSingleComponent(String component) {
+    DefaultLocationPart part = new DefaultLocationPart(component,
+                                                       of(TypedComponentIdentifier.builder()
+                                                           .withType(TypedComponentIdentifier.ComponentType.UNKNOWN)
+                                                           .withIdentifier(ComponentIdentifier
+                                                               .buildFromStringRepresentation(component))
+                                                           .build()),
+                                                       empty(),
+                                                       empty());
+    return new DefaultComponentLocation(of(component), asList(part));
+  }
 
   /**
    * @param name the name of the global element in which the specific component is located.

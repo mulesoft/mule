@@ -8,6 +8,7 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleEventContext;
@@ -38,7 +39,7 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatch() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
         .message(of(new Fruit[] {new Apple(), new Orange()}))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
@@ -49,7 +50,7 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatchGenericFail() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
         .message(of(new Object[] {new Apple(), new Orange()}))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
@@ -60,7 +61,7 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatchFail() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
         .message(of(new Object[] {"blah"}))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);

@@ -14,6 +14,7 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.failedToScheduleWor
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.just;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -135,7 +136,7 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
   private void pollWith(final Message request) {
     try {
       just(request)
-          .map(message -> builder(create(flowConstruct, getPollingUniqueName())).message(request).flow(flowConstruct).build())
+          .map(message -> builder(create(flowConstruct, fromSingleComponent(getPollingUniqueName()))).message(request).flow(flowConstruct).build())
           .doOnNext(event -> setCurrentEvent(event))
           .doOnNext(event -> muleContext.getNotificationManager()
               .fireNotification(new ConnectorMessageNotification(this, event.getMessage(), getPollingUniqueName(),

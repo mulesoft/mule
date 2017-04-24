@@ -69,6 +69,7 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.module.deployment.impl.internal.application.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
@@ -4036,7 +4037,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         (Flow) deploymentService.getApplications().get(0).getMuleContext().getRegistry().lookupFlowConstruct(flowName);
     Message muleMessage = of(TEST_MESSAGE);
 
-    mainFlow.process(Event.builder(DefaultEventContext.create(mainFlow, TEST_CONNECTOR))
+    mainFlow.process(Event.builder(DefaultEventContext.create(mainFlow, fromSingleComponent(TEST_CONNECTOR)))
         .message(muleMessage)
         .flow(mainFlow).build());
   }

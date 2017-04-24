@@ -9,6 +9,7 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.message.Message;
@@ -39,7 +40,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
     ir.setStorePrefix("foo");
     ir.setStore(new InMemoryObjectStore<String>());
 
-    final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR);
+    final EventContext context = DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR));
 
     Message okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
     Event event = Event.builder(context).message(okMessage).flow(getTestFlow(muleContext)).session(session).build();

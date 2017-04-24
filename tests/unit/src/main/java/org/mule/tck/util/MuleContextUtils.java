@@ -10,6 +10,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 import org.mule.runtime.api.exception.MuleException;
@@ -67,7 +68,7 @@ public class MuleContextUtils {
    */
   public static Builder eventBuilder() throws MuleException {
     FlowConstruct flowConstruct = getTestFlow(mockContextWithServices());
-    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR));
+    return Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)));
   }
 
 }

@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -82,7 +83,8 @@ public class ExpressionFilter implements Filter, MuleContextAware {
 
     // TODO MULE-9341 Remove Filters. Expression filter will be replaced by something that uses MuleEvent.
     Flow flowConstruct = builder("ExpressionFilterFlow", muleContext).build();
-    return accept(Event.builder(create(flowConstruct, "ExpressionFilter")).message(message).flow(flowConstruct).build(), builder);
+    return accept(Event.builder(create(flowConstruct, fromSingleComponent("ExpressionFilter"))).message(message)
+        .flow(flowConstruct).build(), builder);
   }
 
   /**

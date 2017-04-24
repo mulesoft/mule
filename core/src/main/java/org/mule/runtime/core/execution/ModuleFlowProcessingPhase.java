@@ -20,7 +20,6 @@ import static org.mule.runtime.core.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollection;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -91,8 +90,7 @@ public class ModuleFlowProcessingPhase
 
       MonoProcessor<Void> responseCompletion = MonoProcessor.create();
 
-      Event templateEvent = createEvent(template, messageProcessContext, sourceLocation.getComponentIdentifier().getIdentifier(),
-                                        responseCompletion);
+      Event templateEvent = createEvent(template, messageProcessContext, sourceLocation, responseCompletion);
 
       // TODO MULE-11167 Policies should be non blocking
       if (System.getProperty(ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY) == null) {
@@ -172,12 +170,12 @@ public class ModuleFlowProcessingPhase
   }
 
   private Event createEvent(ModuleFlowProcessingPhaseTemplate template, MessageProcessContext messageProcessContext,
-                            ComponentIdentifier sourceIdentifier, Publisher<Void> responseCompletion)
+                            ComponentLocation sourceLocation, Publisher<Void> responseCompletion)
       throws MuleException {
     Message message = template.getMessage();
     Event templateEvent =
-        Event.builder(create(messageProcessContext.getFlowConstruct(), sourceIdentifier.getNamespace(), null, responseCompletion))
-            .message(message).build();
+        Event.builder(create(messageProcessContext.getFlowConstruct(), sourceLocation, null, responseCompletion)).message(message)
+            .build();
 
     if (message.getPayload().getValue() instanceof SourceResultAdapter) {
       SourceResultAdapter adapter = (SourceResultAdapter) message.getPayload().getValue();

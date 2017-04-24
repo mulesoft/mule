@@ -18,6 +18,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
@@ -146,7 +147,8 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
   }
 
   private Event createTestEvent() {
-    return Event.builder(DefaultEventContext.create(mockFlowConstruct, "http")).message(Message.of(null)).build();
+    return Event.builder(DefaultEventContext.create(mockFlowConstruct, fromSingleComponent("http"))).message(Message.of(null))
+        .build();
   }
 
 }

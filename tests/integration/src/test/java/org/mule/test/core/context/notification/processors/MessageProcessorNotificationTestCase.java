@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
-
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultEventContext;
@@ -293,9 +293,11 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     final Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("composite-source");
     CompositeMessageSource composite = (CompositeMessageSource) flow.getMessageSource();
     assertNotNull(((TestMessageSource) composite.getSources().get(0))
-        .fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(of(TEST_PAYLOAD)).build()));
+        .fireEvent(Event.builder(DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR))).message(of(TEST_PAYLOAD))
+            .build()));
     assertNotNull(((TestMessageSource) composite.getSources().get(1))
-        .fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(of(TEST_PAYLOAD)).build()));
+        .fireEvent(Event.builder(DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR))).message(of(TEST_PAYLOAD))
+            .build()));
 
     assertNotifications();
   }

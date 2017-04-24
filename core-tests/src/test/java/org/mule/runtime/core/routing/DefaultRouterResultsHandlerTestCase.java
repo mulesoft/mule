@@ -22,6 +22,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -59,7 +60,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
 
-    context = DefaultEventContext.create(flow, "test");
+    context = DefaultEventContext.create(flow, fromSingleComponent("test"));
   }
 
   @Test

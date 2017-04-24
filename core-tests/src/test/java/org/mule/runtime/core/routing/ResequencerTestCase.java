@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -49,7 +50,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     router.setFlowConstruct(flow);
     router.initialise();
 
-    EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
+    EventContext context = DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR), "foo");
 
     Message message1 = of("test event A");
     Message message2 = of("test event B");
@@ -83,7 +84,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     router.setFlowConstruct(flow);
     router.initialise();
 
-    EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
+    EventContext context = DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR), "foo");
 
     Message message1 = of("test event A");
     Message message2 = of("test event B");

@@ -51,18 +51,22 @@ public interface EventContext {
   OffsetTime getReceivedTime();
 
   /**
-   * TODO MULE-10517 Review this
    * 
    * @return the name of the flow that processes events of this context.
    */
   String getOriginatingFlowName();
 
   /**
-   * TODO MULE-10517 Review this
    * 
-   * @return the name of the connector that generated the message for the first event of this context.
+   * @return the name of the component that generated the message for the first event of this context.
    */
   String getOriginatingConnectorName();
+
+  /**
+   *
+   * @return the name of the source that generated the message for the first event of this context.
+   */
+  String getOriginatingSourceName();
 
   /**
    * Complete this {@link EventContext} successfully with no result {@link Event}.

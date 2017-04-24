@@ -7,6 +7,7 @@
 package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
@@ -96,7 +97,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     onErrorContinueHandler.setFlowConstruct(flow);
     when(mockMuleContext.getStreamCloserService()).thenReturn(mockStreamCloserService);
 
-    context = DefaultEventContext.create(flow, TEST_CONNECTOR);
+    context = DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR));
     muleEvent = Event.builder(context).message(muleMessage).flow(flow).build();
   }
 
