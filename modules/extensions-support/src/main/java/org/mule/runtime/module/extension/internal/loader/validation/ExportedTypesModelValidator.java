@@ -86,10 +86,10 @@ public final class ExportedTypesModelValidator implements ExtensionModelValidato
       public void visitObject(ObjectType objectType) {
         Collection<ObjectFieldType> parameters = objectType.getFields();
         Set<String> fieldsWithGetters =
-            getFieldsWithGetters(parameterType).stream().map(TypeUtils::getAlias).collect(toSet());
+            getFieldsWithGetters(parameterType).stream().map(TypeUtils::getAlias).map(String::toLowerCase).collect(toSet());
         Set<String> parameterWithoutGetters =
             parameters.stream().map(f -> f.getKey().getName().getLocalPart())
-                .filter(fieldName -> !fieldsWithGetters.contains(fieldName)).collect(toSet());
+                .filter(fieldName -> !fieldsWithGetters.contains(fieldName.toLowerCase())).collect(toSet());
         if (!parameterWithoutGetters.isEmpty()) {
           problems
               .addError(new Problem(model,

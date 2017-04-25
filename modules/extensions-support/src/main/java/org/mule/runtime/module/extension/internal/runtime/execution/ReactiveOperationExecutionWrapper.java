@@ -40,7 +40,7 @@ import reactor.core.publisher.Mono;
  */
 public final class ReactiveOperationExecutionWrapper implements OperationExecutor, Lifecycle, MuleContextAware {
 
-  private static final Logger LOGGER = getLogger(InterceptableOperationExecutorWrapper.class);
+  private static final Logger LOGGER = getLogger(ReactiveOperationExecutionWrapper.class);
 
   private final OperationExecutor delegate;
   private MuleContext muleContext;

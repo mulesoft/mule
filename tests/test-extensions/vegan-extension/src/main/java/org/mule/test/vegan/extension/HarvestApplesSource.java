@@ -7,33 +7,60 @@
 package org.mule.test.vegan.extension;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.testmodels.fruit.Apple;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Alias("harvest-apples")
 @MetadataScope(keysResolver = HarvestAppleKeyResolver.class,
     outputResolver = HarvestAppleKeyResolver.class)
-public class HarvestApplesSource extends Source<Apple, Attributes> {
+public class HarvestApplesSource extends Source<Apple, HarvestApplesAttributes> {
 
   @Config
-  AppleConfig appleConfig;
+  private AppleConfig appleConfig;
 
   @MetadataKeyId
   @Parameter
   @Optional
   private String key;
 
-  @Override
-  public void onStart(SourceCallback<Apple, Attributes> sourceCallback) throws MuleException {
+  @Parameter
+  @ConfigOverride
+  private List<String> mainProducers;
 
+  @Parameter
+  @ConfigOverride
+  private HealthyFood sample;
+
+  @Parameter
+  @Optional
+  private String shouldNotOverride;
+
+  @Parameter
+  @Optional
+  private String flowName;
+
+  @Override
+  public void onStart(SourceCallback<Apple, HarvestApplesAttributes> sourceCallback) throws MuleException {
+    sourceCallback.handle(Result.<Apple, HarvestApplesAttributes>builder()
+        .output(null).attributes(null).build());
+  }
+
+  @OnSuccess
+  public void onSuccess(@ConfigOverride @Optional Integer timeToPeel) {
+    appleConfig.getResults().put(flowName, Arrays.asList(mainProducers, sample, shouldNotOverride, timeToPeel));
   }
 
   @Override

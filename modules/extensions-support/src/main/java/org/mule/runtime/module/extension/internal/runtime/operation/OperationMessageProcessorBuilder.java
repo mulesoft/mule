@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
@@ -13,11 +14,13 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
@@ -26,6 +29,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 public final class OperationMessageProcessorBuilder {
 
@@ -84,11 +89,23 @@ public final class OperationMessageProcessorBuilder {
   public OperationMessageProcessor build() {
     return withContextClassLoader(getClassLoader(extensionModel), () -> {
       try {
-        ResolverSet resolverSet =
-            ParametersResolver.fromValues(parameters, muleContext).getParametersAsResolverSet(operationModel, muleContext);
-        OperationMessageProcessor processor;
-        ExtensionManager extensionManager = muleContext.getExtensionManager();
 
+        final ExtensionManager extensionManager = muleContext.getExtensionManager();
+        final Function<Event, Optional<ConfigurationInstance>> configurationInstanceProvider = event -> {
+          if (configurationProvider != null) {
+            return ofNullable(configurationProvider.get(event));
+          }
+
+          return extensionManager.getConfigurationProvider(extensionModel, operationModel)
+              .map(provider -> ofNullable(provider.get(event)))
+              .orElseGet(() -> extensionManager.getConfiguration(extensionModel, operationModel, event));
+        };
+
+        final ResolverSet resolverSet =
+            ParametersResolver.fromValues(parameters, muleContext, configurationInstanceProvider)
+                .getParametersAsResolverSet(operationModel, muleContext);
+
+        OperationMessageProcessor processor;
         if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
           processor =
               new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,

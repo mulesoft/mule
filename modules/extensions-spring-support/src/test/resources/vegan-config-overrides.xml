@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd">
+
+    <vegan:apple-config name="apple">
+        <vegan:cook-book>
+            <vegan:vegan-cook-book/>
+        </vegan:cook-book>
+    </vegan:apple-config>
+
+    <vegan:apple-config name="appleCustom" timeToPeel="60" shouldNotOverride="AppleConfigValue">
+        <vegan:main-producers>
+            <vegan:main-producer value="appleProducerOne"/>
+            <vegan:main-producer value="appleProducerTwo"/>
+        </vegan:main-producers>
+        <vegan:sample>
+            <vegan:taste-profile tasty="true"/>
+        </vegan:sample>
+        <vegan:cook-book>
+            <vegan:vegan-cook-book/>
+        </vegan:cook-book>
+    </vegan:apple-config>
+
+    <vegan:banana-config name="bananaCustom" timeToPeel="20"/>
+
+    <vegan:banana-config name="bananaDynamic" timeToPeel="#[payload]"/>
+
+    <!--timeToPeel-->
+    <flow name="timeToPeelOverrideOperationWithDefaults">
+        <vegan:get-time-to-peel config-ref="apple"/>
+    </flow>
+
+    <flow name="timeToPeelOverrideOperationWithCustom">
+        <vegan:get-time-to-peel config-ref="appleCustom"/>
+    </flow>
+
+    <flow name="timeToPeelDeclareValueInOperationWithCustom">
+        <vegan:get-time-to-peel config-ref="appleCustom" timeToPeel="30"/>
+    </flow>
+
+    <flow name="timeToPeelOverrideOperationWithBananaCustom">
+        <vegan:get-time-to-peel config-ref="bananaCustom"/>
+    </flow>
+
+    <flow name="timeToPeelOverrideOperationWithBananaDynamic">
+        <vegan:get-time-to-peel config-ref="bananaDynamic" timeToPeel="#[declaredVar]"/>
+    </flow>
+
+
+    <!--mainProducers-->
+    <flow name="mainProducersOverrideOperationWithDefaults">
+        <vegan:get-producers config-ref="apple"/>
+    </flow>
+
+    <flow name="mainProducersOverrideOperationWithCustom">
+        <vegan:get-producers config-ref="appleCustom"/>
+    </flow>
+
+    <flow name="mainProducersDeclareValueInOperationWithCustom">
+        <vegan:get-producers config-ref="appleCustom">
+            <vegan:main-producers>
+                <vegan:main-producer value="getProducersOne"/>
+            </vegan:main-producers>
+        </vegan:get-producers>
+    </flow>
+
+
+    <!--sample-->
+    <flow name="sampleOverrideOperationWithDefaults">
+        <vegan:get-fruit-sample config-ref="apple"/>
+    </flow>
+
+    <flow name="sampleOverrideOperationWithBananaDefaults">
+        <vegan:get-fruit-sample config-ref="bananaCustom"/>
+    </flow>
+
+    <flow name="sampleOverrideOperationWithCustom">
+        <vegan:get-fruit-sample config-ref="appleCustom"/>
+    </flow>
+
+    <flow name="sampleDeclareValueInOperationWithCustom">
+        <vegan:get-fruit-sample config-ref="appleCustom">
+            <vegan:sample>
+                <vegan:taste-profile tasty="false"/>
+            </vegan:sample>
+        </vegan:get-fruit-sample>
+    </flow>
+
+
+    <!--shouldNotOverride-->
+    <flow name="shouldNotOverrideOverrideOperationWithDefaults">
+        <vegan:get-not-overriden-parameter config-ref="apple"/>
+    </flow>
+
+    <flow name="shouldNotOverrideOverrideOperationWithCustom">
+        <vegan:get-not-overriden-parameter config-ref="appleCustom"/>
+    </flow>
+
+    <flow name="shouldNotOverrideDeclareValueInOperationWithCustom">
+        <vegan:get-not-overriden-parameter config-ref="appleCustom" shouldNotOverride="declared"/>
+    </flow>
+
+    
+    <!-- source -->
+    <flow name="sourceOverrideWithDefaults">
+        <vegan:harvest-apples config-ref="apple" flowName="sourceOverrideWithDefaults"/>
+        <logger level="ERROR"/>
+    </flow>
+
+    <flow name="sourceOverrideWithCustom">
+        <vegan:harvest-apples config-ref="appleCustom" flowName="sourceOverrideWithCustom"/>
+        <logger level="ERROR"/>
+    </flow>
+
+    <flow name="sourceDeclareValueInlineWithCustom">
+        <vegan:harvest-apples config-ref="appleCustom" timeToPeel="30" shouldNotOverride="declared"
+                              flowName="sourceDeclareValueInlineWithCustom">
+            <vegan:main-producers>
+                <vegan:main-producer value="getProducersOne"/>
+            </vegan:main-producers>
+            <vegan:sample>
+                <vegan:taste-profile tasty="false"/>
+            </vegan:sample>
+        </vegan:harvest-apples>
+        <logger level="ERROR"/>
+    </flow>
+
+
+</mule>

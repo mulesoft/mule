@@ -10,8 +10,8 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.core.policy.PolicyManager;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
@@ -27,7 +27,7 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
   private final ExtensionModel extensionModel;
   private final OperationModel operationModel;
   private final PolicyManager policyManager;
-  private ConfigurationProvider configuration;
+  private ConfigurationProvider configurationProvider;
   private String target = EMPTY;
   private CursorProviderFactory cursorProviderFactory;
 
@@ -40,11 +40,26 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
     this.operationModel = operationModel;
     this.policyManager = policyManager;
   }
+  //
+  // protected ParametersResolver getParametersResolver(MuleContext muleContext) {
+  //   final ExtensionManager extensionManager = muleContext.getExtensionManager();
+  //   final Function<Event, Optional<ConfigurationInstance>> configurationInstanceProvider = (event) -> {
+  //     if (configurationProvider != null) {
+  //       return ofNullable(configurationProvider.get(event));
+  //     }
+  //
+  //     return extensionManager.getConfigurationProvider(extensionModel, operationModel)
+  //       .map(provider -> ofNullable(provider.get(event)))
+  //       .orElseGet(() -> extensionManager.getConfiguration(extensionModel, operationModel, event));
+  //   };
+  //
+  //   return ParametersResolver.fromValues(parameters, muleContext, configurationInstanceProvider);
+  // }
 
   @Override
   public OperationMessageProcessor doGetObject() throws Exception {
     return new OperationMessageProcessorBuilder(extensionModel, operationModel, policyManager, muleContext)
-        .setConfigurationProvider(configuration)
+        .setConfigurationProvider(configurationProvider)
         .setParameters(parameters)
         .setTarget(target)
         .setCursorProviderFactory(cursorProviderFactory)
@@ -52,7 +67,7 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
   }
 
   public void setConfigurationProvider(ConfigurationProvider configuration) {
-    this.configuration = configuration;
+    this.configurationProvider = configuration;
   }
 
   public void setTarget(String target) {

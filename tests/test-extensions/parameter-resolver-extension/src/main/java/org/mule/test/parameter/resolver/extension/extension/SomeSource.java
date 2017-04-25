@@ -9,8 +9,9 @@ package org.mule.test.parameter.resolver.extension.extension;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.source.Source;

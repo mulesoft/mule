@@ -14,16 +14,27 @@ import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Configuration(name = APPLE)
-@Operations({EatAppleOperation.class, SpreadVeganismOperation.class, VeganFidelityOperation.class})
+@Operations({EatAppleOperation.class, SpreadVeganismOperation.class, VeganFidelityOperation.class,
+    FruitOperationsWithConfigOverride.class})
 @Sources({HarvestApplesSource.class, PaulMcCartneySource.class})
 @ConnectionProviders(VeganAppleConnectionProvider.class)
-public class AppleConfig {
+public class AppleConfig extends EasyToEatConfig {
 
   @Parameter
   private VeganCookBook cookBook;
 
+  private Map<String, List<Object>> results = new HashMap<>();
+
   public VeganCookBook getCookBook() {
     return cookBook;
+  }
+
+  public Map<String, List<Object>> getResults() {
+    return results;
   }
 }

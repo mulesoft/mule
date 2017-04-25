@@ -327,20 +327,29 @@ public final class MetadataMediator<T extends ComponentModel> {
       parameterGroup.getParameterModels().forEach(parameterModel -> {
         ParameterMetadataDescriptor parameterMetadataDescriptor = inputTypeDescriptors.get(parameterModel.getName());
         ParameterModel typedParameterModel =
-            new ImmutableParameterModel(parameterModel.getName(), parameterModel.getDescription(),
+            new ImmutableParameterModel(parameterModel.getName(),
+                                        parameterModel.getDescription(),
                                         parameterMetadataDescriptor.getType(),
-                                        parameterMetadataDescriptor.isDynamic(), parameterModel.isRequired(),
+                                        parameterMetadataDescriptor.isDynamic(),
+                                        parameterModel.isRequired(),
+                                        parameterModel.isOverrideFromConfig(),
                                         parameterModel.getExpressionSupport(),
-                                        parameterModel.getDefaultValue(), parameterModel.getRole(),
-                                        parameterModel.getDslConfiguration(), parameterModel.getDisplayModel().orElse(null),
-                                        parameterModel.getLayoutModel().orElse(null), parameterModel.getModelProperties());
+                                        parameterModel.getDefaultValue(),
+                                        parameterModel.getRole(),
+                                        parameterModel.getDslConfiguration(),
+                                        parameterModel.getDisplayModel().orElse(null),
+                                        parameterModel.getLayoutModel().orElse(null),
+                                        parameterModel.getModelProperties());
         parameters.add(typedParameterModel);
       });
 
       parameterGroups
-          .add(new ImmutableParameterGroupModel(parameterGroup.getName(), parameterGroup.getDescription(), parameters,
+          .add(new ImmutableParameterGroupModel(parameterGroup.getName(),
+                                                parameterGroup.getDescription(),
+                                                parameters,
                                                 parameterGroup.getExclusiveParametersModels(),
-                                                parameterGroup.isShowInDsl(), parameterGroup.getDisplayModel().orElse(null),
+                                                parameterGroup.isShowInDsl(),
+                                                parameterGroup.getDisplayModel().orElse(null),
                                                 parameterGroup.getLayoutModel().orElse(null),
                                                 parameterGroup.getModelProperties()));
     });

@@ -95,7 +95,8 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
     return builder.build();
   }
 
-  private Object resolveValue(ValueResolver<?> resolver, Event event) throws MuleException {
+  private Object resolveValue(ValueResolver<?> resolver, Event event)
+      throws MuleException {
     Object value = resolver.resolve(event);
     if (value instanceof ValueResolver) {
       return resolveValue((ValueResolver<?>) value, event);
