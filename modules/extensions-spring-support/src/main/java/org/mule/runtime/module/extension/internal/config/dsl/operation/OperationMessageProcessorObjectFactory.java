@@ -40,21 +40,6 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
     this.operationModel = operationModel;
     this.policyManager = policyManager;
   }
-  //
-  // protected ParametersResolver getParametersResolver(MuleContext muleContext) {
-  //   final ExtensionManager extensionManager = muleContext.getExtensionManager();
-  //   final Function<Event, Optional<ConfigurationInstance>> configurationInstanceProvider = (event) -> {
-  //     if (configurationProvider != null) {
-  //       return ofNullable(configurationProvider.get(event));
-  //     }
-  //
-  //     return extensionManager.getConfigurationProvider(extensionModel, operationModel)
-  //       .map(provider -> ofNullable(provider.get(event)))
-  //       .orElseGet(() -> extensionManager.getConfiguration(extensionModel, operationModel, event));
-  //   };
-  //
-  //   return ParametersResolver.fromValues(parameters, muleContext, configurationInstanceProvider);
-  // }
 
   @Override
   public OperationMessageProcessor doGetObject() throws Exception {
