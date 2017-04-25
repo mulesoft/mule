@@ -46,7 +46,7 @@ public class ServiceClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
     parentClassLoader = mock(ArtifactClassLoader.class);
     when(parentClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
-    when(lookupPolicy.getLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
+    when(lookupPolicy.getClassLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
     when(parentClassLoader.getClassLoaderLookupPolicy()).thenReturn(lookupPolicy);
   }
 
@@ -108,6 +108,6 @@ public class ServiceClassLoaderFactoryTestCase extends AbstractMuleTestCase {
       // Expected
     }
 
-    verify(lookupPolicy).getLookupStrategy(className);
+    verify(lookupPolicy).getClassLookupStrategy(className);
   }
 }

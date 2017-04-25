@@ -76,7 +76,7 @@ public class CustomJavaSerializationProtocolTestCase extends AbstractSerializerP
 
     final URL[] urls = new URL[] {compiler.getTargetFolder().toURL()};
     final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
-    when(lookupPolicy.getLookupStrategy(any())).thenReturn(PARENT_FIRST);
+    when(lookupPolicy.getClassLookupStrategy(any())).thenReturn(PARENT_FIRST);
     final MuleArtifactClassLoader artifactClassLoader =
         new MuleArtifactClassLoader(ARTIFACT_ID, new ArtifactDescriptor(ARTIFACT_NAME), urls, getClass().getClassLoader(),
                                     lookupPolicy);

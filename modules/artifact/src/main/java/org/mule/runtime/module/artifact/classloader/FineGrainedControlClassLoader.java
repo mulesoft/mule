@@ -67,7 +67,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
       return result;
     }
 
-    final LookupStrategy lookupStrategy = lookupPolicy.getLookupStrategy(name);
+    final LookupStrategy lookupStrategy = lookupPolicy.getClassLookupStrategy(name);
     if (lookupStrategy == null) {
       throw new NullPointerException(format("Unable to find a lookup strategy for '%s' from %s", name, this));
     }

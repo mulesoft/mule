@@ -67,7 +67,7 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
     final File appLibrary = new File(libDir, "appLibrary.jar");
     stringToFile(appLibrary.getAbsolutePath(), "Some text");
 
-    when(classLoaderLookupPolicy.getLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
+    when(classLoaderLookupPolicy.getClassLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
     when(parentArtifactClassLoader.getClassLoaderLookupPolicy()).thenReturn(classLoaderLookupPolicy);
     when(parentArtifactClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
 

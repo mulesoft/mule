@@ -46,10 +46,10 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
     final ArtifactClassLoader containerClassLoader = factory.createContainerClassLoader(this.getClass().getClassLoader());
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = containerClassLoader.getClassLoaderLookupPolicy();
-    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo1.Foo"), instanceOf(ContainerOnlyLookupStrategy.class));
-    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo1.bar.Bar"), instanceOf(ContainerOnlyLookupStrategy.class));
-    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo2.Fo"), instanceOf(ContainerOnlyLookupStrategy.class));
-    assertThat(classLoaderLookupPolicy.getLookupStrategy("org.foo2.bar.Bar"), sameInstance(CHILD_FIRST));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.foo1.Foo"), instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.foo1.bar.Bar"), instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.foo2.Fo"), instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.foo2.bar.Bar"), sameInstance(CHILD_FIRST));
   }
 
   @Test

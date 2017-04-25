@@ -140,8 +140,13 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
       super("testId", new ArtifactDescriptor("test"), new URL[0], parentCl, new ClassLoaderLookupPolicy() {
 
         @Override
-        public LookupStrategy getLookupStrategy(String className) {
+        public LookupStrategy getClassLookupStrategy(String className) {
           return PARENT_FIRST;
+        }
+
+        @Override
+        public LookupStrategy getPackageLookupStrategy(String packageName) {
+          return null;
         }
 
         @Override
