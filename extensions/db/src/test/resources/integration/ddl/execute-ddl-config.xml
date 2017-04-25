@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="executeDdl">
-        <db:execute-ddl>
+        <db:execute-ddl config-ref="dbConfig">
             <db:sql>CREATE TABLE TestDdl(NAME VARCHAR(255))</db:sql>
         </db:execute-ddl>
     </flow>

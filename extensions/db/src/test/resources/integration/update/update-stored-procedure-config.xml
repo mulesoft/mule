@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="updateStoredProcedure">
-        <db:update>
+        <db:update config-ref="dbConfig">
             <db:sql>{ call updateTestType1() }</db:sql>
         </db:update>
     </flow>

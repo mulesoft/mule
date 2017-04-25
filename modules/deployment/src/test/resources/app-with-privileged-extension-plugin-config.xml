@@ -12,6 +12,6 @@
             <fixed-frequency-scheduler frequency="1000"/>
         </scheduler>
         <set-payload value=""/>
-        <privileged:print-message/>
+        <privileged:print-message config-ref="default"/>
     </flow>
 </mule>

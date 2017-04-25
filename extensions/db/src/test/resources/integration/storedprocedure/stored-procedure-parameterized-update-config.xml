@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="update">
-        <db:stored-procedure>
+        <db:stored-procedure config-ref="dbConfig">
             <db:sql>call updateParamTestType1(:type)</db:sql>
             <db:input-parameters>
                 #[{'type' : payload}]

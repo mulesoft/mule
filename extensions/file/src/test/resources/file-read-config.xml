@@ -13,11 +13,11 @@
         <logger level="ERROR" message="#[streaming]" />
         <choice>
             <when expression="#[streaming]">
-                <file:read path="#[path]" />
+                <file:read config-ref="file" path="#[path]" />
                 <object-to-string-transformer />
             </when>
             <otherwise>
-                <file:read path="#[path]">
+                <file:read config-ref="file" path="#[path]">
                     <non-repeatable-stream />
                 </file:read>
             </otherwise>
@@ -25,13 +25,13 @@
     </flow>
 
     <flow name="readWithLock">
-        <file:read path="#[path]" lock="true">
+        <file:read config-ref="file" path="#[path]" lock="true">
             <non-repeatable-stream />
         </file:read>
     </flow>
 
     <flow name="readWithForcedMimeType">
-        <file:read path="#[path]" outputMimeType="test/test"/>
+        <file:read config-ref="file" path="#[path]" outputMimeType="test/test"/>
         <object-to-string-transformer />
     </flow>
     

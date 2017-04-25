@@ -28,27 +28,27 @@
     </heisenberg:config>
 
     <flow name="defaultContentType">
-        <heisenberg:say-my-name/>
+        <heisenberg:say-my-name config-ref="heisenberg"/>
     </flow>
 
     <flow name="setsContentTypeOnXml">
-        <heisenberg:say-my-name outputEncoding="${customEncoding}" outputMimeType="text/plain"/>
+        <heisenberg:say-my-name config-ref="heisenberg" outputEncoding="${customEncoding}" outputMimeType="text/plain"/>
     </flow>
 
     <flow name="onlySetEncodingOnXml">
-        <heisenberg:get-enemy index="0" outputEncoding="${customEncoding}" />
+        <heisenberg:get-enemy config-ref="heisenberg" index="0" outputEncoding="${customEncoding}" />
     </flow>
 
     <flow name="onlySetMimeTypeOnXml">
-        <heisenberg:say-my-name outputMimeType="dead/dead"/>
+        <heisenberg:say-my-name config-ref="heisenberg" outputMimeType="dead/dead"/>
     </flow>
 
     <flow name="setsContentTypeProgrammatically">
-        <heisenberg:get-enemy index="0"/>
+        <heisenberg:get-enemy config-ref="heisenberg" index="0"/>
     </flow>
 
     <flow name="setEncodingInMimeTypeAndParam">
-        <heisenberg:say-my-name outputMimeType="application/json; charset=UTF-8" outputEncoding="UTF-16"/>
+        <heisenberg:say-my-name config-ref="heisenberg" outputMimeType="application/json; charset=UTF-8" outputEncoding="UTF-16"/>
     </flow>
 
 </mule>

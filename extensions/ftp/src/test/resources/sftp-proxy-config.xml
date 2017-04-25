@@ -13,7 +13,7 @@
     </ftp:config>
 
     <flow name="sftpRead">
-        <ftp:read path="files/hello.json"/>
+        <ftp:read config-ref="sftp" path="files/hello.json"/>
         <object-to-string-transformer/>
     </flow>
 </mule>

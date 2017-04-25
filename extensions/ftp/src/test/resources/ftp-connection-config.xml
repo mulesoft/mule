@@ -5,7 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd">
 
-    <ftp:config name="ftp">
+    <ftp:config name="config">
         <ftp:connection username="anonymous" password="password" host="localhost" port="${ftpPort}" workingDir="${workingDir}"/>
     </ftp:config>
 

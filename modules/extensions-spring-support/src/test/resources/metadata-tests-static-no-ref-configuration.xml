@@ -10,6 +10,6 @@
     </metadata:config>
 
     <flow name="resolverWithImplicitStaticConfig">
-        <metadata:simple-multi-level-key-resolver continent="AMERICA" country="USA" city="SFO"/>
+        <metadata:simple-multi-level-key-resolver config-ref="config" continent="AMERICA" country="USA" city="SFO"/>
     </flow>
 </mule>

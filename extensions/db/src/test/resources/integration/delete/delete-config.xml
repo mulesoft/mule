@@ -6,13 +6,13 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="deleteDynamic">
-        <db:delete>
+        <db:delete config-ref="dbConfig">
             <db:sql>#["DELETE FROM PLANET WHERE name = '$(payload)'"]</db:sql>
         </db:delete>
     </flow>
 
     <flow name="deleteParameterized">
-        <db:delete>
+        <db:delete config-ref="dbConfig">
             <db:sql>DELETE FROM PLANET WHERE name = :name</db:sql>
             <db:input-parameters>
                 #[{

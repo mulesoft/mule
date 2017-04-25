@@ -25,7 +25,7 @@
     </heisenberg:config>
 
     <flow name="source" initialState="stopped">
-        <heisenberg:listen-payments initialBatchNumber="0">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
@@ -35,7 +35,7 @@
     </flow>
 
     <flow name="sourceFailed" initialState="stopped">
-        <heisenberg:listen-payments initialBatchNumber="0">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
@@ -47,14 +47,14 @@
 
     <flow name="sourceFailedOnRuntime" initialState="stopped">
         <!--invalid initialBatchNumber with negative value -->
-        <heisenberg:listen-payments initialBatchNumber="-1"/>
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="-1"/>
 
         <set-payload value="100"/>
     </flow>
 
     <flow name="sourceFailedOnStart" initialState="stopped">
         <!--invalid corePoolSize with negative value -->
-        <heisenberg:listen-payments initialBatchNumber="1" corePoolSize="-1"/>
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="1" corePoolSize="-1"/>
 
         <set-payload value="100"/>
     </flow>

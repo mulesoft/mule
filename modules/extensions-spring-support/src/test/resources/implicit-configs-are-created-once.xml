@@ -7,10 +7,13 @@
 
     <implicitexclusive:blaconf name="blaexplicit"/>
     <implicitexclusive:blaconf name="blaexplicit2"/>
-    <implicitexclusive:bleconf name="bleexplicit"/>
+    <implicitexclusive:bleconf name="bleexplicit" number="15"/>
 
     <flow name="implicitConfig">
         <implicitexclusive:bla/>
+        <implicitexclusive:bla/>
+        <implicitexclusive:bla/>
+        <implicitexclusive:ble/>
         <implicitexclusive:ble/>
     </flow>
 </mule>

@@ -48,31 +48,31 @@
     </heisenberg:config>
 
     <flow name="sayMyName">
-        <heisenberg:say-my-name/>
+        <heisenberg:say-my-name config-ref="heisenberg"/>
     </flow>
 
     <flow name="sayMyNameOnTarget">
-        <heisenberg:say-my-name target="myFace"/>
+        <heisenberg:say-my-name config-ref="heisenberg" target="myFace"/>
     </flow>
 
     <flow name="die">
-        <heisenberg:die/>
+        <heisenberg:die config-ref="heisenberg" />
     </flow>
 
     <flow name="getFixedEnemy">
-        <heisenberg:get-enemy index="0"/>
+        <heisenberg:get-enemy config-ref="heisenberg" index="0"/>
     </flow>
 
     <flow name="getDefaultEnemy">
-        <heisenberg:get-enemy/>
+        <heisenberg:get-enemy config-ref="heisenberg"/>
     </flow>
     
     <flow name="getAllEnemies">
-        <heisenberg:get-all-enemies />
+        <heisenberg:get-all-enemies config-ref="heisenberg"/>
     </flow>
 
     <flow name="expressionEnemy">
-        <heisenberg:get-enemy index="#[mel:flowVars['enemy']]"/>
+        <heisenberg:get-enemy config-ref="heisenberg" index="#[mel:flowVars['enemy']]"/>
     </flow>
 
     <flow name="getInlineInfo">
@@ -82,7 +82,7 @@
     </flow>
 
     <flow name="getInlinePersonalInfo">
-        <heisenberg:get-inline-personal-info>
+        <heisenberg:get-inline-personal-info >
             <heisenberg:personal-info-argument myName="Pepe" age="26">
                 <heisenberg:known-addresses>
                     <heisenberg:known-address value="explicitAddress"/>
@@ -179,7 +179,7 @@
     </flow>
 
     <flow name="callSaul">
-        <heisenberg:call-saul/>
+        <heisenberg:call-saul config-ref="heisenberg"/>
     </flow>
 
     <flow name="killWithWeapon">
@@ -222,7 +222,7 @@
     </flow>
 
     <flow name="getSaulNumber">
-        <heisenberg:get-saul-phone/>
+        <heisenberg:get-saul-phone config-ref="heisenberg"/>
     </flow>
 
     <flow name="literalEcho">

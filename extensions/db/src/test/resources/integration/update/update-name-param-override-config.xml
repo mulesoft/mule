@@ -19,15 +19,15 @@
     </db:query>
 
     <flow name="defaultParams">
-        <db:update template="updateTemplate" />
+        <db:update config-ref="dbConfig" template="updateTemplate" />
     </flow>
 
     <flow name="overriddenParams">
-        <db:update template="overriddenUpdateParam" />
+        <db:update config-ref="dbConfig" template="overriddenUpdateParam" />
     </flow>
 
     <flow name="inlineOverriddenParams">
-        <db:update template="overriddenUpdateParam">
+        <db:update config-ref="dbConfig" template="overriddenUpdateParam">
             <db:input-parameters>
                 #[{'position' : 3}]
             </db:input-parameters>
@@ -35,13 +35,13 @@
     </flow>
 
     <flow name="inlineQuery">
-        <db:update>
+        <db:update config-ref="dbConfig">
             <db:sql>#["update PLANET set NAME='Mercury' where POSITION=4"]</db:sql>
         </db:update>
     </flow>
 
     <flow name="expressionParam">
-        <db:update>
+        <db:update config-ref="dbConfig">
             <db:sql>#["update PLANET set NAME='Mercury' where POSITION=$(type) AND NAME = 'Earth'"]</db:sql>
         </db:update>
     </flow>

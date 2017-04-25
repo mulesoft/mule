@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="getResultSet">
-        <db:stored-procedure>
+        <db:stored-procedure config-ref="dbConfig">
             <db:sql>{ call getTestRecords() }</db:sql>
         </db:stored-procedure>
     </flow>

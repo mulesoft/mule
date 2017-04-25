@@ -6,13 +6,13 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="bulkInsert">
-        <db:bulk-insert>
+        <db:bulk-insert config-ref="dbConfig">
             <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)</db:sql>
         </db:bulk-insert>
     </flow>
 
     <flow name="bulkInsertWithOverriddenType">
-        <db:bulk-insert>
+        <db:bulk-insert config-ref="dbConfig">
             <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)</db:sql>
             <db:parameter-types>
                 <db:parameter-type key="name" type="VARCHAR" />
@@ -22,7 +22,7 @@
     </flow>
 
     <flow name="bulkInsertWithUnusedParameterType">
-        <db:bulk-insert>
+        <db:bulk-insert config-ref="dbConfig">
             <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)</db:sql>
             <db:parameter-types>
                 <db:parameter-type key="name" type="VARCHAR" />

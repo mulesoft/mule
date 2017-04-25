@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="update">
-        <db:update>
+        <db:update config-ref="dbConfig">
             <db:sql>update PLANET set NAME='Mercury' where POSITION=4</db:sql>
         </db:update>
     </flow>
@@ -15,13 +15,13 @@
         <set-variable variableName="data" value="Mercury"/>
         <set-variable variableName="type" value="4"/>
 
-        <db:update>
+        <db:update config-ref="dbConfig">
             <db:sql>#["update PLANET set NAME='$(data)' where POSITION=$(type)"]</db:sql>
         </db:update>
     </flow>
 
     <flow name="updateParameterized">
-        <db:update>
+        <db:update config-ref="dbConfig">
             <db:sql>update PLANET set NAME= :name where NAME='Mars'</db:sql>
             <db:input-parameters>
                 #[{'name' : payload}]
@@ -30,7 +30,7 @@
     </flow>
 
     <flow name="updateBlob">
-        <db:update>
+        <db:update config-ref="dbConfig">
             <db:sql>update PLANET set PICTURE = :pic where NAME='Mars'</db:sql>
             <db:input-parameters>
                 #[{'pic' : payload}]
@@ -39,7 +39,7 @@
     </flow>
 
     <flow name="merge">
-        <db:update>
+        <db:update config-ref="dbConfig">
             <db:sql>
                 MERGE INTO PLANET p1
                 USING PLANET p2
@@ -51,7 +51,7 @@
     </flow>
 
     <flow name="truncateTable">
-        <db:update>
+        <db:update config-ref="dbConfig">
             <db:sql>TRUNCATE TABLE PLANET</db:sql>
         </db:update>
     </flow>

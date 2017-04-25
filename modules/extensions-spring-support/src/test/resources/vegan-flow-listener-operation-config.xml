@@ -8,17 +8,17 @@
     <vegan:banana-config name="banana"/>
 
     <flow name="listenAndByteBanana">
-        <vegan:get-lunch />
+        <vegan:get-lunch config-ref="banana" />
         <expression-component>mel:payload.bite()</expression-component>
     </flow>
 
     <flow name="listenAndEatMeat">
-        <vegan:get-lunch />
+        <vegan:get-lunch config-ref="banana"/>
         <set-payload value="pork beef" />
     </flow>
 
     <flow name="listenAndFail">
-        <vegan:get-lunch />
+        <vegan:get-lunch config-ref="banana"/>
         <expression-component>mel:bla bla bla</expression-component>
     </flow>
                   

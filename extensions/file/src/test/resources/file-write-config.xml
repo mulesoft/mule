@@ -12,18 +12,18 @@
     </spring:beans>
 
     <flow name="write">
-        <file:write path="#[path]" mode="#[mode]" createParentDirectories="#[createParent]" encoding="#[encoding]"/>
+        <file:write config-ref="file" path="#[path]" mode="#[mode]" createParentDirectories="#[createParent]" encoding="#[encoding]"/>
     </flow>
 
     <flow name="writeStaticContent">
-        <file:write path="#[path]" mode="#[mode]" createParentDirectories="#[createParent]">
+        <file:write config-ref="file" path="#[path]" mode="#[mode]" createParentDirectories="#[createParent]">
             <file:content>Hello World!</file:content>
         </file:write>
     </flow>
 
     <flow name="readAndWrite">
-        <file:read path="#[path]" />
+        <file:read config-ref="file" path="#[path]" />
         <set-payload value="Hello World!" />
-        <file:write path="#[path]" mode="OVERWRITE"/>
+        <file:write config-ref="file" path="#[path]" mode="OVERWRITE"/>
     </flow>
 </mule>

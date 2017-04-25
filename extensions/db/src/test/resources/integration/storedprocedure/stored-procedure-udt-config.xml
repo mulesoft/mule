@@ -7,7 +7,7 @@
 
     <flow name="returnsObject">
         <try transactionalAction="ALWAYS_BEGIN">
-            <db:stored-procedure>
+            <db:stored-procedure config-ref="dbConfig">
                 <db:sql>{ CALL getManagerDetails('Southwest', :out) }</db:sql>
                 <db:output-parameters>
                     <db:output-parameter key="out" customType="CONTACT_DETAILS"/>

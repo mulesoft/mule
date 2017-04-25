@@ -7,19 +7,19 @@
 
 
     <flow name="insert">
-        <db:insert>
+        <db:insert config-ref="dbConfig">
             <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (777, 'Mercury')</db:sql>
         </db:insert>
     </flow>
 
     <flow name="insertDynamic">
-        <db:insert>
+        <db:insert config-ref="dbConfig">
             <db:sql>#["INSERT INTO PLANET(POSITION, NAME) VALUES (777, $(payload))"]</db:sql>
         </db:insert>
     </flow>
 
     <flow name="insertParameterized">
-        <db:insert>
+        <db:insert config-ref="dbConfig">
             <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (:id, :name)</db:sql>
             <db:input-parameters>
                 #[

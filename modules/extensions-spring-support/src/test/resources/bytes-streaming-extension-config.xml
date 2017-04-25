@@ -10,14 +10,14 @@
     <marvel:dr-strange name="drStrange" />
 
     <flow name="readStream">
-        <marvel:read-stream />
+        <marvel:read-stream config-ref="drStrange"/>
     </flow>
 
     <flow name="rewind">
         <flow-ref name="toStream" />
-        <marvel:read-stream target="firstRead" />
-        <marvel:seek-stream position="0" />
-        <marvel:read-stream target="secondRead" />
+        <marvel:read-stream config-ref="drStrange" target="firstRead" />
+        <marvel:seek-stream config-ref="drStrange" position="0" />
+        <marvel:read-stream config-ref="drStrange" target="secondRead" />
     </flow>
 
     <flow name="consumeGeneratedStream">
@@ -32,13 +32,13 @@
     
     <flow name="seekStream">
         <flow-ref name="toStream" />
-        <marvel:seek-stream position="#[position]" />
+        <marvel:seek-stream config-ref="drStrange" position="#[position]" />
     </flow>
     
     <flow name="seekStreamTx">
         <try transactionalAction="BEGIN_OR_JOIN">
             <flow-ref name="toStream" />
-            <marvel:seek-stream position="#[position]" />
+            <marvel:seek-stream config-ref="drStrange" position="#[position]" />
         </try>
     </flow>
 
@@ -48,7 +48,7 @@
 
     <flow name="toGreedyStream">
         <try>
-            <marvel:to-stream>
+            <marvel:to-stream config-ref="drStrange" >
                 <repeatable-in-memory-stream maxInMemorySize="1" initialBufferSize="1" bufferSizeIncrement="1" bufferUnit="BYTE" />
             </marvel:to-stream>
             <flow-ref name="readStream" />
@@ -62,20 +62,20 @@
     </flow>
 
     <flow name="toSimpleStream">
-        <marvel:to-stream>
+        <marvel:to-stream config-ref="drStrange" >
             <non-repeatable-stream />
         </marvel:to-stream>
     </flow>
 
     <flow name="bytesCaster" initialState="stopped">
-        <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain" />
+        <marvel:bytes-caster config-ref="drStrange" castFrequencyInMillis="5000" spell="dormammu i've come to bargain" />
         <flow-ref name="assertPayloadIsStreamProvider" />
         <object-to-string-transformer />
         <flow-ref name="castSpell" />
     </flow>
 
     <flow name="bytesCasterInTx" initialState="stopped">
-        <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain" />
+        <marvel:bytes-caster config-ref="drStrange" castFrequencyInMillis="5000" spell="dormammu i've come to bargain" />
         <try transactionalAction="BEGIN_OR_JOIN">
             <flow-ref name="assertPayloadIsStreamProvider" />
             <object-to-string-transformer />
@@ -86,7 +86,7 @@
     
 
     <flow name="bytesCasterWithoutStreaming" initialState="stopped">
-        <marvel:bytes-caster castFrequencyInMillis="5000" spell="dormammu i've come to bargain">
+        <marvel:bytes-caster config-ref="drStrange" castFrequencyInMillis="5000" spell="dormammu i've come to bargain">
             <non-repeatable-stream />
         </marvel:bytes-caster>
         <flow-ref name="assertPayloadIsNotStreamProvider" />

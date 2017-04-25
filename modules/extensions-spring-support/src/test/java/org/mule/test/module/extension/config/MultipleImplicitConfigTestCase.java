@@ -30,7 +30,7 @@ public class MultipleImplicitConfigTestCase extends AbstractExtensionFunctionalT
   protected void doSetUpBeforeMuleContextCreation() throws Exception {
     expectedException.expect(InitialisationException.class);
     expectedException.expectCause(instanceOf(LifecycleException.class));
-    expectedException.expectMessage("No configuration can be inferred por extension 'multiImplicitConfig'");
+    expectedException.expectMessage("No configuration can be inferred for extension 'multiImplicitConfig'");
   }
 
   @Test

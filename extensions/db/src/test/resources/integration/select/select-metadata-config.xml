@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="selectMetadata">
-        <db:select>
+        <db:select config-ref="dbConfig">
             <db:sql>select * from PLANET</db:sql>
         </db:select>
     </flow>
