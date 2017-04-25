@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:simple-prefix="http://www.mulesoft.org/schema/a/different/path/mule/module-simple"
+      xmlns:module-simple-proxy="http://www.mulesoft.org/schema/mule/module-simple-proxy"
+      xsi:schemaLocation="
+      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/a/different/path/mule/module-simple http://www.mulesoft.org/schema/a/different/path/mule/module-simple/module-simple.xsd
+      http://www.mulesoft.org/schema/mule/module-simple-proxy http://www.mulesoft.org/schema/mule/module-simple-proxy/module-simple-proxy.xsd">
+
+    <notifications>
+        <notification event="MESSAGE-PROCESSOR"/>
+    </notifications>
+
+    <flow name="flowWithSingleMp">
+        <logger message="check"/>
+    </flow>
+
+    <flow name="flowWithSetPayloadHardcoded">
+        <simple-prefix:set-payload-hardcoded-value />
+    </flow>
+
+    <flow name="flowWithSetPayloadHardcodedTwice">
+        <simple-prefix:set-payload-hardcoded-value />
+        <simple-prefix:set-payload-hardcoded-value />
+    </flow>
+
+    <flow name="flowWithSetPayloadParamValue">
+        <simple-prefix:set-payload-param-value value="input value" />
+    </flow>
+
+    <flow name="flowWithSetPayloadTwoTimes">
+        <simple-prefix:set-payload-two-times/>
+    </flow>
+
+    <flow name="flowWithSetPayloadTwoTimesTwice">
+        <simple-prefix:set-payload-two-times/>
+        <simple-prefix:set-payload-two-times/>
+    </flow>
+
+    <flow name="flowWithProxySetPayloadHardcoded">
+        <module-simple-proxy:set-payload-hardcoded-value />
+    </flow>
+</mule>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-simple"
+        minMuleVersion="4.1.0"
+        prefix="simple-prefix"
+        namespace="http://www.mulesoft.org/schema/a/different/path/mule/module-simple"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+    <operation name="set-payload-hardcoded-value">
+        <body>
+            <mule:set-payload value="hardcoded value"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-param-value">
+        <parameters>
+            <parameter name="value" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[parameters.value]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-two-times">
+        <body>
+            <mule:set-payload value="a value"/>
+            <mule:set-payload value="another value"/>
+        </body>
+        <output type="string"/>
+    </operation>
+</module>

@@ -220,8 +220,11 @@ public class MacroExpansionModuleModel {
    */
   private ComponentModel createOperationInstance(ComponentModel operationRefModel, ExtensionModel extensionModel,
                                                  OperationModel operationModel, Set<String> moduleGlobalElementsNames) {
-    List<ComponentModel> bodyProcessors = operationModel.getModelProperty(OperationComponentModelModelProperty.class).get()
-        .getComponentModel().getInnerComponents();
+    final OperationComponentModelModelProperty operationComponentModelModelProperty =
+        operationModel.getModelProperty(OperationComponentModelModelProperty.class).get();
+    final ComponentModel operationModuleComponentModel = operationComponentModelModelProperty
+        .getBodyComponentModel();
+    List<ComponentModel> bodyProcessors = operationModuleComponentModel.getInnerComponents();
 
     String configRefName = operationRefModel.getParameters().get(MODULE_OPERATION_CONFIG_REF);
 
@@ -252,6 +255,14 @@ public class MacroExpansionModuleModel {
     for (ComponentModel processorChainModelChild : processorChainModel.getInnerComponents()) {
       processorChainModelChild.setParent(processorChainModel);
     }
+    final String configFileName = operationComponentModelModelProperty.getOperationComponentModel().getConfigFileName()
+        .orElseThrow(() -> new IllegalArgumentException(format("The is no config file name for the operation [%s] in the module [%s]",
+                                                               operationModel.getName(), extensionModel.getName())));
+    processorChainBuilder.setConfigFileName(configFileName);
+    final Integer lineNumber = operationComponentModelModelProperty.getOperationComponentModel().getLineNumber()
+        .orElseThrow(() -> new IllegalArgumentException(format("The is no line number for the operation [%s] in the module [%s]",
+                                                               operationModel.getName(), extensionModel.getName())));
+    processorChainBuilder.setLineNumber(lineNumber);
     return processorChainModel;
   }
 
@@ -411,6 +422,14 @@ public class MacroExpansionModuleModel {
                                                        copyComponentModel(operationChildModel, configRefName,
                                                                           moduleGlobalElementsNames, literalsParameters));
     }
+
+    final String configFileName = modelToCopy.getConfigFileName()
+        .orElseThrow(() -> new IllegalArgumentException("The is no config file name for the component to macro expand"));
+    final Integer lineNumber = modelToCopy.getLineNumber()
+        .orElseThrow(() -> new IllegalArgumentException("The is no line number for the component to macro expand"));
+    operationReplacementModel.setConfigFileName(configFileName);
+    operationReplacementModel.setLineNumber(lineNumber);
+
     ComponentModel componentModel = operationReplacementModel.build();
     for (ComponentModel child : componentModel.getInnerComponents()) {
       child.setParent(componentModel);
