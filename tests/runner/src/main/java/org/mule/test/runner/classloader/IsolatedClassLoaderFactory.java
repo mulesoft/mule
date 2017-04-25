@@ -14,6 +14,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.container.internal.ContainerClassLoaderFactory.SYSTEM_PACKAGES;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
@@ -93,7 +94,7 @@ public class IsolatedClassLoaderFactory {
    */
   public ArtifactClassLoaderHolder createArtifactClassLoader(List<String> extraBootPackages,
                                                              ArtifactsUrlClassification artifactsUrlClassification) {
-    JarInfo appJarInfo = getTestJarInfo(artifactsUrlClassification);
+    JarInfo testJarInfo = getTestJarInfo(artifactsUrlClassification);
 
     ArtifactClassLoader containerClassLoader;
     ClassLoaderLookupPolicy childClassLoaderLookupPolicy;
@@ -148,7 +149,7 @@ public class IsolatedClassLoaderFactory {
           pluginsArtifactClassLoaders.add(pluginCL);
 
           ArtifactClassLoaderFilter filter =
-              createArtifactClassLoaderFilter(pluginUrlClassification, appJarInfo.getPackages(), childClassLoaderLookupPolicy);
+              createArtifactClassLoaderFilter(pluginUrlClassification, testJarInfo.getPackages(), childClassLoaderLookupPolicy);
 
           pluginArtifactClassLoaderFilters.add(filter);
           filteredPluginsArtifactClassLoaders.add(new FilteringArtifactClassLoader(pluginCL, filter, emptyList()));
@@ -169,7 +170,7 @@ public class IsolatedClassLoaderFactory {
                                              pluginsArtifactClassLoaders);
 
     regionClassLoader.addClassLoader(appClassLoader,
-                                     new DefaultArtifactClassLoaderFilter(appJarInfo.getPackages(), appJarInfo.getResources()));
+                                     new DefaultArtifactClassLoaderFilter(testJarInfo.getPackages(), testJarInfo.getResources()));
 
     for (int i = 0; i < filteredPluginsArtifactClassLoaders.size(); i++) {
       final ArtifactClassLoaderFilter classLoaderFilter = pluginArtifactClassLoaderFilters.get(i);
@@ -268,7 +269,7 @@ public class IsolatedClassLoaderFactory {
    */
   private Set<String> sanitizeTestExportedPackages(Set<String> productionPackages, Set<String> testPackages) {
     Set<String> sanitizedTestPackages = new HashSet<>(testPackages);
-    removePackagesFromTestClassLoader(sanitizedTestPackages, ContainerClassLoaderFactory.SYSTEM_PACKAGES);
+    removePackagesFromTestClassLoader(sanitizedTestPackages, SYSTEM_PACKAGES);
     removePackagesFromTestClassLoader(sanitizedTestPackages, productionPackages);
 
     return sanitizedTestPackages;
