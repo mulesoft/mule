@@ -34,6 +34,8 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
+import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
@@ -41,7 +43,6 @@ import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
@@ -113,6 +114,7 @@ public final class ParameterModelsLoaderDelegate {
       parameter.ofType(extensionParameter.getMetadataType(typeLoader)).describedAs(extensionParameter.getDescription());
       parseParameterRole(extensionParameter, parameter);
       parseExpressionSupport(extensionParameter, parameter);
+      parseConfigOverride(extensionParameter, parameter);
       parseNullSafe(extensionParameter, parameter);
       parseDefaultEncoding(extensionParameter, parameter);
       addTypeRestrictions(extensionParameter, parameter);
@@ -124,6 +126,12 @@ public final class ParameterModelsLoaderDelegate {
     }
 
     return declarerList;
+  }
+
+  private void parseConfigOverride(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
+    if (extensionParameter.getAnnotation(ConfigOverride.class).isPresent()) {
+      parameter.asConfigOverride();
+    }
   }
 
   private void parseDefaultEncoding(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
@@ -227,6 +235,12 @@ public final class ParameterModelsLoaderDelegate {
 
   private void parseNullSafe(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     if (extensionParameter.isAnnotatedWith(NullSafe.class)) {
+      if (extensionParameter.isAnnotatedWith(ConfigOverride.class)) {
+        throw new IllegalParameterModelDefinitionException(
+                                                           format("Parameter '%s' is annotated with '@%s' and also marked as a config override, which is redundant. "
+                                                               + "The default value for this parameter will come from the configuration parameter",
+                                                                  extensionParameter.getName(), NullSafe.class.getSimpleName()));
+      }
       if (extensionParameter.isRequired() && !extensionParameter.isAnnotatedWith(ParameterGroup.class)) {
         throw new IllegalParameterModelDefinitionException(
                                                            format("Parameter '%s' is required but annotated with '@%s', which is redundant",

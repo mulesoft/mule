@@ -8,15 +8,19 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+
+import java.util.Optional;
 
 /**
  * Resolves and injects the values of a {@link Source} that has fields annotated with {@link Parameter} or
@@ -33,7 +37,8 @@ public final class SourceConfigurer {
   /**
    * Create a new instance
    *
-   * @param model the {@link SourceModel} which describes the instances that the {@link #configure(Source)} method will accept
+   * @param model the {@link SourceModel} which describes the instances that
+   *              the {@link #configure(Source, Optional)} method will accept
    * @param resolverSet the {@link ResolverSet} used to resolve the parameters
    * @param muleContext the current {@link MuleContext}
    */
@@ -47,10 +52,11 @@ public final class SourceConfigurer {
    * Performs the configuration of the given {@code source} and returns the result
    *
    * @param source a {@link Source}
+   * @param config the {@link ConfigurationInstance config instance} associated to {@code this} source object.
    * @return the configured instance
    * @throws MuleException
    */
-  public Source configure(Source source) throws MuleException {
+  public Source configure(Source source, Optional<ConfigurationInstance> config) throws MuleException {
     ResolverSetBasedObjectBuilder<Source> builder =
         new ResolverSetBasedObjectBuilder<Source>(source.getClass(), model, resolverSet) {
 
@@ -58,6 +64,12 @@ public final class SourceConfigurer {
           protected Source instantiateObject() {
             return source;
           }
+
+          @Override
+          public Source build(Event event) throws MuleException {
+            return build(resolverSet.resolve(event));
+          }
+
         };
 
     try {

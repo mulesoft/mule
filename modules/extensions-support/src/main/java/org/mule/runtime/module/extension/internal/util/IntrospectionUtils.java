@@ -399,6 +399,7 @@ public final class IntrospectionUtils {
     }
   }
 
+
   public static String getMemberName(EnrichableModel enrichableModel, String defaultName) {
     return enrichableModel.getModelProperty(DeclaringMemberModelProperty.class).map(p -> p.getDeclaringField().getName())
         .orElse(defaultName);

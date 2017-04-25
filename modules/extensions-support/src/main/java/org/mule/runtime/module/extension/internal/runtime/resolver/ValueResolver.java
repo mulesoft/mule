@@ -8,6 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+
+import java.util.Optional;
 
 /**
  * Provides a value which is dependant on a {@link Event}

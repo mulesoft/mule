@@ -164,8 +164,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
     @Override
     public void onFailure(MessagingException exception, Map<String, Object> parameters) {
       safely(() -> onErrorExecutor.execute(exception.getEvent(), parameters, context), callbackException -> {
-        throw new MuleRuntimeException(createStaticMessage(format(
-                                                                  "Found exception trying to handle error from source '%s'",
+        throw new MuleRuntimeException(createStaticMessage(format("Found exception trying to handle error from source '%s'",
                                                                   sourceModel.getName())),
                                        callbackException);
       });

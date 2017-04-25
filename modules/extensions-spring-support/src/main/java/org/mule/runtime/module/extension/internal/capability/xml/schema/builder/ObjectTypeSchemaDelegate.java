@@ -479,7 +479,12 @@ final class ObjectTypeSchemaDelegate {
   }
 
   private ImmutableParameterModel asParameter(ObjectFieldType field) {
-    return new ImmutableParameterModel(field.getKey().getName().getLocalPart(), "", field.getValue(), false, field.isRequired(),
+    return new ImmutableParameterModel(field.getKey().getName().getLocalPart(),
+                                       "",
+                                       field.getValue(),
+                                       false,
+                                       field.isRequired(),
+                                       false,
                                        getExpressionSupport(field), getDefaultValue(field).orElse(null),
                                        getParameterRole(field), ParameterDslConfiguration.getDefaultInstance(),
                                        null, getLayoutModel(field).orElse(null), emptySet());

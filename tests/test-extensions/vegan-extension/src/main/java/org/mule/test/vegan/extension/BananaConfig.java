@@ -18,10 +18,11 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Configuration(name = BANANA)
-@Operations({EatBananaOperation.class, SpreadVeganismOperation.class, FlowListenerBananaOperations.class})
+@Operations({EatBananaOperation.class, SpreadVeganismOperation.class, FlowListenerBananaOperations.class,
+    FruitOperationsWithConfigOverride.class})
 @ConnectionProviders(VeganBananaConnectionProvider.class)
 @Sources(PaulMcCartneySource.class)
-public class BananaConfig {
+public class BananaConfig extends EasyToEatConfig {
 
   private final AtomicInteger bananasCount = new AtomicInteger(0);
   private final AtomicInteger nonBananasCount = new AtomicInteger(0);

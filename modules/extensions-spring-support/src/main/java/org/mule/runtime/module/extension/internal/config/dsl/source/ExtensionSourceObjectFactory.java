@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl.source;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -17,14 +18,18 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceAdapter;
@@ -36,6 +41,7 @@ import com.google.common.base.Joiner;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -60,6 +66,21 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
     super(muleContext);
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
+  }
+
+  protected ParametersResolver getParametersResolver(MuleContext muleContext) {
+    final ExtensionManager extensionManager = muleContext.getExtensionManager();
+    final Function<Event, Optional<ConfigurationInstance>> configurationInstanceProvider = event -> {
+      if (configurationProvider != null) {
+        return ofNullable(configurationProvider.get(event));
+      }
+
+      return extensionManager.getConfigurationProvider(extensionModel, sourceModel)
+          .map(provider -> ofNullable(provider.get(event)))
+          .orElseGet(() -> extensionManager.getConfiguration(extensionModel, sourceModel, event));
+    };
+
+    return ParametersResolver.fromValues(parameters, muleContext, configurationInstanceProvider);
   }
 
   @Override
@@ -106,7 +127,9 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
     return (configurationInstance, sourceCallbackFactory) -> {
       Source source = MuleExtensionUtils.getSourceFactory(sourceModel).createSource();
       try {
-        source = new SourceConfigurer(sourceModel, nonCallbackParameters, muleContext).configure(source);
+        source = new SourceConfigurer(sourceModel, nonCallbackParameters, muleContext)
+            .configure(source, configurationInstance);
+
         return new SourceAdapter(extensionModel,
                                  sourceModel,
                                  source,
