@@ -6,10 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
+import static javax.lang.model.SourceVersion.RELEASE_8;
+import static org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.capability.xml.description.DescriptionDeclarationEnricher;
 import org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModelLoader;
+
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedOptions;
+import javax.annotation.processing.SupportedSourceVersion;
 
 
 /**
@@ -18,6 +24,9 @@ import org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModel
  *
  * @since 4.0.0
  */
+@SupportedAnnotationTypes(value = {"org.mule.runtime.extension.api.annotation.Extension"})
+@SupportedSourceVersion(RELEASE_8)
+@SupportedOptions(EXTENSION_VERSION)
 public class SoapExtensionResourcesGeneratorAnnotationProcessor extends BaseExtensionResourcesGeneratorAnnotationProcessor {
 
   @Override
@@ -31,4 +40,6 @@ public class SoapExtensionResourcesGeneratorAnnotationProcessor extends BaseExte
       }
     };
   }
+
+
 }

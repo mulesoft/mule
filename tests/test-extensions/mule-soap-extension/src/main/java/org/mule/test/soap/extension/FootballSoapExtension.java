@@ -16,8 +16,6 @@ import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 import org.mule.runtime.extension.api.soap.annotation.Soap;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 @Alias("base")
@@ -37,14 +35,10 @@ public class FootballSoapExtension implements SoapServiceProvider {
 
   @Override
   public List<WebServiceDefinition> getWebServiceDefinitions() {
-    try {
-      return singletonList(WebServiceDefinition.builder().withId(LEAGUES_ID).withFriendlyName(LEAGUES_FRIENDLY_NAME)
-          .withWsdlUrl(new URL(leaguesAddress + "?wsdl")).withAddress(new URL(leaguesAddress))
-          .withService(LEAGUES_SERVICE).withPort(LEAGUES_PORT).withExcludedOperations(emptyList())
-          .build());
-    } catch (MalformedURLException e) {
-      throw new RuntimeException("Error Parsing Leagues Address", e);
-    }
+    return singletonList(WebServiceDefinition.builder().withId(LEAGUES_ID).withFriendlyName(LEAGUES_FRIENDLY_NAME)
+        .withWsdlUrl(leaguesAddress + "?wsdl").withAddress(leaguesAddress)
+        .withService(LEAGUES_SERVICE).withPort(LEAGUES_PORT).withExcludedOperations(emptyList())
+        .build());
   }
 
 }

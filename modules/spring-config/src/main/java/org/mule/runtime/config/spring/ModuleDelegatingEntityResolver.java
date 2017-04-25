@@ -14,21 +14,25 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.SchemaResourceFactory;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.xml.DelegatingEntityResolver;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * Custom implementation of resolver for schemas where it will delegate in the default {@link DelegatingEntityResolver}
@@ -84,6 +88,12 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     if (inputSource == null) {
       inputSource = generateModuleXsd(publicId, systemId);
     }
+
+    if (systemId.contains("mule-soap.xsd")) {
+      FileUtils.writeStringToFile(new File("pepitos.xsd"),
+                                  IOUtils.toString(entityResolver.resolveEntity(publicId, systemId).getByteStream()));
+    }
+
     return inputSource;
   }
 

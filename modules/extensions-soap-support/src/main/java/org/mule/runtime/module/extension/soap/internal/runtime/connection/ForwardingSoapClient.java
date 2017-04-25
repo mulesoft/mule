@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 
+import static com.google.common.collect.ImmutableList.copyOf;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.services.soap.api.client.SoapClientConfiguration.builder;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
@@ -54,9 +54,8 @@ public class ForwardingSoapClient {
    *
    * @param id the id of the {@link WebServiceDefinition}.
    * @return a {@link SoapClient} instance
-   * @throws MuleException in any error case.
    */
-  public SoapClient getSoapClient(String id) throws MuleException {
+  public SoapClient getSoapClient(String id) {
     List<WebServiceDefinition> webServiceDefinitions = serviceProvider.getWebServiceDefinitions();
     WebServiceDefinition wsd = webServiceDefinitions.stream().filter(ws -> ws.getServiceId().equals(id)).findAny()
         .orElseThrow(() -> new IllegalArgumentException("Could not find a soap client id [" + id + "]"));
@@ -65,6 +64,10 @@ public class ForwardingSoapClient {
     } catch (ExecutionException e) {
       throw new MuleRuntimeException(createStaticMessage("Error while retrieving soap client id [" + id + "]"), e);
     }
+  }
+
+  public List<WebServiceDefinition> getAllWebServices() {
+    return copyOf(serviceProvider.getWebServiceDefinitions());
   }
 
   /**

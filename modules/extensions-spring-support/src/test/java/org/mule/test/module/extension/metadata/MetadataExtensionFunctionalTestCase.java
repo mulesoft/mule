@@ -151,7 +151,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
     personType = getMetadata(PERSON_METADATA_KEY.getId());
   }
 
-  enum ResolutionType {
+  public enum ResolutionType {
     EXPLICIT_RESOLUTION, DSL_RESOLUTION
   }
 
@@ -262,11 +262,11 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
     assertThat(resultKey.getChilds(), hasSize(metadataKey.getChilds().size()));
   }
 
-  Set<MetadataKey> getKeysFromContainer(MetadataKeysContainer metadataKeysContainer) {
+  public Set<MetadataKey> getKeysFromContainer(MetadataKeysContainer metadataKeysContainer) {
     return metadataKeysContainer.getKeys(metadataKeysContainer.getCategories().iterator().next()).get();
   }
 
-  void assertSuccessResult(MetadataResult<?> result) {
+  public void assertSuccessResult(MetadataResult<?> result) {
     assertThat(result.getFailures(), is(empty()));
     String failures = result.getFailures().stream().map(Object::toString).collect(joining(", "));
     assertThat("Expecting success but this failure/s result/s found:\n " + failures, result.isSuccess(), is(true));

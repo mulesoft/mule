@@ -23,16 +23,13 @@ import org.mule.services.soap.api.client.metadata.SoapMetadataResolver;
 public abstract class BaseWscResolver implements NamedTypeResolver {
 
   private static final String WSC_CATEGORY = "WebServiceConsumerCategory";
-  public static final String BODY_FIELD = "body";
-  public static final String HEADERS_FIELD = "headers";
-  public static final String ATTACHMENTS_FIELD = "attachments";
 
   @Override
   public String getCategoryName() {
     return WSC_CATEGORY;
   }
 
-  protected SoapMetadataResolver getMetadataResolver(MetadataContext context)
+  SoapMetadataResolver getMetadataResolver(MetadataContext context)
       throws MetadataResolvingException, ConnectionException {
     return context.<SoapClient>getConnection().map(SoapClient::getMetadataResolver)
         .orElseThrow(() -> new MetadataResolvingException("Could not obtain connection to retrieve metadata",

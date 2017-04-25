@@ -9,26 +9,20 @@ package org.mule.test.runner.api;
 
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.VERSION;
+import static org.mule.test.runner.api.MulePluginBasedLoaderFinder.META_INF_MULE_PLUGIN;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,40 +73,17 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
     for (Object pluginClassLoader : pluginsClassLoaders) {
       String artifactName = (String) pluginClassLoader.getClass().getMethod("getArtifactId").invoke(pluginClassLoader);
       ClassLoader classLoader = (ClassLoader) pluginClassLoader.getClass().getMethod("getClassLoader").invoke(pluginClassLoader);
-      URL manifestUrl = getExtensionManifest(classLoader);
-      if (manifestUrl != null) {
-        LOGGER.debug("Discovered extension: {}", artifactName);
-
-        //TODO: Remove when MULE-11136
-        ExtensionManifest extensionManifest = extensionManager.parseExtensionManifestXml(manifestUrl);
-        Map<String, Object> params = new HashMap<>();
-        params.put(TYPE_PROPERTY_NAME, extensionManifest.getDescriberManifest().getProperties().get("type"));
-        params.put(VERSION, extensionManifest.getVersion());
-        // TODO: soap extensions
-        final DefaultJavaExtensionModelLoader loader = new DefaultJavaExtensionModelLoader();
-        extensionManager.registerExtension(loader.loadExtensionModel(classLoader, getDefault(emptySet()), params));
+      Method findResource = classLoader.getClass().getMethod("findResource", String.class);
+      URL json = ((URL) findResource.invoke(classLoader, META_INF_MULE_PLUGIN));
+      if (json != null) {
+        LOGGER.debug("Discovered extension '{}'", artifactName);
+        MulePluginBasedLoaderFinder finder = new MulePluginBasedLoaderFinder(json.openStream());
+        ExtensionModel extension = finder.getLoader().loadExtensionModel(classLoader, getDefault(emptySet()), finder.getParams());
+        extensionManager.registerExtension(extension);
       } else {
-        LOGGER.debug(
-                     "Discarding plugin artifact class loader with artifactName '{}' due to it doesn't have an extension descriptor",
-                     artifactName);
+        LOGGER.debug("Discarding plugin with artifactName '{}' due to it doesn't have an mule-plugin.json", artifactName);
       }
     }
-  }
-
-  /**
-   * Gets the extension manifest as {@link URL}
-   *
-   * @param classLoader the plugin {@link ClassLoader} to look for the resource
-   * @return a {@link URL} or null if it is not present
-   * @throws NoSuchMethodException if findResources {@link Method} is no found by reflection
-   * @throws IllegalAccessException if findResources {@link Method} cannot be accessed
-   * @throws InvocationTargetException if findResources {@link Method} throws an error
-   */
-  private URL getExtensionManifest(final ClassLoader classLoader)
-      throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-    Method findResourceMethod = classLoader.getClass().getMethod("findResource", String.class);
-    findResourceMethod.setAccessible(true);
-    return (URL) findResourceMethod.invoke(classLoader, "META-INF/" + EXTENSION_MANIFEST_FILE_NAME);
   }
 
   /**

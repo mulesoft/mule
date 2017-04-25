@@ -12,7 +12,7 @@ import org.mule.extension.ws.api.SoapMessageBuilder;
 import org.mule.extension.ws.internal.metadata.ConsumeOutputResolver;
 import org.mule.extension.ws.internal.metadata.MessageBuilderResolver;
 import org.mule.extension.ws.internal.metadata.OperationKeysResolver;
-import org.mule.extension.ws.internal.metadata.WscAttributesResolver;
+import org.mule.extension.ws.internal.metadata.ConsumeAttributesResolver;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.metadata.DataType;
@@ -60,7 +60,7 @@ public class ConsumeOperation {
    */
   @OnException(WscExceptionEnricher.class)
   @Throws(ConsumeErrorTypeProvider.class)
-  @OutputResolver(output = ConsumeOutputResolver.class, attributes = WscAttributesResolver.class)
+  @OutputResolver(output = ConsumeOutputResolver.class, attributes = ConsumeAttributesResolver.class)
   public Result<?, SoapAttributes> consume(@Connection SoapClient connection,
                                            @MetadataKeyId(OperationKeysResolver.class) String operation,
                                            // TODO MULE-11235 MULE-11584

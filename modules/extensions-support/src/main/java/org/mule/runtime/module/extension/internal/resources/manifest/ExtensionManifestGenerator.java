@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.LOADER_ID;
+import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
@@ -43,7 +43,7 @@ public final class ExtensionManifestGenerator implements GeneratedResourceFactor
     builder.setName(extensionModel.getName()).setDescription(extensionModel.getDescription())
         .setVersion(extensionModel.getVersion()).setMinMuleVersion(extensionModel.getMinMuleVersion())
         .addExportedPackages(exportCollector.getExportedPackages()).addExportedResources(exportCollector.getExportedResources())
-        .withDescriber().setId(LOADER_ID).addProperty(TYPE_PROPERTY_NAME, typeProperty.get().getType().getName());
+        .withDescriber().setId(JAVA_LOADER_ID).addProperty(TYPE_PROPERTY_NAME, typeProperty.get().getType().getName());
 
     String manifestXml = new ExtensionManifestXmlSerializer().serialize(builder.build());
     return Optional.of(new GeneratedResource(EXTENSION_MANIFEST_FILE_NAME, manifestXml.getBytes()));

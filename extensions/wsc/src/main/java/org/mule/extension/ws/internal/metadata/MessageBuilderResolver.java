@@ -6,6 +6,9 @@
  */
 package org.mule.extension.ws.internal.metadata;
 
+import static org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder.ATTACHMENTS_FIELD;
+import static org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder.BODY_FIELD;
+import static org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder.HEADERS_FIELD;
 import org.mule.extension.ws.api.SoapMessageBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -38,10 +41,10 @@ public class MessageBuilderResolver extends BaseWscResolver implements InputType
   public MetadataType getInputMetadata(MetadataContext context, String operationName)
       throws MetadataResolvingException, ConnectionException {
     SoapOperationMetadata metadata = getMetadataResolver(context).getInputMetadata(operationName);
-    ObjectTypeBuilder typeBuilder = context.getTypeBuilder().objectType();
-    typeBuilder.addField().key(HEADERS_FIELD).value(metadata.getHeadersType());
-    typeBuilder.addField().key(BODY_FIELD).value(metadata.getBodyType());
-    typeBuilder.addField().key(ATTACHMENTS_FIELD).value(metadata.getAttachmentsType());
-    return typeBuilder.build();
+    ObjectTypeBuilder object = context.getTypeBuilder().objectType();
+    object.addField().key(HEADERS_FIELD).value(metadata.getHeadersType());
+    object.addField().key(BODY_FIELD).value(metadata.getBodyType());
+    object.addField().key(ATTACHMENTS_FIELD).value(metadata.getAttachmentsType());
+    return object.build();
   }
 }

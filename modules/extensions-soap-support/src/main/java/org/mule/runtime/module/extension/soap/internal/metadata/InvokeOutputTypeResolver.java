@@ -4,38 +4,42 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.ws.internal.metadata;
+package org.mule.runtime.module.extension.soap.internal.metadata;
 
-import org.mule.extension.ws.internal.ConsumeOperation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
+import org.mule.services.soap.api.client.SoapClient;
 import org.mule.services.soap.api.client.metadata.SoapOperationMetadata;
 import org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder;
 
 /**
- * Resolves the metadata for output payload of the {@link ConsumeOperation}.
+ * Resolves the output metadata for the soap connect invoke operation
  *
  * @since 4.0
  */
-public class ConsumeOutputResolver extends BaseWscResolver implements OutputTypeResolver<String> {
+public final class InvokeOutputTypeResolver extends BaseInvokeResolver implements OutputTypeResolver<WebServiceTypeKey> {
 
   private final SoapOutputTypeBuilder outputTypeBuilder = new SoapOutputTypeBuilder();
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getResolverName() {
-    return "ConsumeOutputResolver";
+    return "InvokeOutput";
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public MetadataType getOutputType(MetadataContext context, String operationName)
+  public MetadataType getOutputType(MetadataContext context, WebServiceTypeKey key)
       throws MetadataResolvingException, ConnectionException {
-    SoapOperationMetadata metadata = getMetadataResolver(context).getOutputMetadata(operationName);
+    SoapClient client = getClient(context, key);
+    SoapOperationMetadata metadata = client.getMetadataResolver().getOutputMetadata(key.getOperation());
     return outputTypeBuilder.build(metadata, context.getTypeBuilder());
   }
 }

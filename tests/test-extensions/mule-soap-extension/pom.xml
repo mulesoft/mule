@@ -12,6 +12,7 @@
     <artifactId>mule-soap-extension</artifactId>
 
     <properties>
+        <testExtensionModelLoaderId>soap</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 

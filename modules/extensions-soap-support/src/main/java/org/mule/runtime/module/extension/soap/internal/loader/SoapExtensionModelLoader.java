@@ -15,10 +15,10 @@ import org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtens
  */
 public class SoapExtensionModelLoader extends AbstractJavaExtensionModelLoader {
 
-  private static final String LOADER_ID = "soap";
+  public static final String SOAP_LOADER_ID = "soap";
 
   public SoapExtensionModelLoader() {
-    super(LOADER_ID, SoapModelLoaderDelegate::new);
+    super(SOAP_LOADER_ID, SoapModelLoaderDelegate::new);
   }
 
 }
