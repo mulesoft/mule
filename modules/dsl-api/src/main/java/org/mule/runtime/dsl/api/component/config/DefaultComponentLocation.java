@@ -55,7 +55,7 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
 
   private String name;
   private LinkedList<DefaultLocationPart> parts;
-  private String location;
+  private volatile String location;
 
   /**
    * Creates a virtual {@link ComponentLocation} for a single element, using the core namespace and using UNKNOWN as type. Only
