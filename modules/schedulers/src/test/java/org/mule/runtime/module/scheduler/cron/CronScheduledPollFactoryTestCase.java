@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.modules.schedulers.cron;
+package org.mule.runtime.module.scheduler.cron;
 
 import static java.util.TimeZone.getDefault;
 import static java.util.TimeZone.getTimeZone;
@@ -16,6 +16,7 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.module.scheduler.cron.CronScheduler;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

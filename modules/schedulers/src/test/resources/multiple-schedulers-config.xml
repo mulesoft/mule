@@ -12,7 +12,7 @@
             <schedulers:cron-scheduler expression="0/1 0/1 * 1/1 * ? *"/>
         </scheduler>
         <set-payload value="poll1"/>
-        <component class="org.mule.test.modules.schedulers.cron.MultipleSchedulersTestCase$SynchronizedPollExecutionCounter"/>
+        <component class="org.mule.test.module.scheduler.cron.MultipleSchedulersTestCase$SynchronizedPollExecutionCounter"/>
     </flow>
 
     <flow name="poll2" processingStrategy="synchronous">
@@ -20,6 +20,6 @@
             <schedulers:cron-scheduler expression="0/1 0/1 * 1/1 * ? *"/>
         </scheduler>
         <set-payload value="poll2"/>
-        <component class="org.mule.test.modules.schedulers.cron.MultipleSchedulersTestCase$SynchronizedPollExecutionCounter"/>
+        <component class="org.mule.test.module.scheduler.cron.MultipleSchedulersTestCase$SynchronizedPollExecutionCounter"/>
     </flow>
 </mule>

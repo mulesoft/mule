@@ -4,10 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.modules.schedulers.config;
+package org.mule.runtime.module.scheduler.config;
 
 import static java.util.Arrays.asList;
-import static org.mule.runtime.modules.schedulers.config.SchedulersComponentBuildingDefinitionProvider.SCHEDULERS_NAMESPACE;
 
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
@@ -32,7 +31,7 @@ public class SchedulersXmlNamespaceInfoProvider implements XmlNamespaceInfoProvi
 
       @Override
       public String getNamespace() {
-        return SCHEDULERS_NAMESPACE;
+        return SchedulersComponentBuildingDefinitionProvider.SCHEDULERS_NAMESPACE;
       }
     });
   }

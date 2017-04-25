@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.modules.schedulers.cron;
+package org.mule.runtime.module.scheduler.cron;
 
 import static java.lang.String.format;
 import static java.util.TimeZone.getDefault;
