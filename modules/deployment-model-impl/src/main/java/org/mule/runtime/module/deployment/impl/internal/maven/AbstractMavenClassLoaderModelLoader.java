@@ -26,6 +26,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants;
+import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.descriptor.BundleScope;
@@ -110,12 +111,13 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
       }
     }
 
-    File mavenLocalRepository = localRepositorySupplierFactory.environmentMavenRepositorySupplier().get();
+    File localMavenRepositoryLocation = GlobalConfigLoader.getMavenConfig().getLocalMavenRepositoryLocation();
+
     Supplier<File> compositeRepoLocationSupplier =
         localRepositorySupplierFactory
-            .composeSuppliers(localRepositorySupplierFactory.artifactFolderRepositorySupplier(artifactFile, mavenLocalRepository),
-                              localRepositorySupplierFactory.fixedFolderSupplier(containerRepository),
-                              localRepositorySupplierFactory.fixedFolderSupplier(mavenLocalRepository));
+            .composeSuppliers(localRepositorySupplierFactory.artifactFolderRepositorySupplier(artifactFile,
+                                                                                              localMavenRepositoryLocation),
+                              localRepositorySupplierFactory.fixedFolderSupplier(localMavenRepositoryLocation));
     File mavenRepository = compositeRepoLocationSupplier.get();
     List<org.mule.maven.client.api.BundleDependency> dependencies =
         mavenClient.resolveArtifactDependencies(artifactFile, enabledTestDependencies(), of(mavenRepository),
