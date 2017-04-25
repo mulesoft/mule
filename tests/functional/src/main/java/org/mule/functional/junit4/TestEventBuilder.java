@@ -7,8 +7,7 @@
 package org.mule.functional.junit4;
 
 import static org.mockito.Mockito.spy;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
+import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
@@ -253,9 +252,9 @@ public class TestEventBuilder {
     EventContext eventContext;
     if (externalCompletionCallback != null) {
       eventContext =
-          DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR), sourceCorrelationId, externalCompletionCallback);
+          DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId, externalCompletionCallback);
     } else {
-      eventContext = DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR), sourceCorrelationId);
+      eventContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId);
     }
 
     Event event = Event.builder(eventContext)

@@ -12,7 +12,6 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
@@ -21,11 +20,11 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.api.model.resolvers.ArrayEntryPointResolver;
 import org.mule.runtime.core.api.model.resolvers.EntryPointNotFoundException;
 import org.mule.runtime.core.api.model.resolvers.LegacyEntryPointResolverSet;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -55,7 +54,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
     try {
       LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
       FlowConstruct flowConstruct = getTestFlow(muleContext);
-      final Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
+      final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
           .message(of("blah"))
           .build();
       MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
@@ -70,7 +69,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
     try {
       LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
       FlowConstruct flowConstruct = getTestFlow(muleContext);
-      final Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
+      final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
           .message(of(new FruitLover("Mmmm")))
           .build();
       MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
@@ -85,7 +84,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
     try {
       LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
       FlowConstruct flowConstruct = getTestFlow(muleContext);
-      final Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
+      final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
           .message(of(new Fruit[] {new Apple(), new Orange()}))
           .build();
       MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
@@ -101,7 +100,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
     try {
       LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
       FlowConstruct flowConstruct = getTestFlow(muleContext);
-      final Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
+      final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
           .message(of(new Object[] {new Fruit[] {new Apple(), new Orange()}}))
           .build();
       MuleEventContext eventContext =
@@ -121,7 +120,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
       LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
       resolver.addEntryPointResolver(new ArrayEntryPointResolver());
       FlowConstruct flowConstruct = getTestFlow(muleContext);
-      final Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
+      final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
           .message(of(new Fruit[] {new Apple(), new Orange()}))
           .build();
       MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
@@ -140,7 +139,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
 
     try {
       FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-      setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
+      setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
           .message(of("Hello"))
           .build());
       MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(muleContext), getCurrentEvent());
@@ -159,7 +158,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
   public void testMethodOverrideDoesNotFallback() throws Exception {
     EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
     FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
         .message(of(new FruitLover("Yummy!")))
         .build());
 
@@ -185,7 +184,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
     EntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
     FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
         .message(of(new FruitLover("Yummy!")))
         .build());
 
@@ -223,7 +222,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
     EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
     FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
         .message(of(new FruitLover("Yummy!")))
         .build());
 
@@ -251,7 +250,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
 
     Object payload = new Object[] {new Fruit[] {new Apple(), new Banana()}};
     FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
         .message(of(payload)).build();
     setCurrentEvent(event);
 
@@ -272,7 +271,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
     EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
     Object payload = Arrays.asList(new Fruit[] {new Apple(), new Banana()});
     FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
         .message(of(payload))
         .build();
     setCurrentEvent(event);
@@ -295,7 +294,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
 
     Object payload = Arrays.asList(new Fruit[] {new Apple(), new Banana()});
     FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
         .message(of(payload))
         .build();
     setCurrentEvent(event);

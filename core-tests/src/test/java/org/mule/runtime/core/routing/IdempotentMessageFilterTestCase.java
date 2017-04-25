@@ -9,16 +9,14 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -40,7 +38,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
     ir.setStorePrefix("foo");
     ir.setStore(new InMemoryObjectStore<String>());
 
-    final EventContext context = DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR));
+    final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
 
     Message okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
     Event event = Event.builder(context).message(okMessage).flow(getTestFlow(muleContext)).session(session).build();

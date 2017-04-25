@@ -22,7 +22,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -32,9 +31,9 @@ import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -60,7 +59,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
 
-    context = DefaultEventContext.create(flow, fromSingleComponent("test"));
+    context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
   }
 
   @Test

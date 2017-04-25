@@ -11,6 +11,7 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -56,10 +57,17 @@ public class DefaultComponentLocation implements ComponentLocation {
   private String location;
   private Lock lock = new ReentrantLock();
 
+  /**
+   * Creates a virtual {@link ComponentLocation} for a single element, using the core namespace and using UNKNOWN as type. Only
+   * meant for situations where a real location cannot be obtained.
+   *
+   * @param component the name of the element
+   * @return a location for it
+   */
   public static DefaultComponentLocation fromSingleComponent(String component) {
     DefaultLocationPart part = new DefaultLocationPart(component,
                                                        of(TypedComponentIdentifier.builder()
-                                                           .withType(TypedComponentIdentifier.ComponentType.UNKNOWN)
+                                                           .withType(UNKNOWN)
                                                            .withIdentifier(ComponentIdentifier
                                                                .buildFromStringRepresentation(component))
                                                            .build()),

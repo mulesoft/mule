@@ -23,7 +23,6 @@ import static org.mule.functional.junit4.TestLegacyMessageUtils.getOutboundPrope
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
@@ -108,12 +107,12 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     TestSimpleMessageSource source2 = (TestSimpleMessageSource) sources.get(1);
 
     assertEquals("01xyz", getPayloadAsString(source1
-        .fireEvent(Event.builder(DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR)))
+        .fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION))
             .message(of("0"))
             .build())
         .getMessage()));
     assertEquals("01xyz", getPayloadAsString(source2
-        .fireEvent(Event.builder(DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR)))
+        .fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION))
             .message(of("0"))
             .build())
         .getMessage()));
@@ -555,7 +554,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     TestMessageSource source = (TestMessageSource) flow.getMessageSource();
 
     Event result = source
-        .fireEvent(Event.builder(DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR))).message(of("a")).build());
+        .fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION)).message(of("a")).build());
     assertEquals("abcd", result.getMessageAsString(muleContext));
   }
 

@@ -7,8 +7,7 @@
 package org.mule.test.integration;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
+import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.message.Message;
@@ -29,7 +28,7 @@ public class TestClusterizableMessageSource extends AbstractAnnotatedObject
   @Override
   public void start() throws MuleException {
     Message muleMessage = of("TEST");
-    Event defaultMuleEvent = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
+    Event defaultMuleEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
         .message(muleMessage).flow(flowConstruct).build();
     listener.process(defaultMuleEvent);
   }

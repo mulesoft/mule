@@ -8,7 +8,6 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleEventContext;
@@ -37,7 +36,7 @@ public class CallableEntryPointDiscoveryTestCase extends AbstractMuleContextTest
   public void testBadMatch() throws Exception {
     CallableEntryPointResolver resolver = new CallableEntryPointResolver();
     final Event event =
-        Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
+        Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
             .message(of(new StringBuilder("foo"))).build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new WaterMelon(), eventContext, Event.builder(eventContext.getEvent()));
@@ -49,7 +48,7 @@ public class CallableEntryPointDiscoveryTestCase extends AbstractMuleContextTest
     CallableEntryPointResolver resolver = new CallableEntryPointResolver();
     final Apple apple = new Apple();
     apple.setMuleContext(muleContext);
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, fromSingleComponent(TEST_CONNECTOR)))
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
         .message(of(new StringBuilder("blah")))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);

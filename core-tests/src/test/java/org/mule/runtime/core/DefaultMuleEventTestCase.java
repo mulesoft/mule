@@ -11,7 +11,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -43,7 +42,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   @Before
   public void before() throws Exception {
     flow = getTestFlow(muleContext);
-    messageContext = DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR));
+    messageContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
     muleEvent = Event.builder(messageContext).message(muleMessage).flow(flow).build();
   }
 

@@ -14,7 +14,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
@@ -78,7 +77,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveP
     Flow flow = builder("flow", muleContext).build();
     initialiseObject(flow);
 
-    Event event = Event.builder(DefaultEventContext.create(flow, fromSingleComponent(TEST_CONNECTOR)))
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION))
         .message(of(TEST_MESSAGE))
         .build();
 

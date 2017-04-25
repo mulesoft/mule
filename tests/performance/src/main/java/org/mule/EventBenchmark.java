@@ -8,7 +8,6 @@ package org.mule;
 
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
@@ -16,8 +15,8 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.session.DefaultMuleSession;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -28,7 +27,6 @@ public class EventBenchmark extends AbstractBenchmark {
 
   public static final String KEY = "key";
   public static final String VALUE = "value";
-  public static final String TEST_CONNECTOR = "test";
 
   private MuleContext muleContext;
   private Flow flow;
@@ -45,7 +43,7 @@ public class EventBenchmark extends AbstractBenchmark {
     muleContext.getRegistry().registerFlowConstruct(flow);
     Message.Builder messageBuilder = Message.builder().payload(PAYLOAD);
     Event.Builder eventBuilder =
-        Event.builder(DefaultEventContext.create(flow, fromSingleComponent(CONNECTOR_NAME))).message(messageBuilder.build());
+        Event.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(messageBuilder.build());
     event = eventBuilder.build();
     eventWith10VariablesProperties = createMuleEventWithFlowVarsAndProperties(10);
     eventWith50VariablesProperties = createMuleEventWithFlowVarsAndProperties(50);
@@ -60,7 +58,7 @@ public class EventBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public Event createEvent() {
-    return Event.builder(DefaultEventContext.create(flow, fromSingleComponent(CONNECTOR_NAME))).message(of(PAYLOAD)).build();
+    return Event.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(of(PAYLOAD)).build();
   }
 
   @Benchmark
@@ -169,7 +167,7 @@ public class EventBenchmark extends AbstractBenchmark {
   private Event createMuleEvent(Message message, int numProperties) {
     final Builder builder;
     try {
-      builder = Event.builder(DefaultEventContext.create(flow, fromSingleComponent(CONNECTOR_NAME))).message(message);
+      builder = Event.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(message);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

@@ -13,6 +13,7 @@ import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
 import static org.openjdk.jmh.annotations.Scope.Benchmark;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.config.builders.BasicRuntimeServicesConfigurationBuilder;
 import org.mule.runtime.core.DefaultEventContext;
@@ -50,6 +51,7 @@ public class AbstractBenchmark {
   public static final String PAYLOAD;
   public static final String KEY = "key";
   public static final String VALUE = "value";
+  public static final ComponentLocation CONNECTOR_LOCATION = fromSingleComponent(CONNECTOR_NAME);
 
   static {
     try {
@@ -83,7 +85,7 @@ public class AbstractBenchmark {
 
   public Event createEvent(Flow flow, Object payload) {
     try {
-      return Event.builder(DefaultEventContext.create(flow, fromSingleComponent(CONNECTOR_NAME))).message(of(payload)).build();
+      return Event.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(of(payload)).build();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

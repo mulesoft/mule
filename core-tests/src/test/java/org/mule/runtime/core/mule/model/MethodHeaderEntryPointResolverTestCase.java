@@ -8,17 +8,15 @@ package org.mule.runtime.core.mule.model;
 
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.api.model.resolvers.MethodHeaderPropertyEntryPointResolver;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -117,7 +115,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextT
     FlowConstruct flowConstruct = getTestFlow(muleContext);
     return new DefaultMuleEventContext(flowConstruct,
                                        Event.builder(DefaultEventContext.create(flowConstruct,
-                                                                                fromSingleComponent(TEST_CONNECTOR)))
+                                                                                TEST_CONNECTOR_LOCATION))
                                            .message(InternalMessage.builder().payload(payload)
                                                .inboundProperties(inboundProperties)
                                                .build())
