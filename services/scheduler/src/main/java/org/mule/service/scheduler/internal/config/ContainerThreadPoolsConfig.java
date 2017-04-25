@@ -242,16 +242,4 @@ public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
   private void setCpuIntensiveQueueSize(int cpuIntensiveQueueSize) {
     this.cpuIntensiveQueueSize = cpuIntensiveQueueSize;
   }
-
-  @Override
-  public Properties defaultQuartzProperties(String name) {
-    Properties factoryProperties = new Properties();
-
-    factoryProperties.setProperty("org.quartz.scheduler.instanceName", name);
-    factoryProperties.setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
-    factoryProperties.setProperty("org.quartz.threadPool.threadNamePrefix", name + "_qz");
-    factoryProperties.setProperty("org.quartz.threadPool.threadCount", "1");
-    return factoryProperties;
-  }
-
 }

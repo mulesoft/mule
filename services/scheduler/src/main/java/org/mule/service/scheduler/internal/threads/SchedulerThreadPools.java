@@ -34,7 +34,9 @@ import org.mule.service.scheduler.internal.executor.ByCallerThreadGroupPolicy;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -127,7 +129,7 @@ public class SchedulerThreadPools {
 
     StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
     try {
-      schedulerFactory.initialize(threadPoolsConfig.defaultQuartzProperties(name));
+      schedulerFactory.initialize(defaultQuartzProperties());
       quartzScheduler = schedulerFactory.getScheduler();
       quartzScheduler.start();
     } catch (SchedulerException e) {
@@ -138,6 +140,20 @@ public class SchedulerThreadPools {
     ioExecutor.prestartAllCoreThreads();
     computationExecutor.prestartAllCoreThreads();
     scheduledExecutor.prestartAllCoreThreads();
+  }
+
+  /**
+   * @param name the name of the owner of the quartz scheduler
+   * @return the properties to provide the quartz scheduler
+   */
+  private Properties defaultQuartzProperties() {
+    Properties factoryProperties = new Properties();
+
+    factoryProperties.setProperty("org.quartz.scheduler.instanceName", name);
+    factoryProperties.setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
+    factoryProperties.setProperty("org.quartz.threadPool.threadNamePrefix", name + "_qz");
+    factoryProperties.setProperty("org.quartz.threadPool.threadCount", "1");
+    return factoryProperties;
   }
 
   public void stop() throws MuleException, InterruptedException {
@@ -253,42 +269,32 @@ public class SchedulerThreadPools {
   }
 
   public Scheduler createCustomScheduler(SchedulerConfig config, int workers, Supplier<Long> stopTimeout) {
-    if (config.getMaxConcurrentTasks() == null) {
-      throw new IllegalArgumentException("Custom schedulers must define a thread pool size");
-    }
-    final ThreadPoolExecutor executor =
-        new ThreadPoolExecutor(config.getMaxConcurrentTasks(), config.getMaxConcurrentTasks(), 0L, MILLISECONDS,
-                               new SynchronousQueue<Runnable>(),
-                               new SchedulerThreadFactory(resolveThreadGroupForCustomScheduler(config),
-                                                          "%s." + resolveCustomSchedulerName(config) + ".%02d"),
-                               byCallerThreadGroupPolicy);
-
-    final CustomScheduler customScheduler =
-        new CustomScheduler(resolveCustomSchedulerName(config), executor, workers, scheduledExecutor,
-                            quartzScheduler, CUSTOM, stopTimeout, schr -> activeSchedulers.remove(schr));
-    customSchedulersExecutors.add(executor);
-    activeSchedulers.add(customScheduler);
-    return customScheduler;
+    return doCreateCustomScheduler(config, workers, stopTimeout, resolveCustomSchedulerName(config),
+                                   new SynchronousQueue<Runnable>());
   }
 
   public Scheduler createCustomScheduler(SchedulerConfig config, int workers, Supplier<Long> stopTimeout, int queueSize) {
+    return doCreateCustomScheduler(config, workers, stopTimeout, resolveCustomSchedulerName(config),
+                                   new LinkedBlockingQueue<Runnable>(queueSize));
+  }
+
+  private Scheduler doCreateCustomScheduler(SchedulerConfig config, int workers, Supplier<Long> stopTimeout, String schedulerName,
+                                            BlockingQueue<Runnable> workQueue) {
     if (config.getMaxConcurrentTasks() == null) {
       throw new IllegalArgumentException("Custom schedulers must define a thread pool size");
     }
     final ThreadPoolExecutor executor =
-        new ThreadPoolExecutor(config.getMaxConcurrentTasks(), config.getMaxConcurrentTasks(), 0L, MILLISECONDS,
-                               new LinkedBlockingQueue<Runnable>(queueSize),
-                               new SchedulerThreadFactory(resolveThreadGroupForCustomScheduler(config),
-                                                          "%s." + resolveCustomSchedulerName(config) + ".%02d"),
+        new ThreadPoolExecutor(config.getMaxConcurrentTasks(), config.getMaxConcurrentTasks(), 0L,
+                               MILLISECONDS, workQueue, new SchedulerThreadFactory(resolveThreadGroupForCustomScheduler(config),
+                                                                                   "%s." + schedulerName + ".%02d"),
                                byCallerThreadGroupPolicy);
 
     final CustomScheduler customScheduler =
-        new CustomScheduler(resolveCustomSchedulerName(config), executor, workers, scheduledExecutor,
-                            quartzScheduler, CUSTOM, stopTimeout, schr -> activeSchedulers.remove(schr));
+        new CustomScheduler(schedulerName, executor, workers, scheduledExecutor, quartzScheduler, CUSTOM, stopTimeout,
+                            schr -> activeSchedulers.remove(schr));
     customSchedulersExecutors.add(executor);
     activeSchedulers.add(customScheduler);
     return customScheduler;
-
   }
 
   public ThreadGroup resolveThreadGroupForCustomScheduler(SchedulerConfig config) {

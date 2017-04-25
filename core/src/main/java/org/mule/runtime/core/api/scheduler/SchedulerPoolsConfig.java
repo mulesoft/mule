@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.scheduler;
 
-import java.util.Properties;
 import java.util.concurrent.Executor;
 
 /**
@@ -62,11 +61,5 @@ public interface SchedulerPoolsConfig {
    * @return the size of the queue to use for holding {@code cpu_intensive} tasks before they are executed.
    */
   int getCpuIntensiveQueueSize();
-
-  /**
-   * @param name the name of the owner of the quartz scheduler
-   * @return the properties to provide the quartz scheduler
-   */
-  Properties defaultQuartzProperties(String name);
 
 }
