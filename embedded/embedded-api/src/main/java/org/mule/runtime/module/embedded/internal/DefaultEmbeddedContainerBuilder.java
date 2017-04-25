@@ -10,6 +10,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.codehaus.plexus.util.FileUtils.fileWrite;
+import static org.codehaus.plexus.util.FileUtils.toFile;
 import static org.mule.maven.client.api.BundleScope.PROVIDED;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.module.embedded.internal.Serializer.serialize;
@@ -163,7 +164,7 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
   }
 
   private void persistMavenConfiguration(URL containerBaseFolder, MavenConfiguration mavenConfiguration) throws IOException {
-    File configurationFolder = new File(containerBaseFolder.getFile(), "conf");
+    File configurationFolder = new File(toFile(containerBaseFolder), "conf");
     if (!configurationFolder.exists()) {
       if (!configurationFolder.mkdirs()) {
         throw new IllegalArgumentException("Could not create MULE_HOME/conf folder in: " + configurationFolder.getAbsolutePath());
