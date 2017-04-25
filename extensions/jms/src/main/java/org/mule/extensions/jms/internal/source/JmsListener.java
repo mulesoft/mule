@@ -4,23 +4,28 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.api.source;
+package org.mule.extensions.jms.internal.source;
 
 import static java.lang.String.format;
-import static org.mule.extensions.jms.api.config.AckMode.AUTO;
-import static org.mule.extensions.jms.api.config.AckMode.DUPS_OK;
-import static org.mule.extensions.jms.api.config.AckMode.MANUAL;
 import static org.mule.extensions.jms.api.connection.JmsSpecification.JMS_2_0;
 import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_CONTENT_TYPE;
 import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_ENCODING;
+import static org.mule.extensions.jms.internal.common.JmsCommons.toInternalAckMode;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveOverride;
+import static org.mule.extensions.jms.internal.config.InternalAckMode.AUTO;
+import static org.mule.extensions.jms.internal.config.InternalAckMode.DUPS_OK;
+import static org.mule.extensions.jms.internal.config.InternalAckMode.MANUAL;
+import static org.mule.extensions.jms.internal.config.InternalAckMode.TRANSACTED;
+import static org.mule.runtime.extension.api.tx.SourceTransactionalAction.ALWAYS_BEGIN;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.JmsSessionManager;
+import org.mule.extensions.jms.api.source.JmsListenerResponseBuilder;
+import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
 import org.mule.extensions.jms.api.config.AckMode;
-import org.mule.extensions.jms.api.config.JmsConfig;
+import org.mule.extensions.jms.internal.config.InternalAckMode;
+import org.mule.extensions.jms.internal.config.JmsConfig;
 import org.mule.extensions.jms.api.config.JmsConsumerConfig;
-import org.mule.extensions.jms.api.connection.JmsConnection;
-import org.mule.extensions.jms.api.connection.JmsSession;
+import org.mule.extensions.jms.internal.connection.JmsSession;
+import org.mule.extensions.jms.internal.connection.JmsTransactionalConnection;
 import org.mule.extensions.jms.api.destination.ConsumerType;
 import org.mule.extensions.jms.api.destination.TopicConsumer;
 import org.mule.extensions.jms.api.exception.JmsExtensionException;
@@ -40,16 +45,17 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 
 import org.slf4j.Logger;
 
@@ -88,9 +94,13 @@ public class JmsListener extends Source<Object, JmsAttributes> {
   private JmsConfig config;
 
   @Connection
-  private JmsConnection connection;
+  private JmsTransactionalConnection connection;
 
   private JmsSupport jmsSupport;
+
+  private SourceTransactionalAction transactionalAction;
+
+  private InternalAckMode resolvedAckMode;
 
   /**
    * List to save all the created {@link JmsSession} and {@link JmsListenerLock} by this listener.
@@ -165,13 +175,17 @@ public class JmsListener extends Source<Object, JmsAttributes> {
     }
 
     JmsConsumerConfig consumerConfig = config.getConsumerConfig();
-    ackMode = resolveOverride(consumerConfig.getAckMode(), ackMode);
+
+    resolvedAckMode = transactionalAction.equals(ALWAYS_BEGIN)
+        ? TRANSACTED
+        : resolveOverride(toInternalAckMode(consumerConfig.getAckMode()), toInternalAckMode(ackMode));
+
     selector = resolveOverride(consumerConfig.getSelector(), selector);
     consumerType = resolveOverride(config.getConsumerConfig().getConsumerType(), consumerType);
     jmsSupport = connection.getJmsSupport();
 
     JmsMessageListenerFactory messageListenerFactory =
-        new JmsMessageListenerFactory(ackMode, encoding, contentType, config, sessionManager, jmsSupport, sourceCallback);
+        new JmsMessageListenerFactory(resolvedAckMode, encoding, contentType, config, sessionManager, jmsSupport, sourceCallback);
 
     validateNumberOfConsumers(numberOfConsumers);
 
@@ -179,7 +193,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
 
     try {
       for (int i = 0; i < numberOfConsumers; i++) {
-        JmsSession session = connection.createSession(ackMode, consumerType.isTopic());
+        JmsSession session = connection.createSession(resolvedAckMode, consumerType.isTopic());
 
         final Destination jmsDestination = jmsSupport.createDestination(session.get(), destination, consumerType.isTopic());
         final JmsMessageConsumer consumer = connection.createConsumer(session.get(), jmsDestination, selector, consumerType);
@@ -211,7 +225,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
           .forEach(JmsListenerLock::unlockWithFailure);
     } else {
       try {
-        if (ackMode.equals(AUTO) || ackMode.equals(DUPS_OK) || ackMode.equals(MANUAL)) {
+        if (resolvedAckMode.equals(AUTO) || resolvedAckMode.equals(DUPS_OK) || resolvedAckMode.equals(MANUAL)) {
           for (Pair<JmsSession, JmsListenerLock> session : sessions) {
             session.getFirst().get().recover();
           }
@@ -238,7 +252,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
   public void onError(Error error, SourceCallbackContext callbackContext) {
     callbackContext.<JmsListenerLock>getVariable(JMS_LOCK_VAR)
         .ifPresent(jmsLock -> {
-          if (ackMode.equals(AUTO) || ackMode.equals(DUPS_OK)) {
+          if (resolvedAckMode.equals(AUTO) || resolvedAckMode.equals(DUPS_OK)) {
             jmsLock.unlockWithFailure(error);
           } else {
             jmsLock.unlock();

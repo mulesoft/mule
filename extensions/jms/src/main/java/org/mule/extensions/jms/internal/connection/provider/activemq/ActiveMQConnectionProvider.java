@@ -8,7 +8,7 @@ package org.mule.extensions.jms.internal.connection.provider.activemq;
 
 import static org.mule.extensions.jms.api.connection.JmsSpecification.JMS_2_0;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.api.connection.JmsConnection;
+import org.mule.extensions.jms.internal.connection.JmsConnection;
 import org.mule.extensions.jms.internal.connection.exception.ActiveMQException;
 import org.mule.extensions.jms.internal.connection.provider.BaseConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;

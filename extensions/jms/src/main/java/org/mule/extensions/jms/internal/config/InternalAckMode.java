@@ -4,17 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.api.config;
+package org.mule.extensions.jms.internal.config;
 
-import org.mule.extensions.jms.internal.config.JmsAckMode;
+import static javax.jms.Session.AUTO_ACKNOWLEDGE;
+import static javax.jms.Session.CLIENT_ACKNOWLEDGE;
+import static javax.jms.Session.DUPS_OK_ACKNOWLEDGE;
+import static javax.jms.Session.SESSION_TRANSACTED;
 import org.mule.extensions.jms.internal.operation.JmsConsume;
 import org.mule.extensions.jms.internal.source.JmsListener;
-import org.mule.extensions.jms.internal.config.InternalAckMode;
 
 import javax.jms.Session;
 
 /**
  * Declares the kind of Acknowledgement mode supported.
+ * If a session is transacted, message acknowledgment is handled automatically by {@code commit},
+ * and recovery is handled automatically by {@code rollback}.
+ *
+ * If a session is not transacted, there are four acknowledgment options:
+ *
  * <ul>
  *     <li><b>AUTO</b>: Mule ACKs the message only if the flow is finished successfully. </li>
  *     <li><b>MANUAL</b>: This is JMS {@link Session#CLIENT_ACKNOWLEDGE} mode. The user must do the ack manually within the flow. </li>
@@ -22,40 +29,44 @@ import javax.jms.Session;
  *     <li><b>NONE</b>: Mule automatically ACKs the message upon reception. </li>
  * </ul>
  *
- *  @since 4.0
+ * @since 4.0
  */
-public enum AckMode implements JmsAckMode {
+public enum InternalAckMode {
 
   /**
    * Mule automatically ACKs the message upon reception
    */
-  NONE(InternalAckMode.NONE),
+  NONE(0),
 
   /**
    * This is JMS {@link Session#AUTO_ACKNOWLEDGE} mode.
    * The session automatically acknowledges the receipt when it successfully delivered the message
    * to a {@link JmsConsume#consume} or {@link JmsListener} handler.
    */
-  AUTO(InternalAckMode.AUTO),
+  AUTO(AUTO_ACKNOWLEDGE),
 
   /**
    * This is JMS {@link Session#CLIENT_ACKNOWLEDGE} mode. The user must do the ACK manually within the flow
    */
-  MANUAL(InternalAckMode.MANUAL),
+  MANUAL(CLIENT_ACKNOWLEDGE),
 
   /**
    * Similar to AUTO, the JMS message is acknowledged automatically but in a lazy fashion which may lead to duplicates.
    */
-  DUPS_OK(InternalAckMode.DUPS_OK);
+  DUPS_OK(DUPS_OK_ACKNOWLEDGE),
 
-  private InternalAckMode ackMode;
+  /**
+   * Transacted Session don't have ACK
+   */
+  TRANSACTED(SESSION_TRANSACTED);
 
-  AckMode(InternalAckMode ackMode) {
+  private final int ackMode;
+
+  InternalAckMode(int ackMode) {
     this.ackMode = ackMode;
   }
 
-  @Override
-  public InternalAckMode getInternalAckMode() {
+  public int getAckModeValue() {
     return ackMode;
   }
 }

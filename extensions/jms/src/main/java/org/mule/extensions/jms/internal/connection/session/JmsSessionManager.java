@@ -4,13 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms;
+package org.mule.extensions.jms.internal.connection.session;
 
 import static java.util.Optional.ofNullable;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.api.config.AckMode;
-import org.mule.extensions.jms.api.source.JmsListener;
-import org.mule.extensions.jms.api.source.JmsListenerLock;
+import org.mule.extensions.jms.internal.config.InternalAckMode;
+import org.mule.extensions.jms.internal.connection.JmsSession;
+import org.mule.extensions.jms.internal.source.JmsListener;
+import org.mule.extensions.jms.internal.source.JmsListenerLock;
 
 import org.slf4j.Logger;
 
@@ -25,18 +26,19 @@ import javax.jms.Session;
 /**
  * Manager that takes the responsibility of register the session information to be able to execute a manual
  * acknowledgement or a recover over a {@link Session}.
- * This is used when the {@link AckMode} is configured in {@link AckMode#MANUAL}
+ * This is used when the {@link InternalAckMode} is configured in {@link InternalAckMode#MANUAL}
  *
  * @since 4.0
  */
-public class JmsSessionManager {
+final public class JmsSessionManager {
 
   private static final Logger LOGGER = getLogger(JmsSessionManager.class);
   private final Map<String, SessionInformation> pendingSessions = new HashMap<>();
+  private final ThreadLocal<TransactionInformation> transactionInformation = new ThreadLocal<>();
 
   /**
    * Registers the {@link Message} to the {@link Session} using the {@code ackId} in order to being
-   * able later to perform a {@link AckMode#MANUAL} ACK
+   * able later to perform a {@link InternalAckMode#MANUAL} ACK
    *
    * @param ackId   the id associated to the {@link Session} used to create the {@link Message}
    * @param message the {@link Message} to use for executing the {@link Message#acknowledge}
@@ -116,28 +118,51 @@ public class JmsSessionManager {
     return ofNullable(pendingSessions.remove(ackId));
   }
 
-  private class SessionInformation {
+  /**
+   * Binds the given {@link JmsSession} to the current {@link Thread}
+   * @param session session to bind
+   */
+  public void bindToTransaction(JmsSession session) {
+    getTransactionInformation().setJmsSession(session);
+  }
 
-    private Message message;
-    private Session session;
-    private JmsListenerLock jmsListenerLock;
+  /**
+   * Unbinds the current {@link JmsSession}, if there is one, of the current {@link Thread}
+   */
+  public void unbindSession() {
+    transactionInformation.remove();
+  }
 
-    SessionInformation(Message message, Session session, JmsListenerLock jmsListenerLock) {
-      this.message = message;
-      this.session = session;
-      this.jmsListenerLock = jmsListenerLock;
+  /**
+   * @return the {@link Optional} {@link JmsSession} of the current {@link Thread}
+   */
+  public Optional<JmsSession> getTransactedSession() {
+    return ofNullable(getTransactionInformation().getJmsSession());
+  }
+
+  /**
+   * @return The status of the transaction.
+   * - {@link TransactionStatus#NONE} means that there is no started transaction for the current {@link Thread}
+   * - {@link TransactionStatus#STARTED} means that there is a transaction being executed in the current {@link Thread}
+   */
+  public TransactionStatus getTransactionStatus() {
+    TransactionStatus transactionStatus = getTransactionInformation().getTransactionStatus();
+    return transactionStatus != null ? transactionStatus : TransactionStatus.NONE;
+  }
+
+  /**
+   * @param transactionStatus The new {@link TransactionStatus}
+   */
+  public void changeTransactionStatus(TransactionStatus transactionStatus) {
+    getTransactionInformation().setTransactionStatus(transactionStatus);
+  }
+
+  private TransactionInformation getTransactionInformation() {
+    TransactionInformation transactionInformation = this.transactionInformation.get();
+    if (transactionInformation == null) {
+      transactionInformation = new TransactionInformation();
+      this.transactionInformation.set(transactionInformation);
     }
-
-    Message getMessage() {
-      return message;
-    }
-
-    Session getSession() {
-      return session;
-    }
-
-    Optional<JmsListenerLock> getJmsListenerLock() {
-      return ofNullable(jmsListenerLock);
-    }
+    return transactionInformation;
   }
 }

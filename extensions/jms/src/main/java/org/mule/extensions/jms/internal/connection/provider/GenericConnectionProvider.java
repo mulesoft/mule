@@ -9,7 +9,7 @@ package org.mule.extensions.jms.internal.connection.provider;
 import static org.mule.extensions.jms.api.connection.JmsSpecification.JMS_1_0_2b;
 import static org.mule.extensions.jms.api.connection.JmsSpecification.JMS_1_1;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import org.mule.extensions.jms.api.connection.JmsConnection;
+import org.mule.extensions.jms.internal.connection.JmsConnection;
 import org.mule.extensions.jms.api.connection.JmsSpecification;
 import org.mule.extensions.jms.api.connection.LookupJndiDestination;
 import org.mule.extensions.jms.api.connection.factory.jndi.JndiConnectionFactory;

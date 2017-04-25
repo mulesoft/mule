@@ -4,22 +4,28 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.api.connection;
+package org.mule.extensions.jms.internal.connection;
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
-import static org.mule.extensions.jms.api.config.AckMode.MANUAL;
-import static org.mule.extensions.jms.api.config.AckMode.TRANSACTED;
+import static org.mule.extensions.jms.internal.config.InternalAckMode.MANUAL;
+import static org.mule.extensions.jms.internal.config.InternalAckMode.TRANSACTED;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.api.config.AckMode;
+import org.mule.extensions.jms.api.connection.JmsSpecification;
+import org.mule.extensions.jms.internal.config.InternalAckMode;
 import org.mule.extensions.jms.api.destination.ConsumerType;
+import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
 import org.mule.extensions.jms.internal.consume.JmsMessageConsumer;
 import org.mule.extensions.jms.internal.publish.JmsMessageProducer;
 import org.mule.extensions.jms.internal.support.JmsSupport;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+
 import org.slf4j.Logger;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
@@ -32,27 +38,27 @@ import javax.jms.Session;
 import javax.jms.Topic;
 import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A Connection for the JmsExtension
  *
  * @since 4.0
  */
-public final class JmsConnection implements Stoppable, Disposable {
+public class JmsConnection implements Stoppable, Disposable {
 
   private static final Logger LOGGER = getLogger(JmsConnection.class);
 
   private final JmsSupport jmsSupport;
   private final Connection connection;
+  final JmsSessionManager jmsSessionManager;
   private final List<JmsMessageConsumer> createdConsumers = new LinkedList<>();
   private final List<JmsMessageProducer> createdProducers = new LinkedList<>();
   private final List<JmsSession> createdSessions = new LinkedList<>();
 
-  public JmsConnection(JmsSupport jmsSupport, Connection connection) {
+  public JmsConnection(JmsSupport jmsSupport, Connection connection, JmsSessionManager jmsSessionManager) {
     this.jmsSupport = jmsSupport;
     this.connection = connection;
+    this.jmsSessionManager = jmsSessionManager;
   }
 
   public JmsSupport getJmsSupport() {
@@ -66,14 +72,14 @@ public final class JmsConnection implements Stoppable, Disposable {
   /**
    * Creates a new JMS {@link Session} using the current {@link Connection}
    *
-   * @param ackMode the {@link Session} {@link AckMode}
+   * @param ackMode the {@link Session} {@link InternalAckMode}
    * @param isTopic if {@code true} the {@link Session} created will be a {@link TopicSession}.
    *                This distinction is made only for {@link JmsSpecification#JMS_1_0_2b}
    * @return a new {@link Session}
    * @throws JMSException if an error occurs while creating the {@link Session}
    */
-  public JmsSession createSession(AckMode ackMode, boolean isTopic) throws JMSException {
-    Session session = jmsSupport.createSession(connection, isTopic, ackMode.equals(TRANSACTED), ackMode.getAckMode());
+  public JmsSession createSession(InternalAckMode ackMode, boolean isTopic) throws JMSException {
+    Session session = jmsSupport.createSession(connection, isTopic, ackMode.equals(TRANSACTED), ackMode.getAckModeValue());
     JmsSession wrapper;
 
     if (ackMode.equals(MANUAL)) {
@@ -226,5 +232,4 @@ public final class JmsConnection implements Stoppable, Disposable {
       }
     }
   }
-
 }

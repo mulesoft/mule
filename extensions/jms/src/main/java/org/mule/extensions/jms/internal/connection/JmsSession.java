@@ -4,18 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.api.connection;
+package org.mule.extensions.jms.internal.connection;
 
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.slf4j.Logger;
+
 import java.util.Optional;
 
 import javax.jms.JMSException;
 import javax.jms.Session;
-
-import org.slf4j.Logger;
 
 /**
  * Wrapper element for a JMS {@link Session} that relates the

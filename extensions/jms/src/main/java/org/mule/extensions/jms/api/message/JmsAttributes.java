@@ -9,8 +9,6 @@ package org.mule.extensions.jms.api.message;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.runtime.api.message.Attributes;
 
-import java.util.Optional;
-
 import javax.jms.Message;
 
 /**

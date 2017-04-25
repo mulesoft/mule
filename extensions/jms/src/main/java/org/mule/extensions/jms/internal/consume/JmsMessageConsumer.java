@@ -9,8 +9,9 @@ package org.mule.extensions.jms.internal.consume;
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.apache.commons.lang.time.StopWatch;
 import org.mule.extensions.jms.api.exception.JmsTimeoutException;
+
+import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 
 import javax.jms.JMSException;

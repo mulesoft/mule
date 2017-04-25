@@ -6,7 +6,7 @@
  */
 package org.mule.extensions.jms.internal.support;
 
-import org.mule.extensions.jms.api.config.AckMode;
+import org.mule.extensions.jms.internal.config.InternalAckMode;
 import org.mule.extensions.jms.api.connection.JmsSpecification;
 import org.mule.extensions.jms.api.connection.LookupJndiDestination;
 import org.mule.extensions.jms.api.destination.ConsumerType;
@@ -64,7 +64,7 @@ public interface JmsSupport {
    * @param topic if {@code true} the {@link Session} created will be a {@link TopicSession}.
    *                This distinction is made only for {@link JmsSpecification#JMS_1_0_2b}
    * @param transacted indicates whether the session will use a local transaction
-   * @param ackMode the {@link Session} {@link AckMode}
+   * @param ackMode the {@link Session} {@link InternalAckMode}
    * @return a new {@link Session}
    * @throws JMSException if an error occurs during connection creation
    */

@@ -4,14 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.api.config;
+package org.mule.extensions.jms.internal.config;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import org.mule.extensions.jms.JmsExtension;
-import org.mule.extensions.jms.api.operation.JmsConsume;
-import org.mule.extensions.jms.api.operation.JmsPublish;
-import org.mule.extensions.jms.api.operation.JmsPublishConsume;
-import org.mule.extensions.jms.api.source.JmsListener;
+import org.mule.extensions.jms.api.config.JmsConsumerConfig;
+import org.mule.extensions.jms.api.config.JmsProducerConfig;
+import org.mule.extensions.jms.internal.JmsExtension;
+import org.mule.extensions.jms.internal.operation.JmsConsume;
+import org.mule.extensions.jms.internal.operation.JmsPublish;
+import org.mule.extensions.jms.internal.operation.JmsPublishConsume;
+import org.mule.extensions.jms.internal.source.JmsListener;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Operations;

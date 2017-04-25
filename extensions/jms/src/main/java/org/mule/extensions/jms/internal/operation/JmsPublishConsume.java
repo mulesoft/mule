@@ -4,23 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.api.operation;
+package org.mule.extensions.jms.internal.operation;
 
 import static java.lang.String.format;
-import static org.mule.extensions.jms.api.config.AckMode.AUTO;
 import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_CONTENT_TYPE;
 import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_ENCODING;
 import static org.mule.extensions.jms.internal.common.JmsCommons.evaluateMessageAck;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageContentType;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageEncoding;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveOverride;
+import static org.mule.extensions.jms.internal.common.JmsCommons.toInternalAckMode;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.JmsSessionManager;
+import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
 import org.mule.extensions.jms.api.config.AckMode;
-import org.mule.extensions.jms.api.config.JmsConfig;
+import org.mule.extensions.jms.api.config.ConsumerAckMode;
+import org.mule.extensions.jms.internal.config.JmsConfig;
 import org.mule.extensions.jms.api.config.JmsProducerConfig;
-import org.mule.extensions.jms.api.connection.JmsConnection;
-import org.mule.extensions.jms.api.connection.JmsSession;
+import org.mule.extensions.jms.internal.connection.JmsConnection;
+import org.mule.extensions.jms.internal.connection.JmsSession;
 import org.mule.extensions.jms.api.destination.ConsumerType;
 import org.mule.extensions.jms.api.destination.QueueConsumer;
 import org.mule.extensions.jms.api.destination.TopicConsumer;
@@ -31,17 +32,18 @@ import org.mule.extensions.jms.api.exception.JmsPublishException;
 import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.api.message.MessageBuilder;
 import org.mule.extensions.jms.api.publish.JmsPublishParameters;
+import org.mule.extensions.jms.internal.config.InternalAckMode;
 import org.mule.extensions.jms.internal.consume.JmsMessageConsumer;
 import org.mule.extensions.jms.internal.message.JmsResultFactory;
 import org.mule.extensions.jms.internal.metadata.JmsOutputResolver;
 import org.mule.extensions.jms.internal.support.JmsSupport;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -97,8 +99,7 @@ public class JmsPublishConsume {
                                                       @Placement(order = 0) String destination,
                                                       @Optional @NullSafe @Placement(
                                                           order = 1) @Summary("A builder for the message that will be published") MessageBuilder messageBuilder,
-                                                      //TODO - MULE-11962 : Limit ACK Modes for PublishConsume operation
-                                                      @Optional AckMode ackMode,
+                                                      @Optional final ConsumerAckMode ackMode,
                                                       @Optional(defaultValue = "10000") long maximumWait,
                                                       @Optional(defaultValue = "MILLISECONDS") TimeUnit maximumWaitUnit,
                                                       @Placement(order = 2) @ParameterGroup(
@@ -110,6 +111,8 @@ public class JmsPublishConsume {
     JmsSession session;
     Message message;
     ConsumerType replyConsumerType;
+    InternalAckMode resolvedAckMode =
+        resolveOverride(toInternalAckMode(config.getConsumerConfig().getAckMode()), toInternalAckMode(ackMode));
 
     try {
       if (LOGGER.isDebugEnabled()) {
@@ -117,7 +120,7 @@ public class JmsPublishConsume {
       }
 
       JmsSupport jmsSupport = connection.getJmsSupport();
-      session = connection.createSession(AUTO, false);
+      session = connection.createSession(resolvedAckMode, false);
 
       message = messageBuilder.build(jmsSupport, session.get(), config);
       replyConsumerType = setReplyDestination(messageBuilder, session, jmsSupport, message);
@@ -150,8 +153,7 @@ public class JmsPublishConsume {
       Message received = consumer.consume(maximumWaitUnit.toMillis(maximumWait));
 
       if (received != null) {
-        ackMode = resolveOverride(config.getConsumerConfig().getAckMode(), ackMode);
-        evaluateMessageAck(ackMode, session, received, sessionManager, null);
+        evaluateMessageAck(resolvedAckMode, session, received, sessionManager, null);
       }
 
       if (LOGGER.isDebugEnabled()) {

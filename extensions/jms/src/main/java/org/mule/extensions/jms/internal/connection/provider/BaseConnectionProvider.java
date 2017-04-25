@@ -17,8 +17,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.api.connection.JmsConnection;
+import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
+import org.mule.extensions.jms.internal.connection.JmsConnection;
 import org.mule.extensions.jms.api.connection.JmsSpecification;
+import org.mule.extensions.jms.internal.connection.JmsTransactionalConnection;
 import org.mule.extensions.jms.api.connection.caching.CachingStrategy;
 import org.mule.extensions.jms.api.connection.caching.DefaultCachingStrategy;
 import org.mule.extensions.jms.api.exception.JmsCallbackConnectionException;
@@ -40,22 +42,24 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
+import org.slf4j.Logger;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.inject.Inject;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Session;
 
-import org.slf4j.Logger;
-
 /**
  * Base implementation of a {@link PoolingConnectionProvider} for {@link JmsConnection}s
  *
  * @since 4.0
  */
-public abstract class BaseConnectionProvider implements PoolingConnectionProvider<JmsConnection>, Initialisable, Disposable {
+public abstract class BaseConnectionProvider
+    implements PoolingConnectionProvider<JmsTransactionalConnection>, Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(BaseConnectionProvider.class);
 
@@ -69,6 +73,9 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
   @Optional
   @NullSafe(defaultImplementingType = DefaultCachingStrategy.class)
   private CachingStrategy cachingStrategy;
+
+  @Inject
+  JmsSessionManager jmsSessionManager;
 
 
   /**
@@ -105,7 +112,7 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
   }
 
   @Override
-  public JmsConnection connect() throws ConnectionException {
+  public JmsTransactionalConnection connect() throws ConnectionException {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Connection Started");
     }
@@ -114,7 +121,7 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
     try {
       Connection connection = createConnection();
       connection.start();
-      return new JmsConnection(jmsSupport, connection);
+      return new JmsTransactionalConnection(jmsSupport, connection, jmsSessionManager);
 
     } catch (Exception e) {
       try {
@@ -137,7 +144,7 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
   }
 
   @Override
-  public ConnectionValidationResult validate(JmsConnection jmsConnection) {
+  public ConnectionValidationResult validate(JmsTransactionalConnection jmsConnection) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Validating connection");
     }
@@ -160,7 +167,7 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
   }
 
   @Override
-  public void disconnect(JmsConnection jmsConnection) {
+  public void disconnect(JmsTransactionalConnection jmsConnection) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Disconnection Started");
     }
@@ -172,7 +179,7 @@ public abstract class BaseConnectionProvider implements PoolingConnectionProvide
   }
 
   @Override
-  public void onReturn(JmsConnection connection) {
+  public void onReturn(JmsTransactionalConnection connection) {
     connection.releaseResources();
   }
 

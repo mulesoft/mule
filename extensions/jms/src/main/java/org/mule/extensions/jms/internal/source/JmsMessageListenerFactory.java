@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.api.source;
+package org.mule.extensions.jms.internal.source;
 
-import org.mule.extensions.jms.JmsSessionManager;
-import org.mule.extensions.jms.api.config.AckMode;
-import org.mule.extensions.jms.api.config.JmsConfig;
-import org.mule.extensions.jms.api.connection.JmsSession;
+import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
+import org.mule.extensions.jms.internal.config.InternalAckMode;
+import org.mule.extensions.jms.internal.config.JmsConfig;
+import org.mule.extensions.jms.internal.connection.JmsSession;
 import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.internal.support.JmsSupport;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -23,7 +23,7 @@ import javax.jms.Message;
  */
 final class JmsMessageListenerFactory {
 
-  private final AckMode ackMode;
+  private final InternalAckMode ackMode;
   private final String encoding;
   private final String contentType;
   private JmsConfig config;
@@ -43,7 +43,7 @@ final class JmsMessageListenerFactory {
    * @param jmsSupport     JMS Support that communicates the used specification
    * @param sourceCallback callback use to dispatch the {@link Message} to the mule flow
    */
-  JmsMessageListenerFactory(AckMode ackMode, String encoding, String contentType, JmsConfig config,
+  JmsMessageListenerFactory(InternalAckMode ackMode, String encoding, String contentType, JmsConfig config,
                             JmsSessionManager sessionManager, JmsSupport jmsSupport,
                             SourceCallback<Object, JmsAttributes> sourceCallback) {
     this.ackMode = ackMode;

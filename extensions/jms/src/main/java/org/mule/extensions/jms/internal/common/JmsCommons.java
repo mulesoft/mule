@@ -8,23 +8,29 @@ package org.mule.extensions.jms.internal.common;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.mule.extensions.jms.api.config.AckMode.MANUAL;
-import static org.mule.extensions.jms.api.config.AckMode.NONE;
 import static org.mule.extensions.jms.api.message.MessageBuilder.BODY_CONTENT_TYPE_JMS_PROPERTY;
 import static org.mule.extensions.jms.api.message.MessageBuilder.BODY_ENCODING_JMS_PROPERTY;
+import static org.mule.extensions.jms.internal.config.InternalAckMode.MANUAL;
+import static org.mule.extensions.jms.internal.config.InternalAckMode.NONE;
+import static org.mule.extensions.jms.internal.config.InternalAckMode.TRANSACTED;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.JmsSessionManager;
-import org.mule.extensions.jms.api.config.AckMode;
-import org.mule.extensions.jms.api.connection.JmsSession;
+import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
+import org.mule.extensions.jms.internal.config.JmsAckMode;
+import org.mule.extensions.jms.internal.connection.JmsConnection;
+import org.mule.extensions.jms.internal.connection.JmsSession;
 import org.mule.extensions.jms.api.exception.JmsAckException;
-import org.mule.extensions.jms.api.source.JmsListenerLock;
+import org.mule.extensions.jms.internal.source.JmsListenerLock;
+import org.mule.extensions.jms.internal.config.InternalAckMode;
+
 import org.slf4j.Logger;
+
+import java.util.Optional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 
 /**
- * Utility class for Jms Operations
+ * Utility class to reuse logic for JMS Extension
  *
  * @since 4.0
  */
@@ -61,7 +67,7 @@ public final class JmsCommons {
     return operationValue == null ? configValue : operationValue;
   }
 
-  public static void evaluateMessageAck(AckMode ackMode, JmsSession session, Message receivedMessage,
+  public static void evaluateMessageAck(InternalAckMode ackMode, JmsSession session, Message receivedMessage,
                                         JmsSessionManager messageSessionManager, JmsListenerLock jmsLock)
       throws JMSException {
     try {
@@ -85,4 +91,40 @@ public final class JmsCommons {
     }
   }
 
+  /**
+   * Utility method to create new {@link JmsSession} from a given {@link JmsConnection}
+   *
+   * @param jmsConnection the connection from where create a new {@link JmsSession}
+   * @param ackMode the {@link InternalAckMode} to use
+   * @param isTopic Indicates if the destination is whether a topic or a queue
+   * @param jmsSessionManager {@link JmsSessionManager} to retrieve information about the current transaction status
+   * @return a new {@link JmsSession} from the given {@link JmsConnection}
+   * @throws JMSException If an error happens creating a new {@link JmsSession}
+   */
+  public static JmsSession createJmsSession(JmsConnection jmsConnection, InternalAckMode ackMode, boolean isTopic,
+                                            JmsSessionManager jmsSessionManager)
+      throws JMSException {
+    Optional<JmsSession> transactedSession = jmsSessionManager.getTransactedSession();
+    JmsSession session;
+
+    if (transactedSession.isPresent()) {
+      session = transactedSession.get();
+    } else {
+      switch (jmsSessionManager.getTransactionStatus()) {
+        case STARTED:
+          ackMode = TRANSACTED;
+          session = jmsConnection.createSession(ackMode, isTopic);
+          jmsSessionManager.bindToTransaction(session);
+          break;
+        default:
+          session = jmsConnection.createSession(ackMode, isTopic);
+          break;
+      }
+    }
+    return session;
+  }
+
+  public static InternalAckMode toInternalAckMode(JmsAckMode jmsAckMode) {
+    return jmsAckMode == null ? null : jmsAckMode.getInternalAckMode();
+  }
 }

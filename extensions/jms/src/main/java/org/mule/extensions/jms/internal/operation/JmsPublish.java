@@ -4,15 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.api.operation;
+package org.mule.extensions.jms.internal.operation;
 
 import static java.lang.String.format;
-import static org.mule.extensions.jms.api.config.AckMode.AUTO;
+import static org.mule.extensions.jms.internal.common.JmsCommons.createJmsSession;
+import static org.mule.extensions.jms.internal.config.InternalAckMode.AUTO;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.api.config.JmsConfig;
+import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
+import org.mule.extensions.jms.internal.config.JmsConfig;
 import org.mule.extensions.jms.api.config.JmsProducerConfig;
-import org.mule.extensions.jms.api.connection.JmsConnection;
-import org.mule.extensions.jms.api.connection.JmsSession;
+import org.mule.extensions.jms.internal.connection.JmsConnection;
+import org.mule.extensions.jms.internal.connection.JmsSession;
+import org.mule.extensions.jms.internal.connection.JmsTransactionalConnection;
 import org.mule.extensions.jms.api.destination.DestinationType;
 import org.mule.extensions.jms.api.exception.JmsExtensionException;
 import org.mule.extensions.jms.api.exception.JmsPublishException;
@@ -21,14 +24,16 @@ import org.mule.extensions.jms.api.message.MessageBuilder;
 import org.mule.extensions.jms.api.publish.JmsPublishParameters;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.error.Throws;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+
 import org.slf4j.Logger;
 
+import javax.inject.Inject;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.Message;
@@ -41,6 +46,9 @@ import javax.jms.Message;
 public final class JmsPublish {
 
   private static final Logger LOGGER = getLogger(JmsPublish.class);
+
+  @Inject
+  private JmsSessionManager jmsSessionManager;
 
   /**
    * Operation that allows the user to send a {@link Message} to a JMS {@link Destination
@@ -59,7 +67,7 @@ public final class JmsPublish {
    * @throws JmsPublishException if an error occurs
    */
   @Throws(JmsPublisherErrorTypeProvider.class)
-  public void publish(@Config JmsConfig config, @Connection JmsConnection connection,
+  public void publish(@Config JmsConfig config, @Connection JmsTransactionalConnection connection,
                       @XmlHints(
                           allowReferences = false) @Summary("The name of the Destination where the Message should be sent") String destination,
                       @Optional(defaultValue = "QUEUE") @Summary("The type of the Destination") DestinationType destinationType,
@@ -74,7 +82,8 @@ public final class JmsPublish {
         LOGGER.debug("Begin publish");
       }
 
-      JmsSession session = connection.createSession(AUTO, destinationType.isTopic());
+      JmsSession session = createJmsSession(connection, AUTO, destinationType.isTopic(), jmsSessionManager);
+
       Message message = messageBuilder.build(connection.getJmsSupport(), session.get(), config);
 
       if (LOGGER.isDebugEnabled()) {
@@ -95,5 +104,4 @@ public final class JmsPublish {
       throw new JmsPublishException(format("An error occurred while sending a message to [%s]: ", destination), e);
     }
   }
-
 }

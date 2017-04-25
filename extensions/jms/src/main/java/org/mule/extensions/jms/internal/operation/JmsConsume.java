@@ -4,27 +4,31 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extensions.jms.api.operation;
+package org.mule.extensions.jms.internal.operation;
 
 import static java.lang.String.format;
 import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_CONTENT_TYPE;
 import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_ENCODING;
+import static org.mule.extensions.jms.internal.common.JmsCommons.createJmsSession;
 import static org.mule.extensions.jms.internal.common.JmsCommons.evaluateMessageAck;
+import static org.mule.extensions.jms.internal.common.JmsCommons.toInternalAckMode;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageContentType;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageEncoding;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveOverride;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.JmsSessionManager;
-import org.mule.extensions.jms.api.config.AckMode;
-import org.mule.extensions.jms.api.config.JmsConfig;
+import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
+import org.mule.extensions.jms.api.config.ConsumerAckMode;
+import org.mule.extensions.jms.internal.config.JmsConfig;
 import org.mule.extensions.jms.api.config.JmsConsumerConfig;
-import org.mule.extensions.jms.api.connection.JmsConnection;
-import org.mule.extensions.jms.api.connection.JmsSession;
+import org.mule.extensions.jms.internal.connection.JmsConnection;
+import org.mule.extensions.jms.internal.connection.JmsSession;
+import org.mule.extensions.jms.internal.connection.JmsTransactionalConnection;
 import org.mule.extensions.jms.api.destination.ConsumerType;
 import org.mule.extensions.jms.api.exception.JmsConsumeErrorTypeProvider;
 import org.mule.extensions.jms.api.exception.JmsConsumeException;
 import org.mule.extensions.jms.api.exception.JmsExtensionException;
 import org.mule.extensions.jms.api.message.JmsAttributes;
+import org.mule.extensions.jms.internal.config.InternalAckMode;
 import org.mule.extensions.jms.internal.consume.JmsMessageConsumer;
 import org.mule.extensions.jms.internal.message.JmsResultFactory;
 import org.mule.extensions.jms.internal.metadata.JmsOutputResolver;
@@ -32,19 +36,21 @@ import org.mule.extensions.jms.internal.support.JmsSupport;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+
 import org.slf4j.Logger;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Operation that allows the user to consume a single {@link Message} from a given {@link Destination}
@@ -68,7 +74,7 @@ public final class JmsConsume {
    * @param destination     the name of the {@link Destination} from where the {@link Message} should be consumed
    * @param consumerType    the type of the {@link MessageConsumer} that is required for the given destination, along with any
    *                        extra configurations that are required based on the destination type.
-   * @param ackMode         the {@link AckMode} that will be configured over the Message and Session
+   * @param ackMode         the {@link ConsumerAckMode} that will be configured over the Message and Session
    * @param selector        a custom JMS selector for filtering the messages
    * @param contentType     the {@link Message}'s content content type
    * @param encoding        the {@link Message}'s content encoding
@@ -80,11 +86,11 @@ public final class JmsConsume {
    */
   @OutputResolver(output = JmsOutputResolver.class)
   @Throws(JmsConsumeErrorTypeProvider.class)
-  public Result<Object, JmsAttributes> consume(@Connection JmsConnection connection, @Config JmsConfig config,
+  public Result<Object, JmsAttributes> consume(@Connection JmsTransactionalConnection connection, @Config JmsConfig config,
                                                @XmlHints(
                                                    allowReferences = false) @Summary("The name of the Destination from where the Message should be consumed") String destination,
                                                @Optional @Summary("The Type of the Consumer that should be used for the provided destination") ConsumerType consumerType,
-                                               @Optional @Summary("The Session ACK mode to use when consuming a message") AckMode ackMode,
+                                               @Optional @Summary("The Session ACK mode to use when consuming a message") ConsumerAckMode ackMode,
                                                @Optional @Summary("JMS selector to be used for filtering incoming messages") String selector,
                                                @Optional @Summary("The content type of the message body") @Example(EXAMPLE_CONTENT_TYPE) String contentType,
                                                @Optional @Summary("The encoding of the message body") @Example(EXAMPLE_ENCODING) String encoding,
@@ -96,8 +102,8 @@ public final class JmsConsume {
 
     JmsConsumerConfig consumerConfig = config.getConsumerConfig();
 
+    InternalAckMode resolvedAckMode = resolveOverride(toInternalAckMode(consumerConfig.getAckMode()), toInternalAckMode(ackMode));
     consumerType = resolveOverride(consumerConfig.getConsumerType(), consumerType);
-    ackMode = resolveOverride(consumerConfig.getAckMode(), ackMode);
     selector = resolveOverride(consumerConfig.getSelector(), selector);
 
     try {
@@ -106,7 +112,8 @@ public final class JmsConsume {
       }
 
       JmsSupport jmsSupport = connection.getJmsSupport();
-      JmsSession session = connection.createSession(ackMode, consumerType.isTopic());
+      JmsSession session =
+          createJmsSession(connection, resolvedAckMode, consumerType.isTopic(), sessionManager);
       Destination jmsDestination = jmsSupport.createDestination(session.get(), destination, consumerType.isTopic());
 
       JmsMessageConsumer consumer = connection.createConsumer(session.get(), jmsDestination, selector, consumerType);
@@ -118,7 +125,7 @@ public final class JmsConsume {
       Message received = consumer.consume(maximumWaitUnit.toMillis(maximumWait));
 
       if (received != null) {
-        evaluateMessageAck(ackMode, session, received, sessionManager, null);
+        evaluateMessageAck(resolvedAckMode, session, received, sessionManager, null);
         // If no explicit content type was provided to the operation, fallback to the
         // one communicated in the message properties. Finally if no property was set,
         // use the default one provided by the config
