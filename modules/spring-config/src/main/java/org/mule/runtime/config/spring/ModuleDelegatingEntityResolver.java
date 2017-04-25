@@ -14,13 +14,10 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.SchemaResourceFactory;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -87,11 +84,6 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     InputSource inputSource = entityResolver.resolveEntity(publicId, systemId);
     if (inputSource == null) {
       inputSource = generateModuleXsd(publicId, systemId);
-    }
-
-    if (systemId.contains("mule-soap.xsd")) {
-      FileUtils.writeStringToFile(new File("pepitos.xsd"),
-                                  IOUtils.toString(entityResolver.resolveEntity(publicId, systemId).getByteStream()));
     }
 
     return inputSource;

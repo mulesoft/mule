@@ -40,11 +40,13 @@ public final class ParameterGroupDescriptor {
   public ParameterGroupDescriptor(String name, Type type, AnnotatedElement container) {
     checkArgument(!isBlank(name), "name cannot be blank");
     checkArgument(type != null, "type cannot be null");
-    //checkArgument(container != null, "container cannot be null");
-
     this.name = name;
     this.type = type;
     this.container = container;
+  }
+
+  public ParameterGroupDescriptor(String name, Type type) {
+    this(name, type, null);
   }
 
   /**

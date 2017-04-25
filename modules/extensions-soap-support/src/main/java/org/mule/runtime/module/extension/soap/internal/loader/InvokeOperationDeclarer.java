@@ -143,7 +143,7 @@ public class InvokeOperationDeclarer {
    */
   private void declareMetadataKeyParameters(OperationDeclarer operation) {
     TypeWrapper keyType = new TypeWrapper(WebServiceTypeKey.class);
-    ParameterGroupDescriptor descriptor = new ParameterGroupDescriptor(KEYS_GROUP, keyType, null);
+    ParameterGroupDescriptor descriptor = new ParameterGroupDescriptor(KEYS_GROUP, keyType);
     ParameterGroupDeclarer group = operation.blocking(true)
         .onParameterGroup(KEYS_GROUP)
         .withModelProperty(new ParameterGroupModelProperty(descriptor));
