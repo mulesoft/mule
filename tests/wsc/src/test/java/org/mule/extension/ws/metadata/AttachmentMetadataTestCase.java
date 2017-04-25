@@ -6,16 +6,15 @@
  */
 package org.mule.extension.ws.metadata;
 
-import static org.mule.extension.ws.WscTestUtils.ECHO;
-import static org.mule.extension.ws.WscTestUtils.UPLOAD_ATTACHMENT;
-import static org.mule.extension.ws.metadata.OutputMetadataTestCase.ATTACHMENTS_FIELD;
-import static org.mule.extension.ws.metadata.OutputMetadataTestCase.BODY_FIELD;
-import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
-
+import static org.mule.extension.ws.WscTestUtils.ECHO;
+import static org.mule.extension.ws.WscTestUtils.UPLOAD_ATTACHMENT;
+import static org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder.ATTACHMENTS_FIELD;
+import static org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder.BODY_FIELD;
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectFieldType;

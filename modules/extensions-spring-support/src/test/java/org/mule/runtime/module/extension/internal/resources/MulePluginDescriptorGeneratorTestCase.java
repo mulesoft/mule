@@ -4,17 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.resources.descriptor;
+package org.mule.runtime.module.extension.internal.resources;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.loadExtension;
-import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.module.extension.internal.resources.AbstractGeneratedResourceFactoryTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
@@ -24,6 +22,7 @@ import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 @SmallTest
 public class MulePluginDescriptorGeneratorTestCase extends AbstractGeneratedResourceFactoryTestCase {
@@ -51,6 +50,6 @@ public class MulePluginDescriptorGeneratorTestCase extends AbstractGeneratedReso
     assertThat(resource.isPresent(), is(true));
 
     String actualDescriptor = new String(resource.get().getContent());
-    assertEquals(actualDescriptor, expectedDescriptor, true);
+    JSONAssert.assertEquals(actualDescriptor, expectedDescriptor, true);
   }
 }

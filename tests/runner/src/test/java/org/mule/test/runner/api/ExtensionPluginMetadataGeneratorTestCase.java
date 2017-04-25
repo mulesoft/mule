@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Mock;
 
 public class ExtensionPluginMetadataGeneratorTestCase {
 
@@ -38,6 +39,9 @@ public class ExtensionPluginMetadataGeneratorTestCase {
   private Artifact heisenbergPlugin = new DefaultArtifact("org.mule.tests:mule-heisenberg-extension:1.0-SNAPSHOT");
   private Artifact petStorePlugin = new DefaultArtifact("org.mule.tests:mule-petstore-extension:1.0-SNAPSHOT");
 
+  @Mock
+  private DependencyResolver depResolver;
+
   private ExtensionPluginMetadataGenerator generator;
 
   @Before
@@ -47,28 +51,25 @@ public class ExtensionPluginMetadataGeneratorTestCase {
 
   @Test
   public void scanningClassPathShouldNotIncludeSpringStuff() {
-    Class scanned = generator.scanForExtensionAnnotatedClasses(heisenbergPlugin, newArrayList(
-                                                                                              this.getClass()
-                                                                                                  .getProtectionDomain()
-                                                                                                  .getCodeSource()
-                                                                                                  .getLocation()));
+    Class scanned = generator.scanForExtensionAnnotatedClasses(heisenbergPlugin, newArrayList(this.getClass()
+        .getProtectionDomain()
+        .getCodeSource()
+        .getLocation()));
 
     assertThat(scanned, is(nullValue()));
   }
 
   @Test
   public void generateExtensionManifestForTwoExtensionsInDifferentFolders() {
-    File heisenbergPluginFolder = generator.generateExtensionManifest(heisenbergPlugin, HeisenbergExtension.class);
-    File petStorePluginFolder = generator.generateExtensionManifest(petStorePlugin, PetStoreConnector.class);
-
+    File heisenbergPluginFolder = generator.generateExtensionResources(heisenbergPlugin, HeisenbergExtension.class, depResolver);
+    File petStorePluginFolder = generator.generateExtensionResources(petStorePlugin, PetStoreConnector.class, depResolver);
     assertThat(heisenbergPluginFolder, not(equalTo(petStorePluginFolder)));
   }
 
   @Test
   public void generateExtensionMetadataForTwoExtensionsInDifferentFolders() throws Exception {
-    File heisenbergPluginFolder = generator.generateExtensionManifest(heisenbergPlugin, HeisenbergExtension.class);
-    File petStorePluginFolder = generator.generateExtensionManifest(petStorePlugin, PetStoreConnector.class);
-
+    File heisenbergPluginFolder = generator.generateExtensionResources(heisenbergPlugin, HeisenbergExtension.class, depResolver);
+    File petStorePluginFolder = generator.generateExtensionResources(petStorePlugin, PetStoreConnector.class, depResolver);
     generator.generateDslResources();
 
     assertThat(listFiles(heisenbergPluginFolder, "heisenberg.xsd"), arrayWithSize(1));

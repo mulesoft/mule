@@ -13,9 +13,9 @@ package org.mule.runtime.module.extension.internal.loader.java;
  */
 public class DefaultJavaExtensionModelLoader extends AbstractJavaExtensionModelLoader {
 
-  public static final String LOADER_ID = "java";
+  public static final String JAVA_LOADER_ID = "java";
 
   public DefaultJavaExtensionModelLoader() {
-    super(LOADER_ID, DefaultJavaModelLoaderDelegate::new);
+    super(JAVA_LOADER_ID, DefaultJavaModelLoaderDelegate::new);
   }
 }

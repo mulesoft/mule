@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.EventedExecutionContext;
@@ -51,10 +50,10 @@ public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
   }
 
   private T doBuild(Predicate<String> hasParameter, Function<String, Object> parameters, Event event) throws MuleException {
-    groupDescriptor.getType().getAnnotatedFields(Parameter.class).forEach(field -> {
-      String fieldName = field.getName();
-      if (hasParameter.test(fieldName)) {
-        addPropertyResolver(fieldName, new StaticValueResolver<>(parameters.apply(fieldName)));
+    groupDescriptor.getType().getFields().forEach(field -> {
+      String name = field.getName();
+      if (hasParameter.test(name)) {
+        addPropertyResolver(name, new StaticValueResolver<>(parameters.apply(name)));
       }
     });
 

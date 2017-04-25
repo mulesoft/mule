@@ -9,7 +9,8 @@ package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.io.File.separator;
-
+import static org.mule.test.runner.api.MulePluginBasedLoaderFinder.META_INF_MULE_PLUGIN;
+import static org.mule.test.runner.utils.ExtensionLoaderUtils.getLoaderById;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.DefaultMuleContext;
@@ -22,18 +23,28 @@ import org.mule.runtime.core.exception.ErrorTypeRepositoryFactory;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.test.runner.infrastructure.ExtensionsTestInfrastructureDiscoverer;
+import org.mule.test.runner.maven.MavenModelFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
+import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -53,6 +64,7 @@ public class ExtensionPluginMetadataGenerator {
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final ExtensionsTestInfrastructureDiscoverer extensionsInfrastructure;
   private final File generatedResourcesBase;
+  private final File extensionMulePluginJson;
 
   private List<ExtensionGeneratorEntry> extensionGeneratorEntries = newArrayList();
 
@@ -61,9 +73,15 @@ public class ExtensionPluginMetadataGenerator {
    *
    * @param baseResourcesFolder {@link File} folder to write resources generated for each extension
    */
-  public ExtensionPluginMetadataGenerator(File baseResourcesFolder) {
+  ExtensionPluginMetadataGenerator(File baseResourcesFolder) {
     this.extensionsInfrastructure = new ExtensionsTestInfrastructureDiscoverer(createExtensionManager());
-    generatedResourcesBase = getGeneratedResourcesBase(baseResourcesFolder);
+    this.generatedResourcesBase = getGeneratedResourcesBase(baseResourcesFolder);
+    this.extensionMulePluginJson = getExtensionMulePluginJsonFile(baseResourcesFolder);
+
+  }
+
+  private File getExtensionMulePluginJsonFile(File baseResourcesFolder) {
+    return Paths.get(baseResourcesFolder.getPath(), "classes", META_INF_MULE_PLUGIN).toFile();
   }
 
   /**
@@ -121,7 +139,7 @@ public class ExtensionPluginMetadataGenerator {
    * is no annotated {@link Class}.
    *
    * @param plugin the {@link Artifact} to generate its extension manifest if it is an extension.
-   * @param urls {@link URL}s to use for discovering {@link Class}es annotated with {@link Extension}
+   * @param urls   {@link URL}s to use for discovering {@link Class}es annotated with {@link Extension}
    * @return {@link Class} annotated with {@link Extension} or {@code null}
    */
   public Class scanForExtensionAnnotatedClasses(Artifact plugin, List<URL> urls) {
@@ -154,39 +172,65 @@ public class ExtensionPluginMetadataGenerator {
   /**
    * Discovers the extension and builds the {@link ExtensionModel}.
    *
-   * @param plugin the extension {@link Artifact} plugin
-   * @param extensionClass the {@link Class} annotated with {@link Extension}
+   * @param plugin             the extension {@link Artifact} plugin
+   * @param extensionClass     the {@link Class} annotated with {@link Extension}
+   * @param dependencyResolver
    * @return {@link ExtensionModel} for the extensionClass
    */
-  public ExtensionModel getExtensionModel(Artifact plugin, Class extensionClass) {
-    return extensionsInfrastructure.discoverExtension(extensionClass);
+  ExtensionModel getExtensionModel(Artifact plugin, Class extensionClass, DependencyResolver dependencyResolver) {
+    ExtensionModelLoader loader = findLoaderByProperty(plugin, dependencyResolver).orElse(findLoaderFromMulePlugin());
+    return extensionsInfrastructure.discoverExtension(extensionClass, loader);
+  }
+
+  private ExtensionModelLoader findLoaderFromMulePlugin() {
+    try {
+      MulePluginBasedLoaderFinder finder = new MulePluginBasedLoaderFinder(extensionMulePluginJson);
+      return finder.getLoader();
+    } catch (FileNotFoundException e) {
+      // TODO: MULE-12295. make it work for soap connect extensions when running from IDE
+      return new DefaultJavaExtensionModelLoader();
+    }
   }
 
   /**
-   * Generates the extension manifest for the {@link Artifact} plugin with the {@link Extension}.
+   * Generates the extension resources for the {@link Artifact} plugin with the {@link Extension}.
    *
-   * @param plugin the {@link Artifact} to generate its extension manifest if it is an extension.
-   * @param extensionClass {@link Class} annotated with {@link Extension}
+   * @param plugin             the {@link Artifact} to generate its extension manifest if it is an extension.
+   * @param extensionClass     {@link Class} annotated with {@link Extension}
+   * @param dependencyResolver the dependency resolver used to discover test extensions poms to find which loader to use
    * @return {@link File} folder where extension manifest resources were generated
    */
-  public File generateExtensionManifest(Artifact plugin, Class extensionClass) {
+  File generateExtensionResources(Artifact plugin, Class extensionClass, DependencyResolver dependencyResolver) {
     logger.debug("Generating Extension metadata for extension class: '{}'", extensionClass);
-
     File generatedResourcesDirectory = new File(generatedResourcesBase, plugin.getArtifactId() + separator + "META-INF");
     generatedResourcesDirectory.mkdirs();
-    final ExtensionModel extensionModel = getExtensionModel(plugin, extensionClass);
-    extensionsInfrastructure
-        .generateLoaderResources(extensionModel, generatedResourcesDirectory);
-
+    final ExtensionModel extensionModel = getExtensionModel(plugin, extensionClass, dependencyResolver);
+    extensionsInfrastructure.generateLoaderResources(extensionModel, generatedResourcesDirectory);
     extensionGeneratorEntries.add(new ExtensionGeneratorEntry(extensionModel, generatedResourcesDirectory));
-
     return generatedResourcesDirectory.getParentFile();
+  }
+
+  /**
+   * Searches in the plugin pom.xml for the {@code testExtensionModelLoaderId} property which specifies with which loader the
+   * extension must be loaded. The main use of this is for Test Extensions that don't generate a mule-plugin.json.
+   */
+  private Optional<ExtensionModelLoader> findLoaderByProperty(Artifact plugin, DependencyResolver dependencyResolver) {
+    DefaultArtifact artifact = new DefaultArtifact(plugin.getGroupId(), plugin.getArtifactId(), "pom", plugin.getVersion());
+    try {
+      ArtifactResult artifactResult = dependencyResolver.resolveArtifact(artifact);
+      File pomFile = artifactResult.getArtifact().getFile();
+      Model mavenProject = MavenModelFactory.createMavenProject(pomFile);
+      String id = mavenProject.getProperties().getProperty("testExtensionModelLoaderId");
+      return id != null ? Optional.ofNullable(getLoaderById(id)) : Optional.empty();
+    } catch (ArtifactResolutionException e) {
+      throw new RuntimeException("Cannot load extension, the artifact: [" + plugin.toString() + "] cannot be resolved", e);
+    }
   }
 
   /**
    * Generates DSL resources for the plugins where extension manifest were generated. This method should be called after all
    * extensions manifest where generated.
-   *
+   * <p>
    * <pre>
    *   spring.schemas
    *   spring.handlers
@@ -196,10 +240,10 @@ public class ExtensionPluginMetadataGenerator {
    * These files are going to be generated for each extension registered here.
    */
   public void generateDslResources() {
-    extensionGeneratorEntries.stream()
-        .forEach(entry -> extensionsInfrastructure.generateDslResources(entry.getResourcesFolder(),
-                                                                        entry.getExtensionModel()));
+    extensionGeneratorEntries.forEach(entry -> extensionsInfrastructure.generateDslResources(entry.getResourcesFolder(),
+                                                                                             entry.getExtensionModel()));
   }
+
 
   /**
    * Entry class for generating resources for an Extension.

@@ -7,12 +7,13 @@
 package org.mule.extension.ws.internal.metadata;
 
 import org.mule.extension.ws.internal.ConsumeOperation;
-import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
+import org.mule.services.soap.api.client.metadata.SoapOperationMetadata;
+import org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder;
 
 /**
  * {@link AttributesTypeResolver} implementation for the {@link ConsumeOperation}.
@@ -22,16 +23,14 @@ import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
  *
  * @since 4.0
  */
-public final class WscAttributesResolver extends BaseWscResolver implements AttributesTypeResolver<String> {
+public final class ConsumeAttributesResolver extends BaseWscResolver implements AttributesTypeResolver<String> {
+
+  private final SoapOutputTypeBuilder outputTypeBuilder = new SoapOutputTypeBuilder();
 
   @Override
   public MetadataType getAttributesType(MetadataContext context, String operationName)
       throws MetadataResolvingException, ConnectionException {
-    MetadataType soapHeadersType = getMetadataResolver(context).getOutputMetadata(operationName).getHeadersType();
-    ObjectTypeBuilder attributes = context.getTypeBuilder().objectType();
-    attributes.addField().key(HEADERS_FIELD).value(soapHeadersType);
-    ObjectTypeBuilder protocolHeaders = attributes.addField().key("protocolHeaders").value().objectType();
-    protocolHeaders.openWith().stringType();
-    return attributes.build();
+    SoapOperationMetadata outputMetadata = getMetadataResolver(context).getOutputMetadata(operationName);
+    return outputTypeBuilder.buildAttributes(outputMetadata, context.getTypeBuilder());
   }
 }

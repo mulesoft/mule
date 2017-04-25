@@ -137,7 +137,6 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     }
 
     final Class<?> isolatedTestClass = getTestClass(clazz);
-    //    artifactClassLoaderHolder.loadClassWithApplicationClassLoader("org.mule.extension.db.internal.domain.connection.DbConnectionProvider");
     final Class<? extends Annotation> runnerDelegateToClass = (Class<? extends Annotation>) artifactClassLoaderHolder
         .loadClassWithApplicationClassLoader(RunnerDelegateTo.class.getName());
 

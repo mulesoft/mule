@@ -11,7 +11,7 @@ import org.mule.runtime.api.metadata.MetadataService;
 
 public abstract class AbstractMetadataOperationTestCase extends MetadataExtensionFunctionalTestCase<OperationModel> {
 
-  AbstractMetadataOperationTestCase(ResolutionType resolutionType) {
+  public AbstractMetadataOperationTestCase(ResolutionType resolutionType) {
     super(resolutionType);
     this.provider = resolutionType == ResolutionType.EXPLICIT_RESOLUTION ? MetadataService::getOperationMetadata
         : (metadataService, componentId, key) -> metadataService.getOperationMetadata(componentId);
