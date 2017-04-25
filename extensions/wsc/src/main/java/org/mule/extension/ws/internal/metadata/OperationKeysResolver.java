@@ -6,6 +6,8 @@
  */
 package org.mule.extension.ws.internal.metadata;
 
+import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import org.mule.extension.ws.internal.ConsumeOperation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -26,6 +28,6 @@ public class OperationKeysResolver extends BaseWscResolver implements TypeKeysRe
 
   @Override
   public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
-    return getMetadataResolver(context).getMetadataKeys();
+    return getMetadataResolver(context).getAvailableOperations().stream().map(ope -> newKey(ope).build()).collect(toSet());
   }
 }

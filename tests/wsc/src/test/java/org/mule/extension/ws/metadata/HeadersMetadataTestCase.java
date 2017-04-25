@@ -6,15 +6,14 @@
  */
 package org.mule.extension.ws.metadata;
 
-import static org.mule.extension.ws.WscTestUtils.ECHO_ACCOUNT;
-import static org.mule.extension.ws.WscTestUtils.ECHO_HEADERS;
-import static org.mule.extension.ws.internal.metadata.BaseWscResolver.HEADERS_FIELD;
-import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.extension.ws.WscTestUtils.ECHO_ACCOUNT;
+import static org.mule.extension.ws.WscTestUtils.ECHO_HEADERS;
+import static org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder.HEADERS_FIELD;
+import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;

@@ -153,7 +153,6 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
   @Test
   public void generate() throws Exception {
     XmlDslModel languageModel = extensionUnderTest.getXmlDslModel();
-
     String schema = generator.generate(extensionUnderTest, languageModel, new SchemaTestDslContext());
     compareXML(expectedSchema, schema);
   }

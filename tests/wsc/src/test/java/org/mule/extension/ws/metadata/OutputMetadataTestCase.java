@@ -12,6 +12,9 @@ import static org.mule.extension.ws.WscTestUtils.ECHO_ACCOUNT;
 import static org.mule.extension.ws.WscTestUtils.ECHO_HEADERS;
 import static org.mule.extension.ws.WscTestUtils.HEADER_INOUT;
 import static org.mule.extension.ws.WscTestUtils.HEADER_OUT;
+import static org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder.ATTACHMENTS_FIELD;
+import static org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder.BODY_FIELD;
+import static org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder.HEADERS_FIELD;
 import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
@@ -41,11 +44,6 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @Features(WSC_EXTENSION)
 @Stories("Metadata")
 public class OutputMetadataTestCase extends AbstractMetadataTestCase {
-
-  // TODO classloading
-  public static final String BODY_FIELD = "body";
-  public static final String HEADERS_FIELD = "headers";
-  public static final String ATTACHMENTS_FIELD = "attachments";
 
   @Test
   @Description("Checks the Output Body Metadata for an operation that returns a simple string")

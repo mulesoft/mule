@@ -16,6 +16,7 @@
     <description>A Mule extension for testing</description>
 
     <properties>
+        <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 

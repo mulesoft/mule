@@ -12,7 +12,6 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsUrl;
 import static org.springframework.util.ReflectionUtils.findMethod;
-import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -29,7 +28,6 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 
@@ -73,10 +71,6 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
   @Override
   //TODO - MULE-11119: Make final again once we can add the HTTP service injection as the scehduler's is
   protected void addBuilders(List<ConfigurationBuilder> builders) {
-    //builders.add(TestServicesConfigurationBuilder.builder()
-    //    .withMockHttpService()
-    //    .withExpressionExecutor()
-    //    .build());
     super.addBuilders(builders);
     builders.add(0, new AbstractConfigurationBuilder() {
 
@@ -87,10 +81,6 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
     });
   }
 
-  protected Optional<ExtensionModel> getExtensionModel(String name) {
-    return extensionManager.getExtension(name);
-  }
-
   private void createExtensionsManager(MuleContext muleContext) throws Exception {
     extensionManager = new DefaultExtensionManager();
     File generatedResourcesDirectory = getGenerationTargetDirectory();
@@ -98,13 +88,13 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
     ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
     initialiseIfNeeded(extensionManager, muleContext);
 
-    ExtensionsTestInfrastructureDiscoverer extensionsTestInfrastructureDiscoverer =
-        new ExtensionsTestInfrastructureDiscoverer(extensionManager, getExtensionModelLoader());
+    ExtensionsTestInfrastructureDiscoverer discoverer = new ExtensionsTestInfrastructureDiscoverer(extensionManager);
 
-    extensionsTestInfrastructureDiscoverer.discoverExtensions(getAnnotatedExtensionClasses());
-
+    for (Class<?> annotatedClass : getAnnotatedExtensionClasses()) {
+      discoverer.discoverExtension(annotatedClass, getExtensionModelLoader());
+    }
     generateResourcesAndAddToClasspath(generatedResourcesDirectory,
-                                       copyOf(extensionsTestInfrastructureDiscoverer
+                                       copyOf(discoverer
                                            .generateDslResources(generatedResourcesDirectory)));
   }
 

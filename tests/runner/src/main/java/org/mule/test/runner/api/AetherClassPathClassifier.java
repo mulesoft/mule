@@ -613,17 +613,18 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    *
    * @param plugin plugin {@link Artifact} to generate its Extension metadata
    * @param context {@link ClassPathClassifierContext} with settings for the classification process
-   * @param extensionPluginGenerator {@link ExtensionPluginMetadataGenerator} extensions metadata generator
+   * @param pluginGenerator {@link ExtensionPluginMetadataGenerator} extensions metadata generator
    * @param urls current {@link List} of {@link URL}s classified for the plugin
    * @return {@link List} of {@link URL}s classified for the plugin
    */
   private List<URL> generateExtensionMetadata(Artifact plugin, ClassPathClassifierContext context,
-                                              ExtensionPluginMetadataGenerator extensionPluginGenerator, List<URL> urls) {
-    Class extensionClass = extensionPluginGenerator.scanForExtensionAnnotatedClasses(plugin, urls);
+                                              ExtensionPluginMetadataGenerator pluginGenerator,
+                                              List<URL> urls) {
+    Class extensionClass = pluginGenerator.scanForExtensionAnnotatedClasses(plugin, urls);
     if (extensionClass != null) {
       logger.debug("Plugin '{}' has been discovered as Extension", plugin);
       if (context.isExtensionMetadataGenerationEnabled()) {
-        File generatedMetadataFolder = extensionPluginGenerator.generateExtensionManifest(plugin, extensionClass);
+        File generatedMetadataFolder = pluginGenerator.generateExtensionResources(plugin, extensionClass, dependencyResolver);
         URL generatedTestResources = toUrl(generatedMetadataFolder);
 
         List<URL> appendedTestResources = newArrayList(generatedTestResources);

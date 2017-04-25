@@ -7,16 +7,13 @@
 package org.mule.extension.ws.internal.metadata;
 
 import org.mule.extension.ws.internal.ConsumeOperation;
-import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.NullType;
-import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.api.util.Reference;
 import org.mule.services.soap.api.client.metadata.SoapOperationMetadata;
+import org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder;
 
 /**
  * Resolves the metadata for output payload of the {@link ConsumeOperation}.
@@ -24,6 +21,8 @@ import org.mule.services.soap.api.client.metadata.SoapOperationMetadata;
  * @since 4.0
  */
 public class ConsumeOutputResolver extends BaseWscResolver implements OutputTypeResolver<String> {
+
+  private final SoapOutputTypeBuilder outputTypeBuilder = new SoapOutputTypeBuilder();
 
   @Override
   public String getResolverName() {
@@ -37,23 +36,6 @@ public class ConsumeOutputResolver extends BaseWscResolver implements OutputType
   public MetadataType getOutputType(MetadataContext context, String operationName)
       throws MetadataResolvingException, ConnectionException {
     SoapOperationMetadata metadata = getMetadataResolver(context).getOutputMetadata(operationName);
-    Reference<MetadataType> result = new Reference<>();
-    metadata.getAttachmentsType().accept(new MetadataTypeVisitor() {
-
-      @Override
-      protected void defaultVisit(MetadataType metadataType) {
-        ObjectTypeBuilder typeBuilder = context.getTypeBuilder().objectType();
-        typeBuilder.addField().key(BODY_FIELD).value(metadata.getBodyType());
-        typeBuilder.addField().key(ATTACHMENTS_FIELD).value().arrayType().of(context.getTypeBuilder().anyType());
-        result.set(typeBuilder.build());
-      }
-
-      @Override
-      public void visitNull(NullType nullType) {
-        result.set(metadata.getBodyType());
-      }
-    });
-
-    return result.get();
+    return outputTypeBuilder.build(metadata, context.getTypeBuilder());
   }
 }

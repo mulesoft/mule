@@ -20,13 +20,31 @@
         </soap:invoke>
     </flow>
 
+    <flow name="getPresidentInfo">
+        <soap:invoke config-ref="leagues" service="leagues" operation="getPresidentInfo">
+            <soap:request>#[payload]</soap:request>
+        </soap:invoke>
+    </flow>
+
+    <flow name="invalidKey">
+        <soap:invoke config-ref="leagues" service="leagues" operation="invalidKey">
+            <soap:request>#[payload]</soap:request>
+        </soap:invoke>
+    </flow>
+
+    <flow name="getTeams">
+        <soap:invoke config-ref="laLiga" service="A" operation="getTeams">
+            <soap:request>#[payload]</soap:request>
+        </soap:invoke>
+    </flow>
+
     <flow name="getLeagueTeams">
         <soap:invoke config-ref="leagues" service="leagues" operation="getLeagueTeams">
             <soap:headers>
             #[
             %dw 2.0
             %output application/xml
-            %namespace con http://services.soap.internal.extension.module.runtime.mule.org/
+            %namespace con http://services.soap.extension.module.test.mule.org/
              ---
             "headers": {
                 con#auth: "Authorized"
