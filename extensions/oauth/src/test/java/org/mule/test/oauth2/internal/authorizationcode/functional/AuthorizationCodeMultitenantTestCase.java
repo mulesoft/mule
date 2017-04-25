@@ -16,21 +16,26 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static java.lang.String.format;
 import static org.apache.http.client.fluent.Request.Get;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeQueryString;
 import static org.mule.services.oauth.internal.OAuthConstants.ACCESS_TOKEN_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.CODE_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.EXPIRES_IN_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.STATE_PARAMETER;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.google.common.collect.ImmutableMap;
-import org.junit.Rule;
-import org.junit.Test;
+
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.test.oauth2.asserter.AuthorizationRequestAsserter;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.google.common.collect.ImmutableMap;
+
 import java.io.IOException;
+
+import org.junit.Rule;
+import org.junit.Test;
 
 public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthorizationTestCase {
 
@@ -115,7 +120,8 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
 
     wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse()
         .withBody("{" + "\"" + ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," + "\"" + EXPIRES_IN_PARAMETER + "\":"
-            + EXPIRES_IN + "," + "\"" + REFRESH_TOKEN_PARAMETER + "\":\"" + REFRESH_TOKEN + "\"}")));
+            + EXPIRES_IN + "," + "\"" + REFRESH_TOKEN_PARAMETER + "\":\"" + REFRESH_TOKEN + "\"}")
+        .withHeader(CONTENT_TYPE, MediaType.JSON.toRfcString())));
 
     final String redirectUrlQueryParams =
         encodeQueryString(ImmutableMap.<String, String>builder().put(CODE_PARAMETER, AUTHENTICATION_CODE)

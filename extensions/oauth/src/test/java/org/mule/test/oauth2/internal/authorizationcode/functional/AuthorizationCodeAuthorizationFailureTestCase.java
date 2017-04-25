@@ -92,7 +92,7 @@ public class AuthorizationCodeAuthorizationFailureTestCase extends AbstractAutho
 
   @Test
   public void callToTokenUrlSuccessButNoAccessTokenRetrievedEmptyResponse() throws Exception {
-    configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody(EMPTY);
+    configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody(EMPTY, EMPTY);
 
     verifyCallToRedirectUrlFails();
   }

@@ -36,7 +36,9 @@ import static org.mule.services.oauth.internal.OAuthConstants.GRANT_TYPE_PARAMET
 import static org.mule.services.oauth.internal.OAuthConstants.REDIRECT_URI_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.SCOPE_PARAMETER;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -44,13 +46,8 @@ import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.collect.ImmutableMap;
 
-import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.google.common.collect.ImmutableMap;
-
 import java.io.UnsupportedEncodingException;
 
-import org.junit.Before;
 import org.junit.Rule;
 
 public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFunctionalTestCase {
@@ -110,17 +107,19 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
   protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType(String accessToken, String refreshToken) {
     configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody("{" + "\""
         + ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," + "\"" + EXPIRES_IN_PARAMETER
-        + "\":" + EXPIRES_IN + "," + "\"" + REFRESH_TOKEN_PARAMETER + "\":\"" + refreshToken + "\"}");
+        + "\":" + EXPIRES_IN + "," + "\"" + REFRESH_TOKEN_PARAMETER + "\":\"" + refreshToken + "\"}",
+                                                                                   MediaType.JSON.toRfcString());
   }
 
   protected void configureWireMockToExpectOfflineTokenPathRequestForAuthorizationCodeGrantType(String accessToken) {
     configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody("{" + "\""
         + ACCESS_TOKEN_PARAMETER + "\":\"" + accessToken + "\"," + "\"" + EXPIRES_IN_PARAMETER
-        + "\":" + EXPIRES_IN + "," + "\"}");
+        + "\":" + EXPIRES_IN + "}", MediaType.JSON.toRfcString());
   }
 
-  protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody(String body) {
-    wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse().withBody(body)));
+  protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeWithBody(String body, String contentType) {
+    wireMockRule.stubFor(post(urlEqualTo(TOKEN_PATH))
+        .willReturn(aResponse().withBody(body).withHeader(CONTENT_TYPE, contentType)));
   }
 
   protected void configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantTypeAndFail() {
@@ -138,9 +137,9 @@ public abstract class AbstractOAuthAuthorizationTestCase extends MuleArtifactFun
   protected void configureWireMockToExpectTokenPathRequestForClientCredentialsGrantType(String accessToken) {
     wireMockRule
         .stubFor(post(urlEqualTo(TOKEN_PATH)).willReturn(aResponse().withBody("{" + "\"" + ACCESS_TOKEN_PARAMETER
-            + "\":\"" + accessToken + "\"," + "\"" + EXPIRES_IN_PARAMETER + "\":\"" + EXPIRES_IN + "\"}")));
+            + "\":\"" + accessToken + "\"," + "\"" + EXPIRES_IN_PARAMETER + "\":\"" + EXPIRES_IN + "\"}")
+            .withHeader(CONTENT_TYPE, MediaType.JSON.toRfcString())));
   }
-
 
   protected void configureWireMockToExpectTokenPathRequestForClientCredentialsGrantTypeWithMapResponse(String accessToken) {
     configureWireMockToExpectTokenPathRequestForClientCredentialsGrantTypeWithMapResponse(accessToken,

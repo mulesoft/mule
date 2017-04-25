@@ -49,9 +49,9 @@ public abstract class AbstractGrantType implements HttpAuthentication, MuleConte
   private static final Logger LOGGER = getLogger(AbstractGrantType.class);
 
   // Expressions to extract parameters from standard token url response.
-  private static final String ACCESS_TOKEN_EXPRESSION = "#[(payload match /.*\"access_token\"[ ]*:[ ]*\"([^\\\"]*)\".*/)[1]]";
-  private static final String REFRESH_TOKEN_EXPRESSION = "#[(payload match /.*\"refresh_token\"[ ]*:[ ]*\"([^\\\"]*)\".*/)[1]]";
-  private static final String EXPIRATION_TIME_EXPRESSION = "#[(payload match /.*\"expires_in\"[ ]*:[ ]*\"([^\\\"]*)\".*/)[1]]";
+  private static final String ACCESS_TOKEN_EXPRESSION = "#[payload.access_token]";
+  private static final String REFRESH_TOKEN_EXPRESSION = "#[payload.refresh_token]";
+  private static final String EXPIRATION_TIME_EXPRESSION = "#[payload.expires_in]";
 
   // TODO MULE-11412 Add @Inject
   protected MuleContext muleContext;

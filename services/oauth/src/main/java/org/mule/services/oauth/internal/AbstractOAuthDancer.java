@@ -185,7 +185,7 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
                           .build(), DataType.fromType(DataType.class)))
           .build();
 
-      return (T) expressionEvaluator.evaluate(expr, resultContext).getValue();
+      return (T) expressionEvaluator.evaluate(expr, DataType.STRING, resultContext).getValue();
     }
   }
 
@@ -211,7 +211,7 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
                           .build(), DataType.fromType(DataType.class)))
           .build();
 
-      return (T) expressionEvaluator.evaluate(expr, resultContext).getValue();
+      return (T) expressionEvaluator.evaluate(expr, DataType.STRING, resultContext).getValue();
     }
   }
 
