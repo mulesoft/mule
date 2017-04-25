@@ -23,6 +23,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppConfigFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
@@ -48,6 +49,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFi
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import org.mule.tck.util.CompilerUtils;
 
@@ -80,6 +82,13 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
   public static final String APP_NAME = "testApp";
   public static final String JAR_FILE_NAME = "test.jar";
+
+  @Rule
+  public SystemProperty remoteMavenRepository = new SystemProperty("muleRuntimeConfig.maven.repositoryLocation",
+                                                                   discoverProvider(ApplicationDescriptorFactoryTestCase.class
+                                                                       .getClassLoader()).getLocalRepositorySuppliers()
+                                                                           .environmentMavenRepositorySupplier().get()
+                                                                           .getAbsolutePath());
 
   @Rule
   public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
