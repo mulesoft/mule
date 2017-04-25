@@ -24,6 +24,7 @@
         <module>extensions-support</module>
         <module>extensions-xml-support</module>
         <module>file-extension-common</module>
+        <module>global-config</module>
         <module>launcher</module>
         <module>http-api</module>
         <module>http-policy-api</module>

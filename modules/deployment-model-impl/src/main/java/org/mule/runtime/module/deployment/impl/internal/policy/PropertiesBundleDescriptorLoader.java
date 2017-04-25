@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
+import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
@@ -39,11 +40,13 @@ public class PropertiesBundleDescriptorLoader implements BundleDescriptorLoader 
    *
    * @param artifactFolder {@link File} where the current artifact to work with. Non null
    * @param attributes attributes defined in the loader.
+   * @param artifactType the type of the artifact of the descriptor to be loaded.
    * @return a locator of the coordinates of the current artifact
    * @throws ArtifactDescriptorCreateException if any bundle descriptor required property is missing on the given attributes.
    */
   @Override
-  public BundleDescriptor load(File artifactFolder, Map<String, Object> attributes) throws InvalidDescriptorLoaderException {
+  public BundleDescriptor load(File artifactFolder, Map<String, Object> attributes, ArtifactType artifactType)
+      throws InvalidDescriptorLoaderException {
     String version = (String) attributes.get(VERSION);
     String groupId = (String) attributes.get(GROUP_ID);
     String artifactId = (String) attributes.get(ARTIFACT_ID);
