@@ -12,7 +12,11 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.LocationPart;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
@@ -20,10 +24,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -107,6 +113,24 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
     TestServerNotification notification = new TestServerNotification();
     helper.fireNotification(notification);
     verify(defaultNotificationHandler).fireNotification(notification);
+  }
+
+  @Test
+  public void fireNotificationUsingLocation() {
+    final LocationPart flowPart = mock(LocationPart.class);
+    when(flowPart.getPartPath()).thenReturn("flowName");
+    final ComponentLocation location = mock(ComponentLocation.class);
+    when(location.getParts()).thenReturn(Collections.singletonList(flowPart));
+    when(location.getComponentIdentifier()).thenReturn(TypedComponentIdentifier.builder()
+        .withType(SOURCE)
+        .withIdentifier(buildFromStringRepresentation("http:listener"))
+        .build());
+    final FlowConstruct flowConstruct = mock(FlowConstruct.class);
+    when(flowConstruct.getMuleContext()).thenReturn(muleContext);
+    final int action = 100;
+
+    helper.fireNotification(messageSource, event, location, flowConstruct, action);
+    assertConnectorMessageNotification(eventNotificationHandler, messageSource, "flowName/http:listener", flowConstruct, action);
   }
 
   private void assertConnectorMessageNotification(ServerNotificationHandler notificationHandler, MessageSource messageSource,

@@ -19,11 +19,10 @@ import org.mule.runtime.api.component.location.LocationPart;
 
 import com.google.common.collect.ImmutableList;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A component location describes where the component is defined in the configuration of the artifact.
@@ -50,12 +49,11 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @since 4.0
  */
-public class DefaultComponentLocation implements ComponentLocation {
+public class DefaultComponentLocation implements ComponentLocation, Serializable {
 
   private String name;
   private LinkedList<DefaultLocationPart> parts;
   private String location;
-  private Lock lock = new ReentrantLock();
 
   /**
    * Creates a virtual {@link ComponentLocation} for a single element, using the core namespace and using UNKNOWN as type. Only
@@ -123,8 +121,7 @@ public class DefaultComponentLocation implements ComponentLocation {
    */
   public String getLocation() {
     if (location == null) {
-      lock.lock();
-      try {
+      synchronized (this) {
         if (location == null) {
           StringBuilder locationBuilder = new StringBuilder();
           for (DefaultLocationPart part : parts) {
@@ -132,8 +129,6 @@ public class DefaultComponentLocation implements ComponentLocation {
           }
           location = locationBuilder.replace(0, 1, "").toString();
         }
-      } finally {
-        lock.unlock();
       }
     }
     return location;
@@ -179,7 +174,7 @@ public class DefaultComponentLocation implements ComponentLocation {
    * 
    * @since 4.0
    */
-  public static class DefaultLocationPart implements LocationPart {
+  public static class DefaultLocationPart implements LocationPart, Serializable {
 
     private String partPath;
     private TypedComponentIdentifier partIdentifier;

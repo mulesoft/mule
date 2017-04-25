@@ -20,14 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Answers;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -46,6 +39,15 @@ import org.mule.runtime.core.execution.ResponseDispatchException;
 import org.mule.runtime.core.execution.ValidationPhase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -182,7 +184,7 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     when(mockRequestResponseTemplate.afterRouteEvent(any(Event.class))).thenThrow(mockMessagingException);
     when(mockMessagingException.handled()).thenReturn(true);
     phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
-    verify(notificationHelper).fireNotification(any(MessageSource.class), any(Event.class), isNull(String.class),
+    verify(notificationHelper).fireNotification(any(MessageSource.class), any(Event.class), any(ComponentLocation.class),
                                                 any(FlowConstruct.class), eq(MESSAGE_RESPONSE));
     verify(notificationHelper, never()).fireNotification(any(MessageSource.class), any(Event.class), isNull(String.class),
                                                          any(FlowConstruct.class), eq(MESSAGE_ERROR_RESPONSE));
@@ -194,9 +196,9 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     when(mockRequestResponseTemplate.afterRouteEvent(any(Event.class))).thenThrow(mockMessagingException);
     when(mockMessagingException.handled()).thenReturn(false);
     phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
-    verify(notificationHelper, never()).fireNotification(any(MessageSource.class), any(Event.class), isNull(String.class),
+    verify(notificationHelper, never()).fireNotification(any(MessageSource.class), any(Event.class), any(ComponentLocation.class),
                                                          any(FlowConstruct.class), eq(MESSAGE_RESPONSE));
-    verify(notificationHelper).fireNotification(any(MessageSource.class), any(Event.class), isNull(String.class),
+    verify(notificationHelper).fireNotification(any(MessageSource.class), any(Event.class), any(ComponentLocation.class),
                                                 any(FlowConstruct.class), eq(MESSAGE_ERROR_RESPONSE));
   }
 

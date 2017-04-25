@@ -93,6 +93,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   private final OffsetTime receivedDate = now();
 
   private final String serverId;
+  private final ComponentLocation location;
   private final String flowName;
   private final String connectorName;
   private final String sourceName;
@@ -113,6 +114,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   @Override
   public OffsetTime getReceivedTime() {
     return receivedDate;
+  }
+
+  @Override
+  public ComponentLocation getOriginatingLocation() {
+    return location;
   }
 
   @Override
@@ -166,6 +172,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     this.id = flow.getUniqueIdString();
     this.serverId = flow.getServerId();
     this.flowName = flow.getName();
+    this.location = location;
     this.connectorName = location.getComponentIdentifier().getIdentifier().getNamespace();
     this.sourceName = location.getComponentIdentifier().getIdentifier().getName();
     this.processingTime = ProcessingTime.newInstance(flow);
@@ -202,6 +209,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     @Override
     public OffsetTime getReceivedTime() {
       return parent.getReceivedTime();
+    }
+
+    @Override
+    public ComponentLocation getOriginatingLocation() {
+      return parent.getOriginatingLocation();
     }
 
     @Override

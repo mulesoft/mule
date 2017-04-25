@@ -33,6 +33,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
+import org.mule.runtime.core.context.notification.NotificationHelper;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -50,6 +52,7 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
     implements MessageSource, FlowConstructAware, SchedulerMessageSource, MuleContextAware, Initialisable, Disposable {
 
   private final PeriodicScheduler scheduler;
+  private final NotificationHelper notificationHelper;
 
   private Scheduler pollingExecutor;
   private ScheduledFuture<?> schedulingJob;
@@ -65,6 +68,8 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
   public DefaultSchedulerMessageSource(MuleContext muleContext, PeriodicScheduler scheduler) {
     this.muleContext = muleContext;
     this.scheduler = scheduler;
+    this.notificationHelper =
+        new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false);
   }
 
   @Override
@@ -138,9 +143,7 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
       just(request)
           .map(message -> builder(create(flowConstruct, fromSingleComponent(getPollingUniqueName()))).message(request).flow(flowConstruct).build())
           .doOnNext(event -> setCurrentEvent(event))
-          .doOnNext(event -> muleContext.getNotificationManager()
-              .fireNotification(new ConnectorMessageNotification(this, event.getMessage(), getPollingUniqueName(),
-                                                                 flowConstruct, MESSAGE_RECEIVED)))
+          .doOnNext(event -> notificationHelper.fireNotification(this, event, getLocation(), flowConstruct, MESSAGE_RECEIVED))
           .transform(listener)
           .subscribe(requestUnbounded());
     } catch (Exception e) {

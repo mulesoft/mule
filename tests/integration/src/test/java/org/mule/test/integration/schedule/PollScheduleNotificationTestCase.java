@@ -7,10 +7,8 @@
 package org.mule.test.integration.schedule;
 
 
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.ConnectorMessageNotificationListener;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
-import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -34,14 +32,12 @@ public class PollScheduleNotificationTestCase extends AbstractIntegrationTestCas
   public void validateNotificationsAreSent() throws Exception {
     final MyListener listener = new MyListener();
     muleContext.getNotificationManager().addListener(listener);
-    Flow flow = (Flow) getFlowConstruct("pollfoo");
-    DefaultSchedulerMessageSource schedulerMessageSource = (DefaultSchedulerMessageSource) flow.getMessageSource();
     prober.check(new Probe() {
 
       @Override
       public boolean isSatisfied() {
         return listener.getNotifications().size() > 1
-            && schedulerMessageSource.getPollingUniqueName().equals(listener.getNotifications().get(0).getEndpoint());
+            && "pollfoo/scheduler".equals(listener.getNotifications().get(0).getEndpoint());
       }
 
       @Override

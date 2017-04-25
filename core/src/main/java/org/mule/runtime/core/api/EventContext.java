@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.management.stats.ProcessingTime;
@@ -49,6 +50,12 @@ public interface EventContext {
    * @return a timestamp indicating when the message was received by the connector source
    */
   OffsetTime getReceivedTime();
+
+  /**
+   *
+   * @return the location where this context's events come from
+   */
+  ComponentLocation getOriginatingLocation();
 
   /**
    * 
