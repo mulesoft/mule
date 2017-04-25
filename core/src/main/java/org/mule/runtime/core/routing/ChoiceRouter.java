@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Collections.singletonList;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
@@ -18,8 +19,8 @@ import java.util.Collections;
  * Routes the event to a single<code>MessageProcessor</code> using a {@link Filter} to evaluate the event being processed and find
  * the first route that can be used.
  * <p>
- * If a default route has been configured and no match has been found, the default route will be used. Otherwise it throws a
- * {@link RoutePathNotFoundException}.
+ * If a default route has been configured and no match has been found, the default route will be used. Otherwise it continues the
+ * execution through the next MP in the chain.
  */
 public class ChoiceRouter extends AbstractSelectiveRouter implements Processor {
 
@@ -32,5 +33,14 @@ public class ChoiceRouter extends AbstractSelectiveRouter implements Processor {
     }
 
     return Collections.emptySet();
+  }
+
+  @Override
+  protected Collection<Processor> getProcessorsToRoute(Event event) throws RoutePathNotFoundException {
+    try {
+      return super.getProcessorsToRoute(event);
+    } catch (RoutePathNotFoundException e) {
+      return singletonList(event1 -> event1);
+    }
   }
 }
