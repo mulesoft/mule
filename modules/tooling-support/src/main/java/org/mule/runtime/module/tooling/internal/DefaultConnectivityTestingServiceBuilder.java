@@ -8,7 +8,6 @@ package org.mule.runtime.module.tooling.internal;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
-import static org.mule.maven.client.api.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
@@ -20,6 +19,7 @@ import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder;
@@ -102,10 +102,8 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
       MavenClientProvider mavenClientProvider = MavenClientProvider.discoverProvider(currentThread().getContextClassLoader());
       applicationDescriptor
           .setClassLoaderModel(new DeployableMavenClassLoaderModelLoader(mavenClientProvider
-              .createMavenClient(newMavenConfigurationBuilder()
-                  .withLocalMavenRepositoryLocation(mavenClientProvider.getLocalRepositorySuppliers()
-                      .environmentMavenRepositorySupplier().get())
-                  .build()), mavenClientProvider.getLocalRepositorySuppliers()).load(applicationFolder));
+              .createMavenClient(GlobalConfigLoader.getMavenConfig()), mavenClientProvider.getLocalRepositorySuppliers())
+                  .load(applicationFolder));
       return defaultApplicationFactory.createAppFrom(applicationDescriptor);
     });
   }
