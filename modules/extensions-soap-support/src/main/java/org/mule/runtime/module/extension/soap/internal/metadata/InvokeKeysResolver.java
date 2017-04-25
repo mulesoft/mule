@@ -52,8 +52,8 @@ public final class InvokeKeysResolver extends BaseInvokeResolver implements Type
     MetadataKeyBuilder key = newKey(serviceId).withDisplayName(ws.getFriendlyName());
     List<String> excludedOperations = ws.getExcludedOperations();
     resolver.getAvailableOperations().stream()
-      .filter(ope -> !excludedOperations.contains(ope))
-      .forEach(ope -> key.withChild(newKey(ope)));
+        .filter(ope -> !excludedOperations.contains(ope))
+        .forEach(ope -> key.withChild(newKey(ope)));
     return key.build();
   }
 }

@@ -133,7 +133,6 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
 
     return ImmutableList.<GeneratedResourceFactory>builder()
         .addAll(serviceRegistry.lookupProviders(GeneratedResourceFactory.class, getClass().getClassLoader()))
-        //.add(new MulePluginDescriptorGenerator())
         .addAll(serviceRegistry.lookupProviders(DslResourceFactory.class, getClass().getClassLoader())).build();
 
   }

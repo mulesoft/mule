@@ -177,7 +177,7 @@ class ExtensionPluginMetadataGenerator {
    */
   private ExtensionModel getExtensionModel(Artifact plugin, Class extensionClass, DependencyResolver dependencyResolver) {
     ExtensionModelLoader loader = extensionModelLoaderFinder.findLoaderByProperty(plugin, dependencyResolver)
-                                    .orElse(extensionModelLoaderFinder.findLoaderFromMulePlugin(extensionMulePluginJson));
+        .orElse(extensionModelLoaderFinder.findLoaderFromMulePlugin(extensionMulePluginJson));
     return extensionsInfrastructure.discoverExtension(extensionClass, loader);
   }
 

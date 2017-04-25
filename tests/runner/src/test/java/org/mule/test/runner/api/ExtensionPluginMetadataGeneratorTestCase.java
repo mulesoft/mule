@@ -84,7 +84,7 @@ public class ExtensionPluginMetadataGeneratorTestCase {
     assertThat(listFiles(petStorePluginFolder, "petstore.xsd"), arrayWithSize(1));
   }
 
-  public String[] listFiles(File pluginResourcesFolder, String pattern) {
+  private String[] listFiles(File pluginResourcesFolder, String pattern) {
     return new File(pluginResourcesFolder, META_INF).list(new PatternFilenameFilter(pattern));
   }
 
