@@ -177,12 +177,11 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
     JsonObject mavenObject = new JsonObject();
     muleRuntimeConfigObject.add("maven", mavenObject);
     if (!mavenConfiguration.getMavenRemoteRepositories().isEmpty()) {
-      JsonArray repositoriesElement = new JsonArray();
-      mavenObject.add("repositories", repositoriesElement);
+      JsonObject repositoriesObject = new JsonObject();
+      mavenObject.add("repositories", repositoriesObject);
       mavenConfiguration.getMavenRemoteRepositories().forEach(mavenRepo -> {
         JsonObject repoObject = new JsonObject();
-        repositoriesElement.add(repoObject);
-        repoObject.addProperty("id", mavenRepo.getId());
+        repositoriesObject.add(mavenRepo.getId(), repoObject);
         repoObject.addProperty("url", mavenRepo.getUrl().toString());
         mavenRepo.getAuthentication().ifPresent(authentication -> {
           repoObject.addProperty("username", authentication.getUsername());
