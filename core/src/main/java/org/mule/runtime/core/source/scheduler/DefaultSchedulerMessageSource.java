@@ -87,10 +87,6 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
     }
   }
 
-  public String getPollingUniqueName() {
-    return flowConstruct.getName() + "-polling-" + this.hashCode();
-  }
-
   @Override
   public synchronized void stop() throws MuleException {
     if (!started) {
