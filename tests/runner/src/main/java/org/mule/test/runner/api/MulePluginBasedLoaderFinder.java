@@ -24,16 +24,16 @@ import java.util.Map;
 
 public class MulePluginBasedLoaderFinder {
 
-  public static final String META_INF_MULE_PLUGIN = "META-INF/mule-plugin.json";
+  static final String META_INF_MULE_PLUGIN = "META-INF/mule-plugin.json";
 
   private static final MulePluginModelJsonSerializer mulePluginSerializer = new MulePluginModelJsonSerializer();
   private final MulePluginModel mulePlugin;
 
-  public MulePluginBasedLoaderFinder(InputStream json) {
+  MulePluginBasedLoaderFinder(InputStream json) {
     this.mulePlugin = mulePluginSerializer.deserialize(IOUtils.toString(json));
   }
 
-  public MulePluginBasedLoaderFinder(File json) throws FileNotFoundException {
+  MulePluginBasedLoaderFinder(File json) throws FileNotFoundException {
     this(new FileInputStream(json));
   }
 
