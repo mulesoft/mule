@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.modules.schedulers.config;
+package org.mule.runtime.module.scheduler.config;
 
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.runtime.modules.schedulers.cron.CronScheduler;
+import org.mule.runtime.module.scheduler.cron.CronScheduler;
 
 
 public class SchedulersNamespaceHandler extends AbstractMuleNamespaceHandler {

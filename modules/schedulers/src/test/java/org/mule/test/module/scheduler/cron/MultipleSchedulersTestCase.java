@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.modules.schedulers.cron;
+package org.mule.test.module.scheduler.cron;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.construct.Flow;

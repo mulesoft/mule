@@ -1,1 +1,1 @@
-http\://www.mulesoft.org/schema/mule/schedulers=org.mule.runtime.modules.schedulers.config.SchedulersNamespaceHandler
+http\://www.mulesoft.org/schema/mule/schedulers=SchedulersNamespaceHandler
