@@ -57,7 +57,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-class DefaultScheduler extends AbstractExecutorService implements Scheduler {
+public class DefaultScheduler extends AbstractExecutorService implements Scheduler {
 
   /**
    * Forced shutdown delay. The time to wait while threads are being interrupted.
@@ -105,9 +105,9 @@ class DefaultScheduler extends AbstractExecutorService implements Scheduler {
    * @param shutdownTimeoutMillis the time in millis to wait for the gracefule stop of this scheduler
    * @param shutdownCallback a callback to be invoked when this scheduler is stopped/shutdown.
    */
-  DefaultScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
-                   org.quartz.Scheduler quartzScheduler, ThreadType threadsType, Supplier<Long> shutdownTimeoutMillis,
-                   Consumer<Scheduler> shutdownCallback) {
+  public DefaultScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
+                          org.quartz.Scheduler quartzScheduler, ThreadType threadsType, Supplier<Long> shutdownTimeoutMillis,
+                          Consumer<Scheduler> shutdownCallback) {
     this.name = name + "@" + toHexString(hashCode());
     scheduledTasks = new ConcurrentHashMap<>(workers, 1.00f, getRuntime().availableProcessors());
     cancelledBeforeFireTasks = newKeySet();

@@ -45,9 +45,9 @@ public class ThrottledScheduler extends DefaultScheduler {
    * @param shutdownTimeoutMillis the time in millis to wait for the gracefule stop of this scheduler
    * @param shutdownCallback a callback to be invoked when this scheduler is stopped/shutdown.
    */
-  ThrottledScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
-                     org.quartz.Scheduler quartzScheduler, ThreadType threadsType, int maxConcurrentTasks,
-                     Supplier<Long> shutdownTimeoutMillis, Consumer<Scheduler> shutdownCallback) {
+  public ThrottledScheduler(String name, ExecutorService executor, int workers, ScheduledExecutorService scheduledExecutor,
+                            org.quartz.Scheduler quartzScheduler, ThreadType threadsType, int maxConcurrentTasks,
+                            Supplier<Long> shutdownTimeoutMillis, Consumer<Scheduler> shutdownCallback) {
     super(name, executor, workers, scheduledExecutor, quartzScheduler, threadsType, shutdownTimeoutMillis, shutdownCallback);
     this.maxConcurrentTasks = maxConcurrentTasks;
   }
