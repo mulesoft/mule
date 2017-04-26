@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
@@ -99,7 +98,8 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
       applicationDescriptor.setArtifactLocation(applicationFolder);
       createDeployablePomFile(applicationFolder, model);
       updateArtifactPom(applicationFolder, model);
-      MavenClientProvider mavenClientProvider = MavenClientProvider.discoverProvider(currentThread().getContextClassLoader());
+      MavenClientProvider mavenClientProvider =
+          MavenClientProvider.discoverProvider(DefaultConnectivityTestingServiceBuilder.class.getClassLoader());
       applicationDescriptor
           .setClassLoaderModel(new DeployableMavenClassLoaderModelLoader(mavenClientProvider
               .createMavenClient(GlobalConfigLoader.getMavenConfig()), mavenClientProvider.getLocalRepositorySuppliers())

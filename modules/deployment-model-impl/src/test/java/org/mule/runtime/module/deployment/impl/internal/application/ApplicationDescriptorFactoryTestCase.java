@@ -84,11 +84,11 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
   public static final String JAR_FILE_NAME = "test.jar";
 
   @Rule
-  public SystemProperty remoteMavenRepository = new SystemProperty("muleRuntimeConfig.maven.repositoryLocation",
-                                                                   discoverProvider(ApplicationDescriptorFactoryTestCase.class
-                                                                       .getClassLoader()).getLocalRepositorySuppliers()
-                                                                           .environmentMavenRepositorySupplier().get()
-                                                                           .getAbsolutePath());
+  public SystemProperty repositoryLocation = new SystemProperty("muleRuntimeConfig.maven.repositoryLocation",
+                                                                discoverProvider(ApplicationDescriptorFactoryTestCase.class
+                                                                    .getClassLoader()).getLocalRepositorySuppliers()
+                                                                        .environmentMavenRepositorySupplier().get()
+                                                                        .getAbsolutePath());
 
   @Rule
   public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
