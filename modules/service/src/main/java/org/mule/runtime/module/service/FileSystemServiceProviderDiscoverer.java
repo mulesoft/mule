@@ -78,7 +78,8 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
     List<ServiceProvider> serviceProviders = new LinkedList<>();
     for (ServiceDescriptor serviceDescriptor : serviceDescriptors) {
       final ArtifactClassLoader serviceClassLoader =
-          serviceClassLoaderFactory.create(getServiceArtifactId(serviceDescriptor), apiClassLoader, serviceDescriptor);
+          serviceClassLoaderFactory.create(getServiceArtifactId(serviceDescriptor), serviceDescriptor,
+                                           apiClassLoader.getClassLoader(), apiClassLoader.getClassLoaderLookupPolicy());
       final ServiceProvider serviceProvider =
           instantiateServiceProvider(serviceClassLoader.getClassLoader(), serviceDescriptor.getServiceProviderClassName());
 

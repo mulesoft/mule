@@ -25,6 +25,7 @@ import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_P
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
@@ -47,6 +48,8 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
   public void setUp() throws Exception {
     final File servicesFolder = getServicesFolder();
     assertThat(servicesFolder.mkdir(), is(true));
+    when(containerClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
+    when(containerClassLoader.getClassLoaderLookupPolicy()).thenReturn(mock(ClassLoaderLookupPolicy.class));
   }
 
   @Test
@@ -65,9 +68,10 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
     installService("barService", BarServiceProvider.class);
 
     ArtifactClassLoader serviceClassLoader = mock(ArtifactClassLoader.class);
-    when(serviceClassLoaderFactory.create(argThat(any(String.class)), argThat(any(ArtifactClassLoader.class)),
-                                          argThat(any(ServiceDescriptor.class))))
-                                              .thenReturn(serviceClassLoader);
+    when(serviceClassLoaderFactory.create(argThat(any(String.class)),
+                                          argThat(any(ServiceDescriptor.class)), argThat(any(ClassLoader.class)), argThat(any(
+                                                                                                                              ClassLoaderLookupPolicy.class))))
+                                                                                                                                  .thenReturn(serviceClassLoader);
     final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
         new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory);
 
@@ -83,9 +87,10 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
     installCorruptedService("fooService", FooServiceProvider.class);
 
     ArtifactClassLoader serviceClassLoader = mock(ArtifactClassLoader.class);
-    when(serviceClassLoaderFactory.create(argThat(any(String.class)), argThat(any(ArtifactClassLoader.class)),
-                                          argThat(any(ServiceDescriptor.class))))
-                                              .thenReturn(serviceClassLoader);
+    when(serviceClassLoaderFactory.create(argThat(any(String.class)),
+                                          argThat(any(ServiceDescriptor.class)), argThat(any(ClassLoader.class)), argThat(any(
+                                                                                                                              ClassLoaderLookupPolicy.class))))
+                                                                                                                                  .thenReturn(serviceClassLoader);
     final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
         new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory);
 

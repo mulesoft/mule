@@ -1647,6 +1647,29 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void deploysAppWithExportedPackagePrecedenceOverPlugin() throws Exception {
+    // Defines a plugin that contains org.bar package, which is also exported on the application
+    ArtifactPluginFileBuilder echoPluginWithoutLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
+        .containingClass(pluginEcho1TestClassFile, "org/foo/Plugin1Echo.class")
+        .dependingOn(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile));
+
+    ApplicationFileBuilder sharedLibPluginAppFileBuilder = new ApplicationFileBuilder("shared-plugin-lib-app")
+        .definedBy("app-with-echo1-plugin-config.xml").dependingOn(echoPluginWithoutLib1)
+        .dependingOnSharedLibrary(new JarFileBuilder("barUtils", barUtils1_0JarFile));
+
+    addPackedAppFromBuilder(sharedLibPluginAppFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, sharedLibPluginAppFileBuilder.getId());
+    assertAppsDir(NONE, new String[] {sharedLibPluginAppFileBuilder.getId()}, true);
+    assertApplicationAnchorFileExists(sharedLibPluginAppFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
   public void deploysAppZipWithExtensionPlugin() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
                                                                                            helloExtensionV1Plugin);

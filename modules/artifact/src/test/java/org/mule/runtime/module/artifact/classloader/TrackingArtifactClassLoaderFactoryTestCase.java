@@ -24,14 +24,16 @@ import org.junit.Test;
 @SmallTest
 public class TrackingArtifactClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
-  public static final String ARTIFACT_ID = "testId";
-  public static final String ARTIFACT_NAME = "test";
+  private static final String ARTIFACT_ID = "testId";
+  private static final String ARTIFACT_NAME = "test";
+
   private ArtifactClassLoaderManager artifactClassLoaderManager;
   private ArtifactClassLoaderFactory<ArtifactDescriptor> delegateFactory;
   private TrackingArtifactClassLoaderFactory<ArtifactDescriptor> factory;
   private ArtifactClassLoader parent;
   private ArtifactDescriptor descriptor;
   private ArtifactClassLoader classLoader;
+  private ClassLoaderLookupPolicy lookupPolicy;
 
   @Before
   public void setUp() throws Exception {
@@ -40,23 +42,23 @@ public class TrackingArtifactClassLoaderFactoryTestCase extends AbstractMuleTest
     factory = new TrackingArtifactClassLoaderFactory<>(artifactClassLoaderManager, delegateFactory);
     parent = mock(ArtifactClassLoader.class);
     descriptor = new ArtifactDescriptor(ARTIFACT_NAME);
-    ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    lookupPolicy = mock(ClassLoaderLookupPolicy.class);
     classLoader = new MuleArtifactClassLoader(ARTIFACT_NAME, descriptor, new URL[0], getClass().getClassLoader(), lookupPolicy);
 
     when(lookupPolicy.getClassLookupStrategy(any())).thenReturn(PARENT_FIRST);
-    when(delegateFactory.create(ARTIFACT_ID, parent, descriptor)).thenReturn(classLoader);
+    when(delegateFactory.create(ARTIFACT_ID, descriptor, getClass().getClassLoader(), lookupPolicy)).thenReturn(classLoader);
   }
 
   @Test
   public void registersClassLoader() throws Exception {
-    ArtifactClassLoader artifactClassLoader = factory.create(ARTIFACT_ID, parent, descriptor);
+    ArtifactClassLoader artifactClassLoader = factory.create(ARTIFACT_ID, descriptor, getClass().getClassLoader(), lookupPolicy);
 
     verify(artifactClassLoaderManager).register(artifactClassLoader);
   }
 
   @Test
   public void disposesClassLoader() throws Exception {
-    ArtifactClassLoader artifactClassLoader = factory.create(ARTIFACT_ID, parent, descriptor);
+    ArtifactClassLoader artifactClassLoader = factory.create(ARTIFACT_ID, descriptor, getClass().getClassLoader(), lookupPolicy);
 
     artifactClassLoader.dispose();
 
