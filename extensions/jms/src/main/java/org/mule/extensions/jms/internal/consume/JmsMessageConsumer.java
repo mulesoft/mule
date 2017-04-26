@@ -69,7 +69,7 @@ public final class JmsMessageConsumer implements AutoCloseable {
     Message message = consumer.receive(maximumWaitTime);
     timeoutValidator.stop();
 
-    if (message == null && timeoutValidator.getTime() > maximumWaitTime) {
+    if (message == null && timeoutValidator.getTime() >= maximumWaitTime) {
       throw new JmsTimeoutException("Failed to retrieve a Message, operation timed out");
     }
     return message;
