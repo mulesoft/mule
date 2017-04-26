@@ -9,17 +9,18 @@ package org.mule.runtime.core.api.scheduler;
 import org.mule.runtime.api.scheduler.Scheduler;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * Provides an instance of {@link SchedulerPoolsConfig} to use when building the infrastructure for the {@link Scheduler}s.
- * <p>
- * Implementations may return an empty config on {@link #get()}, which indicates that it is the responsability ig the caller to
- * provide the configuration.
  * 
  * @since 4.0
  */
-public interface SchedulerPoolsConfigFactory extends Supplier<Optional<SchedulerPoolsConfig>> {
+public interface SchedulerPoolsConfigFactory {
 
+  /**
+   * @return the {@link SchedulerPoolsConfig} to use, or {@link Optional#empty()} to indicate that it is the responsability of the
+   *         caller to provide the configuration.
+   */
+  Optional<SchedulerPoolsConfig> getConfig();
 
 }

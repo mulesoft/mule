@@ -6,13 +6,13 @@
  */
 package org.mule.test.module.http.functional.proxy;
 
-import static org.mule.service.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.mule.service.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -29,11 +29,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.ListenableFuture;
-import com.ning.http.client.generators.InputStreamBodyGenerator;
-import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -43,6 +38,13 @@ import org.apache.http.entity.ContentType;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.generators.InputStreamBodyGenerator;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
+
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features(HTTP_EXTENSION)
@@ -54,8 +56,8 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   private static String SENSING_REQUEST_RESPONSE_PROCESSOR_NAME = "sensingRequestResponseProcessor";
   private RequestHandlerExtender handlerExtender;
   private boolean consumeAllRequest = true;
-  private static String CPU_LIGHT_THREAD_PREFIX = "SchedulerService_cpuLight";
-  private static String IO_THREAD_PREFIX = "SchedulerService_io";
+  private static String CPU_LIGHT_THREAD_PREFIX = "[MuleRuntime].cpuLight";
+  private static String IO_THREAD_PREFIX = "[MuleRuntime].io";
 
   @Override
   protected String getConfigFile() {

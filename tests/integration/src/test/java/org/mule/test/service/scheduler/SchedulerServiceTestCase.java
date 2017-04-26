@@ -78,7 +78,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     SchedulerService schedulerService = muleContext.getSchedulerService();
     final Scheduler ioScheduler = schedulerService.ioScheduler();
     assertThat(ioScheduler.getName(),
-               startsWith("SchedulerService_io@" + SchedulerServiceTestCase.class.getName() + ".schedulerDefaultName:"));
+               startsWith("[MuleRuntime].io@" + SchedulerServiceTestCase.class.getName() + ".schedulerDefaultName:"));
     ioScheduler.shutdownNow();
   }
 
@@ -88,7 +88,7 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     final Scheduler ioScheduler =
         schedulerService.customScheduler(muleContext.getSchedulerBaseConfig().withMaxConcurrentTasks(1));
     assertThat(ioScheduler.getName(),
-               startsWith("SchedulerService_custom@" + SchedulerServiceTestCase.class.getName()
+               startsWith("[MuleRuntime].custom@" + SchedulerServiceTestCase.class.getName()
                    + ".customSchedulerDefaultName:"));
     ioScheduler.shutdownNow();
   }

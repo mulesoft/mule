@@ -14,8 +14,8 @@ import org.mule.runtime.core.api.scheduler.SchedulerPoolsConfigFactory;
 import java.util.Optional;
 
 /**
- * Singleton implementation whose {@link #get()} method returns an empty value, to indicate that the container pools have to be
- * used.
+ * Singleton implementation whose {@link #getConfig()} method returns an empty value, to indicate that the container pools have to
+ * be used.
  * 
  * @since 4.0
  */
@@ -32,7 +32,7 @@ public class SchedulerContainerPoolsConfig implements SchedulerPoolsConfigFactor
   }
 
   @Override
-  public Optional<SchedulerPoolsConfig> get() {
+  public Optional<SchedulerPoolsConfig> getConfig() {
     return empty();
   }
 }
