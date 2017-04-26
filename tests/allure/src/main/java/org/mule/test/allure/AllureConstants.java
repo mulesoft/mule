@@ -105,6 +105,23 @@ public interface AllureConstants {
     }
   }
 
+  interface ComponentsFeature {
+
+    interface FlowReferenceStory {
+
+      String FLOW_REFERENCE = "Flow Reference";
+
+    }
+
+    interface LoggerStory {
+
+      String LOGGER = "Logger";
+
+    }
+
+  }
+
+
   interface FtpFeature {
 
     String FTP_EXTENSION = "FTP Extension";
