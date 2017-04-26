@@ -24,6 +24,7 @@ public class ArtifactDeployerMonitorThreadFactory implements ThreadFactory {
     namePrefix = String.format("Mule.app.deployer.monitor.%d.thread.", poolNumber.getAndIncrement());
   }
 
+  @Override
   public Thread newThread(Runnable r) {
     Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
     // make sure it's non-daemon, allows for an 'idle' state of Mule by preventing early termination

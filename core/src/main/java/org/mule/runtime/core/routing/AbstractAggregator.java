@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.util.rx.Operators.echoOnNullMap;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -32,12 +35,12 @@ import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.routing.correlation.EventCorrelator;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
-import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.core.util.store.ProvidedObjectStoreWrapper;
 import org.mule.runtime.core.util.store.ProvidedPartitionableObjectStoreWrapper;
 
 import org.apache.commons.collections.Factory;
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 /**
  * <code>AbstractEventAggregator</code> will aggregate a set of messages into a single message. <b>EIP Reference:</b>
@@ -46,6 +49,8 @@ import org.reactivestreams.Publisher;
 
 public abstract class AbstractAggregator extends AbstractInterceptingMessageProcessor
     implements Initialisable, MuleContextAware, FlowConstructAware, Aggregator, Startable, Stoppable, Disposable {
+
+  private static final Logger LOGGER = getLogger(AbstractAggregator.class);
 
   public static final int MAX_PROCESSED_GROUPS = 50000;
   public static final String EVENTS_STORE_REGISTRY_KEY_PREFIX = "aggregator.eventsObjectStore.";
@@ -68,7 +73,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   public void initialise() throws InitialisationException {
     if (storePrefix == null) {
       storePrefix =
-          String.format("%s%s.%s.", ThreadNameHelper.getPrefix(muleContext), flowConstruct.getName(), this.getClass().getName());
+          format("%s%s.%s.", muleContext.getConfiguration().getId(), flowConstruct.getName(), this.getClass().getName());
     }
 
     initProcessedGroupsObjectStore();
@@ -206,15 +211,8 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
   @Override
   public void dispose() {
-    disposeIfDisposable(processedGroupsObjectStore);
-    disposeIfDisposable(eventGroupsObjectStore);
+    disposeIfNeeded(processedGroupsObjectStore, LOGGER);
+    disposeIfNeeded(eventGroupsObjectStore, LOGGER);
     eventCorrelator.dispose();
-  }
-
-
-  private void disposeIfDisposable(ObjectStore objectStore) {
-    if (objectStore != null && objectStore instanceof Disposable) {
-      ((Disposable) objectStore).dispose();
-    }
   }
 }

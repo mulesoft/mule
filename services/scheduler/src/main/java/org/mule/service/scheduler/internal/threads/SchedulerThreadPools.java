@@ -68,7 +68,6 @@ public class SchedulerThreadPools {
   private static final String TIMER_THREADS_NAME = "timer";
   private static final String CUSTOM_THREADS_NAME = CUSTOM.getName();
 
-  private String name;
   private SchedulerPoolsConfig threadPoolsConfig;
 
   private final ThreadGroup schedulerGroup;
@@ -91,7 +90,6 @@ public class SchedulerThreadPools {
   private List<Scheduler> activeSchedulers = synchronizedList(new ArrayList<>());
 
   public SchedulerThreadPools(String name, SchedulerPoolsConfig threadPoolsConfig) {
-    this.name = name;
     this.threadPoolsConfig = threadPoolsConfig;
 
     schedulerGroup = new ThreadGroup(name);
@@ -150,9 +148,9 @@ public class SchedulerThreadPools {
   private Properties defaultQuartzProperties() {
     Properties factoryProperties = new Properties();
 
-    factoryProperties.setProperty("org.quartz.scheduler.instanceName", name);
+    factoryProperties.setProperty("org.quartz.scheduler.instanceName", threadPoolsConfig.getThreadNamePrefix());
     factoryProperties.setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
-    factoryProperties.setProperty("org.quartz.threadPool.threadNamePrefix", name + "_qz");
+    factoryProperties.setProperty("org.quartz.threadPool.threadNamePrefix", threadPoolsConfig.getThreadNamePrefix() + "_qz");
     factoryProperties.setProperty("org.quartz.threadPool.threadCount", "1");
     return factoryProperties;
   }
@@ -273,24 +271,26 @@ public class SchedulerThreadPools {
   }
 
   public Scheduler createCustomScheduler(SchedulerConfig config, int workers, Supplier<Long> stopTimeout) {
+    String threadsName = resolveCustomThreadsName(config);
     return doCreateCustomScheduler(config, workers, stopTimeout, resolveCustomSchedulerName(config),
-                                   new SynchronousQueue<Runnable>());
+                                   new SynchronousQueue<Runnable>(), threadsName);
   }
 
   public Scheduler createCustomScheduler(SchedulerConfig config, int workers, Supplier<Long> stopTimeout, int queueSize) {
+    String threadsName = resolveCustomThreadsName(config);
     return doCreateCustomScheduler(config, workers, stopTimeout, resolveCustomSchedulerName(config),
-                                   new LinkedBlockingQueue<Runnable>(queueSize));
+                                   new LinkedBlockingQueue<Runnable>(queueSize), threadsName);
   }
 
   private Scheduler doCreateCustomScheduler(SchedulerConfig config, int workers, Supplier<Long> stopTimeout, String schedulerName,
-                                            BlockingQueue<Runnable> workQueue) {
+                                            BlockingQueue<Runnable> workQueue, String threadsName) {
     if (config.getMaxConcurrentTasks() == null) {
       throw new IllegalArgumentException("Custom schedulers must define a thread pool size");
     }
     final ThreadPoolExecutor executor =
         new ThreadPoolExecutor(config.getMaxConcurrentTasks(), config.getMaxConcurrentTasks(), 0L,
                                MILLISECONDS, workQueue, new SchedulerThreadFactory(resolveThreadGroupForCustomScheduler(config),
-                                                                                   "%s." + schedulerName + ".%02d"),
+                                                                                   "%s." + threadsName + ".%02d"),
                                byCallerThreadGroupPolicy);
 
     final CustomScheduler customScheduler =
@@ -301,7 +301,7 @@ public class SchedulerThreadPools {
     return customScheduler;
   }
 
-  public ThreadGroup resolveThreadGroupForCustomScheduler(SchedulerConfig config) {
+  private ThreadGroup resolveThreadGroupForCustomScheduler(SchedulerConfig config) {
     if (config.getRejectionAction() == WAIT) {
       return customWaitGroup;
     } else {
@@ -309,35 +309,41 @@ public class SchedulerThreadPools {
     }
   }
 
-  public String resolveCpuLightSchedulerName(SchedulerConfig config) {
-    if (config.getSchedulerName() == null) {
-      return resolveSchedulerCreationLocation(threadPoolsConfig.getThreadNamePrefix() + CPU_LIGHT_THREADS_NAME);
-    } else {
-      return config.getSchedulerName();
+  private String resolveCpuLightSchedulerName(SchedulerConfig config) {
+    if (!config.hasName()) {
+      config =
+          config.withName(resolveSchedulerCreationLocation(CPU_LIGHT_THREADS_NAME));
     }
+    return config.getSchedulerName();
   }
 
-  public String resolveIoSchedulerName(SchedulerConfig config) {
-    if (config.getSchedulerName() == null) {
-      return resolveSchedulerCreationLocation(threadPoolsConfig.getThreadNamePrefix() + IO_THREADS_NAME);
-    } else {
-      return config.getSchedulerName();
+  private String resolveIoSchedulerName(SchedulerConfig config) {
+    if (!config.hasName()) {
+      config = config.withName(resolveSchedulerCreationLocation(IO_THREADS_NAME));
     }
+    return config.getSchedulerName();
   }
 
-  public String resolveComputationSchedulerName(SchedulerConfig config) {
-    if (config.getSchedulerName() == null) {
-      return resolveSchedulerCreationLocation(threadPoolsConfig.getThreadNamePrefix() + COMPUTATION_THREADS_NAME);
-    } else {
-      return config.getSchedulerName();
+  private String resolveComputationSchedulerName(SchedulerConfig config) {
+    if (!config.hasName()) {
+      config =
+          config.withName(resolveSchedulerCreationLocation(COMPUTATION_THREADS_NAME));
     }
+    return config.getSchedulerName();
   }
 
-  public String resolveCustomSchedulerName(SchedulerConfig config) {
-    if (config.getSchedulerName() == null) {
-      return resolveSchedulerCreationLocation(threadPoolsConfig.getThreadNamePrefix() + CUSTOM_THREADS_NAME);
-    } else {
+  private String resolveCustomSchedulerName(SchedulerConfig config) {
+    if (!config.hasName()) {
+      config = config.withName(resolveSchedulerCreationLocation(CUSTOM_THREADS_NAME));
+    }
+    return config.getSchedulerName();
+  }
+
+  private String resolveCustomThreadsName(SchedulerConfig config) {
+    if (config.hasName()) {
       return config.getSchedulerName();
+    } else {
+      return threadPoolsConfig.getThreadNamePrefix() + CUSTOM_THREADS_NAME;
     }
   }
 

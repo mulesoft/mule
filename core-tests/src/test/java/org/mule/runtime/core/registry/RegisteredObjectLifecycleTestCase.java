@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.registry;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -15,8 +16,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -43,45 +42,45 @@ public class RegisteredObjectLifecycleTestCase extends AbstractMuleContextTestCa
   @Test
   public void testLifecycleForMuleContext() throws Exception {
     muleContext.getRegistry().registerObject("dummy", bean);
-    assertTrue(initLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+    assertTrue(initLatch.await(TIMEOUT, MILLISECONDS));
     Thread.sleep(TIMEOUT);
     assertThat(startLatch.getCount(), is(1L));
     assertThat(stopLatch.getCount(), is(1L));
     assertThat(disposeLatch.getCount(), is(1L));
 
     muleContext.start();
-    assertTrue(startLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+    assertTrue(startLatch.await(TIMEOUT, MILLISECONDS));
     Thread.sleep(TIMEOUT);
     assertThat(stopLatch.getCount(), is(1L));
     assertThat(disposeLatch.getCount(), is(1L));
 
     muleContext.stop();
-    assertTrue(stopLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+    assertTrue(stopLatch.await(TIMEOUT, MILLISECONDS));
     Thread.sleep(TIMEOUT);
     assertThat(disposeLatch.getCount(), is(1L));
 
     muleContext.dispose();
-    assertTrue(disposeLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+    assertTrue(disposeLatch.await(TIMEOUT, MILLISECONDS));
   }
 
   @Test
   public void testLifecycleForUnregisteredObject() throws Exception {
     muleContext.getRegistry().registerObject("dummy", bean);
-    assertTrue(initLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+    assertTrue(initLatch.await(TIMEOUT, MILLISECONDS));
     Thread.sleep(TIMEOUT);
     assertThat(startLatch.getCount(), is(1L));
     assertThat(stopLatch.getCount(), is(1L));
     assertThat(disposeLatch.getCount(), is(1L));
 
     muleContext.start();
-    assertTrue(startLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+    assertTrue(startLatch.await(TIMEOUT, MILLISECONDS));
     Thread.sleep(TIMEOUT);
     assertThat(stopLatch.getCount(), is(1L));
     assertThat(disposeLatch.getCount(), is(1L));
 
     muleContext.getRegistry().unregisterObject("dummy");
-    assertTrue(stopLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
-    assertTrue(disposeLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
+    assertTrue(stopLatch.await(TIMEOUT, MILLISECONDS));
+    assertTrue(disposeLatch.await(TIMEOUT, MILLISECONDS));
   }
 
   public class DummyBean implements Lifecycle {

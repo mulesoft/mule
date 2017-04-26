@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.launcher;
 
+import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
+
 import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -102,7 +104,8 @@ public class MuleContainer {
     this.extensionModelLoaderManager = artifactResourcesRegistry.getExtensionModelLoaderManager();
 
     this.deploymentService = new MuleDeploymentService(artifactResourcesRegistry.getDomainFactory(),
-                                                       artifactResourcesRegistry.getApplicationFactory());
+                                                       artifactResourcesRegistry.getApplicationFactory(),
+                                                       () -> findSchedulerService(serviceManager));
     this.repositoryService = new RepositoryServiceFactory().createRepositoryService();
 
     this.toolingService = new DefaultToolingService(artifactResourcesRegistry.getApplicationFactory());

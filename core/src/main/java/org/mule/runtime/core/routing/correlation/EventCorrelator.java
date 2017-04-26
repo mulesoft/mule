@@ -6,20 +6,27 @@
  */
 package org.mule.runtime.core.routing.correlation;
 
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static java.util.concurrent.TimeUnit.DAYS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.mule.runtime.core.context.notification.RoutingNotification.CORRELATION_TIMEOUT;
 import static org.mule.runtime.core.context.notification.RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.core.message.GroupCorrelation.NOT_SET;
+import static org.mule.runtime.core.util.StringMessageUtils.truncate;
 
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
@@ -31,9 +38,7 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.RoutingNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.EventGroup;
-import org.mule.runtime.core.routing.EventProcessingThread;
 import org.mule.runtime.core.util.StringMessageUtils;
-import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.core.util.monitor.Expirable;
 import org.mule.runtime.core.util.monitor.ExpiryMonitor;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
@@ -42,7 +47,6 @@ import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,9 +60,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
 
   public static final String NO_CORRELATION_ID = "no-id";
 
-  private static final long ONE_DAY_IN_MILLI = 1000 * 60 * 60 * 24;
-
-  protected long groupTimeToLive = ONE_DAY_IN_MILLI;
+  private static final long DELAY_TIME = 10;
 
   protected final Object groupsLock = new Object();
 
@@ -82,7 +84,8 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
   private PartitionableObjectStore correlatorStore = null;
   private String storePrefix;
 
-  private EventCorrelator.ExpiringGroupMonitoringThread expiringGroupMonitoringThread;
+  private Scheduler scheduler;
+  private ExpiringGroupMonitoringRunnable expiringGroupRunnable;
   private final String name;
 
   private final FlowConstruct flowConstruct;
@@ -99,7 +102,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
     this.callback = callback;
     this.muleContext = muleContext;
     this.timeoutMessageProcessor = timeoutMessageProcessor;
-    name = String.format("%s%s.event.correlator", ThreadNameHelper.getPrefix(muleContext), flowConstruct.getName());
+    name = format("%s.event.correlator", flowConstruct.getName());
     this.flowConstruct = flowConstruct;
 
     this.correlatorStore = correlatorStore;
@@ -126,11 +129,9 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
 
     if (logger.isTraceEnabled()) {
       try {
-        logger.trace(String.format("Received async reply message for correlationID: %s%n%s%n%s",
-                                   groupId, StringMessageUtils
-                                       .truncate(StringMessageUtils.toString(event.getMessage().getPayload().getValue()), 200,
-                                                 false),
-                                   event.getMessage().toString()));
+        logger.trace(format("Received async reply message for correlationID: %s%n%s%n%s", groupId,
+                            truncate(StringMessageUtils.toString(event.getMessage().getPayload().getValue()), 200, false),
+                            event.getMessage().toString()));
       } catch (Exception e) {
         // ignore
       }
@@ -257,7 +258,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
 
   protected void addProcessedGroup(Object id) throws ObjectStoreException {
     synchronized (groupsLock) {
-      processedGroups.store((Serializable) id, System.currentTimeMillis());
+      processedGroups.store((Serializable) id, currentTimeMillis());
     }
   }
 
@@ -310,7 +311,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
       }
 
       try {
-        if (!(group.getCreated() + groupTimeToLive < System.currentTimeMillis())) {
+        if (!(group.getCreated() + DAYS.toMillis(1) < currentTimeMillis())) {
           Event newEvent = Event.builder(callback.aggregateEvents(group)).build();
           group.clear();
 
@@ -341,42 +342,39 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
   public void start() throws MuleException {
     logger.info("Starting event correlator: " + name);
     if (timeout != 0) {
-      expiringGroupMonitoringThread = new ExpiringGroupMonitoringThread();
-      expiringGroupMonitoringThread.start();
+      scheduler = muleContext.getSchedulerService().customScheduler(muleContext.getSchedulerBaseConfig().withName(name)
+          .withMaxConcurrentTasks(1).withShutdownTimeout(0, MILLISECONDS));
+      expiringGroupRunnable = new ExpiringGroupMonitoringRunnable();
+      scheduler.scheduleWithFixedDelay(expiringGroupRunnable, 0, DELAY_TIME, MILLISECONDS);
     }
   }
 
   @Override
   public void stop() throws MuleException {
     logger.info("Stopping event correlator: " + name);
-    if (expiringGroupMonitoringThread != null) {
-      expiringGroupMonitoringThread.stopProcessing();
+    if (scheduler != null) {
+      scheduler.stop();
     }
   }
 
-  private final class ExpiringGroupMonitoringThread extends EventProcessingThread implements Expirable, Disposable {
+  private final class ExpiringGroupMonitoringRunnable implements Runnable, Expirable, Disposable {
 
     private ExpiryMonitor expiryMonitor;
-    public static final long DELAY_TIME = 10;
 
-    public ExpiringGroupMonitoringThread() {
-      super(name, DELAY_TIME);
-      this.expiryMonitor = new ExpiryMonitor(name, 1000 * 60, muleContext, true);
-      // clean up every 30 minutes
-      this.expiryMonitor.addExpirable(1000 * 60 * 30, TimeUnit.MILLISECONDS, this);
+    public ExpiringGroupMonitoringRunnable() {
+      this.expiryMonitor = new ExpiryMonitor(name, MINUTES.toMillis(1), muleContext, true);
+      this.expiryMonitor.addExpirable(30, MINUTES, this);
     }
 
     /**
      * Removes the elements in expiredAndDispatchedGroups when groupLife is reached
-     *
-     * @throws ObjectStoreException
      */
     @Override
     public void expired() {
       try {
         for (Serializable o : (List<Serializable>) correlatorStore.allKeys(getExpiredAndDispatchedPartitionKey())) {
           Long time = (Long) correlatorStore.retrieve(o, getExpiredAndDispatchedPartitionKey());
-          if (time + groupTimeToLive < System.currentTimeMillis()) {
+          if (time + DAYS.toMillis(1) < currentTimeMillis()) {
             correlatorStore.remove(o, getExpiredAndDispatchedPartitionKey());
             logger.warn(MessageFormat.format("Discarding group {0}", o));
           }
@@ -387,7 +385,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
     }
 
     @Override
-    public void doRun() {
+    public void run() {
 
       //// TODO(pablo.kraan): is not good to have threads doing nothing in all the nodes but the primary. Need to
       //// start the thread on the primary node only, and then use a notification schema to start a new thread
@@ -401,7 +399,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
         for (Serializable o : (List<Serializable>) correlatorStore.allKeys(getEventGroupsPartitionKey())) {
           EventGroup group = getEventGroup(o);
           // group may have been removed by another thread right after eventGroups.allKeys()
-          if (group != null && group.getCreated() + getTimeout() < System.currentTimeMillis()) {
+          if (group != null && group.getCreated() + getTimeout() < currentTimeMillis()) {
             expired.add(group);
           }
         }
@@ -442,12 +440,6 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
 
   @Override
   public void dispose() {
-    disposeIfDisposable(expiringGroupMonitoringThread);
-  }
-
-  private void disposeIfDisposable(Object o) {
-    if (o != null && o instanceof Disposable) {
-      ((Disposable) o).dispose();
-    }
+    expiringGroupRunnable.dispose();
   }
 }

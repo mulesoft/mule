@@ -51,20 +51,23 @@ public class SchedulerConfig {
   }
 
   private final Integer maxConcurrentTasks;
+  private final String schedulerPrefix;
   private final String schedulerName;
   private final RejectionAction rejectionAction;
   private final Supplier<Long> shutdownTimeoutMillis;
 
   private SchedulerConfig() {
     this.maxConcurrentTasks = null;
+    this.schedulerPrefix = null;
     this.schedulerName = null;
     this.rejectionAction = DEFAULT;
     this.shutdownTimeoutMillis = () -> null;
   }
 
-  private SchedulerConfig(Integer maxConcurrentTasks, String schedulerName, RejectionAction rejectionAction,
-                          Supplier<Long> shutdownTimeoutMillis) {
+  private SchedulerConfig(Integer maxConcurrentTasks, String schedulerPrefix, String schedulerName,
+                          RejectionAction rejectionAction, Supplier<Long> shutdownTimeoutMillis) {
     this.maxConcurrentTasks = maxConcurrentTasks;
+    this.schedulerPrefix = schedulerPrefix;
     this.schedulerName = schedulerName;
     this.rejectionAction = rejectionAction;
     this.shutdownTimeoutMillis = shutdownTimeoutMillis;
@@ -80,7 +83,7 @@ public class SchedulerConfig {
    * @return the updated configuration.
    */
   public SchedulerConfig withMaxConcurrentTasks(int maxConcurrentTasks) {
-    return new SchedulerConfig(maxConcurrentTasks, schedulerName, rejectionAction, shutdownTimeoutMillis);
+    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, rejectionAction, shutdownTimeoutMillis);
   }
 
   /**
@@ -91,20 +94,37 @@ public class SchedulerConfig {
   }
 
   /**
+   * Sets the prefix to prepend to the name for the target {@link Scheduler}, which will override the default one.
+   * 
+   * @param schedulerPrefix the prefix for the name for the target {@link Scheduler}.
+   * @return the updated configuration.
+   */
+  public SchedulerConfig withPrefix(String schedulerPrefix) {
+    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, rejectionAction, shutdownTimeoutMillis);
+  }
+
+  /**
    * Sets the name for the target {@link Scheduler}, which will override the default one.
    * 
    * @param schedulerName the name for the target {@link Scheduler}.
    * @return the updated configuration.
    */
   public SchedulerConfig withName(String schedulerName) {
-    return new SchedulerConfig(maxConcurrentTasks, schedulerName, rejectionAction, shutdownTimeoutMillis);
+    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, rejectionAction, shutdownTimeoutMillis);
   }
 
   /**
    * @return the name for the target {@link Scheduler}.
    */
   public String getSchedulerName() {
-    return schedulerName;
+    return schedulerPrefix == null ? schedulerName : format("[%s].%s", schedulerPrefix, schedulerName);
+  }
+
+  /**
+   * @return {@code true} if {@link #withName(String)} was called with a non-null value, {@code false} otherwise.
+   */
+  public boolean hasName() {
+    return schedulerName != null;
   }
 
   /**
@@ -119,7 +139,7 @@ public class SchedulerConfig {
    */
   public SchedulerConfig withRejectionAction(RejectionAction rejectionAction) {
     requireNonNull(rejectionAction);
-    return new SchedulerConfig(maxConcurrentTasks, schedulerName, rejectionAction, shutdownTimeoutMillis);
+    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, rejectionAction, shutdownTimeoutMillis);
   }
 
   /**
@@ -140,7 +160,7 @@ public class SchedulerConfig {
   public SchedulerConfig withShutdownTimeout(Supplier<Long> shutdownTimeoutSupplier, TimeUnit shutdownTimeoutUnit) {
     requireNonNull(shutdownTimeoutUnit);
 
-    return new SchedulerConfig(maxConcurrentTasks, schedulerName, rejectionAction, () -> {
+    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, rejectionAction, () -> {
       long shutdownTimeout = shutdownTimeoutSupplier.get();
       validateTimeoutValue(shutdownTimeout);
       return shutdownTimeoutUnit.toMillis(shutdownTimeout);

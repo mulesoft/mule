@@ -6,19 +6,20 @@
  */
 package org.mule.runtime.core.util.store;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.UUID;
-import org.mule.runtime.core.util.concurrent.DaemonThreadFactory;
 
 import java.io.Serializable;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ScheduledFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,8 @@ public abstract class AbstractMonitoredObjectStore<T extends Serializable>
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   protected MuleContext context;
-  protected ScheduledThreadPoolExecutor scheduler;
+  private Scheduler scheduler;
+  private ScheduledFuture<?> scheduledTask;
 
   /**
    * the maximum number of entries that this store keeps around. Specify <em>-1</em> if the store is supposed to be "unbounded".
@@ -57,6 +59,7 @@ public abstract class AbstractMonitoredObjectStore<T extends Serializable>
    */
   protected String name = null;
 
+  @Override
   public void initialise() throws InitialisationException {
     if (name == null) {
       name = UUID.getUUID();
@@ -68,20 +71,23 @@ public abstract class AbstractMonitoredObjectStore<T extends Serializable>
     }
 
     if (scheduler == null) {
-      this.scheduler = new ScheduledThreadPoolExecutor(1);
-      scheduler.setThreadFactory(new DaemonThreadFactory(name + "-Monitor", this.getClass().getClassLoader()));
-      scheduler.scheduleWithFixedDelay(this, 0, expirationInterval, TimeUnit.MILLISECONDS);
+      this.scheduler = context.getSchedulerService()
+          .customScheduler(context.getSchedulerBaseConfig().withName(name + "-Monitor").withMaxConcurrentTasks(1));
+      scheduledTask = scheduler.scheduleWithFixedDelay(this, 0, expirationInterval, MILLISECONDS);
     }
   }
 
+  @Override
   public final void run() {
     if (context == null || context.isPrimaryPollingInstance()) {
       expire();
     }
   }
 
+  @Override
   public void dispose() {
-    if (scheduler != null) {
+    if (scheduledTask != null) {
+      scheduledTask.cancel(true);
       scheduler.shutdown();
     }
   }
@@ -102,14 +108,11 @@ public abstract class AbstractMonitoredObjectStore<T extends Serializable>
     this.maxEntries = maxEntries;
   }
 
-  public void setScheduler(ScheduledThreadPoolExecutor scheduler) {
-    this.scheduler = scheduler;
-  }
-
   public void setName(String id) {
     this.name = id;
   }
 
+  @Override
   public void setMuleContext(MuleContext context) {
     this.context = context;
   }
@@ -128,10 +131,6 @@ public abstract class AbstractMonitoredObjectStore<T extends Serializable>
 
   public String getName() {
     return name;
-  }
-
-  public ScheduledThreadPoolExecutor getScheduler() {
-    return scheduler;
   }
 
   protected abstract void expire();

@@ -13,7 +13,6 @@ import static org.mule.runtime.core.context.notification.PipelineMessageNotifica
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 
@@ -60,7 +59,6 @@ import java.util.function.Consumer;
 import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.Operators;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link Processor}s that will be used to process
@@ -133,7 +131,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         }
       }
 
-      processingStrategy = processingStrategyFactory.create(muleContext, getPrefix(muleContext) + getName());
+      processingStrategy = processingStrategyFactory.create(muleContext, getName());
     }
   }
 

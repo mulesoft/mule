@@ -12,7 +12,6 @@ import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 import static org.mule.runtime.core.util.StringUtils.DASH;
-import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -72,8 +71,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   @Override
   public void start() {
     pool = muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig()
-        .withName(format("%s%s.%s", getPrefix(getUntilSuccessfulConfiguration().getMuleContext()),
-                         getUntilSuccessfulConfiguration().getFlowConstruct().getName(), "until-successful")));
+        .withName(format("%s.%s", getUntilSuccessfulConfiguration().getFlowConstruct().getName(), "until-successful")));
 
     scheduleAllPendingEventsForProcessing();
   }

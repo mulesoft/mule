@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.core.util.monitor;
 
-import org.mule.runtime.core.api.MuleContext;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.core.config.i18n.CoreMessages.propertyHasInvalidValue;
+
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.concurrent.DaemonThreadFactory;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.MuleContext;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -31,15 +32,13 @@ public class ExpiryMonitor implements Runnable, Disposable {
    */
   protected static final Logger logger = LoggerFactory.getLogger(ExpiryMonitor.class);
 
-  protected ScheduledThreadPoolExecutor scheduler;
+  protected Scheduler scheduler;
 
   private Map monitors;
 
-  private int monitorFrequency;
+  private long monitorFrequency;
 
   private String name;
-
-  private ClassLoader contextClassLoader;
 
   private MuleContext muleContext;
 
@@ -50,45 +49,23 @@ public class ExpiryMonitor implements Runnable, Disposable {
     this.onPollingNodeOnly = onPollingNodeOnly;
   }
 
-  public ExpiryMonitor(String name, MuleContext muleContext, boolean onPollingNodeOnly) {
-    this(name, 1000, muleContext, onPollingNodeOnly);
-  }
-
-  public ExpiryMonitor(String name, int monitorFrequency, MuleContext muleContext, boolean onPollingNodeOnly) {
+  public ExpiryMonitor(String name, long monitorFrequency, MuleContext muleContext, boolean onPollingNodeOnly) {
     this(muleContext, onPollingNodeOnly);
     this.name = name;
     this.monitorFrequency = monitorFrequency;
-    init();
-  }
-
-  public ExpiryMonitor(String name, int monitorFrequency, ClassLoader contextClassLoader, MuleContext muleContext,
-                       boolean onPollingNodeOnly) {
-    this(muleContext, onPollingNodeOnly);
-    this.name = name;
-    this.monitorFrequency = monitorFrequency;
-    this.contextClassLoader = contextClassLoader;
-    init();
-  }
-
-  public ExpiryMonitor(String name, int monitorFrequency, ScheduledThreadPoolExecutor scheduler, MuleContext muleContext,
-                       boolean onPollingNodeOnly) {
-    this(muleContext, onPollingNodeOnly);
-    this.name = name;
-    this.monitorFrequency = monitorFrequency;
-    this.scheduler = scheduler;
     init();
   }
 
   protected void init() {
     if (monitorFrequency <= 0) {
-      throw new IllegalArgumentException(CoreMessages.propertyHasInvalidValue("monitorFrequency", new Integer(monitorFrequency))
+      throw new IllegalArgumentException(propertyHasInvalidValue("monitorFrequency", Long.valueOf(monitorFrequency))
           .toString());
     }
     monitors = new ConcurrentHashMap();
     if (scheduler == null) {
-      this.scheduler = new ScheduledThreadPoolExecutor(1);
-      scheduler.setThreadFactory(new DaemonThreadFactory(name + ".expiry.monitor", contextClassLoader));
-      scheduler.scheduleWithFixedDelay(this, 0, monitorFrequency, TimeUnit.MILLISECONDS);
+      this.scheduler = muleContext.getSchedulerService()
+          .customScheduler(muleContext.getSchedulerBaseConfig().withName(name + ".expiry.monitor").withMaxConcurrentTasks(1));
+      scheduler.scheduleWithFixedDelay(this, 0, monitorFrequency, MILLISECONDS);
     }
   }
 
@@ -135,6 +112,7 @@ public class ExpiryMonitor implements Runnable, Disposable {
   /**
    * The action to be performed by this timer task.
    */
+  @Override
   public void run() {
     ExpirableHolder holder;
 
@@ -149,9 +127,10 @@ public class ExpiryMonitor implements Runnable, Disposable {
     }
   }
 
+  @Override
   public void dispose() {
     logger.info("disposing monitor");
-    scheduler.shutdown();
+    scheduler.stop();
     ExpirableHolder holder;
     for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();) {
       holder = (ExpirableHolder) iterator.next();
@@ -175,10 +154,6 @@ public class ExpiryMonitor implements Runnable, Disposable {
       this.milliseconds = milliseconds;
       this.expirable = expirable;
       created = System.currentTimeMillis();
-    }
-
-    public long getMilliSeconds() {
-      return milliseconds;
     }
 
     public Expirable getExpirable() {

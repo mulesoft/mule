@@ -12,8 +12,10 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.runtime.core.util.IOUtils;
@@ -59,7 +61,7 @@ public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testResponseEventsCleanedUp() throws Exception {
-    RelaxedAsyncReplyMP mp = new RelaxedAsyncReplyMP();
+    RelaxedAsyncReplyMP mp = new RelaxedAsyncReplyMP(muleContext);
 
     try {
       Event event =
@@ -83,9 +85,10 @@ public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
    */
   private static final class RelaxedAsyncReplyMP extends AbstractAsyncRequestReplyRequester {
 
-    private RelaxedAsyncReplyMP() throws MuleException {
+    private RelaxedAsyncReplyMP(MuleContext muleContext) throws MuleException {
       store = new SimpleMemoryObjectStore<>();
       name = "asyncReply";
+      setMuleContext(muleContext);
       start();
     }
 

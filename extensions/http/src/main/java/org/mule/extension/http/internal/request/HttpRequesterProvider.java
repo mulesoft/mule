@@ -13,11 +13,11 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
@@ -62,7 +62,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   private static final Logger logger = LoggerFactory.getLogger(HttpRequesterProvider.class);
 
   private static final int UNLIMITED_CONNECTIONS = -1;
-  private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
+  private static final String THREAD_NAME_PREFIX_PATTERN = "http.requester.%s";
 
   @Inject
   private MuleContext muleContext;
@@ -166,7 +166,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     if (client.isPresent()) {
       httpClient = client.get();
     } else {
-      String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, getPrefix(muleContext), configName);
+      String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, configName);
 
       HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
           .setTlsContextFactory(tlsContext)

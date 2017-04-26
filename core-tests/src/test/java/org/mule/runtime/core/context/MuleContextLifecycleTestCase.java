@@ -15,15 +15,15 @@ import static org.junit.Assert.fail;
 import static org.mule.tck.MuleAssert.assertTrue;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
@@ -42,6 +42,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -50,6 +51,8 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
   private MuleContextBuilder ctxBuilder;
   private SensingLifecycleManager lifecycleManager;
   private MuleContext ctx;
+  @Rule
+  public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
 
   @Before
   public void setup() throws Exception {
@@ -57,7 +60,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
     lifecycleManager = new SensingLifecycleManager();
     ctxBuilder.setLifecycleManager(lifecycleManager);
     ctx = ctxBuilder.buildMuleContext();
-    new TestServicesConfigurationBuilder().configure(ctx);
+    testServicesConfigurationBuilder.configure(ctx);
   }
 
   @After

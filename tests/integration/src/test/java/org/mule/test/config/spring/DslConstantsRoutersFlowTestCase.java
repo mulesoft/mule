@@ -9,8 +9,9 @@ package org.mule.test.config.spring;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.api.Event;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
@@ -46,7 +47,6 @@ public class DslConstantsRoutersFlowTestCase extends AbstractIntegrationTestCase
     assertEquals(1001, store.getExpirationInterval());
     assertEquals(1001, store.getMaxEntries());
     assertEquals("xyz", store.getName());
-    assertNotNull(store.getScheduler());
   }
 
   @Test
@@ -65,7 +65,6 @@ public class DslConstantsRoutersFlowTestCase extends AbstractIntegrationTestCase
     assertEquals(10000000, store.getMaxEntries());
     assertEquals("foo", store.getDirectory());
     assertNotNull(store.getName());
-    assertNotNull(store.getScheduler());
   }
 
   @Test

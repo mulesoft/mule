@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.exception;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
@@ -13,12 +14,12 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.message.ExceptionPayload;
-import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
 /**
@@ -72,7 +73,8 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
 
   @Override
   protected void doInitialise(MuleContext context) throws InitialisationException {
-    retryScheduler = muleContext.getSchedulerService().ioScheduler();
+    retryScheduler =
+        muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig().withShutdownTimeout(0, MILLISECONDS));
     super.doInitialise(context);
   }
 
@@ -80,7 +82,7 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
   public void dispose() {
     super.dispose();
     if (retryScheduler != null) {
-      retryScheduler.shutdownNow();
+      retryScheduler.stop();
       retryScheduler = null;
     }
   }

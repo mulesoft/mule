@@ -117,6 +117,7 @@ public class SchedulerServiceTestCase extends AbstractMuleTestCase {
     when(config.getIoKeepAlive()).thenReturn(OptionalLong.of(30000L));
     when(config.getCpuIntensivePoolSize()).thenReturn(OptionalInt.of(1));
     when(config.getCpuIntensiveQueueSize()).thenReturn(OptionalInt.of(1));
+    when(config.getThreadNamePrefix()).thenReturn("test");
     return config;
   }
 }

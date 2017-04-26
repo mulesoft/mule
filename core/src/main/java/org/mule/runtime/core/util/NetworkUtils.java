@@ -7,50 +7,17 @@
 package org.mule.runtime.core.util;
 
 import java.net.InetAddress;
-import java.net.Socket;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public final class NetworkUtils {
-
-  private static final Logger logger = LoggerFactory.getLogger(NetworkUtils.class);
 
   private static final Map<String, String> ipPerHost = new ConcurrentHashMap<>();
   private static InetAddress localHost;
 
   private NetworkUtils() {
     // utility class only
-  }
-
-  public static boolean isServerReachable(URL url, int timeout) {
-    int port = url.getPort() != -1 ? url.getPort() : url.getDefaultPort();
-    return isServerReachable(url.getHost(), port, timeout);
-  }
-
-  public static boolean isServerReachable(String host, int port, int timeout) {
-    boolean isServerReachable = false;
-    Socket socket = null;
-
-    try {
-      socket = TimedSocket.createSocket(host, port, timeout);
-      isServerReachable = true;
-    } catch (Exception e) {
-      logger.debug("Server at " + host + ":" + port + " not reachable. " + e.getMessage());
-      try {
-        if (socket != null) {
-          socket.close();
-        }
-      } catch (Exception socketNotClosed) {
-        logger.debug("Error closing socket", socketNotClosed);
-      }
-    }
-
-    return isServerReachable;
   }
 
   public static InetAddress getLocalHost() throws UnknownHostException {

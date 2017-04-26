@@ -9,13 +9,13 @@ package org.mule.runtime.core.routing;
 import static java.lang.String.format;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
-import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-import org.mule.runtime.core.api.Event;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
@@ -58,7 +58,8 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
   @Override
   public void initialise() throws InitialisationException {
     if (storePrefix == null) {
-      storePrefix = format("%s.%s.%s", getPrefix(muleContext), flowConstruct.getName(), this.getClass().getName());
+      storePrefix =
+          format("%s.%s.%s", muleContext.getConfiguration().getId(), flowConstruct.getName(), this.getClass().getName());
     }
     if (store == null) {
       this.store = createMessageIdStore();

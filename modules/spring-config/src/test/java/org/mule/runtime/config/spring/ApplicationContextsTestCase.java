@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -26,9 +27,8 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.Seed;
 
-import java.util.concurrent.TimeUnit;
-
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
@@ -37,6 +37,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class ApplicationContextsTestCase extends AbstractMuleTestCase {
 
   private static final int INIT_WAIT_TIMEOUT_MILLIS = 5000;
+
+  @Rule
+  public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
+
   private MuleContext context;
 
   @After
@@ -68,7 +72,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase {
    */
   @Test
   public void testSpringConfigurationBuilder() throws Exception {
-    context = new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(),
+    context = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
                                                                 new DefaultsConfigurationBuilder());
 
     ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
@@ -85,7 +89,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void springConfigurationBuilderCircularRefs() throws Exception {
-    context = new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(),
+    context = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
                                                                 new DefaultsConfigurationBuilder());
 
     ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context-circular-ref.xml");
@@ -95,7 +99,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase {
     context.start();
 
     Object seed = context.getRegistry().lookupObject("seed");
-    ((Seed) seed).awaitInitialize(INIT_WAIT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+    ((Seed) seed).awaitInitialize(INIT_WAIT_TIMEOUT_MILLIS, MILLISECONDS);
 
     Object apple = context.getRegistry().lookupObject("apple");
     assertThat(apple, not(nullValue()));
@@ -108,7 +112,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase {
    */
   @Test
   public void testSpringConfigurationBuilderPrecedence() throws Exception {
-    context = new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(),
+    context = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
                                                                 new DefaultsConfigurationBuilder());
 
     ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
@@ -129,7 +133,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testSpringConfigurationBuilderBackwardsPrecedence() throws Exception {
-    context = new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(),
+    context = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
                                                                 new DefaultsConfigurationBuilder());
 
     ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context-2.xml");
@@ -157,7 +161,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase {
 
     SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("mule-config.xml");
     builder.setParentContext(appContext);
-    context = new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(), builder);
+    context = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder, builder);
 
     context.start();
 
@@ -173,7 +177,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase {
   @Test
   public void testAppContextTogetherWithMuleConfig() throws Exception {
     context = new DefaultMuleContextFactory()
-        .createMuleContext(new TestServicesConfigurationBuilder(),
+        .createMuleContext(testServicesConfigurationBuilder,
                            new SpringXmlConfigurationBuilder(new String[] {"application-context.xml", "mule-config.xml"}, false));
 
     context.start();

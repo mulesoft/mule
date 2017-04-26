@@ -6,20 +6,21 @@
  */
 package org.mule.runtime.core.util.store;
 
+import static java.util.Collections.synchronizedMap;
+import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
+
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObjectStore<T> implements ListableObjectStore<T> {
 
-  private Map<Serializable, T> map = Collections.synchronizedMap(new HashMap<Serializable, T>());
+  private Map<Serializable, T> map = synchronizedMap(new HashMap<Serializable, T>());
 
   @Override
   public boolean isPersistent() {
@@ -34,7 +35,7 @@ public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObj
   @Override
   protected void doStore(Serializable key, T value) throws ObjectStoreException {
     if (value == null) {
-      throw new ObjectStoreException(CoreMessages.objectIsNull("value"));
+      throw new ObjectStoreException(objectIsNull("value"));
     }
 
     map.put(key, value);

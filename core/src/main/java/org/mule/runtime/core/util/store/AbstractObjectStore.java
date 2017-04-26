@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.util.store;
 
+import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.core.api.store.ObjectStore;
@@ -15,7 +18,6 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import java.io.Serializable;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This is an abstract superclass for {@link ObjectStore} implementations that conforms to the contract defined in the interface's
@@ -23,12 +25,12 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractObjectStore<T extends Serializable> implements ObjectStore<T> {
 
-  protected final Logger logger = LoggerFactory.getLogger(getClass());
+  protected final Logger logger = getLogger(getClass());
 
   @Override
   public boolean contains(Serializable key) throws ObjectStoreException {
     if (key == null) {
-      throw new ObjectStoreException(CoreMessages.objectIsNull("key"));
+      throw new ObjectStoreException(objectIsNull("key"));
     }
     return doContains(key);
   }
@@ -38,7 +40,7 @@ public abstract class AbstractObjectStore<T extends Serializable> implements Obj
   @Override
   public void store(Serializable key, T value) throws ObjectStoreException {
     if (key == null) {
-      throw new ObjectStoreException(CoreMessages.objectIsNull("key"));
+      throw new ObjectStoreException(objectIsNull("key"));
     }
 
     if (contains(key)) {
@@ -53,7 +55,7 @@ public abstract class AbstractObjectStore<T extends Serializable> implements Obj
   @Override
   public T retrieve(Serializable key) throws ObjectStoreException {
     if (key == null) {
-      throw new ObjectStoreException(CoreMessages.objectIsNull("key"));
+      throw new ObjectStoreException(objectIsNull("key"));
     }
 
     if (contains(key) == false) {
@@ -69,7 +71,7 @@ public abstract class AbstractObjectStore<T extends Serializable> implements Obj
   @Override
   public T remove(Serializable key) throws ObjectStoreException {
     if (key == null) {
-      throw new ObjectStoreException(CoreMessages.objectIsNull("key"));
+      throw new ObjectStoreException(objectIsNull("key"));
     }
 
     if (contains(key) == false) {

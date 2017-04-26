@@ -7,10 +7,13 @@
 package org.mule.runtime.core.util.store;
 
 import static junit.framework.Assert.assertNotNull;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import org.mule.runtime.core.api.config.MuleProperties;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -28,16 +31,15 @@ public class MuleObjectStoreDisposalTestCase extends AbstractMuleContextTestCase
 
   @Override
   protected void doSetUp() throws Exception {
-    osm = muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_MANAGER);
+    osm = muleContext.getRegistry().lookupObject(OBJECT_STORE_MANAGER);
     muleContext.getRegistry().registerObject(DISPOSABLE_TRANSIENT_USER_STORE_KEY, new SimpleMemoryObjectStore<>());
     osm.setBaseTransientUserStoreKey(DISPOSABLE_TRANSIENT_USER_STORE_KEY);
   }
 
   @Test
   public void shutdownScheduler() throws Exception {
-    osm.scheduler = spy(osm.scheduler);
     doDispose();
-    verify(osm.scheduler).shutdown();
+    assertThat(osm.scheduler.isShutdown(), is(true));
   }
 
   @Test

@@ -6,19 +6,19 @@
  */
 package org.mule.runtime.core.util.store;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreNotAvaliableException;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-public class MonitoredObjectStoreTestCase extends AbstractMuleTestCase {
+public class MonitoredObjectStoreTestCase extends AbstractMuleContextTestCase {
 
   private static final int EXPIRATION_INTERVAL = 500;
 
@@ -39,6 +39,7 @@ public class MonitoredObjectStoreTestCase extends AbstractMuleTestCase {
 
   private ExpiringStore createExpiringStore() throws InitialisationException {
     ExpiringStore store = new ExpiringStore();
+    store.setMuleContext(muleContext);
     store.setExpirationInterval(EXPIRATION_INTERVAL);
     store.initialise();
 

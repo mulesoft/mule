@@ -6,11 +6,16 @@
  */
 package org.mule.runtime.core.routing.requestreply;
 
+import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.config.i18n.CoreMessages.responseTimedOutWaitingForId;
+import static org.mule.runtime.core.context.notification.RoutingNotification.ASYNC_REPLY_TIMEOUT;
 import static org.mule.runtime.core.context.notification.RoutingNotification.MISSED_ASYNC_REPLY;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -18,12 +23,11 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
@@ -33,11 +37,10 @@ import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.context.notification.RoutingNotification;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessorBase;
-import org.mule.runtime.core.routing.EventProcessingThread;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
@@ -45,7 +48,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 
@@ -65,7 +67,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   protected MessageSource replyMessageSource;
   protected FlowConstruct flowConstruct;
   private final Processor internalAsyncReplyMessageProcessor = new InternalAsyncReplyMessageProcessor();
-  private AsyncReplyMonitoringThread replyThread;
+  private Scheduler scheduler;
+  private AsyncReplyMonitoringRunnable replyRunnable;
   protected final Map<String, Latch> locks = new ConcurrentHashMap<>();
   private String storePrefix = "";
 
@@ -126,30 +129,30 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
   @Override
   public void initialise() throws InitialisationException {
-    name = String.format(NAME_TEMPLATE, storePrefix, ThreadNameHelper.getPrefix(muleContext),
-                         flowConstruct == null ? "" : flowConstruct.getName());
-    store = ((ObjectStoreManager) muleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER))
+    name = format(NAME_TEMPLATE, storePrefix, muleContext.getConfiguration().getId(),
+                  flowConstruct == null ? "" : flowConstruct.getName());
+    store = ((ObjectStoreManager) muleContext.getRegistry().get(OBJECT_STORE_MANAGER))
         .getObjectStore(name, false, MAX_PROCESSED_GROUPS, UNCLAIMED_TIME_TO_LIVE, UNCLAIMED_INTERVAL);
   }
 
   @Override
   public void start() throws MuleException {
-    replyThread = new AsyncReplyMonitoringThread(name);
-    replyThread.start();
+    scheduler = muleContext.getSchedulerService().customScheduler(muleContext.getSchedulerBaseConfig().withName(name)
+        .withMaxConcurrentTasks(1).withShutdownTimeout(0, MILLISECONDS));
+    replyRunnable = new AsyncReplyMonitoringRunnable();
+    scheduler.scheduleWithFixedDelay(replyRunnable, 0, 100, MILLISECONDS);
   }
 
   @Override
   public void stop() throws MuleException {
-    if (replyThread != null) {
-      replyThread.stopProcessing();
-    }
+    scheduler.stop();
   }
 
   @Override
   public void dispose() {
     if (store != null) {
       try {
-        ((ObjectStoreManager) muleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).disposeStore(store);
+        ((ObjectStoreManager) muleContext.getRegistry().get(OBJECT_STORE_MANAGER)).disposeStore(store);
       } catch (ObjectStoreException e) {
         logger.debug("Exception disposingg of store", e);
       }
@@ -194,11 +197,11 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         asyncReplyLatch.await();
         resultAvailable = true;
       } else {
-        resultAvailable = asyncReplyLatch.await(timeout, TimeUnit.MILLISECONDS);
+        resultAvailable = asyncReplyLatch.await(timeout, MILLISECONDS);
       }
       if (!resultAvailable) {
         postLatchAwait(asyncReplyCorrelationId);
-        asyncReplyLatch.await(1000, TimeUnit.MILLISECONDS);
+        asyncReplyLatch.await(1000, MILLISECONDS);
         resultAvailable = asyncReplyLatch.getCount() == 0;
       }
     } catch (InterruptedException e) {
@@ -227,7 +230,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
       addProcessed(asyncReplyCorrelationId);
 
       if (failOnTimeout) {
-        muleContext.fireNotification(new RoutingNotification(event.getMessage(), null, RoutingNotification.ASYNC_REPLY_TIMEOUT));
+        muleContext.fireNotification(new RoutingNotification(event.getMessage(), null, ASYNC_REPLY_TIMEOUT));
 
         throw new ResponseTimeoutException(responseTimedOutWaitingForId((int) timeout, asyncReplyCorrelationId), null);
       } else {
@@ -260,7 +263,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     @Override
     public Event process(Event event) throws MuleException {
       store.store(getAsyncReplyCorrelationId(event), event);
-      replyThread.processNow();
+      replyRunnable.run();
       return null;
     }
   }
@@ -275,14 +278,10 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     this.flowConstruct = flowConstruct;
   }
 
-  private class AsyncReplyMonitoringThread extends EventProcessingThread {
-
-    AsyncReplyMonitoringThread(String name) {
-      super(name, 100);
-    }
+  private class AsyncReplyMonitoringRunnable implements Runnable {
 
     @Override
-    protected void doRun() {
+    public void run() {
       try {
         List<Serializable> ids = store.allKeys();
         logger.debug("Found " + ids.size() + " objects in store");

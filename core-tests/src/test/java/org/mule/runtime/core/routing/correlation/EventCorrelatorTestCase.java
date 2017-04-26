@@ -12,14 +12,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
@@ -29,12 +30,14 @@ import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.routing.EventGroup;
 import org.mule.runtime.core.util.store.PartitionedInMemoryObjectStore;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -53,6 +56,8 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
   public static final boolean USE_PERSISTENT_STORE = false;
 
   private static final Logger LOGGER = getLogger(EventCorrelatorTestCase.class);
+
+  private SimpleUnitTestSupportSchedulerService schedulerService;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private EventCorrelatorCallback mockEventCorrelatorCallback;
@@ -78,11 +83,17 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setup() {
+    schedulerService = new SimpleUnitTestSupportSchedulerService();
+    when(mockMuleContext.getSchedulerService()).thenReturn(schedulerService);
     when(mockEventGroup.getMessageCollectionEvent()).thenReturn(mockMuleEvent);
     when(mockMuleEvent.getMessage()).thenReturn(mockMessageCollection);
     when(mockMessageCollection.getPayload()).thenReturn(new TypedValue<>(null, OBJECT));
   }
 
+  @After
+  public void after() throws MuleException {
+    schedulerService.stop();
+  }
 
   @Test(expected = CorrelationTimeoutException.class)
   public void initAfterDeserializationAfterForceGroupExpiry() throws Exception {
@@ -169,7 +180,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
   }
 
   private EventCorrelator createEventCorrelator() throws Exception {
-    when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
+    when(mockMuleContext.getRegistry().get(OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
     memoryObjectStore.store(TEST_GROUP_ID, mockEventGroup, "prefix.eventGroups");
     when(mockEventGroup.getGroupId()).thenReturn(TEST_GROUP_ID);
     when(mockEventGroup.getMessageCollectionEvent()).thenReturn(mock(Event.class));

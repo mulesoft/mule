@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.management.stats;
 
-import org.mule.runtime.core.api.MuleContext;
+import static java.lang.Thread.currentThread;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -17,17 +20,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, MuleContextAware {
-
-  private static final Logger logger = LoggerFactory.getLogger(DefaultProcessingTimeWatcher.class);
 
   private final ReferenceQueue<ProcessingTime> queue = new ReferenceQueue<ProcessingTime>();
   private final Map<ProcessingTimeReference, Object> refs = new ConcurrentHashMap<ProcessingTimeReference, Object>();
-  private Thread watcherThread;
   private MuleContext muleContext;
+  private Scheduler scheduler;
 
   @Override
   public void addProcessingTime(ProcessingTime processingTime) {
@@ -36,17 +34,14 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
 
   @Override
   public void start() throws MuleException {
-    String threadName = String.format("%sprocessing.time.monitor", ThreadNameHelper.getPrefix(muleContext));
-    watcherThread = new Thread(new ProcessingTimeChecker(), threadName);
-    watcherThread.setDaemon(true);
-    watcherThread.start();
+    scheduler = muleContext.getSchedulerService().customScheduler(muleContext.getSchedulerBaseConfig()
+        .withName("processing.time.monitor").withMaxConcurrentTasks(1).withShutdownTimeout(0, MILLISECONDS));
+    scheduler.submit(new ProcessingTimeChecker());
   }
 
   @Override
   public void stop() throws MuleException {
-    if (watcherThread != null) {
-      watcherThread.interrupt();
-    }
+    scheduler.stop();
     refs.clear();
   }
 
@@ -60,23 +55,18 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
     /**
      * As weak references to completed ProcessingTimes are delivered, record them
      */
+    @Override
     public void run() {
-      while (true) {
-        try {
-          ProcessingTimeReference ref = (ProcessingTimeReference) queue.remove();
-          refs.remove(ref);
+      try {
+        ProcessingTimeReference ref = (ProcessingTimeReference) queue.remove();
+        refs.remove(ref);
 
-          FlowConstructStatistics stats = ref.getStatistics();
-          if (stats.isEnabled()) {
-            stats.addCompleteFlowExecutionTime(ref.getAccumulator().longValue());
-          }
-        } catch (InterruptedException ex) {
-          Thread.currentThread().interrupt();
-          break;
-        } catch (Exception ex) {
-          // Don't let exception escape -- it kills the thread
-          logger.error("Error running {}. Thread will be stopped", this, ex);
+        FlowConstructStatistics stats = ref.getStatistics();
+        if (stats.isEnabled()) {
+          stats.addCompleteFlowExecutionTime(ref.getAccumulator().longValue());
         }
+      } catch (InterruptedException ex) {
+        currentThread().interrupt();
       }
     }
   }

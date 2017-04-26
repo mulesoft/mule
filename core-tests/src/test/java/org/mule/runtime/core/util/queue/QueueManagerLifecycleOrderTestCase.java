@@ -10,11 +10,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.commons.lang.NotImplementedException;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 @SmallTest
@@ -37,13 +38,16 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
   private List<Object> startStopOrder = new ArrayList<>();
   private RecordingTQM rtqm = new RecordingTQM();
 
+  @Rule
+  public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
+
   private MuleContext muleContext;
 
   @Before
   public void before() throws InitialisationException, ConfigurationException {
-    muleContext = new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(),
+    muleContext = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
                                                                     new QueueManagerOnlyConfigurationBuilder());
-    new TestServicesConfigurationBuilder().configure(muleContext);
+    testServicesConfigurationBuilder.configure(muleContext);
   }
 
   @After

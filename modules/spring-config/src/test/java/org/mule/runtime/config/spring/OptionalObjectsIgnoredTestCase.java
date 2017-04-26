@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
@@ -22,21 +23,24 @@ import java.util.Calendar;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class OptionalObjectsIgnoredTestCase extends AbstractMuleTestCase {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(OptionalObjectsIgnoredTestCase.class);
+  private static final Logger LOGGER = getLogger(OptionalObjectsIgnoredTestCase.class);
   private static final String OPTIONAL_OBJECT_KEY = "problematic";
+
+  @Rule
+  public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
 
   private MuleContext muleContext;
 
   @Before
   public void before() throws Exception {
     muleContext =
-        new DefaultMuleContextFactory().createMuleContext(new TestServicesConfigurationBuilder(),
+        new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
                                                           new SpringXmlConfigurationBuilder(new String[] {}, emptyMap(), APP));
     muleContext.start();
     muleContext.getRegistry().lookupByType(Calendar.class);

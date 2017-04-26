@@ -6,28 +6,27 @@
  */
 package org.mule.runtime.core.util.store;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.store.ObjectStoreManager.UNBOUNDED;
 
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.UUID;
-import org.mule.runtime.core.util.concurrent.DaemonThreadFactory;
 
 import java.io.Serializable;
-import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ScheduledFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +40,8 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
   private static Logger logger = LoggerFactory.getLogger(MonitoredObjectStoreWrapper.class);
 
   protected MuleContext context;
-  protected ScheduledThreadPoolExecutor scheduler;
+  private Scheduler scheduler;
+  private ScheduledFuture<?> scheduledTask;
   ListableObjectStore<StoredObject<T>> baseStore;
 
   /**
@@ -158,13 +158,8 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
       PriorityQueue<StoredObject<T>> sortedMaxEntries = null;
 
       if (excess > 0) {
-        sortedMaxEntries = new PriorityQueue<StoredObject<T>>(excess, new Comparator<StoredObject<T>>() {
-
-          @Override
-          public int compare(StoredObject<T> paramT1, StoredObject<T> paramT2) {
-            return paramT1.timestamp.compareTo(paramT2.timestamp);
-          }
-        });
+        sortedMaxEntries =
+            new PriorityQueue<StoredObject<T>>(excess, (paramT1, paramT2) -> paramT1.timestamp.compareTo(paramT2.timestamp));
       }
 
       ListableObjectStore<StoredObject<T>> store = getStore();
@@ -194,7 +189,8 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
 
   @Override
   public void dispose() {
-    if (scheduler != null) {
+    if (scheduledTask != null) {
+      scheduledTask.cancel(true);
       scheduler.shutdown();
     }
   }
@@ -211,9 +207,9 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
     }
 
     if (scheduler == null) {
-      this.scheduler = new ScheduledThreadPoolExecutor(1);
-      scheduler.setThreadFactory(new DaemonThreadFactory(name + "-Monitor", context.getExecutionClassLoader()));
-      scheduler.scheduleWithFixedDelay(this, 0, expirationInterval, TimeUnit.MILLISECONDS);
+      this.scheduler = context.getSchedulerService()
+          .customScheduler(context.getSchedulerBaseConfig().withName(name + "-Monitor").withMaxConcurrentTasks(1));
+      scheduledTask = scheduler.scheduleWithFixedDelay(this, 0, expirationInterval, MILLISECONDS);
     }
   }
 

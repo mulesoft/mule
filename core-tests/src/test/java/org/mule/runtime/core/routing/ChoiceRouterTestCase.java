@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
@@ -32,7 +33,6 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
 
   public ChoiceRouterTestCase(Mode mode) {
     super(mode);
-    setDisposeContextPerClass(true);
   }
 
   @Override

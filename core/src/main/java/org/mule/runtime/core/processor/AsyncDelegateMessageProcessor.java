@@ -15,7 +15,6 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -88,7 +87,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public void start() throws MuleException {
-    scheduler = schedulerService.cpuLightScheduler(muleContext.getSchedulerBaseConfig().withName(getPrefix(muleContext) + name));
+    scheduler = schedulerService.cpuLightScheduler(muleContext.getSchedulerBaseConfig().withName(name));
     super.start();
   }
 

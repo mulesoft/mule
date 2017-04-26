@@ -6,19 +6,20 @@
  */
 package org.mule.runtime.core.util.store;
 
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import org.junit.After;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class InMemoryStoreTestCase extends AbstractMuleTestCase {
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.After;
+import org.junit.Test;
+
+public class InMemoryStoreTestCase extends AbstractMuleContextTestCase {
 
   private InMemoryObjectStore<String> store = null;
 
@@ -152,6 +153,7 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase {
     assertTrue("objects' time to live must be greater than the expire interval", timeToLive > expireInterval);
 
     store = new InMemoryObjectStore<String>();
+    store.setMuleContext(muleContext);
     store.setName("timed");
     store.setMaxEntries(3);
     store.setEntryTTL(timeToLive);
@@ -174,6 +176,7 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase {
 
   private void createNonexpiringObjectStore() {
     store = new NonExpiringInMemoryObjectStore();
+    store.setMuleContext(muleContext);
   }
 
   /**

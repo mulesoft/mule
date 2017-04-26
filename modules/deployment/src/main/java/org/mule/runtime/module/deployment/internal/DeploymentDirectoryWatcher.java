@@ -6,25 +6,30 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static java.lang.String.format;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
+
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.Artifact;
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ElementAddedEvent;
 import org.mule.runtime.module.deployment.internal.util.ElementRemovedEvent;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
-import org.mule.runtime.module.artifact.Artifact;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -36,10 +41,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.io.filefilter.AndFileFilter;
@@ -70,6 +74,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   private final ReentrantLock deploymentLock;
   private final ArchiveDeployer<Domain> domainArchiveDeployer;
   protected final ArchiveDeployer<Application> applicationArchiveDeployer;
+  protected final Supplier<SchedulerService> schedulerServiceSupplier;
   private final ArtifactTimestampListener<Application> applicationTimestampListener;
   private final ArtifactTimestampListener<Domain> domainTimestampListener;
   private final ObservableList<Application> applications;
@@ -82,7 +87,8 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   public DeploymentDirectoryWatcher(final ArchiveDeployer<Domain> domainArchiveDeployer,
                                     final ArchiveDeployer<Application> applicationArchiveDeployer, ObservableList<Domain> domains,
-                                    ObservableList<Application> applications, final ReentrantLock deploymentLock) {
+                                    ObservableList<Application> applications, Supplier<SchedulerService> schedulerServiceSupplier,
+                                    final ReentrantLock deploymentLock) {
     this.appsDir = applicationArchiveDeployer.getDeploymentDirectory();
     this.domainsDir = domainArchiveDeployer.getDeploymentDirectory();
     this.deploymentLock = deploymentLock;
@@ -90,28 +96,23 @@ public class DeploymentDirectoryWatcher implements Runnable {
     this.applicationArchiveDeployer = applicationArchiveDeployer;
     this.applications = applications;
     this.domains = domains;
-    applications.addPropertyChangeListener(new PropertyChangeListener() {
-
-      public void propertyChange(PropertyChangeEvent e) {
-        if (e instanceof ElementAddedEvent || e instanceof ElementRemovedEvent) {
-          if (logger.isDebugEnabled()) {
-            logger.debug("Deployed applications set has been modified, flushing state.");
-          }
-          dirty = true;
+    applications.addPropertyChangeListener(e -> {
+      if (e instanceof ElementAddedEvent || e instanceof ElementRemovedEvent) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Deployed applications set has been modified, flushing state.");
         }
+        dirty = true;
       }
     });
-    domains.addPropertyChangeListener(new PropertyChangeListener() {
-
-      public void propertyChange(PropertyChangeEvent e) {
-        if (e instanceof ElementAddedEvent || e instanceof ElementRemovedEvent) {
-          if (logger.isDebugEnabled()) {
-            logger.debug("Deployed applications set has been modified, flushing state.");
-          }
-          dirty = true;
+    domains.addPropertyChangeListener(e -> {
+      if (e instanceof ElementAddedEvent || e instanceof ElementRemovedEvent) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Deployed applications set has been modified, flushing state.");
         }
+        dirty = true;
       }
     });
+    this.schedulerServiceSupplier = schedulerServiceSupplier;
     this.applicationTimestampListener = new ArtifactTimestampListener(applications);
     this.domainTimestampListener = new ArtifactTimestampListener(domains);
   }
@@ -219,9 +220,10 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   private void scheduleChangeMonitor() {
     final int reloadIntervalMs = getChangesCheckIntervalMs();
-    artifactDirMonitorTimer = Executors.newSingleThreadScheduledExecutor(new ArtifactDeployerMonitorThreadFactory());
+    // TODO MULE-12337 migrate this to an scheduler
+    artifactDirMonitorTimer = newSingleThreadScheduledExecutor(new ArtifactDeployerMonitorThreadFactory());
 
-    artifactDirMonitorTimer.scheduleWithFixedDelay(this, 0, reloadIntervalMs, TimeUnit.MILLISECONDS);
+    artifactDirMonitorTimer.scheduleWithFixedDelay(this, 0, reloadIntervalMs, MILLISECONDS);
 
     if (logger.isInfoEnabled()) {
       logger.info(miniSplash(format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
@@ -256,6 +258,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   // redeploy modified apps
   // deploy archives apps
   // deploy exploded apps
+  @Override
   public void run() {
     try {
       if (logger.isDebugEnabled()) {
@@ -263,7 +266,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
       }
       // use non-barging lock to preserve fairness, according to javadocs
       // if there's a lock present - wait for next poll to do anything
-      if (!deploymentLock.tryLock(0, TimeUnit.SECONDS)) {
+      if (!deploymentLock.tryLock(0, SECONDS)) {
         if (logger.isDebugEnabled()) {
           logger.debug("Another deployment operation in progress, will skip this cycle. Owner thread: "
               + ((DebuggableReentrantLock) deploymentLock).getOwner());
@@ -467,7 +470,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     if (artifactDirMonitorTimer != null) {
       artifactDirMonitorTimer.shutdown();
       try {
-        artifactDirMonitorTimer.awaitTermination(getChangesCheckIntervalMs(), TimeUnit.MILLISECONDS);
+        artifactDirMonitorTimer.awaitTermination(getChangesCheckIntervalMs(), MILLISECONDS);
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }

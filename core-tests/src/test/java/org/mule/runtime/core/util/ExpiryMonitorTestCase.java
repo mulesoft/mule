@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.util.monitor.Expirable;
 import org.mule.runtime.core.util.monitor.ExpiryMonitor;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
@@ -23,7 +23,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ExpiryMonitorTestCase extends AbstractMuleTestCase {
+public class ExpiryMonitorTestCase extends AbstractMuleContextTestCase {
 
 
   private static final int EXPIRE_TIME = 300;
@@ -38,9 +38,9 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase {
   private ExpiryMonitor monitor;
 
   @Before
-  public void doSetUp() throws Exception {
+  public void before() throws Exception {
     expired = false;
-    monitor = new ExpiryMonitor("test", EXPIRE_INTERVAL, null, false);
+    monitor = new ExpiryMonitor("test", EXPIRE_INTERVAL, muleContext, false);
   }
 
   @After
