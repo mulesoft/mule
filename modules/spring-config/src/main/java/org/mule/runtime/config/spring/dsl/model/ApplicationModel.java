@@ -475,8 +475,9 @@ public class ApplicationModel {
         if (muleComponentModels.isEmpty()) {
           muleComponentModels.add(componentModel);
         } else {
-          // Only one componentModel as Root should be set, therefore componentModel from other configFiles are added as innerComponents
-          muleComponentModels.get(0).getInnerComponents().addAll(componentModel.getInnerComponents());
+          // Only one componentModel as Root should be set, therefore componentModel is merged
+          final ComponentModel rootComponentModel = muleComponentModels.get(0);
+          muleComponentModels.set(0, new ComponentModel.Builder(rootComponentModel).merge(componentModel).build());
         }
       } else {
         springComponentModels.add(componentModel);
