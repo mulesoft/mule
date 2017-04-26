@@ -32,7 +32,7 @@ public class WscConnectionTestCase extends AbstractSoapServiceTestCase {
 
   private static final String SAME_INSTANCE_FLOW = "operationShareInstance";
   private static final String LOCAL_WSDL_FLOW = "withLocalWsdlConnection";
-  private static final String RPC_CONNETION = "rpcConnection";
+  private static final String RPC_CONNECTION = "rpcConnection";
 
   @Override
   protected String getConfigurationFile() {
@@ -51,7 +51,7 @@ public class WscConnectionTestCase extends AbstractSoapServiceTestCase {
   @Description("Tries to instantiate a connection with an RPC WSDL and fails.")
   public void rpcWsdlFails() throws Exception {
     URL wsdl = currentThread().getContextClassLoader().getResource("wsdl/rpc.wsdl");
-    Throwable e = flowRunner(RPC_CONNETION).withVariable("wsdl", wsdl.getPath()).runExpectingException().getRootCause();
+    Throwable e = flowRunner(RPC_CONNECTION).withVariable("wsdl", wsdl.getPath()).runExpectingException().getRootCause();
     assertThat(e.getMessage(), containsString("RPC WSDLs are not supported"));
     assertThat(e, instanceOf(ConnectionException.class));
   }
@@ -59,10 +59,8 @@ public class WscConnectionTestCase extends AbstractSoapServiceTestCase {
   @Test
   @Description("Consumes an operation using a connection that uses a local .wsdl file")
   public void localWsdlConnection() throws Exception {
-    URL wsdl = currentThread().getContextClassLoader().getResource("wsdl/simple-service.wsdl");
     Message msg = flowRunner(LOCAL_WSDL_FLOW)
         .withVariable("req", getRequestResource(ECHO))
-        .withVariable("wsdl", wsdl.getPath())
         .run().getMessage();
     String out = (String) msg.getPayload().getValue();
     assertSoapResponse(ECHO, out);

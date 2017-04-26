@@ -12,7 +12,7 @@
     </wsc:config>
 
     <wsc:config name="localWsdl">
-        <wsc:connection address="http://localhost:${servicePort}/server" service="TestService" port="TestPort" wsdlLocation="#[wsdl]" soapVersion="${soapVersion}">
+        <wsc:connection address="http://localhost:${servicePort}/server" service="TestService" port="TestPort" wsdlLocation="wsdl/simple-service.wsdl" soapVersion="${soapVersion}">
             <reconnect blocking="false"/>
             <pooling-profile maxActive="1"/>
         </wsc:connection>

@@ -14,7 +14,7 @@ import org.mule.extension.ws.internal.security.WssSignSecurityStrategy;
 import org.mule.extension.ws.internal.security.WssTimestampSecurityStrategy;
 import org.mule.extension.ws.internal.security.WssUsernameTokenSecurityStrategy;
 import org.mule.extension.ws.internal.security.WssVerifySignatureSecurityStrategy;
-import org.mule.extension.ws.internal.connection.WscConnectionProvider;
+import org.mule.extension.ws.internal.connection.SoapClientConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
@@ -31,7 +31,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
  */
 @ErrorTypes(WscErrors.class)
 @Operations(ConsumeOperation.class)
-@ConnectionProviders(WscConnectionProvider.class)
+@ConnectionProviders(SoapClientConnectionProvider.class)
 @SubTypeMapping(baseType = SecurityStrategyAdapter.class,
     subTypes = {WssDecryptSecurityStrategy.class, WssEncryptSecurityStrategy.class, WssSignSecurityStrategy.class,
         WssUsernameTokenSecurityStrategy.class, WssTimestampSecurityStrategy.class, WssVerifySignatureSecurityStrategy.class})
