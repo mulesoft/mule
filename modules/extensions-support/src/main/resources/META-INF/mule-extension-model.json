@@ -115,6 +115,7 @@
               },
               "hasDynamicType": false,
               "required": true,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -143,6 +144,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "true",
               "role": "BEHAVIOUR",
@@ -185,6 +187,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -226,6 +229,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -254,6 +258,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "false",
               "role": "BEHAVIOUR",
@@ -282,6 +287,7 @@
               },
               "hasDynamicType": false,
               "required": true,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -323,6 +329,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
               "role": "PRIMARY_CONTENT",
@@ -360,6 +367,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -469,6 +477,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
               "role": "PRIMARY_CONTENT",
@@ -506,6 +515,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -576,6 +586,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -603,6 +614,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -640,6 +652,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "DEBUG",
               "role": "BEHAVIOUR",
@@ -747,6 +760,7 @@
               },
               "hasDynamicType": false,
               "required": true,
+              "isConfigOverride": false,
               "expressionSupport": "REQUIRED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -783,6 +797,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -905,6 +920,7 @@
               },
               "hasDynamicType": false,
               "required": true,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -963,12 +979,325 @@
               "name": "payload",
               "description": "",
               "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "typeId": "java.util.List"
+                },
+                "item": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "java.lang.Object",
+                    "classInformation": {
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": []
+                    },
+                    "typeAlias": {
+                      "value": "setVariable"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "variableName",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "java.lang.String"
+                        }
+                      },
+                      "annotations": {
+                        "parameterPurpose": {
+                          "role": "BEHAVIOUR"
+                        },
+                        "expressionSupport": {
+                          "value": "NOT_SUPPORTED"
+                        },
+                        "layout": {
+                          "layoutModel": {
+                            "password": false,
+                            "text": false,
+                            "query": false
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "resource"
+                      },
+                      "model": {
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "java.lang.String"
+                        }
+                      },
+                      "annotations": {
+                        "parameterPurpose": {
+                          "role": "BEHAVIOUR"
+                        },
+                        "expressionSupport": {
+                          "value": "NOT_SUPPORTED"
+                        },
+                        "layout": {
+                          "layoutModel": {
+                            "password": false,
+                            "text": false,
+                            "query": false
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "script"
+                      },
+                      "model": {
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "java.lang.String"
+                        }
+                      },
+                      "annotations": {
+                        "parameterPurpose": {
+                          "role": "BEHAVIOUR"
+                        },
+                        "expressionSupport": {
+                          "value": "NOT_SUPPORTED"
+                        },
+                        "layout": {
+                          "layoutModel": {
+                            "password": false,
+                            "text": true,
+                            "query": false
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": true,
+                "query": false,
+                "order": 2
+              },
+              "name": "setVariable",
+              "displayModel": {
+                "displayName": "Set Variables"
+              },
+              "description": "Sets a list of variables in which each one has a name and a content",
+              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
-          "showInDsl": false,
+          "showInDsl": true,
           "name": "General",
           "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "java.lang.Object",
+                  "classInformation": {
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  },
+                  "typeAlias": {
+                    "value": "Object"
+                  }
+                },
+                "fields": []
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "#[payload]",
+              "role": "CONTENT",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "script",
+              "description": "Modifies the payload of the message according to the provided value",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "name": "resource",
+              "displayModel": {
+                "displayName": "Resource"
+              },
+              "description": "The name of the resource which contains a defined transformation",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [
+            {
+              "exclusiveParameterNames": [
+                "resource",
+                "script"
+              ],
+              "isOneRequired": true
+            }
+          ],
+          "showInDsl": true,
+          "name": "setPayload",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "java.lang.Object",
+                  "classInformation": {
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  },
+                  "typeAlias": {
+                    "value": "Object"
+                  }
+                },
+                "fields": []
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "#[payload]",
+              "role": "CONTENT",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "script",
+              "description": "Modifies the payload of the message according to the provided value",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "name": "resource",
+              "displayModel": {
+                "displayName": "Resource"
+              },
+              "description": "The name of the resource which contains a defined transformation",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [
+            {
+              "exclusiveParameterNames": [
+                "resource",
+                "script"
+              ],
+              "isOneRequired": true
+            }
+          ],
+          "showInDsl": true,
+          "name": "setAttributes",
+          "description": "Modifies the attributes of the message according to the provided value",
           "modelProperties": {}
         },
         {
@@ -1067,6 +1396,7 @@
               },
               "hasDynamicType": false,
               "required": true,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1108,6 +1438,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
               "role": "PRIMARY_CONTENT",
@@ -1195,6 +1526,7 @@
               },
               "hasDynamicType": false,
               "required": true,
+              "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1236,6 +1568,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
               "role": "PRIMARY_CONTENT",
@@ -1273,6 +1606,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1382,6 +1716,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
               "defaultValue": "#[payload]",
               "role": "BEHAVIOUR",
@@ -1411,6 +1746,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1438,6 +1774,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "rootMessage",
               "role": "BEHAVIOUR",
@@ -1466,6 +1803,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "counter",
               "role": "BEHAVIOUR",
@@ -1503,6 +1841,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1558,6 +1897,7 @@
                   },
                   "hasDynamicType": false,
                   "required": false,
+                  "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -1702,6 +2042,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "true",
               "role": "BEHAVIOUR",
@@ -1731,6 +2072,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "0",
               "role": "BEHAVIOUR",
@@ -1773,6 +2115,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -1896,6 +2239,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "INDIFFERENT",
               "role": "BEHAVIOUR",
@@ -1933,6 +2277,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "defaultValue": "LOCAL",
               "role": "BEHAVIOUR",
@@ -2105,6 +2450,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -2132,6 +2478,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -2160,6 +2507,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
               "defaultValue" : "true",
               "role": "BEHAVIOUR",
@@ -2189,6 +2537,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "defaultValue" : "true",
               "role": "BEHAVIOUR",
@@ -2302,6 +2651,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -2329,6 +2679,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
@@ -2357,6 +2708,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
               "defaultValue" : "true",
               "role": "BEHAVIOUR",
@@ -2386,6 +2738,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "defaultValue" : "true",
               "role": "BEHAVIOUR",
@@ -2560,6 +2913,7 @@
               },
               "hasDynamicType": false,
               "required": false,
+              "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
               "dslConfiguration": {

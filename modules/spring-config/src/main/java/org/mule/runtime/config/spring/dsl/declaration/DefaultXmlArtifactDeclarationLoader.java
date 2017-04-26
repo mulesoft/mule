@@ -11,6 +11,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.forExtension;
+import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newFlow;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newObjectValue;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
@@ -30,6 +31,7 @@ import static org.mule.runtime.extension.internal.dsl.syntax.DslSyntaxUtils.getI
 import static org.mule.runtime.extension.internal.dsl.syntax.DslSyntaxUtils.isExtensible;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
@@ -38,8 +40,8 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.TRANSFORM_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
-
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -108,6 +110,9 @@ import org.w3c.dom.Document;
  */
 public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLoader {
 
+  public static final String SET_VARIABLE = "setVariable";
+  public static final String GENERAL = "General";
+  public static final String SCRIPT = "script";
   private final DslResolvingContext context;
   private final Map<ExtensionModel, DslSyntaxResolver> resolvers;
   private final Map<String, ExtensionModel> extensionsByNamespace = new HashMap<>();
@@ -249,7 +254,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   }
 
   private void declareFlow(ConfigLine configLine, ArtifactDeclarer artifactDeclarer) {
-    final FlowElementDeclarer flow = ElementDeclarer.newFlow().withRefName(getDeclaredName(configLine));
+    final FlowElementDeclarer flow = newFlow().withRefName(getDeclaredName(configLine));
     copyExplicitAttributes(configLine.getConfigAttributes(), flow);
 
     configLine.getChildren().forEach(line -> {
@@ -267,6 +272,12 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
     String namespace = getNamespace(line);
     ExtensionModel extensionModel = extensionsByNamespace.get(namespace);
+
+    // TODO EE-5398: Create EE ExtensionModel 
+    if (extensionModel == null && EE_PREFIX.equals(namespace)) {
+      extensionModel = extensionsByNamespace.get(CORE_PREFIX);
+    }
+
     if (extensionModel == null) {
       throw new MuleRuntimeException(createStaticMessage("Missing Extension model in the context for namespace [" + namespace
           + "]"));
@@ -283,7 +294,11 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
       @Override
       protected void onOperation(HasOperationModels owner, OperationModel model) {
-        declareComponent(model, e -> e.newOperation(model.getName()));
+        if (!model.getName().equals(TRANSFORM_IDENTIFIER)) {
+          declareComponent(model, e -> e.newOperation(model.getName()));
+        } else {
+          declareTransform(model, e -> e.newOperation(model.getName()));
+        }
       }
 
       @Override
@@ -352,7 +367,55 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         }
       }
 
+      private void declareTransform(ComponentModel model,
+                                    Function<ElementDeclarer, ComponentElementDeclarer> declarerProvider) {
+        final DslElementSyntax elementDsl = dsl.resolve(model);
+        if (elementDsl.getElementName().equals(line.getIdentifier())) {
+          ComponentElementDeclarer declarer = declarerProvider.apply(extensionElementsDeclarer);
+          copyExplicitAttributes(line.getConfigAttributes(), declarer);
+
+          // handle set-payload and set-attributes
+          model.getParameterGroupModels().stream()
+              .filter(g -> !g.getName().equals(GENERAL))
+              .filter(ParameterGroupModel::isShowInDsl)
+              .forEach(group -> elementDsl.getChild(group.getName())
+                  .ifPresent(groupDsl -> line.getChildren().stream()
+                      .filter(c -> c.getIdentifier().equals(groupDsl.getElementName()))
+                      .findFirst()
+                      .ifPresent(groupConfig -> {
+                        declarer.withParameter(group.getName(), getTransformParameterBuilder(groupConfig).build());
+                      })));
+
+          // handle set-variable
+          model.getAllParameterModels().stream().filter(g -> g.getName().equals(SET_VARIABLE)).findFirst().ifPresent(group -> {
+            ParameterObjectValue.Builder generalGroup = ElementDeclarer.newObjectValue();
+            ParameterListValue.Builder setVariablesListBuilder = ElementDeclarer.newListValue();
+            elementDsl.getChild(GENERAL).get().getChild(SET_VARIABLE)
+                .ifPresent(groupDsl -> line.getChildren().stream()
+                    .filter(c -> c.getIdentifier().equals(groupDsl.getElementName()))
+                    .forEach(groupConfig -> {
+                      setVariablesListBuilder.withValue(getTransformParameterBuilder(groupConfig).build());
+
+                    }));
+            declarer.withParameter(GENERAL, generalGroup.withParameter(SET_VARIABLE, setVariablesListBuilder.build()).build());
+          });
+
+          declarationConsumer.accept((ComponentElementDeclaration) declarer.getDeclaration());
+          stop();
+        }
+      }
     };
+  }
+
+  private ParameterObjectValue.Builder getTransformParameterBuilder(ConfigLine groupConfig) {
+    ParameterObjectValue.Builder objectBuilder = ElementDeclarer.newObjectValue();
+    copyExplicitAttributes(groupConfig.getConfigAttributes(), objectBuilder);
+
+    // add DW script text content to script parameter
+    if (groupConfig.getTextContent() != null) {
+      objectBuilder.withParameter(SCRIPT, ParameterSimpleValue.of(groupConfig.getTextContent()));
+    }
+    return objectBuilder;
   }
 
   private Optional<RouteElementDeclaration> declareRoute(RouteModel model, DslElementSyntax elementDsl, ConfigLine line,

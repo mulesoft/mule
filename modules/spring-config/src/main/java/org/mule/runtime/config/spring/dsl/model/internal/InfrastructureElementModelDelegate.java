@@ -27,7 +27,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
-import org.mule.runtime.api.app.declaration.ParameterElementDeclaration;
+import org.mule.runtime.api.app.declaration.ParameterValue;
 import org.mule.runtime.api.app.declaration.ParameterValueVisitor;
 import org.mule.runtime.api.app.declaration.fluent.ParameterObjectValue;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -50,46 +50,46 @@ class InfrastructureElementModelDelegate {
   private final Set<String> eeStreamingStrategies =
       ImmutableSet.of(REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS, REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS);
 
-  public void addParameter(ParameterElementDeclaration declaration,
+  public void addParameter(String parameterName, ParameterValue value,
                            ParameterModel parameterModel,
                            DslElementSyntax paramDsl,
                            ComponentConfiguration.Builder parentConfig,
                            DslElementModel.Builder parentElement) {
 
-    checkArgument(INFRASTRUCTURE_PARAMETER_NAMES.contains(declaration.getName()),
-                  format("The parameter '%s' is not of infrastructure kind", declaration.getName()));
+    checkArgument(INFRASTRUCTURE_PARAMETER_NAMES.contains(parameterName),
+                  format("The parameter '%s' is not of infrastructure kind", parameterName));
 
-    switch (declaration.getName()) {
+    switch (parameterName) {
       case RECONNECTION_STRATEGY_PARAMETER_NAME:
-        createReconnectionStrategy(declaration, parameterModel, paramDsl, parentConfig, parentElement);
+        createReconnectionStrategy(value, parameterModel, paramDsl, parentConfig, parentElement);
         return;
 
       case STREAMING_STRATEGY_PARAMETER_NAME:
-        createStreamingStrategy(declaration, parameterModel, paramDsl, parentConfig, parentElement);
+        createStreamingStrategy(value, parameterModel, paramDsl, parentConfig, parentElement);
         return;
 
       case REDELIVERY_POLICY_PARAMETER_NAME:
         cloneDeclarationToElement(parameterModel, paramDsl, parentConfig, parentElement,
-                                  (ParameterObjectValue) declaration.getValue(),
+                                  (ParameterObjectValue) value,
                                   REDELIVERY_POLICY_ELEMENT_IDENTIFIER, paramDsl.getNamespace());
         return;
 
       case POOLING_PROFILE_PARAMETER_NAME:
         cloneDeclarationToElement(parameterModel, paramDsl, parentConfig, parentElement,
-                                  (ParameterObjectValue) declaration.getValue(),
+                                  (ParameterObjectValue) value,
                                   POOLING_PROFILE_ELEMENT_IDENTIFIER, paramDsl.getNamespace());
         return;
 
       case TLS_PARAMETER_NAME:
-        createTlsContext(declaration, parameterModel, paramDsl, parentConfig, parentElement);
+        createTlsContext(value, parameterModel, paramDsl, parentConfig, parentElement);
         return;
 
       default:
-        declaration.getValue().accept(new ParameterValueVisitor() {
+        value.accept(new ParameterValueVisitor() {
 
           @Override
           public void visitSimpleValue(String value) {
-            parentConfig.withParameter(declaration.getName(), value);
+            parentConfig.withParameter(parameterName, value);
             parentElement.containing(DslElementModel.builder()
                 .withModel(parameterModel)
                 .withDsl(paramDsl)
@@ -100,13 +100,13 @@ class InfrastructureElementModelDelegate {
     }
   }
 
-  private void createTlsContext(ParameterElementDeclaration declaration,
+  private void createTlsContext(ParameterValue value,
                                 ParameterModel parameterModel,
                                 DslElementSyntax paramDsl,
                                 ComponentConfiguration.Builder parentConfig,
                                 DslElementModel.Builder parentElement) {
 
-    declaration.getValue().accept(new ParameterValueVisitor() {
+    value.accept(new ParameterValueVisitor() {
 
       @Override
       public void visitSimpleValue(String value) {
@@ -153,13 +153,13 @@ class InfrastructureElementModelDelegate {
 
   }
 
-  private void createReconnectionStrategy(ParameterElementDeclaration declaration,
+  private void createReconnectionStrategy(ParameterValue value,
                                           ParameterModel parameterModel,
                                           DslElementSyntax paramDsl,
                                           ComponentConfiguration.Builder parentConfig,
                                           DslElementModel.Builder parentElement) {
 
-    ParameterObjectValue objectValue = (ParameterObjectValue) declaration.getValue();
+    ParameterObjectValue objectValue = (ParameterObjectValue) value;
     checkArgument(!isBlank(objectValue.getTypeId()), "Missing declaration of which reconnection to use");
 
     String elementName = objectValue.getTypeId().equals(RECONNECT_ALIAS)
@@ -169,13 +169,13 @@ class InfrastructureElementModelDelegate {
                               paramDsl.getNamespace());
   }
 
-  private void createStreamingStrategy(ParameterElementDeclaration declaration,
+  private void createStreamingStrategy(ParameterValue value,
                                        ParameterModel parameterModel,
                                        DslElementSyntax paramDsl,
                                        ComponentConfiguration.Builder parentConfig,
                                        DslElementModel.Builder parentElement) {
 
-    ParameterObjectValue objectValue = (ParameterObjectValue) declaration.getValue();
+    ParameterObjectValue objectValue = (ParameterObjectValue) value;
     checkArgument(!isBlank(objectValue.getTypeId()), "Missing declaration of which streaming strategy to use");
 
     String namespace = eeStreamingStrategies.contains(objectValue.getTypeId()) ? EE_PREFIX : CORE_PREFIX;
