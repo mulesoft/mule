@@ -12,7 +12,8 @@ import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.config.i18n.CoreMessages.failedToScheduleWork;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
-import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
+import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -22,19 +23,15 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.source.SchedulerMessageSource;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.execution.ExecutionCallback;
-import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
-import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -136,26 +133,15 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
   }
 
   private void pollWith(final Message request) {
-    ExecutionTemplate<Event> executionTemplate =
-        createMainExecutionTemplate(muleContext, flowConstruct, flowConstruct.getExceptionListener());
     try {
-      executionTemplate.execute(new ExecutionCallback<Event>() {
-
-        @Override
-        public Event process() throws Exception {
-          Event event = builder(create(flowConstruct, getPollingUniqueName())).message(request).flow(flowConstruct).build();
-
-          setCurrentEvent(event);
-
-          muleContext.getNotificationManager()
+      just(request)
+          .map(message -> builder(create(flowConstruct, getPollingUniqueName())).message(request).flow(flowConstruct).build())
+          .doOnNext(event -> setCurrentEvent(event))
+          .doOnNext(event -> muleContext.getNotificationManager()
               .fireNotification(new ConnectorMessageNotification(this, event.getMessage(), getPollingUniqueName(),
-                                                                 flowConstruct, MESSAGE_RECEIVED));
-          listener.process(event);
-          return null;
-        }
-      });
-    } catch (MessagingException e) {
-      // Already handled by TransactionTemplate
+                                                                 flowConstruct, MESSAGE_RECEIVED)))
+          .transform(listener)
+          .subscribe(requestUnbounded());
     } catch (Exception e) {
       muleContext.getExceptionListener().handleException(e);
     }

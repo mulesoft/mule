@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDI
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
+import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static reactor.core.Exceptions.propagate;
@@ -38,17 +39,14 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
-import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.streaming.StreamingManager;
 
 import com.google.common.cache.Cache;
@@ -62,6 +60,7 @@ import java.util.function.Consumer;
 import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Operators;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link Processor}s that will be used to process
@@ -234,22 +233,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected ReactiveProcessor processFlowFunction() {
     return stream -> from(stream)
         .transform(processingStrategy.onPipeline(pipeline))
-        // After flow processing complete EventContext with response event, null event or error (after error handing).
         .doOnNext(response -> response.getContext().success(response))
-        .doOnError(MessagingException.class, handleError())
         .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
                    throwable -> LOGGER.error("Unhandled exception in async processing " + throwable));
-  }
-
-  private Consumer<MessagingException> handleError() {
-    if (messageSource instanceof LegacyInboundEndpoint || messageSource instanceof DefaultSchedulerMessageSource) {
-      return me -> me.getEvent().getContext().error(me);
-    } else {
-      return me -> Mono.defer(() -> Mono.from(getExceptionListener().apply(me)))
-          .doOnNext(event -> event.getContext().success(event))
-          .doOnError(throwable -> me.getEvent().getContext().error(throwable))
-          .subscribe();
-    }
   }
 
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
@@ -354,21 +340,24 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
   }
 
-  private class ProcessorStartCompleteProcessor extends AbstractRequestResponseMessageProcessor
-      implements InternalMessageProcessor {
+  private class ProcessorStartCompleteProcessor implements Processor, InternalMessageProcessor {
 
     @Override
-    protected Event processRequest(Event event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       muleContext.getNotificationManager()
           .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event, PROCESS_START));
-      return super.processRequest(event);
+      Mono.from(event.getContext().getBeforeResponsePublisher()).doOnTerminate((event1, throwable) -> {
+        MessagingException messagingException = null;
+        if (throwable != null && !(throwable instanceof MessagingException)) {
+          messagingException = new MessagingException(event, throwable, this instanceof Processor ? this : null);
+        }
+        muleContext.getNotificationManager()
+            .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event, PROCESS_COMPLETE,
+                                                              messagingException));
+      }).subscribe(requestUnbounded());
+      return event;
     }
 
-    @Override
-    protected void processFinally(Event event, MessagingException exception) {
-      muleContext.getNotificationManager()
-          .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event, PROCESS_COMPLETE, exception));
-    }
   }
 
 }

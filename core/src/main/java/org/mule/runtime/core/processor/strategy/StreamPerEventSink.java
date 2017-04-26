@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.core.api.Event;
@@ -42,8 +43,6 @@ class StreamPerEventSink implements Sink {
     just(event)
         .doOnNext(request -> eventConsumer.accept(request))
         .transform(processor)
-        // Use empty error handler to avoid reactor ErrorCallbackNotImplemented
-        .subscribe(null, throwable -> {
-        });
+        .subscribe(requestUnbounded());
   }
 }

@@ -115,6 +115,9 @@ public interface EventContext {
    */
   Optional<EventContext> getParentContext();
 
+
+  Publisher<Event> getBeforeResponsePublisher();
+
   /**
    * A {@link Publisher<Event>} that completes when a response is ready or an error was produced for this {@link EventContext}.
    * Any asynchronous processing initiated as part of processing the request {@link Event} maybe still be in process.

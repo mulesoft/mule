@@ -55,7 +55,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
   @SuppressWarnings(value = {"unchecked"})
   public Event aggregateResults(final List<Event> results,
                                 final Event previous) {
-    if (results == null) {
+    if (results == null || results.isEmpty()) {
       return null;
     } else if (results.size() == 1) {
       Event event = results.get(0);

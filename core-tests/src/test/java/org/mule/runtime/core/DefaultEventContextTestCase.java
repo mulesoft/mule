@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.core;
 
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.DefaultEventContext.create;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EventContextStory.RESPONSE_AND_COMPLETION_PUBLISHERS;
@@ -19,7 +22,12 @@ import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.rx.Exceptions;
+import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,6 +67,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     parent.success();
 
     assertNullResponse(parent);
+    assertBeforeResponseDone(parent);
     assertThat(from(parent.getCompletionPublisher()).blockMillis(BLOCK_TIMEOUT), is(nullValue()));
   }
 
@@ -74,10 +83,44 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
     assertCompletionDone(parent);
 
-    assertResponseNotDone(parent);
+    assertResponseDone(parent);
+    assertBeforeResponseDone(parent);
 
     expectedException.expect(is(exception));
     from(parent.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT);
+  }
+
+  @Test
+  @Description("EventContext beforeResponsePublisher subscribers are notified before responsePublisher subscribers (assuming " +
+      "both are subscribed before response is completed)")
+  public void beforeResponse() throws Exception {
+    EventContext parent = create(getTestFlow(muleContext), "");
+
+    Event event = testEvent();
+
+    Latch latch = new Latch();
+    Latch lock = new Latch();
+    Latch responseSubscriberFired = new Latch();
+    from(parent.getBeforeResponsePublisher()).doOnNext(checkedConsumer(e -> {
+      lock.countDown();
+      latch.await();
+    })).subscribe();
+    from(parent.getResponsePublisher()).doOnNext(checkedConsumer(e -> {
+      responseSubscriberFired.countDown();
+    })).subscribe();
+
+    newSingleThreadExecutor().submit(() -> parent.success(event));
+
+    lock.await();
+
+    assertThat(responseSubscriberFired.await(BLOCK_TIMEOUT, MILLISECONDS), is(false));
+
+    latch.countDown();
+
+    assertThat(responseSubscriberFired.await(BLOCK_TIMEOUT, MILLISECONDS), is(true));
+
+    assertResponse(parent, event);
+    assertCompletionDone(parent);
   }
 
   @Test
@@ -175,10 +218,10 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     child.error(exception);
     parent.error(exception);
 
-    assertResponseNotDone(child);
+    assertResponseDone(child);
     assertCompletionDone(child);
 
-    assertResponseNotDone(parent);
+    assertResponseDone(parent);
     assertCompletionDone(parent);
 
   }
@@ -193,7 +236,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     RuntimeException exception = new RuntimeException();
     parent.error(exception);
 
-    assertResponseNotDone(parent);
+    assertResponseDone(parent);
     assertCompletionNotDone(parent);
     assertCompletionNotDone(child);
 
@@ -244,38 +287,38 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     EventContext child = DefaultEventContext.child(parent);
     EventContext grandchild = DefaultEventContext.child(child);
 
-    assertResponseDone(parent);
+    assertResponseNotDone(parent);
     assertCompletionNotDone(parent);
-    assertResponseDone(child);
+    assertResponseNotDone(child);
     assertCompletionNotDone(child);
-    assertResponseDone(grandchild);
+    assertResponseNotDone(grandchild);
     assertCompletionNotDone(grandchild);
 
     grandchild.success();
 
-    assertResponseDone(parent);
+    assertResponseNotDone(parent);
     assertCompletionNotDone(parent);
-    assertResponseDone(child);
+    assertResponseNotDone(child);
     assertCompletionNotDone(child);
-    assertResponseNotDone(grandchild);
+    assertResponseDone(grandchild);
     assertCompletionDone(grandchild);
 
     child.success();
 
-    assertResponseDone(parent);
+    assertResponseNotDone(parent);
     assertCompletionNotDone(parent);
-    assertResponseNotDone(child);
+    assertResponseDone(child);
     assertCompletionDone(child);
-    assertResponseNotDone(grandchild);
+    assertResponseDone(grandchild);
     assertCompletionDone(grandchild);
 
     parent.success();
 
-    assertResponseNotDone(parent);
+    assertResponseDone(parent);
     assertCompletionDone(parent);
-    assertResponseNotDone(child);
+    assertResponseDone(child);
     assertCompletionDone(child);
-    assertResponseNotDone(grandchild);
+    assertResponseDone(grandchild);
     assertCompletionDone(grandchild);
 
   }
@@ -288,38 +331,38 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     EventContext child = DefaultEventContext.child(parent);
     EventContext grandchild = DefaultEventContext.child(child);
 
-    assertResponseDone(parent);
+    assertResponseNotDone(parent);
     assertCompletionNotDone(parent);
-    assertResponseDone(child);
+    assertResponseNotDone(child);
     assertCompletionNotDone(child);
-    assertResponseDone(grandchild);
+    assertResponseNotDone(grandchild);
     assertCompletionNotDone(grandchild);
 
     parent.success();
 
-    assertResponseNotDone(parent);
+    assertResponseDone(parent);
     assertCompletionNotDone(parent);
-    assertResponseDone(child);
+    assertResponseNotDone(child);
     assertCompletionNotDone(child);
-    assertResponseDone(grandchild);
+    assertResponseNotDone(grandchild);
     assertCompletionNotDone(grandchild);
 
     child.success();
 
-    assertResponseNotDone(parent);
+    assertResponseDone(parent);
     assertCompletionNotDone(parent);
-    assertResponseNotDone(child);
+    assertResponseDone(child);
     assertCompletionNotDone(child);
-    assertResponseDone(grandchild);
+    assertResponseNotDone(grandchild);
     assertCompletionNotDone(grandchild);
 
     grandchild.success();
 
-    assertResponseNotDone(parent);
+    assertResponseDone(parent);
     assertCompletionDone(parent);
-    assertResponseNotDone(child);
+    assertResponseDone(child);
     assertCompletionDone(child);
-    assertResponseNotDone(grandchild);
+    assertResponseDone(grandchild);
     assertCompletionDone(grandchild);
   }
 
@@ -458,6 +501,10 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     assertCompletionDone(deserializedParent);
   }
 
+  private void assertBeforeResponseDone(EventContext parent) {
+    assertThat(from(parent.getBeforeResponsePublisher()).toFuture().isDone(), is(true));
+  }
+
   private void assertResponse(EventContext parent, Event event) {
     assertThat(from(parent.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), equalTo(event));
   }
@@ -467,11 +514,11 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   }
 
   private void assertResponseDone(EventContext parent) {
-    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(false));
+    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(true));
   }
 
   private void assertResponseNotDone(EventContext parent) {
-    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(true));
+    assertThat(from(parent.getResponsePublisher()).toFuture().isDone(), is(false));
   }
 
   private void assertCompletionDone(EventContext parent) {

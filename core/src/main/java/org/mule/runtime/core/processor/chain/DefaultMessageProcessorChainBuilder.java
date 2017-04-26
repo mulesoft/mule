@@ -7,6 +7,9 @@
 package org.mule.runtime.core.processor.chain;
 
 import static java.util.Collections.singletonList;
+
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -153,6 +156,14 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     @Override
     protected List<Processor> getProcessorsToExecute() {
       return singletonList(head);
+    }
+
+    @Override
+    public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
+      if (head instanceof MessagingExceptionHandlerAware) {
+        ((MessagingExceptionHandlerAware) head).setMessagingExceptionHandler(messagingExceptionHandler);
+      }
+      super.setMessagingExceptionHandler(messagingExceptionHandler);
     }
   }
 }
