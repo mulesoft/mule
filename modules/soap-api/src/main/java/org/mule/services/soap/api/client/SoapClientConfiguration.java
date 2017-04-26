@@ -28,14 +28,14 @@ public final class SoapClientConfiguration {
   private final List<SecurityStrategy> securities;
   private final MessageDispatcher dispatcher;
 
-  public SoapClientConfiguration(String wsdlLocation,
-                                 String address,
-                                 String service,
-                                 String port,
-                                 SoapVersion version,
-                                 boolean mtomEnabled,
-                                 List<SecurityStrategy> securities,
-                                 MessageDispatcher dispatcher) {
+  SoapClientConfiguration(String wsdlLocation,
+                          String address,
+                          String service,
+                          String port,
+                          SoapVersion version,
+                          boolean mtomEnabled,
+                          List<SecurityStrategy> securities,
+                          MessageDispatcher dispatcher) {
     this.wsdlLocation = wsdlLocation;
     this.address = address;
     this.service = service;
