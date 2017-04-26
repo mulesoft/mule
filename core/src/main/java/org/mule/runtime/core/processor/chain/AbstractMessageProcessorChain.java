@@ -123,22 +123,11 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
       for (BiFunction<Processor, ReactiveProcessor, ReactiveProcessor> interceptor : interceptorsToBeExecuted) {
         processorFunction = interceptor.apply(processor, processorFunction);
       }
-      if (flowConstruct instanceof Pipeline) {
-        processorFunction = ((Pipeline) flowConstruct).getProcessingStrategy()
-            .onProcessor(processorFunction);
-      }
 
       ReactiveProcessor finalProcessorFunction = processorFunction;
-      stream = from(stream).flatMap(event -> {
-        try {
-          return Flux.just(event)
-              .transform(finalProcessorFunction)
-              .onErrorResumeWith(MessagingException.class, handleError(event.getContext()));
-        } catch (Throwable throwable) {
-          event.getContext().error(throwable);
-          return Mono.empty();
-        }
-      });
+      stream = from(stream).flatMap(event -> Flux.just(event)
+          .transform(finalProcessorFunction)
+          .onErrorResumeWith(MessagingException.class, handleError(event.getContext())));
       return stream;
     };
   }

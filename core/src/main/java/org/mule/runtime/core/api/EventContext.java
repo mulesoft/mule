@@ -116,13 +116,35 @@ public interface EventContext {
   Optional<EventContext> getParentContext();
 
 
+  /**
+   * A {@link Publisher<Event>} that completes when a response is ready or an error was produced for this {@link EventContext} but
+   * importantly before the Response {@link Publisher} obtained via {@link #getResponsePublisher()} completes. This allows for
+   * response subscribers that are executed before the source, client or parent flow receives to be registered. In order to
+   * subscribe after response processing you can use the response {@link Publisher}.
+   * <p/>
+   * Any asynchronous processing initiated as part of processing the request {@link Event} maybe still be in process when this
+   * {@link Publisher} completes. The completion {@link Publisher} can be used to perform an action after all processing is
+   * complete.
+   *
+   * @return publisher that completes when this {@link EventContext} instance has a response of error.
+   * @see #getResponsePublisher()
+   * @see #getCompletionPublisher()
+   */
   Publisher<Event> getBeforeResponsePublisher();
 
   /**
    * A {@link Publisher<Event>} that completes when a response is ready or an error was produced for this {@link EventContext}.
-   * Any asynchronous processing initiated as part of processing the request {@link Event} maybe still be in process.
+   * Any subscribers registered before the response completes will be executed after the response has been processed by the
+   * source, client or parent flow. In order to subscribe before response processing you can use the before response
+   * {@link Publisher}.
+   * <p/>
+   * Any asynchronous processing initiated as part of processing the request {@link Event} maybe still be in process when this
+   * {@link Publisher} completes. The completion {@link Publisher} can be used to perform an action after all processing is
+   * complete.
    *
    * @return publisher that completes when this {@link EventContext} instance has a response of error.
+   * @see #getBeforeResponsePublisher() ()
+   * @see #getCompletionPublisher()
    */
   Publisher<Event> getResponsePublisher();
 
