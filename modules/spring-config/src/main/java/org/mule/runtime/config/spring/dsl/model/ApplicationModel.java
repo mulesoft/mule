@@ -472,7 +472,12 @@ public class ApplicationModel {
       ComponentModel componentModel =
           componentModelReader.extractComponentDefinitionModel(configFile.getConfigLines().get(0), configFile.getFilename());
       if (isMuleConfigFile(configFile)) {
-        muleComponentModels.add(componentModel);
+        if (muleComponentModels.isEmpty()) {
+          muleComponentModels.add(componentModel);
+        } else {
+          // Only one componentModel as Root should be set, therefore componentModel from other configFiles are added as innerComponents
+          muleComponentModels.get(0).getInnerComponents().addAll(componentModel.getInnerComponents());
+        }
       } else {
         springComponentModels.add(componentModel);
       }
