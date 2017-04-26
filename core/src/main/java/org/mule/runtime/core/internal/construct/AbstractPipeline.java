@@ -346,16 +346,24 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     public Event process(Event event) throws MuleException {
       muleContext.getNotificationManager()
           .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event, PROCESS_START));
-      Mono.from(event.getContext().getBeforeResponsePublisher()).doOnTerminate((event1, throwable) -> {
-        MessagingException messagingException = null;
-        if (throwable != null && !(throwable instanceof MessagingException)) {
-          messagingException = new MessagingException(event, throwable, this instanceof Processor ? this : null);
-        }
-        muleContext.getNotificationManager()
-            .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event, PROCESS_COMPLETE,
-                                                              messagingException));
-      }).subscribe(requestUnbounded());
+
+      // Fire COMPLETE notification on async response
+      Mono.from(event.getContext().getBeforeResponsePublisher())
+          .doOnNext(result -> fireCompleteNotification(result, null))
+          .doOnError(MessagingException.class, messagingException -> fireCompleteNotification(null, messagingException))
+          .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
+                     throwable -> fireCompleteNotification(null, new MessagingException(event, throwable,
+                                                                                        this instanceof Processor ? this : null))
+
+          ).subscribe(requestUnbounded());
+
       return event;
+    }
+
+    private void fireCompleteNotification(Event event, MessagingException messagingException) {
+      muleContext.getNotificationManager()
+          .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event, PROCESS_COMPLETE,
+                                                            messagingException));
     }
 
   }
