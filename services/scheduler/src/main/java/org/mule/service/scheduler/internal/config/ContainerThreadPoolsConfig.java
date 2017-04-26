@@ -242,4 +242,9 @@ public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
   private void setCpuIntensiveQueueSize(int cpuIntensiveQueueSize) {
     this.cpuIntensiveQueueSize = cpuIntensiveQueueSize;
   }
+
+  @Override
+  public String getThreadNamePrefix() {
+    return "[MuleRuntime].";
+  }
 }

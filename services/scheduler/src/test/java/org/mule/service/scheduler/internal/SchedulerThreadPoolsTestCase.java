@@ -6,6 +6,7 @@
  */
 package org.mule.service.scheduler.internal;
 
+import static java.lang.Runtime.getRuntime;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -21,13 +22,14 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.WAIT;
+import static org.mule.service.scheduler.internal.config.ContainerThreadPoolsConfig.loadThreadPoolsConfig;
 import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.service.scheduler.internal.threads.SchedulerThreadPools;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -52,21 +54,23 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features(SCHEDULER_SERVICE)
-public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
+public class SchedulerThreadPoolsTestCase extends AbstractMuleTestCase {
+
+  private static final int CORES = getRuntime().availableProcessors();
 
   @Rule
   public ExpectedException expected = none();
 
-  private DefaultSchedulerService service;
+  private SchedulerThreadPools service;
 
   @Before
   public void before() throws MuleException {
-    service = new DefaultSchedulerService();
+    service = new SchedulerThreadPools(SchedulerThreadPoolsTestCase.class.getName(), loadThreadPoolsConfig());
     service.start();
   }
 
   @After
-  public void after() throws MuleException {
+  public void after() throws MuleException, InterruptedException {
     if (service == null) {
       return;
     }
@@ -78,14 +82,14 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   @Description("Tests that the threads of the SchedulerService are correcly created and destroyed.")
-  public void serviceStop() throws MuleException {
-    assertThat(collectThreadNames(), hasItem(startsWith(SchedulerService.class.getSimpleName())));
+  public void serviceStop() throws MuleException, InterruptedException {
+    assertThat(collectThreadNames(), hasItem(startsWith("[MuleRuntime].")));
 
     service.stop();
     service = null;
 
     new PollingProber(500, 50).check(new JUnitLambdaProbe(() -> {
-      assertThat(collectThreadNames(), not(hasItem(startsWith(SchedulerService.class.getSimpleName()))));
+      assertThat(collectThreadNames(), not(hasItem(startsWith("[MuleRuntime]."))));
       return true;
     }));
   }
@@ -95,8 +99,10 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   public void executorRejects() throws MuleException, ExecutionException, InterruptedException {
     final Latch latch = new Latch();
 
-    final Scheduler cpuLight = service.customScheduler(config().withMaxConcurrentTasks(1));
-    final Scheduler custom = service.customScheduler(config().withMaxConcurrentTasks(1));
+    final Scheduler cpuLight =
+        service.createCustomScheduler(config().withMaxConcurrentTasks(1), CORES, () -> 1000L);
+    final Scheduler custom =
+        service.createCustomScheduler(config().withMaxConcurrentTasks(1), CORES, () -> 1000L);
 
     custom.execute(() -> {
       try {
@@ -123,7 +129,7 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   @Test
   @Description("Tests that a dispatched task has inherited the context classloader.")
   public void classLoaderPropagates() throws Exception {
-    final Scheduler scheduler = service.cpuLightScheduler();
+    final Scheduler scheduler = service.createCpuLightScheduler(config(), CORES, () -> 1000L);
 
     final ClassLoader contextClassLoader = mock(ClassLoader.class);
     currentThread().setContextClassLoader(contextClassLoader);
@@ -138,7 +144,7 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   @Test
   @Description("Tests that a scheduled task has inherited the context classloader.")
   public void classLoaderPropagatesScheduled() throws Exception {
-    final Scheduler scheduler = service.cpuLightScheduler();
+    final Scheduler scheduler = service.createCpuLightScheduler(config(), CORES, () -> 1000L);
 
     final ClassLoader contextClassLoader = mock(ClassLoader.class);
     currentThread().setContextClassLoader(contextClassLoader);
@@ -163,7 +169,7 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   @Test
   @Description("Tests that a cron-scheduled task has inherited the context classloader.")
   public void classLoaderPropagatesCron() throws Exception {
-    final Scheduler scheduler = service.cpuLightScheduler();
+    final Scheduler scheduler = service.createCpuLightScheduler(config(), CORES, () -> 1000L);
 
     final ClassLoader contextClassLoader = mock(ClassLoader.class);
     currentThread().setContextClassLoader(contextClassLoader);
@@ -189,28 +195,29 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   public void onlyCustomMayConfigureWaitCpuLight() {
     expected.expect(IllegalArgumentException.class);
     expected.expectMessage("Only custom schedulers may define waitDispatchingToBusyScheduler");
-    service.cpuLightScheduler(config().withRejectionAction(WAIT));
+    service.createCpuLightScheduler(config().withRejectionAction(WAIT), CORES, () -> 1000L);
   }
 
   @Test
   public void onlyCustomMayConfigureWaitCpuIntensive() {
     expected.expect(IllegalArgumentException.class);
     expected.expectMessage("Only custom schedulers may define waitDispatchingToBusyScheduler");
-    service.cpuIntensiveScheduler(config().withRejectionAction(WAIT));
+    service.createCpuIntensiveScheduler(config().withRejectionAction(WAIT), CORES, () -> 1000L);
   }
 
   @Test
   public void onlyCustomMayConfigureWaitIO() {
     expected.expect(IllegalArgumentException.class);
     expected.expectMessage("Only custom schedulers may define waitDispatchingToBusyScheduler");
-    service.ioScheduler(config().withRejectionAction(WAIT));
+    service.createIoScheduler(config().withRejectionAction(WAIT), CORES, () -> 1000L);
   }
 
   @Test
   @Description("Tests that tasks dispatched from a CPU Light thread to a busy Scheduler are rejected.")
   public void rejectionPolicyCpuLight() throws MuleException, InterruptedException, ExecutionException, TimeoutException {
-    Scheduler sourceScheduler = service.cpuLightScheduler();
-    Scheduler targetScheduler = service.customScheduler(config().withMaxConcurrentTasks(1));
+    Scheduler sourceScheduler = service.createCpuLightScheduler(config(), CORES, () -> 1000L);
+    Scheduler targetScheduler =
+        service.createCustomScheduler(config().withMaxConcurrentTasks(1), CORES, () -> 1000L);
 
     Latch latch = new Latch();
 
@@ -224,8 +231,9 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   @Test
   @Description("Tests that tasks dispatched from a CPU Intensive thread to a busy Scheduler are rejected.")
   public void rejectionPolicyCpuIntensive() throws MuleException, InterruptedException, ExecutionException, TimeoutException {
-    Scheduler sourceScheduler = service.cpuIntensiveScheduler();
-    Scheduler targetScheduler = service.customScheduler(config().withMaxConcurrentTasks(1));
+    Scheduler sourceScheduler = service.createCpuIntensiveScheduler(config(), CORES, () -> 1000L);
+    Scheduler targetScheduler =
+        service.createCustomScheduler(config().withMaxConcurrentTasks(1), CORES, () -> 1000L);
 
     Latch latch = new Latch();
 
@@ -239,8 +247,9 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   @Test
   @Description("Tests that tasks dispatched from an IO thread to a busy Scheduler waits for execution.")
   public void rejectionPolicyIO() throws MuleException, InterruptedException, ExecutionException, TimeoutException {
-    Scheduler sourceScheduler = service.ioScheduler();
-    Scheduler targetScheduler = service.customScheduler(config().withMaxConcurrentTasks(1));
+    Scheduler sourceScheduler = service.createIoScheduler(config(), CORES, () -> 1000L);
+    Scheduler targetScheduler =
+        service.createCustomScheduler(config().withMaxConcurrentTasks(1), CORES, () -> 1000L);
 
     Latch latch = new Latch();
 
@@ -260,8 +269,9 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   @Description("Tests that periodic tasks scheduled to a busy Scheduler are skipped but the job continues executing.")
   public void rejectionPolicyScheduledPeriodic()
       throws MuleException, InterruptedException, ExecutionException, TimeoutException {
-    Scheduler sourceScheduler = service.customScheduler(config().withMaxConcurrentTasks(2));
-    Scheduler targetScheduler = service.cpuLightScheduler();
+    Scheduler sourceScheduler =
+        service.createCustomScheduler(config().withMaxConcurrentTasks(2), CORES, () -> 1000L);
+    Scheduler targetScheduler = service.createCpuLightScheduler(config(), CORES, () -> 1000L);
 
     Latch latch = new Latch();
 
@@ -296,8 +306,10 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   @Test
   @Description("Tests that tasks dispatched from a Custom scheduler thread to a busy Scheduler waits for execution.")
   public void rejectionPolicyCustom() throws MuleException, InterruptedException, ExecutionException, TimeoutException {
-    Scheduler sourceScheduler = service.customScheduler(config().withMaxConcurrentTasks(1));
-    Scheduler targetScheduler = service.customScheduler(config().withMaxConcurrentTasks(1));
+    Scheduler sourceScheduler =
+        service.createCustomScheduler(config().withMaxConcurrentTasks(1), CORES, () -> 1000L);
+    Scheduler targetScheduler =
+        service.createCustomScheduler(config().withMaxConcurrentTasks(1), CORES, () -> 1000L);
 
     Latch latch = new Latch();
 
@@ -311,9 +323,10 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   @Test
   @Description("Tests that tasks dispatched from a Custom scheduler with 'Wait' allowed thread to a busy Scheduler waits for execution.")
   public void rejectionPolicyCustomWithConfig() throws MuleException, InterruptedException, ExecutionException, TimeoutException {
-    Scheduler sourceScheduler =
-        service.customScheduler(config().withRejectionAction(WAIT).withMaxConcurrentTasks(1), 1);
-    Scheduler targetScheduler = service.customScheduler(config().withMaxConcurrentTasks(1));
+    Scheduler sourceScheduler = service.createCustomScheduler(config().withRejectionAction(WAIT).withMaxConcurrentTasks(1),
+                                                              CORES, () -> 1000L, 1);
+    Scheduler targetScheduler =
+        service.createCustomScheduler(config().withMaxConcurrentTasks(1), CORES, () -> 1000L);
 
     Latch latch = new Latch();
 
@@ -333,7 +346,8 @@ public class DefaultSchedulerServiceTestCase extends AbstractMuleTestCase {
   @Description("Tests that tasks dispatched from any other thread to a busy Scheduler are rejected.")
   public void rejectionPolicyOther() throws MuleException, InterruptedException, ExecutionException, TimeoutException {
     ExecutorService sourceExecutor = newSingleThreadExecutor();
-    Scheduler targetScheduler = service.customScheduler(config().withMaxConcurrentTasks(1));
+    Scheduler targetScheduler =
+        service.createCustomScheduler(config().withMaxConcurrentTasks(1), CORES, () -> 1000L);
 
     Latch latch = new Latch();
 

@@ -19,11 +19,13 @@ import org.mule.runtime.container.api.ServiceInvocationHandler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.config.PreferredObjectSelector;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -70,7 +72,8 @@ public class InjectParamsFromContextServiceProxy extends ServiceInvocationHandle
         if (parameter.isAnnotationPresent(Named.class)) {
           arg = context.getRegistry().lookupObject(parameter.getAnnotation(Named.class).value());
         } else {
-          arg = context.getRegistry().lookupObject(parameter.getType());
+          final Collection<?> lookupObjects = context.getRegistry().lookupObjects(parameter.getType());
+          arg = new PreferredObjectSelector().select(lookupObjects.iterator());
         }
         if (arg == null) {
           throw new IllegalDependencyInjectionException(format(NO_OBJECT_FOUND_FOR_PARAM,
@@ -115,7 +118,7 @@ public class InjectParamsFromContextServiceProxy extends ServiceInvocationHandle
     // Check that the remaining parameters are injectable
     for (int j = i; j < serviceImplParams.length; ++j) {
       if (!serviceImplParams[j].isAnnotationPresent(Named.class)
-          && context.getRegistry().lookupObject(serviceImplParams[j].getType()) == null) {
+          && context.getRegistry().lookupObjects(serviceImplParams[j].getType()).isEmpty()) {
         return false;
       }
     }

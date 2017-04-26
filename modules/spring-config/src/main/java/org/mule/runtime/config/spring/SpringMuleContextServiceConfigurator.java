@@ -41,6 +41,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSOR_INTERCEPTOR_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_POOLS_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SERIALIZER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
@@ -109,6 +110,7 @@ import org.mule.runtime.core.policy.DefaultPolicyStateHandler;
 import org.mule.runtime.core.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
+import org.mule.runtime.core.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.core.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.util.DefaultStreamCloserService;
 import org.mule.runtime.core.util.queue.DelegateQueueManager;
@@ -226,6 +228,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_COMPONENT_INITIAL_STATE_MANAGER, getBeanDefinition(DefaultComponentInitialStateManager.class))
       .put(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class))
       .put(OBJECT_TRANSFORMATION_SERVICE, getBeanDefinition(TransformationService.class))
+      .put(OBJECT_SCHEDULER_POOLS_CONFIG, getConstantObjectBeanDefinition(SchedulerContainerPoolsConfig.getInstance()))
       .put(OBJECT_SCHEDULER_BASE_CONFIG, getBeanDefinition(SchedulerBaseConfigFactory.class))
       .build();
 

@@ -11,6 +11,7 @@ import static java.util.Collections.unmodifiableList;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
+import org.mule.runtime.core.api.scheduler.SchedulerPoolsConfigFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 import java.util.ArrayList;
@@ -51,6 +52,21 @@ public class MockSchedulerService implements SchedulerService {
 
   @Override
   public Scheduler cpuIntensiveScheduler(SchedulerConfig config) {
+    return new MockScheduler();
+  }
+  
+  @Override
+  public Scheduler cpuLightScheduler(SchedulerConfig config, SchedulerPoolsConfigFactory poolsConfigFactory) {
+    return new MockScheduler();
+  }
+  
+  @Override
+  public Scheduler ioScheduler(SchedulerConfig config, SchedulerPoolsConfigFactory poolsConfigFactory) {
+    return new MockScheduler();
+  }
+  
+  @Override
+  public Scheduler cpuIntensiveScheduler(SchedulerConfig config, SchedulerPoolsConfigFactory poolsConfigFactory) {
     return new MockScheduler();
   }
   

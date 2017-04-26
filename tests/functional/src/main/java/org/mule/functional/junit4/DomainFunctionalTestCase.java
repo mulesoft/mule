@@ -106,12 +106,12 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     return null;
   }
 
-  public class ApplicationConfig {
+  public static class ApplicationConfig {
 
     String applicationName;
     String[] applicationResources;
 
-    public ApplicationConfig(String applicationName, String[] applicationResources) {
+    public ApplicationConfig(String applicationName, String... applicationResources) {
       this.applicationName = applicationName;
       this.applicationResources = applicationResources;
     }

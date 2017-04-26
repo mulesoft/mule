@@ -27,6 +27,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_POOLS_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
@@ -55,6 +56,7 @@ import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
+import org.mule.runtime.core.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.core.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.util.DefaultStreamCloserService;
 import org.mule.runtime.core.util.queue.DelegateQueueManager;
@@ -121,6 +123,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_TIME_SUPPLIER, new TimeSupplier(), muleContext);
     registerObject(OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager(muleContext), muleContext);
     registerObject(OBJECT_METADATA_SERVICE, new MuleMetadataService(), muleContext);
+    registerObject(OBJECT_SCHEDULER_POOLS_CONFIG, SchedulerContainerPoolsConfig.getInstance(), muleContext);
     registerObject(OBJECT_SCHEDULER_BASE_CONFIG,
                    config().withShutdownTimeout(() -> muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
                    muleContext);

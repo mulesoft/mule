@@ -21,6 +21,7 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.container.api.ServiceInvocationHandler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
+import org.mule.runtime.core.config.Preferred;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -61,6 +62,21 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
     serviceProxy.augmented();
 
     assertThat(augmentedParam, sameInstance(muleContext));
+  }
+
+  @Test
+  public void augmentedWithPreferredInvocation() throws Exception {
+    muleContext.getRegistry().registerObject("myBean", new MyBean());
+    final MyPreferredBean preferredBean = new MyPreferredBean();
+    muleContext.getRegistry().registerObject("myPreferredBean", preferredBean);
+
+    BaseService service = new AugmentedWithPreferredMethodService();
+
+    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
+
+    serviceProxy.augmented();
+
+    assertThat(augmentedParam, sameInstance(preferredBean));
   }
 
   @Test
@@ -203,6 +219,31 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
     public void augmented(MuleContext context) {
       augmentedParam = context;
     }
+  }
+
+  public class AugmentedWithPreferredMethodService implements BaseService {
+
+    @Override
+    public String getName() {
+      return "AugmentedWithPreferredMethodService";
+    }
+
+    @Override
+    public void augmented() {}
+
+    @Inject
+    public void augmented(MyBean context) {
+      augmentedParam = context;
+    }
+  }
+
+  public class MyBean {
+
+  }
+
+  @Preferred
+  public class MyPreferredBean extends MyBean {
+
   }
 
   public class NamedAugmentedMethodService implements BaseService {

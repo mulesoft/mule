@@ -62,4 +62,8 @@ public interface SchedulerPoolsConfig {
    */
   int getCpuIntensiveQueueSize();
 
+  /**
+   * @return the prefix to prepend to the names of the threads of the pools created for a scheduler with this configuration.
+   */
+  String getThreadNamePrefix();
 }
