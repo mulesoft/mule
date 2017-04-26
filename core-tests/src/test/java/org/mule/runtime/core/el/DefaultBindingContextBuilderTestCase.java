@@ -15,6 +15,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionModule;
+import org.mule.runtime.api.el.ModuleNamespace;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -27,6 +29,7 @@ public class DefaultBindingContextBuilderTestCase extends AbstractMuleTestCase {
 
   private BindingContext.Builder builder = new DefaultBindingContextBuilder();
   private TypedValue<String> typedValue = new TypedValue<>("", STRING);
+  private ModuleNamespace namespace = new ModuleNamespace("org", "mule", "mymodule");
 
   @Test
   public void addsBinding() {
@@ -39,14 +42,24 @@ public class DefaultBindingContextBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void addsBindings() {
+    ExpressionModule module = ExpressionModule.builder(namespace).addBinding("id", typedValue).build();
     BindingContext previousContext =
-        BindingContext.builder().addBinding(ID, typedValue).addBinding(OTHER_ID, typedValue).build();
+        BindingContext.builder()
+            .addBinding(ID, typedValue)
+            .addBinding(OTHER_ID, typedValue)
+            .addModule(module)
+            .build();
+
+
     BindingContext context = builder.addAll(previousContext).build();
 
     assertThat(context.bindings(), hasSize(2));
     assertThat(context.identifiers(), hasItems(ID, OTHER_ID));
     assertThat(context.lookup(ID).get(), is(sameInstance(typedValue)));
     assertThat(context.lookup(OTHER_ID).get(), is(sameInstance(typedValue)));
+
+    assertThat(context.modules(), hasSize(1));
+    assertThat(context.modules(), hasItems(module));
   }
 
 }
