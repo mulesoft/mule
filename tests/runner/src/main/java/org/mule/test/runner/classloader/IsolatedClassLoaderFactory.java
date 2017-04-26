@@ -11,11 +11,13 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.container.internal.ContainerClassLoaderFactory.SYSTEM_PACKAGES;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
@@ -28,6 +30,7 @@ import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibrary
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.classloader.ChildFirstLookupStrategy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -45,8 +48,11 @@ import org.mule.test.runner.api.ArtifactUrlClassification;
 import org.mule.test.runner.api.ArtifactsUrlClassification;
 import org.mule.test.runner.api.PluginUrlClassification;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -88,6 +94,8 @@ public class IsolatedClassLoaderFactory {
    */
   public ArtifactClassLoaderHolder createArtifactClassLoader(List<String> extraBootPackages,
                                                              ArtifactsUrlClassification artifactsUrlClassification) {
+    JarInfo testJarInfo = getTestJarInfo(artifactsUrlClassification);
+
     ArtifactClassLoader containerClassLoader;
     ClassLoaderLookupPolicy childClassLoaderLookupPolicy;
     RegionClassLoader regionClassLoader;
@@ -140,7 +148,8 @@ public class IsolatedClassLoaderFactory {
                                                                                          pluginLookupPolicy));
           pluginsArtifactClassLoaders.add(pluginCL);
 
-          ArtifactClassLoaderFilter filter = createArtifactClassLoaderFilter(pluginUrlClassification);
+          ArtifactClassLoaderFilter filter =
+              createArtifactClassLoaderFilter(pluginUrlClassification, testJarInfo.getPackages(), childClassLoaderLookupPolicy);
 
           pluginArtifactClassLoaderFilters.add(filter);
           filteredPluginsArtifactClassLoaders.add(new FilteringArtifactClassLoader(pluginCL, filter, emptyList()));
@@ -159,8 +168,6 @@ public class IsolatedClassLoaderFactory {
     ArtifactClassLoader appClassLoader =
         createApplicationArtifactClassLoader(regionClassLoader, appLookupPolicy, artifactsUrlClassification,
                                              pluginsArtifactClassLoaders);
-
-    JarInfo testJarInfo = getJarInfo(artifactsUrlClassification);
 
     regionClassLoader.addClassLoader(appClassLoader,
                                      new DefaultArtifactClassLoaderFilter(testJarInfo.getPackages(), testJarInfo.getResources()));
@@ -235,21 +242,77 @@ public class IsolatedClassLoaderFactory {
    *        {@link ClassLoader}
    * @return {@link JarInfo} for the classification
    */
-  private JarInfo getJarInfo(ArtifactsUrlClassification artifactsUrlClassification) {
+  private JarInfo getTestJarInfo(ArtifactsUrlClassification artifactsUrlClassification) {
+    URL testCodeUrl = artifactsUrlClassification.getApplicationUrls().get(0);
+    Set<String> productionPackages = getProductionCodePackages(testCodeUrl);
+    JarInfo testJarInfo = getTestCodePackages(artifactsUrlClassification, testCodeUrl);
+
+    Set<String> testPackages = sanitizeTestExportedPackages(productionPackages, testJarInfo.getPackages());
+
+    return new JarInfo(testPackages, testJarInfo.getResources());
+  }
+
+  /**
+   * Sanitizes packages exported on the test class loader.
+   * <p/>
+   * Test runner exports test packages to the plugins used during the test, to enable the usage of test classes to configure them.
+   * A problem is that test code usually contains a mix of unit and integration tests. This causes that packages from the
+   * production code are also used to write unit tests for them. The test runner cannot export those production packages as that
+   * will cause an error when creating the class loader for the test. To avoid this, every production code package will not be
+   * exported on the test.
+   * <p/>
+   * A similar sanitization is done for packages that are system packages, as child artifacts cannot redefine them.
+   *
+   * @param productionPackages all packages from the module under test's production code.
+   * @param testPackages all packages from the module under test's test code
+   * @return sanitized packages to export on the test class loader.
+   */
+  private Set<String> sanitizeTestExportedPackages(Set<String> productionPackages, Set<String> testPackages) {
+    Set<String> sanitizedTestPackages = new HashSet<>(testPackages);
+    removePackagesFromTestClassLoader(sanitizedTestPackages, SYSTEM_PACKAGES);
+    removePackagesFromTestClassLoader(sanitizedTestPackages, productionPackages);
+
+    return sanitizedTestPackages;
+  }
+
+  private JarInfo getTestCodePackages(ArtifactsUrlClassification artifactsUrlClassification, URL testCodeUrl) {
+    List<URL> libraries = newArrayList(testCodeUrl);
+    libraries.addAll(artifactsUrlClassification.getPluginSharedLibUrls());
+
     Set<String> packages = new HashSet<>();
     Set<String> resources = new HashSet<>();
     final JarExplorer jarExplorer = new FileJarExplorer();
 
-    List<URL> libraries = newArrayList(artifactsUrlClassification.getApplicationUrls().get(0));
-    libraries.addAll(artifactsUrlClassification.getPluginSharedLibUrls());
-
     for (URL library : libraries) {
-      final JarInfo jarInfo = jarExplorer.explore(library);
+      JarInfo jarInfo = jarExplorer.explore(library);
       packages.addAll(jarInfo.getPackages());
       resources.addAll(jarInfo.getResources());
     }
 
     return new JarInfo(packages, resources);
+  }
+
+  private Set<String> getProductionCodePackages(URL testCodeUrl) {
+    int index = testCodeUrl.toString().lastIndexOf("test-classes");
+    try {
+      URL productionCodeUrl = new URL(testCodeUrl.toString().substring(0, index) + "classes");
+      if (new File(productionCodeUrl.getFile()).exists()) {
+        final JarExplorer jarExplorer = new FileJarExplorer();
+
+        return jarExplorer.explore(productionCodeUrl).getPackages();
+      } else {
+        return emptySet();
+      }
+    } catch (MalformedURLException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  private void removePackagesFromTestClassLoader(Set<String> packages, Collection<String> systemPackages) {
+    Set<String> packagesToRemove = new HashSet<>();
+    systemPackages.stream().forEach(systemPackage -> packages.stream().filter(p -> p.startsWith(systemPackage))
+        .forEach(p -> packagesToRemove.add(p)));
+    packages.removeAll(packagesToRemove);
   }
 
   /**
@@ -304,8 +367,13 @@ public class IsolatedClassLoaderFactory {
     };
   }
 
-  private ArtifactClassLoaderFilter createArtifactClassLoaderFilter(PluginUrlClassification pluginUrlClassification) {
-    String exportedPackages = pluginUrlClassification.getExportedPackages().stream().collect(joining(", "));
+  private ArtifactClassLoaderFilter createArtifactClassLoaderFilter(PluginUrlClassification pluginUrlClassification,
+                                                                    Set<String> parentExportedPackages,
+                                                                    ClassLoaderLookupPolicy childClassLoaderLookupPolicy) {
+    Set<String> sanitizedExportedPackages =
+        sanitizePluginExportedPackages(pluginUrlClassification, parentExportedPackages, childClassLoaderLookupPolicy);
+    String exportedPackages = sanitizedExportedPackages.stream().collect(joining(", "));
+
     final String exportedResources = pluginUrlClassification.getExportedResources().stream().collect(joining(", "));
     ArtifactClassLoaderFilter artifactClassLoaderFilter =
         classLoaderFilterFactory.create(exportedPackages, exportedResources);
@@ -315,6 +383,32 @@ public class IsolatedClassLoaderFactory {
           new TestArtifactClassLoaderFilter(artifactClassLoaderFilter, pluginUrlClassification.getExportClasses());
     }
     return artifactClassLoaderFilter;
+  }
+
+  private Set<String> sanitizePluginExportedPackages(PluginUrlClassification pluginUrlClassification,
+                                                     Set<String> parentExportedPackages,
+                                                     ClassLoaderLookupPolicy childClassLoaderLookupPolicy) {
+    Set<String> exportedPackages = new HashSet<>(pluginUrlClassification.getExportedPackages());
+
+    Set<String> containerProvidedPackages = exportedPackages.stream().filter(p -> {
+      LookupStrategy lookupStrategy = childClassLoaderLookupPolicy.getPackageLookupStrategy(p);
+      return !(lookupStrategy instanceof ChildFirstLookupStrategy);
+    }).collect(toSet());
+    if (!containerProvidedPackages.isEmpty()) {
+      exportedPackages.removeAll(containerProvidedPackages);
+      logger
+          .warn("Exported packages from plugin '" + pluginUrlClassification.getName() + "' are provided by parent class loader: "
+              + containerProvidedPackages);
+    }
+
+    Set<String> appProvidedPackages =
+        parentExportedPackages.stream().filter(p -> exportedPackages.contains(p)).collect(toSet());
+    if (!appProvidedPackages.isEmpty()) {
+      exportedPackages.removeAll(appProvidedPackages);
+      logger.warn("Exported packages from plugin '" + pluginUrlClassification.getName() + "' are provided by the artifact owner: "
+          + appProvidedPackages);
+    }
+    return exportedPackages;
   }
 
   /**

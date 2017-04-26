@@ -7,26 +7,35 @@
 package org.mule.runtime.deployment.model.internal;
 
 import static java.util.Arrays.asList;
-import static org.apache.commons.collections.CollectionUtils.find;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.ChildFirstLookupStrategy;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for all artifacts class loader filters.
@@ -37,6 +46,8 @@ import java.util.Set;
 public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtifactClassLoaderBuilder> {
 
   public static final String PLUGIN_CLASSLOADER_IDENTIFIER = "/plugin/";
+
+  protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   protected final ArtifactClassLoaderFactory artifactPluginClassLoaderFactory;
   private Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
   private String artifactId = UUID.getUUID();
@@ -109,17 +120,26 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
         new RegionClassLoader(artifactId, artifactDescriptor, parentClassLoader.getClassLoader(),
                               parentClassLoader.getClassLoaderLookupPolicy());
 
+    ArtifactClassLoaderFilter artifactClassLoaderFilter =
+        createArtifactClassLoaderFilter(artifactDescriptor.getClassLoaderModel(),
+                                        parentClassLoader.getClassLoaderLookupPolicy());
+
+    Map<String, LookupStrategy> appAdditionalLookupStrategy = new HashMap<>();
+    artifactClassLoaderFilter.getExportedClassPackages().stream().forEach(p -> appAdditionalLookupStrategy.put(p, PARENT_FIRST));
+
     final List<ArtifactClassLoader> pluginClassLoaders =
-        createPluginClassLoaders(artifactId, regionClassLoader, artifactPluginDescriptors);
+        createPluginClassLoaders(artifactId, regionClassLoader, artifactPluginDescriptors,
+                                 regionClassLoader.getClassLoaderLookupPolicy().extend(appAdditionalLookupStrategy));
 
     final ArtifactClassLoader artifactClassLoader = createArtifactClassLoader(artifactId, regionClassLoader);
-    ArtifactClassLoaderFilter artifactClassLoaderFilter = createClassLoaderFilter(artifactDescriptor.getClassLoaderModel());
+
     regionClassLoader.addClassLoader(artifactClassLoader, artifactClassLoaderFilter);
 
     int artifactPluginIndex = 0;
     for (ArtifactPluginDescriptor artifactPluginDescriptor : artifactPluginDescriptors) {
       final ArtifactClassLoaderFilter classLoaderFilter =
-          createClassLoaderFilter(artifactPluginDescriptor.getClassLoaderModel());
+          createPluginClassLoaderFilter(artifactPluginDescriptor, artifactDescriptor.getClassLoaderModel().getExportedPackages(),
+                                        parentClassLoader.getClassLoaderLookupPolicy());
       regionClassLoader.addClassLoader(pluginClassLoaders.get(artifactPluginIndex), classLoaderFilter);
       artifactPluginIndex++;
     }
@@ -135,31 +155,62 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
    */
   protected abstract ArtifactClassLoader createArtifactClassLoader(String artifactId, RegionClassLoader regionClassLoader);
 
-  private ArtifactClassLoaderFilter createClassLoaderFilter(ClassLoaderModel classLoaderModel) {
-    return new DefaultArtifactClassLoaderFilter(classLoaderModel.getExportedPackages(), classLoaderModel.getExportedResources());
+  private ArtifactClassLoaderFilter createArtifactClassLoaderFilter(ClassLoaderModel classLoaderModel,
+                                                                    ClassLoaderLookupPolicy classLoaderLookupPolicy) {
+    Set<String> artifactExportedPackages = sanitizeExportedPackages(classLoaderLookupPolicy,
+                                                                    classLoaderModel.getExportedPackages());
+
+    return new DefaultArtifactClassLoaderFilter(artifactExportedPackages, classLoaderModel.getExportedResources());
+  }
+
+  private ArtifactClassLoaderFilter createPluginClassLoaderFilter(ArtifactPluginDescriptor pluginDescriptor,
+                                                                  Set<String> parentArtifactExportedPackages,
+                                                                  ClassLoaderLookupPolicy classLoaderLookupPolicy) {
+    Set<String> sanitizedArtifactExportedPackages =
+        sanitizeExportedPackages(classLoaderLookupPolicy, pluginDescriptor.getClassLoaderModel().getExportedPackages());
+
+    Set<String> replacedPackages =
+        parentArtifactExportedPackages.stream().filter(p -> sanitizedArtifactExportedPackages.contains(p)).collect(toSet());
+    if (!replacedPackages.isEmpty()) {
+      sanitizedArtifactExportedPackages.removeAll(replacedPackages);
+      logger.warn("Exported packages from plugin '" + pluginDescriptor.getName() + "' are provided by the artifact owner: "
+          + replacedPackages);
+    }
+    return new DefaultArtifactClassLoaderFilter(sanitizedArtifactExportedPackages,
+                                                pluginDescriptor.getClassLoaderModel().getExportedResources());
+  }
+
+  private Set<String> sanitizeExportedPackages(ClassLoaderLookupPolicy classLoaderLookupPolicy,
+                                               Set<String> artifactExportedPackages) {
+    Set<String> sanitizedArtifactExportedPackages = new HashSet<>(artifactExportedPackages);
+
+    Set<String> containerProvidedPackages = sanitizedArtifactExportedPackages.stream().filter(p -> {
+      LookupStrategy lookupStrategy = classLoaderLookupPolicy.getPackageLookupStrategy(p);
+      return !(lookupStrategy instanceof ChildFirstLookupStrategy);
+    }).collect(toSet());
+    if (!containerProvidedPackages.isEmpty()) {
+      sanitizedArtifactExportedPackages.removeAll(containerProvidedPackages);
+      logger.warn("Exported packages from artifact '" + artifactDescriptor.getName() + "' are provided by parent class loader: "
+          + containerProvidedPackages);
+    }
+    return sanitizedArtifactExportedPackages;
   }
 
   protected abstract String getArtifactId(ArtifactDescriptor artifactDescriptor);
 
-  /**
-   * @param appPluginDescriptor
-   * @return true if this application has the given appPluginDescriptor already defined in its artifactPluginDescriptors list.
-   */
-  private boolean containsApplicationPluginDescriptor(ArtifactPluginDescriptor appPluginDescriptor) {
-    return find(this.artifactPluginDescriptors,
-                object -> ((ArtifactPluginDescriptor) object).getName().equals(appPluginDescriptor.getName())) != null;
-  }
-
   private List<ArtifactClassLoader> createPluginClassLoaders(String artifactId, ArtifactClassLoader parent,
-                                                             Set<ArtifactPluginDescriptor> artifactPluginDescriptors) {
+                                                             Set<ArtifactPluginDescriptor> artifactPluginDescriptors,
+                                                             ClassLoaderLookupPolicy appExportedPackagesLookupPolicy) {
     List<ArtifactClassLoader> classLoaders = new LinkedList<>();
 
     for (ArtifactPluginDescriptor artifactPluginDescriptor : artifactPluginDescriptors) {
       artifactPluginDescriptor.setArtifactPluginDescriptors(artifactPluginDescriptors);
 
       final String pluginArtifactId = getArtifactPluginId(artifactId, artifactPluginDescriptor.getName());
+
       final ArtifactClassLoader artifactClassLoader =
-          artifactPluginClassLoaderFactory.create(pluginArtifactId, parent, artifactPluginDescriptor);
+          artifactPluginClassLoaderFactory.create(pluginArtifactId, artifactPluginDescriptor, parent.getClassLoader(),
+                                                  appExportedPackagesLookupPolicy);
       artifactPluginClassLoaders.add(artifactClassLoader);
       classLoaders.add(artifactClassLoader);
     }

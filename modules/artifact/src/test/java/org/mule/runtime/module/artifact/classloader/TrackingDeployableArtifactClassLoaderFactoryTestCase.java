@@ -47,7 +47,7 @@ public class TrackingDeployableArtifactClassLoaderFactoryTestCase extends Abstra
     ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
     classLoader = new MuleArtifactClassLoader(ARTIFACT_NAME, descriptor, new URL[0], getClass().getClassLoader(), lookupPolicy);
 
-    when(lookupPolicy.getLookupStrategy(any())).thenReturn(PARENT_FIRST);
+    when(lookupPolicy.getClassLookupStrategy(any())).thenReturn(PARENT_FIRST);
     when(delegateFactory.create(ARTIFACT_ID, parent, descriptor, artifactPluginClassLoaders)).thenReturn(classLoader);
   }
 

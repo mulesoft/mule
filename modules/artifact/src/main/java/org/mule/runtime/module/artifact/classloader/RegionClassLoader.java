@@ -102,7 +102,16 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
                                                                                           emptyList()),
                                                          filter));
 
-    filter.getExportedClassPackages().forEach(p -> packageMapping.put(p, artifactClassLoader));
+    filter.getExportedClassPackages().forEach(p -> {
+      LookupStrategy packageLookupStrategy = getClassLoaderLookupPolicy().getPackageLookupStrategy(p);
+      if (!(packageLookupStrategy instanceof ChildFirstLookupStrategy)) {
+        throw new IllegalStateException(illegalPackageMappingError(p, packageLookupStrategy));
+      } else if (packageMapping.containsKey(p)) {
+        throw new IllegalStateException(duplicatePackageMappingError(p));
+      } else {
+        packageMapping.put(p, artifactClassLoader);
+      }
+    });
 
     for (String exportedResource : filter.getExportedResources()) {
       List<ArtifactClassLoader> classLoaders = resourceMapping.get(exportedResource);
@@ -114,6 +123,15 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
       classLoaders.add(artifactClassLoader);
     }
+  }
+
+  static String illegalPackageMappingError(String p, LookupStrategy packageLookupStrategy) {
+    return format("Attempt to map package '%s' which was already defined on the region lookup policy with '%s'",
+                  p, packageLookupStrategy.getClass().getName());
+  }
+
+  static String duplicatePackageMappingError(String packageName) {
+    return "Attempt to redefine mapping for package: " + packageName;
   }
 
   private RegisteredClassLoader findRegisteredClassLoader(ArtifactClassLoader artifactClassLoader) {

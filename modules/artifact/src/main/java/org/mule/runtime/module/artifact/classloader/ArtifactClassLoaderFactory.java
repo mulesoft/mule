@@ -17,10 +17,11 @@ public interface ArtifactClassLoaderFactory<T extends ArtifactDescriptor> {
    * Creates a classLoader from a given descriptor
    *
    * @param artifactId artifact unique ID
-   * @param parent parent for the new artifact classloader.
    * @param descriptor descriptor of the artifact owner of the created classloader
+   * @param parent parent for the new artifact classloader.
+   * @param baseLookupPolicy lookup policy from the parent context that wil lbe extended on the created classloader.
    * @return a new classLoader for described artifact
    */
-  ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, T descriptor);
+  ArtifactClassLoader create(String artifactId, T descriptor, ClassLoader parent, ClassLoaderLookupPolicy baseLookupPolicy);
 
 }

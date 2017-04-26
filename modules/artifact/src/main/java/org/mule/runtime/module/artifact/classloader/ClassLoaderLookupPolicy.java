@@ -22,9 +22,18 @@ public interface ClassLoaderLookupPolicy {
    *
    * @param className class to lookup.
    * @return the configured lookup strategy for the class's package or {@link ChildFirstLookupStrategy#CHILD_FIRST} if not
+   *         explicit configuration was defined for the class's package.
+   */
+  LookupStrategy getClassLookupStrategy(String className);
+
+  /**
+   * Returns the lookup strategy to use for a given package.
+   *
+   * @param packageName package to lookup.
+   * @return the configured lookup strategy for the class's package or {@link ChildFirstLookupStrategy#CHILD_FIRST} if not
    *         explicit configuration was defined for the package.
    */
-  LookupStrategy getLookupStrategy(String className);
+  LookupStrategy getPackageLookupStrategy(String packageName);
 
   /**
    * Creates a new instance extending the original poclicy configuration

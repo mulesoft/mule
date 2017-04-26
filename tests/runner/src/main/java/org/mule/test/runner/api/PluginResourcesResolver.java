@@ -79,12 +79,6 @@ public class PluginResourcesResolver {
                                                                                                               new ArrayList<>()));
                                                                       });
 
-      // TODO(pablo.kraan): MULE-12189 - this is an ugly hack to make test pass. It will be fixed soon
-      exportPackages.remove("org.mule.tck.message");
-      exportPackages.remove("org.mule.tck.testmodels.fruit");
-      exportPackages.remove("org.mule.tck.testmodels.fruit.peel");
-      exportPackages.remove("org.mule.tck.testmodels.fruit.seed");
-
       return new PluginUrlClassification(pluginUrlClassification.getName(), pluginUrlClassification.getUrls(),
                                          pluginUrlClassification.getExportClasses(),
                                          pluginUrlClassification.getPluginDependencies(), exportPackages, exportResources);

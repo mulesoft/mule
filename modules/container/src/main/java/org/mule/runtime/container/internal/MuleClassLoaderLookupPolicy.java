@@ -91,9 +91,12 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
   }
 
   @Override
-  public LookupStrategy getLookupStrategy(String className) {
-    final String packageName = getPackageName(className);
+  public LookupStrategy getClassLookupStrategy(String className) {
+    return getPackageLookupStrategy(getPackageName(className));
+  }
 
+  @Override
+  public LookupStrategy getPackageLookupStrategy(String packageName) {
     LookupStrategy lookupStrategy = lookupStrategies.get(packageName);
     if (lookupStrategy == null) {
       synchronized (this) {

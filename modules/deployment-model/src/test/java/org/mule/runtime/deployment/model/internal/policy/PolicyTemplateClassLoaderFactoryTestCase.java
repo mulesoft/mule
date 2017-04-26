@@ -54,7 +54,7 @@ public class PolicyTemplateClassLoaderFactoryTestCase extends AbstractMuleTestCa
 
     parentClassLoader = mock(ArtifactClassLoader.class);
     when(parentClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
-    when(lookupPolicy.getLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
+    when(lookupPolicy.getClassLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
     when(parentClassLoader.getClassLoaderLookupPolicy()).thenReturn(lookupPolicy);
   }
 
@@ -85,7 +85,7 @@ public class PolicyTemplateClassLoaderFactoryTestCase extends AbstractMuleTestCa
       // Expected
     }
 
-    verify(lookupPolicy).getLookupStrategy(className);
+    verify(lookupPolicy).getClassLookupStrategy(className);
   }
 
   @Test

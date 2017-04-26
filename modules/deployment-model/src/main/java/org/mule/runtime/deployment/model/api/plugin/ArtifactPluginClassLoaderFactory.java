@@ -44,14 +44,10 @@ public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFact
     this.moduleRepository = moduleRepository;
   }
 
-  /**
-   * @param artifactId artifact unique ID. Non empty.
-   * @param parent parent for the new artifact classloader.
-   * @param descriptor descriptor of the artifact owner of the created classloader
-   * @return an {@link ArtifactClassLoader} for the given {@link ArtifactPluginDescriptor}
-   */
   @Override
-  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, ArtifactPluginDescriptor descriptor) {
+  public ArtifactClassLoader create(String artifactId, ArtifactPluginDescriptor descriptor,
+                                    ClassLoader parent,
+                                    ClassLoaderLookupPolicy baseLookupPolicy) {
     Map<String, LookupStrategy> pluginsLookupPolicies = new HashMap<>();
     for (ArtifactPluginDescriptor dependencyPluginDescriptor : descriptor.getArtifactPluginDescriptors()) {
       if (dependencyPluginDescriptor.getName().equals(descriptor.getName())) {
@@ -75,10 +71,9 @@ public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFact
       }
     }
 
-    final ClassLoaderLookupPolicy lookupPolicy = parent.getClassLoaderLookupPolicy().extend(pluginsLookupPolicies);
+    final ClassLoaderLookupPolicy lookupPolicy = baseLookupPolicy.extend(pluginsLookupPolicies);
 
-    return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderModel().getUrls(),
-                                       parent.getClassLoader(), lookupPolicy);
+    return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderModel().getUrls(), parent, lookupPolicy);
   }
 
   private LookupStrategy getClassLoaderLookupStrategy(ArtifactPluginDescriptor descriptor,

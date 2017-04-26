@@ -59,7 +59,7 @@ public class PluginLookPolicyFactoryTestCase extends AbstractMuleTestCase {
 
     ClassLoaderLookupPolicy pluginPolicy =
         factory.createLookupPolicy(barPluginClassification, pluginClassifications, parentLookupPolicies);
-    assertThat(pluginPolicy.getLookupStrategy(FOO_PACKAGE), sameInstance(PARENT_FIRST));
+    assertThat(pluginPolicy.getClassLookupStrategy(FOO_PACKAGE), sameInstance(PARENT_FIRST));
   }
 
   @Test
@@ -71,7 +71,7 @@ public class PluginLookPolicyFactoryTestCase extends AbstractMuleTestCase {
 
     ClassLoaderLookupPolicy pluginPolicy =
         factory.createLookupPolicy(barPluginClassification, pluginClassifications, parentLookupPolicies);
-    assertThat(pluginPolicy.getLookupStrategy(FOO_PACKAGE), is(nullValue()));
+    assertThat(pluginPolicy.getClassLookupStrategy(FOO_PACKAGE), is(nullValue()));
   }
 
   private ClassLoaderLookupPolicy getParentClassLoaderLookupPolicy() {
@@ -86,8 +86,13 @@ public class PluginLookPolicyFactoryTestCase extends AbstractMuleTestCase {
     return new ClassLoaderLookupPolicy() {
 
       @Override
-      public LookupStrategy getLookupStrategy(String className) {
+      public LookupStrategy getClassLookupStrategy(String className) {
         return delegate.get(className);
+      }
+
+      @Override
+      public LookupStrategy getPackageLookupStrategy(String packageName) {
+        return null;
       }
 
       @Override

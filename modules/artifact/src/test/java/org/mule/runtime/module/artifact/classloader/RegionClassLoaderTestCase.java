@@ -26,6 +26,8 @@ import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStra
 import static org.mule.runtime.module.artifact.classloader.RegionClassLoader.REGION_OWNER_CANNOT_BE_REMOVED_ERROR;
 import static org.mule.runtime.module.artifact.classloader.RegionClassLoader.createCannotRemoveClassLoaderError;
 import static org.mule.runtime.module.artifact.classloader.RegionClassLoader.createClassLoaderAlreadyInRegionError;
+import static org.mule.runtime.module.artifact.classloader.RegionClassLoader.duplicatePackageMappingError;
+import static org.mule.runtime.module.artifact.classloader.RegionClassLoader.illegalPackageMappingError;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -82,7 +84,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
     classLoaders.forEach(classLoader -> regionClassLoader.addClassLoader(classLoader, NULL_CLASSLOADER_FILTER));
 
-    when(lookupPolicy.getLookupStrategy(Object.class.getName())).thenReturn(CHILD_FIRST);
+    when(lookupPolicy.getClassLookupStrategy(Object.class.getName())).thenReturn(CHILD_FIRST);
     regionClassLoader.loadClass(CLASS_NAME);
   }
 
@@ -96,7 +98,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     List<ArtifactClassLoader> classLoaders = getClassLoaders(appClassLoader, pluginClassLoader);
 
     classLoaders.forEach(classLoader -> regionClassLoader.addClassLoader(classLoader, NULL_CLASSLOADER_FILTER));
-    when(lookupPolicy.getLookupStrategy(Object.class.getName())).thenReturn(CHILD_FIRST);
+    when(lookupPolicy.getClassLookupStrategy(Object.class.getName())).thenReturn(CHILD_FIRST);
     final Class loadedClass = regionClassLoader.loadClass(CLASS_NAME);
     assertThat(loadedClass, equalTo(PARENT_LOADED_CLASS));
   }
@@ -106,13 +108,15 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     when(parentClassLoader.loadClass(CLASS_NAME)).thenReturn(PARENT_LOADED_CLASS);
 
+    when(lookupPolicy.getClassLookupStrategy(Object.class.getName())).thenReturn(CHILD_FIRST);
+    when(lookupPolicy.getPackageLookupStrategy(PACKAGE_NAME)).thenReturn(CHILD_FIRST);
+
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
 
     regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
     regionClassLoader.addClassLoader(pluginClassLoader,
                                      new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), emptySet()));
     pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
-    when(lookupPolicy.getLookupStrategy(Object.class.getName())).thenReturn(CHILD_FIRST);
     final Class loadedClass = regionClassLoader.loadClass(CLASS_NAME);
     assertThat(loadedClass, equalTo(PLUGIN_LOADED_CLASS));
   }
@@ -191,7 +195,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void disposesClassLoaders() throws Exception {
-    when(lookupPolicy.getLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
+    when(lookupPolicy.getClassLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
 
     RegionClassLoader regionClassLoader =
         new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, getClass().getClassLoader(), lookupPolicy);
@@ -210,7 +214,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void disposesClassLoadersEvenOnExceptions() throws Exception {
-    when(lookupPolicy.getLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
+    when(lookupPolicy.getClassLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
 
     RegionClassLoader regionClassLoader =
         new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, getClass().getClassLoader(), lookupPolicy);
@@ -240,6 +244,32 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(createClassLoaderAlreadyInRegionError(appClassLoader.getArtifactId()));
     regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
+  }
+
+  @Test
+  public void failsToAddClassLoaderThatOverridesPackageMapping() throws Exception {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    when(lookupPolicy.getPackageLookupStrategy(anyString())).thenReturn(CHILD_FIRST);
+
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+
+    regionClassLoader.addClassLoader(appClassLoader, new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), emptySet()));
+    expectedException.expect(IllegalStateException.class);
+    expectedException.expectMessage(duplicatePackageMappingError(PACKAGE_NAME));
+    regionClassLoader.addClassLoader(pluginClassLoader,
+                                     new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), emptySet()));
+  }
+
+  @Test
+  public void failsToAddClassLoaderThatOverridesLookupPolicy() throws Exception {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    when(lookupPolicy.getPackageLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
+
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+
+    expectedException.expect(IllegalStateException.class);
+    expectedException.expectMessage(illegalPackageMappingError(PACKAGE_NAME, PARENT_FIRST));
+    regionClassLoader.addClassLoader(appClassLoader, new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), emptySet()));
   }
 
   @Test
@@ -283,6 +313,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   public void failsToRemoveRegionMemberIfExportsPackages() throws Exception {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
     when(parentClassLoader.getResource(RESOURCE_NAME)).thenReturn(PARENT_LOADED_RESOURCE);
+    when(lookupPolicy.getPackageLookupStrategy(anyString())).thenReturn(CHILD_FIRST);
 
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
     regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);

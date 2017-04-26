@@ -42,7 +42,7 @@ public class ToolingPluginArtifactClassLoaderTestCase extends AbstractMuleTestCa
   public void createAppClassLoader() {
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = mock(ClassLoaderLookupPolicy.class);
     // Mandatory to find a resource releaser instance when doing the dispose of a RegionClassLoader
-    when(classLoaderLookupPolicy.getLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
+    when(classLoaderLookupPolicy.getClassLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
 
     regionClassLoader =
         new RegionClassLoader(TEST_REGION, new ArtifactDescriptor(REGION_NAME), getClass().getClassLoader(),

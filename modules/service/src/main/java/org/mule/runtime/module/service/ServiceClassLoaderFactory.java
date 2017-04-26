@@ -9,6 +9,7 @@ package org.mule.runtime.module.service;
 
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 
 import java.io.File;
@@ -33,7 +34,8 @@ public class ServiceClassLoaderFactory implements ArtifactClassLoaderFactory<Ser
    * @inherited
    */
   @Override
-  public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, ServiceDescriptor descriptor) {
+  public ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor, ClassLoader parent,
+                                    ClassLoaderLookupPolicy baseLookupPolicy) {
     File rootFolder = descriptor.getRootFolder();
     if (rootFolder == null || !rootFolder.exists()) {
       throw new IllegalArgumentException("Service folder does not exists: " + (rootFolder != null ? rootFolder.getName() : null));
@@ -41,8 +43,7 @@ public class ServiceClassLoaderFactory implements ArtifactClassLoaderFactory<Ser
 
     List<URL> urls = getServiceUrls(rootFolder);
 
-    return new MuleArtifactClassLoader(artifactId, descriptor, urls.toArray(new URL[0]), parent.getClassLoader(),
-                                       parent.getClassLoaderLookupPolicy());
+    return new MuleArtifactClassLoader(artifactId, descriptor, urls.toArray(new URL[0]), parent, baseLookupPolicy);
   }
 
   private List<URL> getServiceUrls(File rootFolder) {

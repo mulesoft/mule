@@ -58,13 +58,13 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
         new MuleClassLoaderLookupPolicy(singletonMap(JAVA_PACKAGE, CHILD_FIRST),
                                         emptySet());
 
-    LookupStrategy lookupStrategy = lookupPolicy.getLookupStrategy(Object.class.getName());
+    LookupStrategy lookupStrategy = lookupPolicy.getClassLookupStrategy(Object.class.getName());
     assertThat(lookupStrategy, sameInstance(CHILD_FIRST));
 
     lookupPolicy =
         new MuleClassLoaderLookupPolicy(singletonMap(JAVA_PACKAGE_PREFIX, CHILD_FIRST), emptySet());
 
-    lookupStrategy = lookupPolicy.getLookupStrategy(Object.class.getName());
+    lookupStrategy = lookupPolicy.getClassLookupStrategy(Object.class.getName());
     assertThat(lookupStrategy, sameInstance(CHILD_FIRST));
   }
 
@@ -72,17 +72,17 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
   public void usesParentOnlyForSystemPackage() throws Exception {
     ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton(SYSTEM_PACKAGE));
 
-    assertThat(lookupPolicy.getLookupStrategy(Object.class.getName()), sameInstance(PARENT_ONLY));
+    assertThat(lookupPolicy.getClassLookupStrategy(Object.class.getName()), sameInstance(PARENT_ONLY));
 
     lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), singleton(JAVA_PACKAGE));
-    assertThat(lookupPolicy.getLookupStrategy(Object.class.getName()), sameInstance(PARENT_ONLY));
+    assertThat(lookupPolicy.getClassLookupStrategy(Object.class.getName()), sameInstance(PARENT_ONLY));
   }
 
   @Test
   public void usesChildFirstForNoConfiguredPackage() throws Exception {
     ClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), emptySet());
 
-    assertThat(lookupPolicy.getLookupStrategy(FOO_CLASS), sameInstance(CHILD_FIRST));
+    assertThat(lookupPolicy.getClassLookupStrategy(FOO_CLASS), sameInstance(CHILD_FIRST));
   }
 
   @Test
@@ -92,7 +92,7 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
     final ClassLoaderLookupPolicy extendedPolicy =
         lookupPolicy.extend(singletonMap(FOO_PACKAGE, PARENT_FIRST));
 
-    assertThat(extendedPolicy.getLookupStrategy(FOO_CLASS), sameInstance(PARENT_FIRST));
+    assertThat(extendedPolicy.getClassLookupStrategy(FOO_CLASS), sameInstance(PARENT_FIRST));
   }
 
   @Test
@@ -105,8 +105,8 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
     final ClassLoaderLookupPolicy extendedPolicy =
         lookupPolicy.extend(singletonMap(FOO_PACKAGE, PARENT_FIRST));
 
-    assertThat(extendedPolicy.getLookupStrategy(FOO_CLASS), instanceOf(ContainerOnlyLookupStrategy.class));
-    assertThat(extendedPolicy.getLookupStrategy(FOO_CLASS).getClassLoaders(getClass().getClassLoader()),
+    assertThat(extendedPolicy.getClassLookupStrategy(FOO_CLASS), instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(extendedPolicy.getClassLookupStrategy(FOO_CLASS).getClassLoaders(getClass().getClassLoader()),
                contains(getClass().getClassLoader()));
   }
 
@@ -120,8 +120,8 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
     final ClassLoaderLookupPolicy extendedPolicy =
         lookupPolicy.extend(singletonMap(FOO_PACKAGE_PREFIX, PARENT_FIRST));
 
-    assertThat(extendedPolicy.getLookupStrategy(FOO_CLASS), instanceOf(ContainerOnlyLookupStrategy.class));
-    assertThat(extendedPolicy.getLookupStrategy(FOO_CLASS).getClassLoaders(getClass().getClassLoader()),
+    assertThat(extendedPolicy.getClassLookupStrategy(FOO_CLASS), instanceOf(ContainerOnlyLookupStrategy.class));
+    assertThat(extendedPolicy.getClassLookupStrategy(FOO_CLASS).getClassLoaders(getClass().getClassLoader()),
                contains(getClass().getClassLoader()));
   }
 
