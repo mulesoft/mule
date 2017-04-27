@@ -37,8 +37,8 @@ public class SoapFaultTestCase extends AbstractSoapServiceTestCase {
   private static final String FAIL_FLOW = "failOperation";
 
   // TODO MULE-12038
-  private static final String SOAP_FAULT = "Soap Fault";
-  private static final String BAD_REQUEST = "Bad Request";
+  private static final String SOAP_FAULT = "SOAP_FAULT";
+  private static final String BAD_REQUEST = "BAD_REQUEST";
 
   @Override
   protected String getConfigurationFile() {

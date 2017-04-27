@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.services.soap.api.client.metadata;
+package org.mule.services.soap.internal.metadata;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
@@ -12,6 +12,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.util.Reference;
+import org.mule.services.soap.api.client.metadata.SoapOperationMetadata;
 
 /**
  * Helper class that builds the output types retrieved by Soap Connect extensions and WSC.

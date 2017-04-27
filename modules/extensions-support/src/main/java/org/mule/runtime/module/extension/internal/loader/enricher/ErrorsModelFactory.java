@@ -12,15 +12,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.ANY;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.CONNECTIVITY;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.RETRY_EXHAUSTED;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.Graph;
-import org.jgrapht.alg.CycleDetector;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultDirectedWeightedGraph;
-import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
@@ -32,6 +23,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultDirectedWeightedGraph;
+import org.jgrapht.traverse.TopologicalOrderIterator;
+
 /**
  * Extension's {@link ErrorModel} factory.
  * Given an {@link Enum} implementing {@link ErrorTypeDefinition} and the namespace of the extension validates
@@ -39,7 +39,7 @@ import java.util.stream.Stream;
  *
  * @since 4.0
  */
-class ErrorsModelFactory {
+public class ErrorsModelFactory {
 
   private static final String MULE = CORE_PREFIX.toUpperCase();
   private final String extensionNamespace;
@@ -51,7 +51,7 @@ class ErrorsModelFactory {
    * @param errorTypesEnum     an {@link ErrorTypeDefinition} implementation indicating all the errors from an extension
    * @param extensionNamespace the namespace for the {@link ErrorModel} to be generated
    */
-  ErrorsModelFactory(ErrorTypeDefinition<?>[] errorTypesEnum, String extensionNamespace)
+  public ErrorsModelFactory(ErrorTypeDefinition<?>[] errorTypesEnum, String extensionNamespace)
       throws IllegalModelDefinitionException {
     this.extensionNamespace = extensionNamespace.toUpperCase();
     final DirectedGraph<ErrorTypeDefinition, Pair<ErrorTypeDefinition, ErrorTypeDefinition>> graph = toGraph(errorTypesEnum);
@@ -69,7 +69,7 @@ class ErrorsModelFactory {
   /**
    * @return A {@link Set} of converted {@link ErrorModel}s generated from the given {@link ErrorTypeDefinition} array
    */
-  Set<ErrorModel> getErrorModels() {
+  public Set<ErrorModel> getErrorModels() {
     return errorModelMap.values().stream().collect(toSet());
   }
 

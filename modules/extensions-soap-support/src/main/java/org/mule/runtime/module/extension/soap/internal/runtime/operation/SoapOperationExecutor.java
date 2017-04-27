@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.extension.soap.internal.runtime.operation;
 
-import static org.mule.runtime.module.extension.soap.internal.loader.InvokeOperationDeclarer.ATTACHMENTS_PARAM;
-import static org.mule.runtime.module.extension.soap.internal.loader.InvokeOperationDeclarer.HEADERS_PARAM;
-import static org.mule.runtime.module.extension.soap.internal.loader.InvokeOperationDeclarer.OPERATION_PARAM;
-import static org.mule.runtime.module.extension.soap.internal.loader.InvokeOperationDeclarer.REQUEST_PARAM;
-import static org.mule.runtime.module.extension.soap.internal.loader.InvokeOperationDeclarer.SERVICE_PARAM;
-import static org.mule.runtime.module.extension.soap.internal.loader.InvokeOperationDeclarer.TRANSPORT_HEADERS_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.ATTACHMENTS_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.HEADERS_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.OPERATION_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.REQUEST_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.SERVICE_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_HEADERS_PARAM;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.justOrEmpty;
 import org.mule.runtime.api.el.BindingContext;
@@ -29,6 +29,7 @@ import org.mule.services.soap.api.client.SoapClient;
 import org.mule.services.soap.api.message.SoapRequest;
 import org.mule.services.soap.api.message.SoapRequestBuilder;
 import org.mule.services.soap.api.message.SoapResponse;
+import org.mule.services.soap.internal.exception.error.SoapExceptionEnricher;
 
 import java.io.InputStream;
 import java.util.Map;
@@ -49,6 +50,7 @@ public final class SoapOperationExecutor implements OperationExecutor {
   private MuleExpressionLanguage expressionExecutor;
 
   private final ConnectionArgumentResolver connectionResolver = new ConnectionArgumentResolver();
+  private final SoapExceptionEnricher soapExceptionEnricher = new SoapExceptionEnricher();
 
   /**
    * {@inheritDoc}
@@ -61,7 +63,7 @@ public final class SoapOperationExecutor implements OperationExecutor {
       SoapResponse response = connection.getSoapClient(serviceId).consume(getRequest(executionContext));
       return justOrEmpty(response.getAsResult());
     } catch (Exception e) {
-      return error(e);
+      return error(soapExceptionEnricher.enrich(e));
     }
   }
 

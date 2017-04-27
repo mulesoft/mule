@@ -38,11 +38,11 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class ServiceProviderDeclarer {
+public class SoapServiceProviderDeclarer {
 
   private final ParameterModelsLoaderDelegate parametersLoader;
 
-  ServiceProviderDeclarer(ClassTypeLoader loader) {
+  SoapServiceProviderDeclarer(ClassTypeLoader loader) {
     parametersLoader = new ParameterModelsLoaderDelegate(getContributors(loader), loader);
   }
 
