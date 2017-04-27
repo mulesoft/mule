@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="executeScript">
-        <db:execute-script>
+        <db:execute-script config-ref="dbConfig">
             <db:sql>
                 update PLANET set NAME='Mercury' where POSITION=0;
                 update PLANET set NAME='Mercury' where POSITION=4
@@ -15,7 +15,7 @@
     </flow>
 
     <flow name="executeScriptFromFile">
-        <db:execute-script file="integration/executescript/bulk-script.sql" />
+        <db:execute-script config-ref="dbConfig" file="integration/executescript/bulk-script.sql" />
     </flow>
 
 </mule>

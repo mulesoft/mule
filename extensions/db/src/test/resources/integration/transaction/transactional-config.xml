@@ -18,7 +18,7 @@
 
     <flow name="commitAnOptionalTxUpdateIsANonTxBlock">
         <try transactionalAction="INDIFFERENT">
-            <db:update transactionalAction="JOIN_IF_POSSIBLE">
+            <db:update config-ref="dbConfig" transactionalAction="JOIN_IF_POSSIBLE">
                 <db:sql>
                     update PLANET set NAME='Mercury' where POSITION=4
                 </db:sql>
@@ -29,7 +29,7 @@
 
     <flow name="commitNonTxUpdateInATxBlock">
         <try transactionalAction="BEGIN_OR_JOIN">
-            <db:update transactionalAction="NOT_SUPPORTED">
+            <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
                 <db:sql>
                     update PLANET set NAME='Mercury' where POSITION=4
                 </db:sql>
@@ -52,7 +52,7 @@
 
     <flow name="rollbackOptionalTxUpdateInATxBlock">
         <try transactionalAction="ALWAYS_BEGIN">
-            <db:update transactionalAction="JOIN_IF_POSSIBLE">
+            <db:update config-ref="dbConfig" transactionalAction="JOIN_IF_POSSIBLE">
                 <db:sql>
                     update PLANET set NAME='Mercury' where POSITION=4
                 </db:sql>

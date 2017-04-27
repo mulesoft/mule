@@ -7,21 +7,21 @@
 
     <flow name="updatesStringArray">
         <try transactionalAction="ALWAYS_BEGIN">
-            <db:select>
+            <db:select config-ref="dbConfig">
                 <db:sql>select ZIPS from REGIONS where REGION_NAME='Northwest'</db:sql>
             </db:select>
 
             <!-- Sets the SQL array as payload-->
             <set-payload value="#[payload[0]['ZIPS']]"/>
 
-            <db:update>
+            <db:update config-ref="dbConfig">
                 <db:sql>update REGIONS set ZIPS = :zip where REGION_NAME = 'Southwest'</db:sql>
                 <db:input-parameters>
                     #[{'zip' : payload}]
                 </db:input-parameters>
             </db:update>
 
-            <db:select>
+            <db:select config-ref="dbConfig">
                 <db:sql>select ZIPs from REGIONS where REGION_NAME = 'Southwest'</db:sql>
             </db:select>
 
@@ -32,21 +32,21 @@
 
     <flow name="updatesStructArray">
         <try transactionalAction="ALWAYS_BEGIN">
-            <db:select>
+            <db:select config-ref="dbConfig">
                 <db:sql>select DETAILS from CONTACTS where CONTACT_NAME='Contact2'</db:sql>
             </db:select>
 
             <!-- Sets the SQL array as payload-->
             <set-payload value="#[payload[0]['DETAILS']]"/>
 
-            <db:update>
+            <db:update config-ref="dbConfig">
                 <db:sql>update contacts set DETAILS = :detail where CONTACT_NAME = 'Contact1'</db:sql>
                 <db:input-parameters>
                     #[{'detail' : payload}]
                 </db:input-parameters>
             </db:update>
 
-            <db:select>
+            <db:select config-ref="dbConfig">
                 <db:sql>select DETAILS from CONTACTS where CONTACT_NAME='Contact1'</db:sql>
             </db:select>
 

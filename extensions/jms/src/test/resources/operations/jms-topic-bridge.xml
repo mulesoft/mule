@@ -17,12 +17,12 @@
     </flow>
 
     <flow name="listener">
-        <jms:listener destination="${initialDestination}" ackMode="AUTO" numberOfConsumers="1">
+        <jms:listener config-ref="config" destination="${initialDestination}" ackMode="AUTO" numberOfConsumers="1">
             <jms:consumer-type>
                 <jms:topic-consumer />
             </jms:consumer-type>
         </jms:listener>
-        <jms:publish destination="${finalDestination}" destinationType="TOPIC">
+        <jms:publish config-ref="config" destination="${finalDestination}" destinationType="TOPIC">
             <jms:message-builder jmsxProperties="#[attributes.properties.jmsxProperties]">
                 <jms:body>#["bridged_" ++ payload]</jms:body>
                 <jms:properties>#[attributes.properties.userProperties ++ {'MULE_JMS_BRIDGED': true}]</jms:properties>
@@ -31,7 +31,7 @@
     </flow>
 
     <flow name="final-listener">
-        <jms:listener destination="${finalDestination}" ackMode="AUTO" numberOfConsumers="1">
+        <jms:listener config-ref="config" destination="${finalDestination}" ackMode="AUTO" numberOfConsumers="1">
             <jms:consumer-type>
                 <jms:topic-consumer />
             </jms:consumer-type>

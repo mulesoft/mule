@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="inOutParameter">
-        <db:stored-procedure>
+        <db:stored-procedure config-ref="dbConfig">
             <db:sql>{ call doubleMyInt(:myInt) }</db:sql>
             <db:in-out-parameters>
                 <db:in-out-parameter key="myInt" value="3"/>
@@ -15,7 +15,7 @@
     </flow>
 
     <flow name="outParam">
-        <db:stored-procedure>
+        <db:stored-procedure config-ref="dbConfig">
             <db:sql>{ CALL countTestRecords(:count) }</db:sql>
             <db:output-parameters>
                 <db:output-parameter key="count"/>
@@ -24,7 +24,7 @@
     </flow>
 
     <flow name="multiplyInts">
-        <db:stored-procedure>
+        <db:stored-procedure config-ref="dbConfig">
             <db:sql>{ call multiplyInts(:int1, :int2, :result1, :int3, :result2) }</db:sql>
             <db:input-parameters>
                 #[{

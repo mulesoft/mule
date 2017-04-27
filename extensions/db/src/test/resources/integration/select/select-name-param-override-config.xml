@@ -21,11 +21,11 @@
     </db:query>
 
     <flow name="overriddenParamsByName">
-        <db:select template="overridenQueryParamByName"/>
+        <db:select config-ref="dbConfig" template="overridenQueryParamByName"/>
     </flow>
 
     <flow name="inlineOverriddenParamsByName">
-        <db:select template="namedParamsQueryTemplate">
+        <db:select config-ref="dbConfig" template="namedParamsQueryTemplate">
             <db:input-parameters>
                 <!-- Note that parameters are in different order-->
                 #[{'name' : 'Venus', 'position' : 2}]

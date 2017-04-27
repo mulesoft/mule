@@ -12,6 +12,6 @@
             <fixed-frequency-scheduler frequency="1000"/>
         </scheduler>
         <set-payload value=""/>
-        <hello:print-message/>
+        <hello:print-message config-ref="default" />
     </flow>
 </mule>

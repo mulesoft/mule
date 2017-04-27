@@ -105,11 +105,11 @@
     </flow>
 
     <flow name="configRetriever">
-        <subtypes:config-retriever/>
+        <subtypes:config-retriever config-ref="config"/>
     </flow>
 
     <flow name="connectionRetriever">
-        <subtypes:connection-retriever/>
+        <subtypes:connection-retriever config-ref="config"/>
     </flow>
 
     <flow name="subtypedAndConcreteParameters">

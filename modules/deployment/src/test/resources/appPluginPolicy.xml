@@ -11,7 +11,7 @@
 
     <test-policy:proxy>
         <test-policy:operation>
-            <hello:print-message/>
+            <hello:print-message config-ref="default"/>
 
             <component class="org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase$TestPolicyComponent" />
 

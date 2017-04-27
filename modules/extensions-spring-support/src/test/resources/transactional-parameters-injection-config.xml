@@ -14,21 +14,21 @@
     </tx:config>
 
     <flow name="alwaysBeginTxAction" initialState="stopped">
-        <tx:transactional-source-with-t-x-parameters transactionalAction="ALWAYS_BEGIN"/>
+        <tx:transactional-source-with-t-x-parameters config-ref="localTx1" transactionalAction="ALWAYS_BEGIN"/>
         <logger />
     </flow>
 
     <flow name="defaultTxAction" initialState="stopped">
-        <tx:transactional-source-with-t-x-parameters/>
+        <tx:transactional-source-with-t-x-parameters config-ref="localTx1"/>
         <logger />
     </flow>
 
     <flow name="injectInOperationJoinNotSupported">
-        <tx:inject-transactional-action action="NOT_SUPPORTED"/>
+        <tx:inject-transactional-action config-ref="localTx1" action="NOT_SUPPORTED"/>
     </flow>
 
     <flow name="injectInOperationDefaultValue">
-        <tx:inject-transactional-action/>
+        <tx:inject-transactional-action config-ref="localTx1"/>
     </flow>
 
 </mule>

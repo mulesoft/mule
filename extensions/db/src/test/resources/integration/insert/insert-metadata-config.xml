@@ -6,13 +6,13 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="insertMetadata">
-        <db:insert>
+        <db:insert config-ref="dbConfig">
             <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (777, 'Mercury')</db:sql>
         </db:insert>
     </flow>
 
     <flow name="bulkInsertMetadata">
-        <db:bulk-insert>
+        <db:bulk-insert config-ref="dbConfig">
             <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (777, :name)</db:sql>
         </db:bulk-insert>
     </flow>

@@ -12,19 +12,19 @@
     </spring:beans>
 
     <flow name="write">
-        <ftp:write path="#[path]" mode="#[mode]" createParentDirectories="#[createParent]" encoding="#[encoding]" />
+        <ftp:write config-ref="config" path="#[path]" mode="#[mode]" createParentDirectories="#[createParent]" encoding="#[encoding]" />
     </flow>
 
     <flow name="writeStaticContent">
-        <ftp:write path="#[path]" mode="#[mode]" createParentDirectories="#[createParent]">
+        <ftp:write config-ref="config" path="#[path]" mode="#[mode]" createParentDirectories="#[createParent]">
             <ftp:content>Hello World!</ftp:content>
         </ftp:write>
     </flow>
 
     <flow name="readAndWrite">
-        <ftp:read path="#[path]" />
+        <ftp:read config-ref="config" path="#[path]" />
         <set-payload value="Hello World!" />
-        <ftp:write path="#[path]" mode="OVERWRITE"/>
+        <ftp:write config-ref="config" path="#[path]" mode="OVERWRITE"/>
     </flow>
 
 </mule>

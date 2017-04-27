@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static java.lang.String.format;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.canBeUsedImplicitly;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
 import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -57,7 +57,7 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
           + "' and none can be created automatically. Please define one");
     }
 
-    final String providerName = format("%s-%s", extensionModel.getName(), implicitConfigurationModel.getName());
+    final String providerName = getImplicitConfigurationProviderName(extensionModel, implicitConfigurationModel);
     final ResolverSet resolverSet =
         buildImplicitResolverSet(implicitConfigurationModel, muleContext);
     try {
@@ -71,13 +71,13 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
 
       if (resolverSet.isDynamic() || needsDynamicConnectionProvider(extensionModel, implicitConfigurationModel,
                                                                     implicitConnectionProviderValueResolver)) {
-        return new DynamicConfigurationProvider(implicitConfigurationModel.getName(), extensionModel, implicitConfigurationModel,
+        return new DynamicConfigurationProvider(providerName, extensionModel, implicitConfigurationModel,
                                                 resolverSet,
                                                 implicitConnectionProviderValueResolver,
                                                 ImmutableExpirationPolicy.getDefault(new TimeSupplier()), muleContext);
       }
 
-      return new ConfigurationProviderMetadataAdapter(implicitConfigurationModel.getName(), extensionModel,
+      return new ConfigurationProviderMetadataAdapter(providerName, extensionModel,
                                                       implicitConfigurationModel, configurationInstance, muleContext);
 
     } catch (MuleException e) {

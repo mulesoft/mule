@@ -7,21 +7,21 @@
 
     <flow name="updatesWithStruct">
         <try transactionalAction="ALWAYS_BEGIN">
-            <db:select>
+            <db:select config-ref="dbConfig">
                 <db:sql>select DETAILS from REGION_MANAGERS where REGION_NAME='Southwest'</db:sql>
             </db:select>
 
             <!-- Sets the UDT as payload-->
             <set-payload value="#[payload[0]['DETAILS']]"/>
 
-            <db:update>
+            <db:update config-ref="dbConfig">
                 <db:sql>update REGION_MANAGERS set DETAILS = :details where REGION_NAME = 'Northwest'</db:sql>
                 <db:input-parameters>
                     #[{'details' : payload}]
                 </db:input-parameters>
             </db:update>
 
-            <db:select>
+            <db:select config-ref="dbConfig">
                 <db:sql>select DETAILS from REGION_MANAGERS where REGION_NAME = 'Northwest'</db:sql>
             </db:select>
 
@@ -32,7 +32,7 @@
 
     <flow name="updatesWithObject">
         <try transactionalAction="ALWAYS_BEGIN">
-            <db:update>
+            <db:update config-ref="dbConfig">
                 <db:sql>update REGION_MANAGERS set DETAILS = :details where REGION_NAME = 'Northwest'</db:sql>
                 <db:parameter-types>
                     <db:parameter-type key="details" customType="CONTACT_DETAILS"/>
@@ -42,7 +42,7 @@
                 </db:input-parameters>
             </db:update>
 
-            <db:select>
+            <db:select config-ref="dbConfig">
                 <db:sql>select DETAILS from REGION_MANAGERS where REGION_NAME = 'Northwest'</db:sql>
             </db:select>
 

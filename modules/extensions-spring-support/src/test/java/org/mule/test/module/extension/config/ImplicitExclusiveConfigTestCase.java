@@ -29,7 +29,7 @@ public class ImplicitExclusiveConfigTestCase extends AbstractExtensionFunctional
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return asList(new Object[][] {{"implicit-exclusive-config.xml", 10}, {"multiple-implicit-exclusive-config.xml", 5},
-        {"implicit-exclusive-config-with-declared-configs.xml", 10}});
+        {"implicit-exclusive-config-with-declared-configs.xml", 5}});
   }
 
   @Override

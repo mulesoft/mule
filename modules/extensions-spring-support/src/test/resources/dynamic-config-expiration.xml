@@ -40,7 +40,7 @@
     </heisenberg:config>
 
     <flow name="dynamic">
-        <heisenberg:say-my-name />
+        <heisenberg:say-my-name config-ref="heisenberg"/>
     </flow>
 
 </mule>

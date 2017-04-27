@@ -13,7 +13,7 @@
     </flow>
 
     <flow name="publishConsumer">
-        <jms:publish-consume destination="${destination}">
+        <jms:publish-consume config-ref="config" destination="${destination}">
             <jms:message-builder >
                 <jms:reply-to destination="${destination}" destinationType="QUEUE"/>
             </jms:message-builder>
@@ -21,7 +21,7 @@
     </flow>
 
     <flow name="publishConsumer-with-override">
-        <jms:publish-consume destination="${destination}" contentType="text/json" encoding="US-ASCII">
+        <jms:publish-consume config-ref="config" destination="${destination}" contentType="text/json" encoding="US-ASCII">
             <jms:message-builder >
                 <jms:reply-to destination="${destination}" destinationType="QUEUE"/>
             </jms:message-builder>
@@ -29,7 +29,7 @@
     </flow>
 
     <flow name="consumer">
-        <jms:consume destination="${destination}"/>
+        <jms:consume config-ref="config" destination="${destination}"/>
     </flow>
 
     <flow name="listener" initialState="stopped">
@@ -39,7 +39,7 @@
     </flow>
 
     <flow name="consumer-with-override">
-        <jms:consume destination="${destination}" contentType="text/json" encoding="US-ASCII"/>
+        <jms:consume config-ref="config" destination="${destination}" contentType="text/json" encoding="US-ASCII"/>
     </flow>
 
     <flow name="listener-with-override" initialState="stopped">

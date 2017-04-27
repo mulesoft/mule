@@ -7,7 +7,7 @@
 
     <flow name="returnsDefaultArrayValue">
         <try transactionalAction="ALWAYS_BEGIN">
-            <db:stored-procedure>
+            <db:stored-procedure config-ref="dbConfig">
                 <db:sql>{ CALL getZipCodes('Southwest', :out) }</db:sql>
                 <db:output-parameters>
                     <db:output-parameter key="out" customType="ZIPARRAY"/>
@@ -21,7 +21,7 @@
 
     <flow name="returnsCustomArrayValue">
         <try transactionalAction="ALWAYS_BEGIN">
-            <db:stored-procedure>
+            <db:stored-procedure config-ref="dbConfig">
                 <db:sql>{ CALL getContactDetails('Contact1', :out) }</db:sql>
                 <db:output-parameters>
                     <db:output-parameter key="out" customType="CONTACT_DETAILS_ARRAY"/>

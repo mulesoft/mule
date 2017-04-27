@@ -14,11 +14,11 @@
     <flow name="read">
         <choice>
             <when expression="#[streaming]">
-                <ftp:read path="#[path]"/>
+                <ftp:read config-ref="config" path="#[path]"/>
                 <object-to-string-transformer />
             </when>
             <otherwise>
-                <ftp:read path="#[path]">
+                <ftp:read config-ref="config" path="#[path]">
                     <non-repeatable-stream />
                 </ftp:read>
             </otherwise>
@@ -26,13 +26,13 @@
     </flow>
 
     <flow name="readWithLock" processingStrategy="synchronous">
-        <ftp:read path="files/hello.json" lock="true">
+        <ftp:read config-ref="config" path="files/hello.json" lock="true">
             <non-repeatable-stream />
         </ftp:read>
     </flow>
 
     <flow name="readWithForcedMimeType">
-        <ftp:read path="#[path]" outputMimeType="test/test"/>
+        <ftp:read config-ref="config" path="#[path]" outputMimeType="test/test"/>
         <object-to-string-transformer />
     </flow>
 

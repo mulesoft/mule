@@ -29,6 +29,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
@@ -263,19 +264,12 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void getConfigurationThroughDefaultConfig() throws Exception {
-    registerConfigurationProvider();
-
-    Optional<ConfigurationInstance> configInstance =
-        extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event);
-    assertThat(configInstance.isPresent(), is(true));
-    assertThat(configInstance.get().getValue(), is(sameInstance(this.configInstance)));
-  }
-
-  @Test
   public void getConfigurationThroughImplicitConfiguration() throws Exception {
+    when(muleContext.getRegistry().get(getImplicitConfigurationProviderName(extensionModel1, extension1ConfigurationModel)))
+        .thenReturn(extension1ConfigurationProvider);
     when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     registerConfigurationProvider();
+
     Optional<ConfigurationInstance> configInstance =
         extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event);
     assertThat(configInstance.isPresent(), is(true));
@@ -286,14 +280,13 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   public void getOperationExecutorThroughImplicitConfigurationConcurrently() throws Exception {
     final int threadCount = 2;
     final CountDownLatch joinerLatch = new CountDownLatch(threadCount);
-
     MuleRegistry registry = muleContext.getRegistry();
     when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     when(registry.lookupObjects(ConfigurationProvider.class)).thenReturn(emptyList());
 
     doAnswer(invocation -> {
-      when(muleContext.getRegistry().lookupObjects(ConfigurationProvider.class))
-          .thenReturn(asList((ConfigurationProvider) invocation.getArguments()[1]));
+      when(registry.get(getImplicitConfigurationProviderName(extensionModel1, extension1ConfigurationModel)))
+          .thenReturn(extension1ConfigurationProvider);
       new Thread(() -> extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event)).start();
       joinerLatch.countDown();
 

@@ -543,4 +543,10 @@ public class MuleExtensionUtils {
     final DslResolvingContext dslResolvingContext = getDefault(emptySet());
     return new DefaultJavaExtensionModelLoader().loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
   }
+
+  public static String getImplicitConfigurationProviderName(ExtensionModel extensionModel,
+                                                            ConfigurationModel implicitConfigurationModel) {
+    return format("%s-%s-implicit", extensionModel.getName(), implicitConfigurationModel.getName());
+  }
+
 }
