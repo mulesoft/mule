@@ -14,7 +14,6 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.failedToScheduleWor
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -32,6 +31,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
+import org.mule.runtime.core.context.notification.NotificationHelper;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -49,6 +49,7 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
     implements MessageSource, FlowConstructAware, SchedulerMessageSource, MuleContextAware, Initialisable, Disposable {
 
   private final PeriodicScheduler scheduler;
+  private final NotificationHelper notificationHelper;
 
   private Scheduler pollingExecutor;
   private ScheduledFuture<?> schedulingJob;
@@ -64,6 +65,8 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
   public DefaultSchedulerMessageSource(MuleContext muleContext, PeriodicScheduler scheduler) {
     this.muleContext = muleContext;
     this.scheduler = scheduler;
+    this.notificationHelper =
+        new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false);
   }
 
   @Override
@@ -79,10 +82,6 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
       this.stop();
       throw new CreateException(failedToScheduleWork(), ex, this);
     }
-  }
-
-  public String getPollingUniqueName() {
-    return flowConstruct.getName() + "-polling-" + this.hashCode();
   }
 
   @Override
@@ -135,11 +134,9 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
   private void pollWith(final Message request) {
     try {
       just(request)
-          .map(message -> builder(create(flowConstruct, getPollingUniqueName())).message(request).flow(flowConstruct).build())
+          .map(message -> builder(create(flowConstruct, getLocation())).message(request).flow(flowConstruct).build())
           .doOnNext(event -> setCurrentEvent(event))
-          .doOnNext(event -> muleContext.getNotificationManager()
-              .fireNotification(new ConnectorMessageNotification(this, event.getMessage(), getPollingUniqueName(),
-                                                                 flowConstruct, MESSAGE_RECEIVED)))
+          .doOnNext(event -> notificationHelper.fireNotification(this, event, getLocation(), flowConstruct, MESSAGE_RECEIVED))
           .transform(listener)
           .subscribe(requestUnbounded());
     } catch (Exception e) {

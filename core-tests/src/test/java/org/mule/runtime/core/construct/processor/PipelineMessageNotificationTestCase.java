@@ -91,7 +91,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     when(muleContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
     pipeline = new TestPipeline(pipelineName, muleContext);
     when(muleContext.getTransformationService()).thenReturn(new TransformationService(muleContext));
-    context = DefaultEventContext.create(pipeline, TEST_CONNECTOR);
+    context = DefaultEventContext.create(pipeline, TEST_CONNECTOR_LOCATION);
   }
 
   @After

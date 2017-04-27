@@ -13,7 +13,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
@@ -139,7 +139,8 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
 
   private Event createTestEvent() {
     when(mockFlowConstruct.getUniqueIdString()).thenReturn(executionId);
-    return Event.builder(DefaultEventContext.create(mockFlowConstruct, "http")).message(Message.builder().nullPayload().build())
+    return Event.builder(DefaultEventContext.create(mockFlowConstruct, fromSingleComponent("http")))
+        .message(Message.builder().nullPayload().build())
         .build();
   }
 }

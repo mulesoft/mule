@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.context.notification;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -99,6 +100,22 @@ public class NotificationHelper {
   }
 
   /**
+   * Fires a {@link ConnectorMessageNotification} for the given arguments using the {@link ServerNotificationHandler} associated
+   * to the given {@code event} and based on a {@link ComponentLocation}.
+   *
+   * @param source
+   * @param event a {@link org.mule.runtime.core.api.Event}
+   * @param location the location of the firing component
+   * @param flowConstruct the {@link org.mule.runtime.core.api.construct.FlowConstruct} that generated the notification
+   * @param action the action code for the notification
+   */
+  public void fireNotification(Object source, Event event, ComponentLocation location, FlowConstruct flowConstruct, int action) {
+    doFireNotification(getNotificationHandler(flowConstruct.getMuleContext()), source, event.getMessage(), toUri(location),
+                       flowConstruct,
+                       action);
+  }
+
+  /**
    * Fires the given {@code notification} using the {@link #defaultNotificationHandler}. Use this method when the
    * {@code notification} is not related to any {@link Event} (for example, connect/disconnect/etc). Otherwise, use
    * {@link #fireNotification(ServerNotification, Event)} instead
@@ -130,6 +147,9 @@ public class NotificationHelper {
     }
   }
 
+  private String toUri(ComponentLocation location) {
+    return location.getParts().get(0).getPartPath() + "/" + location.getComponentIdentifier().getIdentifier().toString();
+  }
 
   private ServerNotificationHandler adaptNotificationHandler(ServerNotificationHandler serverNotificationHandler) {
     return dynamicNotifications ? serverNotificationHandler

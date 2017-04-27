@@ -41,7 +41,7 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
     ir.setStore(new InMemoryObjectStore<>());
     ir.setMuleContext(muleContext);
 
-    final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR);
+    final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
 
     Message okMessage = of("OK");
     Event event = Event.builder(context).message(okMessage).flow(getTestFlow(muleContext)).session(session).build();

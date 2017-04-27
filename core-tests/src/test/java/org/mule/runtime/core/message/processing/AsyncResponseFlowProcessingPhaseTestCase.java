@@ -11,7 +11,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -21,9 +20,10 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.context.notification.NotificationHelper;
@@ -196,9 +196,9 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
       return null;
     }).when(mockTemplate).sendResponseToClient(any(Event.class), any(ResponseCompletionCallback.class));
     phase.runPhase(mockTemplate, mockContext, mockNotifier);
-    verify(notificationHelper).fireNotification(any(MessageSource.class), any(Event.class), isNull(String.class),
+    verify(notificationHelper).fireNotification(any(MessageSource.class), any(Event.class), any(ComponentLocation.class),
                                                 any(FlowConstruct.class), eq(MESSAGE_RESPONSE));
-    verify(notificationHelper, never()).fireNotification(any(MessageSource.class), any(Event.class), isNull(String.class),
+    verify(notificationHelper, never()).fireNotification(any(MessageSource.class), any(Event.class), any(ComponentLocation.class),
                                                          any(FlowConstruct.class), eq(MESSAGE_ERROR_RESPONSE));
   }
 
@@ -211,9 +211,9 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
     }).when(mockTemplate).sendResponseToClient(any(Event.class), any(ResponseCompletionCallback.class));
     when(mockTemplate.routeEvent(any(Event.class))).thenThrow(mockMessagingException);
     phase.runPhase(mockTemplate, mockContext, mockNotifier);
-    verify(notificationHelper, never()).fireNotification(any(MessageSource.class), any(Event.class), isNull(String.class),
+    verify(notificationHelper, never()).fireNotification(any(MessageSource.class), any(Event.class), any(ComponentLocation.class),
                                                          any(FlowConstruct.class), eq(MESSAGE_RESPONSE));
-    verify(notificationHelper).fireNotification(any(MessageSource.class), any(Event.class), isNull(String.class),
+    verify(notificationHelper).fireNotification(any(MessageSource.class), any(Event.class), any(ComponentLocation.class),
                                                 any(FlowConstruct.class), eq(MESSAGE_ERROR_RESPONSE));
   }
 

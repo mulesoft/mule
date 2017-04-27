@@ -44,7 +44,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     Message message2 = of("test event B");
     Message message3 = of("test event C");
 
-    EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
+    EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
 
     Event event1 = Event.builder(context).message(message1).groupCorrelation(new GroupCorrelation(3, null)).flow(flow)
         .session(session).build();

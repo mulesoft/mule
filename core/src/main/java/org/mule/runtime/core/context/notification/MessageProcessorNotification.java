@@ -9,6 +9,7 @@ package org.mule.runtime.core.context.notification;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.DefaultEventContext.create;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -71,7 +72,8 @@ public class MessageProcessorNotification extends ServerNotification implements 
       return sourceEvent;
     } else if (rootId != null && flowConstruct != null) {
       final Message msg = of(null);
-      return Event.builder(create(flowConstruct, "MessageProcessorNotification", lastRootMessageId.get())).message(msg)
+      return Event.builder(create(flowConstruct, fromSingleComponent("MessageProcessorNotification"), lastRootMessageId.get()))
+          .message(msg)
           .flow(flowConstruct).build();
     } else {
       return null;

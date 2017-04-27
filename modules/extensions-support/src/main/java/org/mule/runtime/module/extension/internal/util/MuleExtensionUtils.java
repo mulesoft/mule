@@ -23,6 +23,7 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.UUID.getUUID;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.VERSION;
 import static org.springframework.util.ReflectionUtils.setField;
@@ -290,7 +291,8 @@ public class MuleExtensionUtils {
         return null;
       }
     };
-    return Event.builder(create(flowConstruct, "InitializerEvent")).message(of(null)).flow(flowConstruct).build();
+    return Event.builder(create(flowConstruct, fromSingleComponent("InitializerEvent"))).message(of(null)).flow(flowConstruct)
+        .build();
   }
 
   /**

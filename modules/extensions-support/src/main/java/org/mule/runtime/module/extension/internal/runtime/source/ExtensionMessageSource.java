@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
@@ -17,8 +16,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.slf4j.LoggerFactory.getLogger;
-
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
@@ -278,12 +275,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       @Override
       public ClassLoader getExecutionClassLoader() {
         return muleContext.getExecutionClassLoader();
-      }
-
-      @Override
-      public ComponentIdentifier getSourceIdentifier() {
-        return builder().withNamespace(getExtensionModel().getName().toLowerCase())
-            .withName(sourceModel.getName()).build();
       }
 
       private TransactionConfig buildTransactionConfig() {

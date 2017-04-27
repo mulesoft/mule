@@ -18,6 +18,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.test.allure.AllureConstants.SchedulerServiceFeature.SCHEDULER_SERVICE;
 
 import org.mule.functional.functional.SkeletonSource;
@@ -170,7 +171,8 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
 
     for (int i = 0; i < CUSTOM_SCHEDULER_SIZE; ++i) {
       ((SkeletonSource) messageSource).getListener()
-          .process(Event.builder(create(delayScheduleFlow, SchedulerServiceTestCase.class.getSimpleName())).build());
+          .process(Event.builder(create(delayScheduleFlow, fromSingleComponent(SchedulerServiceTestCase.class.getSimpleName())))
+              .build());
     }
 
     expected.expect(MessagingException.class);
@@ -194,7 +196,8 @@ public class SchedulerServiceTestCase extends AbstractIntegrationTestCase {
     Scheduler scheduler = muleContext.getSchedulerService().cpuLightScheduler();
     try {
       scheduler.submit(() -> ((SkeletonSource) messageSource).getListener()
-          .process(Event.builder(create(delayScheduleFlow, SchedulerServiceTestCase.class.getSimpleName())).message(of(null))
+          .process(Event.builder(create(delayScheduleFlow, fromSingleComponent(SchedulerServiceTestCase.class.getSimpleName())))
+              .message(of(null))
               .build()))
           .get();
     } catch (ExecutionException executionException) {

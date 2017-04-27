@@ -47,8 +47,9 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
     when(flow.getUniqueIdString()).thenReturn(GENERATED_CORRELATION_ID);
     when(flow.getServerId()).thenReturn(SERVER_ID);
 
-    executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR);
-    executionContextWithCorrelation = DefaultEventContext.create(flow, TEST_CONNECTOR, CUSTOM_CORRELATION_ID);
+    executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
+    executionContextWithCorrelation =
+        DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, CUSTOM_CORRELATION_ID);
   }
 
   @Test

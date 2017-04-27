@@ -8,17 +8,18 @@ package org.mule.runtime.core.transformer;
 
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.DefaultEventContext.create;
-
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClientFlowConstruct;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
@@ -123,7 +124,8 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     if (event == null) {
       MuleClientFlowConstruct flowConstruct =
           new MuleClientFlowConstruct(muleContext);
-      event = Event.builder(create(flowConstruct, "AbstractMessageTransformer")).message(message)
+      ComponentLocation location = getLocation() != null ? getLocation() : fromSingleComponent("AbstractMessageTransformer");
+      event = Event.builder(create(flowConstruct, location)).message(message)
           .flow(flowConstruct).build();
     }
     try {

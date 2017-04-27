@@ -71,7 +71,8 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleConte
   public void testComponentNotificationNotRegistered() throws Exception {
     assertFalse(componentListener.isNotified());
 
-    component.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(of("test data")).build());
+    component.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION))
+        .message(of("test data")).build());
 
     assertFalse(componentListener.isNotified());
     assertFalse(componentListener.isBefore());
@@ -85,7 +86,7 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleConte
 
     assertFalse(componentListener.isNotified());
 
-    component.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+    component.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION))
         .message(of("test data"))
         .build());
 

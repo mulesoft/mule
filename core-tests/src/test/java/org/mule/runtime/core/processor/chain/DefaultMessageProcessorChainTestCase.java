@@ -33,7 +33,6 @@ import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKIN
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -1014,7 +1013,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   protected Event getTestEventUsingFlow(Object data) {
     Event event = mock(Event.class);
-    EventContext eventContext = DefaultEventContext.create(flow, "");
+    EventContext eventContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
     Message message = of(data);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getMessage()).thenReturn(message);

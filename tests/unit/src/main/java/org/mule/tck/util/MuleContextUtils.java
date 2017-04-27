@@ -11,7 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
+import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -67,7 +67,7 @@ public class MuleContextUtils {
    */
   public static Builder eventBuilder() throws MuleException {
     FlowConstruct flowConstruct = getTestFlow(mockContextWithServices());
-    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR));
+    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION));
   }
 
 }

@@ -9,16 +9,15 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
@@ -74,8 +73,9 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
     @Override
     public void run() {
       Message okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-      Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(okMessage).flow(flow)
-          .session(session).build();
+      Event event =
+          Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION)).message(okMessage).flow(flow)
+              .session(session).build();
 
       try {
         event = idempotentMessageFilter.process(event);

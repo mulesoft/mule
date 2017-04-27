@@ -38,7 +38,7 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatch() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
         .message(of(new Fruit[] {new Apple(), new Orange()}))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
@@ -49,7 +49,7 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatchGenericFail() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
         .message(of(new Object[] {new Apple(), new Orange()}))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
@@ -60,7 +60,7 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatchFail() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION))
         .message(of(new Object[] {"blah"}))
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);

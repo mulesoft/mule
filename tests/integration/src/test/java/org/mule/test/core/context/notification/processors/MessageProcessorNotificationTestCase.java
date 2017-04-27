@@ -293,9 +293,11 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     final Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("composite-source");
     CompositeMessageSource composite = (CompositeMessageSource) flow.getMessageSource();
     assertNotNull(((TestMessageSource) composite.getSources().get(0))
-        .fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(of(TEST_PAYLOAD)).build()));
+        .fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION)).message(of(TEST_PAYLOAD))
+            .build()));
     assertNotNull(((TestMessageSource) composite.getSources().get(1))
-        .fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(of(TEST_PAYLOAD)).build()));
+        .fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION)).message(of(TEST_PAYLOAD))
+            .build()));
 
     assertNotifications();
   }

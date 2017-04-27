@@ -77,7 +77,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractReactiveP
     Flow flow = builder("flow", muleContext).build();
     initialiseObject(flow);
 
-    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION))
         .message(of(TEST_MESSAGE))
         .build();
 

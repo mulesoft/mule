@@ -15,9 +15,11 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.util.SystemUtils.parsePropertyDefinitions;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.StringUtils;
@@ -49,6 +51,8 @@ public abstract class AbstractMuleTestCase {
 
   public static final String TEST_PAYLOAD = "test";
   public static final String TEST_CONNECTOR = "test";
+
+  public static final ComponentLocation TEST_CONNECTOR_LOCATION = fromSingleComponent(TEST_CONNECTOR);
 
   public static final String TESTING_MODE_PROPERTY_NAME = "mule.testingMode";
 

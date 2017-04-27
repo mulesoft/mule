@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.core.source.polling;
 
+import static java.util.Collections.singletonMap;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
@@ -41,6 +42,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
 
     SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
     schedulerMessageSource.setListener(flow);
+    schedulerMessageSource.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
 
     schedulerMessageSource.trigger();
     new PollingProber(RECEIVE_TIMEOUT, 100).check(new Probe() {

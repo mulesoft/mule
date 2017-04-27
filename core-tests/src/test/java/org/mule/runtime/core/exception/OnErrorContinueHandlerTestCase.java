@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.core.exception;
 
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
-import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
@@ -23,7 +18,11 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.DefaultEventContext;
@@ -32,10 +31,10 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.util.StreamCloserService;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
@@ -96,7 +95,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     onErrorContinueHandler.setFlowConstruct(flow);
     when(mockMuleContext.getStreamCloserService()).thenReturn(mockStreamCloserService);
 
-    context = DefaultEventContext.create(flow, TEST_CONNECTOR);
+    context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
     muleEvent = Event.builder(context).message(muleMessage).flow(flow).build();
   }
 

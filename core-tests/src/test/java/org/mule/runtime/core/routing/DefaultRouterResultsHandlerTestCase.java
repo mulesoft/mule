@@ -31,9 +31,9 @@ import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -59,7 +59,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
 
-    context = DefaultEventContext.create(flow, "test");
+    context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
   }
 
   @Test

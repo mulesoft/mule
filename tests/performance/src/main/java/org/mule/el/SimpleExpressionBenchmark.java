@@ -34,7 +34,7 @@ public class SimpleExpressionBenchmark extends AbstractBenchmark {
   @Setup
   public void setup() throws MuleException {
     muleContext = createMuleContextWithServices();
-    event = Event.builder(create(createFlow(muleContext), "")).message(of(PAYLOAD)).build();
+    event = Event.builder(create(createFlow(muleContext), CONNECTOR_LOCATION)).message(of(PAYLOAD)).build();
   }
 
   @TearDown

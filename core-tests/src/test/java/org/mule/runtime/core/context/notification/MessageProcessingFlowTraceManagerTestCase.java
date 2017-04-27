@@ -90,7 +90,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     when(nestedFlowConstruct.getName()).thenReturn(NESTED_FLOW_NAME);
     when(nestedFlowConstruct.getMuleContext()).thenReturn(context);
 
-    messageContext = create(rootFlowConstruct, "test");
+    messageContext = create(rootFlowConstruct, TEST_CONNECTOR_LOCATION);
   }
 
   @Test

@@ -9,18 +9,17 @@ package org.mule.runtime.core.el.context;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
 import org.mule.mvel2.ImmutableElementException;
 import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -51,7 +50,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
   @Before
   public void setupMessageContext() throws Exception {
-    context = DefaultEventContext.create(flowConstruct, TEST_CONNECTOR);
+    context = DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION);
   }
 
   @Before

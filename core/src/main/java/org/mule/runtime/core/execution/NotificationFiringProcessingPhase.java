@@ -31,7 +31,7 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
 
   private ConcurrentHashMap<ServerNotificationManager, NotificationHelper> notificationHelpers = new ConcurrentHashMap<>();
 
-  private MuleContext muleContext;
+  protected MuleContext muleContext;
 
   protected void fireNotification(Object source, Event event, FlowConstruct flow, int action) {
     try {
@@ -46,7 +46,7 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
         }
       }
       getNotificationHelper(muleContext.getNotificationManager())
-          .fireNotification(source, event, event.getContext().getOriginatingConnectorName(), flow, action);
+          .fireNotification(source, event, event.getContext().getOriginatingLocation(), flow, action);
     } catch (Exception e) {
       logger.warn("Could not fire notification. Action: " + action, e);
     }

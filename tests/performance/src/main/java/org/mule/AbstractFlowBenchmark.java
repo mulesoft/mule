@@ -29,7 +29,6 @@ import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
-
 import reactor.core.publisher.Mono;
 
 public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
@@ -109,14 +108,15 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public Event processSource() throws MuleException {
-    return source.trigger(Event.builder(DefaultEventContext.create(flow, CONNECTOR_NAME)).message(of(PAYLOAD)).build());
+    return source.trigger(Event.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION))
+        .message(of(PAYLOAD)).build());
   }
 
   @Benchmark
   public CountDownLatch processSourceStream() throws MuleException, InterruptedException {
     CountDownLatch latch = new CountDownLatch(getStreamIterations());
     for (int i = 0; i < getStreamIterations(); i++) {
-      Mono.just(Event.builder(DefaultEventContext.create(flow, CONNECTOR_NAME))
+      Mono.just(Event.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION))
           .message(of(PAYLOAD)).build()).transform(source.getListener()).doOnNext(event -> latch.countDown())
           .subscribe();
     }
@@ -126,7 +126,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public Event processFlow() throws MuleException {
-    return flow.process(Event.builder(DefaultEventContext.create(flow, CONNECTOR_NAME))
+    return flow.process(Event.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION))
         .message(of(PAYLOAD)).build());
   }
 
@@ -134,7 +134,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   public CountDownLatch processFlowStream() throws MuleException, InterruptedException {
     CountDownLatch latch = new CountDownLatch(getStreamIterations());
     for (int i = 0; i < getStreamIterations(); i++) {
-      Mono.just(Event.builder(DefaultEventContext.create(flow, CONNECTOR_NAME))
+      Mono.just(Event.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION))
           .message(of(PAYLOAD)).build()).transform(flow).doOnNext(event -> latch.countDown()).subscribe();
     }
     latch.await();

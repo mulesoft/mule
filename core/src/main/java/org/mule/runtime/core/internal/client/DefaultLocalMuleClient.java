@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_M
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.message.ErrorBuilder.builder;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
@@ -199,7 +200,7 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   private org.mule.runtime.core.api.Event.Builder baseEventBuilder(Message message) {
-    return Event.builder(create(flowConstruct, "muleClient")).message(message).flow(flowConstruct);
+    return Event.builder(create(flowConstruct, fromSingleComponent("muleClient"))).message(message).flow(flowConstruct);
   }
 
   protected Event returnEvent(Event event) {
