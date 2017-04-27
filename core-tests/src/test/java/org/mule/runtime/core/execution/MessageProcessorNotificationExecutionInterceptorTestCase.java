@@ -31,6 +31,7 @@ import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.dsl.api.component.config.DefaultLocationPart;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -83,8 +84,8 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
     when(mockMuleContext.getNotificationManager()).thenReturn(mockNotificationManager);
     when(((AnnotatedObject) mockMessageProcessor).getAnnotation(LOCATION_KEY))
         .thenReturn(new DefaultComponentLocation(empty(),
-                                                 asList(new DefaultComponentLocation.DefaultLocationPart("path", empty(), empty(),
-                                                                                                         empty()))));
+                                                 asList(new DefaultLocationPart("path", empty(), empty(),
+                                                                                empty()))));
   }
 
   @Test

@@ -41,6 +41,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.dsl.api.component.config.DefaultLocationPart;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.common.collect.ImmutableMap;
@@ -1131,14 +1132,14 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
           .put(ANNOTATION_PARAMETERS, singletonMap("param", "#[payload]"))
           .put(LOCATION_KEY,
                new DefaultComponentLocation(of("flowName"),
-                                            singletonList(new DefaultComponentLocation.DefaultLocationPart("0",
-                                                                                                           of(
-                                                                                                              builder()
-                                                                                                                  .withIdentifier(
-                                                                                                                                  buildFromStringRepresentation("test:processor"))
-                                                                                                                  .withType(PROCESSOR)
-                                                                                                                  .build()),
-                                                                                                           empty(), empty()))))
+                                            singletonList(new DefaultLocationPart("0",
+                                                                                  of(
+                                                                                     builder()
+                                                                                         .withIdentifier(
+                                                                                                         buildFromStringRepresentation("test:processor"))
+                                                                                         .withType(PROCESSOR)
+                                                                                         .build()),
+                                                                                  empty(), empty()))))
           .build());
     }
 
