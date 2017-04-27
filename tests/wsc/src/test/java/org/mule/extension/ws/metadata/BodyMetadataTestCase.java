@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.ws.WscTestUtils.ECHO;
 import static org.mule.extension.ws.WscTestUtils.ECHO_ACCOUNT;
 import static org.mule.extension.ws.WscTestUtils.NO_PARAMS;
-import static org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder.BODY_FIELD;
+import static org.mule.services.soap.internal.metadata.SoapOutputTypeBuilder.BODY_FIELD;
 import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;

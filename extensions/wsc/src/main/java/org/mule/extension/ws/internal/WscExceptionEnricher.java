@@ -6,20 +6,9 @@
  */
 package org.mule.extension.ws.internal;
 
-import static org.mule.extension.ws.api.exception.WscErrors.BAD_REQUEST;
-import static org.mule.extension.ws.api.exception.WscErrors.BAD_RESPONSE;
-import static org.mule.extension.ws.api.exception.WscErrors.ENCODING;
-import static org.mule.extension.ws.api.exception.WscErrors.INVALID_WSDL;
-import static org.mule.extension.ws.api.exception.WscErrors.SOAP_FAULT;
-
-import org.mule.extension.ws.api.exception.WscEncodingException;
-import org.mule.extension.ws.api.exception.WscException;
-import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
-import org.mule.services.soap.api.exception.BadRequestException;
-import org.mule.services.soap.api.exception.BadResponseException;
-import org.mule.services.soap.api.exception.InvalidWsdlException;
 import org.mule.services.soap.api.exception.SoapFaultException;
+import org.mule.services.soap.internal.exception.error.SoapExceptionEnricher;
 
 /**
  * {@link ExceptionHandler} implementation to wrap unexpected exceptions thrown by the {@link ConsumeOperation} and if a
@@ -29,29 +18,13 @@ import org.mule.services.soap.api.exception.SoapFaultException;
  */
 public class WscExceptionEnricher extends ExceptionHandler {
 
+  private final SoapExceptionEnricher enricher = new SoapExceptionEnricher();
+
   /**
    * {@inheritDoc}
    */
   @Override
   public Exception enrichException(Exception e) {
-    if (e instanceof WscEncodingException) {
-      return new ModuleException(e, ENCODING);
-    }
-    if (e instanceof SoapFaultException) {
-      return new ModuleException(e, SOAP_FAULT);
-    }
-    if (e instanceof InvalidWsdlException) {
-      return new ModuleException(e, INVALID_WSDL);
-    }
-    if (e instanceof BadResponseException) {
-      return new ModuleException(e, BAD_RESPONSE);
-    }
-    if (e instanceof BadRequestException) {
-      return new ModuleException(e, BAD_REQUEST);
-    }
-    if (e instanceof WscException) {
-      return e;
-    }
-    return new WscException("Unexpected error while consuming web service: " + e.getMessage(), e);
+    return enricher.enrich(e);
   }
 }

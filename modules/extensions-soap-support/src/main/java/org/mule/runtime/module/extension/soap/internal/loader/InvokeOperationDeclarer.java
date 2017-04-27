@@ -21,6 +21,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
 import org.mule.runtime.extension.api.soap.SoapAttachment;
@@ -48,6 +49,7 @@ import com.google.common.collect.ImmutableMap;
 
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -72,17 +74,18 @@ public class InvokeOperationDeclarer {
 
   /**
    * Declares the invoke operation.
-   *
    * @param declarer the soap extension declarer
    * @param loader   a {@link ClassTypeLoader} to load some parameters types.
+   * @param soapErrors
    */
-  public OperationDeclarer declare(ExtensionDeclarer declarer, ClassTypeLoader loader) {
+  public OperationDeclarer declare(ExtensionDeclarer declarer, ClassTypeLoader loader, Set<ErrorModel> soapErrors) {
 
     OperationDeclarer operation = declarer.withOperation(OPERATION_NAME)
         .describedAs(OPERATION_DESCRIPTION)
         .withModelProperty(new OperationExecutorModelProperty(new SoapOperationExecutorFactory()))
         .requiresConnection(true).withModelProperty(new ConnectivityModelProperty(ForwardingSoapClient.class));
 
+    soapErrors.forEach(operation::withError);
     declareMetadata(operation, loader);
     declareOutput(operation, loader);
     declareGeneralParameters(operation, loader);

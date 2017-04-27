@@ -8,10 +8,13 @@ package org.mule.runtime.module.extension.soap.internal.loader;
 
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isOneOf;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
@@ -35,14 +38,19 @@ import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.services.soap.api.exception.error.SoapErrors;
 import org.mule.test.soap.extension.FootballSoapExtension;
+
+import com.google.common.collect.ImmutableList;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -57,6 +65,8 @@ public class SoapExtensionDeclarationTestCase {
     params.put(VERSION, getProductVersion());
     ExtensionModel model =
         loader.loadExtensionModel(FootballSoapExtension.class.getClassLoader(), getDefault(emptySet()), params);
+
+    assertErrorModels(model.getErrorModels());
 
     assertThat(model.getConfigurationModels(), hasSize(1));
     ConfigurationModel configuration = model.getConfigurationModels().get(0);
@@ -80,8 +90,20 @@ public class SoapExtensionDeclarationTestCase {
     assertConnectionProvider(providers.get(2), CALCIO_ID + "-connection", CALCIO_DESC);
   }
 
+  private void assertErrorModels(Set<ErrorModel> errors) {
+    assertThat(errors, hasSize(13));
+    ImmutableList<String> errorNames = ImmutableList.<String>builder()
+        .addAll(of(SoapErrors.values()).map(Object::toString).collect(toList()))
+        .add("RETRY_EXHAUSTED")
+        .add("CONNECTIVITY")
+        .add("ANY")
+        .build();
+    errors.forEach(e -> assertThat(e.getType(), isOneOf(errorNames.toArray())));
+  }
+
   private void assertOperation(OperationModel operation) {
     assertThat(operation.getOutput().getType(), is(instanceOf(UnionType.class)));
+    assertErrorModels(operation.getErrorModels());
     assertThat(operation.getName(), is(OPERATION_NAME));
     assertThat(operation.getDescription(), is(OPERATION_DESCRIPTION));
     ParameterProber[] probers = new ParameterProber[] {

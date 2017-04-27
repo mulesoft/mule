@@ -6,9 +6,9 @@
  */
 package org.mule.extension.ws.internal.metadata;
 
-import static org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder.ATTACHMENTS_FIELD;
-import static org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder.BODY_FIELD;
-import static org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder.HEADERS_FIELD;
+import static org.mule.services.soap.internal.metadata.SoapOutputTypeBuilder.ATTACHMENTS_FIELD;
+import static org.mule.services.soap.internal.metadata.SoapOutputTypeBuilder.BODY_FIELD;
+import static org.mule.services.soap.internal.metadata.SoapOutputTypeBuilder.HEADERS_FIELD;
 import org.mule.extension.ws.api.SoapMessageBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;

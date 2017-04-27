@@ -29,6 +29,7 @@ import org.mule.services.soap.api.client.SoapClient;
 import org.mule.services.soap.api.message.SoapRequest;
 import org.mule.services.soap.api.message.SoapRequestBuilder;
 import org.mule.services.soap.api.message.SoapResponse;
+import org.mule.services.soap.internal.exception.error.SoapExceptionEnricher;
 
 import java.io.InputStream;
 import java.util.Map;
@@ -49,6 +50,7 @@ public final class SoapOperationExecutor implements OperationExecutor {
   private MuleExpressionLanguage expressionExecutor;
 
   private final ConnectionArgumentResolver connectionResolver = new ConnectionArgumentResolver();
+  private final SoapExceptionEnricher soapExceptionEnricher = new SoapExceptionEnricher();
 
   /**
    * {@inheritDoc}
@@ -61,7 +63,7 @@ public final class SoapOperationExecutor implements OperationExecutor {
       SoapResponse response = connection.getSoapClient(serviceId).consume(getRequest(executionContext));
       return justOrEmpty(response.getAsResult());
     } catch (Exception e) {
-      return error(e);
+      return error(soapExceptionEnricher.enrich(e));
     }
   }
 

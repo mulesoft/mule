@@ -93,4 +93,8 @@ public abstract class SoapExtensionArtifactFunctionalTestCase extends MuleArtifa
     laLigaService.stop();
   }
 
+  String getBodyXml(String tagName, String content) {
+    String ns = "http://services.soap.extension.module.test.mule.org/";
+    return String.format("<con:%s xmlns:con=\"%s\">%s</con:%s>", tagName, ns, content, tagName);
+  }
 }

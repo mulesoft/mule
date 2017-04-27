@@ -13,7 +13,7 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.services.soap.api.client.metadata.SoapOperationMetadata;
-import org.mule.services.soap.api.client.metadata.SoapOutputTypeBuilder;
+import org.mule.services.soap.internal.metadata.SoapOutputTypeBuilder;
 
 /**
  * {@link AttributesTypeResolver} implementation for the {@link ConsumeOperation}.
