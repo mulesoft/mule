@@ -17,7 +17,6 @@ import static org.mule.runtime.api.component.ComponentIdentifier.buildFromString
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
@@ -517,9 +516,9 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   @Description("Verify that a location produces connector and source data.")
   public void componentData() throws Exception {
     TypedComponentIdentifier typedComponentIdentifier = TypedComponentIdentifier.builder()
-      .withType(SOURCE)
-      .withIdentifier(buildFromStringRepresentation("http:listener"))
-      .build();
+        .withType(SOURCE)
+        .withIdentifier(buildFromStringRepresentation("http:listener"))
+        .build();
     ComponentLocation location = mock(ComponentLocation.class);
     when(location.getComponentIdentifier()).thenReturn(typedComponentIdentifier);
     EventContext context = create(getTestFlow(muleContext), location);
