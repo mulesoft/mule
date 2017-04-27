@@ -6,9 +6,13 @@
  */
 package org.mule.test.core.context.notification.processors;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultEventContext;
@@ -18,8 +22,10 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.component.ComponentException;
+import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.test.core.context.notification.Node;
+import org.mule.test.core.context.notification.NotificationLogger;
 import org.mule.test.core.context.notification.RestrictedNode;
 
 import java.util.Arrays;
@@ -49,6 +55,28 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
         .serial(prePost());
 
     assertNotNull(flowRunner("singleMP").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void errorMidFlow() throws Exception {
+    specificationFactory = () -> new Node()
+        // notifications fired for processors before failing and failing but not others.
+        .serial(prePost()).serial(prePost());
+
+    try {
+      flowRunner("errorMidFlow").withPayload(TEST_PAYLOAD).run();
+    } catch (Throwable t) {
+      // Ignore
+    }
+
+    // Current approach for testing notifications does not allow exceptions to be verified so assert error notification manually.
+    NotificationLogger notificationLogger = muleContext.getRegistry().lookupObject("notificationLogger");
+    MessageProcessorNotification errorPostNotification =
+        ((MessageProcessorNotification) notificationLogger.getNotifications().get(3));
+    assertThat(errorPostNotification.getAction(), equalTo(MESSAGE_PROCESSOR_POST_INVOKE));
+    assertThat(errorPostNotification.getExceptionThrown(), instanceOf(MessagingException.class));
 
     assertNotifications();
   }
