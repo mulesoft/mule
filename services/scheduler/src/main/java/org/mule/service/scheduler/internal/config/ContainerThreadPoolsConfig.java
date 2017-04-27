@@ -24,6 +24,8 @@ import org.mule.runtime.core.api.scheduler.SchedulerPoolsConfig;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -169,83 +171,83 @@ public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
   }
 
   @Override
-  public Long getGracefulShutdownTimeout() {
-    return gracefulShutdownTimeout;
+  public OptionalLong getGracefulShutdownTimeout() {
+    return OptionalLong.of(gracefulShutdownTimeout);
   }
 
-  private void setGracefulShutdownTimeout(Long gracefulShutdownTimeout) {
+  private void setGracefulShutdownTimeout(long gracefulShutdownTimeout) {
     this.gracefulShutdownTimeout = gracefulShutdownTimeout;
   }
 
   @Override
-  public Integer getCpuLightPoolSize() {
-    return cpuLightPoolSize;
+  public OptionalInt getCpuLightPoolSize() {
+    return OptionalInt.of(cpuLightPoolSize);
   }
 
-  private void setCpuLightPoolSize(Integer cpuLightPoolSize) {
+  private void setCpuLightPoolSize(int cpuLightPoolSize) {
     this.cpuLightPoolSize = cpuLightPoolSize;
   }
 
   @Override
-  public Integer getCpuLightQueueSize() {
-    return cpuLightQueueSize;
+  public OptionalInt getCpuLightQueueSize() {
+    return OptionalInt.of(cpuLightQueueSize);
   }
 
-  private void setCpuLightQueueSize(Integer cpuLightQueueSize) {
+  private void setCpuLightQueueSize(int cpuLightQueueSize) {
     this.cpuLightQueueSize = cpuLightQueueSize;
   }
 
   @Override
-  public Integer getIoCorePoolSize() {
-    return ioCorePoolSize;
+  public OptionalInt getIoCorePoolSize() {
+    return OptionalInt.of(ioCorePoolSize);
   }
 
-  private void setIoCorePoolSize(Integer ioCorePoolSize) {
+  private void setIoCorePoolSize(int ioCorePoolSize) {
     this.ioCorePoolSize = ioCorePoolSize;
   }
 
   @Override
-  public Integer getIoMaxPoolSize() {
-    return ioMaxPoolSize;
+  public OptionalInt getIoMaxPoolSize() {
+    return OptionalInt.of(ioMaxPoolSize);
   }
 
-  private void setIoMaxPoolSize(Integer ioMaxPoolSize) {
+  private void setIoMaxPoolSize(int ioMaxPoolSize) {
     this.ioMaxPoolSize = ioMaxPoolSize;
   }
 
   @Override
-  public Integer getIoQueueSize() {
-    return ioQueueSize;
+  public OptionalInt getIoQueueSize() {
+    return OptionalInt.of(ioQueueSize);
   }
 
-  private void setIoQueueSize(Integer ioQueueSize) {
+  private void setIoQueueSize(int ioQueueSize) {
     this.ioQueueSize = ioQueueSize;
   }
 
   @Override
-  public Long getIoKeepAlive() {
-    return ioKeepAlive;
+  public OptionalLong getIoKeepAlive() {
+    return OptionalLong.of(ioKeepAlive);
   }
 
-  private void setIoKeepAlive(Long ioKeepAlive) {
+  private void setIoKeepAlive(long ioKeepAlive) {
     this.ioKeepAlive = ioKeepAlive;
   }
 
   @Override
-  public Integer getCpuIntensivePoolSize() {
-    return cpuIntensivePoolSize;
+  public OptionalInt getCpuIntensivePoolSize() {
+    return OptionalInt.of(cpuIntensivePoolSize);
   }
 
-  private void setCpuIntensivePoolSize(Integer cpuIntensivePoolSize) {
+  private void setCpuIntensivePoolSize(int cpuIntensivePoolSize) {
     this.cpuIntensivePoolSize = cpuIntensivePoolSize;
   }
 
   @Override
-  public Integer getCpuIntensiveQueueSize() {
-    return cpuIntensiveQueueSize;
+  public OptionalInt getCpuIntensiveQueueSize() {
+    return OptionalInt.of(cpuIntensiveQueueSize);
   }
 
-  private void setCpuIntensiveQueueSize(Integer cpuIntensiveQueueSize) {
+  private void setCpuIntensiveQueueSize(int cpuIntensiveQueueSize) {
     this.cpuIntensiveQueueSize = cpuIntensiveQueueSize;
   }
 
