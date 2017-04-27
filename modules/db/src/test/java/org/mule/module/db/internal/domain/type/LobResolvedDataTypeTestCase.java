@@ -7,6 +7,7 @@
 
 package org.mule.module.db.internal.domain.type;
 
+import static java.sql.Types.BLOB;
 import static java.sql.Types.CLOB;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.mock;
@@ -17,8 +18,10 @@ import org.mule.config.ReaderInputStream;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,34 +32,60 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @SmallTest
-public class ClobResolvedDataTypeTestCase extends AbstractMuleTestCase {
+public class LobResolvedDataTypeTestCase extends AbstractMuleTestCase {
 
   private static final int PARAM_INDEX = 1;
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private ClobResolvedDataType dataType;
+  private ClobResolvedDataType dataTypeClob;
+  private BlobResolvedDataType dataTypeBlob;
   private PreparedStatement statement;
   private Connection connection;
   private Clob clob;
+  private Blob blob;
 
   @Before
   public void setUp() throws Exception {
-    dataType = new ClobResolvedDataType(CLOB, null);
+    dataTypeClob = new ClobResolvedDataType(CLOB, null);
+    dataTypeBlob = new BlobResolvedDataType(BLOB, null);
     statement = mock(PreparedStatement.class);
     connection = mock(Connection.class);
     clob = mock(Clob.class);
+    blob = mock(Blob.class);
 
     when(statement.getConnection()).thenReturn(connection);
     when(connection.createClob()).thenReturn(clob);
+    when(connection.createBlob()).thenReturn(blob);
+  }
+
+  @Test
+  public void convertsStringToBlob() throws Exception {
+    String value = "foo";
+
+    dataTypeBlob.setParameterValue(statement, PARAM_INDEX, value.getBytes());
+
+    verify(blob).setBytes(1, value.getBytes());
+    verify(statement).setObject(PARAM_INDEX, blob, BLOB);
+  }
+
+  @Test
+  public void convertsInputStreamToBlob() throws Exception {
+    String streamContent = "bar";
+    InputStream value = new ByteArrayInputStream(streamContent.getBytes());
+
+    dataTypeBlob.setParameterValue(statement, PARAM_INDEX, value);
+
+    verify(blob).setBytes(1, streamContent.getBytes());
+    verify(statement).setObject(PARAM_INDEX, blob, BLOB);
   }
 
   @Test
   public void convertsStringToClob() throws Exception {
     String value = "foo";
 
-    dataType.setParameterValue(statement, PARAM_INDEX, value);
+    dataTypeClob.setParameterValue(statement, PARAM_INDEX, value);
 
     verify(clob).setString(1, value);
     verify(statement).setObject(PARAM_INDEX, clob, CLOB);
@@ -67,7 +96,7 @@ public class ClobResolvedDataTypeTestCase extends AbstractMuleTestCase {
     String streamContent = "bar";
     InputStream value = new StringInputStream(streamContent);
 
-    dataType.setParameterValue(statement, PARAM_INDEX, value);
+    dataTypeClob.setParameterValue(statement, PARAM_INDEX, value);
 
     verify(clob).setString(1, streamContent);
     verify(statement).setObject(PARAM_INDEX, clob, CLOB);
@@ -80,7 +109,7 @@ public class ClobResolvedDataTypeTestCase extends AbstractMuleTestCase {
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(containsString(createUnsupportedTypeErrorMessage(value)));
 
-    dataType.setParameterValue(statement, PARAM_INDEX, value);
+    dataTypeClob.setParameterValue(statement, PARAM_INDEX, value);
   }
 
   private static class StringInputStream extends ReaderInputStream

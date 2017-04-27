@@ -7,11 +7,11 @@
 
 package org.mule.module.db.internal.config.domain.database;
 
+import static org.mule.module.db.internal.domain.type.JdbcTypes.types;
 import static org.springframework.util.xml.DomUtils.getChildElementByTagName;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.module.db.internal.domain.type.ArrayResolvedDbType;
-import org.mule.module.db.internal.domain.type.ClobResolvedDataType;
 import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.module.db.internal.domain.type.MappedStructResolvedDbType;
 import org.mule.module.db.internal.domain.type.ResolvedDbType;
@@ -123,9 +123,9 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
                         customDbTypes.add(new StructDbType(id, name));
                     }
                 }
-                else if (id == Types.CLOB)
+                else if (types.contains(new ResolvedDbType(id, name)))
                 {
-                    customDbTypes.add(new ClobResolvedDataType(id, name));
+                    customDbTypes.add(types.get(types.indexOf(new ResolvedDbType(id, name))));
                 }
                 else
                 {
