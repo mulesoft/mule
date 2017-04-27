@@ -60,7 +60,9 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -127,6 +129,8 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   @Parameter
   @Optional
   @Placement(order = 2)
+  @Summary("Comma separated list of methods. Leave empty to allow all.")
+  @Example("GET, POST")
   private String allowedMethods;
 
   /**
