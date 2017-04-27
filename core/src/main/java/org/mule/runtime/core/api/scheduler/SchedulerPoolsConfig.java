@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.scheduler;
 
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.concurrent.Executor;
 
 /**
@@ -19,48 +21,48 @@ public interface SchedulerPoolsConfig {
    * @return the maximum time (in milliseconds) to wait until all tasks in all the runtime thread pools have completed execution
    *         when stopping the scheduler service.
    */
-  long getGracefulShutdownTimeout();
+  OptionalLong getGracefulShutdownTimeout();
 
   /**
    * @return the number of threads to keep in the {@code cpu_lite} pool, even if they are idle.
    */
-  int getCpuLightPoolSize();
+  OptionalInt getCpuLightPoolSize();
 
   /**
    * @return the size of the queue to use for holding {@code cpu_lite} tasks before they are executed.
    */
-  int getCpuLightQueueSize();
+  OptionalInt getCpuLightQueueSize();
 
   /**
    * @return the number of threads to keep in the {@code I/O} pool.
    */
-  int getIoCorePoolSize();
+  OptionalInt getIoCorePoolSize();
 
   /**
    * @return the maximum number of threads to allow in the {@code I/O} pool.
    */
-  int getIoMaxPoolSize();
+  OptionalInt getIoMaxPoolSize();
 
   /**
    * @return the size of the queue to use for holding {@code I/O} tasks before they are executed.
    */
-  int getIoQueueSize();
+  OptionalInt getIoQueueSize();
 
   /**
    * @return when the number of threads in the {@code I/O} pool is greater than {@link #getIoCorePoolSize()}, this is the maximum
    *         time (in milliseconds) that excess idle threads will wait for new tasks before terminating.
    */
-  long getIoKeepAlive();
+  OptionalLong getIoKeepAlive();
 
   /**
    * @return the number of threads to keep in the {@code cpu_intensive} pool, even if they are idle.
    */
-  int getCpuIntensivePoolSize();
+  OptionalInt getCpuIntensivePoolSize();
 
   /**
    * @return the size of the queue to use for holding {@code cpu_intensive} tasks before they are executed.
    */
-  int getCpuIntensiveQueueSize();
+  OptionalInt getCpuIntensiveQueueSize();
 
   /**
    * @return the prefix to prepend to the names of the threads of the pools created for a scheduler with this configuration.

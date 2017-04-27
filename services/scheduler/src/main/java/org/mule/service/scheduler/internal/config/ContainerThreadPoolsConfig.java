@@ -24,6 +24,8 @@ import org.mule.runtime.core.api.scheduler.SchedulerPoolsConfig;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -31,11 +33,14 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.apache.logging.log4j.core.config.ConfigurationException;
 import org.slf4j.Logger;
 
 /**
  * Bean that contains the thread pools configuration for the runtime.
- *
+ * <p>
+ * All of its getter methods for configuration values eturn non-null values.
+ * 
  * @since 4.0
  */
 public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
@@ -93,6 +98,9 @@ public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
 
     ScriptEngineManager manager = new ScriptEngineManager();
     ScriptEngine engine = manager.getEngineByName("js");
+    if (engine == null) {
+      throw new ConfigurationException("No 'js' script engine found. It is required to parse the config in 'conf/scheduler-pools.conf'");
+    }
     engine.put("cores", cores);
     engine.put("mem", mem);
 
@@ -163,8 +171,8 @@ public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
   }
 
   @Override
-  public long getGracefulShutdownTimeout() {
-    return gracefulShutdownTimeout;
+  public OptionalLong getGracefulShutdownTimeout() {
+    return OptionalLong.of(gracefulShutdownTimeout);
   }
 
   private void setGracefulShutdownTimeout(long gracefulShutdownTimeout) {
@@ -172,8 +180,8 @@ public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
   }
 
   @Override
-  public int getCpuLightPoolSize() {
-    return cpuLightPoolSize;
+  public OptionalInt getCpuLightPoolSize() {
+    return OptionalInt.of(cpuLightPoolSize);
   }
 
   private void setCpuLightPoolSize(int cpuLightPoolSize) {
@@ -181,8 +189,8 @@ public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
   }
 
   @Override
-  public int getCpuLightQueueSize() {
-    return cpuLightQueueSize;
+  public OptionalInt getCpuLightQueueSize() {
+    return OptionalInt.of(cpuLightQueueSize);
   }
 
   private void setCpuLightQueueSize(int cpuLightQueueSize) {
@@ -190,8 +198,8 @@ public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
   }
 
   @Override
-  public int getIoCorePoolSize() {
-    return ioCorePoolSize;
+  public OptionalInt getIoCorePoolSize() {
+    return OptionalInt.of(ioCorePoolSize);
   }
 
   private void setIoCorePoolSize(int ioCorePoolSize) {
@@ -199,8 +207,8 @@ public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
   }
 
   @Override
-  public int getIoMaxPoolSize() {
-    return ioMaxPoolSize;
+  public OptionalInt getIoMaxPoolSize() {
+    return OptionalInt.of(ioMaxPoolSize);
   }
 
   private void setIoMaxPoolSize(int ioMaxPoolSize) {
@@ -208,8 +216,8 @@ public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
   }
 
   @Override
-  public int getIoQueueSize() {
-    return ioQueueSize;
+  public OptionalInt getIoQueueSize() {
+    return OptionalInt.of(ioQueueSize);
   }
 
   private void setIoQueueSize(int ioQueueSize) {
@@ -217,8 +225,8 @@ public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
   }
 
   @Override
-  public long getIoKeepAlive() {
-    return ioKeepAlive;
+  public OptionalLong getIoKeepAlive() {
+    return OptionalLong.of(ioKeepAlive);
   }
 
   private void setIoKeepAlive(long ioKeepAlive) {
@@ -226,8 +234,8 @@ public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
   }
 
   @Override
-  public int getCpuIntensivePoolSize() {
-    return cpuIntensivePoolSize;
+  public OptionalInt getCpuIntensivePoolSize() {
+    return OptionalInt.of(cpuIntensivePoolSize);
   }
 
   private void setCpuIntensivePoolSize(int cpuIntensivePoolSize) {
@@ -235,8 +243,8 @@ public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
   }
 
   @Override
-  public int getCpuIntensiveQueueSize() {
-    return cpuIntensiveQueueSize;
+  public OptionalInt getCpuIntensiveQueueSize() {
+    return OptionalInt.of(cpuIntensiveQueueSize);
   }
 
   private void setCpuIntensiveQueueSize(int cpuIntensiveQueueSize) {

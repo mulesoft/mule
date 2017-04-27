@@ -24,6 +24,8 @@ import org.mule.tck.probe.PollingProber;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 
 import org.junit.After;
 import org.junit.Before;
@@ -106,13 +108,15 @@ public class SchedulerServiceTestCase extends AbstractMuleTestCase {
 
   private SchedulerPoolsConfig getMockConfig() {
     final SchedulerPoolsConfig config = mock(SchedulerPoolsConfig.class);
-    when(config.getCpuLightPoolSize()).thenReturn(1);
-    when(config.getCpuLightQueueSize()).thenReturn(1);
-    when(config.getCpuIntensiveQueueSize()).thenReturn(1);
-    when(config.getIoCorePoolSize()).thenReturn(1);
-    when(config.getIoMaxPoolSize()).thenReturn(1);
-    when(config.getCpuIntensivePoolSize()).thenReturn(1);
-    when(config.getCpuIntensiveQueueSize()).thenReturn(1);
+    when(config.getGracefulShutdownTimeout()).thenReturn(OptionalLong.of(30000L));
+    when(config.getCpuLightPoolSize()).thenReturn(OptionalInt.of(1));
+    when(config.getCpuLightQueueSize()).thenReturn(OptionalInt.of(1));
+    when(config.getCpuIntensiveQueueSize()).thenReturn(OptionalInt.of(1));
+    when(config.getIoCorePoolSize()).thenReturn(OptionalInt.of(1));
+    when(config.getIoMaxPoolSize()).thenReturn(OptionalInt.of(1));
+    when(config.getIoKeepAlive()).thenReturn(OptionalLong.of(30000L));
+    when(config.getCpuIntensivePoolSize()).thenReturn(OptionalInt.of(1));
+    when(config.getCpuIntensiveQueueSize()).thenReturn(OptionalInt.of(1));
     return config;
   }
 }

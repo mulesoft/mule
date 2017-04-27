@@ -107,20 +107,21 @@ public class SchedulerThreadPools {
 
   public void start() throws MuleException {
     cpuLightExecutor =
-        new ThreadPoolExecutor(threadPoolsConfig.getCpuLightPoolSize(), threadPoolsConfig.getCpuLightPoolSize(),
-                               0, SECONDS, new LinkedBlockingQueue<>(threadPoolsConfig.getCpuLightQueueSize()),
+        new ThreadPoolExecutor(threadPoolsConfig.getCpuLightPoolSize().getAsInt(),
+                               threadPoolsConfig.getCpuLightPoolSize().getAsInt(),
+                               0, SECONDS, new LinkedBlockingQueue<>(threadPoolsConfig.getCpuLightQueueSize().getAsInt()),
                                new SchedulerThreadFactory(cpuLightGroup), byCallerThreadGroupPolicy);
     ioExecutor =
-        new ThreadPoolExecutor(threadPoolsConfig.getIoCorePoolSize(), threadPoolsConfig.getIoMaxPoolSize(),
-                               threadPoolsConfig.getIoKeepAlive(), MILLISECONDS,
+        new ThreadPoolExecutor(threadPoolsConfig.getIoCorePoolSize().getAsInt(), threadPoolsConfig.getIoMaxPoolSize().getAsInt(),
+                               threadPoolsConfig.getIoKeepAlive().getAsLong(), MILLISECONDS,
                                // TODO MULE-11505 - Implement cached IO scheduler that grows and uses async hand-off
                                // with queue.
                                new SynchronousQueue<>(),
                                new SchedulerThreadFactory(ioGroup), byCallerThreadGroupPolicy);
     computationExecutor =
-        new ThreadPoolExecutor(threadPoolsConfig.getCpuIntensivePoolSize(),
-                               threadPoolsConfig.getCpuIntensivePoolSize(),
-                               0, SECONDS, new LinkedBlockingQueue<>(threadPoolsConfig.getCpuIntensiveQueueSize()),
+        new ThreadPoolExecutor(threadPoolsConfig.getCpuIntensivePoolSize().getAsInt(),
+                               threadPoolsConfig.getCpuIntensivePoolSize().getAsInt(),
+                               0, SECONDS, new LinkedBlockingQueue<>(threadPoolsConfig.getCpuIntensiveQueueSize().getAsInt()),
                                new SchedulerThreadFactory(computationGroup), byCallerThreadGroupPolicy);
 
     scheduledExecutor = new ScheduledThreadPoolExecutor(1, new SchedulerThreadFactory(timerGroup, "%s"));
@@ -195,8 +196,9 @@ public class SchedulerThreadPools {
 
   protected void waitForExecutorTermination(final long startMillis, final ExecutorService executor, final String executorLabel)
       throws InterruptedException {
-    if (!executor.awaitTermination(threadPoolsConfig.getGracefulShutdownTimeout() - (currentTimeMillis() - startMillis),
-                                   MILLISECONDS)) {
+    if (!executor
+        .awaitTermination(threadPoolsConfig.getGracefulShutdownTimeout().getAsLong() - (currentTimeMillis() - startMillis),
+                          MILLISECONDS)) {
       final List<Runnable> cancelledJobs = executor.shutdownNow();
       logger.warn("'" + executorLabel + "' " + executor.toString() + " did not shutdown gracefully after "
           + threadPoolsConfig.getGracefulShutdownTimeout() + " milliseconds.");
