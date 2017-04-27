@@ -43,7 +43,6 @@
         <module>repository</module>
         <module>spring-security</module>
         <module>tls</module>
-        <module>tomcat</module>
         <module>tooling-support</module>
         <module>soap-api</module>
         <module>extensions-soap-support</module>

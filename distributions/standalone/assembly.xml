@@ -165,7 +165,6 @@
                 <include>org.mule.runtime:mule-module-spring-security</include>
                 <include>org.mule.modules:mule-module-sockets</include>
                 <include>org.mule.runtime:mule-module-tls</include>
-                <include>org.mule.runtime:mule-module-tomcat</include>
                 <include>org.mule.runtime:mule-module-tooling-support</include>
 
                 <!-- Shared libs -->
@@ -250,7 +249,6 @@
                 <exclude>org.mule.runtime:mule-module-spring-security</exclude>
                 <exclude>org.mule.modules:mule-module-sockets</exclude>
                 <exclude>org.mule.runtime:mule-module-tls</exclude>
-                <exclude>org.mule.runtime:mule-module-tomcat</exclude>
                 <exclude>org.mule.runtime:mule-module-tooling-support</exclude>
 
                 <!-- lib/plugins (these artifacts are zip type) -->
