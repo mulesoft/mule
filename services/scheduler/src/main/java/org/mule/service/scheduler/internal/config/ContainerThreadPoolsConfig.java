@@ -31,11 +31,14 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.apache.logging.log4j.core.config.ConfigurationException;
 import org.slf4j.Logger;
 
 /**
  * Bean that contains the thread pools configuration for the runtime.
- *
+ * <p>
+ * All of its getter methods for configuration values eturn non-null values.
+ * 
  * @since 4.0
  */
 public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
@@ -93,6 +96,9 @@ public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
 
     ScriptEngineManager manager = new ScriptEngineManager();
     ScriptEngine engine = manager.getEngineByName("js");
+    if (engine == null) {
+      throw new ConfigurationException("No 'js' script engine found. It is required to parse the config in 'conf/scheduler-pools.conf'");
+    }
     engine.put("cores", cores);
     engine.put("mem", mem);
 
@@ -163,83 +169,83 @@ public class ContainerThreadPoolsConfig implements SchedulerPoolsConfig {
   }
 
   @Override
-  public long getGracefulShutdownTimeout() {
+  public Long getGracefulShutdownTimeout() {
     return gracefulShutdownTimeout;
   }
 
-  private void setGracefulShutdownTimeout(long gracefulShutdownTimeout) {
+  private void setGracefulShutdownTimeout(Long gracefulShutdownTimeout) {
     this.gracefulShutdownTimeout = gracefulShutdownTimeout;
   }
 
   @Override
-  public int getCpuLightPoolSize() {
+  public Integer getCpuLightPoolSize() {
     return cpuLightPoolSize;
   }
 
-  private void setCpuLightPoolSize(int cpuLightPoolSize) {
+  private void setCpuLightPoolSize(Integer cpuLightPoolSize) {
     this.cpuLightPoolSize = cpuLightPoolSize;
   }
 
   @Override
-  public int getCpuLightQueueSize() {
+  public Integer getCpuLightQueueSize() {
     return cpuLightQueueSize;
   }
 
-  private void setCpuLightQueueSize(int cpuLightQueueSize) {
+  private void setCpuLightQueueSize(Integer cpuLightQueueSize) {
     this.cpuLightQueueSize = cpuLightQueueSize;
   }
 
   @Override
-  public int getIoCorePoolSize() {
+  public Integer getIoCorePoolSize() {
     return ioCorePoolSize;
   }
 
-  private void setIoCorePoolSize(int ioCorePoolSize) {
+  private void setIoCorePoolSize(Integer ioCorePoolSize) {
     this.ioCorePoolSize = ioCorePoolSize;
   }
 
   @Override
-  public int getIoMaxPoolSize() {
+  public Integer getIoMaxPoolSize() {
     return ioMaxPoolSize;
   }
 
-  private void setIoMaxPoolSize(int ioMaxPoolSize) {
+  private void setIoMaxPoolSize(Integer ioMaxPoolSize) {
     this.ioMaxPoolSize = ioMaxPoolSize;
   }
 
   @Override
-  public int getIoQueueSize() {
+  public Integer getIoQueueSize() {
     return ioQueueSize;
   }
 
-  private void setIoQueueSize(int ioQueueSize) {
+  private void setIoQueueSize(Integer ioQueueSize) {
     this.ioQueueSize = ioQueueSize;
   }
 
   @Override
-  public long getIoKeepAlive() {
+  public Long getIoKeepAlive() {
     return ioKeepAlive;
   }
 
-  private void setIoKeepAlive(long ioKeepAlive) {
+  private void setIoKeepAlive(Long ioKeepAlive) {
     this.ioKeepAlive = ioKeepAlive;
   }
 
   @Override
-  public int getCpuIntensivePoolSize() {
+  public Integer getCpuIntensivePoolSize() {
     return cpuIntensivePoolSize;
   }
 
-  private void setCpuIntensivePoolSize(int cpuIntensivePoolSize) {
+  private void setCpuIntensivePoolSize(Integer cpuIntensivePoolSize) {
     this.cpuIntensivePoolSize = cpuIntensivePoolSize;
   }
 
   @Override
-  public int getCpuIntensiveQueueSize() {
+  public Integer getCpuIntensiveQueueSize() {
     return cpuIntensiveQueueSize;
   }
 
-  private void setCpuIntensiveQueueSize(int cpuIntensiveQueueSize) {
+  private void setCpuIntensiveQueueSize(Integer cpuIntensiveQueueSize) {
     this.cpuIntensiveQueueSize = cpuIntensiveQueueSize;
   }
 
