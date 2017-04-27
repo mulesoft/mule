@@ -38,8 +38,8 @@ import java.util.Set;
  */
 final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
 
-  private final InvokeOperationDeclarer operationDeclarer;
-  private final ServiceProviderDeclarer serviceProviderDeclarer;
+  private final SoapInvokeOperationDeclarer operationDeclarer;
+  private final SoapServiceProviderDeclarer serviceProviderDeclarer;
   private final Class<?> extensionType;
   private final String version;
   private final ClassTypeLoader typeLoader;
@@ -48,8 +48,8 @@ final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
     this.extensionType = extensionType;
     this.version = version;
     this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-    this.serviceProviderDeclarer = new ServiceProviderDeclarer(typeLoader);
-    this.operationDeclarer = new InvokeOperationDeclarer();
+    this.serviceProviderDeclarer = new SoapServiceProviderDeclarer(typeLoader);
+    this.operationDeclarer = new SoapInvokeOperationDeclarer();
   }
 
   /**

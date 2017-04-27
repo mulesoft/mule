@@ -57,7 +57,7 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class InvokeOperationDeclarer {
+public class SoapInvokeOperationDeclarer {
 
   private static final String KEYS_GROUP = "WebServiceConfiguration";
   static final String OPERATION_NAME = "invoke";
@@ -76,7 +76,7 @@ public class InvokeOperationDeclarer {
    * Declares the invoke operation.
    * @param declarer the soap extension declarer
    * @param loader   a {@link ClassTypeLoader} to load some parameters types.
-   * @param soapErrors
+   * @param soapErrors the {@link ErrorModel}s that this operation can throw.
    */
   public OperationDeclarer declare(ExtensionDeclarer declarer, ClassTypeLoader loader, Set<ErrorModel> soapErrors) {
 

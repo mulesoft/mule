@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.extension.soap.internal.runtime.operation;
 
-import static org.mule.runtime.module.extension.soap.internal.loader.InvokeOperationDeclarer.ATTACHMENTS_PARAM;
-import static org.mule.runtime.module.extension.soap.internal.loader.InvokeOperationDeclarer.HEADERS_PARAM;
-import static org.mule.runtime.module.extension.soap.internal.loader.InvokeOperationDeclarer.OPERATION_PARAM;
-import static org.mule.runtime.module.extension.soap.internal.loader.InvokeOperationDeclarer.REQUEST_PARAM;
-import static org.mule.runtime.module.extension.soap.internal.loader.InvokeOperationDeclarer.SERVICE_PARAM;
-import static org.mule.runtime.module.extension.soap.internal.loader.InvokeOperationDeclarer.TRANSPORT_HEADERS_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.ATTACHMENTS_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.HEADERS_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.OPERATION_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.REQUEST_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.SERVICE_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_HEADERS_PARAM;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.justOrEmpty;
 import org.mule.runtime.api.el.BindingContext;
