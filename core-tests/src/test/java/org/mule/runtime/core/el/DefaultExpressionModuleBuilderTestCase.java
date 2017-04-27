@@ -13,11 +13,16 @@ import org.mule.runtime.api.el.ModuleNamespace;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 
 public class DefaultExpressionModuleBuilderTestCase extends AbstractMuleTestCase {
+
+  public static final String ID = "id";
 
   private TypedValue<String> typedValue = new TypedValue<>("", STRING);
   private ModuleNamespace namespace = new ModuleNamespace("org", "mule", "mymodule");
@@ -26,12 +31,12 @@ public class DefaultExpressionModuleBuilderTestCase extends AbstractMuleTestCase
   public void shouldCreateTheModuleCorrectly() {
 
     ExpressionModule.Builder builder = ExpressionModule.builder(namespace);
-    builder.addBinding("id", typedValue);
+    builder.addBinding(ID, typedValue);
 
     ExpressionModule module = builder.build();
     assertThat(module.bindings(), hasSize(1));
-    assertThat(module.identifiers(), hasItem("id"));
-    assertThat(module.lookup("id").get(), is(sameInstance(typedValue)));
+    assertThat(module.identifiers(), hasItem(ID));
+    assertThat(module.lookup(ID).get(), is(sameInstance(typedValue)));
     assertThat(module.namespace(), is(namespace));
 
   }

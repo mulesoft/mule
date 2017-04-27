@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.el;
 
+import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -15,7 +16,13 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionModule;
 import org.mule.runtime.api.metadata.TypedValue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 
 public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
@@ -62,8 +69,8 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
     private List<ExpressionModule> modules;
 
     private BindingContextImplementation(Map<String, TypedValue> bindings, List<ExpressionModule> modules) {
-      this.bindings = unmodifiableMap(bindings);
-      this.modules = modules;
+      this.bindings = unmodifiableMap(new HashMap<>(bindings));
+      this.modules = unmodifiableList(new ArrayList<>(modules));
     }
 
     @Override

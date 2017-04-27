@@ -62,4 +62,27 @@ public class DefaultBindingContextBuilderTestCase extends AbstractMuleTestCase {
     assertThat(context.modules(), hasItems(module));
   }
 
+
+  @Test
+  public void fromPreviousBindings() {
+    ExpressionModule module = ExpressionModule.builder(namespace).addBinding("id", typedValue).build();
+    BindingContext previousContext =
+        BindingContext.builder()
+            .addBinding(ID, typedValue)
+            .addBinding(OTHER_ID, typedValue)
+            .addModule(module)
+            .build();
+
+
+    BindingContext context = BindingContext.builder(previousContext).build();
+
+    assertThat(context.bindings(), hasSize(2));
+    assertThat(context.identifiers(), hasItems(ID, OTHER_ID));
+    assertThat(context.lookup(ID).get(), is(sameInstance(typedValue)));
+    assertThat(context.lookup(OTHER_ID).get(), is(sameInstance(typedValue)));
+
+    assertThat(context.modules(), hasSize(1));
+    assertThat(context.modules(), hasItems(module));
+  }
+
 }
