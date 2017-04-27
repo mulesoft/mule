@@ -30,6 +30,7 @@ import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -94,13 +95,44 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     ApplicationModel minimalModel =
         generator.getMinimalModel(builder().globalName("flowTwo").addProcessorsPart().addIndexPart(0).build());
     assertThat(minimalModel.findNamedComponent("flowTwo").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowTwo").get().isEnabled(), is(true));
     assertThat(minimalModel.findNamedComponent("flowOne").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowOne").get().isEnabled(), is(false));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().isEnabled(), is(false));
 
     List<ComponentModel> componentModelList = generator.resolveComponentModelDependencies();
     assertThat(componentModelList, hasSize(2));
 
     assertThat(componentModelList.get(0).getNameAttribute(), equalTo("flowOne"));
     assertThat(componentModelList.get(1).getNameAttribute(), equalTo("flowTwo"));
+  }
+
+  @Test
+  public void resolveDependenciesMultipleConfigFiles() throws Exception {
+    final String firstConfigFile = "resolve-dependencies-config-1.xml";
+    final String secondConfigFile = "resolve-dependencies-config-2.xml";
+    MinimalApplicationModelGenerator generator =
+        createGeneratorForConfig(firstConfigFile, secondConfigFile);
+    ApplicationModel minimalModel =
+        generator.getMinimalModel(builder().globalName("flowTwo").addProcessorsPart().addIndexPart(0).build());
+    assertThat(minimalModel.findNamedComponent("flowTwo").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowTwo").get().isEnabled(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowOne").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowOne").get().isEnabled(), is(false));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").isPresent(), is(true));
+    assertThat(minimalModel.findNamedComponent("flowWithSource").get().isEnabled(), is(false));
+
+    List<ComponentModel> componentModelList = generator.resolveComponentModelDependencies();
+    assertThat(componentModelList, hasSize(2));
+
+    assertThat(componentModelList.get(0).getNameAttribute(), equalTo("flowOne"));
+    assertThat(componentModelList.get(1).getNameAttribute(), equalTo("flowTwo"));
+
+    assertThat(minimalModel.findNamedComponent("flowTwo").get().getConfigFileName().get(),
+               is(firstConfigFile));
+    assertThat(minimalModel.findNamedComponent("flowOne").get().getConfigFileName().get(),
+               is(secondConfigFile));
   }
 
   @Test
@@ -160,19 +192,26 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     assertThat(minimalModel.findNamedComponent("flowWithSource").get().getInnerComponents().get(0).isEnabled(), is(true));
   }
 
-  private MinimalApplicationModelGenerator createGeneratorForConfig(String configFileName) throws Exception {
-    Optional<ConfigLine> configLine = xmlApplicationParser.parse(documentLoader
-        .loadDocument(configFileName, getClass().getClassLoader().getResourceAsStream("model-generator/" + configFileName))
-        .getDocumentElement());
-    ConfigFile configFile = new ConfigFile("test", Arrays.asList(configLine.get()));
+  private MinimalApplicationModelGenerator createGeneratorForConfig(String... configFileName) throws Exception {
+    List<ConfigFile> configFiles = new ArrayList<>();
+    for (String configFile : configFileName) {
+      Optional<ConfigLine> configLine = xmlApplicationParser.parse(documentLoader
+          .loadDocument(configFile, getClass().getClassLoader().getResourceAsStream("model-generator/" + configFile))
+          .getDocumentElement());
+      configFiles.add(new ConfigFile(configFile, Arrays.asList(configLine.get())));
+    }
     ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry = new ComponentBuildingDefinitionRegistry();
     CoreComponentBuildingDefinitionProvider coreComponentBuildingDefinitionProvider =
         new CoreComponentBuildingDefinitionProvider();
     coreComponentBuildingDefinitionProvider.init();
     coreComponentBuildingDefinitionProvider.getComponentBuildingDefinitions()
         .stream().forEach(componentBuildingDefinitionRegistry::register);
-    return new MinimalApplicationModelGenerator(new ApplicationModel(new ArtifactConfig.Builder().addConfigFile(configFile)
-        .build(), new ArtifactDeclaration(), emptySet(), Optional.of(componentBuildingDefinitionRegistry)),
+
+    final ArtifactConfig.Builder builder = new ArtifactConfig.Builder();
+    configFiles.stream().forEach(configFile -> builder.addConfigFile(configFile));
+    final ArtifactConfig artifactConfig = builder.build();
+    return new MinimalApplicationModelGenerator(new ApplicationModel(artifactConfig, new ArtifactDeclaration(), emptySet(),
+                                                                     Optional.of(componentBuildingDefinitionRegistry)),
                                                 componentBuildingDefinitionRegistry);
   }
 

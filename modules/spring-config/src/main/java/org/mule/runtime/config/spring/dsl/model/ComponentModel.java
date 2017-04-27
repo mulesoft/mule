@@ -7,11 +7,12 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 import static com.google.common.collect.ImmutableMap.copyOf;
+import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
@@ -263,12 +264,28 @@ public class ComponentModel {
   public static class Builder {
 
     private ComponentModel model = new ComponentModel();
+    private ComponentModel root;
+
+    /**
+     * Default constructor for this builder.
+     */
+    public Builder() {}
+
+    /**
+     * Creates an instance of the Builder which will allow to merge other root component models to the given one.
+     * The root component model provided here will be modified instead of cloned.
+     * @param root {@link ComponentModel} to be used as root. It will be modified.
+     */
+    public Builder(ComponentModel root) {
+      this.root = root;
+    }
 
     /**
      * @param identifier identifier for the configuration element this object represents.
      * @return the builder.
      */
     public Builder setIdentifier(ComponentIdentifier identifier) {
+      checkIsNotBuildingFromRootComponentModel("identifier");
       this.model.identifier = identifier;
       return this;
     }
@@ -280,6 +297,7 @@ public class ComponentModel {
      * @return the builder.
      */
     public Builder addParameter(String parameterName, String value, boolean valueFromSchema) {
+      checkIsNotBuildingFromRootComponentModel("parameters");
       this.model.parameters.put(parameterName, value);
       if (valueFromSchema) {
         this.model.schemaValueParameter.add(parameterName);
@@ -294,6 +312,7 @@ public class ComponentModel {
      * @return the builder.
      */
     public Builder addChildComponentModel(ComponentModel componentModel) {
+      checkIsNotBuildingFromRootComponentModel("innerComponents");
       this.model.innerComponents.add(componentModel);
       componentModel.setParent(model);
       return this;
@@ -306,6 +325,7 @@ public class ComponentModel {
      * @return the builder.
      */
     public Builder setTextContent(String textContent) {
+      checkIsNotBuildingFromRootComponentModel("textComponent");
       this.model.textContent = textContent;
       return this;
     }
@@ -316,6 +336,7 @@ public class ComponentModel {
      * @return the builder.
      */
     public Builder markAsRootComponent() {
+      checkIsNotBuildingFromRootComponentModel("root");
       this.model.root = true;
       return this;
     }
@@ -329,6 +350,7 @@ public class ComponentModel {
      * @return the builder.
      */
     public Builder addCustomAttribute(String name, Object value) {
+      checkIsNotBuildingFromRootComponentModel("customAttributes");
       this.model.customAttributes.put(name, value);
       return this;
     }
@@ -338,6 +360,7 @@ public class ComponentModel {
      * @return the builder.
      */
     public Builder setConfigFileName(String configFileName) {
+      checkIsNotBuildingFromRootComponentModel("configFileName");
       this.model.configFileName = configFileName;
       return this;
     }
@@ -347,7 +370,23 @@ public class ComponentModel {
      * @return the builder.
      */
     public Builder setLineNumber(int lineNumber) {
+      checkIsNotBuildingFromRootComponentModel("lineNumber");
       this.model.lineNumber = lineNumber;
+      return this;
+    }
+
+    /**
+     * Given the following root component it will merge its customAttributes, parameters and schemaValueParameters to the root
+     * component model.
+     * @param otherRootComponentModel another component model created as root to be merged.
+     * @return the builder.
+     */
+    public Builder merge(ComponentModel otherRootComponentModel) {
+      this.root.customAttributes.putAll(otherRootComponentModel.customAttributes);
+      this.root.parameters.putAll(otherRootComponentModel.parameters);
+      this.root.schemaValueParameter.addAll(otherRootComponentModel.schemaValueParameter);
+
+      this.root.innerComponents.addAll(otherRootComponentModel.innerComponents);
       return this;
     }
 
@@ -355,8 +394,16 @@ public class ComponentModel {
      * @return a {@code ComponentModel} created based on the supplied parameters.
      */
     public ComponentModel build() {
-      Preconditions.checkState(model.identifier != null, "An identifier must be provided");
+      if (root != null) {
+        return root;
+      }
+      checkState(model.identifier != null, "An identifier must be provided");
       return model;
+    }
+
+    private void checkIsNotBuildingFromRootComponentModel(String parameter) {
+      checkState(root == null,
+                 format("%s cannot be modified when builder has been constructed from a root component", parameter));
     }
 
   }

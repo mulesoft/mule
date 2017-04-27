@@ -472,7 +472,13 @@ public class ApplicationModel {
       ComponentModel componentModel =
           componentModelReader.extractComponentDefinitionModel(configFile.getConfigLines().get(0), configFile.getFilename());
       if (isMuleConfigFile(configFile)) {
-        muleComponentModels.add(componentModel);
+        if (muleComponentModels.isEmpty()) {
+          muleComponentModels.add(componentModel);
+        } else {
+          // Only one componentModel as Root should be set, therefore componentModel is merged
+          final ComponentModel rootComponentModel = muleComponentModels.get(0);
+          muleComponentModels.set(0, new ComponentModel.Builder(rootComponentModel).merge(componentModel).build());
+        }
       } else {
         springComponentModels.add(componentModel);
       }
