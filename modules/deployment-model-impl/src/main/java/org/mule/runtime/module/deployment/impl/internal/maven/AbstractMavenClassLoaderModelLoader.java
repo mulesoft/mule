@@ -145,7 +145,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   private BundleDescriptor convertBundleDescriptor(org.mule.maven.client.api.BundleDescriptor descriptor) {
     BundleDescriptor.Builder builder = new BundleDescriptor.Builder().setGroupId(descriptor.getGroupId())
         .setArtifactId(descriptor.getArtifactId())
-        .setVersion(descriptor.getVersion())
+        // Use baseVersion as it will refer to the unresolved meta version (case of SNAPSHOTS instead of timestamp versions)
+        .setVersion(descriptor.getBaseVersion())
         .setType(descriptor.getType());
     descriptor.getClassifier().ifPresent(builder::setClassifier);
     return builder.build();
