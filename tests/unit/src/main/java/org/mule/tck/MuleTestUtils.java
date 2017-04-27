@@ -10,7 +10,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.construct.Flow.builder;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMuleContext;
@@ -18,6 +17,9 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -83,6 +85,38 @@ public final class MuleTestUtils {
       } else {
         System.setProperty(propertyName, originalPropertyValue);
       }
+    }
+  }
+
+  /**
+   * Execute callback with a given system properties set and replaces the system property with it's original value once done. Useful
+   * for asserting behaviour that is dependent on the presence of a system property.
+   *
+   * @param properties {@link Map} of property name and property value to be set.
+   * @param callback Callback implementing the the test code and assertions to be run with system property set.
+   * @throws Exception any exception thrown by the execution of callback
+   */
+  public static void testWithSystemProperties(Map<String, String> properties, TestCallback callback)
+      throws Exception {
+    assert properties != null && callback != null;
+    Map<String, String> originalPropertyValues = new HashMap<>();
+    properties.forEach((propertyName, propertyValue) -> {
+      if (propertyValue == null) {
+        originalPropertyValues.put(propertyName, System.clearProperty(propertyName));
+      } else {
+        originalPropertyValues.put(propertyName, System.setProperty(propertyName, propertyValue));
+      }
+    });
+    try {
+      callback.run();
+    } finally {
+      originalPropertyValues.forEach((propertyName, originalPropertyValue) -> {
+        if (originalPropertyValue == null) {
+          System.clearProperty(propertyName);
+        } else {
+          System.setProperty(propertyName, originalPropertyValue);
+        }
+      });
     }
   }
 

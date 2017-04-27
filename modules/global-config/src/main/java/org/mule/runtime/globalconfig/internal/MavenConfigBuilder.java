@@ -21,12 +21,15 @@ import com.typesafe.config.ConfigObject;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.Map;
 
 /**
  * Configuration builder for {@link MavenConfiguration} instances.
  */
 public class MavenConfigBuilder {
+
+  private static final String POSITION = "position";
 
   /**
    * @param mavenConfig the maven configuration set by the user
@@ -70,7 +73,7 @@ public class MavenConfigBuilder {
           mavenConfig.hasPath("repositories") ? mavenConfig.getObject("repositories") : null;
       if (repositories != null) {
         Map<String, Object> repositoriesAsMap = repositories.unwrapped();
-        repositoriesAsMap.entrySet().forEach((repoEntry) -> {
+        repositoriesAsMap.entrySet().stream().sorted(remoteRepositoriesComparator()).forEach((repoEntry) -> {
           String repositoryId = repoEntry.getKey();
           Map<String, String> repositoryConfig = (Map<String, String>) repoEntry.getValue();
           String url = repositoryConfig.get("url");
@@ -102,6 +105,16 @@ public class MavenConfigBuilder {
       }
       throw new RuntimeGlobalConfigException(e);
     }
+  }
+
+  private static Comparator<Map.Entry<String, Object>> remoteRepositoriesComparator() {
+    return (firstEntry, secondEntry) -> {
+      Integer firstPosition = Integer
+          .valueOf(((Map<String, String>) firstEntry.getValue()).getOrDefault(POSITION, String.valueOf(Integer.MAX_VALUE)));
+      Integer secondPosition = Integer.valueOf(((Map<String, String>) secondEntry.getValue())
+          .getOrDefault(POSITION, String.valueOf(Integer.MAX_VALUE)));
+      return firstPosition.compareTo(secondPosition);
+    };
   }
 
   /**

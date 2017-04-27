@@ -6,7 +6,6 @@
  */
 package org.mule.test.infrastructure.process.rules;
 
-import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
 import static com.jayway.awaitility.Awaitility.await;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
@@ -15,7 +14,7 @@ import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
-
+import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.infrastructure.process.MuleProcessController;
@@ -26,7 +25,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -90,7 +88,7 @@ public class MuleDeployment extends MuleInstallation {
   private List<String> domains = new ArrayList<>();
   private List<String> libraries = new ArrayList<>();
   private MuleProcessController mule;
-  private Map<String, String> properties = new LinkedHashMap<>();
+  private Map<String, String> properties = new HashMap<>();
   private Map<String, Supplier<String>> propertiesUsingLambdas = new HashMap<>();
 
   public static class Builder {

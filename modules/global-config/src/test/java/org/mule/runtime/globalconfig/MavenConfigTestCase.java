@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.globalconfig;
 
+import static org.hamcrest.Matchers.either;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperties;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.allure.AllureConstants.RuntimeGlobalConfiguration.MavenGlobalConfiguration.MAVEN_GLOBAL_CONFIGURATION_STORY;
 import static org.mule.test.allure.AllureConstants.RuntimeGlobalConfiguration.RUNTIME_GLOBAL_CONFIGURATION;
@@ -22,7 +24,9 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -84,6 +88,52 @@ public class MavenConfigTestCase extends AbstractMuleTestCase {
       assertThat(mavenRemoteRepositories.get(0).getUrl(), is(new URL(additionalRepositoryUrl)));
       assertThat(mavenRemoteRepositories.get(1).getId(), is("mavenCentral"));
       assertThat(mavenRemoteRepositories.get(1).getUrl(), is(new URL(MAVEN_CENTRAL_URL)));
+    });
+  }
+
+  @Description("Loads the configuration from mule-config.json and adds an additional maven repository using system properties with order for remote repositories")
+  @Test
+  public void loadFromFileWithAdditionalRepoFromSystemPropertyInOrder() throws Exception {
+    String additionalRepositoryUrl = "http://localhost/host";
+    Map<String, String> systemProperties = new HashMap<>();
+    systemProperties.put("muleRuntimeConfig.maven.repositories.firstCustomRepo.url", additionalRepositoryUrl);
+    systemProperties.put("muleRuntimeConfig.maven.repositories.firstCustomRepo.position", "1");
+    systemProperties.put("muleRuntimeConfig.maven.repositories.secondCustomRepo.url", additionalRepositoryUrl);
+    systemProperties.put("muleRuntimeConfig.maven.repositories.secondCustomRepo.position", "2");
+    testWithSystemProperties(systemProperties, () -> {
+      GlobalConfigLoader.reset();
+      MavenConfiguration mavenConfig = getMavenConfig();
+      List<RemoteRepository> mavenRemoteRepositories = mavenConfig.getMavenRemoteRepositories();
+      assertThat(mavenRemoteRepositories, hasSize(3));
+      assertThat(mavenRemoteRepositories.get(0).getId(), is("firstCustomRepo"));
+      assertThat(mavenRemoteRepositories.get(0).getUrl(), is(new URL(additionalRepositoryUrl)));
+      assertThat(mavenRemoteRepositories.get(1).getId(), is("secondCustomRepo"));
+      assertThat(mavenRemoteRepositories.get(1).getUrl(), is(new URL(additionalRepositoryUrl)));
+      assertThat(mavenRemoteRepositories.get(2).getId(), is("mavenCentral"));
+      assertThat(mavenRemoteRepositories.get(2).getUrl(), is(new URL(MAVEN_CENTRAL_URL)));
+    });
+  }
+
+  @Description("Loads the configuration from mule-config.json and adds an additional maven repository using system properties with order for remote repositories with same position")
+  @Test
+  public void loadFromFileWithAdditionalRepoFromSystemPropertyInOrderSamePosition() throws Exception {
+    String additionalRepositoryUrl = "http://localhost/host";
+    Map<String, String> systemProperties = new HashMap<>();
+    systemProperties.put("muleRuntimeConfig.maven.repositories.firstCustomRepo.url", additionalRepositoryUrl);
+    systemProperties.put("muleRuntimeConfig.maven.repositories.firstCustomRepo.position", "1");
+    systemProperties.put("muleRuntimeConfig.maven.repositories.secondCustomRepo.url", additionalRepositoryUrl);
+    systemProperties.put("muleRuntimeConfig.maven.repositories.secondCustomRepo.position", "1");
+    testWithSystemProperties(systemProperties, () -> {
+      GlobalConfigLoader.reset();
+      MavenConfiguration mavenConfig = getMavenConfig();
+      List<RemoteRepository> mavenRemoteRepositories = mavenConfig.getMavenRemoteRepositories();
+      assertThat(mavenRemoteRepositories, hasSize(3));
+      assertThat(mavenRemoteRepositories.get(0).getId(), either(is("firstCustomRepo")).or(is("secondCustomRepo")));
+      assertThat(mavenRemoteRepositories.get(0).getUrl(), is(new URL(additionalRepositoryUrl)));
+      assertThat(mavenRemoteRepositories.get(1).getId(), either(is("firstCustomRepo")).or(is("secondCustomRepo")));
+      assertThat(mavenRemoteRepositories.get(1).getUrl(), is(new URL(additionalRepositoryUrl)));
+      assertThat(mavenRemoteRepositories.get(2).getId(), is("mavenCentral"));
+      assertThat(mavenRemoteRepositories.get(2).getUrl(), is(new URL(MAVEN_CENTRAL_URL)));
     });
   }
 
