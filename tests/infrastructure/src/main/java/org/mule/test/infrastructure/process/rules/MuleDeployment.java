@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -89,7 +90,7 @@ public class MuleDeployment extends MuleInstallation {
   private List<String> domains = new ArrayList<>();
   private List<String> libraries = new ArrayList<>();
   private MuleProcessController mule;
-  private Map<String, String> properties = new HashMap<>();
+  private Map<String, String> properties = new LinkedHashMap<>();
   private Map<String, Supplier<String>> propertiesUsingLambdas = new HashMap<>();
 
   public static class Builder {
