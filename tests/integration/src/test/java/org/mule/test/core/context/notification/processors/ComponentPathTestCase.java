@@ -29,6 +29,7 @@ import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.dsl.api.component.config.DefaultLocationPart;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
@@ -50,85 +51,85 @@ public class ComponentPathTestCase extends MuleArtifactFunctionalTestCase {
 
   private static final DefaultComponentLocation FLOW_WITH_SINGLE_MP_LOCATION =
       new DefaultComponentLocation(of("flowWithSingleMp"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithSingleMp",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(27))));
+                                   asList(new DefaultLocationPart("flowWithSingleMp",
+                                                                  FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                  CONFIG_FILE_NAME,
+                                                                  of(27))));
   private static final DefaultComponentLocation FLOW_WITH_MULTIPLE_MP_LOCATION =
       new DefaultComponentLocation(of("flowWithMultipleMps"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithMultipleMps",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(31))));
+                                   asList(new DefaultLocationPart("flowWithMultipleMps",
+                                                                  FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                  CONFIG_FILE_NAME,
+                                                                  of(31))));
   private static final DefaultComponentLocation FLOW_WITH_ERROR_HANDLER =
       new DefaultComponentLocation(of("flowWithErrorHandler"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithErrorHandler",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(37))));
+                                   asList(new DefaultLocationPart("flowWithErrorHandler",
+                                                                  FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                  CONFIG_FILE_NAME,
+                                                                  of(37))));
   private static final DefaultComponentLocation FLOW_WITH_BLOCK_WITH_ERROR_HANDLER =
       new DefaultComponentLocation(of("flowWithTryWithErrorHandler"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithTryWithErrorHandler",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(58))));
+                                   asList(new DefaultLocationPart("flowWithTryWithErrorHandler",
+                                                                  FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                  CONFIG_FILE_NAME,
+                                                                  of(58))));
 
   private static final DefaultComponentLocation FLOW_WITH_SOURCE =
       new DefaultComponentLocation(of("flowWithSource"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithSource",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(70))));
+                                   asList(new DefaultLocationPart("flowWithSource",
+                                                                  FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                  CONFIG_FILE_NAME,
+                                                                  of(70))));
 
   private static final DefaultComponentLocation FLOW_WITH_SPLITTER =
       new DefaultComponentLocation(of("flowWithSplitter"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithSplitter",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(75))));
+                                   asList(new DefaultLocationPart("flowWithSplitter",
+                                                                  FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                  CONFIG_FILE_NAME,
+                                                                  of(75))));
 
   private static final DefaultComponentLocation FLOW_WITH_AGGREGATOR =
       new DefaultComponentLocation(of("flowWithAggregator"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithAggregator",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(81))));
+                                   asList(new DefaultLocationPart("flowWithAggregator",
+                                                                  FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                  CONFIG_FILE_NAME,
+                                                                  of(81))));
 
   private static final DefaultComponentLocation FLOW_WITH_SCATTER_GATHER =
       new DefaultComponentLocation(of("flowWithScatterGather"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithScatterGather",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(98))));
+                                   asList(new DefaultLocationPart("flowWithScatterGather",
+                                                                  FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                  CONFIG_FILE_NAME,
+                                                                  of(98))));
 
   private static final DefaultComponentLocation FLOW_WITH_WIRE_TAP =
       new DefaultComponentLocation(of("flowWithWireTap"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithWireTap",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(106))));
+                                   asList(new DefaultLocationPart("flowWithWireTap",
+                                                                  FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                  CONFIG_FILE_NAME,
+                                                                  of(106))));
 
   private static final DefaultComponentLocation FLOW_WITH_ASYNC =
       new DefaultComponentLocation(of("flowWithAsync"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithAsync",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(116))));
+                                   asList(new DefaultLocationPart("flowWithAsync",
+                                                                  FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                  CONFIG_FILE_NAME,
+                                                                  of(116))));
 
   private static final DefaultComponentLocation FLOW_WITH_SUBFLOW =
       new DefaultComponentLocation(of("flowWithSubflow"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithSubflow",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(87))));
+                                   asList(new DefaultLocationPart("flowWithSubflow",
+                                                                  FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                  CONFIG_FILE_NAME,
+                                                                  of(87))));
 
 
   private static final DefaultComponentLocation SUBFLOW =
       new DefaultComponentLocation(of("subflow"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("subflow",
-                                                                                           SUB_FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(93))));
+                                   asList(new DefaultLocationPart("subflow",
+                                                                  SUB_FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                  CONFIG_FILE_NAME,
+                                                                  of(93))));
   private static final Optional<TypedComponentIdentifier> LOGGER =
       of(builder().withIdentifier(buildFromStringRepresentation("mule:logger"))
           .withType(PROCESSOR).build());

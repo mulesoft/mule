@@ -22,6 +22,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.dsl.api.component.config.DefaultLocationPart;
 
 import com.google.common.collect.ImmutableList;
 
@@ -56,12 +57,12 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
         of(builder().withIdentifier(componentModel.getIdentifier()).withType(resolveComponentType(componentModel)).build());
     if (componentModel.isRoot()) {
       String componentModelNameAttribute = componentModel.getNameAttribute();
-      ImmutableList<DefaultComponentLocation.DefaultLocationPart> parts =
-          ImmutableList.<DefaultComponentLocation.DefaultLocationPart>builder()
-              .add(new DefaultComponentLocation.DefaultLocationPart(componentModelNameAttribute,
-                                                                    typedComponentIdentifier,
-                                                                    componentModel.getConfigFileName(),
-                                                                    componentModel.getLineNumber()))
+      ImmutableList<DefaultLocationPart> parts =
+          ImmutableList.<DefaultLocationPart>builder()
+              .add(new DefaultLocationPart(componentModelNameAttribute,
+                                           typedComponentIdentifier,
+                                           componentModel.getConfigFileName(),
+                                           componentModel.getLineNumber()))
               .build();
       componentLocation = new DefaultComponentLocation(ofNullable(componentModelNameAttribute), parts);
     } else if (existsWithinFlow(componentModel) || existsWithinSubflow(componentModel)) {
