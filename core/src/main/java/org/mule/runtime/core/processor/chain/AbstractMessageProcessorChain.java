@@ -15,10 +15,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
+import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.util.ExceptionUtils.putContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.empty;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -26,6 +28,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -34,6 +37,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.MessagingException;
@@ -53,6 +57,7 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
@@ -67,6 +72,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;
   protected MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
+  protected MessagingExceptionHandler messagingExceptionHandler;
 
   public AbstractMessageProcessorChain(List<Processor> processors) {
     this(null, processors);
@@ -103,16 +109,44 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
     List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptorsToBeExecuted = resolveInterceptors();
-
     Flux<Event> stream = from(publisher);
     for (Processor processor : getProcessorsToExecute()) {
+      stream = stream.transform(applyInterceptors(interceptorsToBeExecuted, processor));
+    }
+    return stream;
+  }
+
+  private ReactiveProcessor applyInterceptors(List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptorsToBeExecuted,
+                                              Processor processor) {
+    return stream -> {
       ReactiveProcessor processorFunction = processor;
       for (BiFunction<Processor, ReactiveProcessor, ReactiveProcessor> interceptor : interceptorsToBeExecuted) {
         processorFunction = interceptor.apply(processor, processorFunction);
       }
-      stream = stream.transform(processorFunction);
+
+      ReactiveProcessor finalProcessorFunction = processorFunction;
+      stream = from(stream).flatMap(event -> Flux.just(event)
+          .transform(finalProcessorFunction)
+          .onErrorResumeWith(MessagingException.class, handleError(event.getContext())));
+      return stream;
+    };
+  }
+
+  private Function<MessagingException, Mono<Event>> handleError(EventContext eventContext) {
+    if (flowConstruct instanceof Pipeline && ((Pipeline) flowConstruct).getMessageSource() instanceof LegacyInboundEndpoint) {
+      return messagingException -> {
+        eventContext.error(messagingException);
+        return empty();
+      };
+    } else {
+      return messagingException -> {
+        from(getMessagingExceptionHandler().apply(messagingException))
+            .doOnNext(handled -> eventContext.success(handled))
+            .doOnError(rethrown -> eventContext.error(rethrown))
+            .subscribe(requestUnbounded());
+        return empty();
+      };
     }
-    return stream;
   }
 
   private List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> resolveInterceptors() {
@@ -250,11 +284,16 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
+    this.messagingExceptionHandler = messagingExceptionHandler;
     for (Processor processor : processors) {
       if (processor instanceof MessagingExceptionHandlerAware) {
         ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(messagingExceptionHandler);
       }
     }
+  }
+
+  public MessagingExceptionHandler getMessagingExceptionHandler() {
+    return messagingExceptionHandler != null ? messagingExceptionHandler : flowConstruct.getExceptionListener();
   }
 
   @Override

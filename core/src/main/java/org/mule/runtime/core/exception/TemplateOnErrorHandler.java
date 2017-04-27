@@ -195,6 +195,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     configuredMessageProcessors = newChain(getMessageProcessors());
     configuredMessageProcessors.setFlowConstruct(flowConstruct);
     configuredMessageProcessors.setMuleContext(muleContext);
+    configuredMessageProcessors.setMessagingExceptionHandler(messagingExceptionHandler);
 
     errorTypeMatcher = createErrorType();
   }

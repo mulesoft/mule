@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.processor;
 import static org.mule.runtime.core.DefaultEventContext.child;
 import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -98,21 +99,72 @@ public class MessageProcessors {
     }
   }
 
+  /**
+   * Adapt a {@link ReactiveProcessor} used via non-blocking API {@link ReactiveProcessor#apply(Object)} by blocking and waiting
+   * for response {@link Event} or throwing an {@link MuleException} in the case of an error.
+   * <p/>
+   * A plain {@link ReactiveProcessor} does not handle {@link EventContext} completion or error handling so this method simply
+   * uses {@code just(event).transform(processor).block();}
+   *
+   * @param event event to process.
+   * @param processor processor to adapt.
+   * @return result event
+   * @throws MuleException
+   */
   public static Event processToApply(Event event, ReactiveProcessor processor) throws MuleException {
+    if (processor instanceof Flow) {
+      return processToApply(event, (Flow) processor);
+    } else if (processor instanceof MessageProcessorChain) {
+      return processToApply(event, (MessageProcessorChain) processor);
+    } else {
+      try {
+        return just(event).transform(processor).block();
+      } catch (Throwable e) {
+        throw rxExceptionToMuleException(e);
+      }
+    }
+  }
+
+  /**
+   * Adapt a {@link MessageProcessorChain} used via non-blocking API {@link ReactiveProcessor#apply(Object)} by blocking and
+   * waiting for response {@link Event} or throwing an {@link MuleException} in the case of an error.
+   * <p/>
+   * A {@link MessageProcessorChain} does not handle {@link EventContext} completion but does do error handling so this method
+   * manually completes response and then blocks on {@link EventContext} response {@link Publisher}.
+   *
+   * @param event event to process.
+   * @param messageProcessorChain processor chain to adapt.
+   * @return result event
+   * @throws MuleException
+   */
+  public static Event processToApply(Event event, MessageProcessorChain messageProcessorChain) throws MuleException {
     try {
-      return just(event).transform(processor).block();
+      just(event)
+          .transform(messageProcessorChain)
+          .subscribe(response -> event.getContext().success(response), throwable -> event.getContext().error(throwable));
+      return from(event.getContext().getResponsePublisher()).block();
     } catch (Throwable e) {
       throw rxExceptionToMuleException(e);
     }
   }
 
+  /**
+   * Adapt a {@link Flow} used via non-blocking API {@link ReactiveProcessor#apply(Object)} by blocking and waiting for response
+   * {@link Event} or throwing an {@link MuleException} in the case of an error.
+   * <p/>
+   * A {@link Flow} handles {@link EventContext} completion and error handling so this method dispatches {@link Event} to
+   * {@link Flow} and then blocks on {@link EventContext} response {@link Publisher}.
+   *
+   * @param event event to process.
+   * @param flow flow to adapt.
+   * @return result event
+   * @throws MuleException
+   */
   public static Event processToApply(Event event, Flow flow) throws MuleException {
     try {
       just(event)
           .transform(flow)
-          // Use empty error handler to avoid reactor ErrorCallbackNotImplemented
-          .subscribe(null, throwable -> {
-          });
+          .subscribe(requestUnbounded());
       return from(event.getContext().getResponsePublisher()).block();
     } catch (Throwable e) {
       throw rxExceptionToMuleException(e);

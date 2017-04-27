@@ -43,6 +43,11 @@
         <logger message="check"/>
     </flow>
 
+    <flow name="errorMidFlow">
+        <logger message="check"/>
+        <test:component throwException="true"/>
+        <logger message="check"/>
+    </flow>
 
     <flow name="processorChain2">
         <processor-chain>

@@ -11,6 +11,9 @@ import org.mule.runtime.core.api.Event;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.SynchronousSink;
 
 /**
@@ -59,6 +62,40 @@ public final class Operators {
         }
       }
     };
+  }
+
+  /**
+   * Return a singleton {@link Subscriber} that does not check for double onSubscribe and purely request Long.MAX. Unlike using
+   * {@link Flux#subscribe()} directly this will not throw an exception if an error occurs.
+   *
+   * @return a new {@link Subscriber} whose sole purpose is to request Long.MAX
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> Subscriber<T> requestUnbounded() {
+    return (Subscriber<T>) RequstMaxSubscriber.INSTANCE;
+  }
+
+  final static class RequstMaxSubscriber<T> implements Subscriber<T> {
+
+    static final RequstMaxSubscriber INSTANCE = new RequstMaxSubscriber();
+
+    @Override
+    public void onSubscribe(Subscription s) {
+      s.request(Long.MAX_VALUE);
+    }
+
+    @Override
+    public void onNext(Object o) {
+
+    }
+
+    @Override
+    public void onError(Throwable t) {}
+
+    @Override
+    public void onComplete() {
+
+    }
   }
 
 }

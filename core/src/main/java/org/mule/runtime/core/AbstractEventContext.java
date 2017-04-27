@@ -7,12 +7,14 @@
 package org.mule.runtime.core;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.when;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.internal.util.rx.Operators;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +35,7 @@ abstract class AbstractEventContext implements EventContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
 
+  private transient MonoProcessor<Event> beforeResponseProcessor;
   private transient MonoProcessor<Event> responseProcessor;
   private transient MonoProcessor<Void> completionProcessor;
   private transient Disposable completionSubscriberDisposable;
@@ -49,7 +52,9 @@ abstract class AbstractEventContext implements EventContext {
   }
 
   private void initCompletionProcessor() {
+    beforeResponseProcessor = MonoProcessor.create();
     responseProcessor = MonoProcessor.create();
+    responseProcessor.doOnEach(s -> s.accept(beforeResponseProcessor)).subscribe(requestUnbounded());
     completionProcessor = MonoProcessor.create();
     completionProcessor.doFinally(e -> {
       if (LOGGER.isDebugEnabled()) {
@@ -121,6 +126,11 @@ abstract class AbstractEventContext implements EventContext {
       }
       responseProcessor.onError(throwable);
     }
+  }
+
+  @Override
+  public Publisher<Event> getBeforeResponsePublisher() {
+    return beforeResponseProcessor;
   }
 
   @Override
