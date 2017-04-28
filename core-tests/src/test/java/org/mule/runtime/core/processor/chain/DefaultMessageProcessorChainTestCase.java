@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.processor.chain;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
@@ -33,6 +34,7 @@ import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKIN
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -71,7 +73,6 @@ import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -102,7 +103,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {
+    return asList(new Object[][] {
         {new DefaultFlowProcessingStrategyFactory(), BLOCKING},
         {new ReactorProcessingStrategyFactory(), BLOCKING},
         {new ProactorProcessingStrategyFactory(), BLOCKING},

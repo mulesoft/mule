@@ -12,6 +12,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
+
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -21,9 +24,13 @@ import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.service.http.api.HttpService;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
-import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
-
 import java.util.List;
+
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
+
+import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
 
 /**
  * Registers services instances into the {@link MuleRegistry} of a {@link MuleContext}.
@@ -32,7 +39,7 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class TestServicesConfigurationBuilder extends AbstractConfigurationBuilder {
+public class TestServicesConfigurationBuilder extends AbstractConfigurationBuilder implements TestRule {
 
   private static final String MOCK_HTTP_SERVICE = "mockHttpService";
   private static final String MOCK_EXPR_EXECUTOR = "mockExpressionExecutor";
@@ -54,6 +61,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
   public void doConfigure(MuleContext muleContext) throws Exception {
     MuleRegistry registry = muleContext.getRegistry();
     registry.registerObject(schedulerService.getName(), spy(schedulerService));
+    registry.registerObject(OBJECT_SCHEDULER_BASE_CONFIG, config());
 
     if (mockExpressionExecutor) {
       DefaultExpressionLanguageFactoryService expressionExecutor =
@@ -76,6 +84,21 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
     } finally {
       schedulerService.stop();
     }
+  }
+
+  @Override
+  public Statement apply(Statement base, Description description) {
+    return new Statement() {
+
+      @Override
+      public void evaluate() throws Throwable {
+        try {
+          base.evaluate();
+        } finally {
+          stopServices();
+        }
+      }
+    };
   }
 
 }

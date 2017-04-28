@@ -7,42 +7,46 @@
 
 package org.mule.runtime.core.util.store;
 
-import org.mule.runtime.core.api.MuleContext;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.store.PartitionableExpirableObjectStore;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
-import org.mule.runtime.core.util.concurrent.DaemonThreadFactory;
 
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAware, Initialisable, Disposable {
 
-  private static Logger logger = LoggerFactory.getLogger(MuleObjectStoreManager.class);
-  protected ScheduledThreadPoolExecutor scheduler;
+  private static Logger logger = getLogger(MuleObjectStoreManager.class);
+
+  protected Scheduler scheduler;
   MuleContext muleContext;
   protected ConcurrentMap<String, ObjectStore<?>> stores = new ConcurrentHashMap<String, ObjectStore<?>>();
   private final ConcurrentMap<String, ScheduledFuture<?>> monitors = new ConcurrentHashMap<>();
-  private String baseTransientStoreKey = MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
-  private String basePersistentStoreKey = MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
-  private String baseTransientUserStoreKey = MuleProperties.DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME;
-  private String basePersistentUserStoreKey = MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
+  private String baseTransientStoreKey = OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
+  private String basePersistentStoreKey = OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+  private String baseTransientUserStoreKey = DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME;
+  private String basePersistentUserStoreKey = DEFAULT_USER_OBJECT_STORE_NAME;
 
   @Override
   public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name) {
@@ -155,8 +159,9 @@ public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAw
     if (baseStore instanceof PartitionableExpirableObjectStore) {
       T previous = (T) stores.putIfAbsent(name, store);
       if (previous == null) {
-        Monitor m = new Monitor(name, (PartitionableExpirableObjectStore) baseStore, entryTTL, maxEntries);
-        ScheduledFuture<?> future = scheduler.scheduleWithFixedDelay(m, 0, expirationInterval, TimeUnit.MILLISECONDS);
+        ScheduledFuture<?> future = scheduler
+            .scheduleWithFixedDelay(new Monitor(name, (PartitionableExpirableObjectStore) baseStore, entryTTL, maxEntries), 0,
+                                    expirationInterval, MILLISECONDS);
         monitors.put(name, future);
         return store;
       } else {
@@ -195,7 +200,7 @@ public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAw
 
   @Override
   public void dispose() {
-    scheduler.shutdown();
+    scheduler.stop();
     for (ObjectStore<?> objectStore : stores.values()) {
       if (objectStore instanceof Disposable) {
         ((Disposable) objectStore).dispose();
@@ -205,8 +210,8 @@ public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAw
 
   @Override
   public void initialise() throws InitialisationException {
-    scheduler = new ScheduledThreadPoolExecutor(1);
-    scheduler.setThreadFactory(new DaemonThreadFactory("ObjectStoreManager-Monitor", this.getClass().getClassLoader()));
+    scheduler = muleContext.getSchedulerService()
+        .customScheduler(muleContext.getSchedulerBaseConfig().withName("ObjectStoreManager-Monitor").withMaxConcurrentTasks(1));
   }
 
   @Override
@@ -260,8 +265,7 @@ public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAw
         try {
           store.expire(entryTTL, maxEntries, partitionName);
         } catch (Exception e) {
-          MuleObjectStoreManager.logger
-              .warn("Running expirty on partition " + partitionName + " of " + store + " threw " + e + ":" + e.getMessage());
+          logger.warn("Running expirty on partition " + partitionName + " of " + store + " threw " + e + ":" + e.getMessage());
         }
       }
     }

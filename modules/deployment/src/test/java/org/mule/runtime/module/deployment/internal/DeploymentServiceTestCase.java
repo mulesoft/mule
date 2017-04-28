@@ -82,9 +82,11 @@ import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWat
 import static org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase.TestPolicyComponent.invocationCount;
 import static org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase.TestPolicyComponent.policyParametrization;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
@@ -484,7 +486,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     artifactClassLoaderManager = muleArtifactResourcesRegistry.getArtifactClassLoaderManager();
 
     deploymentService = new MuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
-                                                  muleArtifactResourcesRegistry.getApplicationFactory());
+                                                  muleArtifactResourcesRegistry.getApplicationFactory(),
+                                                  () -> findSchedulerService(serviceManager));
     deploymentService.addDeploymentListener(applicationDeploymentListener);
     deploymentService.addDomainDeploymentListener(domainDeploymentListener);
 
@@ -1072,7 +1075,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     final String appName = "bad-config-app";
 
     addPackedAppFromBuilder(badConfigAppFileBuilder);
-    deploymentService.start();
+    startDeployment();
 
     assertDeploymentFailure(applicationDeploymentListener, appName);
     assertAppsDir(new String[] {}, new String[] {appName}, true);
@@ -1085,7 +1088,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertApplicationAnchorFileDoesNotExists(app.getArtifactName());
 
     reset(applicationDeploymentListener);
-    org.apache.commons.io.FileUtils.deleteDirectory(new File(appsDir, app.getArtifactName()));
+    deleteDirectory(new File(appsDir, app.getArtifactName()));
     assertAppFolderIsDeleted(appName);
     assertAtLeastOneUndeploymentSuccess(applicationDeploymentListener, appName);
 

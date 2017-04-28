@@ -23,6 +23,7 @@ import java.util.Collection;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -44,8 +45,8 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
   }
 
   @Parameterized.Parameters
-  public static Collection<Object[]> parameters() {
-    return asList(new Object[][] {{BLOCKING}, {NON_BLOCKING}});
+  public static Collection<Mode> modeParameters() {
+    return asList(new Mode[] {BLOCKING, NON_BLOCKING});
   }
 
   @Override

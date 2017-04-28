@@ -17,7 +17,6 @@ import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
 import static org.mule.extension.file.common.api.FileDisplayConstants.MATCH_WITH;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 
 import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileEventType;
@@ -224,7 +223,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     matcher = predicateBuilder != null ? predicateBuilder.build() : new NullFilePayloadPredicate();
 
     listenerExecutor = schedulerService.customScheduler(muleContext.getSchedulerBaseConfig().withMaxConcurrentTasks(1)
-        .withName(format("%s%s.file.listener", getPrefix(muleContext), flowConstruct.getName())));
+        .withName(format("%s.file.listener", flowConstruct.getName())));
 
     submittedListenerTask = listenerExecutor.submit(() -> listen(sourceCallback));
 

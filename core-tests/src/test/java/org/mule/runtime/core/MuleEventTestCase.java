@@ -19,6 +19,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -79,7 +80,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   public void testEventSerializationRestart() throws Exception {
     // Create and register artifacts
     Event event = createEventToSerialize();
-    muleContext.start();
 
     // Serialize
     Serializable serialized = (Serializable) createSerializableToByteArrayTransformer().transform(event);

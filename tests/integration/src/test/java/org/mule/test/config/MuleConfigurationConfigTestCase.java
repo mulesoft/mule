@@ -18,9 +18,13 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 public class MuleConfigurationConfigTestCase extends AbstractMuleTestCase {
+
+  @ClassRule
+  public static TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
 
   private MuleContext muleContext;
 
@@ -50,7 +54,7 @@ public class MuleConfigurationConfigTestCase extends AbstractMuleTestCase {
     @Override
     protected void addBuilders(List<ConfigurationBuilder> builders) {
       super.addBuilders(builders);
-      builders.add(new TestServicesConfigurationBuilder());
+      builders.add(testServicesConfigurationBuilder);
     }
   }
 }

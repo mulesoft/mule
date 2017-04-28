@@ -34,7 +34,8 @@ public class SchedulerBaseConfigFactory implements FactoryBean<SchedulerConfig> 
 
   @Override
   public SchedulerConfig getObject() throws Exception {
-    return config().withShutdownTimeout(() -> muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
+    return config().withPrefix(muleContext.getConfiguration().getId())
+        .withShutdownTimeout(() -> muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS);
   }
 
   @Override

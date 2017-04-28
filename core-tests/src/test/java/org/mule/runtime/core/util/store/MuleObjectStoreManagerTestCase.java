@@ -11,23 +11,29 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
+import static org.mule.runtime.core.api.store.ObjectStoreManager.UNBOUNDED;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.MuleProperties;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -35,10 +41,11 @@ import org.mule.tck.size.SmallTest;
 
 import java.io.Serializable;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Mockito;
 
 @SmallTest
 public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
@@ -49,10 +56,30 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
   public static final String TEST_KEY = "Some Key";
   public static final String TEST_VALUE = "Some Value";
 
-  private MuleObjectStoreManager storeManager = new MuleObjectStoreManager();
+  private SimpleUnitTestSupportSchedulerService schedulerService;
+
+  private MuleContext muleContext;
+  private MuleObjectStoreManager storeManager;
 
   @Rule
   public TemporaryFolder tempWorkDir = new TemporaryFolder();
+
+  @Before
+  public void setup() {
+    schedulerService = new SimpleUnitTestSupportSchedulerService();
+    muleContext = mock(MuleContext.class);
+    when(muleContext.getSchedulerService()).thenReturn(schedulerService);
+    when(muleContext.getSchedulerBaseConfig())
+        .thenReturn(config().withPrefix(MuleObjectStoreManagerTestCase.class.getName() + "#" + name.getMethodName()));
+
+    storeManager = new MuleObjectStoreManager();
+    storeManager.setMuleContext(muleContext);
+  }
+
+  @After
+  public void after() throws MuleException {
+    schedulerService.stop();
+  }
 
   @Test
   public void disposeDisposableStore() throws ObjectStoreException {
@@ -70,7 +97,7 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
     @SuppressWarnings("unchecked")
     ObjectStorePartition<Serializable> store =
         mock(ObjectStorePartition.class,
-             withSettings().extraInterfaces(Disposable.class).defaultAnswer(Mockito.RETURNS_DEEP_STUBS));
+             withSettings().extraInterfaces(Disposable.class).defaultAnswer(RETURNS_DEEP_STUBS));
 
     when(store.getPartitionName()).thenReturn(TEST_PARTITION_NAME);
 
@@ -138,15 +165,11 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
 
       @Override
       public boolean isSatisfied() {
-        return assertMonitors(expectedValue) && assertSchedulers(expectedValue);
+        return assertMonitors(expectedValue);
       }
 
       private boolean assertMonitors(int expectedValue) {
         return storeManager.getMonitorsCount() == expectedValue;
-      }
-
-      private boolean assertSchedulers(int expectedValue) {
-        return storeManager.scheduler.getQueue().size() + storeManager.scheduler.getActiveCount() == expectedValue;
       }
 
       @Override
@@ -158,7 +181,6 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
 
   private ObjectStorePartition<Serializable> createStorePartition(String partitionName, boolean isPersistent)
       throws InitialisationException {
-    MuleContext muleContext = mock(MuleContext.class);
     addJavaSerializerToMockMuleContext(muleContext);
 
     createRegistryAndBaseStore(muleContext, isPersistent);
@@ -167,7 +189,7 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
     storeManager.initialise();
 
     ObjectStorePartition<Serializable> store =
-        storeManager.getObjectStore(partitionName, isPersistent, ObjectStoreManager.UNBOUNDED, 10000, 50);
+        storeManager.getObjectStore(partitionName, isPersistent, UNBOUNDED, 10000, 50);
 
     assertThat(storeManager.stores.keySet(), hasItem(partitionName));
 
@@ -178,10 +200,10 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
     MuleRegistry muleRegistry = mock(MuleRegistry.class);
     if (isPersistent) {
       PartitionableObjectStore<?> store = createPersistentPartitionableObjectStore(muleContext);
-      when(muleRegistry.lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME)).thenReturn(store);
+      when(muleRegistry.lookupObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME)).thenReturn(store);
     } else {
       PartitionableObjectStore<?> store = createTransientPartitionableObjectStore();
-      when(muleRegistry.lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME)).thenReturn(store);
+      when(muleRegistry.lookupObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME)).thenReturn(store);
     }
 
     when(muleContext.getRegistry()).thenReturn(muleRegistry);

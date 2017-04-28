@@ -37,6 +37,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
       new SimpleUnitTestSupportScheduler(8, new NamedThreadFactory(SimpleUnitTestSupportScheduler.class.getSimpleName()),
                                          new AbortPolicy());
 
+  private List<Scheduler> customSchedulers = new ArrayList<>();
   private List<Scheduler> decorators = new ArrayList<>();
 
   @Override
@@ -109,24 +110,28 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   @Override
   public Scheduler customScheduler(SchedulerConfig config) {
-    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
-        decorateScheduler(new SimpleUnitTestSupportScheduler(config.getMaxConcurrentTasks(),
-                                                             new NamedThreadFactory(config.getSchedulerName() != null
-                                                                 ? config.getSchedulerName()
-                                                                 : "SimpleUnitTestSupportSchedulerService_custom"),
-                                                             new AbortPolicy()));
+    final SimpleUnitTestSupportScheduler customScheduler = new SimpleUnitTestSupportScheduler(config.getMaxConcurrentTasks(),
+                                                                                              new NamedThreadFactory(config
+                                                                                                  .getSchedulerName() != null
+                                                                                                      ? config.getSchedulerName()
+                                                                                                      : "SimpleUnitTestSupportSchedulerService_custom"),
+                                                                                              new AbortPolicy());
+    customSchedulers.add(customScheduler);
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(customScheduler);
     decorators.add(decorator);
     return decorator;
   }
 
   @Override
   public Scheduler customScheduler(SchedulerConfig config, int queueSize) {
-    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator =
-        decorateScheduler(new SimpleUnitTestSupportScheduler(config.getMaxConcurrentTasks(),
-                                                             new NamedThreadFactory(config.getSchedulerName() != null
-                                                                 ? config.getSchedulerName()
-                                                                 : "SimpleUnitTestSupportSchedulerService_custom"),
-                                                             new AbortPolicy()));
+    final SimpleUnitTestSupportScheduler customScheduler = new SimpleUnitTestSupportScheduler(config.getMaxConcurrentTasks(),
+                                                                                              new NamedThreadFactory(config
+                                                                                                  .getSchedulerName() != null
+                                                                                                      ? config.getSchedulerName()
+                                                                                                      : "SimpleUnitTestSupportSchedulerService_custom"),
+                                                                                              new AbortPolicy());
+    customSchedulers.add(customScheduler);
+    final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(customScheduler);
     decorators.add(decorator);
     return decorator;
   }
@@ -164,6 +169,9 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   public void stop() throws MuleException {
     if (!scheduler.isShutdown()) {
       scheduler.shutdownNow();
+    }
+    for (Scheduler customScheduler : customSchedulers) {
+      customScheduler.shutdownNow();
     }
   }
 

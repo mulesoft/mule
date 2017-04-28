@@ -18,12 +18,16 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
@@ -41,10 +45,14 @@ import java.util.List;
 import java.util.Properties;
 
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
 
 public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
 
   private DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
   private static String TEST_STRING_KEY = "test";
@@ -64,7 +72,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testCreateMuleContext() throws InitialisationException, ConfigurationException {
-    context = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), new DefaultsConfigurationBuilder());
+    context = muleContextFactory.createMuleContext(testServicesConfigurationBuilder, new DefaultsConfigurationBuilder());
 
     assertMuleContextConfiguration(context);
     assertDefaults(context);
@@ -72,7 +80,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testCreateMuleContextConfigurationBuilder() throws InitialisationException, ConfigurationException {
-    context = muleContextFactory.createMuleContext(new TestServicesConfigurationBuilder(), new TestConfigurationBuilder());
+    context = muleContextFactory.createMuleContext(testServicesConfigurationBuilder, new TestConfigurationBuilder());
 
     assertMuleContextConfiguration(context);
     assertConfigurationBuilder1Objects(context);
@@ -82,7 +90,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void testCreateMuleContextListMuleContextBuilder() throws InitialisationException, ConfigurationException {
     List<ConfigurationBuilder> configBuilders = new ArrayList<>();
-    configBuilders.add(new TestServicesConfigurationBuilder());
+    configBuilders.add(testServicesConfigurationBuilder);
     configBuilders.add(new TestConfigurationBuilder());
     configBuilders.add(new TestConfigurationBuilder2());
 
@@ -99,7 +107,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
   public void testCreateMuleContextMuleContextBuilder() throws InitialisationException, ConfigurationException {
     TestMuleContextBuilder muleContextBuilder = new TestMuleContextBuilder();
     context =
-        muleContextFactory.createMuleContext(asList(new TestServicesConfigurationBuilder(), new SimpleConfigurationBuilder(null)),
+        muleContextFactory.createMuleContext(asList(testServicesConfigurationBuilder, new SimpleConfigurationBuilder(null)),
                                              muleContextBuilder);
 
     assertCustomMuleContext(context);
@@ -111,7 +119,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
       throws InitialisationException, ConfigurationException {
     TestMuleContextBuilder muleContextBuilder = new TestMuleContextBuilder();
     context = muleContextFactory
-        .createMuleContext(asList(new TestServicesConfigurationBuilder(), new TestConfigurationBuilder2()), muleContextBuilder);
+        .createMuleContext(asList(testServicesConfigurationBuilder, new TestConfigurationBuilder2()), muleContextBuilder);
 
     assertCustomMuleContext(context);
     assertConfigurationBuilder2Objects(context);
@@ -155,7 +163,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     properties.put("testKey3", "testValue3");
     properties.put("testKey4", "testValue4");
 
-    context = muleContextFactory.createMuleContext(asList(new TestServicesConfigurationBuilder(), new TestConfigurationBuilder()),
+    context = muleContextFactory.createMuleContext(asList(testServicesConfigurationBuilder, new TestConfigurationBuilder()),
                                                    properties);
 
     assertMuleContextConfiguration(context);
@@ -188,19 +196,19 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
   private void assertDefaults(MuleContext context) {
     // Asert existance of defauts in registry
-    assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER));
-    assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER));
-    assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
-    assertNotNull(context.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME));
+    assertNotNull(context.getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
+    assertNotNull(context.getRegistry().lookupObject(OBJECT_SECURITY_MANAGER));
+    assertNotNull(context.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
+    assertNotNull(context.getRegistry().lookupObject(QUEUE_STORE_DEFAULT_IN_MEMORY_NAME));
   }
 
   private void assertNoDefaults(MuleContext context) {
     // Asert non-existance of defauts in registry
-    assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER));
-    assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER));
-    assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
-    assertNull(context.getRegistry().lookupObject(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME));
-    assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
+    assertNull(context.getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
+    assertNull(context.getRegistry().lookupObject(OBJECT_SECURITY_MANAGER));
+    assertNull(context.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
+    assertNull(context.getRegistry().lookupObject(QUEUE_STORE_DEFAULT_IN_MEMORY_NAME));
+    assertNull(context.getRegistry().lookupObject(OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
   }
 
   private void assertMuleContextConfiguration(MuleContext context) {

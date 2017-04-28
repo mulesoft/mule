@@ -7,6 +7,8 @@
 package org.mule.tck.junit4;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.construct.Flow.builder;
@@ -14,7 +16,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.util.FileUtils.newFile;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
@@ -38,6 +39,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.api.el.ExpressionExecutor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -50,7 +52,6 @@ import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -63,10 +64,8 @@ import org.mule.tck.config.TestServicesConfigurationBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.After;
@@ -83,6 +82,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   private static final Logger LOGGER = getLogger(AbstractMuleContextTestCase.class);
   public static final String WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY = "workingDirectory";
   public static final String REACTOR_BLOCK_TIMEOUT_EXCEPTION_MESSAGE = "Timeout on Mono blocking read";
+
+  public TestServicesConfigurationBuilder testServicesConfigurationBuilder =
+      new TestServicesConfigurationBuilder(mockHttpService(), mockExprExecutorService());
 
   public TemporaryFolder workingDirectory = new TemporaryFolder();
 
@@ -197,7 +199,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
     muleContext.start();
 
-    contextStartedLatch.get().await(20, TimeUnit.SECONDS);
+    contextStartedLatch.get().await(20, SECONDS);
   }
 
   /**
@@ -233,6 +235,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         String workingDirectory = this.workingDirectory.getRoot().getAbsolutePath();
         LOGGER.info("Using working directory for test: " + workingDirectory);
         muleConfiguration.setWorkingDirectory(workingDirectory);
+        muleConfiguration.setId(this.getClass().getSimpleName() + "#" + name.getMethodName());
         contextBuilder.setMuleConfiguration(muleConfiguration);
         contextBuilder.setExecutionClassLoader(executionClassLoader);
         contextBuilder.setObjectSerializer(getObjectSerializer());
@@ -263,7 +266,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   // This shouldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
   // creating the MuleContext.
   protected void addBuilders(List<ConfigurationBuilder> builders) {
-    builders.add(new TestServicesConfigurationBuilder(mockHttpService(), mockExprExecutorService()));
+    builders.add(testServicesConfigurationBuilder);
   }
 
   /**
@@ -312,6 +315,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       }
 
       disposeContext();
+      testServicesConfigurationBuilder.stopServices();
       doTearDownAfterMuleContextDispose();
     }
 
@@ -397,7 +401,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     final JavaComponent component = new DefaultJavaComponent(of);
     ((MuleContextAware) component).setMuleContext(muleContext);
 
-    Flow flow = builder(name, muleContext).messageProcessors(Collections.singletonList(component)).build();
+    Flow flow = builder(name, muleContext).messageProcessors(singletonList(component)).build();
     muleContext.getRegistry().registerFlowConstruct(flow);
     return flow;
   }

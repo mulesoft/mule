@@ -50,6 +50,8 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @Stories(TERMINATION)
 public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTestCase {
 
+  private static final long STOP_DELAY_DELTA = 100l;
+
   private Matcher<ExecutorService> terminatedMatcher;
 
   public DefaultSchedulerTerminationTestCase(Matcher<ExecutorService> terminatedMatcher) {
@@ -413,7 +415,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
         assertThat(executor, terminatedMatcher);
         return true;
       }));
-      assertThat(NANOSECONDS.toMillis(nanoTime() - stopReqNanos), lessThan(30l));
+      assertThat(NANOSECONDS.toMillis(nanoTime() - stopReqNanos), lessThan(STOP_DELAY_DELTA));
     } finally {
       auxExecutor.shutdown();
     }
@@ -435,7 +437,7 @@ public class DefaultSchedulerTerminationTestCase extends BaseDefaultSchedulerTes
         assertThat(executor, terminatedMatcher);
         return true;
       }));
-      assertThat(NANOSECONDS.toMillis(nanoTime() - stopReqNanos), lessThan(30l));
+      assertThat(NANOSECONDS.toMillis(nanoTime() - stopReqNanos), lessThan(STOP_DELAY_DELTA));
     } finally {
       auxExecutor.shutdown();
     }

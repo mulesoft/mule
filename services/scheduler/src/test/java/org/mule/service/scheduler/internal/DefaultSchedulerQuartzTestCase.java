@@ -15,7 +15,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -159,8 +158,6 @@ public class DefaultSchedulerQuartzTestCase extends BaseDefaultSchedulerTestCase
     scheduled.cancel(true);
 
     verify(sharedQuartzScheduler).scheduleJob(any(JobDetail.class), argThat(new CronTriggerMatcher(everyTwoSeconds)));
-    assertThat(NANOSECONDS.toMillis(startTimes.get(2) - endTimes.get(1)),
-               greaterThanOrEqualTo(1800L - DELTA_MILLIS));
   }
 
   @Test

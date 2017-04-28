@@ -12,20 +12,24 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
-import org.mule.runtime.core.config.StartupContext;
+
+import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.StartupListener;
-import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainFactory;
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
+import org.mule.runtime.module.service.ServiceManager;
 
 import java.io.IOException;
 import java.net.URL;
@@ -35,9 +39,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -69,7 +73,8 @@ public class MuleDeploymentService implements DeploymentService {
   private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
   private DefaultArchiveDeployer<Application> applicationDeployer;
 
-  public MuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory) {
+  public MuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
+                               Supplier<SchedulerService> schedulerServiceSupplier) {
     // TODO MULE-9653 : Migrate domain class loader creation to use ArtifactClassLoaderBuilder which already has support for
     // artifact plugins.
     domainFactory.setMuleContextListenerFactory(new DeploymentMuleContextListenerFactory(domainDeploymentListener));
@@ -95,10 +100,12 @@ public class MuleDeploymentService implements DeploymentService {
       }
       logger.info("Using parallel deployment");
       this.deploymentDirectoryWatcher =
-          new ParallelDeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications, deploymentLock);
+          new ParallelDeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications,
+                                                 schedulerServiceSupplier, deploymentLock);
     } else {
       this.deploymentDirectoryWatcher =
-          new DeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications, deploymentLock);
+          new DeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications, schedulerServiceSupplier,
+                                         deploymentLock);
     }
   }
 
@@ -152,13 +159,7 @@ public class MuleDeploymentService implements DeploymentService {
   @Override
   public Collection<Application> findDomainApplications(final String domain) {
     Preconditions.checkArgument(domain != null, "Domain name cannot be null");
-    return CollectionUtils.select(applications, new Predicate() {
-
-      @Override
-      public boolean evaluate(Object object) {
-        return ((Application) object).getDomain().getArtifactName().equals(domain);
-      }
-    });
+    return CollectionUtils.select(applications, object -> ((Application) object).getDomain().getArtifactName().equals(domain));
   }
 
 
@@ -295,5 +296,14 @@ public class MuleDeploymentService implements DeploymentService {
         deploymentLock.unlock();
       }
     }
+  }
+
+  /**
+   * @param serviceManager the manager to do the lookup of the service in.
+   * @return the instance of the {@link SchedulerService} from within the given {@code serviceManager}.
+   */
+  public static SchedulerService findSchedulerService(ServiceManager serviceManager) {
+    final List<Service> services = serviceManager.getServices();
+    return (SchedulerService) services.stream().filter(s -> s instanceof SchedulerService).findFirst().get();
   }
 }

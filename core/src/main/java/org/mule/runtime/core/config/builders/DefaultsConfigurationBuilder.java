@@ -125,7 +125,8 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_METADATA_SERVICE, new MuleMetadataService(), muleContext);
     registerObject(OBJECT_SCHEDULER_POOLS_CONFIG, SchedulerContainerPoolsConfig.getInstance(), muleContext);
     registerObject(OBJECT_SCHEDULER_BASE_CONFIG,
-                   config().withShutdownTimeout(() -> muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
+                   config().withPrefix(muleContext.getConfiguration().getId())
+                       .withShutdownTimeout(() -> muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
                    muleContext);
   }
 
