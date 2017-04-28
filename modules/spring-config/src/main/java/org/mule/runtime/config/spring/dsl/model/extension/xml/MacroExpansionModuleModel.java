@@ -237,8 +237,7 @@ public class MacroExpansionModuleModel {
 
     ComponentModel.Builder processorChainBuilder = new ComponentModel.Builder();
     processorChainBuilder
-        .setIdentifier(builder().withNamespace(CORE_PREFIX).withName("module-operation-chain").build()); //TODO lautaro check if this can be exported to some place
-
+        .setIdentifier(builder().withNamespace(CORE_PREFIX).withName("module-operation-chain").build());
 
     processorChainBuilder.addParameter("returnsVoid", String.valueOf(isVoid(operationModel.getOutput().getType())), false);
     Map<String, String> propertiesMap = extractProperties(operationRefModel, extensionModel);

@@ -189,7 +189,8 @@ final class XmlExtensionLoaderDelegate {
     }
     ComponentModelReader componentModelReader =
         new ComponentModelReader(new DefaultArtifactProperties(emptyMap(), emptyMap(), emptyMap()));
-    final String configFileName = modulePath.substring(modulePath.lastIndexOf("/") + 1); //TODO MULE-12291: we would, ideally, leave either the relative path (modulePath) or the URL to the current config file, rather than just the name of the file (which will be useless from a tooling POV)
+    //TODO MULE-12291: we would, ideally, leave either the relative path (modulePath) or the URL to the current config file, rather than just the name of the file (which will be useless from a tooling POV)
+    final String configFileName = modulePath.substring(modulePath.lastIndexOf("/") + 1);
     ComponentModel componentModel = componentModelReader.extractComponentDefinitionModel(parseModule.get(), configFileName);
 
     loadModuleExtension(context.getExtensionDeclarer(), componentModel);
