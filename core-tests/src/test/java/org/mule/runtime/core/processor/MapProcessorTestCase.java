@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.processor;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -15,11 +14,12 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
 import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.just;
+
+import org.mule.runtime.core.exception.MuleFatalException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -29,6 +29,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import reactor.core.publisher.Mono;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -42,6 +43,8 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
 
   private RuntimeException exception = new RuntimeException() {};
 
+  private Error error = new LinkageError();
+
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
@@ -50,52 +53,50 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
   private Processor testProcessorThrowsException = event -> {
     throw exception;
   };
+  private Processor testProcessorThrowsError = event -> {
+    throw error;
+  };
 
   @Test
   public void mapBlocking() throws Exception {
-    assertThat(testProcessor.process(event).getMessage().getPayload().getValue(), equalTo(TEST_PAYLOAD));
+    Event result = testProcessor.process(event);
+    assertThat(result.getMessage().getPayload().getValue(), equalTo(TEST_PAYLOAD));
   }
 
   @Test
   public void mapStreamBlockingGet() {
-    assertThat(just(event).transform(testProcessor).block().getMessage().getPayload().getValue(),
-               equalTo(TEST_PAYLOAD));
+    Event result = just(event).transform(testProcessor).block();
+    assertThat(result.getMessage().getPayload().getValue(), equalTo(TEST_PAYLOAD));
   }
 
   @Test
   public void mapStreamSubscribe() throws Exception {
-    Latch latch = new Latch();
-    just(event).transform(testProcessor).subscribe(event -> {
-      assertThat(event.getMessage().getPayload().getValue(), equalTo(TEST_PAYLOAD));
-      latch.countDown();
-    });
-    latch.await(RECEIVE_TIMEOUT, MILLISECONDS);
+    Event result = just(event).transform(testProcessor).block();
+    assertThat(result.getMessage().getPayload().getValue(), equalTo(TEST_PAYLOAD));
   }
 
   @Test
   public void mapBlockingNullResult() throws Exception {
-    assertThat(testProcessorReturnsNull.process(event).getMessage().getPayload().getValue(), is(nullValue()));
+    Event result = testProcessorReturnsNull.process(event);
+    assertThat(result.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   public void mapStreamBlockingGetNullResult() {
-    assertThat(just(event).transform(testProcessorReturnsNull).block().getMessage().getPayload().getValue(), is(nullValue()));
+    Event result = just(event).transform(testProcessorReturnsNull).block();
+    assertThat(result.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   public void mapStreamSubscribeNullResult() throws Exception {
-    Latch latch = new Latch();
-    just(event).transform(testProcessorReturnsNull).subscribe(event -> {
-      assertThat(event.getMessage().getPayload().getValue(), is(nullValue()));
-      latch.countDown();
-    });
-    latch.await(RECEIVE_TIMEOUT, MILLISECONDS);
+    Event result = just(event).transform(testProcessorReturnsNull).block();
+    assertThat(result.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   public void mapBlockingExceptionThrown() throws Exception {
     thrown.expect(is(exception));
-    assertThat(testProcessorThrowsException.process(event), is(nullValue()));
+    testProcessorThrowsException.process(event);
   }
 
   @Test
@@ -113,13 +114,46 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void mapStreamSubscribeExceptionThrown() throws Exception {
-    Latch latch = new Latch();
-    just(event).transform(testProcessorThrowsException).doOnError(throwable -> {
+    just(event).transform(testProcessorThrowsException).onErrorResume(throwable -> {
       assertThat(throwable, is(instanceOf(MessagingException.class)));
       assertThat(throwable.getCause(), is(exception));
-      latch.countDown();
+
+      // If there are no assertion errors, the actual throwable will be ignored
+      return Mono.empty();
     }).subscribe();
-    latch.await(RECEIVE_TIMEOUT, MILLISECONDS);
   }
 
+  @Test
+  public void mapBlockingErrorThrown() throws Exception {
+    thrown.expect(is(error));
+    testProcessorThrowsError.process(event);
+  }
+
+  @Test
+  public void mapStreamBlockingGetErrorThrown() throws Throwable {
+    Event result = null;
+    try {
+      result = just(event).transform(testProcessorThrowsError).block();
+    } catch (Exception e) {
+      Throwable problem = unwrap(e);
+
+      assertThat(problem, is(instanceOf(MessagingException.class)));
+      assertThat(problem.getCause(), is(instanceOf(MuleFatalException.class)));
+      assertThat(problem.getCause().getCause(), is(error));
+    }
+
+    assertThat(result, is(nullValue()));
+  }
+
+  @Test
+  public void mapStreamSubscribeErrorThrown() throws Exception {
+    just(event).transform(testProcessorThrowsError).onErrorResume(throwable -> {
+      assertThat(throwable, is(instanceOf(MessagingException.class)));
+      assertThat(throwable.getCause(), is(instanceOf(MuleFatalException.class)));
+      assertThat(throwable.getCause().getCause(), is(error));
+
+      // If there are no assertion errors, the actual throwable will be ignored
+      return Mono.empty();
+    }).subscribe().block();
+  }
 }

@@ -7,13 +7,17 @@
 package org.mule.test.module.extension;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mule.functional.junit4.rules.ExpectedError.none;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
+
 import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.core.exception.MuleFatalException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 
 import org.junit.Rule;
@@ -49,5 +53,23 @@ public class OperationErrorHandlingTestCase extends AbstractExtensionFunctionalT
         .expectErrorType(CORE_PREFIX.toUpperCase(), UNKNOWN_ERROR_IDENTIFIER)
         .expectCause(instanceOf(HeisenbergException.class));
     flowRunner("unrecognizedException").run();
+  }
+
+  @Test
+  public void errorIsPropagatedCorrectly() throws Exception {
+    expectedError
+        .expectErrorType(HEISENBERG, CONNECTIVITY_ERROR_IDENTIFIER)
+        .expectCause(instanceOf(ConnectionException.class));
+
+    try {
+      flowRunner("throwError").run();
+      fail("Should've thrown an exception");
+
+    } catch (Throwable t) {
+      Throwable problem = t.getCause().getCause();
+      assertThat(problem, instanceOf(MuleFatalException.class));
+      assertThat(problem.getCause(), instanceOf(LinkageError.class));
+      throw t;
+    }
   }
 }

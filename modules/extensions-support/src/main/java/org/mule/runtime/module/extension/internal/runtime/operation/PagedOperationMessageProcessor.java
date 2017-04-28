@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -58,7 +60,8 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
     try {
       Event resultEvent = super.doProcess(event, operationContext).block();
       PagingProvider<?, ?> pagingProvider = getTarget()
-          .map(target -> getPagingProvider((Message) resultEvent.getVariable(target).getValue()))
+          .map(target -> getPagingProvider(
+                                           (Message) resultEvent.getVariable(target).getValue()))
           .orElseGet(() -> getPagingProvider(resultEvent.getMessage()));
 
       if (pagingProvider == null) {
@@ -73,6 +76,8 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
       return just(returnDelegate.asReturnValue(new ConsumerStreamingIterator<>(consumer), operationContext));
     } catch (Exception e) {
       return error(e);
+    } catch (Throwable t) {
+      return error(wrapFatal(t));
     }
   }
 
