@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.policy;
 
-import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
@@ -129,18 +129,11 @@ public class CompositeSourcePolicy extends
           getParametersTransformer().map(parametersTransformer -> concatMaps(originalResponseParameters, parametersTransformer
               .fromMessageToSuccessResponseParameters(policiesResultEvent.getMessage()))).orElse(originalResponseParameters);
       return right(new SuccessSourcePolicyResult(policiesResultEvent, responseParameters, getParametersProcessor()));
-    } catch (FlowExecutionException e) {
-      Map<String, Object> responseParameters =
-          getParametersTransformer()
-              .map(parametersTransformer -> concatMaps(originalFailureResponseParameters, parametersTransformer
-                  .fromMessageToErrorResponseParameters(e.getEvent().getMessage())))
-              .orElse(originalFailureResponseParameters);
-      return left(new FailureSourcePolicyResult(e, responseParameters));
     } catch (MessagingException e) {
       Map<String, Object> responseParameters =
           getParametersTransformer()
               .map(parametersTransformer -> concatMaps(originalFailureResponseParameters, parametersTransformer
-                  .fromMessageToErrorResponseParameters(of(null))))
+                  .fromMessageToErrorResponseParameters(e.getEvent().getMessage())))
               .orElse(originalFailureResponseParameters);
       return left(new FailureSourcePolicyResult(e, responseParameters));
     }

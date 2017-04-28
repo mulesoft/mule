@@ -62,7 +62,9 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
 
   @Override
   public Map<String, Object> fromMessageToSuccessResponseParameters(Message message) {
-    return messageToResponseParameters(new HttpListenerResponseBuilder(), "response", message);
+    HttpListenerResponseBuilder responseBuilder = new HttpListenerResponseBuilder();
+    responseBuilder.setBody(message.getPayload());
+    return messageToResponseParameters(responseBuilder, "response", message);
   }
 
   @Override
@@ -74,23 +76,22 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
                                                           String responseBuilderParameterName, Message message) {
     ImmutableMap.Builder<String, Object> mapBuilder =
         ImmutableMap.<String, Object>builder().put(responseBuilderParameterName, httpListenerResponseBuilder);
+
     if (message.getAttributes().getValue() instanceof HttpResponseAttributes) {
       HttpResponseAttributes httpResponseAttributes = (HttpResponseAttributes) message.getAttributes().getValue();
       httpListenerResponseBuilder.setBody(message.getPayload());
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
       httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
-      return mapBuilder.build();
     } else if (message.getAttributes().getValue() instanceof HttpPolicyResponseAttributes) {
       HttpPolicyResponseAttributes httpResponseAttributes = (HttpPolicyResponseAttributes) message.getAttributes().getValue();
       httpListenerResponseBuilder.setBody(message.getPayload());
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
       httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
-      return mapBuilder.build();
-    } else {
-      return mapBuilder.build();
     }
+
+    return mapBuilder.build();
   }
 
 }
