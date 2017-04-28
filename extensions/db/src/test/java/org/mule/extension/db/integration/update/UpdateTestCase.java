@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
@@ -51,6 +52,7 @@ public class UpdateTestCase extends AbstractDbIntegrationTestCase {
   }
 
   @Test
+  @Ignore("MULE-12338")
   public void truncateTable() throws Exception {
     flowRunner("truncateTable").run();
     List<Map<String, String>> result = selectData("select * from PLANET", getDefaultDataSource());
