@@ -221,7 +221,6 @@
         <staxApiVersion>3.1.4</staxApiVersion>
         <staxonVersion>1.2</staxonVersion>
         <testFtpServerVersion>1.0.6</testFtpServerVersion>
-        <tomcatVersion>6.0.44</tomcatVersion>
         <unirestVersion>1.4.9</unirestVersion>
         <weaveVersion>4.0.0-SNAPSHOT</weaveVersion>
         <woodstoxVersion>4.4.1</woodstoxVersion>
@@ -1172,60 +1171,6 @@
                 <groupId>asm</groupId>
                 <artifactId>asm</artifactId>
                 <version>${asmVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>jasper-el</artifactId>
-                <version>${tomcatVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>el-api</artifactId>
-                <version>${tomcatVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>jasper</artifactId>
-                <version>${tomcatVersion}</version>
-                <exclusions>
-                    <!-- Duplicates, provided by other means -->
-                    <exclusion>
-                        <groupId>org.apache.tomcat</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.tomcat</groupId>
-                        <artifactId>catalina</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>jsp-api</artifactId>
-                <version>${tomcatVersion}</version>
-                <exclusions>
-                    <!-- Duplicates, provided by other means -->
-                    <exclusion>
-                        <groupId>org.apache.tomcat</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>annotations-api</artifactId>
-                <version>${tomcatVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>juli</artifactId>
-                <version>${tomcatVersion}</version>
             </dependency>
 
             <dependency>
