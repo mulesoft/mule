@@ -29,7 +29,8 @@ import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.artifact.ArtifactProperties;
@@ -46,9 +47,8 @@ import org.mule.runtime.core.config.artifact.DefaultArtifactProperties;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import org.springframework.util.PropertyPlaceholderHelper;
+import org.w3c.dom.Node;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,9 +62,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
-
-import org.springframework.util.PropertyPlaceholderHelper;
-import org.w3c.dom.Node;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -117,6 +114,7 @@ public class ApplicationModel {
   public static final String FLOW_ELEMENT = "flow";
   public static final String FLOW_REF_ELEMENT = "flow-ref";
   public static final String SUBFLOW_ELEMENT = "sub-flow";
+  private static final String MODULE_OPERATION_CHAIN_ELEMENT = "module-operation-chain";
 
   public static final String REDELIVERY_POLICY_ELEMENT = "redelivery-policy";
   // TODO MULE-9638 Remove once all bean definitions parsers where migrated
@@ -213,6 +211,8 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(REDELIVERY_POLICY_ELEMENT).build();
   public static final ComponentIdentifier GLOBAL_PROPERTY_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(GLOBAL_PROPERTY).build();
+  public static final ComponentIdentifier MODULE_OPERATION_CHAIN =
+      builder().withNamespace(CORE_PREFIX).withName(MODULE_OPERATION_CHAIN_ELEMENT).build();
 
   private static ImmutableSet<ComponentIdentifier> ignoredNameValidationComponentList =
       ImmutableSet.<ComponentIdentifier>builder()

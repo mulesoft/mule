@@ -24,6 +24,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
+import org.mule.runtime.config.spring.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
@@ -57,6 +58,12 @@ public class MacroExpansionModuleModel {
    */
   private static final String MODULE_CONFIG_GLOBAL_ELEMENT_NAME = "config";
   private static final String MODULE_OPERATION_CONFIG_REF = "config-ref";
+  /**
+   * Used to obtain the {@link ComponentIdentifier} element from the <module/>'s original {@ink ComponentModel} to be later added
+   * in the macro expanded element (aka: <module-operation-chain ../>) so that the location set by the {@link ComponentLocationVisitor}
+   * can properly set the paths for every element (even the macro expanded)
+   */
+  public static final String ORIGINAL_IDENTIFIER = "ORIGINAL_IDENTIFIER";
 
   private final ApplicationModel applicationModel;
   private final List<ExtensionModel> extensions;
@@ -230,7 +237,7 @@ public class MacroExpansionModuleModel {
 
     ComponentModel.Builder processorChainBuilder = new ComponentModel.Builder();
     processorChainBuilder
-        .setIdentifier(builder().withNamespace(CORE_PREFIX).withName("module-operation-chain").build());
+        .setIdentifier(builder().withNamespace(CORE_PREFIX).withName("module-operation-chain").build()); //TODO lautaro check if this can be exported to some place
 
 
     processorChainBuilder.addParameter("returnsVoid", String.valueOf(isVoid(operationModel.getOutput().getType())), false);
@@ -258,11 +265,12 @@ public class MacroExpansionModuleModel {
     final String configFileName = operationComponentModelModelProperty.getOperationComponentModel().getConfigFileName()
         .orElseThrow(() -> new IllegalArgumentException(format("The is no config file name for the operation [%s] in the module [%s]",
                                                                operationModel.getName(), extensionModel.getName())));
-    processorChainBuilder.setConfigFileName(configFileName);
     final Integer lineNumber = operationComponentModelModelProperty.getOperationComponentModel().getLineNumber()
         .orElseThrow(() -> new IllegalArgumentException(format("The is no line number for the operation [%s] in the module [%s]",
                                                                operationModel.getName(), extensionModel.getName())));
+    processorChainBuilder.setConfigFileName(configFileName);
     processorChainBuilder.setLineNumber(lineNumber);
+    processorChainBuilder.addCustomAttribute(ORIGINAL_IDENTIFIER, operationRefModel.getIdentifier());
     return processorChainModel;
   }
 

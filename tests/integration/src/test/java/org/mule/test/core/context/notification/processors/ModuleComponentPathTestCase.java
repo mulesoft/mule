@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.PROCESSOR;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
@@ -31,6 +32,7 @@ import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
+import ru.yandex.qatools.allure.annotations.Description;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,13 +42,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * Test suite to ensure XML connectors do properly generate the paths
- *
- * @since 4.0
- */
+@Description("Test suite to ensure XML connectors do properly generate the paths")
 public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase {
 
+  private static final String COLON_SEPARATOR = ":";
   private static final String MODULE_SIMPLE_XML = "module-simple.xml";
   private static final String MODULE_SIMPLE_PROXY_XML = "module-simple-proxy.xml";
   private static final String FLOWS_USING_MODULE_SIMPLE_XML = "flows-using-modules.xml";
@@ -70,49 +69,91 @@ public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase 
                                                                                            CONFIG_FILE_NAME,
                                                                                            of(15))));
 
-  private static final DefaultComponentLocation FLOW_WITH_SET_PAYLOAD_HARDCODED =
-      new DefaultComponentLocation(of("flowWithSetPayloadHardcoded"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithSetPayloadHardcoded",
+  private static final DefaultComponentLocation FLOW_WITH_PROXY_AND_SIMPLE_MODULE_AND_LOGGER =
+      new DefaultComponentLocation(of("flowWithProxyAndSimpleModuleAndLogger"),
+                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithProxyAndSimpleModuleAndLogger",
                                                                                            FLOW_TYPED_COMPONENT_IDENTIFIER,
                                                                                            CONFIG_FILE_NAME,
+                                                                                           of(49))));
+
+  private static final DefaultComponentLocation FLOW_WITH_PROXY_AND_SIMPLE_MODULE_AND_LOGGER_REVERSE =
+      new DefaultComponentLocation(of("flowWithProxyAndSimpleModuleAndLoggerReverse"),
+                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithProxyAndSimpleModuleAndLoggerReverse",
+                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                                           CONFIG_FILE_NAME,
+                                                                                           of(55))));
+
+  /**
+   * "module-simple" operations defined below
+   */
+  private static final String MODULE_SIMPLE_NAMESPACE_IN_APP = "simple-prefix";
+  private static final String SET_PAYLOAD_HARDCODED_VALUE_NAME = "set-payload-hardcoded-value";
+  private static final Optional<TypedComponentIdentifier> MODULE_SET_PAYLOAD_HARDCODED_VALUE =
+      of(builder()
+          .withIdentifier(buildFromStringRepresentation(MODULE_SIMPLE_NAMESPACE_IN_APP + ":" + SET_PAYLOAD_HARDCODED_VALUE_NAME))
+          .withType(OPERATION).build());
+  private static final DefaultComponentLocation OPERATION_SET_PAYLOAD_HARDCODED_VALUE =
+      new DefaultComponentLocation(of(SET_PAYLOAD_HARDCODED_VALUE_NAME),
+                                   asList(new DefaultComponentLocation.DefaultLocationPart(SET_PAYLOAD_HARDCODED_VALUE_NAME,
+                                                                                           MODULE_SET_PAYLOAD_HARDCODED_VALUE,
+                                                                                           MODULE_SIMPLE_FILE_NAME,
+                                                                                           of(12))));
+
+  private static final String SET_PAYLOAD_PARAM_VALUE_NAME = "set-payload-param-value";
+  private static final Optional<TypedComponentIdentifier> MODULE_SET_PAYLOAD_PARAM_VALUE =
+      of(builder()
+          .withIdentifier(buildFromStringRepresentation(MODULE_SIMPLE_NAMESPACE_IN_APP + ":" + SET_PAYLOAD_PARAM_VALUE_NAME))
+          .withType(OPERATION).build());
+  private static final DefaultComponentLocation OPERATION_SET_PAYLOAD_PARAM_VALUE =
+      new DefaultComponentLocation(of(SET_PAYLOAD_PARAM_VALUE_NAME),
+                                   asList(new DefaultComponentLocation.DefaultLocationPart(SET_PAYLOAD_PARAM_VALUE_NAME,
+                                                                                           MODULE_SET_PAYLOAD_PARAM_VALUE,
+                                                                                           MODULE_SIMPLE_FILE_NAME,
                                                                                            of(19))));
 
-  private static final DefaultComponentLocation FLOW_WITH_SET_PAYLOAD_HARDCODED_TWICE =
-      new DefaultComponentLocation(of("flowWithSetPayloadHardcodedTwice"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithSetPayloadHardcodedTwice",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(23))));
-  private static final DefaultComponentLocation FLOW_WITH_SET_PAYLOAD_PARAM_VALUE =
-      new DefaultComponentLocation(of("flowWithSetPayloadParamValue"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithSetPayloadParamValue",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(28))));
-  private static final DefaultComponentLocation FLOW_WITH_OP_TWO_MP =
-      new DefaultComponentLocation(of("flowWithSetPayloadTwoTimes"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithSetPayloadTwoTimes",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(32))));
-  private static final DefaultComponentLocation FLOW_WITH_OP_TWO_MP_TWICE =
-      new DefaultComponentLocation(of("flowWithSetPayloadTwoTimesTwice"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithSetPayloadTwoTimesTwice",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(36))));
+  private static final String SET_PAYLOAD_TWO_TIMES_NAME = "set-payload-two-times";
+  private static final Optional<TypedComponentIdentifier> MODULE_SET_PAYLOAD_TWO_TIMES =
+      of(builder()
+          .withIdentifier(buildFromStringRepresentation(MODULE_SIMPLE_NAMESPACE_IN_APP + ":" + SET_PAYLOAD_TWO_TIMES_NAME))
+          .withType(OPERATION).build());
+  private static final DefaultComponentLocation OPERATION_SET_PAYLOAD_TWO_TIMES =
+      new DefaultComponentLocation(of(SET_PAYLOAD_TWO_TIMES_NAME),
+                                   asList(new DefaultComponentLocation.DefaultLocationPart(SET_PAYLOAD_TWO_TIMES_NAME,
+                                                                                           MODULE_SET_PAYLOAD_TWO_TIMES,
+                                                                                           MODULE_SIMPLE_FILE_NAME,
+                                                                                           of(29))));
 
-  private static final DefaultComponentLocation FLOW_WITH_PROXY_SET_PAYLOAD_HARDCODED =
-      new DefaultComponentLocation(of("flowWithProxySetPayloadHardcoded"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithProxySetPayloadHardcoded",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(41))));
+  /**
+   * "module-simple-proxy" operations defined below
+   */
+  private static final String MODULE_SIMPLE_PROXY_NAMESPACE_IN_APP = "module-simple-proxy";
+  private static final String PROXY_SET_PAYLOAD_NAME = "proxy-set-payload-hardcoded-value";
+  private static final Optional<TypedComponentIdentifier> MODULE_PROXY_SET_PAYLOAD =
+      of(builder()
+          .withIdentifier(buildFromStringRepresentation(MODULE_SIMPLE_PROXY_NAMESPACE_IN_APP + ":" + PROXY_SET_PAYLOAD_NAME))
+          .withType(OPERATION).build());
+  private static final DefaultComponentLocation OPERATION_PROXY_SET_PAYLOAD =
+      new DefaultComponentLocation(of(PROXY_SET_PAYLOAD_NAME),
+                                   asList(new DefaultComponentLocation.DefaultLocationPart(PROXY_SET_PAYLOAD_NAME,
+                                                                                           MODULE_PROXY_SET_PAYLOAD,
+                                                                                           MODULE_SIMPLE_PROXY_FILE_NAME,
+                                                                                           of(13))));
 
-  private static final Optional<TypedComponentIdentifier> MODULE_OPERATION_CHAIN =
-      of(builder().withIdentifier(buildFromStringRepresentation("mule:module-operation-chain"))
-          .withType(PROCESSOR).build());
+  private static final String PROXY_SET_PAYLOAD_AND_LOGGER_NAME = "proxy-set-payload-hardcoded-value-and-logger";
+  private static final Optional<TypedComponentIdentifier> MODULE_PROXY_SET_PAYLOAD_AND_LOGGER =
+      of(builder().withIdentifier(buildFromStringRepresentation(MODULE_SIMPLE_PROXY_NAMESPACE_IN_APP + COLON_SEPARATOR
+          + PROXY_SET_PAYLOAD_AND_LOGGER_NAME))
+          .withType(OPERATION).build());
+  private static final DefaultComponentLocation OPERATION_PROXY_SET_PAYLOAD_AND_LOGGER =
+      new DefaultComponentLocation(of(PROXY_SET_PAYLOAD_AND_LOGGER_NAME),
+                                   asList(new DefaultComponentLocation.DefaultLocationPart(PROXY_SET_PAYLOAD_AND_LOGGER_NAME,
+                                                                                           MODULE_PROXY_SET_PAYLOAD_AND_LOGGER,
+                                                                                           MODULE_SIMPLE_PROXY_FILE_NAME,
+                                                                                           of(20))));
 
+  /**
+   * runtime provided MPs
+   */
   private static final Optional<TypedComponentIdentifier> LOGGER =
       of(builder().withIdentifier(buildFromStringRepresentation("mule:logger"))
           .withType(PROCESSOR).build());
@@ -133,7 +174,8 @@ public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase 
   public void flowWithSingleMp() throws Exception {
     //simple test to be sure the macro expansion doesn't mess up the a flow that has no modifications
     flowRunner("flowWithSingleMp").run();
-    assertNextProcessorLocationIs(FLOW_WITH_SINGLE_MP_LOCATION.appendLocationPart("processors", empty(), empty(), empty())
+    assertNextProcessorLocationIs(FLOW_WITH_SINGLE_MP_LOCATION
+        .appendLocationPart("processors", empty(), empty(), empty())
         .appendLocationPart("0", LOGGER, CONFIG_FILE_NAME, of(16)));
     assertNoNextProcessorNotification();
   }
@@ -141,10 +183,12 @@ public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase 
   @Test
   public void flowWithSetPayloadHardcoded() throws Exception {
     flowRunner("flowWithSetPayloadHardcoded").run();
-    assertNextProcessorLocationIs(FLOW_WITH_SET_PAYLOAD_HARDCODED.appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(12)));
-    assertNextProcessorLocationIs(FLOW_WITH_SET_PAYLOAD_HARDCODED.appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(12))
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12))
         .appendLocationPart("processors", empty(), empty(), empty())
         .appendLocationPart("0", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(14)));
     assertNoNextProcessorNotification();
@@ -153,21 +197,21 @@ public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase 
   @Test
   public void flowWithSetPayloadHardcodedTwice() throws Exception {
     flowRunner("flowWithSetPayloadHardcodedTwice").run();
-    assertNextProcessorLocationIs(FLOW_WITH_SET_PAYLOAD_HARDCODED_TWICE
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
         .appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(12)));
-    assertNextProcessorLocationIs(FLOW_WITH_SET_PAYLOAD_HARDCODED_TWICE
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
         .appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(12))
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12))
         .appendLocationPart("processors", empty(), empty(), empty())
         .appendLocationPart("0", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(14)));
 
-    assertNextProcessorLocationIs(FLOW_WITH_SET_PAYLOAD_HARDCODED_TWICE
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
         .appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("1", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(12)));
-    assertNextProcessorLocationIs(FLOW_WITH_SET_PAYLOAD_HARDCODED_TWICE
+        .appendLocationPart("1", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
         .appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("1", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(12))
+        .appendLocationPart("1", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12))
         .appendLocationPart("processors", empty(), empty(), empty())
         .appendLocationPart("0", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(14)));
     assertNoNextProcessorNotification();
@@ -176,10 +220,10 @@ public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase 
   @Test
   public void flowWithSetPayloadParamValue() throws Exception {
     flowRunner("flowWithSetPayloadParamValue").run();
-    assertNextProcessorLocationIs(FLOW_WITH_SET_PAYLOAD_PARAM_VALUE.appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(19)));
-    assertNextProcessorLocationIs(FLOW_WITH_SET_PAYLOAD_PARAM_VALUE.appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(19))
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_PARAM_VALUE.appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_PARAM_VALUE, MODULE_SIMPLE_FILE_NAME, of(19)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_PARAM_VALUE.appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_PARAM_VALUE, MODULE_SIMPLE_FILE_NAME, of(19))
         .appendLocationPart("processors", empty(), empty(), empty())
         .appendLocationPart("0", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(24)));
     assertNoNextProcessorNotification();
@@ -188,14 +232,14 @@ public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase 
   @Test
   public void flowWithSetPayloadTwoTimes() throws Exception {
     flowRunner("flowWithSetPayloadTwoTimes").run();
-    assertNextProcessorLocationIs(FLOW_WITH_OP_TWO_MP.appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(29)));
-    assertNextProcessorLocationIs(FLOW_WITH_OP_TWO_MP.appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(29))
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_TWO_TIMES.appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_TWO_TIMES, MODULE_SIMPLE_FILE_NAME, of(29)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_TWO_TIMES.appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_TWO_TIMES, MODULE_SIMPLE_FILE_NAME, of(29))
         .appendLocationPart("processors", empty(), empty(), empty())
         .appendLocationPart("0", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(31)));
-    assertNextProcessorLocationIs(FLOW_WITH_OP_TWO_MP.appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(29))
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_TWO_TIMES.appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_TWO_TIMES, MODULE_SIMPLE_FILE_NAME, of(29))
         .appendLocationPart("processors", empty(), empty(), empty())
         .appendLocationPart("1", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(32)));
     assertNoNextProcessorNotification();
@@ -204,25 +248,25 @@ public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase 
   @Test
   public void flowWithSetPayloadTwoTimesTwice() throws Exception {
     flowRunner("flowWithSetPayloadTwoTimesTwice").run();
-    assertNextProcessorLocationIs(FLOW_WITH_OP_TWO_MP_TWICE.appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(29)));
-    assertNextProcessorLocationIs(FLOW_WITH_OP_TWO_MP_TWICE.appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(29))
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_TWO_TIMES.appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_TWO_TIMES, MODULE_SIMPLE_FILE_NAME, of(29)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_TWO_TIMES.appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_TWO_TIMES, MODULE_SIMPLE_FILE_NAME, of(29))
         .appendLocationPart("processors", empty(), empty(), empty())
         .appendLocationPart("0", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(31)));
-    assertNextProcessorLocationIs(FLOW_WITH_OP_TWO_MP_TWICE.appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(29))
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_TWO_TIMES.appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_TWO_TIMES, MODULE_SIMPLE_FILE_NAME, of(29))
         .appendLocationPart("processors", empty(), empty(), empty())
         .appendLocationPart("1", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(32)));
     //assertion on the second call of the OP
-    assertNextProcessorLocationIs(FLOW_WITH_OP_TWO_MP_TWICE.appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("1", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(29)));
-    assertNextProcessorLocationIs(FLOW_WITH_OP_TWO_MP_TWICE.appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("1", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(29))
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_TWO_TIMES.appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("1", MODULE_SET_PAYLOAD_TWO_TIMES, MODULE_SIMPLE_FILE_NAME, of(29)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_TWO_TIMES.appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("1", MODULE_SET_PAYLOAD_TWO_TIMES, MODULE_SIMPLE_FILE_NAME, of(29))
         .appendLocationPart("processors", empty(), empty(), empty())
         .appendLocationPart("0", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(31)));
-    assertNextProcessorLocationIs(FLOW_WITH_OP_TWO_MP_TWICE.appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("1", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(29))
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_TWO_TIMES.appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("1", MODULE_SET_PAYLOAD_TWO_TIMES, MODULE_SIMPLE_FILE_NAME, of(29))
         .appendLocationPart("processors", empty(), empty(), empty())
         .appendLocationPart("1", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(32)));
     assertNoNextProcessorNotification();
@@ -232,23 +276,109 @@ public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase 
   public void flowWithProxySetPayloadHardcoded() throws Exception {
     flowRunner("flowWithProxySetPayloadHardcoded").run();
     //flow assertion
-    assertNextProcessorLocationIs(FLOW_WITH_PROXY_SET_PAYLOAD_HARDCODED
+    assertNextProcessorLocationIs(OPERATION_PROXY_SET_PAYLOAD
         .appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_PROXY_FILE_NAME, of(11)));
-    //proxy chain assertion
-    assertNextProcessorLocationIs(FLOW_WITH_PROXY_SET_PAYLOAD_HARDCODED
+        .appendLocationPart("0", MODULE_PROXY_SET_PAYLOAD, MODULE_SIMPLE_PROXY_FILE_NAME, of(13)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
         .appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_PROXY_FILE_NAME, of(11))
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
         .appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(12)));
-    //chain assertion
-    assertNextProcessorLocationIs(FLOW_WITH_PROXY_SET_PAYLOAD_HARDCODED
-        .appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_PROXY_FILE_NAME, of(11))
-        .appendLocationPart("processors", empty(), empty(), empty())
-        .appendLocationPart("0", MODULE_OPERATION_CHAIN, MODULE_SIMPLE_FILE_NAME, of(12))
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12))
         .appendLocationPart("processors", empty(), empty(), empty())
         .appendLocationPart("0", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(14)));
+    assertNoNextProcessorNotification();
+  }
+
+  @Test
+  public void flowWithProxySetPayloadHardcodedAndLogger() throws Exception {
+    flowRunner("flowWithProxySetPayloadHardcodedAndLogger").run();
+    assertNextProcessorLocationIs(OPERATION_PROXY_SET_PAYLOAD_AND_LOGGER
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_PROXY_SET_PAYLOAD_AND_LOGGER, MODULE_SIMPLE_PROXY_FILE_NAME, of(20)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12))
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(14)));
+    assertNextProcessorLocationIs(OPERATION_PROXY_SET_PAYLOAD_AND_LOGGER
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_PROXY_SET_PAYLOAD_AND_LOGGER, MODULE_SIMPLE_PROXY_FILE_NAME, of(20))
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("1", LOGGER, MODULE_SIMPLE_PROXY_FILE_NAME, of(23)));
+    assertNoNextProcessorNotification();
+  }
+
+  @Test
+  public void flowWithProxyAndSimpleModuleAndLogger() throws Exception {
+    flowRunner("flowWithProxyAndSimpleModuleAndLogger").run();
+    assertNextProcessorLocationIs(OPERATION_PROXY_SET_PAYLOAD_AND_LOGGER
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_PROXY_SET_PAYLOAD_AND_LOGGER, MODULE_SIMPLE_PROXY_FILE_NAME, of(20)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12))
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(14)));
+    assertNextProcessorLocationIs(OPERATION_PROXY_SET_PAYLOAD_AND_LOGGER
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_PROXY_SET_PAYLOAD_AND_LOGGER, MODULE_SIMPLE_PROXY_FILE_NAME, of(20))
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("1", LOGGER, MODULE_SIMPLE_PROXY_FILE_NAME, of(23)));
+
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("1", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("1", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12))
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(14)));
+
+    assertNextProcessorLocationIs(FLOW_WITH_PROXY_AND_SIMPLE_MODULE_AND_LOGGER
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("2", LOGGER, CONFIG_FILE_NAME, of(52)));
+    assertNoNextProcessorNotification();
+  }
+
+  @Test
+  public void flowWithProxyAndSimpleModuleAndLoggerReverse() throws Exception {
+    flowRunner("flowWithProxyAndSimpleModuleAndLoggerReverse").run();
+    assertNextProcessorLocationIs(FLOW_WITH_PROXY_AND_SIMPLE_MODULE_AND_LOGGER_REVERSE
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", LOGGER, CONFIG_FILE_NAME, of(56)));
+
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("1", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("1", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12))
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(14)));
+
+    assertNextProcessorLocationIs(OPERATION_PROXY_SET_PAYLOAD_AND_LOGGER
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("2", MODULE_PROXY_SET_PAYLOAD_AND_LOGGER, MODULE_SIMPLE_PROXY_FILE_NAME, of(20)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12)));
+    assertNextProcessorLocationIs(OPERATION_SET_PAYLOAD_HARDCODED_VALUE
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", MODULE_SET_PAYLOAD_HARDCODED_VALUE, MODULE_SIMPLE_FILE_NAME, of(12))
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("0", SET_PAYLOAD, MODULE_SIMPLE_FILE_NAME, of(14)));
+    assertNextProcessorLocationIs(OPERATION_PROXY_SET_PAYLOAD_AND_LOGGER
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("2", MODULE_PROXY_SET_PAYLOAD_AND_LOGGER, MODULE_SIMPLE_PROXY_FILE_NAME, of(20))
+        .appendLocationPart("processors", empty(), empty(), empty())
+        .appendLocationPart("1", LOGGER, MODULE_SIMPLE_PROXY_FILE_NAME, of(23)));
     assertNoNextProcessorNotification();
   }
 
