@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.globalconfig.internal;
 
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.valueOf;
 import static java.lang.String.format;
 import org.mule.maven.client.api.Authentication;
 import org.mule.maven.client.api.MavenConfiguration;
@@ -109,10 +111,10 @@ public class MavenConfigBuilder {
 
   private static Comparator<Map.Entry<String, Object>> remoteRepositoriesComparator() {
     return (firstEntry, secondEntry) -> {
-      Integer firstPosition = Integer
-          .valueOf(((Map<String, String>) firstEntry.getValue()).getOrDefault(POSITION, String.valueOf(Integer.MAX_VALUE)));
-      Integer secondPosition = Integer.valueOf(((Map<String, String>) secondEntry.getValue())
-          .getOrDefault(POSITION, String.valueOf(Integer.MAX_VALUE)));
+      Integer firstPosition =
+          valueOf(((Map<String, String>) firstEntry.getValue()).getOrDefault(POSITION, String.valueOf(MAX_VALUE)));
+      Integer secondPosition = valueOf(((Map<String, String>) secondEntry.getValue())
+          .getOrDefault(POSITION, String.valueOf(MAX_VALUE)));
       return firstPosition.compareTo(secondPosition);
     };
   }

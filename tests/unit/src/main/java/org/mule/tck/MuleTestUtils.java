@@ -60,7 +60,7 @@ public final class MuleTestUtils {
   }
 
   /**
-   * Execute callback with a given system property set and replaces the system property with it's original value once done. Useful
+   * Executes callback with a given system property set and replaces the system property with it's original value once done. Useful
    * for asserting behaviour that is dependent on the presence of a system property.
    * 
    * @param propertyName Name of system property to set
@@ -89,7 +89,7 @@ public final class MuleTestUtils {
   }
 
   /**
-   * Execute callback with a given system properties set and replaces the system property with it's original value once done. Useful
+   * Executes callback with a given system properties set and replaces the system properties with their original values once done. Useful
    * for asserting behaviour that is dependent on the presence of a system property.
    *
    * @param properties {@link Map} of property name and property value to be set.
