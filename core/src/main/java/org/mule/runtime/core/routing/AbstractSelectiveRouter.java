@@ -13,6 +13,7 @@ import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Flux.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -35,6 +36,7 @@ import org.mule.runtime.core.api.routing.SelectiveRouter;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
+
 import org.mule.runtime.core.management.stats.RouterStatistics;
 
 import java.util.ArrayList;
@@ -45,6 +47,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.collections.ListUtils;
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject implements SelectiveRouter,
     RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware {
@@ -178,8 +181,17 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   public Publisher<Event> apply(Publisher<Event> publisher) {
     return from(publisher).concatMap(event -> {
       try {
-        return fromIterable(getProcessorsToRoute(event)).concatMap(mp -> just(event).transform(mp)).collectList()
-            .map(list -> resultsHandler.aggregateResults(list, event));
+        return fromIterable(getProcessorsToRoute(event))
+            .concatMap(mp -> just(event).transform(mp))
+            .collectList()
+            .handle((list, sink) -> {
+              Event aggregateEvent = resultsHandler.aggregateResults(list, event);
+              // Routes will also return null when an exception is thrown, so we need to take into account this case and not
+              // continue processing if the response has already been completed.
+              if (aggregateEvent != null && !Mono.from(event.getContext().getResponsePublisher()).toFuture().isDone()) {
+                sink.next(aggregateEvent);
+              }
+            });
       } catch (RoutePathNotFoundException e) {
         return error(new MessagingException(event, e, this));
       }

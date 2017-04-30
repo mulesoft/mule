@@ -9,6 +9,7 @@ package org.mule.runtime.core.routing;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
@@ -55,7 +56,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
   @SuppressWarnings(value = {"unchecked"})
   public Event aggregateResults(final List<Event> results,
                                 final Event previous) {
-    if (results == null || results.isEmpty()) {
+    if (results == null) {
       return null;
     } else if (results.size() == 1) {
       Event event = results.get(0);
