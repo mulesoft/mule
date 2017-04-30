@@ -12,10 +12,12 @@ import static org.mule.runtime.api.component.ComponentIdentifier.buildFromString
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -23,8 +25,10 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
@@ -39,6 +43,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     implements MessagingExceptionHandlerAcceptor {
@@ -92,7 +97,15 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
         @Override
         public Publisher<Event> apply(Publisher<Event> publisher) {
-          return from(publisher).then(event -> from(routeAsync(event, exception)));
+          if (flowConstruct instanceof Pipeline
+              && ((Pipeline) flowConstruct).getMessageSource() instanceof LegacyInboundEndpoint) {
+            // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
+            // Use child context if HandleExceptionInterceptor is being used to avoid response being completed twice..
+            return Mono.from(publisher).flatMap(event -> processWithChildContext(event, p -> from(p)
+                .flatMap(childEvent -> Mono.from(routeAsync(childEvent, exception)))));
+          } else {
+            return from(publisher).then(event -> from(routeAsync(event, exception)));
+          }
         }
       };
 

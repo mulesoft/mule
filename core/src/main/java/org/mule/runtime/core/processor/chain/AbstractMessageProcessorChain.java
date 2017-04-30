@@ -15,7 +15,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
-import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.util.ExceptionUtils.putContext;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -132,20 +131,24 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
     };
   }
 
-  private Function<MessagingException, Mono<Event>> handleError(EventContext eventContext) {
+  private Function<MessagingException, Publisher<Event>> handleError(EventContext eventContext) {
     if (flowConstruct instanceof Pipeline && ((Pipeline) flowConstruct).getMessageSource() instanceof LegacyInboundEndpoint) {
+      // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
+      // Don't handle exception in chain as it needs to be handled by HandleExceptionInterceptor.
       return messagingException -> {
         eventContext.error(messagingException);
         return empty();
       };
     } else {
-      return messagingException -> {
-        from(getMessagingExceptionHandler().apply(messagingException))
-            .doOnNext(handled -> eventContext.success(handled))
-            .doOnError(rethrown -> eventContext.error(rethrown))
-            .subscribe(requestUnbounded());
-        return empty();
-      };
+      return messagingException -> Mono.from(getMessagingExceptionHandler().apply(messagingException))
+          .flatMap(handled -> {
+            eventContext.success(handled);
+            return Mono.<Event>empty();
+          })
+          .onErrorResumeWith(rethrown -> {
+            eventContext.error(rethrown);
+            return empty();
+          });
     }
   }
 
