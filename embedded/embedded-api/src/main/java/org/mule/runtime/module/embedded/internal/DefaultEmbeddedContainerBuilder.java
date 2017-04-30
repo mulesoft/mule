@@ -7,13 +7,13 @@
 package org.mule.runtime.module.embedded.internal;
 
 import static com.google.common.base.Preconditions.checkState;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.codehaus.plexus.util.FileUtils.fileWrite;
 import static org.codehaus.plexus.util.FileUtils.toFile;
 import static org.mule.maven.client.api.BundleScope.PROVIDED;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.module.embedded.internal.Serializer.serialize;
+
 import org.mule.maven.client.api.BundleDependency;
 import org.mule.maven.client.api.BundleDescriptor;
 import org.mule.maven.client.api.MavenClient;
@@ -25,7 +25,6 @@ import org.mule.runtime.module.embedded.api.EmbeddedContainer;
 import org.mule.runtime.module.embedded.internal.classloading.JdkOnlyClassLoader;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.io.ByteArrayOutputStream;
@@ -35,6 +34,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -89,6 +89,10 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
     try {
       JdkOnlyClassLoader jdkOnlyClassLoader = new JdkOnlyClassLoader();
 
+      if (log4jConfigurationFile != null) {
+        configureLogging(jdkOnlyClassLoader);
+      }
+
       MavenClientProvider mavenClientProvider = discoverProvider(getClass().getClassLoader());
       MavenClient mavenClient = mavenClientProvider.createMavenClient(mavenConfiguration);
 
@@ -101,8 +105,6 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
       if (mavenConfiguration != null) {
         persistMavenConfiguration(containerBaseFolder, mavenConfiguration);
       }
-
-      ofNullable(log4jConfigurationFile).ifPresent(containerInfo::setLog4jConfigurationFile);
 
       ClassLoader embeddedControllerBootstrapClassLoader =
           createEmbeddedImplClassLoader(containerModulesClassLoader, mavenClient, muleVersion);
@@ -161,6 +163,16 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private void configureLogging(JdkOnlyClassLoader jdkOnlyClassLoader)
+      throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    final Class<?> log4jLogManagerClass = jdkOnlyClassLoader.loadClass("org.apache.logging.log4j.LogManager");
+    final Object logContext = log4jLogManagerClass.getMethod("getContext", boolean.class).invoke(null, false);
+
+    final Class<?> log4jLoggerContextClass = jdkOnlyClassLoader.loadClass("org.apache.logging.log4j.core.LoggerContext");
+    log4jLoggerContextClass.getMethod("setConfigLocation", URI.class).invoke(logContext,
+                                                                             new File(log4jConfigurationFile).toURI());
   }
 
   private void persistMavenConfiguration(URL containerBaseFolder, MavenConfiguration mavenConfiguration) throws IOException {

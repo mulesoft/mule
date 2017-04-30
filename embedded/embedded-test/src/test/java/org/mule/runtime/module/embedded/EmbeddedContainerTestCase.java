@@ -27,14 +27,13 @@ import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EMBEDDED_API;
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EmbeddedApiStory.CONFIGURATION;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.module.embedded.api.Application;
 import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
 import org.mule.runtime.module.embedded.api.DeploymentConfiguration;
 import org.mule.runtime.module.embedded.api.EmbeddedContainer;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.FreePortFinder;
-
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.exceptions.UnirestException;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,13 +51,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features(EMBEDDED_API)
 @Stories(CONFIGURATION)
-public class EmbeddedContainerTestCase {
+public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
 
   private static final String LOGGING_FILE = "app.log";
   private static final Logger LOGGER = getLogger(EmbeddedContainerTestCase.class);
@@ -217,5 +220,10 @@ public class EmbeddedContainerTestCase {
 
   private URI getClasspathResourceAsUri(String resource) throws URISyntaxException {
     return getClass().getClassLoader().getResource(resource).toURI();
+  }
+
+  @Override
+  public int getTestTimeoutSecs() {
+    return 20 * super.getTestTimeoutSecs();
   }
 }

@@ -90,11 +90,6 @@ public class EmbeddedController {
       setProperty(ADD_TEST_DEPENDENCIES_KEY, "true");
     }
 
-    containerInfo.getLog4jConfigurationFile()
-        .ifPresent(log4jConfigurationFile -> System.setProperty("log4j.configurationFile", log4jConfigurationFile));
-
-    ((org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false)).reconfigure();
-
     MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
 
     containerClassLoader =

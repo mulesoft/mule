@@ -30,14 +30,14 @@ public class ClassLoaderFilter {
   }
 
   public boolean exportsClass(String name) {
-    return isExportedBooPackage(name, CLASS_PACKAGE_SPLIT_REGEX);
+    return isExportedBootPackage(name, CLASS_PACKAGE_SPLIT_REGEX);
   }
 
   public boolean exportsResource(String name) {
-    return isExportedBooPackage(name, RESOURCE_PACKAGE_SPLIT_REGEX);
+    return isExportedBootPackage(name, RESOURCE_PACKAGE_SPLIT_REGEX);
   }
 
-  private boolean isExportedBooPackage(String name, String splitRegex) {
+  private boolean isExportedBootPackage(String name, String splitRegex) {
     boolean exported = false;
     final String[] splitName = name.split(splitRegex);
     final String[] packages = Arrays.copyOf(splitName, splitName.length - 1);

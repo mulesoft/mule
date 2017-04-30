@@ -44,7 +44,7 @@ public class FilteringClassLoader extends ClassLoader {
   @Override
   public Class<?> loadClass(String name) throws ClassNotFoundException {
     if (filter.exportsClass(name)) {
-      return loadClass(name);
+      return super.loadClass(name);
     } else {
       throw new NotExportedClassException(name, filter);
     }
