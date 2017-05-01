@@ -58,6 +58,14 @@ public class MuleProcessController {
     return controller.isDeployed(appName);
   }
 
+  public File getArtifactInternalRepository(String artifactName) {
+    return controller.getArtifactInternalRepository(artifactName);
+  }
+
+  public File getRuntimeInternalRepository() {
+    return controller.getRuntimeInternalRepository();
+  }
+
   public boolean isDomainDeployed(String domainName) {
     return controller.isDomainDeployed(domainName);
   }
