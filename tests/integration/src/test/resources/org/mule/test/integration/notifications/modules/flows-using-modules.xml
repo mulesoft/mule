@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:simple-weirdo-prefix="http://www.mulesoft.org/schema/a/different/path/mule/module-simple"
+      xmlns:module-simple-proxy="http://www.mulesoft.org/schema/mule/module-simple-proxy"
+      xsi:schemaLocation="
+      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/a/different/path/mule/module-simple http://www.mulesoft.org/schema/a/different/path/mule/module-simple/module-simple.xsd
+      http://www.mulesoft.org/schema/mule/module-simple-proxy http://www.mulesoft.org/schema/mule/module-simple-proxy/module-simple-proxy.xsd">
+
+    <notifications>
+        <notification event="MESSAGE-PROCESSOR"/>
+    </notifications>
+
+    <flow name="flowWithSingleMp">
+        <logger message="check"/>
+    </flow>
+
+    <flow name="flowWithSetPayloadHardcoded">
+        <simple-weirdo-prefix:set-payload-hardcoded-value />
+    </flow>
+
+    <flow name="flowWithSetPayloadHardcodedTwice">
+        <simple-weirdo-prefix:set-payload-hardcoded-value />
+        <simple-weirdo-prefix:set-payload-hardcoded-value />
+    </flow>
+
+    <flow name="flowWithSetPayloadParamValue">
+        <simple-weirdo-prefix:set-payload-param-value value="input value" />
+    </flow>
+
+    <flow name="flowWithSetPayloadTwoTimes">
+        <simple-weirdo-prefix:set-payload-two-times/>
+    </flow>
+
+    <flow name="flowWithSetPayloadTwoTimesTwice">
+        <simple-weirdo-prefix:set-payload-two-times/>
+        <simple-weirdo-prefix:set-payload-two-times/>
+    </flow>
+
+    <flow name="flowWithProxySetPayloadHardcoded">
+        <module-simple-proxy:proxy-set-payload-hardcoded-value />
+    </flow>
+
+    <flow name="flowWithProxySetPayloadHardcodedAndLogger">
+        <module-simple-proxy:proxy-set-payload-hardcoded-value-and-logger />
+    </flow>
+
+    <flow name="flowWithProxyAndSimpleModuleAndLogger">
+        <module-simple-proxy:proxy-set-payload-hardcoded-value-and-logger />
+        <simple-weirdo-prefix:set-payload-hardcoded-value />
+        <logger message="check"/>
+    </flow>
+
+    <flow name="flowWithProxyAndSimpleModuleAndLoggerReverse">
+        <logger message="check"/>
+        <simple-weirdo-prefix:set-payload-hardcoded-value />
+        <module-simple-proxy:proxy-set-payload-hardcoded-value-and-logger />
+    </flow>
+</mule>

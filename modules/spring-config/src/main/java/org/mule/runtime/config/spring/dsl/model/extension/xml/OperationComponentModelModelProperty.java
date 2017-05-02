@@ -11,29 +11,39 @@ import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.processor.Processor;
 
 /**
- * Property to store all {@link ComponentModel} of an operation's <body/> that are contained in an extension written in XML.
+ * Property to store the <operation/>'s {@link ComponentModel}  and the <body/> that are contained in an extension written in XML.
  *
  * @since 4.0
  */
 public class OperationComponentModelModelProperty implements ModelProperty {
 
-  private final ComponentModel componentModel;
+  private final ComponentModel operationComponentModel;
+  private final ComponentModel bodyComponentModel;
 
   /**
-   * Constructs a {@link ModelProperty} that will hold the {@link Processor}s defined in a <body/> element of an <operation/>
-   * to be later macro expanded into a Mule application.
+   * Constructs a {@link ModelProperty} that will hold the complete <operation/> and its {@link Processor}s defined in a <body/>
+   * element to be later macro expanded into a Mule application.
    *
-   * @param componentModel <body/> element with all the {@link Processor} represented through {@link ComponentModel}s.
+   * @param operationComponentModel <operation/> element represented through {@link ComponentModel}s.
+   * @param bodyComponentModel <body/> element with all the {@link Processor} represented through {@link ComponentModel}s.
    */
-  public OperationComponentModelModelProperty(ComponentModel componentModel) {
-    this.componentModel = componentModel;
+  public OperationComponentModelModelProperty(ComponentModel operationComponentModel, ComponentModel bodyComponentModel) {
+    this.operationComponentModel = operationComponentModel;
+    this.bodyComponentModel = bodyComponentModel;
+  }
+
+  /**
+   * @return the {@link ComponentModel} that's pointing to the <operation/> element
+   */
+  public ComponentModel getOperationComponentModel() {
+    return operationComponentModel;
   }
 
   /**
    * @return the {@link ComponentModel} that's pointing to the <body/> element
    */
-  public ComponentModel getComponentModel() {
-    return componentModel;
+  public ComponentModel getBodyComponentModel() {
+    return bodyComponentModel;
   }
 
   @Override

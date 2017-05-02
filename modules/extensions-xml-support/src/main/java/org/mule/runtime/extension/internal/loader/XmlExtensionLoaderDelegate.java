@@ -24,7 +24,7 @@ import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
-
+import com.google.common.collect.ImmutableMap;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -56,8 +56,7 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
 import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
-
-import com.google.common.collect.ImmutableMap;
+import org.w3c.dom.Document;
 
 import java.io.IOException;
 import java.net.URL;
@@ -70,10 +69,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.w3c.dom.Document;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -194,8 +189,9 @@ final class XmlExtensionLoaderDelegate {
     }
     ComponentModelReader componentModelReader =
         new ComponentModelReader(new DefaultArtifactProperties(emptyMap(), emptyMap(), emptyMap()));
-    ComponentModel componentModel =
-        componentModelReader.extractComponentDefinitionModel(parseModule.get(), resource.getFile());
+    //TODO MULE-12291: we would, ideally, leave either the relative path (modulePath) or the URL to the current config file, rather than just the name of the file (which will be useless from a tooling POV)
+    final String configFileName = modulePath.substring(modulePath.lastIndexOf("/") + 1);
+    ComponentModel componentModel = componentModelReader.extractComponentDefinitionModel(parseModule.get(), configFileName);
 
     loadModuleExtension(context.getExtensionDeclarer(), componentModel);
   }
@@ -317,7 +313,7 @@ final class XmlExtensionLoaderDelegate {
         .orElseThrow(() -> new IllegalArgumentException(format("The operation '%s' is missing the <body> statement",
                                                                operationName)));
 
-    operationDeclarer.withModelProperty(new OperationComponentModelModelProperty(bodyComponentModel));
+    operationDeclarer.withModelProperty(new OperationComponentModelModelProperty(operationModel, bodyComponentModel));
     operationDeclarer.describedAs(getDescription(operationModel));
     extractOperationParameters(operationDeclarer, operationModel);
     extractOutputType(operationDeclarer, operationModel);

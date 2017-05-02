@@ -1732,7 +1732,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
    */
   private void addModuleOperationChainParser(LinkedList<ComponentBuildingDefinition> componentBuildingDefinitions) {
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("module-operation-chain")
-        .withTypeDefinition(fromType(Processor.class))
+        .withTypeDefinition(fromType(AnnotatedProcessor.class))
         .withObjectFactoryType(ModuleOperationMessageProcessorChainFactoryBean.class)
         .withSetterParameterDefinition("properties", fromChildMapConfiguration(String.class, String.class)
             .withWrapperIdentifier("module-operation-properties").build())

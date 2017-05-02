@@ -57,7 +57,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Optional<OperationComponentModelModelProperty> modelProperty =
         operationModel.get().getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
-    assertThat(modelProperty.get().getComponentModel().getInnerComponents().size(), is(1));
+    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(1));
   }
 
   @Test
@@ -91,7 +91,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Optional<OperationComponentModelModelProperty> modelProperty =
         operationModel.get().getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
-    assertThat(modelProperty.get().getComponentModel().getInnerComponents().size(), is(1));
+    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(1));
   }
 
   @Test
@@ -128,7 +128,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Optional<OperationComponentModelModelProperty> modelProperty =
         operationModel.get().getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
-    assertThat(modelProperty.get().getComponentModel().getInnerComponents().size(), is(2));
+    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(2));
   }
 
   @Test
@@ -160,7 +160,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Optional<OperationComponentModelModelProperty> modelProperty =
         operation.getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
-    assertThat(modelProperty.get().getComponentModel().getInnerComponents().size(), is(1));
+    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(1));
   }
 
   @Test
@@ -209,7 +209,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Optional<OperationComponentModelModelProperty> modelProperty =
         operationModel.get().getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
-    assertThat(modelProperty.get().getComponentModel().getInnerComponents().size(), is(1));
+    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(1));
   }
 
   private ExtensionModel getExtensionModelFrom(String modulePath) {

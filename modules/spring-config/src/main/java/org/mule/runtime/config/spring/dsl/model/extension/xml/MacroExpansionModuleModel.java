@@ -24,6 +24,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
+import org.mule.runtime.config.spring.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
@@ -57,6 +58,12 @@ public class MacroExpansionModuleModel {
    */
   private static final String MODULE_CONFIG_GLOBAL_ELEMENT_NAME = "config";
   private static final String MODULE_OPERATION_CONFIG_REF = "config-ref";
+  /**
+   * Used to obtain the {@link ComponentIdentifier} element from the <module/>'s original {@ink ComponentModel} to be later added
+   * in the macro expanded element (aka: <module-operation-chain ../>) so that the location set by the {@link ComponentLocationVisitor}
+   * can properly set the paths for every element (even the macro expanded)
+   */
+  public static final String ORIGINAL_IDENTIFIER = "ORIGINAL_IDENTIFIER";
 
   private final ApplicationModel applicationModel;
   private final List<ExtensionModel> extensions;
@@ -220,15 +227,17 @@ public class MacroExpansionModuleModel {
    */
   private ComponentModel createOperationInstance(ComponentModel operationRefModel, ExtensionModel extensionModel,
                                                  OperationModel operationModel, Set<String> moduleGlobalElementsNames) {
-    List<ComponentModel> bodyProcessors = operationModel.getModelProperty(OperationComponentModelModelProperty.class).get()
-        .getComponentModel().getInnerComponents();
+    final OperationComponentModelModelProperty operationComponentModelModelProperty =
+        operationModel.getModelProperty(OperationComponentModelModelProperty.class).get();
+    final ComponentModel operationModuleComponentModel = operationComponentModelModelProperty
+        .getBodyComponentModel();
+    List<ComponentModel> bodyProcessors = operationModuleComponentModel.getInnerComponents();
 
     String configRefName = operationRefModel.getParameters().get(MODULE_OPERATION_CONFIG_REF);
 
     ComponentModel.Builder processorChainBuilder = new ComponentModel.Builder();
     processorChainBuilder
         .setIdentifier(builder().withNamespace(CORE_PREFIX).withName("module-operation-chain").build());
-
 
     processorChainBuilder.addParameter("returnsVoid", String.valueOf(isVoid(operationModel.getOutput().getType())), false);
     Map<String, String> propertiesMap = extractProperties(operationRefModel, extensionModel);
@@ -252,6 +261,15 @@ public class MacroExpansionModuleModel {
     for (ComponentModel processorChainModelChild : processorChainModel.getInnerComponents()) {
       processorChainModelChild.setParent(processorChainModel);
     }
+    final String configFileName = operationComponentModelModelProperty.getOperationComponentModel().getConfigFileName()
+        .orElseThrow(() -> new IllegalArgumentException(format("The is no config file name for the operation [%s] in the module [%s]",
+                                                               operationModel.getName(), extensionModel.getName())));
+    final Integer lineNumber = operationComponentModelModelProperty.getOperationComponentModel().getLineNumber()
+        .orElseThrow(() -> new IllegalArgumentException(format("The is no line number for the operation [%s] in the module [%s]",
+                                                               operationModel.getName(), extensionModel.getName())));
+    processorChainBuilder.setConfigFileName(configFileName);
+    processorChainBuilder.setLineNumber(lineNumber);
+    processorChainBuilder.addCustomAttribute(ORIGINAL_IDENTIFIER, operationRefModel.getIdentifier());
     return processorChainModel;
   }
 
@@ -411,6 +429,14 @@ public class MacroExpansionModuleModel {
                                                        copyComponentModel(operationChildModel, configRefName,
                                                                           moduleGlobalElementsNames, literalsParameters));
     }
+
+    final String configFileName = modelToCopy.getConfigFileName()
+        .orElseThrow(() -> new IllegalArgumentException("The is no config file name for the component to macro expand"));
+    final Integer lineNumber = modelToCopy.getLineNumber()
+        .orElseThrow(() -> new IllegalArgumentException("The is no line number for the component to macro expand"));
+    operationReplacementModel.setConfigFileName(configFileName);
+    operationReplacementModel.setLineNumber(lineNumber);
+
     ComponentModel componentModel = operationReplacementModel.build();
     for (ComponentModel child : componentModel.getInnerComponents()) {
       child.setParent(componentModel);

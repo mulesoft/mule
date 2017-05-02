@@ -9,23 +9,26 @@ package org.mule.runtime.config.spring.dsl.model;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MODULE_OPERATION_CHAIN;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SUBFLOW_IDENTIFIER;
+import static org.mule.runtime.config.spring.dsl.model.extension.xml.MacroExpansionModuleModel.ORIGINAL_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isErrorHandler;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isMessageSource;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isProcessor;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isRouter;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isTemplateOnErrorHandler;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.resolveComponentType;
+import com.google.common.collect.ImmutableList;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultLocationPart;
 
-import com.google.common.collect.ImmutableList;
-
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -89,10 +92,15 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
               .appendLocationPart(findNonProcessorPath(componentModel), empty(), empty(), empty());
         }
       } else if (isProcessor(componentModel)) {
-        componentLocation = parentComponentLocation.appendProcessorsPart().appendLocationPart(findProcessorPath(componentModel),
-                                                                                              typedComponentIdentifier,
-                                                                                              componentModel.getConfigFileName(),
-                                                                                              componentModel.getLineNumber());
+        if (isModuleOperation(componentModel)) {
+          componentLocation = processModuleOperationChain(componentModel);
+        } else {
+          componentLocation = parentComponentLocation.appendProcessorsPart().appendLocationPart(findProcessorPath(componentModel),
+                                                                                                typedComponentIdentifier,
+                                                                                                componentModel
+                                                                                                    .getConfigFileName(),
+                                                                                                componentModel.getLineNumber());
+        }
       } else {
         componentLocation =
             parentComponentLocation.appendLocationPart(findNonProcessorPath(componentModel), typedComponentIdentifier,
@@ -105,6 +113,10 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                      componentModel.getConfigFileName(), componentModel.getLineNumber());
     }
     componentModel.setComponentLocation(componentLocation);
+  }
+
+  private boolean isModuleOperation(ComponentModel componentModel) {
+    return componentModel.getIdentifier().equals(MODULE_OPERATION_CHAIN);
   }
 
   private boolean parentComponentIsRouter(ComponentModel componentModel) {
@@ -158,11 +170,14 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
           parentComponentLocation.appendLocationPart("source", typedComponentIdentifier, componentModel.getConfigFileName(),
                                                      componentModel.getLineNumber());
     } else if (isProcessor(componentModel)) {
-      componentLocation =
-          parentComponentLocation.appendLocationPart(PROCESSORS_PART_NAME, empty(), empty(), empty())
-              .appendLocationPart(findProcessorPath(componentModel),
-                                  typedComponentIdentifier,
-                                  componentModel.getConfigFileName(), componentModel.getLineNumber());
+      if (isModuleOperation(componentModel)) {
+        componentLocation = processModuleOperationChain(componentModel);
+      } else {
+        componentLocation = parentComponentLocation
+            .appendLocationPart(PROCESSORS_PART_NAME, empty(), empty(), empty())
+            .appendLocationPart(findProcessorPath(componentModel), typedComponentIdentifier, componentModel.getConfigFileName(),
+                                componentModel.getLineNumber());
+      }
     } else if (isErrorHandler(componentModel)) {
       componentLocation = processErrorHandlerComponent(componentModel, parentComponentLocation, typedComponentIdentifier);
     } else {
@@ -171,6 +186,24 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                      componentModel.getConfigFileName(), componentModel.getLineNumber());
     }
     return componentLocation;
+  }
+
+  private DefaultComponentLocation processModuleOperationChain(ComponentModel componentModel) {
+    final ComponentIdentifier originalIdentifier =
+        (ComponentIdentifier) componentModel.getCustomAttributes().get(ORIGINAL_IDENTIFIER);
+    final String namespace = originalIdentifier.getNamespace();
+    final String operationName = originalIdentifier.getName();
+
+    final ComponentIdentifier operationIdentifier =
+        ComponentIdentifier.builder().withNamespace(namespace).withName(operationName).build();
+    final Optional<TypedComponentIdentifier> operationTypedIdentifier =
+        of(builder().withIdentifier(operationIdentifier).withType(OPERATION).build());
+    return new DefaultComponentLocation(of(operationName), Collections.EMPTY_LIST)
+        .appendLocationPart(operationName, operationTypedIdentifier, componentModel.getConfigFileName(),
+                            componentModel.getLineNumber())
+        .appendLocationPart(PROCESSORS_PART_NAME, empty(), empty(), empty())
+        .appendLocationPart(findProcessorPath(componentModel), operationTypedIdentifier, componentModel.getConfigFileName(),
+                            componentModel.getLineNumber());
   }
 
   private DefaultComponentLocation processErrorHandlerComponent(ComponentModel componentModel,
