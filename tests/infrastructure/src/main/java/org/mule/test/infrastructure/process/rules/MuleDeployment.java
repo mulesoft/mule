@@ -154,10 +154,7 @@ public class MuleDeployment extends MuleInstallation {
      * @return
      */
     public Builder withProperties(Map<String, String> properties) {
-      if (deployment.properties.size() != 0) {
-        throw new IllegalStateException("Properties map already has properties defined. Can't overwrite all properties");
-      }
-      deployment.properties = properties;
+      deployment.properties.putAll(properties);
       return this;
     }
 
