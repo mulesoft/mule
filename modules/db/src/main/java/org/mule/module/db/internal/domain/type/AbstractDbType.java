@@ -53,25 +53,33 @@ public abstract class AbstractDbType implements DbType
     public boolean equals(Object obj)
     {
         if (this == obj)
+        {
             return true;
+        }
+
         if (obj == null)
+        {
             return false;
+        }
+
         if (!AbstractDbType.class.isAssignableFrom(obj.getClass()))
+        {
             return false;
+        }
         AbstractDbType other = (AbstractDbType) obj;
         if (id != other.id)
+        {
             return false;
+        }
         if (name == null)
         {
             if (other.name != null)
                 return false;
         }
         else if (!name.equals(other.name))
+        {
             return false;
+        }
         return true;
-    }
-
-
-
-
+    }    
 }
