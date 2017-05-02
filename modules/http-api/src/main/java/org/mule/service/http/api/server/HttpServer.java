@@ -17,9 +17,9 @@ import java.util.Collection;
 public interface HttpServer {
 
   /**
-   * Binds the ServerSocket to the network interface and starts listening for requests
+   * Binds the ServerSocket to the network interface and starts listening for requests.
    * 
-   * @throws IOException if there was a problem binding to the host and port specified
+   * @throws IOException if there was a problem binding to the host and port specified.
    */
   void start() throws IOException;
 
@@ -29,12 +29,12 @@ public interface HttpServer {
   void stop();
 
   /**
-   * Removes all secondary data to get rid of the server.
+   * Removes all secondary data to get rid of the server. Cannot be undone.
    */
   void dispose();
 
   /**
-   * @return the server address this server is listening on
+   * @return the server address this server is listening on.
    */
   ServerAddress getServerAddress();
 
@@ -44,12 +44,27 @@ public interface HttpServer {
   boolean isStopping();
 
   /**
-   * @return true if the server is stopped, false otherwise
+   * @return true if the server is stopped, false otherwise.
    */
   boolean isStopped();
 
+  /**
+   * Adds a {@link RequestHandler} on the given path and for the given methods.
+   *
+   * @param methods a list of methods to match
+   * @param path the path to match
+   * @param requestHandler the handler to execute upon a matching request
+   * @return a {@link RequestHandlerManager} for the handler
+   */
   RequestHandlerManager addRequestHandler(final Collection<String> methods, final String path,
                                           final RequestHandler requestHandler);
 
+  /**
+   * Adds a {@link RequestHandler} on the given path and for all methods.
+   *
+   * @param path the path to match
+   * @param requestHandler the handler to execute upon a matching request
+   * @return a {@link RequestHandlerManager} for the handler
+   */
   RequestHandlerManager addRequestHandler(final String path, final RequestHandler requestHandler);
 }

@@ -4,34 +4,36 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.service.http.api.server;
+package org.mule.services.http.impl.service.server;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.service.http.api.server.HttpServer;
+import org.mule.service.http.api.server.HttpServerConfiguration;
 
 import java.util.Optional;
 
 /**
- * Factory object for {@link HttpServer}.
- *
- * @since 4.0
+ * Factory object for {@link HttpServer} that partitions them considering a given creation context in which they can be later
+ * shared.
  */
-public interface HttpServerFactory {
+public interface ContextHttpServerFactory {
 
   /**
    * Creates a new {@link HttpServer}.
    *
    * @param configuration a {@link HttpServerConfiguration} specifying the desired server.
+   * @param context the context under which this server will be created
    * @return a newly built {@link HttpServer} based on the {@code configuration}.
    * @throws ConnectionException if the server cannot be created based on the configuration.
    */
-  HttpServer create(HttpServerConfiguration configuration) throws ConnectionException;
+  HttpServer create(HttpServerConfiguration configuration, String context) throws ConnectionException;
 
   /**
-   * Allows to retrieve a previously created {@link HttpServer}, if used from the same context. Keep in mind lifecycle changes to
-   * the retrieved instance won't take effect since only the owner of the server can modify it's status.
+   * Allows to retrieve a previously created {@link HttpServer}. This will only be possible if used from the same context.
    *
-   * @param name the name the desired {@link HttpServer} was given when created (see {@link HttpServerConfiguration#getName()})
+   * @param identifier the identifier of the server
    * @return an {@link Optional} with the server or an empty one, if none was found.
    */
-  Optional<HttpServer> lookup(String name);
+  Optional<HttpServer> lookup(ServerIdentifier identifier);
+
 }

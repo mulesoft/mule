@@ -6,6 +6,7 @@
  */
 package org.mule.service.http.api.server;
 
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 
@@ -24,15 +25,17 @@ public class HttpServerConfiguration {
   private final TlsContextFactory tlsContextFactory;
   private final boolean usePersistentConnections;
   private final int connectionIdleTimeout;
+  private final String name;
   private final Supplier<Scheduler> schedulerSupplier;
 
   HttpServerConfiguration(String host, int port, TlsContextFactory tlsContextFactory, boolean usePersistentConnections,
-                          int connectionIdleTimeout, Supplier<Scheduler> schedulerSupplier) {
+                          int connectionIdleTimeout, String name, Supplier<Scheduler> schedulerSupplier) {
     this.host = host;
     this.port = port;
     this.tlsContextFactory = tlsContextFactory;
     this.usePersistentConnections = usePersistentConnections;
     this.connectionIdleTimeout = connectionIdleTimeout;
+    this.name = name;
     this.schedulerSupplier = schedulerSupplier;
   }
 
@@ -56,12 +59,16 @@ public class HttpServerConfiguration {
     return connectionIdleTimeout;
   }
 
+  public String getName() {
+    return name;
+  }
+
   public Supplier<Scheduler> getSchedulerSupplier() {
     return schedulerSupplier;
   }
 
   /**
-   * Builder for {@link HttpServerConfiguration}s. At the very least, a host, a port and a scheduler must be provided.
+   * Builder for {@link HttpServerConfiguration}s. At the very least, a host, a port and a name.
    */
   public static class Builder {
 
@@ -71,6 +78,7 @@ public class HttpServerConfiguration {
     private boolean usePersistentConnections = true;
     private int connectionIdleTimeout = 30000;
     private Supplier<Scheduler> schedulerSupplier;
+    private String name;
 
     /**
      * Defines the host where the requests will be sent to the {@link HttpServer}. Must be provided.
@@ -141,12 +149,20 @@ public class HttpServerConfiguration {
       return this;
     }
 
+    public Builder setName(String name) {
+      this.name = name;
+      return this;
+    }
+
     /**
      * @return a {@link HttpServerConfiguration} as specified.
      */
     public HttpServerConfiguration build() {
+      checkNotNull(host, "A host is mandatory");
+      checkNotNull(port, "Port is mandatory");
+      checkNotNull(name, "Name is mandatory");
       return new HttpServerConfiguration(host, port, tlsContextFactory, usePersistentConnections, connectionIdleTimeout,
-                                         schedulerSupplier);
+                                         name, schedulerSupplier);
     }
   }
 }

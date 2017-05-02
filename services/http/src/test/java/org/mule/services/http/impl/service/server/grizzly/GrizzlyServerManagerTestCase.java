@@ -8,16 +8,21 @@ package org.mule.services.http.impl.service.server.grizzly;
 
 import static java.util.concurrent.Executors.newCachedThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.async.ResponseStatusCallback;
 import org.mule.service.http.api.tcp.TcpServerSocketProperties;
 import org.mule.services.http.impl.service.server.DefaultServerAddress;
 import org.mule.services.http.impl.service.server.HttpListenerRegistry;
+import org.mule.services.http.impl.service.server.ServerIdentifier;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -41,16 +46,21 @@ public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
   private ExecutorService selectorPool;
   private ExecutorService workerPool;
   private ExecutorService idleTimeoutExecutorService;
+  private GrizzlyServerManager serverManager;
 
   @Before
   public void before() {
     selectorPool = newCachedThreadPool();
     workerPool = newCachedThreadPool();
     idleTimeoutExecutorService = newCachedThreadPool();
+    HttpListenerRegistry registry = new HttpListenerRegistry();
+    DefaultTcpServerSocketProperties socketProperties = new DefaultTcpServerSocketProperties();
+    serverManager = new GrizzlyServerManager(selectorPool, workerPool, idleTimeoutExecutorService, registry, socketProperties);
   }
 
   @After
   public void after() {
+    serverManager.dispose();
     selectorPool.shutdown();
     workerPool.shutdown();
     idleTimeoutExecutorService.shutdown();
@@ -64,7 +74,8 @@ public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
 
     final HttpServer server = serverManager.createServerFor(new DefaultServerAddress("0.0.0.0", listenerPort.getNumber()),
                                                             () -> muleContext.getSchedulerService().ioScheduler(), true,
-                                                            (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS));
+                                                            (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
+                                                            new ServerIdentifier("context", "name"));
     final ResponseStatusCallback responseStatusCallback = mock(ResponseStatusCallback.class);
     server.addRequestHandler("/path", (requestContext, responseCallback) -> {
       responseCallback.responseReady(HttpResponse.builder().setStatusCode(OK.getStatusCode()).build(),
@@ -96,6 +107,117 @@ public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
       }
       br.close();
     }
+  }
+
+  @Test
+  public void canFindServerInSameContext() throws Exception {
+    ServerIdentifier identifier = new ServerIdentifier("context", "name");
+    final HttpServer createdServer = serverManager.createServerFor(new DefaultServerAddress("0.0.0.0", listenerPort.getNumber()),
+                                                                   () -> muleContext.getSchedulerService().ioScheduler(), true,
+                                                                   (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
+                                                                   identifier);
+    final HttpServer foundServer = serverManager.lookupServer(new ServerIdentifier("context", "name")).get();
+    assertThat(createdServer.getServerAddress(), is(equalTo(foundServer.getServerAddress())));
+  }
+
+  @Test
+  public void cannotFindServerInDifferentContext() throws Exception {
+    String name = "name";
+    ServerIdentifier identifier = new ServerIdentifier("context", name);
+    serverManager.createServerFor(new DefaultServerAddress("0.0.0.0", listenerPort.getNumber()),
+                                  () -> muleContext.getSchedulerService().ioScheduler(), true,
+                                  (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
+                                  identifier);
+    assertThat(serverManager.lookupServer(new ServerIdentifier("otherContext", name)), is(empty()));
+  }
+
+  @Test
+  public void serverIsRemovedAfterDispose() throws Exception {
+    ServerIdentifier identifier = new ServerIdentifier("context", "name");
+    HttpServer server = serverManager.createServerFor(new DefaultServerAddress("0.0.0.0", listenerPort.getNumber()),
+                                                      () -> muleContext.getSchedulerService().ioScheduler(), true,
+                                                      (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
+                                                      identifier);
+    server.start();
+    server.stop();
+    server.dispose();
+    assertThat(serverManager.lookupServer(identifier), is(empty()));
+  }
+
+  @Test
+  public void onlyOwnerCanStartServer() throws Exception {
+    ServerIdentifier identifier = new ServerIdentifier("context", "name");
+    HttpServer owner = serverManager.createServerFor(new DefaultServerAddress("0.0.0.0", listenerPort.getNumber()),
+                                                     () -> muleContext.getSchedulerService().ioScheduler(), true,
+                                                     (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
+                                                     identifier);
+    HttpServer reference = serverManager.lookupServer(identifier).get();
+
+    assertThat(owner.isStopped(), is(true));
+    assertThat(reference.isStopped(), is(true));
+
+    reference.start();
+
+    assertThat(owner.isStopped(), is(true));
+    assertThat(reference.isStopped(), is(true));
+
+    owner.start();
+
+    assertThat(owner.isStopped(), is(false));
+    assertThat(reference.isStopped(), is(false));
+
+    owner.stop();
+    owner.dispose();
+  }
+
+  @Test
+  public void onlyOwnerCanStopServer() throws Exception {
+    ServerIdentifier identifier = new ServerIdentifier("context", "name");
+    HttpServer owner = serverManager.createServerFor(new DefaultServerAddress("0.0.0.0", listenerPort.getNumber()),
+                                                     () -> muleContext.getSchedulerService().ioScheduler(), true,
+                                                     (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
+                                                     identifier);
+    HttpServer reference = serverManager.lookupServer(identifier).get();
+
+    owner.start();
+
+    assertThat(owner.isStopped(), is(false));
+    assertThat(reference.isStopped(), is(false));
+
+    reference.stop();
+
+    assertThat(owner.isStopped(), is(false));
+    assertThat(reference.isStopped(), is(false));
+
+    owner.stop();
+
+    assertThat(owner.isStopped(), is(true));
+    assertThat(reference.isStopped(), is(true));
+
+    owner.dispose();
+  }
+
+  @Test
+  public void onlyOwnerCanDisposeServer() throws Exception {
+    ServerIdentifier identifier = new ServerIdentifier("context", "name");
+    DefaultServerAddress serverAddress = new DefaultServerAddress("0.0.0.0", listenerPort.getNumber());
+    HttpServer owner = serverManager.createServerFor(serverAddress, () -> muleContext.getSchedulerService().ioScheduler(), true,
+                                                     (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
+                                                     identifier);
+    HttpServer reference = serverManager.lookupServer(identifier).get();
+
+    assertThat(serverManager.containsServerFor(serverAddress, identifier), is(true));
+
+    owner.start();
+    owner.stop();
+
+    reference.dispose();
+
+    assertThat(serverManager.containsServerFor(serverAddress, identifier), is(true));
+
+    owner.dispose();
+
+    assertThat(serverManager.containsServerFor(serverAddress, identifier), is(false));
   }
 
   private class DefaultTcpServerSocketProperties implements TcpServerSocketProperties {

@@ -73,7 +73,8 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
   public OAuthAuthorizationCodeDancerBuilder localCallback(URL localCallbackUrl) {
     localCallbackServerFactory = (serversManager) -> {
       final HttpServerConfiguration.Builder serverConfigBuilder = new HttpServerConfiguration.Builder();
-      serverConfigBuilder.setHost(localCallbackUrl.getHost()).setPort(localCallbackUrl.getPort());
+      serverConfigBuilder.setHost(localCallbackUrl.getHost()).setPort(localCallbackUrl.getPort())
+          .setName(localCallbackUrl.toString());
       try {
         return serversManager.getServer(serverConfigBuilder.build());
       } catch (ConnectionException e) {
@@ -89,7 +90,8 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
   public OAuthAuthorizationCodeDancerBuilder localCallback(URL localCallbackUrl, TlsContextFactory tlsContextFactory) {
     localCallbackServerFactory = serversManager -> {
       final HttpServerConfiguration.Builder serverConfigBuilder = new HttpServerConfiguration.Builder();
-      serverConfigBuilder.setHost(localCallbackUrl.getHost()).setPort(localCallbackUrl.getPort());
+      serverConfigBuilder.setHost(localCallbackUrl.getHost()).setPort(localCallbackUrl.getPort())
+          .setName(localCallbackUrl.toString());
       serverConfigBuilder.setTlsContextFactory(tlsContextFactory);
       try {
         return serversManager.getServer(serverConfigBuilder.build());

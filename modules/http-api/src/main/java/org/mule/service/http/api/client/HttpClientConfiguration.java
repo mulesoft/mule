@@ -6,6 +6,7 @@
  */
 package org.mule.service.http.api.client;
 
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.service.http.api.client.proxy.ProxyConfig;
 import org.mule.service.http.api.tcp.TcpClientSocketProperties;
@@ -81,7 +82,7 @@ public class HttpClientConfiguration {
   }
 
   /**
-   * Builder of {@link HttpClientConfiguration}s. At the very least, a thread name prefix and an owner name must be provided.
+   * Builder of {@link HttpClientConfiguration}s. At the very least, a thread name prefix must be provided.
    */
   public static class Builder {
 
@@ -188,7 +189,7 @@ public class HttpClientConfiguration {
     }
 
     /**
-     * Defines the name of the {@link HttpClient}'s owner. Must be specified.
+     * Defines the name of the {@link HttpClient}'s owner. Recommended.
      *
      * @param ownerName a {@link String} with the name
      * @return this builder
@@ -202,6 +203,7 @@ public class HttpClientConfiguration {
      * @return an {@link HttpClientConfiguration} as specified.
      */
     public HttpClientConfiguration build() {
+      checkNotNull(threadNamePrefix, "Thread name prefix is mandatory.");
       return new HttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
                                          usePersistentConnections, connectionIdleTimeout, responseBufferSize, threadNamePrefix,
                                          ownerName);
