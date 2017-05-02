@@ -208,12 +208,6 @@ import org.mule.runtime.core.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.TransactionType;
 import org.mule.runtime.core.transaction.XaTransactionFactory;
-import org.mule.runtime.core.transaction.lookup.GenericTransactionManagerLookupFactory;
-import org.mule.runtime.core.transaction.lookup.JBossTransactionManagerLookupFactory;
-import org.mule.runtime.core.transaction.lookup.JRunTransactionManagerLookupFactory;
-import org.mule.runtime.core.transaction.lookup.Resin3TransactionManagerLookupFactory;
-import org.mule.runtime.core.transaction.lookup.WeblogicTransactionManagerLookupFactory;
-import org.mule.runtime.core.transaction.lookup.WebsphereTransactionManagerLookupFactory;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.codec.Base64Decoder;
 import org.mule.runtime.core.transformer.codec.Base64Encoder;
@@ -436,25 +430,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("propertyName", fromSimpleParameter("propertyName").build())
         .build());
 
-    componentBuildingDefinitions
-        // TODO add support for environment
-        .add(createTransactionManagerDefinitionBuilder("jndi-transaction-manager", GenericTransactionManagerLookupFactory.class)
-            .withSetterParameterDefinition("jndiName", fromSimpleParameter("jndiName").build()).build());
-    componentBuildingDefinitions
-        .add(createTransactionManagerDefinitionBuilder("weblogic-transaction-manager",
-                                                       WeblogicTransactionManagerLookupFactory.class).build());
-    componentBuildingDefinitions
-        .add(createTransactionManagerDefinitionBuilder("jboss-transaction-manager", JBossTransactionManagerLookupFactory.class)
-            .build());
-    componentBuildingDefinitions
-        .add(createTransactionManagerDefinitionBuilder("jrun-transaction-manager", JRunTransactionManagerLookupFactory.class)
-            .build());
-    componentBuildingDefinitions
-        .add(createTransactionManagerDefinitionBuilder("resin-transaction-manager", Resin3TransactionManagerLookupFactory.class)
-            .build());
-    componentBuildingDefinitions
-        .add(createTransactionManagerDefinitionBuilder("websphere-transaction-manager",
-                                                       WebsphereTransactionManagerLookupFactory.class).build());
     componentBuildingDefinitions
         .add(baseDefinition.copy().withIdentifier(PROCESSOR).withTypeDefinition(fromType(AbstractProcessor.class)).build());
     componentBuildingDefinitions

@@ -15,7 +15,6 @@ import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactor
 import org.mule.runtime.config.spring.factories.QueueProfileFactoryBean;
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SchedulingMessageSourceFactoryBean;
-import org.mule.runtime.config.spring.factories.SchedulingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.TryProcessorFactoryBean;
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
@@ -156,12 +155,6 @@ import org.mule.runtime.core.security.UsernamePasswordAuthenticationFilter;
 import org.mule.runtime.core.security.filters.MuleEncryptionEndpointSecurityFilter;
 import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.runtime.core.transaction.XaTransactionFactory;
-import org.mule.runtime.core.transaction.lookup.GenericTransactionManagerLookupFactory;
-import org.mule.runtime.core.transaction.lookup.JBossTransactionManagerLookupFactory;
-import org.mule.runtime.core.transaction.lookup.JRunTransactionManagerLookupFactory;
-import org.mule.runtime.core.transaction.lookup.Resin3TransactionManagerLookupFactory;
-import org.mule.runtime.core.transaction.lookup.WeblogicTransactionManagerLookupFactory;
-import org.mule.runtime.core.transaction.lookup.WebsphereTransactionManagerLookupFactory;
 import org.mule.runtime.core.transformer.codec.Base64Decoder;
 import org.mule.runtime.core.transformer.codec.Base64Encoder;
 import org.mule.runtime.core.transformer.codec.XmlEntityDecoder;
@@ -336,18 +329,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
 
     // Transaction Managers
     registerBeanDefinitionParser("custom-transaction-manager", new TransactionManagerDefinitionParser());
-    registerBeanDefinitionParser("jndi-transaction-manager",
-                                 new TransactionManagerDefinitionParser(GenericTransactionManagerLookupFactory.class));
-    registerBeanDefinitionParser("weblogic-transaction-manager",
-                                 new TransactionManagerDefinitionParser(WeblogicTransactionManagerLookupFactory.class));
-    registerBeanDefinitionParser("jboss-transaction-manager",
-                                 new TransactionManagerDefinitionParser(JBossTransactionManagerLookupFactory.class));
-    registerBeanDefinitionParser("jrun-transaction-manager",
-                                 new TransactionManagerDefinitionParser(JRunTransactionManagerLookupFactory.class));
-    registerBeanDefinitionParser("resin-transaction-manager",
-                                 new TransactionManagerDefinitionParser(Resin3TransactionManagerLookupFactory.class));
-    registerBeanDefinitionParser("websphere-transaction-manager",
-                                 new TransactionManagerDefinitionParser(WebsphereTransactionManagerLookupFactory.class));
 
     registerBeanDefinitionParser("custom-transaction", new TransactionDefinitionParser());
     registerBeanDefinitionParser("xa-transaction", new XaTransactionDefinitionParser(XaTransactionFactory.class));
