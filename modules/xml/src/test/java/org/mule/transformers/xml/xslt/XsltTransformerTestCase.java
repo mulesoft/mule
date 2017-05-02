@@ -10,6 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
@@ -116,11 +118,29 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         XsltTransformer transformer = (XsltTransformer) getTransformer();
 
         InputStream is = IOUtils.getResourceAsStream("cdcatalog.xml", XMLTestUtils.class);
+
         XMLStreamReader sr = XMLUtils.toXMLStreamReader(transformer.getXMLInputFactory(), is);
 
         Object result = transformer.transform(sr);
         assertNotNull(result);
         assertTrue("expected: " + expectedResult + "\nresult: " + result, compareResults(expectedResult, result));
+    }
+
+    @Test
+    public void testTransformInputStream() throws Exception
+    {
+        Object expectedResult = getResultData();
+        assertNotNull(expectedResult);
+
+        XsltTransformer transformer = (XsltTransformer) getTransformer();
+
+        InputStream is = IOUtils.getResourceAsStream("cdcatalog.xml", XMLTestUtils.class);
+        InputStream mockedInputStream = spy(is);
+
+        Object result = transformer.transform(mockedInputStream);
+        assertNotNull(result);
+        assertTrue("expected: " + expectedResult + "\nresult: " + result, compareResults(expectedResult, result));
+        verify(mockedInputStream).close();
     }
 
     @Test
