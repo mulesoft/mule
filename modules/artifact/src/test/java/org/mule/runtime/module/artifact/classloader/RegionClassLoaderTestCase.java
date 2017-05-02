@@ -10,6 +10,7 @@ package org.mule.runtime.module.artifact.classloader;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -337,6 +338,16 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(createCannotRemoveClassLoaderError(appClassLoader.getArtifactId()));
     regionClassLoader.removeClassLoader(pluginClassLoader);
+  }
+
+  @Test
+  public void getsPluginsClassLoaders() throws Exception {
+    final ClassLoader parentClassLoader = mock(ClassLoader.class);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
+    regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
+    regionClassLoader.addClassLoader(pluginClassLoader, NULL_CLASSLOADER_FILTER);
+
+    assertThat(regionClassLoader.getArtifactPluginClassLoaders(), contains(pluginClassLoader));
   }
 
   private List<ArtifactClassLoader> getClassLoaders(ArtifactClassLoader... expectedClassLoaders) {
