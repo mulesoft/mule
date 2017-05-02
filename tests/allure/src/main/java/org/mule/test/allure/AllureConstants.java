@@ -27,6 +27,19 @@ public interface AllureConstants {
     }
   }
 
+  interface DeploymentTypeFeature {
+
+    String DEPLOYMENT_TYPE = "Deployment type";
+
+    interface DeploymentTypeStory {
+
+      String HEAVYWEIGHT = "HeavyWeight";
+      String LIGHTWEIGHT = "LightWeight";
+      String EMBEDDED = "Embedded";
+
+    }
+  }
+
   interface EmailFeature {
 
     String EMAIL_EXTENSION = "Email Extension";

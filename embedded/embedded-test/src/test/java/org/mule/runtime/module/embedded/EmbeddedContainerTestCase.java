@@ -24,6 +24,8 @@ import static org.mule.runtime.api.deployment.management.ComponentInitialStateMa
 import static org.mule.runtime.core.util.UUID.getUUID;
 import static org.mule.runtime.module.embedded.api.EmbeddedContainer.builder;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DEPLOYMENT_TYPE;
+import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.EMBEDDED;
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EMBEDDED_API;
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EmbeddedApiStory.CONFIGURATION;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -59,8 +61,8 @@ import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features(EMBEDDED_API)
-@Stories(CONFIGURATION)
+@Features({EMBEDDED_API, DEPLOYMENT_TYPE})
+@Stories({CONFIGURATION, EMBEDDED})
 public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
 
   private static final String LOGGING_FILE = "app.log";
