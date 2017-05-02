@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core;
 
+import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -69,7 +70,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
     awaittNullResponse(parent);
     assertBeforeResponseDone(parent);
-    assertThat(from(parent.getCompletionPublisher()).blockMillis(BLOCK_TIMEOUT), is(nullValue()));
+    assertThat(from(parent.getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT)), is(nullValue()));
   }
 
   @Test
@@ -88,7 +89,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     assertBeforeResponseDone(parent);
 
     expectedException.expect(is(exception));
-    from(parent.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT);
+    from(parent.getResponsePublisher()).block(ofMillis(BLOCK_TIMEOUT));
   }
 
   @Test
@@ -257,7 +258,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     assertCompletionDone(parent);
 
     expectedException.expect(is(exception));
-    from(child.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT);
+    from(child.getResponsePublisher()).block(ofMillis(BLOCK_TIMEOUT));
   }
 
   @Test
@@ -541,11 +542,11 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   }
 
   private void awaitAndAssertResponse(EventContext parent, Event event) {
-    assertThat(from(parent.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), equalTo(event));
+    assertThat(from(parent.getResponsePublisher()).block(ofMillis(BLOCK_TIMEOUT)), equalTo(event));
   }
 
   private void awaittNullResponse(EventContext child) {
-    assertThat(from(child.getResponsePublisher()).blockMillis(BLOCK_TIMEOUT), is(nullValue()));
+    assertThat(from(child.getResponsePublisher()).block(ofMillis(BLOCK_TIMEOUT)), is(nullValue()));
   }
 
   private void assertResponseDone(EventContext parent) {
@@ -557,7 +558,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   }
 
   private void awaitCompletion(EventContext parent) {
-    assertThat(from(parent.getCompletionPublisher()).blockMillis(BLOCK_TIMEOUT), is(nullValue()));
+    assertThat(from(parent.getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT)), is(nullValue()));
   }
 
   private void assertCompletionDone(EventContext parent) {

@@ -63,7 +63,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
     }
     return flux.transform(processResponse())
         .doOnNext(result -> processFinally(result, null))
-        .onErrorResumeWith(MessagingException.class, exception -> {
+        .onErrorResume(MessagingException.class, exception -> {
           try {
             return Mono.just(processCatch(exception.getEvent(), exception));
           } catch (MessagingException me) {

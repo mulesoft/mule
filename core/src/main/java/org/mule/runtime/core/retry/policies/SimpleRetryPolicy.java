@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.retry.policies;
 
+import static java.time.Duration.ofMillis;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.range;
-import static reactor.core.publisher.Mono.delayMillis;
+import static reactor.core.publisher.Mono.delay;
 import static reactor.core.publisher.Mono.error;
+
 import org.mule.runtime.core.api.retry.RetryPolicy;
 import org.mule.runtime.core.retry.PolicyStatus;
 
@@ -53,7 +55,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
             onExhausted.accept(exception);
             return (Mono<T>) error(exception);
           } else {
-            return delayMillis(frequency);
+            return delay(ofMillis(frequency));
           }
         }));
   }

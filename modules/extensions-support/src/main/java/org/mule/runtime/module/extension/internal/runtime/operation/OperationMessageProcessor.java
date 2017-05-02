@@ -162,8 +162,8 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
       ExecutionContextAdapter operationContext = createExecutionContext(configuration, operationParameters, event);
 
       // TODO: MULE-11184 - it shouldn't be necessary to create the MessagingException here.
-      return doProcess(event, operationContext).mapError(e -> !(e instanceof MessagingException),
-                                                         e -> new MessagingException(event, e, this));
+      return doProcess(event, operationContext).onErrorMap(e -> !(e instanceof MessagingException),
+                                                           e -> new MessagingException(event, e, this));
     }, MuleException.class, e -> {
       throw new DefaultMuleException(e);
     })));
@@ -172,8 +172,8 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   protected Mono<Event> doProcess(Event event, ExecutionContextAdapter operationContext) {
     return executeOperation(operationContext)
         .map(value -> returnDelegate.asReturnValue(value, operationContext))
-        .otherwiseIfEmpty(fromCallable(() -> returnDelegate.asReturnValue(null, operationContext)))
-        .mapError(Exceptions::unwrap);
+        .switchIfEmpty(fromCallable(() -> returnDelegate.asReturnValue(null, operationContext)))
+        .onErrorMap(Exceptions::unwrap);
   }
 
   private Mono<Object> executeOperation(ExecutionContextAdapter operationContext) {

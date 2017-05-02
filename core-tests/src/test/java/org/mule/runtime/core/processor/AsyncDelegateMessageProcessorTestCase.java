@@ -98,7 +98,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     assertThat(target.sensedEvent, notNullValue());
 
     // Block to ensure async fully completes before testing state
-    from(request.getContext().getCompletionPublisher()).blockMillis(BLOCK_TIMEOUT);
+    from(request.getContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
 
     assertCompletionDone(target.sensedEvent.getContext());
     assertCompletionDone(request.getContext());

@@ -79,13 +79,13 @@ abstract class AbstractEventContext implements EventContext {
     // completion condition.
     completionSubscriberDisposable.dispose();
     completionSubscriberDisposable =
-        responseProcessor.otherwise(throwable -> empty()).and(completionCallback).and(getChildCompletionPublisher()).then()
+        responseProcessor.onErrorResume(throwable -> empty()).and(completionCallback).and(getChildCompletionPublisher()).then()
             .doOnEach(s -> s.accept(completionProcessor)).subscribe();
   }
 
   private Mono<Void> getChildCompletionPublisher() {
     return when(childContexts.stream()
-        .map(eventContext -> from(eventContext.getCompletionPublisher()).otherwise(throwable -> empty()))
+        .map(eventContext -> from(eventContext.getCompletionPublisher()).onErrorResume(throwable -> empty()))
         .collect(toList()));
   }
 

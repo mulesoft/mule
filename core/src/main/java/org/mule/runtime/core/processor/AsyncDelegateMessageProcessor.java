@@ -122,7 +122,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
                     .transform(delegate)
                     .doOnNext(event -> fireAsyncCompleteNotification(event, flowConstruct, null))
                     .doOnError(MessagingException.class, e -> fireAsyncCompleteNotification(e.getEvent(), flowConstruct, e))
-                    .onErrorResumeWith(MessagingException.class, messagingExceptionHandler)
+                    .onErrorResume(MessagingException.class, messagingExceptionHandler)
                     .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
                                exception -> logger.error("Unhandled exception in async processing.",
                                                          exception))
@@ -131,7 +131,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
                     .doOnNext(event -> asyncRequest.getContext().success(event))
                     .doOnError(throwable -> asyncRequest.getContext().error(throwable))
                     .subscribe()))
-            .onErrorResumeWith(MessagingException.class, messagingExceptionHandler)
+            .onErrorResume(MessagingException.class, messagingExceptionHandler)
             .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
                        exception -> logger.error("Unhandled exception in async processing.", exception))
             .subscribe());

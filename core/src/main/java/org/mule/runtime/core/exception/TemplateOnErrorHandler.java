@@ -101,8 +101,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
               && ((Pipeline) flowConstruct).getMessageSource() instanceof LegacyInboundEndpoint) {
             // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
             // Use child context if HandleExceptionInterceptor is being used to avoid response being completed twice..
-            return Mono.from(publisher).flatMap(event -> processWithChildContext(event, p -> from(p)
-                .flatMap(childEvent -> Mono.from(routeAsync(childEvent, exception)))));
+            return Mono.from(publisher).flatMapMany(event -> processWithChildContext(event, p -> from(p)
+                .flatMapMany(childEvent -> Mono.from(routeAsync(childEvent, exception)))));
           } else {
             return from(publisher).then(event -> from(routeAsync(event, exception)));
           }

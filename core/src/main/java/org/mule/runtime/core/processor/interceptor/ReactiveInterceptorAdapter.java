@@ -71,7 +71,7 @@ public class ReactiveInterceptorAdapter
       return publisher -> from(publisher)
           .map(doBefore(interceptor, component, dslParameters))
           .flatMap(event -> fromFuture(doAround(event, interceptor, component, dslParameters, next))
-              .mapError(CompletionException.class, completionException -> completionException.getCause()))
+              .onErrorMap(CompletionException.class, completionException -> completionException.getCause()))
           .doOnError(MessagingException.class, error -> {
             interceptor.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause()));
           })
@@ -80,9 +80,8 @@ public class ReactiveInterceptorAdapter
       return publisher -> from(publisher)
           .map(doBefore(interceptor, component, dslParameters))
           .transform(next)
-          .doOnError(MessagingException.class, error -> {
-            interceptor.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause()));
-          })
+          .doOnError(MessagingException.class,
+                     error -> interceptor.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause())))
           .map(doAfter(interceptor));
     }
   }
