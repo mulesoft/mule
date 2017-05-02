@@ -7,63 +7,48 @@
 
 package org.mule.runtime.container.internal;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.container.internal.JreExplorer.exploreJdk;
 import static org.mule.runtime.core.util.CollectionUtils.singletonList;
-import static org.mule.runtime.core.util.JdkVersionUtils.getJdkVersion;
-import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 import org.mule.runtime.container.api.MuleModule;
-import org.mule.runtime.core.util.JdkVersionUtils.JdkVersion;
+import org.mule.runtime.module.artifact.classloader.ExportedService;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Discovers the module corresponding to the JRE by creating a new {@link MuleModule} from the packages listed on the
- * {@value JRE_PACKAGES_PROPERTIES} file.
+ * Discovers the module corresponding to the JRE by creating a new {@link MuleModule} with the Java packages, resources and
+ * services found on the used JRE.
  *
  * @since 4.0
  */
 public class JreModuleDiscoverer implements ModuleDiscoverer {
 
-  protected static final String JRE_PACKAGES_PROPERTIES = "jre-packages.properties";
+  protected static final Logger logger = LoggerFactory.getLogger(JreModuleDiscoverer.class);
+
   protected static final String JRE_MODULE_NAME = "jre";
-  public static final String UNABLE_TO_DETERMINE_JRE_PACKAGES_ERROR = "Unable to determine packages exported by the JRE";
 
   @Override
   public List<MuleModule> discover() {
-    // TODO(pablo.kraan): MULE-12050: find services exported by the JRE
-    return singletonList(new MuleModule(JRE_MODULE_NAME, loadJrePackages(), emptySet(), emptySet(), emptySet(), emptyList()));
-  }
+    Set<String> packages = new HashSet<>(1024);
+    Set<String> resources = new HashSet<>(1024);
+    List<ExportedService> services = new ArrayList<>(128);
 
-  private HashSet<String> loadJrePackages() {
-    try {
-      final Properties properties = loadProperties(getClass().getClassLoader().getResource(JRE_PACKAGES_PROPERTIES));
+    exploreJdk(packages, resources, services);
 
-      final String jreVersionProperty = getJreVersionProperty();
-      if (!properties.keySet().contains(jreVersionProperty)) {
-        throw new IllegalStateException(UNABLE_TO_DETERMINE_JRE_PACKAGES_ERROR);
-      }
-      final String packages = (String) properties.get(jreVersionProperty);
-      final HashSet<String> result = new HashSet<>();
-      for (String jrePackage : packages.split(",")) {
-        jrePackage = jrePackage.trim();
-        if (!isEmpty(jrePackage)) {
-          result.add(jrePackage);
-        }
-      }
-
-      return result;
-    } catch (IOException e) {
-      throw new IllegalStateException("Unable to determine JRE provided packages", e);
+    if (logger.isDebugEnabled()) {
+      logger.debug("Discovered JRE:\npackages: {}\nresources: {}\nservices: {}", packages, resources,
+                   services.stream().map(p -> p.getServiceInterface() + ":" + p.getResource().toString()).collect(toList()));
     }
-  }
 
-  private String getJreVersionProperty() {
-    final JdkVersion jdkVersion = getJdkVersion();
-    return "jre-" + jdkVersion.getMajor() + "." + jdkVersion.getMinor();
+    MuleModule jdkModule = new MuleModule(JRE_MODULE_NAME, packages, resources, emptySet(), emptySet(), services);
+
+    return singletonList(jdkModule);
   }
 }
