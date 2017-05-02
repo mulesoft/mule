@@ -118,17 +118,47 @@ public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
                                                                    identifier);
     final HttpServer foundServer = serverManager.lookupServer(new ServerIdentifier("context", "name")).get();
     assertThat(createdServer.getServerAddress(), is(equalTo(foundServer.getServerAddress())));
+    createdServer.dispose();
   }
 
   @Test
   public void cannotFindServerInDifferentContext() throws Exception {
     String name = "name";
     ServerIdentifier identifier = new ServerIdentifier("context", name);
-    serverManager.createServerFor(new DefaultServerAddress("0.0.0.0", listenerPort.getNumber()),
-                                  () -> muleContext.getSchedulerService().ioScheduler(), true,
-                                  (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
-                                  identifier);
+    HttpServer server = serverManager.createServerFor(new DefaultServerAddress("0.0.0.0", listenerPort.getNumber()),
+                                                      () -> muleContext.getSchedulerService().ioScheduler(), true,
+                                                      (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
+                                                      identifier);
     assertThat(serverManager.lookupServer(new ServerIdentifier("otherContext", name)), is(empty()));
+    server.dispose();
+  }
+
+  @Test
+  public void serverWithSameNameInSameContextOverlaps() throws Exception {
+    ServerIdentifier identifier = new ServerIdentifier("context", "name");
+    DefaultServerAddress serverAddress = new DefaultServerAddress("someHost", listenerPort.getNumber());
+    HttpServer server = serverManager.createServerFor(serverAddress,
+                                                      () -> muleContext.getSchedulerService().ioScheduler(), true,
+                                                      (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
+                                                      identifier);
+    DefaultServerAddress otherServerAddress = new DefaultServerAddress("otherHost", listenerPort.getNumber());
+    assertThat(serverManager.containsServerFor(otherServerAddress, identifier), is(true));
+    server.dispose();
+  }
+
+  @Test
+  public void serverWithSameNameInDifferentContextDoesNotOverlaps() throws Exception {
+    String name = "name";
+    ServerIdentifier identifier = new ServerIdentifier("context", name);
+    DefaultServerAddress serverAddress = new DefaultServerAddress("someHost", listenerPort.getNumber());
+    HttpServer server = serverManager.createServerFor(serverAddress,
+                                                      () -> muleContext.getSchedulerService().ioScheduler(), true,
+                                                      (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
+                                                      identifier);
+    DefaultServerAddress otherServerAddress = new DefaultServerAddress("otherHost", listenerPort.getNumber());
+    ServerIdentifier otherIdentifier = new ServerIdentifier("otherContext", name);
+    assertThat(serverManager.containsServerFor(otherServerAddress, otherIdentifier), is(false));
+    server.dispose();
   }
 
   @Test
