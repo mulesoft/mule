@@ -32,6 +32,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.core.util.func.CheckedFunction;
 import org.mule.runtime.core.util.store.LazyObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthCodeRequest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
@@ -59,6 +60,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@Link ExtensionsOAuthManager}
+ *
+ * @since 4.0
  */
 public class DefaultExtensionsOAuthManager implements Startable, Stoppable, ExtensionsOAuthManager {
 
@@ -86,14 +89,9 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
    * {@inheritDoc}
    */
   @Override
-  public void enable(OAuthConfig config) throws MuleException {
-    final String dancerKey = config.getOwnerConfigName();
-    synchronized (dancers) {
-      if (!dancers.containsKey(dancerKey)) {
-        AuthorizationCodeOAuthDancer dancer = createDancer(config);
-        dancers.put(dancerKey, dancer);
-      }
-    }
+  public void register(OAuthConfig config) throws MuleException {
+    dancers.computeIfAbsent(config.getOwnerConfigName(),
+                            (CheckedFunction<String, AuthorizationCodeOAuthDancer>) k -> createDancer(config));
   }
 
   /**
@@ -193,7 +191,8 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
         .authorizationUrl(authCodeConfig.getAuthorizationUrl())
         .externalCallbackUrl(callbackUrl.toExternalForm())
         .localAuthorizationUrlPath(callbackConfig.getLocalAuthorizePath())
-        .localAuthorizationUrlResourceOwnerId("#[attributes.queryParams.resourceOwnerId when attributes.queryParams.resourceOwnerId != null otherwise '']")
+        .localAuthorizationUrlResourceOwnerId(
+                                              "#[attributes.queryParams.resourceOwnerId when attributes.queryParams.resourceOwnerId != null otherwise '']")
         .state("#[attributes.queryParams.state when attributes.queryParams.state != null otherwise '']")
         .customParameters(config.getCustomParameters())
         .customParametersExtractorsExprs(getParameterExtractors(config));

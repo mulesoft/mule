@@ -92,7 +92,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
 
   @Override
   public void start() throws MuleException {
-    oauthManager.enable(getInitialOAuthConfig());
+    oauthManager.register(getInitialOAuthConfig());
   }
 
   @Override

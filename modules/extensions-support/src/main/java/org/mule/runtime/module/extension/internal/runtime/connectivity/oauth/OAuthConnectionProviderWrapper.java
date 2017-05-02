@@ -108,7 +108,7 @@ public class OAuthConnectionProviderWrapper<C> extends ReconnectableConnectionPr
 
   @Override
   public void start() throws MuleException {
-    oauthManager.enable(oauthConfig);
+    oauthManager.register(oauthConfig);
     super.start();
   }
 }

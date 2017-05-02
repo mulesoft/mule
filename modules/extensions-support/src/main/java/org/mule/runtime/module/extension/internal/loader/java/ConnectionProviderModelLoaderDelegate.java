@@ -108,7 +108,7 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
       AuthorizationCodeGrantType grantType = new AuthorizationCodeGrantType(a.accessTokenUrl(),
                                                                             a.authorizationUrl(),
                                                                             a.accessTokenExpr(),
-                                                                            a.expirationRegex(),
+                                                                            a.expirationExpr(),
                                                                             a.refreshTokenExpr(),
                                                                             a.defaultScopes());
 

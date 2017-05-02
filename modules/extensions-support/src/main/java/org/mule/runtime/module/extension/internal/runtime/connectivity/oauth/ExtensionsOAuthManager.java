@@ -26,7 +26,7 @@ public interface ExtensionsOAuthManager {
    *
    * @param config an {@link OAuthConfig}
    */
-  void enable(OAuthConfig config) throws MuleException;
+  void register(OAuthConfig config) throws MuleException;
 
   /**
    * Invalidates the OAuth information of a particular resourceOwnerId

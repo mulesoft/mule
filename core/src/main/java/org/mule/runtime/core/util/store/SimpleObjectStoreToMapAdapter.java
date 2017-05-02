@@ -11,7 +11,8 @@ import org.mule.runtime.core.api.store.ListableObjectStore;
 import java.io.Serializable;
 
 /**
- * Default implementation of {@link ObjectStoreToMapAdapter}
+ * Simple implementation of {@link ObjectStoreToMapAdapter} which operates on a
+ * {@link ListableObjectStore} received in the constructor
  *
  * @param <T> the generic type of the instances contained in the {@link ListableObjectStore}
  * @since 4.0

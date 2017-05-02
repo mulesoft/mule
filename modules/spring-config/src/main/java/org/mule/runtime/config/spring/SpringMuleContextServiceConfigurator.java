@@ -278,7 +278,7 @@ class SpringMuleContextServiceConfigurator {
 
       //TODO: MULE-12356 uncomment this validation
       //if (beanDefinitionRegistry.containsBeanDefinition(serviceName)) {
-        //throw new IllegalStateException("There is already a bean definition registered with key: " + serviceName);
+      //throw new IllegalStateException("There is already a bean definition registered with key: " + serviceName);
       //}
 
       final CustomService customService = customServices.get(serviceName);

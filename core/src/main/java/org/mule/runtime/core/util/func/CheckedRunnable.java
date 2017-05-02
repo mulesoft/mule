@@ -25,6 +25,11 @@ public interface CheckedRunnable extends Runnable {
 
   }
 
+  /**
+   * Handles the {@code throwable}
+   *
+   * @param throwable the error that was catched
+   */
   default void handleException(Throwable throwable) {
     throw propagate(throwable);
   }
