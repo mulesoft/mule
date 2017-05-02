@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core;
 
+import static java.time.Duration.ofMillis;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -202,7 +203,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     // fails with timeout.
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage(startsWith(TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE));
-    from(before.getContext().getResponsePublisher()).blockMillis(BLOCK_TIMEOUT);
+    from(before.getContext().getResponsePublisher()).block(ofMillis(BLOCK_TIMEOUT));
   }
 
   @Test

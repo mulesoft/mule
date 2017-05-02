@@ -126,7 +126,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
       ReactiveProcessor finalProcessorFunction = processorFunction;
       stream = from(stream).flatMap(event -> Flux.just(event)
           .transform(finalProcessorFunction)
-          .onErrorResumeWith(MessagingException.class, handleError(event.getContext())));
+          .onErrorResume(MessagingException.class, handleError(event.getContext())));
       return stream;
     };
   }
@@ -145,7 +145,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
             eventContext.success(handled);
             return Mono.<Event>empty();
           })
-          .onErrorResumeWith(rethrown -> {
+          .onErrorResume(rethrown -> {
             eventContext.error(rethrown);
             return empty();
           });
@@ -163,7 +163,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
     // Handle errors
     interceptors.add((processor, next) -> stream -> from(stream)
         .transform(next)
-        .mapError(MessagingException.class, handleMessagingException(processor)));
+        .onErrorMap(MessagingException.class, handleMessagingException(processor)));
     // Notify
     interceptors.add((processor, next) -> stream -> from(stream)
         .doOnNext(preNotification(processor))

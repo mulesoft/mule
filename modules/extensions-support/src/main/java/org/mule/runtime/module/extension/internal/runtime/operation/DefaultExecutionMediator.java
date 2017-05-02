@@ -58,10 +58,10 @@ import reactor.core.publisher.Mono;
  * {@link MutableConfigurationStats#addInflightOperation()} and {@link MutableConfigurationStats#discountInflightOperation()} are
  * guaranteed to be called, whatever the operation's outcome.
  * <p>
- * In case of operation failure, it will execute the {@link Interceptor#onError(ExecutionContext, Throwable)} method
- * of all the available interceptors. If the operation fails with {@link ConnectionException}, then a retry might be attempted
- * depending on the configured {@link RetryPolicyTemplate}. Notice that if a retry is attempted, the entire cycle of interception
- * (before, onSuccess/onError, after) will be fired again.
+ * In case of operation failure, it will execute the {@link Interceptor#onError(ExecutionContext, Throwable)} method of all the
+ * available interceptors. If the operation fails with {@link ConnectionException}, then a retry might be attempted depending on
+ * the configured {@link RetryPolicyTemplate}. Notice that if a retry is attempted, the entire cycle of interception (before,
+ * onSuccess/onError, after) will be fired again.
  *
  * @since 4.0
  */
@@ -85,7 +85,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
    * Executes the operation per the specification in this classes' javadoc
    *
    * @param executor an {@link OperationExecutor}
-   * @param context  the {@link ExecutionContextAdapter} for the {@code executor} to use
+   * @param context the {@link ExecutionContextAdapter} for the {@code executor} to use
    * @return the operation's result
    * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
    */
@@ -129,7 +129,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
         stats.ifPresent(s -> s.discountInflightOperation());
         sink.success(value);
       })
-          .mapError(e -> {
+          .onErrorMap(e -> {
             e = exceptionEnricherManager.processException(e);
             e = moduleExceptionHandler.processException(e);
             e = onError(context, e, interceptors);
@@ -220,7 +220,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
         .orElse((ExecutionTemplate<T>) defaultExecutionTemplate);
   }
 
-  //TODO: MULE-10580 - Operation reconnection should be decoupled from config reconnection
+  // TODO: MULE-10580 - Operation reconnection should be decoupled from config reconnection
   private RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConfigurationInstance> configurationInstance) {
     Optional<ConnectionProvider> connectionProviderOptional = configurationInstance.map(
                                                                                         ConfigurationInstance::getConnectionProvider)

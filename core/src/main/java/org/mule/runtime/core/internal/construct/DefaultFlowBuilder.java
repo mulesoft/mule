@@ -223,7 +223,7 @@ public class DefaultFlowBuilder implements Builder {
                   Event result = createReturnEventForParentFlowConstruct(r, event);
                   return result;
                 })
-                .mapError(MessagingException.class, me -> {
+                .onErrorMap(MessagingException.class, me -> {
                   me.setProcessedEvent(createReturnEventForParentFlowConstruct(me.getEvent(), event));
                   return me;
                 });
