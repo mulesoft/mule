@@ -16,7 +16,10 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
+import static reactor.core.Exceptions.bubble;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -24,10 +27,13 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
@@ -42,6 +48,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import org.junit.After;
 import org.junit.Before;
@@ -49,8 +56,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
-
-import reactor.core.publisher.Mono;
 
 public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiveProcessorTestCase {
 
@@ -137,7 +142,22 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     asyncExecutor = muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
 
     flow = builder("test", muleContext)
-        .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix)).build();
+        .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix))
+        // Avoid logging of errors by using a null exception handler.
+        .messagingExceptionHandler((exception, event) -> event)
+        .build();
+  }
+
+  @Override
+  protected void configureMuleContext(MuleContextBuilder contextBuilder) {
+    super.configureMuleContext(contextBuilder);
+    contextBuilder.setNotificationManager(new ServerNotificationManager() {
+
+      @Override
+      public void fireNotification(ServerNotification notification) {
+        // Avoid processing of message processor notifications and verbose logging this may produce.
+      }
+    });
   }
 
   protected abstract ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix);
@@ -172,11 +192,11 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     flow.initialise();
     flow.start();
 
-    asyncExecutor.submit(() -> process(flow, testEvent()));
+    asyncExecutor.submit(() -> process(flow, newEvent()));
 
     latchedProcessor.getFirstCalledLatch().await();
 
-    asyncExecutor.submit(() -> process(flow, testEvent()));
+    asyncExecutor.submit(() -> process(flow, newEvent()));
     assertThat(latchedProcessor.getSecondCalledLatch().await(BLOCK_TIMEOUT, MILLISECONDS), is(!blocks));
 
     latchedProcessor.releaseFirst();
@@ -273,7 +293,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
           latch.countDown();
           break;
         case NON_BLOCKING:
-          Mono.just(testEvent()).transform(flow).doOnNext(event -> latch.countDown()).subscribe();
+          processNonBlocking(newEvent(), t -> latch.countDown(), response -> bubble(new AssertionError("Unexpected error")));
       }
     }
     assertThat(latch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
@@ -297,8 +317,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
           }
           break;
         case NON_BLOCKING:
-          Mono.just(testEvent()).transform(flow).doOnNext(e -> fail("Unexpected success")).doOnError(event -> latch.countDown())
-              .subscribe();
+          processNonBlocking(newEvent(), response -> bubble(new AssertionError("Unexpected success")),
+                             t -> latch.countDown());
       }
     }
     assertThat(latch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
@@ -323,12 +343,16 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
           }
           break;
         case NON_BLOCKING:
-          Mono.just(testEvent()).transform(flow).doOnNext(event -> sucessLatch.countDown()).doOnNext(t -> errorLatch.countDown())
-              .subscribe();
+          processNonBlocking(newEvent(), response -> sucessLatch.countDown(), t -> errorLatch.countDown());
       }
     }
     assertThat(sucessLatch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
     assertThat(errorLatch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
+  }
+
+  private void processNonBlocking(Event event, Consumer<Event> onResponse, Consumer<Throwable> onError) {
+    just(event).transform(flow).subscribe(requestUnbounded());
+    from(event.getContext().getResponsePublisher()).subscribe(onResponse, onError);
   }
 
   @Test
