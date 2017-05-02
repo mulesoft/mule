@@ -26,9 +26,11 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.util.Pair;
@@ -69,10 +71,17 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
   private static final String DANCE_CALLBACK_EVENT_KEY = "event";
 
   @Inject
-  private OAuthService oauthService;
-
-  @Inject
   private MuleContext muleContext;
+
+  //TODO: MULE-10837 this should be a plain old @Inject
+  private LazyValue<OAuthService> oauthService = new LazyValue<>(() -> {
+    try {
+      return muleContext.getRegistry().lookupObject(OAuthService.class);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
+  });
+
 
   private final Map<String, AuthorizationCodeOAuthDancer> dancers = new ConcurrentHashMap<>();
   private boolean started = false;
@@ -169,9 +178,9 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
 
   private AuthorizationCodeOAuthDancer createDancer(OAuthConfig config) throws MuleException {
     OAuthAuthorizationCodeDancerBuilder dancerBuilder =
-        oauthService.authorizationCodeGrantTypeDancerBuilder(lockId -> muleContext.getLockFactory().createLock(lockId),
-                                                             new LazyObjectStoreToMapAdapter(getObjectStoreSupplier(config)),
-                                                             muleContext.getExpressionManager());
+        oauthService.get().authorizationCodeGrantTypeDancerBuilder(lockId -> muleContext.getLockFactory().createLock(lockId),
+                                                                   new LazyObjectStoreToMapAdapter(getObjectStoreSupplier(config)),
+                                                                   muleContext.getExpressionManager());
     final AuthCodeConfig authCodeConfig = config.getAuthCodeConfig();
     final AuthorizationCodeGrantType grantType = config.getGrantType();
     final OAuthCallbackConfig callbackConfig = config.getCallbackConfig();
