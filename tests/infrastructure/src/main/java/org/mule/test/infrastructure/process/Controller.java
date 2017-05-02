@@ -248,6 +248,21 @@ public abstract class Controller {
     return new File(domainsDir, domainName + ANCHOR_SUFFIX).exists();
   }
 
+  /**
+   * @param artifactName
+   * @return the directory of the internal repository for the artifact with the given name.
+   */
+  protected File getArtifactInternalRepository(String artifactName) {
+    return new File(new File(appsDir, artifactName), "repository");
+  }
+
+  /**
+   * @return the directory of the internal repository for the Mule runtime.
+   */
+  protected File getRuntimeInternalRepository() {
+    return new File(muleHome, "repository");
+  }
+
   public File getLog() {
     File logEE = newFile(muleHome + "/logs/mule_ee.log");
     File logCE = newFile(muleHome + "/logs/mule.log");
