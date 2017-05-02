@@ -6,8 +6,8 @@
  */
 package org.mule.transformers.xml.xslt;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertSame;
 
 import org.mule.api.transformer.Transformer;
 import org.mule.module.xml.transformer.XsltTransformer;
@@ -32,6 +32,6 @@ public class XsltTransformerWithUriResolverTestCase extends FunctionalTestCase
         XsltTransformer xsltTransformer = (XsltTransformer) transformer;
 
         URIResolver uriResolver = muleContext.getRegistry().lookupObject("testResolver");
-        assertEquals(uriResolver, xsltTransformer.getUriResolver());
+        assertSame(uriResolver, xsltTransformer.getUriResolver());
     }
 }

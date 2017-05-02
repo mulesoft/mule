@@ -6,10 +6,13 @@
  */
 package org.mule.transformers.xml.xslt;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
@@ -86,6 +89,24 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     public Object getResultData()
     {
         return resultData;
+    }
+
+    @Test
+    public void transformerPoolEvictionIsDisabledByDefault()
+    {
+        XsltTransformer transformer = new XsltTransformer();
+        assertThat(transformer.getTimeBetweenTransformerEvictions(), is(-1L));
+    }
+
+    @Test
+    public void setTimeBetweenTransformerEvictions()
+    {
+        XsltTransformer transformer = new XsltTransformer();
+        long currentEvictionTime = transformer.getTimeBetweenTransformerEvictions();
+        long evictionTimeDifferentThanCurrent = currentEvictionTime + 1;
+        transformer.setTimeBetweenTransformerEvictions(evictionTimeDifferentThanCurrent);
+        assertThat(transformer.getTimeBetweenTransformerEvictions(),
+                is(evictionTimeDifferentThanCurrent));
     }
 
     @Test

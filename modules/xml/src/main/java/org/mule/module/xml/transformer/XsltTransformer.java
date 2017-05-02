@@ -95,6 +95,11 @@ public class XsltTransformer extends AbstractXmlTransformer
     private static final int MAX_IDLE_TRANSFORMERS = 32;
     // MAX_IDLE is also the total limit
     private static final int MAX_ACTIVE_TRANSFORMERS = MAX_IDLE_TRANSFORMERS;
+    /**
+     * A default value of -1 disables eviction functionality.
+     * @see org.apache.commons.pool.impl.GenericObjectPool#setTimeBetweenEvictionRunsMillis(long)
+     */
+    private static final long DEFAULT_TIME_BETWEEN_EVICTIONS_IN_MILLISECONDS = -1;
 
     //Saxon shipped with Mule
     public static final String PREFERRED_TRANSFORMER_FACTORY = "net.sf.saxon.TransformerFactoryImpl";
@@ -118,6 +123,8 @@ public class XsltTransformer extends AbstractXmlTransformer
         transformerPool.setMinIdle(MIN_IDLE_TRANSFORMERS);
         transformerPool.setMaxIdle(MAX_IDLE_TRANSFORMERS);
         transformerPool.setMaxActive(MAX_ACTIVE_TRANSFORMERS);
+        transformerPool.setTimeBetweenEvictionRunsMillis(
+                DEFAULT_TIME_BETWEEN_EVICTIONS_IN_MILLISECONDS);
         contextProperties = new HashMap<String, Object>();
     }
 
@@ -144,6 +151,16 @@ public class XsltTransformer extends AbstractXmlTransformer
         {
             throw new InitialisationException(te, this);
         }
+    }
+
+    /**
+     * Eviction is enabled when minEvictableIdleTimeMillis is greater than zero.
+     * @see GenericObjectPool
+     * @see GenericObjectPool#setMinEvictableIdleTimeMillis(long)
+     */
+    private boolean isTransformerPoolEvictionEnabled()
+    {
+        return getTimeBetweenTransformerEvictions() > 0;
     }
 
     /**
@@ -442,6 +459,14 @@ public class XsltTransformer extends AbstractXmlTransformer
     }
 
     /**
+     * @return The current minimum number of allowable idle transformer objects in the pool.
+     */
+    public int getMinIdleTransformers()
+    {
+        return transformerPool.getMinIdle();
+    }
+
+    /**
      * @return The current maximum number of allowable idle transformer objects in the
      *         pool
      */
@@ -458,6 +483,16 @@ public class XsltTransformer extends AbstractXmlTransformer
     public void setMaxIdleTransformers(int maxIdleTransformers)
     {
         transformerPool.setMaxIdle(maxIdleTransformers);
+    }
+
+    public long getTimeBetweenTransformerEvictions()
+    {
+        return transformerPool.getTimeBetweenEvictionRunsMillis();
+    }
+
+    public void setTimeBetweenTransformerEvictions(long timeBetweenTransformerEvictions)
+    {
+        transformerPool.setTimeBetweenEvictionRunsMillis(timeBetweenTransformerEvictions);
     }
 
     /**

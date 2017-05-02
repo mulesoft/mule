@@ -116,7 +116,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                     </xsd:element>
                     <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
-                            <xsd:documentation>A property that wil be made available to the filter context. Expression Evaluators can be used to grab these properties from the message at runtime.
+                            <xsd:documentation>A property that will be made available to the filter context. Expression Evaluators can be used to grab these properties from the message at runtime.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -431,7 +431,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                                 The core of XStream consists of a registry of Converters. The responsibility of a
                                 Converter is to provide a strategy for converting particular types of objects found in
                                 the object graph, to and from XML. XStream is provided with Converters for common types
-                                such as primitives, String, File, Collections, arrays, and Dates. For a list of defautl convers
+                                such as primitives, String, File, Collections, arrays, and Dates. For a list of default converters
                                 see: http://xstream.codehaus.org/converters.html
                             </xsd:documentation>
                         </xsd:annotation>
@@ -524,14 +524,25 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                     </xsd:element>
                     <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
-                            <xsd:documentation>A property that wil be made available to the transform context. Expression Evaluators can be used to grab these properties from the message at runtime.
+                            <xsd:documentation>A property that will be made available to the transform context. Expression Evaluators can be used to grab these properties from the message at runtime.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
+                <xsd:attribute name="timeBetweenTransformerEvictions" type="mule:substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                          Transformers are pooled for better throughput, since performing an XSL
+                          transformation can be expensive. This attribute controls how often objects
+                          in the pool are evicted. The time is specified in milliseconds and is set
+                          to -1 by default. A value of -1 disables eviction functionality. So, by
+                          default, no transformer will ever be removed from the pool.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="maxIdleTransformers" type="mule:substitutableInt">
                     <xsd:annotation>
-                        <xsd:documentation>Transformers are pooled for better throughput, since performing and XSL transformation can be expensive. This attribute controls how many instances will remain idle in the transformer pool.
+                        <xsd:documentation>Transformers are pooled for better throughput, since performing an XSL transformation can be expensive. This attribute controls how many instances will remain idle in the transformer pool.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -576,7 +587,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                 <xsd:sequence>
                     <xsd:element name="context-property" type="spring:entryType" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
-                            <xsd:documentation>A property that wil be made available to the XQuery transform context. Expression Evaluators can be used to grab these properties from the message at runtime.
+                            <xsd:documentation>A property that will be made available to the XQuery transform context. Expression Evaluators can be used to grab these properties from the message at runtime.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -696,7 +707,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                 <xsd:attribute name="newLineAfterDeclaration" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether a new line is printed after the XML declaration (assuming it is not supressed).
+                            Whether a new line is printed after the XML declaration (assuming it is not suppressed).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
