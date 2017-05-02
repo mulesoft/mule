@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -110,7 +111,7 @@ public abstract class ConnectionProviderWrapper<C>
 
   @Override
   public Optional<PoolingProfile> getPoolingProfile() {
-    return Optional.empty();
+    return empty();
   }
 
   public static ConnectionProvider unwrapProviderWrapper(ConnectionProvider connectionProvider) {

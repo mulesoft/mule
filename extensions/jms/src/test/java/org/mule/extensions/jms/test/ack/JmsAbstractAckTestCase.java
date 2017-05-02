@@ -13,6 +13,7 @@ import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.test.JmsAbstractTestCase;
 import org.mule.extensions.jms.test.JmsMessageStorage;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -20,8 +21,6 @@ import org.mule.tck.probe.PollingProber;
 
 import org.junit.After;
 import org.junit.Rule;
-
-import java.util.function.BooleanSupplier;
 
 public abstract class JmsAbstractAckTestCase extends JmsAbstractTestCase {
 
@@ -79,7 +78,7 @@ public abstract class JmsAbstractAckTestCase extends JmsAbstractTestCase {
     ACK, RECOVER, EXPLODE, NOTHING
   }
 
-  void validate(BooleanSupplier validation, long validationTimeout, long validationDelay) {
+  void validate(CheckedSupplier<Boolean> validation, long validationTimeout, long validationDelay) {
     new PollingProber(validationTimeout, validationDelay).check(new JUnitLambdaProbe(validation));
   }
 }

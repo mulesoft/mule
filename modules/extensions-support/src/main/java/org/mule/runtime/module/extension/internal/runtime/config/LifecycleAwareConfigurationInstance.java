@@ -40,6 +40,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.NoConnectivityTest;
 
 import java.util.List;
 import java.util.Optional;
@@ -170,6 +171,10 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
 
   private void testConnectivity() throws MuleException {
     ConnectionProvider provider = connectionProvider.get();
+    if (provider instanceof NoConnectivityTest) {
+      return;
+    }
+
     RetryPolicyTemplate retryTemplate = connectionManager.getRetryTemplateFor(provider);
 
     RetryCallback retryCallback = new RetryCallback() {

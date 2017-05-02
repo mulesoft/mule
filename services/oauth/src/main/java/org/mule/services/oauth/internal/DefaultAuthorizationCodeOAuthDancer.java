@@ -86,6 +86,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -110,7 +111,7 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
 
   private final String state;
   private final String authorizationUrl;
-  private final Map<String, String> customParameters;
+  private final Supplier<Map<String, String>> customParameters;
 
   private final Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> beforeDanceCallback;
   private final BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterDanceCallback;
@@ -123,7 +124,7 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
                                              String localCallbackUrlPath, String localAuthorizationUrlPath,
                                              String localAuthorizationUrlResourceOwnerId, String state, String authorizationUrl,
                                              String responseAccessTokenExpr, String responseRefreshTokenExpr,
-                                             String responseExpiresInExpr, Map<String, String> customParameters,
+                                             String responseExpiresInExpr, Supplier<Map<String, String>> customParameters,
                                              Map<String, String> customParametersExtractorsExprs,
                                              LockFactory lockProvider, Map<String, DefaultResourceOwnerOAuthContext> tokensStore,
                                              HttpClient httpClient, MuleExpressionLanguage expressionEvaluator,
@@ -152,8 +153,8 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
         addRequestHandler(httpServer, GET, localAuthorizationUrlPath, createLocalAuthorizationUrlListener());
   }
 
-  private static <T> RequestHandlerManager addRequestHandler(HttpServer server, Method method, String path,
-                                                             RequestHandler callbackHandler) {
+  private static RequestHandlerManager addRequestHandler(HttpServer server, Method method, String path,
+                                                         RequestHandler callbackHandler) {
     // MULE-11277 Support non-blocking in OAuth http listeners
     return server.addRequestHandler(singleton(method.name()), path, (requestContext, responseCallback) -> {
       final ClassLoader previousCtxClassLoader = currentThread().getContextClassLoader();
@@ -330,9 +331,7 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
   }
 
   private RequestHandler createLocalAuthorizationUrlListener() {
-    return (requestContext, responseCallback) -> {
-      handleLocalAuthorizationRequest(requestContext.getRequest(), responseCallback);
-    };
+    return (requestContext, responseCallback) -> handleLocalAuthorizationRequest(requestContext.getRequest(), responseCallback);
   }
 
   @Override
@@ -360,7 +359,7 @@ public class DefaultAuthorizationCodeOAuthDancer extends AbstractOAuthDancer imp
         .setAuthorizationUrl(authorizationUrl)
         .setClientId(clientId)
         .setClientSecret(clientSecret)
-        .setCustomParameters(customParameters)
+        .setCustomParameters(customParameters.get())
         .setRedirectUrl(externalCallbackUrl)
         .setState(stateEncoder.getEncodedState())
         .setScope(scopes)

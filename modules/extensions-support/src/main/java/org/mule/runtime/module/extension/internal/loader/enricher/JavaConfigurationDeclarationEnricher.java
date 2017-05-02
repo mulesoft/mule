@@ -41,7 +41,7 @@ public class JavaConfigurationDeclarationEnricher extends AbstractAnnotatedDecla
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
     final Optional<ImplementingTypeModelProperty> implementingType =
-        extractExtensionType(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
+        extractImplementingTypeProperty(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
     if (implementingType.isPresent()) {
       new IdempotentDeclarationWalker() {
 

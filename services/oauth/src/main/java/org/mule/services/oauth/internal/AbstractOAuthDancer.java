@@ -6,6 +6,7 @@
  */
 package org.mule.services.oauth.internal;
 
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
@@ -185,7 +186,7 @@ public abstract class AbstractOAuthDancer implements Startable, Stoppable {
                           .build(), DataType.fromType(DataType.class)))
           .build();
 
-      return (T) expressionEvaluator.evaluate(expr, DataType.STRING, resultContext).getValue();
+      return (T) expressionEvaluator.evaluate(expr, STRING, resultContext).getValue();
     }
   }
 

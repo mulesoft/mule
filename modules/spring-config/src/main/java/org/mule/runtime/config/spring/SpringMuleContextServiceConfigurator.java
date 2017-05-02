@@ -275,9 +275,11 @@ class SpringMuleContextServiceConfigurator {
   private void createCustomServices() {
     final Map<String, CustomService> customServices = customServiceRegistry.getCustomServices();
     for (String serviceName : customServices.keySet()) {
-      if (beanDefinitionRegistry.containsBeanDefinition(serviceName)) {
-        throw new IllegalStateException("There is already a bean definition registered with key: " + serviceName);
-      }
+
+      //TODO: MULE-12356 uncomment this validation
+      //if (beanDefinitionRegistry.containsBeanDefinition(serviceName)) {
+      //throw new IllegalStateException("There is already a bean definition registered with key: " + serviceName);
+      //}
 
       final CustomService customService = customServices.get(serviceName);
       final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService);

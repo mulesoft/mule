@@ -15,6 +15,7 @@ import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Wrapper for {@link Class} that provide utility methods to facilitate the introspection of a {@link Class}
@@ -65,8 +66,8 @@ public class TypeWrapper implements Type {
    * {@inheritDoc}
    */
   @Override
-  public List<FieldElement> getAnnotatedFields(Class<? extends Annotation> annotation) {
-    return getFields().stream().filter(field -> field.isAnnotatedWith(annotation)).collect(toList());
+  public List<FieldElement> getAnnotatedFields(Class<? extends Annotation>... annotations) {
+    return getFields().stream().filter(field -> Stream.of(annotations).anyMatch(field::isAnnotatedWith)).collect(toList());
   }
 
   /**

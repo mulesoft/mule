@@ -7,10 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -25,7 +27,7 @@ import java.util.Optional;
  * @since 4.0
  */
 public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject
-    implements ConnectionProviderValueResolver<C>, Initialisable {
+    implements ConnectionProviderValueResolver<C>, Initialisable, Startable {
 
   private final ConnectionProviderObjectBuilder<C> objectBuilder;
   private final ObjectBuilderValueResolver<ConnectionProvider<C>> valueResolver;
@@ -74,5 +76,10 @@ public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject
   @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(resolverSet);
+  }
+
+  @Override
+  public void start() throws MuleException {
+    startIfNeeded(objectBuilder);
   }
 }

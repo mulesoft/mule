@@ -40,7 +40,7 @@ public final class SubTypesDeclarationEnricher extends AbstractAnnotatedDeclarat
     ExtensionDeclarer declarer = extensionLoadingContext.getExtensionDeclarer();
     ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
 
-    Optional<ImplementingTypeModelProperty> implementingType = extractExtensionType(extensionDeclaration);
+    Optional<ImplementingTypeModelProperty> implementingType = extractImplementingTypeProperty(extensionDeclaration);
     if (!implementingType.isPresent()) {
       return;
     }

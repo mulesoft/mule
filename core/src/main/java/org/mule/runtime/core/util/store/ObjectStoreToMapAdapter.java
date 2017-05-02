@@ -20,29 +20,25 @@ import java.util.Set;
 /**
  * Adapts the object store interface to a map interface so the client doesn't have to deal with all the ObjectStoreExceptions
  * thrown by ObjectStore.
- *
+ * <p>
  * This class provides limited functionality from the Map interface. It does not support some methods (see methods javadoc) that
  * can have a big impact in performance due the underlying object store being used.
- *
+ * <p>
  * The object store provided will be access for completing the map operations but the whole lifecycle of the provided object store
  * must be handled by the user.
- *
+ * <p>
  * Operations of this map are not thread safe so the user must synchronize access to this map properly.
  *
- * @param <ValueType> store type
+ * @param <T> the generic type of the instances contained in the {@link ListableObjectStore}
  */
-public class ObjectStoreToMapAdapter<ValueType extends Serializable> implements Map<Serializable, ValueType> {
+public abstract class ObjectStoreToMapAdapter<T extends Serializable> implements Map<Serializable, T> {
 
-  private final ListableObjectStore<ValueType> objectStore;
-
-  public ObjectStoreToMapAdapter(final ListableObjectStore<ValueType> listableObjectStore) {
-    this.objectStore = listableObjectStore;
-  }
+  protected abstract ListableObjectStore<T> getObjectStore();
 
   @Override
   public int size() {
     try {
-      return this.objectStore.allKeys().size();
+      return getObjectStore().allKeys().size();
     } catch (ObjectStoreException e) {
       throw new MuleRuntimeException(e);
     }
@@ -51,7 +47,7 @@ public class ObjectStoreToMapAdapter<ValueType extends Serializable> implements 
   @Override
   public boolean isEmpty() {
     try {
-      return this.objectStore.allKeys().isEmpty();
+      return getObjectStore().allKeys().isEmpty();
     } catch (ObjectStoreException e) {
       throw new MuleRuntimeException(e);
     }
@@ -60,7 +56,7 @@ public class ObjectStoreToMapAdapter<ValueType extends Serializable> implements 
   @Override
   public boolean containsKey(Object key) {
     try {
-      return this.objectStore.contains((Serializable) key);
+      return getObjectStore().contains((Serializable) key);
     } catch (ObjectStoreException e) {
       throw new MuleRuntimeException(e);
     }
@@ -72,27 +68,27 @@ public class ObjectStoreToMapAdapter<ValueType extends Serializable> implements 
   }
 
   @Override
-  public ValueType get(Object key) {
+  public T get(Object key) {
     try {
-      if (!this.objectStore.contains((Serializable) key)) {
+      if (!getObjectStore().contains((Serializable) key)) {
         return null;
       }
-      return this.objectStore.retrieve((Serializable) key);
+      return getObjectStore().retrieve((Serializable) key);
     } catch (ObjectStoreException e) {
       throw new MuleRuntimeException(e);
     }
   }
 
   @Override
-  public ValueType put(Serializable key, ValueType value) {
-    ValueType previousValue = null;
+  public T put(Serializable key, T value) {
+    T previousValue = null;
     try {
-      if (this.objectStore.contains(key)) {
-        previousValue = objectStore.retrieve(key);
-        objectStore.remove(key);
+      if (getObjectStore().contains(key)) {
+        previousValue = getObjectStore().retrieve(key);
+        getObjectStore().remove(key);
       }
       if (value != null) {
-        objectStore.store(key, value);
+        getObjectStore().store(key, value);
       }
       return previousValue;
     } catch (ObjectStoreException e) {
@@ -101,10 +97,10 @@ public class ObjectStoreToMapAdapter<ValueType extends Serializable> implements 
   }
 
   @Override
-  public ValueType remove(Object key) {
+  public T remove(Object key) {
     try {
-      if (objectStore.contains((Serializable) key)) {
-        return objectStore.remove((Serializable) key);
+      if (getObjectStore().contains((Serializable) key)) {
+        return getObjectStore().remove((Serializable) key);
       }
     } catch (ObjectStoreException e) {
       throw new MuleRuntimeException(e);
@@ -113,7 +109,7 @@ public class ObjectStoreToMapAdapter<ValueType extends Serializable> implements 
   }
 
   @Override
-  public void putAll(Map<? extends Serializable, ? extends ValueType> mapToAdd) {
+  public void putAll(Map<? extends Serializable, ? extends T> mapToAdd) {
     for (Serializable key : mapToAdd.keySet()) {
       put(key, mapToAdd.get(key));
     }
@@ -122,7 +118,7 @@ public class ObjectStoreToMapAdapter<ValueType extends Serializable> implements 
   @Override
   public void clear() {
     try {
-      objectStore.clear();
+      getObjectStore().clear();
     } catch (ObjectStoreException e) {
       throw new MuleRuntimeException(e);
     }
@@ -131,7 +127,7 @@ public class ObjectStoreToMapAdapter<ValueType extends Serializable> implements 
   @Override
   public Set<Serializable> keySet() {
     try {
-      final List<Serializable> allKeys = objectStore.allKeys();
+      final List<Serializable> allKeys = getObjectStore().allKeys();
       return new HashSet(allKeys);
     } catch (ObjectStoreException e) {
       throw new MuleRuntimeException(e);
@@ -142,7 +138,7 @@ public class ObjectStoreToMapAdapter<ValueType extends Serializable> implements 
    * This method is not supported for performance reasons
    */
   @Override
-  public Collection<ValueType> values() {
+  public Collection<T> values() {
     throw new UnsupportedOperationException("ObjectStoreToMapAdapter does not support values() method");
   }
 
@@ -150,8 +146,7 @@ public class ObjectStoreToMapAdapter<ValueType extends Serializable> implements 
    * This method is not supported for performance reasons
    */
   @Override
-  public Set<Entry<Serializable, ValueType>> entrySet() {
+  public Set<Entry<Serializable, T>> entrySet() {
     throw new UnsupportedOperationException("ObjectStoreToMapAdapter does not support entrySet() method");
   }
-
 }

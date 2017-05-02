@@ -16,7 +16,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -122,5 +121,13 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>, I
     for (ValueResolver<V> valueResolver : valueResolvers) {
       initialiseIfNeeded(valueResolver, true, muleContext);
     }
+  }
+
+  public List<ValueResolver<K>> getKeyResolvers() {
+    return keyResolvers;
+  }
+
+  public List<ValueResolver<V>> getValueResolvers() {
+    return valueResolvers;
   }
 }

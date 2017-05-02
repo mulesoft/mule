@@ -53,7 +53,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -76,9 +75,10 @@ import org.mule.runtime.module.extension.internal.config.dsl.object.MediaTypeVal
 import org.mule.runtime.module.extension.internal.config.dsl.object.ObjectParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.ParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.ValueResolverParsingDelegate;
+import org.mule.runtime.module.extension.internal.config.dsl.parameter.AnonymousParameterGroupParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
-import org.mule.runtime.module.extension.internal.config.dsl.parameter.ParameterGroupParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterObjectFactory;
+import org.mule.runtime.module.extension.internal.config.dsl.parameter.TypedParameterGroupParser;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
@@ -933,18 +933,39 @@ public abstract class ExtensionDefinitionParser {
     return parameterModel.getDslConfiguration().allowsReferences();
   }
 
+  protected void parseParameters(ParameterizedModel parameterizedModel) throws ConfigurationException {
+    List<ParameterGroupModel> inlineGroups = getInlineGroups(parameterizedModel);
+    parseParameters(getFlatParameters(inlineGroups, parameterizedModel.getAllParameterModels()));
+
+    for (ParameterGroupModel group : inlineGroups) {
+      parseParameterGroup(group);
+    }
+  }
+
   protected void parseParameterGroup(ParameterGroupModel group) throws ConfigurationException {
     ParameterGroupDescriptor descriptor =
         group.getModelProperty(ParameterGroupModelProperty.class)
             .map(ParameterGroupModelProperty::getDescriptor)
-            .orElseThrow(() -> new IllegalArgumentException("Incomplete group"));
+            .orElse(null);
 
     DslElementSyntax dslElementSyntax = dslResolver.resolveInline(group);
-    addParameter(getChildKey(getContainerName(descriptor.getContainer())),
-                 new DefaultObjectParsingDelegate().parse("", null, dslElementSyntax));
 
-    new ParameterGroupParser(baseDefinitionBuilder.copy(), group, descriptor, getContextClassLoader(), dslElementSyntax,
-                             dslResolver, parsingContext).parse().forEach(this::addDefinition);
+    if (descriptor != null) {
+      addParameter(getChildKey(getContainerName(descriptor.getContainer())),
+                   new DefaultObjectParsingDelegate().parse("", null, dslElementSyntax));
+      new TypedParameterGroupParser(baseDefinitionBuilder.copy(), group, descriptor, getContextClassLoader(), dslElementSyntax,
+                                    dslResolver, parsingContext).parse().forEach(this::addDefinition);
+    } else {
+      AttributeDefinition.Builder builder = fromChildConfiguration(Map.class);
+      if (dslElementSyntax.isWrapped()) {
+        builder.withWrapperIdentifier(dslElementSyntax.getElementName());
+      } else {
+        builder.withIdentifier(dslElementSyntax.getElementName());
+      }
+      addParameter(getChildKey(group.getName()), builder);
+      new AnonymousParameterGroupParser(baseDefinitionBuilder.copy(), group, getContextClassLoader(), dslElementSyntax,
+                                        dslResolver, parsingContext).parse().forEach(this::addDefinition);
+    }
   }
 
   protected List<ParameterModel> getFlatParameters(List<ParameterGroupModel> inlineGroups, List<ParameterModel> parameters) {

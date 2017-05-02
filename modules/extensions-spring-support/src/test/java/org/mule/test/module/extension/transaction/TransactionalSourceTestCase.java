@@ -11,14 +11,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.util.func.CheckedSupplier;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.transactional.TransactionalSource;
 import org.mule.test.transactional.connection.MessageStorage;
 import org.mule.test.transactional.connection.TestTransactionalConnection;
-
-import java.util.function.BooleanSupplier;
 
 import org.junit.After;
 import org.junit.Before;
@@ -111,7 +110,7 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     ((Flow) getFlowConstruct(flowName)).start();
   }
 
-  private void validate(BooleanSupplier validation) {
+  private void validate(CheckedSupplier<Boolean> validation) {
     new PollingProber(10000, 100).check(new JUnitLambdaProbe(validation));
   }
 
