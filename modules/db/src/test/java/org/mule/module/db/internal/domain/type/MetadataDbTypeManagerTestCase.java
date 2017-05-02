@@ -39,6 +39,7 @@ public class MetadataDbTypeManagerTestCase extends AbstractMuleTestCase
     private static final DbType UDT_STRUCT = new ResolvedDbType(Types.STRUCT, "UDT_STRUCT");
     private static final DbType UDT_OK = new ResolvedDbType(1, "UDT_OK");
     private static final DbType UDT_CLOB = new ResolvedDbType(Types.CLOB, "CLOB");
+    private static final DbType UDT_BLOB = new ResolvedDbType(Types.BLOB, "BLOB");
 
     @Test
     public void ignoreUserDefinedTypes() throws Exception
@@ -58,6 +59,21 @@ public class MetadataDbTypeManagerTestCase extends AbstractMuleTestCase
         assertNotContainsUserDefinedType(typeManager, connection, UDT_STRUCT);
     }
 
+    @Test
+    public void resolveBlobDatatype() throws Exception
+    {
+        DatabaseMetaData metaData = mock(DatabaseMetaData.class);
+        when(metaData.getTypeInfo()).thenReturn(createResultSetWithBlobType());
+
+        DbConnection connection = mock(DbConnection.class);
+        when(connection.getMetaData()).thenReturn(metaData);
+
+        MetadataDbTypeManager typeManager = new MetadataDbTypeManager();
+        typeManager.initialise(connection);
+
+        assertThat(typeManager.lookup(connection, Types.BLOB, "BLOB"), instanceOf(BlobResolvedDataType.class));
+    }
+    
     @Test
     public void resolveClobDatatype() throws Exception
     {
@@ -109,7 +125,17 @@ public class MetadataDbTypeManagerTestCase extends AbstractMuleTestCase
         addRecord(resultSetBuilder, UDT_CLOB);
         return resultSetBuilder.build();
     }
-    
+
+    private ResultSet createResultSetWithBlobType() throws SQLException
+    {
+        List<ColumnMetadata> columns = getTypeMedataColumns();
+
+        ResultSetBuilder resultSetBuilder = new ResultSetBuilder(columns, mock(Statement.class));
+
+        addRecord(resultSetBuilder, UDT_BLOB);
+        return resultSetBuilder.build();
+    }
+
     private ResultSet createResultSetWithUserDefinedTypes() throws SQLException
     {
         List<ColumnMetadata> columns = getTypeMedataColumns();
