@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
@@ -22,6 +23,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import java.lang.reflect.Field;
 import java.util.List;
 
+/**
+ * Validates that OAuth enabled {@link ConnectionProvider}s are well formed
+ *
+ * @since 4.0
+ */
 public class OAuthConnectionProviderModelValidator implements ExtensionModelValidator {
 
   @Override
@@ -40,11 +46,11 @@ public class OAuthConnectionProviderModelValidator implements ExtensionModelVali
 
               if (stateFields.size() != 1) {
                 throw new IllegalConnectionProviderModelDefinitionException(
-                                                                            format("Connection Provider of class '%s' uses OAuth2 authorization code grant type and thus should contain "
-                                                                                + "one (and only one) field of type %s. %d were found",
-                                                                                   type,
-                                                                                   AuthorizationCodeState.class.getName(),
-                                                                                   stateFields.size()));
+                    format("Connection Provider of class '%s' uses OAuth2 authorization code grant type and thus should contain "
+                               + "one (and only one) field of type %s. %d were found",
+                           type,
+                           AuthorizationCodeState.class.getName(),
+                           stateFields.size()));
               }
             });
       }
