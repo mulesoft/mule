@@ -45,7 +45,7 @@ public class NumberToString extends AbstractTransformer implements DiscoverableT
     if (numberFormat != null) {
       return numberFormat.format(src);
     } else {
-      return ((Number) src).toString();
+      return src.toString();
     }
   }
 
