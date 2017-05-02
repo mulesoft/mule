@@ -7,12 +7,9 @@
 
 package org.mule.runtime.module.embedded.api;
 
-import static java.util.Optional.ofNullable;
-
 import java.io.Serializable;
 import java.net.URL;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * This class contains all the information related to the container resources.
@@ -38,13 +35,6 @@ public class ContainerInfo implements Serializable {
   }
 
   /**
-   * @param log4jConfigurationFile the absolute path to the log4j configuration file.
-   */
-  public void setLog4jConfigurationFile(String log4jConfigurationFile) {
-    this.log4jConfigurationFile = log4jConfigurationFile;
-  }
-
-  /**
    * @return the runtime version to use
    */
   public String getVersion() {
@@ -63,12 +53,5 @@ public class ContainerInfo implements Serializable {
    */
   public List<URL> getServices() {
     return services;
-  }
-
-  /**
-   * @return the absolute path to the log4j configuration file.
-   */
-  public Optional<String> getLog4jConfigurationFile() {
-    return ofNullable(log4jConfigurationFile);
   }
 }
