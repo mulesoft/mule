@@ -7,6 +7,8 @@
 
 package org.mule.module.db.internal.domain.type;
 
+import static org.mule.module.db.internal.domain.type.JdbcTypes.types;
+
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.result.resultset.ResultSetIterator;
 import org.mule.module.db.internal.result.resultset.SingleResultResultSetCloser;
@@ -101,15 +103,14 @@ public class MetadataDbTypeManager implements DbTypeManager
                 Number data_type = (Number) typeRecord.get(METADATA_TYPE_ID_COLUMN);
                 String type_name = (String) typeRecord.get(METADATA_TYPE_NAME_COLUMN);
 
-                ResolvedDbType resolvedDbType = null;
+                DbType resolvedDbType = null;
 
-                if (data_type.intValue() == Types.CLOB)
+                resolvedDbType = new ResolvedDbType(data_type.intValue(), type_name);
+
+                // In case a custom type is needed for automatic conversions (CLOB, BLOB)
+                if (types.contains(resolvedDbType))
                 {
-                    resolvedDbType = new ClobResolvedDataType(data_type.intValue(), type_name);
-                }
-                else
-                {
-                    resolvedDbType = new ResolvedDbType(data_type.intValue(), type_name);
+                    resolvedDbType = types.get(types.indexOf(resolvedDbType));
                 }
 
                 if (!isUserDefinedType(resolvedDbType))
