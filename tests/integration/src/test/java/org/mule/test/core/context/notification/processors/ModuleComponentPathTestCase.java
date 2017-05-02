@@ -30,6 +30,7 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.dsl.api.component.config.DefaultLocationPart;
 import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import ru.yandex.qatools.allure.annotations.Description;
@@ -64,24 +65,24 @@ public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase 
 
   private static final DefaultComponentLocation FLOW_WITH_SINGLE_MP_LOCATION =
       new DefaultComponentLocation(of("flowWithSingleMp"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithSingleMp",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(15))));
+                                   asList(new DefaultLocationPart("flowWithSingleMp",
+                                                                  FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                  CONFIG_FILE_NAME,
+                                                                  of(15))));
 
   private static final DefaultComponentLocation FLOW_WITH_PROXY_AND_SIMPLE_MODULE_AND_LOGGER =
       new DefaultComponentLocation(of("flowWithProxyAndSimpleModuleAndLogger"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithProxyAndSimpleModuleAndLogger",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(49))));
+                                   asList(new DefaultLocationPart("flowWithProxyAndSimpleModuleAndLogger",
+                                                                  FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                  CONFIG_FILE_NAME,
+                                                                  of(49))));
 
   private static final DefaultComponentLocation FLOW_WITH_PROXY_AND_SIMPLE_MODULE_AND_LOGGER_REVERSE =
       new DefaultComponentLocation(of("flowWithProxyAndSimpleModuleAndLoggerReverse"),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart("flowWithProxyAndSimpleModuleAndLoggerReverse",
-                                                                                           FLOW_TYPED_COMPONENT_IDENTIFIER,
-                                                                                           CONFIG_FILE_NAME,
-                                                                                           of(55))));
+                                   asList(new DefaultLocationPart("flowWithProxyAndSimpleModuleAndLoggerReverse",
+                                                                  FLOW_TYPED_COMPONENT_IDENTIFIER,
+                                                                  CONFIG_FILE_NAME,
+                                                                  of(55))));
 
   /**
    * "module-simple" operations defined below
@@ -94,10 +95,10 @@ public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase 
           .withType(OPERATION).build());
   private static final DefaultComponentLocation OPERATION_SET_PAYLOAD_HARDCODED_VALUE =
       new DefaultComponentLocation(of(SET_PAYLOAD_HARDCODED_VALUE_NAME),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart(SET_PAYLOAD_HARDCODED_VALUE_NAME,
-                                                                                           MODULE_SET_PAYLOAD_HARDCODED_VALUE,
-                                                                                           MODULE_SIMPLE_FILE_NAME,
-                                                                                           of(12))));
+                                   asList(new DefaultLocationPart(SET_PAYLOAD_HARDCODED_VALUE_NAME,
+                                                                  MODULE_SET_PAYLOAD_HARDCODED_VALUE,
+                                                                  MODULE_SIMPLE_FILE_NAME,
+                                                                  of(12))));
 
   private static final String SET_PAYLOAD_PARAM_VALUE_NAME = "set-payload-param-value";
   private static final Optional<TypedComponentIdentifier> MODULE_SET_PAYLOAD_PARAM_VALUE =
@@ -106,10 +107,10 @@ public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase 
           .withType(OPERATION).build());
   private static final DefaultComponentLocation OPERATION_SET_PAYLOAD_PARAM_VALUE =
       new DefaultComponentLocation(of(SET_PAYLOAD_PARAM_VALUE_NAME),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart(SET_PAYLOAD_PARAM_VALUE_NAME,
-                                                                                           MODULE_SET_PAYLOAD_PARAM_VALUE,
-                                                                                           MODULE_SIMPLE_FILE_NAME,
-                                                                                           of(19))));
+                                   asList(new DefaultLocationPart(SET_PAYLOAD_PARAM_VALUE_NAME,
+                                                                  MODULE_SET_PAYLOAD_PARAM_VALUE,
+                                                                  MODULE_SIMPLE_FILE_NAME,
+                                                                  of(19))));
 
   private static final String SET_PAYLOAD_TWO_TIMES_NAME = "set-payload-two-times";
   private static final Optional<TypedComponentIdentifier> MODULE_SET_PAYLOAD_TWO_TIMES =
@@ -118,10 +119,10 @@ public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase 
           .withType(OPERATION).build());
   private static final DefaultComponentLocation OPERATION_SET_PAYLOAD_TWO_TIMES =
       new DefaultComponentLocation(of(SET_PAYLOAD_TWO_TIMES_NAME),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart(SET_PAYLOAD_TWO_TIMES_NAME,
-                                                                                           MODULE_SET_PAYLOAD_TWO_TIMES,
-                                                                                           MODULE_SIMPLE_FILE_NAME,
-                                                                                           of(29))));
+                                   asList(new DefaultLocationPart(SET_PAYLOAD_TWO_TIMES_NAME,
+                                                                  MODULE_SET_PAYLOAD_TWO_TIMES,
+                                                                  MODULE_SIMPLE_FILE_NAME,
+                                                                  of(29))));
 
   /**
    * "module-simple-proxy" operations defined below
@@ -134,10 +135,10 @@ public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase 
           .withType(OPERATION).build());
   private static final DefaultComponentLocation OPERATION_PROXY_SET_PAYLOAD =
       new DefaultComponentLocation(of(PROXY_SET_PAYLOAD_NAME),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart(PROXY_SET_PAYLOAD_NAME,
-                                                                                           MODULE_PROXY_SET_PAYLOAD,
-                                                                                           MODULE_SIMPLE_PROXY_FILE_NAME,
-                                                                                           of(13))));
+                                   asList(new DefaultLocationPart(PROXY_SET_PAYLOAD_NAME,
+                                                                  MODULE_PROXY_SET_PAYLOAD,
+                                                                  MODULE_SIMPLE_PROXY_FILE_NAME,
+                                                                  of(13))));
 
   private static final String PROXY_SET_PAYLOAD_AND_LOGGER_NAME = "proxy-set-payload-hardcoded-value-and-logger";
   private static final Optional<TypedComponentIdentifier> MODULE_PROXY_SET_PAYLOAD_AND_LOGGER =
@@ -146,10 +147,10 @@ public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase 
           .withType(OPERATION).build());
   private static final DefaultComponentLocation OPERATION_PROXY_SET_PAYLOAD_AND_LOGGER =
       new DefaultComponentLocation(of(PROXY_SET_PAYLOAD_AND_LOGGER_NAME),
-                                   asList(new DefaultComponentLocation.DefaultLocationPart(PROXY_SET_PAYLOAD_AND_LOGGER_NAME,
-                                                                                           MODULE_PROXY_SET_PAYLOAD_AND_LOGGER,
-                                                                                           MODULE_SIMPLE_PROXY_FILE_NAME,
-                                                                                           of(20))));
+                                   asList(new DefaultLocationPart(PROXY_SET_PAYLOAD_AND_LOGGER_NAME,
+                                                                  MODULE_PROXY_SET_PAYLOAD_AND_LOGGER,
+                                                                  MODULE_SIMPLE_PROXY_FILE_NAME,
+                                                                  of(20))));
 
   /**
    * runtime provided MPs
