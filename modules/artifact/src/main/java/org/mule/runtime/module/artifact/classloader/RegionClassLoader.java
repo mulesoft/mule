@@ -240,9 +240,9 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     } catch (Exception e) {
       final String message = "Error disposing classloader for '{}'. This can cause a memory leak";
       if (logger.isDebugEnabled()) {
-        logger.debug(message, getArtifactDescriptor().getName(), e);
+        logger.debug(message, classLoader.getArtifactId(), e);
       } else {
-        logger.error(message, getArtifactDescriptor().getName());
+        logger.error(message, classLoader.getArtifactId());
       }
     }
   }
