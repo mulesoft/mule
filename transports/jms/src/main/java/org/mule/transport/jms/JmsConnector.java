@@ -43,6 +43,7 @@ import org.mule.transport.jms.redelivery.RedeliveryHandlerFactory;
 import org.mule.util.BeanUtils;
 import org.mule.util.concurrent.ThreadNameHelper;
 
+import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Timer;
@@ -846,10 +847,35 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         try
         {
             close(consumer);
+            closeWrapperConsumer(consumer);
         }
         catch (Exception e)
         {
             logger.warn("Failed to close jms message consumer: " + e.getMessage());
+        }
+    }
+
+    /**
+     * This method is to close a consumer instance of bitronix.tm.resource.jms.MessageWrapperConsumer due to consumer.close() method is empty in this case.
+     * @param consumer
+     * @throws JMSException
+     */
+    private void closeWrapperConsumer(MessageConsumer consumer) throws JMSException
+    {
+        try
+        {
+            Method method = consumer.getClass().getMethod("getMessageConsumer");
+            MessageConsumer messageConsumer = (MessageConsumer) method.invoke(consumer);
+            messageConsumer.close();
+        }
+        catch (JMSException e)
+        {
+            throw e;
+        }
+        catch (Exception e)
+        {
+            // if getMessageConsumer() method doesn't exist, so the consumer is not instance of bitronix.tm.resource.jms.MessageWrapperConsumer.
+            return ;
         }
     }
 
