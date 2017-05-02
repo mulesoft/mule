@@ -75,11 +75,10 @@ public class ContainerClassLoaderFactory {
    * Boot packages define all the prefixes that must be loaded from the container classLoader without being filtered
    */
   public static final Set<String> BOOT_PACKAGES =
-      ImmutableSet.of("java", "javax.smartcardio",
-                      // Java EE
+      ImmutableSet.of(// Java EE
                       "javax.resource", "javax.servlet", "javax.ws", "javax.mail", "javax.inject", "org.apache.xerces",
                       "org.apache.logging.log4j", "org.slf4j", "org.apache.commons.logging", "org.apache.log4j", "org.dom4j",
-                      "com.sun", "sun", "org.mule.mvel2",
+                      "org.mule.mvel2",
                       // TODO(gfernandes): MULE-10194: need to expose every package from groovy
                       "org.codehaus.groovy",
                       "groovy.lang",
@@ -87,9 +86,7 @@ public class ContainerClassLoaderFactory {
                       // mule-module.properties (fails ClassInterceptorTestCase)
                       "org.aopalliance.aop",
                       // MULE-10194 Mechanism to add custom boot packages to be exported by the container
-                      "com.yourkit",
-                      // TODO(pablo.kraan): MULE-12049 - find a better way to export Nashorn without having to use a boot package
-                      "jdk.nashorn.api.scripting");
+                      "com.yourkit");
 
   private final ModuleRepository moduleRepository;
 

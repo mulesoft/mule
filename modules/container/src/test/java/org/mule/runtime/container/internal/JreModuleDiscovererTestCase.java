@@ -13,9 +13,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mule.runtime.container.internal.JreModuleDiscoverer.JRE_MODULE_NAME;
-import static org.mule.runtime.container.internal.JreModuleDiscoverer.UNABLE_TO_DETERMINE_JRE_PACKAGES_ERROR;
-import static org.mule.runtime.core.util.JdkVersionUtils.JAVA_VERSION_PROPERTY;
-import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -39,17 +36,8 @@ public class JreModuleDiscovererTestCase extends AbstractMuleTestCase {
     assertThat(muleModules.size(), equalTo(1));
     final MuleModule muleModule = muleModules.get(0);
     assertThat(muleModule.getName(), equalTo(JRE_MODULE_NAME));
-    assertThat(muleModule.getExportedPaths(), is(empty()));
+    assertThat(muleModule.getExportedPaths(), is(not(empty())));
     assertThat(muleModule.getExportedPackages(), is(not(empty())));
-  }
-
-  @Test
-  public void cannotDiscoverJreModuleForUnsupportedJre() throws Exception {
-    testWithSystemProperty(JAVA_VERSION_PROPERTY, "1.7", () -> {
-      expected.expect(IllegalStateException.class);
-      expected.expectMessage(UNABLE_TO_DETERMINE_JRE_PACKAGES_ERROR);
-
-      moduleDiscoverer.discover();
-    });
+    assertThat(muleModule.getExportedServices(), is(not(empty())));
   }
 }
