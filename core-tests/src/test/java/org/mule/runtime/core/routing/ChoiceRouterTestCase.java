@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.core.routing;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.management.stats.RouterStatistics;
 import org.mule.runtime.core.routing.filters.EqualsFilter;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
@@ -43,8 +42,8 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void testNoRoute() throws Exception {
-    thrown.expect(is(instanceOf(RoutePathNotFoundException.class)));
-    process(choiceRouter, fooEvent());
+    Event inputEvent = fooEvent();
+    assertThat(process(choiceRouter, inputEvent), is(inputEvent));
   }
 
   @Test
@@ -56,9 +55,8 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void testNoMatchingNorDefaultRoute() throws Exception {
     choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
-
-    thrown.expect(is(instanceOf(RoutePathNotFoundException.class)));
-    process(choiceRouter, fooEvent());
+    Event inputEvent = fooEvent();
+    assertThat(process(choiceRouter, inputEvent), is(inputEvent));
   }
 
   @Test
@@ -89,8 +87,8 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     choiceRouter.removeRoute(mp);
     choiceRouter.setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_OUTBOUND));
 
-    thrown.expect(is(instanceOf(RoutePathNotFoundException.class)));
-    process(choiceRouter, zapEvent());
+    Event inputEvent = zapEvent();
+    assertThat(process(choiceRouter, inputEvent), is(inputEvent));
   }
 
   @Test
