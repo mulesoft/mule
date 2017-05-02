@@ -87,7 +87,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     choiceRouter.removeRoute(mp);
     choiceRouter.setRouterStatistics(new RouterStatistics(RouterStatistics.TYPE_OUTBOUND));
 
-    Event inputEvent = zapEvent();;
+    Event inputEvent = zapEvent();
     assertThat(process(choiceRouter, inputEvent), is(inputEvent));
   }
 
