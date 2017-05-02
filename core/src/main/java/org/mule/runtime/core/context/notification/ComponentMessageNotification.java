@@ -6,42 +6,29 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
+import org.mule.runtime.core.api.context.notification.EnrichedServerNotification;
 
 /**
  * These notifications are fired when before and after a service component is invoked.
  */
-public class ComponentMessageNotification extends ServerNotification {
+public class ComponentMessageNotification extends EnrichedServerNotification {
 
   private static final long serialVersionUID = -6369685122731797646L;
 
   public static final int COMPONENT_PRE_INVOKE = COMPONENT_EVENT_ACTION_START_RANGE + 1;
   public static final int COMPONENT_POST_INVOKE = COMPONENT_EVENT_ACTION_START_RANGE + 2;
 
-  protected transient FlowConstruct flowConstruct;
-  protected transient Component component;
-
   static {
     registerAction("component pre invoke", COMPONENT_PRE_INVOKE);
     registerAction("component post invoke", COMPONENT_POST_INVOKE);
   }
 
-  public ComponentMessageNotification(Message message, Component component, FlowConstruct flowConstruct, int action) {
-    super(message, action);
+  public ComponentMessageNotification(EnrichedNotificationInfo notificationInfo, FlowConstruct flowConstruct,
+                                      int action) {
+    super(notificationInfo, action, flowConstruct);
     this.flowConstruct = flowConstruct;
-    this.component = component;
-    resourceIdentifier = flowConstruct.getName();
-
-  }
-
-  /**
-   * @return the message
-   */
-  public String getServiceName() {
-    return resourceIdentifier;
   }
 
   @Override
@@ -52,19 +39,6 @@ public class ComponentMessageNotification extends ServerNotification {
 
   @Override
   public String getType() {
-    return "trace";
-  }
-
-  @Override
-  public Message getSource() {
-    return (Message) super.getSource();
-  }
-
-  public FlowConstruct getFlowConstruct() {
-    return flowConstruct;
-  }
-
-  public Component getComponent() {
-    return component;
+    return TYPE_TRACE;
   }
 }

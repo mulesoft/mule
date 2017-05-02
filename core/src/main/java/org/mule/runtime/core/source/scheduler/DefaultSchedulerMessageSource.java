@@ -14,6 +14,7 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.failedToScheduleWor
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -136,7 +137,7 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
       just(request)
           .map(message -> builder(create(flowConstruct, getLocation())).message(request).flow(flowConstruct).build())
           .doOnNext(event -> setCurrentEvent(event))
-          .doOnNext(event -> notificationHelper.fireNotification(this, event, getLocation(), flowConstruct, MESSAGE_RECEIVED))
+          .doOnNext(event -> notificationHelper.fireNotification(this, event, flowConstruct, MESSAGE_RECEIVED))
           .transform(listener)
           .subscribe(requestUnbounded());
     } catch (Exception e) {

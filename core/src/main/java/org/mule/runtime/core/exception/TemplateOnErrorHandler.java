@@ -14,8 +14,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
-import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
-import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
+import static org.mule.runtime.core.context.notification.ErrorHandlerNotification.PROCESS_END;
+import static org.mule.runtime.core.context.notification.ErrorHandlerNotification.PROCESS_START;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -27,13 +27,14 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
+import org.mule.runtime.core.context.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
@@ -128,8 +129,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     @Override
     protected Event processRequest(Event request) throws MuleException {
       muleContext.getNotificationManager()
-          .fireNotification(new ExceptionStrategyNotification(request, flowConstruct, PROCESS_START));
-      fireNotification(exception);
+          .fireNotification(new ErrorHandlerNotification(EnrichedNotificationInfo.createInfo(request, exception, null),
+                                                         flowConstruct, PROCESS_START));
+      fireNotification(exception, request);
       logException(exception, request);
       processStatistics();
 
@@ -164,7 +166,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
     @Override
     protected void processFinally(Event event, MessagingException exception) {
-      muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(event, flowConstruct, PROCESS_END));
+      muleContext.getNotificationManager()
+          .fireNotification(new ErrorHandlerNotification(EnrichedNotificationInfo.createInfo(event, exception, null),
+                                                         flowConstruct, PROCESS_END));
     }
 
   }

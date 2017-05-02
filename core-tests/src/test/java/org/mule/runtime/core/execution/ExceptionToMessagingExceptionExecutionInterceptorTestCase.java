@@ -19,6 +19,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
@@ -46,6 +47,8 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
   @Mock
   private Event mockResultMuleEvent;
   @Mock
+  private EventContext mockEventContext;
+  @Mock
   private MessagingException mockMessagingException;
   @Mock
   private MuleException mockMuleException;
@@ -66,6 +69,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
     when(mockMuleEvent.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(mockMuleEvent.getError()).thenReturn(of(mockError));
     when(mockMuleEvent.getMessage()).thenReturn(Message.of(null));
+    when(mockMuleEvent.getContext()).thenReturn(mockEventContext);
     when(mockErrorTypeLocator.lookupErrorType((Exception) any())).thenReturn(mockErrorType);
 
     cut = new ExceptionToMessagingExceptionExecutionInterceptor();

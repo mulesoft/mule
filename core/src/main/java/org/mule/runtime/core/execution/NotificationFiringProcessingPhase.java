@@ -46,7 +46,7 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
         }
       }
       getNotificationHelper(muleContext.getNotificationManager())
-          .fireNotification(source, event, event.getContext().getOriginatingLocation(), flow, action);
+          .fireNotification(source, event, flow, action);
     } catch (Exception e) {
       logger.warn("Could not fire notification. Action: " + action, e);
     }

@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
+import org.mule.runtime.core.api.context.notification.EnrichedServerNotification;
 
-public class ExceptionStrategyNotification extends ServerNotification {
+public class ErrorHandlerNotification extends EnrichedServerNotification {
 
   // Fired when processing of exception strategy starts
   public static final int PROCESS_START = EXCEPTION_STRATEGY_MESSAGE_EVENT_ACTION_START_RANGE + 1;
@@ -22,8 +22,7 @@ public class ExceptionStrategyNotification extends ServerNotification {
     registerAction("exception strategy process end", PROCESS_END);
   }
 
-  public ExceptionStrategyNotification(Event event, FlowConstruct flowConstruct, int action) {
-    super(event, action);
-    resourceIdentifier = flowConstruct.getName();
+  public ErrorHandlerNotification(EnrichedNotificationInfo notificationInfo, FlowConstruct flowConstruct, int action) {
+    super(notificationInfo, action, flowConstruct);
   }
 }

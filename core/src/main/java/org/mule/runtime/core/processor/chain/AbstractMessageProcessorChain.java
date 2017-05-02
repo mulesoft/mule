@@ -57,7 +57,6 @@ import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -276,7 +275,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
       if (processor instanceof AnnotatedObject
           && ((AnnotatedObject) processor).getLocation() != null) {
         serverNotificationManager
-            .fireNotification(new MessageProcessorNotification(flowConstruct, event, processor, exceptionThrown, action));
+            .fireNotification(MessageProcessorNotification.createFrom(event, flowConstruct, processor, exceptionThrown, action));
       }
     }
   }

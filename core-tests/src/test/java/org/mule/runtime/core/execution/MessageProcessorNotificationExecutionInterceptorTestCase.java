@@ -106,10 +106,10 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
     MessageProcessorNotification afterMessageProcessorNotification = (MessageProcessorNotification) serverNotifications.get(1);
     assertThat(beforeMessageProcessorNotification.getAction(), is(MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE));
     assertThat(beforeMessageProcessorNotification.getProcessor(), is(mockMessageProcessor));
-    assertThat(beforeMessageProcessorNotification.getExceptionThrown(), nullValue());
+    assertThat(beforeMessageProcessorNotification.getException(), nullValue());
     assertThat(afterMessageProcessorNotification.getAction(), is(MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE));
     assertThat(afterMessageProcessorNotification.getProcessor(), is(mockMessageProcessor));
-    assertThat(afterMessageProcessorNotification.getExceptionThrown(), nullValue());
+    assertThat(afterMessageProcessorNotification.getException(), nullValue());
   }
 
   @Test
@@ -175,10 +175,10 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
     MessageProcessorNotification afterMessageProcessorNotification = (MessageProcessorNotification) serverNotifications.get(1);
     assertThat(beforeMessageProcessorNotification.getAction(), is(MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE));
     assertThat(beforeMessageProcessorNotification.getProcessor(), is(mockMessageProcessor));
-    assertThat(beforeMessageProcessorNotification.getExceptionThrown(), nullValue());
+    assertThat(beforeMessageProcessorNotification.getException(), nullValue());
     assertThat(afterMessageProcessorNotification.getAction(), is(MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE));
     assertThat(afterMessageProcessorNotification.getProcessor(), is(mockMessageProcessor));
-    assertThat(afterMessageProcessorNotification.getExceptionThrown(), is(mockMessagingException));
+    assertThat(afterMessageProcessorNotification.getException(), is(mockMessagingException));
   }
 
   @Test

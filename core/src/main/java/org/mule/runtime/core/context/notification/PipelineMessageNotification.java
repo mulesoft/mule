@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
+import org.mule.runtime.core.api.context.notification.EnrichedServerNotification;
 import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.exception.MessagingException;
 
 /**
  * <code>PipelineMessageNotification</code> is fired at key steps in the processing of {@link Pipeline}
  */
-public class PipelineMessageNotification extends ServerNotification implements SynchronousServerEvent {
+public class PipelineMessageNotification extends EnrichedServerNotification implements SynchronousServerEvent {
 
   private static final long serialVersionUID = 6065691696506216248L;
 
@@ -32,19 +32,12 @@ public class PipelineMessageNotification extends ServerNotification implements S
     registerAction("pipeline process complete", PROCESS_COMPLETE);
   }
 
-  protected MessagingException exception;
-
-  public PipelineMessageNotification(Pipeline pipeline, Event event, int action) {
-    super(event, action, pipeline.getName());
-  }
-
-  public PipelineMessageNotification(Pipeline pipeline, Event event, int action, MessagingException exception) {
-    this(pipeline, event, action);
-    this.exception = exception;
+  public PipelineMessageNotification(EnrichedNotificationInfo notificationInfo, Pipeline pipeline, int action) {
+    super(notificationInfo, action, pipeline);
   }
 
   public MessagingException getException() {
-    return exception;
+    return (MessagingException) super.getException();
   }
 
 }

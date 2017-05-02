@@ -7,30 +7,25 @@
 package org.mule.runtime.core.context.notification;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-import org.mule.runtime.api.component.location.ComponentLocation;
+
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
+import org.mule.runtime.core.api.context.notification.EnrichedServerNotification;
 import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
-public class MessageProcessorNotification extends ServerNotification implements SynchronousServerEvent {
+public class MessageProcessorNotification extends EnrichedServerNotification implements SynchronousServerEvent {
 
   private static final long serialVersionUID = 1L;
 
   public static final int MESSAGE_PROCESSOR_PRE_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 1;
   public static final int MESSAGE_PROCESSOR_POST_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 2;
-
-  private final transient Processor processor;
-  private final transient FlowConstruct flowConstruct;
-  private final DefaultComponentLocation componentLocation;
 
   static {
     registerAction("message processor pre invoke", MESSAGE_PROCESSOR_PRE_INVOKE);
@@ -38,28 +33,27 @@ public class MessageProcessorNotification extends ServerNotification implements 
   }
 
   private static ThreadLocal<String> lastRootMessageId = new ThreadLocal<>();
-  private MessagingException exceptionThrown;
+  private EventContext eventContext;
 
-
-  public MessageProcessorNotification(FlowConstruct flowConstruct, Event event, Processor processor,
-                                      MessagingException exceptionThrown, int action) {
-    super(produceEvent(event, flowConstruct), action, flowConstruct.getName());
-    this.exceptionThrown = exceptionThrown;
-    this.processor = processor;
-    this.componentLocation = ((DefaultComponentLocation) ((AnnotatedObject) processor).getAnnotation(LOCATION_KEY));
-    this.flowConstruct = flowConstruct;
+  public MessageProcessorNotification(EnrichedNotificationInfo notificationInfo, FlowConstruct flowConstruct,
+                                      EventContext eventContext, int action) {
+    super(notificationInfo, action, flowConstruct);
+    this.eventContext = eventContext;
   }
 
-  @Override
-  public Event getSource() {
-    if (source instanceof String) {
-      return null;
-    }
-    return (Event) super.getSource();
+  public static MessageProcessorNotification createFrom(Event event, FlowConstruct flowConstruct, Processor processor,
+                                                        MessagingException exceptionThrown, int action) {
+    EnrichedNotificationInfo notificationInfo =
+        EnrichedNotificationInfo.createInfo(produceEvent(event, flowConstruct), exceptionThrown, processor);
+    return new MessageProcessorNotification(notificationInfo, flowConstruct, event.getContext(), action);
   }
 
   public Processor getProcessor() {
-    return processor;
+    return (Processor) getComponent();
+  }
+
+  public EventContext getEventContext() {
+    return eventContext;
   }
 
   /**
@@ -80,21 +74,13 @@ public class MessageProcessorNotification extends ServerNotification implements 
     }
   }
 
-  public MessagingException getExceptionThrown() {
-    return exceptionThrown;
-  }
-
-  public ComponentLocation getComponentLocation() {
-    return componentLocation;
-  }
-
-  public FlowConstruct getFlowConstruct() {
-    return flowConstruct;
+  public MessagingException getException() {
+    return (MessagingException) super.getException();
   }
 
   @Override
   public String toString() {
-    return EVENT_NAME + "{" + "action=" + getActionName(action) + ", processor=" + componentLocation.getLocation()
+    return EVENT_NAME + "{" + "action=" + getActionName(action) + ", processor=" + getComponent().getLocation().getLocation()
         + ", resourceId="
         + resourceIdentifier + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
   }

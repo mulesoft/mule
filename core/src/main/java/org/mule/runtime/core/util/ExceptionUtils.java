@@ -10,6 +10,7 @@ import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 
@@ -22,6 +23,7 @@ import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.ErrorMapping;
@@ -214,9 +216,11 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
 
   public static MessagingException putContext(MessagingException messagingException, Processor failingMessageProcessor,
                                               Event event, FlowConstruct flowConstruct, MuleContext muleContext) {
+    EnrichedNotificationInfo notificationInfo =
+        createInfo(event, messagingException, null);
     for (ExceptionContextProvider exceptionContextProvider : muleContext.getExceptionContextProviders()) {
       for (Map.Entry<String, Object> contextInfoEntry : exceptionContextProvider
-          .getContextInfo(event, failingMessageProcessor, flowConstruct).entrySet()) {
+          .getContextInfo(notificationInfo, failingMessageProcessor, flowConstruct).entrySet()) {
         if (!messagingException.getInfo().containsKey(contextInfoEntry.getKey())) {
           messagingException.getInfo().put(contextInfoEntry.getKey(), contextInfoEntry.getValue());
         }

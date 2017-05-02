@@ -32,7 +32,7 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
 
   @Override
   public void handleException(Exception ex, RollbackSourceCallback rollbackMethod) {
-    fireNotification(ex);
+    fireNotification(ex, getCurrentEvent());
 
     doLogException(ex);
 
