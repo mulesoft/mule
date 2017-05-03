@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.core.transaction;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.transaction.constraints.ConstraintFilter;
 import org.mule.runtime.core.util.ClassUtils;
 
 import org.slf4j.Logger;
@@ -41,8 +40,6 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
   private TransactionFactory factory;
 
   private byte action = ACTION_DEFAULT;
-
-  private ConstraintFilter constraint = null;
 
   private Integer timeout;
 
@@ -168,22 +165,6 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
     return factory != null;
   }
 
-  public ConstraintFilter getConstraint() {
-    if (constraint == null) {
-      return null;
-    }
-    try {
-      return (ConstraintFilter) constraint.clone();
-    } catch (CloneNotSupportedException e) {
-      logger.error("Failed to clone ConstraintFilter: " + e.getMessage(), e);
-      return constraint;
-    }
-  }
-
-  public void setConstraint(ConstraintFilter constraint) {
-    this.constraint = constraint;
-  }
-
   public int getTimeout() {
     return timeout == null ? 0 : timeout;
   }
@@ -200,7 +181,7 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
   }
 
   public int hashCode() {
-    return ClassUtils.hash(new Object[] {factory, action, constraint, timeout == null ? 0 : timeout});
+    return ClassUtils.hash(new Object[] {factory, action, timeout == null ? 0 : timeout});
   }
 
   public boolean equals(Object obj) {
@@ -211,8 +192,7 @@ public class MuleTransactionConfig implements TransactionConfig, MuleContextAwar
 
     final MuleTransactionConfig other = (MuleTransactionConfig) obj;
     return ClassUtils.equal(factory, other.factory) && ClassUtils.equal(action, other.action)
-        && ClassUtils.equal(constraint, other.constraint) && ClassUtils.equal(timeout, other.timeout);
-
+        && ClassUtils.equal(timeout, other.timeout);
   }
 
 }
