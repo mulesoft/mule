@@ -140,6 +140,7 @@
         <antVersion>1.7.0</antVersion>
         <assertJVersion>3.5.2</assertJVersion>
         <asmVersion>3.3.1</asmVersion>
+        <asmCommonsVersion>3.1</asmCommonsVersion>
         <aspectjVersion>1.8.5</aspectjVersion>
         <asyncHttpClientVersion>1.9.39</asyncHttpClientVersion>
         <apacheHttpClientVersion>4.5.2</apacheHttpClientVersion>
@@ -1170,6 +1171,11 @@
                 <groupId>asm</groupId>
                 <artifactId>asm</artifactId>
                 <version>${asmVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>asm</groupId>
+                <artifactId>asm-commons</artifactId>
+                <version>${asmCommonsVersion}</version>
             </dependency>
 
             <dependency>
