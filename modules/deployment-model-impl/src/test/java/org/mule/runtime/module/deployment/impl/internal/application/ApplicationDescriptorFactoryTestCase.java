@@ -91,11 +91,6 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
                                                                         .getAbsolutePath());
 
   @Rule
-  public SystemProperty remoteMavenRepository =
-      new SystemProperty("muleRuntimeConfig.maven.repositories.mulesoftPublic.url",
-                         "https://repository.mulesoft.org/nexus/content/repositories/public/");
-
-  @Rule
   public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
   private ArtifactPluginRepository applicationPluginRepository;
 
