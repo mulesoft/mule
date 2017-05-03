@@ -68,7 +68,7 @@ public class HttpServerConfiguration {
   }
 
   /**
-   * Builder for {@link HttpServerConfiguration}s. At the very least, a host, a port and a name.
+   * Builder for {@link HttpServerConfiguration}s. At the very least, a host, a port and a name must be provided.
    */
   public static class Builder {
 
