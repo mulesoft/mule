@@ -7,6 +7,7 @@
 package org.mule.test.oauth.internal;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -19,6 +20,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -26,6 +28,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.service.http.api.HttpConstants.Method.GET;
 import static org.mule.services.oauth.internal.OAuthConstants.CODE_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.STATE_PARAMETER;
 import static org.mule.services.oauth.internal.state.StateEncoder.RESOURCE_OWNER_PARAM_NAME_ASSIGN;
@@ -176,6 +179,7 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
 
     Object minimalDancer = startDancer(builder);
     verify(httpServer, never()).start();
+    verify(httpServer).addRequestHandler(eq(singleton(GET.name())), eq("/localCallback"), any());
 
     stopIfNeeded(minimalDancer);
     verify(httpServer, never()).stop();

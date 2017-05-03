@@ -140,12 +140,12 @@ public class DefaultOAuthAuthorizationCodeDancerBuilder extends AbstractOAuthDan
 
       @Override
       public RequestHandlerManager addRequestHandler(String path, RequestHandler requestHandler) {
-        return server.addRequestHandler(localCallbackConfigPath, requestHandler);
+        return server.addRequestHandler(path, requestHandler);
       }
 
       @Override
       public RequestHandlerManager addRequestHandler(Collection<String> methods, String path, RequestHandler requestHandler) {
-        return server.addRequestHandler(methods, localCallbackConfigPath, requestHandler);
+        return server.addRequestHandler(methods, path, requestHandler);
       }
     };
 

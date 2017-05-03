@@ -20,7 +20,7 @@
                 <oauth:authorization-code-grant-type
                         clientId="${client.id}"
                         clientSecret="${client.secret}"
-                        localCallbackConfig-ref="Listener_Config"
+                        localCallbackConfig="Listener_Config"
                         localCallbackConfigPath="${local.callback.path}"
                         externalCallbackUrl="${local.callback.url}"
                         tokenManager="tokenManagerConfig"
