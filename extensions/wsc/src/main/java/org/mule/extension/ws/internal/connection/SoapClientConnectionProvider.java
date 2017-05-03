@@ -106,13 +106,7 @@ public class SoapClientConnectionProvider implements PoolingConnectionProvider<S
    */
   @Override
   public SoapClient connect() throws ConnectionException {
-    SoapClient soapClient = soapService.getClientFactory().create(getConfiguration());
-    //try {
-    //  soapClient.initialise();
-    //} catch (Exception e) {
-    //  throw new ConnectionException("Could not start the soap service [" + soapClient.toString() + "]", e);
-    //}
-    return soapClient;
+    return soapService.getClientFactory().create(getConfiguration());
   }
 
   /**
