@@ -31,7 +31,7 @@ public class SoapClientFactoryTestCase extends AbstractSoapServiceTestCase {
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private SoapClientFactory factory = new SoapServiceImplementation(null).getClientFactory();
+  private SoapClientFactory factory = new SoapServiceImplementation().getClientFactory();
 
   @Test
   @Description("Tries to instantiate a connection with an RPC WSDL and fails.")

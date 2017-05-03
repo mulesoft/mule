@@ -45,6 +45,9 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
+import reactor.core.Exceptions;
+import reactor.core.publisher.Mono;
+
 
 /**
  * This is the default implementation for a {@link ExtensionsClient}, it uses the {@link ExtensionManager} in the
@@ -78,10 +81,11 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
                                                              String operation,
                                                              OperationParameters parameters) {
     OperationMessageProcessor processor = createProcessor(extension, operation, parameters);
-    return from(processor.apply(just(getInitialiserEvent(muleContext))))
-        .map(event -> Result.<T, A>builder(event.getMessage()).build())
-        .doAfterTerminate((r, t) -> disposeProcessor(processor))
-        .toFuture();
+    Mono<Result<T, A>> resultMono = from(processor.apply(just(getInitialiserEvent(muleContext))))
+      .map(event -> Result.<T, A>builder(event.getMessage()).build())
+      .mapError(Exceptions::unwrap)
+      .doAfterTerminate((r, t) -> disposeProcessor(processor));
+    return resultMono.toFuture();
   }
 
   /**

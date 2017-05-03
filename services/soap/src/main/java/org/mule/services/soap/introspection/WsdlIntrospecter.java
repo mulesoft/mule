@@ -17,8 +17,6 @@ import org.mule.services.soap.api.exception.InvalidWsdlException;
 import org.mule.services.soap.metadata.TypeIntrospecterDelegate;
 
 import com.ibm.wsdl.extensions.schema.SchemaSerializer;
-import com.ibm.wsdl.extensions.soap.SOAPOperationImpl;
-import com.ibm.wsdl.extensions.soap12.SOAP12OperationImpl;
 
 import java.util.List;
 import java.util.Map;
@@ -43,9 +41,11 @@ import javax.wsdl.extensions.mime.MIMEPart;
 import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.wsdl.extensions.soap.SOAPBody;
+import javax.wsdl.extensions.soap.SOAPOperation;
 import javax.wsdl.extensions.soap12.SOAP12Address;
 import javax.wsdl.extensions.soap12.SOAP12Binding;
 import javax.wsdl.extensions.soap12.SOAP12Body;
+import javax.wsdl.extensions.soap12.SOAP12Operation;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
@@ -213,8 +213,8 @@ public class WsdlIntrospecter {
       // if not defined in the binding, one operation is taken to see if the style is defined there.
       BindingOperation bop = (BindingOperation) bindingOperations.get(0);
       bindingStyle = bop.getExtensibilityElements().stream()
-          .filter(e -> e instanceof SOAP12OperationImpl || e instanceof SOAPOperationImpl)
-          .map(e -> e instanceof SOAPOperationImpl ? ((SOAPOperationImpl) e).getStyle() : ((SOAP12OperationImpl) e).getStyle())
+          .filter(e -> e instanceof SOAP12Operation || e instanceof SOAPOperation)
+          .map(e -> e instanceof SOAPOperation ? ((SOAPOperation) e).getStyle() : ((SOAP12Operation) e).getStyle())
           .filter(Objects::nonNull)
           .findAny();
     }

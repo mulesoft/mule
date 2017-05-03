@@ -8,7 +8,6 @@ package org.mule.services.soap;
 
 import static java.util.Collections.emptyList;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.soap.security.SecurityStrategy;
 import org.mule.services.http.impl.service.HttpServiceImplementation;
 import org.mule.services.soap.api.SoapVersion;
@@ -18,6 +17,7 @@ import org.mule.services.soap.api.client.SoapClientConfigurationBuilder;
 import org.mule.services.soap.api.client.metadata.SoapMetadataResolver;
 import org.mule.services.soap.api.message.SoapRequest;
 import org.mule.services.soap.api.message.SoapResponse;
+import org.mule.services.soap.api.message.dispatcher.DefaultHttpMessageDispatcher;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 import java.util.List;
@@ -36,11 +36,12 @@ public class TestSoapClient extends ExternalResource implements SoapClient {
                         List<SecurityStrategy> strategies,
                         SoapVersion version) {
     HttpServiceImplementation httpService = new HttpServiceImplementation(new SimpleUnitTestSupportSchedulerService());
-    SoapServiceImplementation soapService = new SoapServiceImplementation(httpService);
+    SoapServiceImplementation soapService = new SoapServiceImplementation();
     try {
       SoapClientConfigurationBuilder config = SoapClientConfiguration.builder()
           .withWsdlLocation(wsdlLocation)
           .withAddress(address)
+          .withDispatcher(new DefaultHttpMessageDispatcher(httpService))
           .withService(service)
           .withPort(port)
           .withVersion(version);
@@ -61,7 +62,7 @@ public class TestSoapClient extends ExternalResource implements SoapClient {
     this(wsdlLocation, address, "TestService", "TestPort", false, emptyList(), version);
   }
 
-  public TestSoapClient(String location,
+  TestSoapClient(String location,
                         String address,
                         boolean mtom,
                         List<SecurityStrategy> securityStrategies,
@@ -80,8 +81,12 @@ public class TestSoapClient extends ExternalResource implements SoapClient {
   }
 
   @Override
-  public void stop() throws MuleException {}
+  public void start() {
+
+  }
 
   @Override
-  public void start() throws MuleException {}
+  public void stop() {
+
+  }
 }

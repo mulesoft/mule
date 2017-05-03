@@ -7,6 +7,8 @@
 package org.mule.extension.ws.internal;
 
 import org.mule.extension.ws.internal.connection.SoapClientConnectionProvider;
+import org.mule.extension.ws.api.message.CustomHttpTransportConfiguration;
+import org.mule.extension.ws.api.message.CustomTransportConfiguration;
 import org.mule.extension.ws.internal.security.SecurityStrategyAdapter;
 import org.mule.extension.ws.internal.security.WssDecryptSecurityStrategy;
 import org.mule.extension.ws.internal.security.WssEncryptSecurityStrategy;
@@ -32,6 +34,7 @@ import org.mule.services.soap.api.exception.error.SoapErrors;
 @ErrorTypes(SoapErrors.class)
 @Operations(ConsumeOperation.class)
 @ConnectionProviders(SoapClientConnectionProvider.class)
+@SubTypeMapping(baseType = CustomTransportConfiguration.class, subTypes = CustomHttpTransportConfiguration.class)
 @SubTypeMapping(baseType = SecurityStrategyAdapter.class,
     subTypes = {WssDecryptSecurityStrategy.class, WssEncryptSecurityStrategy.class, WssSignSecurityStrategy.class,
         WssUsernameTokenSecurityStrategy.class, WssTimestampSecurityStrategy.class, WssVerifySignatureSecurityStrategy.class})

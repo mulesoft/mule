@@ -7,15 +7,15 @@
 package org.mule.services.soap.client;
 
 import static java.lang.String.format;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
+import static org.mule.services.soap.transport.SoapServiceConduitInitiator.SOAP_SERVICE_KNOWN_PROTOCOLS;
 import org.mule.metadata.xml.XmlTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
-import org.mule.service.http.api.HttpService;
 import org.mule.services.soap.api.client.SoapClient;
 import org.mule.services.soap.api.client.SoapClientConfiguration;
 import org.mule.services.soap.api.client.SoapClientFactory;
 import org.mule.services.soap.introspection.WsdlIntrospecter;
-import org.mule.services.soap.transport.DefaultHttpMessageDispatcher;
 
 import org.apache.cxf.endpoint.Client;
 
@@ -25,12 +25,6 @@ import org.apache.cxf.endpoint.Client;
  * @since 4.0
  */
 public class SoapCxfClientFactory implements SoapClientFactory {
-
-  private final HttpService httpService;
-
-  public SoapCxfClientFactory(HttpService httpService) {
-    this.httpService = httpService;
-  }
 
   /**
    * Creates a new instance of a {@link SoapCxfClient} for the given address ans soap version.
@@ -42,20 +36,18 @@ public class SoapCxfClientFactory implements SoapClientFactory {
     WsdlIntrospecter introspecter = getIntrospecter(config);
     XmlTypeLoader xmlTypeLoader = new XmlTypeLoader(introspecter.getSchemas());
     Client client = CxfClientProvider.getClient(config);
-    return new SoapCxfClient(client,
-                             introspecter,
-                             xmlTypeLoader,
-                             getMessageDispatcher(config, introspecter),
-                             config.getVersion(),
-                             config.isMtomEnabled());
+    return new SoapCxfClient(client, introspecter, xmlTypeLoader, getAddress(config, introspecter),
+                             config.getDispatcher(), config.getVersion(), config.isMtomEnabled());
   }
 
-  private MessageDispatcher getMessageDispatcher(SoapClientConfiguration config, WsdlIntrospecter introspecter)
-      throws ConnectionException {
-    if (config.getDispatcher() != null) {
-      return config.getDispatcher();
+  private String getAddress(SoapClientConfiguration config, WsdlIntrospecter introspecter) throws ConnectionException {
+    String address = config.getAddress() != null ? config.getAddress() : findAddress(introspecter);
+    String protocol = address.substring(0, address.indexOf("://"));
+    if (stream(SOAP_SERVICE_KNOWN_PROTOCOLS).noneMatch(p -> p.startsWith(protocol))) {
+      throw new IllegalArgumentException(format("cannot create a dispatcher for address [%s], known protocols are [%s]",
+                                                address, stream(SOAP_SERVICE_KNOWN_PROTOCOLS).collect(joining(", "))));
     }
-    return createDispatcher(config.getAddress() != null ? config.getAddress() : findAddress(introspecter));
+    return address;
   }
 
   private WsdlIntrospecter getIntrospecter(SoapClientConfiguration config) throws ConnectionException {
@@ -66,16 +58,6 @@ public class SoapCxfClientFactory implements SoapClientFactory {
       throw new ConnectionException(format("The provided WSDL [%s] is RPC style, RPC WSDLs are not supported", wsdlLocation));
     }
     return introspecter;
-  }
-
-
-  // TODO: MULE-10783: use custom transport configuration
-  private MessageDispatcher createDispatcher(String address) throws ConnectionException {
-    String protocol = address.substring(0, address.indexOf("://"));
-    if (protocol.startsWith("http")) {
-      return DefaultHttpMessageDispatcher.create(address, httpService);
-    }
-    throw new IllegalArgumentException(format("cannot create a dispatcher for protocol [%s]", protocol));
   }
 
   private String findAddress(WsdlIntrospecter wsdlIntrospecter) throws ConnectionException {
