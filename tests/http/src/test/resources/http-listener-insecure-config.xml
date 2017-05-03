@@ -1,57 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <tls:context name="globalTlsContext" >
         <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
         <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
     </tls:context>
 
-    <httpn:listener-config name="insecureConfig">
-        <httpn:listener-connection protocol="HTTPS" host="localhost" port="${port1}">
+    <http:listener-config name="insecureConfig">
+        <http:listener-connection protocol="HTTPS" host="localhost" port="${port1}">
             <tls:context>
                 <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit" insecure="true"/>
                 <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
             </tls:context>
-        </httpn:listener-connection>
-    </httpn:listener-config>
+        </http:listener-connection>
+    </http:listener-config>
 
-    <httpn:listener-config name="secureConfig">
-        <httpn:listener-connection protocol="HTTPS" host="localhost" port="${port2}">
+    <http:listener-config name="secureConfig">
+        <http:listener-connection protocol="HTTPS" host="localhost" port="${port2}">
             <tls:context>
                 <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit" />
                 <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
             </tls:context>
-        </httpn:listener-connection>
-    </httpn:listener-config>
+        </http:listener-connection>
+    </http:listener-config>
 
-    <httpn:request-config name="clientGlobalConfig">
-        <httpn:request-connection protocol="HTTPS" host="localhost" port="#[port]" tlsContext="globalTlsContext"/>
-    </httpn:request-config>
+    <http:request-config name="clientGlobalConfig">
+        <http:request-connection protocol="HTTPS" host="localhost" port="#[port]" tlsContext="globalTlsContext"/>
+    </http:request-config>
 
     <flow name="testInsecureServer">
-        <httpn:listener config-ref="insecureConfig" path="/"/>
+        <http:listener config-ref="insecureConfig" path="/"/>
         <echo-component/>
     </flow>
 
     <flow name="testSecureServer">
-        <httpn:listener config-ref="secureConfig" path="/"/>
+        <http:listener config-ref="secureConfig" path="/"/>
         <echo-component/>
     </flow>
 
     <flow name="testRequestToInsecure">
-        <httpn:request config-ref="clientGlobalConfig" path="/" method="POST"/>
+        <http:request config-ref="clientGlobalConfig" path="/" method="POST"/>
         <object-to-string-transformer />
     </flow>
 
     <flow name="testRequestToSecure">
-        <httpn:request config-ref="clientGlobalConfig" path="/" method="POST"/>
+        <http:request config-ref="clientGlobalConfig" path="/" method="POST"/>
         <object-to-string-transformer />
     </flow>
 

@@ -1,71 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:request-config name="noFollowRedirects">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-    </httpn:request-config>
+    <http:request-config name="noFollowRedirects">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
 
-    <httpn:request-config name="withFollowRedirects" followRedirects="false">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-    </httpn:request-config>
+    <http:request-config name="withFollowRedirects" followRedirects="false">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
 
-    <httpn:request-config name="withFollowRedirectsExpression" followRedirects="#[mel:redirect]">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-    </httpn:request-config>
+    <http:request-config name="withFollowRedirectsExpression" followRedirects="#[mel:redirect]">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
 
-    <httpn:request-config name="httpsConfig">
-        <httpn:request-connection protocol="HTTPS" host="localhost" port="${httpsPort}">
+    <http:request-config name="httpsConfig">
+        <http:request-connection protocol="HTTPS" host="localhost" port="${httpsPort}">
             <tls:context>
                 <tls:trust-store path="tls/trustStore" password="mulepassword"/>
                 <tls:key-store path="tls/clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
             </tls:context>
-        </httpn:request-connection>
-    </httpn:request-config>
+        </http:request-connection>
+    </http:request-config>
 
     <flow name="default">
-        <httpn:request config-ref="noFollowRedirects" path="testPath"/>
+        <http:request config-ref="noFollowRedirects" path="testPath"/>
         <object-to-string-transformer />
     </flow>
 
     <flow name="followRedirects">
-        <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="true"/>
+        <http:request config-ref="noFollowRedirects" path="testPath" followRedirects="true"/>
         <object-to-string-transformer />
     </flow>
 
     <flow name="dontFollowRedirects">
-        <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="false"/>
+        <http:request config-ref="noFollowRedirects" path="testPath" followRedirects="false"/>
         <object-to-string-transformer />
     </flow>
 
     <flow name="followRedirectsExpression">
-        <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="#[mel:redirect]"/>
+        <http:request config-ref="noFollowRedirects" path="testPath" followRedirects="#[mel:redirect]"/>
         <object-to-string-transformer />
     </flow>
 
     <flow name="fromConfig">
-        <httpn:request config-ref="withFollowRedirects" path="testPath"/>
+        <http:request config-ref="withFollowRedirects" path="testPath"/>
         <object-to-string-transformer />
     </flow>
 
     <flow name="overrideConfig">
-        <httpn:request config-ref="withFollowRedirects" path="testPath" followRedirects="true"/>
+        <http:request config-ref="withFollowRedirects" path="testPath" followRedirects="true"/>
         <object-to-string-transformer />
     </flow>
 
     <flow name="fromConfigExpression">
-        <httpn:request config-ref="withFollowRedirectsExpression" path="testPath"/>
+        <http:request config-ref="withFollowRedirectsExpression" path="testPath"/>
         <object-to-string-transformer />
     </flow>
 
     <flow name="followRedirectsHttps">
-        <httpn:request config-ref="httpsConfig" path="testPath" followRedirects="true"/>
+        <http:request config-ref="httpsConfig" path="testPath" followRedirects="true"/>
         <object-to-string-transformer />
     </flow>
 </mule>

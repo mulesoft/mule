@@ -2,18 +2,18 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-        http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:listener-config name="listenerConfig">
-		<httpn:listener-connection host="localhost" port="${port1}"/>
-    </httpn:listener-config>
+    <http:listener-config name="listenerConfig">
+		<http:listener-connection host="localhost" port="${port1}"/>
+    </http:listener-config>
 
     <flow name="getLaszloW10">
-        <httpn:listener path="*" config-ref="listenerConfig"/>
+        <http:listener path="*" config-ref="listenerConfig"/>
 
         <echo-component />
 

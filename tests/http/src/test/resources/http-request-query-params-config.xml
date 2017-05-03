@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:request-config name="config">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-    </httpn:request-config>
+    <http:request-config name="config">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
 
     <flow name="queryParamList">
-        <httpn:request config-ref="config" path="testPath" method="POST">
-            <httpn:query-params>
+        <http:request config-ref="config" path="testPath" method="POST">
+            <http:query-params>
                 #[mel:['testName1' : 'testValue1', paramName : paramValue]]
-            </httpn:query-params>
-        </httpn:request>
+            </http:query-params>
+        </http:request>
     </flow>
 
     <flow name="queryParamMap">
-        <httpn:request config-ref="config" path="testPath">
-            <httpn:query-params>#[params]</httpn:query-params>
-        </httpn:request>
+        <http:request config-ref="config" path="testPath">
+            <http:query-params>#[params]</http:query-params>
+        </http:request>
     </flow>
 
     <flow name="multipleQueryParam">
-        <httpn:request config-ref="config" path="testPath">
-            <httpn:query-params>#[params ++ {'testName1':'testValue1'}]</httpn:query-params>
-        </httpn:request>
+        <http:request config-ref="config" path="testPath">
+            <http:query-params>#[params ++ {'testName1':'testValue1'}]</http:query-params>
+        </http:request>
     </flow>
 
     <flow name="queryParamNulls">
-        <httpn:request config-ref="config" path="testPath">
-            <httpn:query-params>#[mel:['testName1' : null, 'testName2' : null]]</httpn:query-params>
-        </httpn:request>
+        <http:request config-ref="config" path="testPath">
+            <http:query-params>#[mel:['testName1' : null, 'testName2' : null]]</http:query-params>
+        </http:request>
     </flow>
 </mule>

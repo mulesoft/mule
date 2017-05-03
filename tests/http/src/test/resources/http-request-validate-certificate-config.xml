@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
 
     <!--
@@ -15,27 +15,27 @@
     and the second one should fail.
     -->
 
-    <httpn:request-config name="validCertHttpConfig">
-        <httpn:request-connection protocol="HTTPS" host="localhost" port="${httpsPort}">
+    <http:request-config name="validCertHttpConfig">
+        <http:request-connection protocol="HTTPS" host="localhost" port="${httpsPort}">
             <tls:context>
                 <tls:trust-store path="tls/trustStore" password="mulepassword" />
             </tls:context>
-        </httpn:request-connection>
-    </httpn:request-config>
+        </http:request-connection>
+    </http:request-config>
 
-    <httpn:request-config name="missingCertHttpConfig">
+    <http:request-config name="missingCertHttpConfig">
         <!-- No certificate has been configured to test certificate verification -->
-        <httpn:request-connection protocol="HTTPS" host="localhost" port="${httpsPort}"/>
-    </httpn:request-config>
+        <http:request-connection protocol="HTTPS" host="localhost" port="${httpsPort}"/>
+    </http:request-config>
 
 
     <flow name="validCertFlow">
-        <httpn:request config-ref="validCertHttpConfig" path="requestPath" method="POST"/>
+        <http:request config-ref="validCertHttpConfig" path="requestPath" method="POST"/>
         <object-to-string-transformer />
     </flow>
 
     <flow name="missingCertFlow">
-        <httpn:request config-ref="missingCertHttpConfig" path="requestPath" method="POST"/>
+        <http:request config-ref="missingCertHttpConfig" path="requestPath" method="POST"/>
     </flow>
 
 </mule>

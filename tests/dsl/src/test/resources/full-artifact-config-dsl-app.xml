@@ -2,12 +2,12 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:db="http://www.mulesoft.org/schema/mule/db"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
       xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
 
     <db:query name="selectQuery">
         <db:input-parameters>
@@ -26,38 +26,38 @@
         </db:derby-connection>
     </db:config>
 
-    <httpn:listener-config name="httpListener" basePath="/">
-        <httpn:listener-connection disableValidation="true" host="localhost" port="49019" protocol="HTTPS">
+    <http:listener-config name="httpListener" basePath="/">
+        <http:listener-connection disableValidation="true" host="localhost" port="49019" protocol="HTTPS">
             <tls:context>
                 <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
             </tls:context>
-        </httpn:listener-connection>
-    </httpn:listener-config>
+        </http:listener-connection>
+    </http:listener-config>
 
-    <httpn:request-config name="httpRequester">
-        <httpn:request-connection host="localhost" port="49020">
-            <httpn:authentication>
-                <httpn:basic-authentication username="user" password="pass"/>
-            </httpn:authentication>
-            <httpn:client-socket-properties>
+    <http:request-config name="httpRequester">
+        <http:request-connection host="localhost" port="49020">
+            <http:authentication>
+                <http:basic-authentication username="user" password="pass"/>
+            </http:authentication>
+            <http:client-socket-properties>
                 <sockets:tcp-client-socket-properties connectionTimeout="1000" keepAlive="true"
                                                       receiveBufferSize="1024" sendBufferSize="1024"
                                                       clientTimeout="1000" linger="1000" />
-            </httpn:client-socket-properties>
-        </httpn:request-connection>
-    </httpn:request-config>
+            </http:client-socket-properties>
+        </http:request-connection>
+    </http:request-config>
 
     <flow name="testFlow" initialState="stopped">
-        <httpn:listener config-ref="httpListener" path="testBuilder">
+        <http:listener config-ref="httpListener" path="testBuilder">
             <redelivery-policy maxRedeliveryCount="2" useSecureHash="true"/>
             <reconnect blocking="true" count="1" frequency="0"/>
-            <httpn:response>
-                <httpn:body>#[{'my': 'map'}]</httpn:body>
-                <httpn:headers>
+            <http:response>
+                <http:body>#[{'my': 'map'}]</http:body>
+                <http:headers>
                     #[{{'content-type' : 'text/plain'}}]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
 
         <choice>
             <when expression="#[true]">
@@ -84,7 +84,7 @@
             </db:parameter-types>
         </db:bulk-insert>
 
-        <httpn:request config-ref="httpRequester" path="/nested" method="POST"/>
+        <http:request config-ref="httpRequester" path="/nested" method="POST"/>
 
         <db:insert config-ref="dbConfig">
             <db:sql>INSERT INTO PLANET(POSITION, NAME, DESCRIPTION) VALUES (777, 'Pluto', :description)</db:sql>

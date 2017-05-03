@@ -2,13 +2,13 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+       xmlns:http="http://www.mulesoft.org/schema/mule/http"
        xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
        xmlns:ss="http://www.springframework.org/schema/security"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-current.xsd">
 
@@ -27,19 +27,19 @@
         <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
     </mule-ss:security-manager>
 
-    <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection host="localhost" port="${port1}"/>
-    </httpn:listener-config>
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${port1}"/>
+    </http:listener-config>
 
     <flow name="authenticate">
-        <httpn:listener config-ref="listenerConfig" path="authenticate"/>
-        <httpn:basic-security-filter realm="mule-realm"/>
+        <http:listener config-ref="listenerConfig" path="authenticate"/>
+        <http:basic-security-filter realm="mule-realm"/>
         <component class="org.mule.runtime.core.component.simple.EchoComponent"/>
     </flow>
 
     <flow name="authorize">
-        <httpn:listener config-ref="listenerConfig" path="authorize"/>
-        <httpn:basic-security-filter realm="mule-realm"/>
+        <http:listener config-ref="listenerConfig" path="authorize"/>
+        <http:basic-security-filter realm="mule-realm"/>
         <mule-ss:authorization-filter requiredAuthorities="ROLE_ADMIN"/>
         <component class="org.mule.runtime.core.component.simple.EchoComponent"/>
     </flow>

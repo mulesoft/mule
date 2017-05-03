@@ -8,7 +8,6 @@ package org.mule.test.extension.dsl;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newArtifact;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newFlow;
@@ -84,7 +83,7 @@ public class ArtifactDeclarationSerializerTestCase extends AbstractElementModelT
 
     ArtifactDeclaration artifact = serializer.deserialize(configIs);
 
-    List<String> expectedCustomParams = asList("xmlns", "xmlns:xsi", "xmlns:db", "xmlns:httpn", "xmlns:jms", "xmlns:sockets",
+    List<String> expectedCustomParams = asList("xmlns", "xmlns:xsi", "xmlns:db", "xmlns:http", "xmlns:jms", "xmlns:sockets",
                                                "xmlns:wsc", "xsi:schemaLocation");
     List<ParameterElementDeclaration> customParameters = artifact.getCustomConfigurationParameters();
     expectedCustomParams

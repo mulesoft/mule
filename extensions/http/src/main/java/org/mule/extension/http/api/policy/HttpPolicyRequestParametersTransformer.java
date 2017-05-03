@@ -29,7 +29,7 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
 
   @Override
   public boolean supports(ComponentIdentifier componentIdentifier) {
-    return componentIdentifier.equals(buildFromStringRepresentation("httpn:request"));
+    return componentIdentifier.equals(buildFromStringRepresentation("http:request"));
   }
 
   @Override

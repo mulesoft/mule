@@ -3,31 +3,31 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
     xmlns:test="http://www.mulesoft.org/schema/mule/test"
-    xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <httpn:listener-config name="listenerConfig3">
-        <httpn:listener-connection host="localhost" port="${port3}"/>
-    </httpn:listener-config>
-    <httpn:request-config name="requestConfig3">
-        <httpn:request-connection host="localhost" port="${port3}"/>
-    </httpn:request-config>
-    <httpn:listener-config name="listenerConfig2">
-        <httpn:listener-connection host="localhost" port="${port2}"/>
-    </httpn:listener-config>
-    <httpn:request-config name="requestConfig2">
-        <httpn:request-connection host="localhost" port="${port2}"/>
-    </httpn:request-config>
-    <httpn:listener-config name="listenerConfig1">
-        <httpn:listener-connection host="localhost" port="${port1}"/>
-    </httpn:listener-config>
-    <httpn:request-config name="requestConfig1">
-        <httpn:request-connection host="localhost" port="${port1}"/>
-    </httpn:request-config>
+    <http:listener-config name="listenerConfig3">
+        <http:listener-connection host="localhost" port="${port3}"/>
+    </http:listener-config>
+    <http:request-config name="requestConfig3">
+        <http:request-connection host="localhost" port="${port3}"/>
+    </http:request-config>
+    <http:listener-config name="listenerConfig2">
+        <http:listener-connection host="localhost" port="${port2}"/>
+    </http:listener-config>
+    <http:request-config name="requestConfig2">
+        <http:request-connection host="localhost" port="${port2}"/>
+    </http:request-config>
+    <http:listener-config name="listenerConfig1">
+        <http:listener-connection host="localhost" port="${port1}"/>
+    </http:listener-config>
+    <http:request-config name="requestConfig1">
+        <http:request-connection host="localhost" port="${port1}"/>
+    </http:request-config>
 
     <set-variable name="addP1" variableName="P1" value="P1_VALUE"/>
     <set-variable name="addP2" variableName="P2" value="P2_VALUE"/>
@@ -64,10 +64,10 @@
     <flow name="noPropagationInDifferentFlowHttp">
         <processor ref="addP1" />
         <test:assert expression="#[mel:P1]" />
-        <httpn:request config-ref="requestConfig2" path="/"/>
+        <http:request config-ref="requestConfig2" path="/"/>
     </flow>
     <flow name="noPropagationInDifferentFlowHttp-2">
-        <httpn:listener config-ref="listenerConfig2" path="/" />
+        <http:listener config-ref="listenerConfig2" path="/" />
         <test:assert expression="#[mel:flowVars['P1'] == null]" />
     </flow>
 
@@ -81,11 +81,11 @@
 
     <flow name="HTTPRequestResponseEndpointFlowMidFlow">
         <processor ref="addP1" />
-        <httpn:request path="/" config-ref="requestConfig1" />
+        <http:request path="/" config-ref="requestConfig1" />
         <test:assert expression="#[mel:P1]" />
     </flow>
     <flow name="HTPPEchoFlow">
-        <httpn:listener path="/" config-ref="listenerConfig1" />
+        <http:listener path="/" config-ref="listenerConfig1" />
         <echo-component />
     </flow>
 
@@ -357,13 +357,13 @@
     </flow>
 
     <sub-flow name="TestSubFlow">
-        <httpn:request config-ref="requestConfig3" path="/" >
-            <httpn:success-status-code-validator values="0..599"/>
-        </httpn:request>
+        <http:request config-ref="requestConfig3" path="/" >
+            <http:success-status-code-validator values="0..599"/>
+        </http:request>
     </sub-flow>
 
     <flow name="TestSubFlowServer">
-        <httpn:listener path="/" config-ref="listenerConfig3"/>
+        <http:listener path="/" config-ref="listenerConfig3"/>
         <test:component throwException="true"/>
     </flow>
 

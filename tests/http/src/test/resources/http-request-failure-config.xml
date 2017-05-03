@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:request-config name="simpleConfig">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-    </httpn:request-config>
+    <http:request-config name="simpleConfig">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
 
-    <httpn:request-config name="basicAuthConfig">
-        <httpn:request-connection host="localhost" port="${httpPort}">
-            <httpn:authentication>
-                <httpn:basic-authentication username="mule" password="man"/>
-            </httpn:authentication>
-        </httpn:request-connection>
-    </httpn:request-config>
+    <http:request-config name="basicAuthConfig">
+        <http:request-connection host="localhost" port="${httpPort}">
+            <http:authentication>
+                <http:basic-authentication username="mule" password="man"/>
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
 
-    <httpn:request-config name="httpsConfig" basePath="test">
-        <httpn:request-connection protocol="HTTPS" host="localhost" port="${httpsPort}"/>
-    </httpn:request-config>
+    <http:request-config name="httpsConfig" basePath="test">
+        <http:request-connection protocol="HTTPS" host="localhost" port="${httpsPort}"/>
+    </http:request-config>
 
     <flow name="simple">
-        <httpn:request config-ref="simpleConfig" path="testPath">
-             <httpn:query-params>
+        <http:request config-ref="simpleConfig" path="testPath">
+             <http:query-params>
                 #[mel:['testName1' : 'testValue1']]
-            </httpn:query-params>
-        </httpn:request>
+            </http:query-params>
+        </http:request>
     </flow>
 
     <flow name="basicAuth">
-        <httpn:request config-ref="basicAuthConfig" path="testPath"/>
+        <http:request config-ref="basicAuthConfig" path="testPath"/>
     </flow>
 
     <flow name="secure">
-        <httpn:request config-ref="httpsConfig" path="testPath"/>
+        <http:request config-ref="httpsConfig" path="testPath"/>
     </flow>
 
 </mule>

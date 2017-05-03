@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
 
     <spring:bean name="catchSensingMessageProcessor" class="org.mule.tck.SensingNullMessageProcessor" scope="singleton" />
     <spring:bean name="rollbackSensingMessageProcessor" class="org.mule.tck.SensingNullMessageProcessor" scope="singleton" />
 
-    <httpn:listener-config name="proxyConfig">
-        <httpn:listener-connection host="localhost" port="${proxyPort}"/>
-    </httpn:listener-config>
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-    </httpn:request-config>
+    <http:listener-config name="proxyConfig">
+        <http:listener-connection host="localhost" port="${proxyPort}"/>
+    </http:listener-config>
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
 
     <flow name="noExceptionStrategyFlow">
-        <httpn:listener config-ref="proxyConfig" path="noExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
-        <httpn:request config-ref="requestConfig" method="#[mel:message.attributes.method]" path="#[mel:message.attributes.requestPath]" parseResponse="false"/>
+        <http:listener config-ref="proxyConfig" path="noExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
+        <http:request config-ref="requestConfig" method="#[mel:message.attributes.method]" path="#[mel:message.attributes.requestPath]" parseResponse="false"/>
     </flow>
 
     <flow name="catchExceptionStrategyFlow">
-        <httpn:listener config-ref="proxyConfig" path="catchExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
-        <httpn:request config-ref="requestConfig" method="#[mel:message.attributes.method]]" path="#[mel:message.attributes.requestPath]" parseResponse="false"/>
+        <http:listener config-ref="proxyConfig" path="catchExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
+        <http:request config-ref="requestConfig" method="#[mel:message.attributes.method]]" path="#[mel:message.attributes.requestPath]" parseResponse="false"/>
         <error-handler>
             <on-error-continue>
                 <processor ref="catchSensingMessageProcessor"/>
@@ -37,8 +37,8 @@
     </flow>
 
     <flow name="rollbackExceptionStrategyFlow">
-        <httpn:listener config-ref="proxyConfig" path="rollbackExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
-        <httpn:request config-ref="requestConfig" method="#[mel:message.attributes.method]]" path="#[mel:message.attributes.requestPath]" parseResponse="false"/>
+        <http:listener config-ref="proxyConfig" path="rollbackExceptionStrategy" responseStreamingMode="AUTO" parseRequest="false" />
+        <http:request config-ref="requestConfig" method="#[mel:message.attributes.method]]" path="#[mel:message.attributes.requestPath]" parseResponse="false"/>
         <error-handler>
             <on-error-propagate>
                 <processor ref="rollbackSensingMessageProcessor"/>

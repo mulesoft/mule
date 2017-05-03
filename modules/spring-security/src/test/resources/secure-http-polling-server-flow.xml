@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
     xmlns:ss="http://www.springframework.org/schema/security"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-current.xsd">
@@ -29,13 +29,13 @@
             name="memory-dao" delegate-ref="authenticationManager" />
     </mule-ss:security-manager>
 
-    <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection host="localhost" port="${port1}"/>
-    </httpn:listener-config>
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${port1}"/>
+    </http:listener-config>
 
     <flow name="SecureUMO">
-        <httpn:listener path="*" config-ref="listenerConfig"/>
-        <httpn:basic-security-filter realm="mule-realm" />
+        <http:listener path="*" config-ref="listenerConfig"/>
+        <http:basic-security-filter realm="mule-realm" />
         <test:component>
             <test:return-data>foo</test:return-data>
         </test:component>

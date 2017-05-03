@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:listener-config name="maxActiveThreadsThreadingProfileConfig">
-        <httpn:listener-connection host="localhost" port="${port1}"/>
-        <httpn:worker-threading-profile maxThreadsActive="${max.threads.active}" poolExhaustedAction="ABORT" />
-    </httpn:listener-config>
+    <http:listener-config name="maxActiveThreadsThreadingProfileConfig">
+        <http:listener-connection host="localhost" port="${port1}"/>
+        <http:worker-threading-profile maxThreadsActive="${max.threads.active}" poolExhaustedAction="ABORT" />
+    </http:listener-config>
 
-    <httpn:listener-config name="defaultMaxActiveThreadsThreadingProfileConfig" host="localhost" port="${port2}">
-        <httpn:listener-connection host="localhost" port="${port2}"/>
-        <httpn:worker-threading-profile poolExhaustedAction="ABORT" />
-    </httpn:listener-config>
+    <http:listener-config name="defaultMaxActiveThreadsThreadingProfileConfig" host="localhost" port="${port2}">
+        <http:listener-connection host="localhost" port="${port2}"/>
+        <http:worker-threading-profile poolExhaustedAction="ABORT" />
+    </http:listener-config>
 
-    <httpn:listener-config name="listenerConfig" host="localhost" port="${port3}">
-        <httpn:listener-connection host="localhost" port="${port3}"/>
-    </httpn:listener-config>
+    <http:listener-config name="listenerConfig" host="localhost" port="${port3}">
+        <http:listener-connection host="localhost" port="${port3}"/>
+    </http:listener-config>
 
     <flow name="maxActiveThreadsConfigFlow">
-        <httpn:listener path="/*" config-ref="maxActiveThreadsThreadingProfileConfig" />
+        <http:listener path="/*" config-ref="maxActiveThreadsThreadingProfileConfig" />
         <test:component />
     </flow>
 
     <flow name="defaultMaxActiveThreadsConfigFlow">
-        <httpn:listener path="/*" config-ref="defaultMaxActiveThreadsThreadingProfileConfig" />
+        <http:listener path="/*" config-ref="defaultMaxActiveThreadsThreadingProfileConfig" />
         <test:component />
     </flow>
 
 
     <flow name="anotherConfigFlow">
-        <httpn:listener path="/*" config-ref="listenerConfig" />
+        <http:listener path="/*" config-ref="listenerConfig" />
         <echo-component/>
     </flow>
 

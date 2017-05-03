@@ -2,21 +2,21 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:oauth="http://www.mulesoft.org/schema/mule/oauth"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd">
 
-    <httpn:listener-config name="Listener_Config">
-        <httpn:listener-connection host="localhost" port="${localHostPort}"/>
-    </httpn:listener-config>
+    <http:listener-config name="Listener_Config">
+        <http:listener-connection host="localhost" port="${localHostPort}"/>
+    </http:listener-config>
 
     <oauth:token-manager-config name="tokenManagerConfig"/>
 
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection>
-            <httpn:authentication>
+    <http:request-config name="requestConfig">
+        <http:request-connection>
+            <http:authentication>
                 <oauth:authorization-code-grant-type
                         clientId="${client.id}"
                         clientSecret="${client.secret}"
@@ -28,8 +28,8 @@
                         authorizationUrl="${authorization.url}"
                         tokenUrl="${token.url}">
                 </oauth:authorization-code-grant-type>
-            </httpn:authentication>
-        </httpn:request-connection>
-    </httpn:request-config>
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
 
 </mule>

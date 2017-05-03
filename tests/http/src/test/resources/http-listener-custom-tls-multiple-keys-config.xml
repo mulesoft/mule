@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <!--
     The clientServerKeystore file contains private keys for both muleclient and muleserver aliases. Muleclient is the first (default)
@@ -27,30 +27,30 @@
         <tls:trust-store path="tls/trustStoreWithoutMuleServerCertificate" password="mulepassword" />
     </tls:context>
 
-    <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection protocol="HTTPS" host="localhost" port="${port}" tlsContext="listenerTlsContext"/>
-    </httpn:listener-config>
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection protocol="HTTPS" host="localhost" port="${port}" tlsContext="listenerTlsContext"/>
+    </http:listener-config>
 
-    <httpn:request-config name="requestConfigWithCertificate">
-        <httpn:request-connection protocol="HTTPS" host="localhost" port="${port}" tlsContext="requestTlsContextWithCertificate"/>
-    </httpn:request-config>
+    <http:request-config name="requestConfigWithCertificate">
+        <http:request-connection protocol="HTTPS" host="localhost" port="${port}" tlsContext="requestTlsContextWithCertificate"/>
+    </http:request-config>
 
-    <httpn:request-config name="requestConfigWithoutCertificate">
-        <httpn:request-connection protocol="HTTPS" host="localhost" port="${port}" tlsContext="requestTlsContextWithoutCertificate"/>
-    </httpn:request-config>
+    <http:request-config name="requestConfigWithoutCertificate">
+        <http:request-connection protocol="HTTPS" host="localhost" port="${port}" tlsContext="requestTlsContextWithoutCertificate"/>
+    </http:request-config>
 
     <flow name="testFlowServer">
-        <httpn:listener config-ref="listenerConfig" path="/" allowedMethods="POST"/>
+        <http:listener config-ref="listenerConfig" path="/" allowedMethods="POST"/>
         <echo-component />
     </flow>
 
     <flow name="testFlowClientWithCertificate">
-        <httpn:request config-ref="requestConfigWithCertificate" path="/" method="POST"/>
+        <http:request config-ref="requestConfigWithCertificate" path="/" method="POST"/>
         <object-to-string-transformer />
     </flow>
 
     <flow name="testFlowClientWithoutCertificate">
-        <httpn:request config-ref="requestConfigWithoutCertificate" path="/" method="POST"/>
+        <http:request config-ref="requestConfigWithoutCertificate" path="/" method="POST"/>
         <object-to-string-transformer />
     </flow>
 

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule-domain xmlns="http://www.mulesoft.org/schema/mule/domain"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+             xmlns:http="http://www.mulesoft.org/schema/mule/http"
              xsi:schemaLocation="http://www.mulesoft.org/schema/mule/domain http://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:listener-config name="httpListenerConfig">
-        <httpn:listener-connection host="localhost" port="${httpPort}"/>
-    </httpn:listener-config>
-    <httpn:request-config name="httpRequester">
-         <httpn:request-connection host="localhost" port="${httpPort}" basePath="/"/>
-    </httpn:request-config>
+    <http:listener-config name="httpListenerConfig">
+        <http:listener-connection host="localhost" port="${httpPort}"/>
+    </http:listener-config>
+    <http:request-config name="httpRequester">
+         <http:request-connection host="localhost" port="${httpPort}" basePath="/"/>
+    </http:request-config>
 
 </mule-domain>

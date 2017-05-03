@@ -1,71 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection host="localhost" port="${port}"/>
-    </httpn:listener-config>
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${port}"/>
+    </http:listener-config>
 
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection host="localhost" port="${port2}"/>
-    </httpn:request-config>
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="${port2}"/>
+    </http:request-config>
 
     <flow name="customErrorType">
-        <httpn:listener config-ref="listenerConfig" path="/error"/>
+        <http:listener config-ref="listenerConfig" path="/error"/>
         <test:throw exception="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase.ErrorException"/>
     </flow>
 
     <flow name="customMessage">
-        <httpn:listener config-ref="listenerConfig" path="/errorMessage"/>
+        <http:listener config-ref="listenerConfig" path="/errorMessage"/>
         <test:throw exception="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase.ErrorMessageException"/>
     </flow>
 
     <flow name="customErrorResponseWhenError">
-        <httpn:listener config-ref="listenerConfig" path="/errorResponse">
-            <httpn:error-response statusCode="403" reasonPhrase="Forbidden">
-                <httpn:body>#['Cant see this']</httpn:body>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/errorResponse">
+            <http:error-response statusCode="403" reasonPhrase="Forbidden">
+                <http:body>#['Cant see this']</http:body>
+                <http:headers>
                     #[{"XX-Custom": "Xcustom"}]
-                </httpn:headers>
-            </httpn:error-response>
-        </httpn:listener>
+                </http:headers>
+            </http:error-response>
+        </http:listener>
         <test:throw exception="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase.ErrorException"/>
     </flow>
 
     <flow name="customErrorResponseWhenErrorMessage">
-        <httpn:listener config-ref="listenerConfig" path="/errorResponseWithMessage">
-            <httpn:error-response statusCode="403" reasonPhrase="Forbidden">
-                <httpn:body>#['Cant see this']</httpn:body>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/errorResponseWithMessage">
+            <http:error-response statusCode="403" reasonPhrase="Forbidden">
+                <http:body>#['Cant see this']</http:body>
+                <http:headers>
                     #[{"XX-Custom": "Xcustom"}]
-                </httpn:headers>
-            </httpn:error-response>
-        </httpn:listener>
+                </http:headers>
+            </http:error-response>
+        </http:listener>
         <test:throw exception="org.mule.test.module.http.functional.listener.HttpListenerErrorInterpretationTestCase.ErrorMessageException"/>
     </flow>
 
     <flow name="requestErrorNotInterpreted">
-        <httpn:listener config-ref="listenerConfig" path="/requestError"/>
-        <httpn:request path="/test" config-ref="requestConfig">
-            <httpn:response-validator>
-                <httpn:failure-status-code-validator values="201"/>
-            </httpn:response-validator>
-        </httpn:request>
+        <http:listener config-ref="listenerConfig" path="/requestError"/>
+        <http:request path="/test" config-ref="requestConfig">
+            <http:response-validator>
+                <http:failure-status-code-validator values="201"/>
+            </http:response-validator>
+        </http:request>
     </flow>
 
     <flow name="requestErrorInterpreted">
-        <httpn:listener config-ref="listenerConfig" path="/requestErrorInterpreted" interpretRequestErrors="true"/>
-        <httpn:request path="/test" config-ref="requestConfig">
-            <httpn:response-validator>
-                <httpn:failure-status-code-validator values="201"/>
-            </httpn:response-validator>
-        </httpn:request>
+        <http:listener config-ref="listenerConfig" path="/requestErrorInterpreted" interpretRequestErrors="true"/>
+        <http:request path="/test" config-ref="requestConfig">
+            <http:response-validator>
+                <http:failure-status-code-validator values="201"/>
+            </http:response-validator>
+        </http:request>
     </flow>
 
 </mule>

@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+      http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:request-config name="reqConfig">
-        <httpn:request-connection host="localhost" protocol="HTTP" port="1010"/>
-    </httpn:request-config>
+    <http:request-config name="reqConfig">
+        <http:request-connection host="localhost" protocol="HTTP" port="1010"/>
+    </http:request-config>
 
-    <httpn:listener-config name="lisConfig">
-        <httpn:listener-connection host="localhost" port="${serverPort}" protocol="HTTP"/>
-    </httpn:listener-config>
+    <http:listener-config name="lisConfig">
+        <http:listener-connection host="localhost" port="${serverPort}" protocol="HTTP"/>
+    </http:listener-config>
 
     <flow name="server">
-        <httpn:listener responseStreamingMode="AUTO" path="test" allowedMethods="GET" parseRequest="true"
+        <http:listener responseStreamingMode="AUTO" path="test" allowedMethods="GET" parseRequest="true"
                         config-ref="lisConfig"/>
         <echo-component/>
     </flow>
 
     <flow name="anyExplicit">
-        <httpn:request path="/" config-ref="reqConfig" outputType="ANY"/>
+        <http:request path="/" config-ref="reqConfig" outputType="ANY"/>
     </flow>
 
     <flow name="anyImplicit">
-        <httpn:request path="/" config-ref="reqConfig"/>
+        <http:request path="/" config-ref="reqConfig"/>
     </flow>
 
     <flow name="multipart">
-        <httpn:request path="/multipart" config-ref="reqConfig" outputType="MULTIPART"/>
+        <http:request path="/multipart" config-ref="reqConfig" outputType="MULTIPART"/>
     </flow>
 
     <flow name="form">
-        <httpn:request path="/form" config-ref="reqConfig" outputType="FORM"/>
+        <http:request path="/form" config-ref="reqConfig" outputType="FORM"/>
     </flow>
 
     <flow name="stream">
-        <httpn:request path="/stream" config-ref="reqConfig" outputType="STREAM"/>
+        <http:request path="/stream" config-ref="reqConfig" outputType="STREAM"/>
     </flow>
 
 </mule>

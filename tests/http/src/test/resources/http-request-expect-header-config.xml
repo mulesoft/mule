@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection host="localhost" port="${httpPort}" usePersistentConnections="false"/>
-    </httpn:request-config>
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="${httpPort}" usePersistentConnections="false"/>
+    </http:request-config>
 
     <flow name="requestFlow">
-        <httpn:request config-ref="requestConfig" method="POST" path="/" responseTimeout="20000">
-            <httpn:headers>
+        <http:request config-ref="requestConfig" method="POST" path="/" responseTimeout="20000">
+            <http:headers>
                 #[mel:['Expect' : '100-continue']]
-            </httpn:headers>
-            <httpn:response-validator>
-                <httpn:success-status-code-validator values="0..599" />
-            </httpn:response-validator>
-        </httpn:request>
+            </http:headers>
+            <http:response-validator>
+                <http:success-status-code-validator values="0..599" />
+            </http:response-validator>
+        </http:request>
     </flow>
 
 </mule>

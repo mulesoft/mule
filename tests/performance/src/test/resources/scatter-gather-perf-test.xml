@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+      http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:listener-config name="HTTP" >
-        <httpn:listener-connection host="0.0.0.0" port="8081" protocol="HTTP"/>
-    </httpn:listener-config>
+    <http:listener-config name="HTTP" >
+        <http:listener-connection host="0.0.0.0" port="8081" protocol="HTTP"/>
+    </http:listener-config>
 
 
-    <httpn:request-config name="HTTP_Request_Configuration">
-        <httpn:request-connection host="localhost" port="8081"/>
-    </httpn:request-config>
+    <http:request-config name="HTTP_Request_Configuration">
+        <http:request-connection host="localhost" port="8081"/>
+    </http:request-config>
 
     <flow name="parallelProcessing">
         <scatter-gather>
@@ -32,22 +32,22 @@
 
     <flow name="parallelHttpProcessing">
         <scatter-gather>
-            <httpn:request config-ref="HTTP_Request_Configuration" path="do" method="GET"/>
-            <httpn:request config-ref="HTTP_Request_Configuration" path="do" method="GET"/>
-            <httpn:request config-ref="HTTP_Request_Configuration" path="do" method="GET"/>
+            <http:request config-ref="HTTP_Request_Configuration" path="do" method="GET"/>
+            <http:request config-ref="HTTP_Request_Configuration" path="do" method="GET"/>
+            <http:request config-ref="HTTP_Request_Configuration" path="do" method="GET"/>
         </scatter-gather>
     </flow>
 
     <flow name="sequentialHttpProcessing">
         <scatter-gather parallel="false">
-            <httpn:request config-ref="HTTP_Request_Configuration" path="do" method="GET"/>
-            <httpn:request config-ref="HTTP_Request_Configuration" path="do" method="GET"/>
-            <httpn:request config-ref="HTTP_Request_Configuration" path="do" method="GET"/>
+            <http:request config-ref="HTTP_Request_Configuration" path="do" method="GET"/>
+            <http:request config-ref="HTTP_Request_Configuration" path="do" method="GET"/>
+            <http:request config-ref="HTTP_Request_Configuration" path="do" method="GET"/>
         </scatter-gather>
     </flow>
 
     <flow name="Http">
-        <httpn:listener config-ref="HTTP" path="do"/>
+        <http:listener config-ref="HTTP" path="do"/>
         <expression-component><![CDATA[mel:Thread.sleep(1);]]></expression-component>
     </flow>
 

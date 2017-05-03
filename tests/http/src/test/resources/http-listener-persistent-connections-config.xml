@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:listener-config name="nonPersistentConfig">
-        <httpn:listener-connection host="localhost" port="${nonPersistentPort}" usePersistentConnections="false"/>
-    </httpn:listener-config>
+    <http:listener-config name="nonPersistentConfig">
+        <http:listener-connection host="localhost" port="${nonPersistentPort}" usePersistentConnections="false"/>
+    </http:listener-config>
     <flow name="nonPersistent">
-        <httpn:listener path="/" config-ref="nonPersistentConfig" />
+        <http:listener path="/" config-ref="nonPersistentConfig" />
         <echo-component/>
     </flow>
 
-    <httpn:listener-config name="persistentConfig">
-        <httpn:listener-connection host="localhost" port="${persistentPort}" usePersistentConnections="true" connectionIdleTimeout="1000"/>
-    </httpn:listener-config>
+    <http:listener-config name="persistentConfig">
+        <http:listener-connection host="localhost" port="${persistentPort}" usePersistentConnections="true" connectionIdleTimeout="1000"/>
+    </http:listener-config>
     <flow name="persistent">
-        <httpn:listener path="/" config-ref="persistentConfig" />
+        <http:listener path="/" config-ref="persistentConfig" />
         <echo-component/>
     </flow>
 
-    <httpn:listener-config name="persistentConfigCloseHeader">
-        <httpn:listener-connection host="localhost" port="${persistentPortCloseHeader}" usePersistentConnections="true" connectionIdleTimeout="1000"/>
-    </httpn:listener-config>
+    <http:listener-config name="persistentConfigCloseHeader">
+        <http:listener-connection host="localhost" port="${persistentPortCloseHeader}" usePersistentConnections="true" connectionIdleTimeout="1000"/>
+    </http:listener-config>
     <flow name="persistentCloseHeader">
-        <httpn:listener path="/" config-ref="persistentConfigCloseHeader" >
-            <httpn:response>
-                <httpn:headers>
+        <http:listener path="/" config-ref="persistentConfigCloseHeader" >
+            <http:response>
+                <http:headers>
                     #[mel:['Connection' : 'close']]
-                </httpn:headers>
-            </httpn:response>
-                </httpn:listener>
+                </http:headers>
+            </http:response>
+                </http:listener>
         <echo-component/>
     </flow>
 
-    <httpn:listener-config name="persistentConfigCloseProperty">
-        <httpn:listener-connection host="localhost" port="${persistentPortCloseProperty}" usePersistentConnections="true" connectionIdleTimeout="1000"/>
-    </httpn:listener-config>
+    <http:listener-config name="persistentConfigCloseProperty">
+        <http:listener-connection host="localhost" port="${persistentPortCloseProperty}" usePersistentConnections="true" connectionIdleTimeout="1000"/>
+    </http:listener-config>
     <flow name="persistentCloseProperty">
-        <httpn:listener path="/" config-ref="persistentConfigCloseProperty"/>
+        <http:listener path="/" config-ref="persistentConfigCloseProperty"/>
         <set-property propertyName="Connection" value="close"/>
         <echo-component/>
     </flow>
 
     <!-- MULE-8502 -->
-    <httpn:listener-config name="persistentConfigStreaming">
-        <httpn:listener-connection host="localhost" port="${persistentStreamingPort}" usePersistentConnections="true" connectionIdleTimeout="1000"/>
-    </httpn:listener-config>
+    <http:listener-config name="persistentConfigStreaming">
+        <http:listener-connection host="localhost" port="${persistentStreamingPort}" usePersistentConnections="true" connectionIdleTimeout="1000"/>
+    </http:listener-config>
     <flow name="persistentStreaming">
-        <httpn:listener path="/" config-ref="persistentConfigStreaming" responseStreamingMode="ALWAYS" />
+        <http:listener path="/" config-ref="persistentConfigStreaming" responseStreamingMode="ALWAYS" />
         <echo-component />
     </flow>
 
-    <httpn:listener-config name="persistentConfigStreamingTransformer">
-        <httpn:listener-connection host="localhost" port="${persistentStreamingTransformerPort}" usePersistentConnections="true" connectionIdleTimeout="1000"/>
-    </httpn:listener-config>
+    <http:listener-config name="persistentConfigStreamingTransformer">
+        <http:listener-connection host="localhost" port="${persistentStreamingTransformerPort}" usePersistentConnections="true" connectionIdleTimeout="1000"/>
+    </http:listener-config>
     <flow name="persistentStreamingTransformer">
-        <httpn:listener path="/" config-ref="persistentConfigStreamingTransformer" responseStreamingMode="ALWAYS" />
+        <http:listener path="/" config-ref="persistentConfigStreamingTransformer" responseStreamingMode="ALWAYS" />
         <set-payload value="from_payload_transformer" />
     </flow>
 

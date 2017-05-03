@@ -1,66 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:listener-config name="emptyConfig">
-        <httpn:listener-connection host="localhost" port="${emptyConfigPort}"/>
-    </httpn:listener-config>
+    <http:listener-config name="emptyConfig">
+        <http:listener-connection host="localhost" port="${emptyConfigPort}"/>
+    </http:listener-config>
 
-    <httpn:listener-config name="fullConfig" basePath="${basePath}">
-        <httpn:listener-connection host="localhost" port="${fullConfigPort}"/>
-    </httpn:listener-config>
+    <http:listener-config name="fullConfig" basePath="${basePath}">
+        <http:listener-connection host="localhost" port="${fullConfigPort}"/>
+    </http:listener-config>
 
-    <httpn:listener-config name="nonLocalHostConfig" basePath="${basePath}">
-        <httpn:listener-connection host="${nonLocalhostIp}" port="${fullConfigPort}"/>
-    </httpn:listener-config>
+    <http:listener-config name="nonLocalHostConfig" basePath="${basePath}">
+        <http:listener-connection host="${nonLocalhostIp}" port="${fullConfigPort}"/>
+    </http:listener-config>
 
-    <httpn:listener-config name="noListenerConfig">
-        <httpn:listener-connection host="localhost" port="${noListenerConfigPort}"/>
-    </httpn:listener-config>
+    <http:listener-config name="noListenerConfig">
+        <http:listener-connection host="localhost" port="${noListenerConfigPort}"/>
+    </http:listener-config>
 
     <flow name="emptyListenerConfigFlow">
-        <httpn:listener path="${path}" config-ref="emptyConfig" />
+        <http:listener path="${path}" config-ref="emptyConfig" />
         <echo-component/>
     </flow>
 
     <!-- If no listener is defined for a config, no server is created -->
     <flow name="noListenerConfigListenerFlow">
-        <httpn:listener path="listener" config-ref="noListenerConfig" />
+        <http:listener path="listener" config-ref="noListenerConfig" />
         <echo-component/>
     </flow>
 
     <flow name="fullListenerConfigFlow">
-        <httpn:listener path="${path}" config-ref="fullConfig" />
+        <http:listener path="${path}" config-ref="fullConfig" />
         <echo-component/>
     </flow>
 
     <flow name="useDifferentIpSamePathFlow">
-        <httpn:listener path="${path}" config-ref="nonLocalHostConfig" />
+        <http:listener path="${path}" config-ref="nonLocalHostConfig" />
         <echo-component/>
     </flow>
 
     <flow name="restrictedMethodsFlow">
-        <httpn:listener path="post" config-ref="fullConfig" allowedMethods="POST"/>
+        <http:listener path="post" config-ref="fullConfig" allowedMethods="POST"/>
         <echo-component/>
     </flow>
 
-    <httpn:listener-config name="slashListenerConfig" basePath="/">
-        <httpn:listener-connection host="localhost" port="${slashConfigPort}"/>
-    </httpn:listener-config>
+    <http:listener-config name="slashListenerConfig" basePath="/">
+        <http:listener-connection host="localhost" port="${slashConfigPort}"/>
+    </http:listener-config>
 
     <flow name="useSlashInPathAndBasePath1">
-        <httpn:listener path="/" config-ref="slashListenerConfig" />
+        <http:listener path="/" config-ref="slashListenerConfig" />
         <set-payload value="1" />
     </flow>
     <flow name="useSlashInPathAndBasePath2">
-        <httpn:listener path="//" config-ref="slashListenerConfig" />
+        <http:listener path="//" config-ref="slashListenerConfig" />
         <set-payload value="2" />
     </flow>
     <flow name="useSlashInPathAndBasePath3">
-        <httpn:listener path="///" config-ref="slashListenerConfig" />
+        <http:listener path="///" config-ref="slashListenerConfig" />
         <set-payload value="3" />
     </flow>
 

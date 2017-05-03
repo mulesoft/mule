@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:context="http://www.springframework.org/schema/context"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <!--Forces protocol because of the cipher suite being used-->
     <tls:context name="tlsClientContext" enabledCipherSuites="TLS_RSA_WITH_AES_128_CBC_SHA">
@@ -14,87 +14,87 @@
         <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
     </tls:context>
 
-    <httpn:request-config name="requestConfig1">
-        <httpn:request-connection protocol="HTTPS" host="localhost" port="${internal.port.1}" tlsContext="tlsClientContext" />
-    </httpn:request-config>
+    <http:request-config name="requestConfig1">
+        <http:request-connection protocol="HTTPS" host="localhost" port="${internal.port.1}" tlsContext="tlsClientContext" />
+    </http:request-config>
 
     <!-- Valid Protocol with a valid cipher -->
-    <httpn:request-config name="requestConfig2">
-        <httpn:request-connection protocol="HTTPS" host="localhost" port="${internal.port.2}">
+    <http:request-config name="requestConfig2">
+        <http:request-connection protocol="HTTPS" host="localhost" port="${internal.port.2}">
             <tls:context enabledProtocols="TLSv1.2" enabledCipherSuites="TLS_RSA_WITH_AES_128_CBC_SHA">
                 <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
             </tls:context>
-        </httpn:request-connection>
-    </httpn:request-config>
+        </http:request-connection>
+    </http:request-config>
 
     <!-- Valid Protocol with invalid cipher -->
-    <httpn:request-config name="requestConfig3">
-        <httpn:request-connection protocol="HTTPS" host="localhost" port="${internal.port.3}">
+    <http:request-config name="requestConfig3">
+        <http:request-connection protocol="HTTPS" host="localhost" port="${internal.port.3}">
             <tls:context enabledProtocols="TLSv1.1" enabledCipherSuites="TLS_RSA_WITH_AES_128_CBC_SHA">
                 <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
             </tls:context>
-        </httpn:request-connection>
-    </httpn:request-config>
+        </http:request-connection>
+    </http:request-config>
 
     <!--Forces TLSv1.1 and TLSv1.2-->
-    <httpn:listener-config name="listenerConfig1">
-        <httpn:listener-connection protocol="HTTPS" host="localhost" port="${internal.port.1}">
+    <http:listener-config name="listenerConfig1">
+        <http:listener-connection protocol="HTTPS" host="localhost" port="${internal.port.1}">
             <tls:context enabledCipherSuites="default">
                 <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit" insecure="true"/>
                 <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
             </tls:context>
-        </httpn:listener-connection>
-    </httpn:listener-config>
+        </http:listener-connection>
+    </http:listener-config>
 
     <tls:context name="tlsServer2Context" enabledCipherSuites="default">
         <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
     </tls:context>
 
-    <httpn:listener-config name="listenerConfig2">
-        <httpn:listener-connection protocol="HTTPS" host="localhost" port="${internal.port.2}" tlsContext="tlsServer2Context" />
-    </httpn:listener-config>
+    <http:listener-config name="listenerConfig2">
+        <http:listener-connection protocol="HTTPS" host="localhost" port="${internal.port.2}" tlsContext="tlsServer2Context" />
+    </http:listener-config>
 
     <!--Forces cipher through a system property-->
-    <httpn:listener-config name="listenerConfig3" >
-        <httpn:listener-connection protocol="HTTPS" host="localhost" port="${internal.port.3}">
+    <http:listener-config name="listenerConfig3" >
+        <http:listener-connection protocol="HTTPS" host="localhost" port="${internal.port.3}">
             <tls:context enabledCipherSuites="${cipherSuites}">
                 <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
             </tls:context>
-        </httpn:listener-connection>
-    </httpn:listener-config>
+        </http:listener-connection>
+    </http:listener-config>
 
     <tls:context name="globalTlsContextDefaultProtocols">
         <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
         <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
     </tls:context>
 
-    <httpn:listener-config name="mainListenerConfig" basePath="test">
-        <httpn:listener-connection host="localhost" port="${httpsPort}" tlsContext="globalTlsContextDefaultProtocols" protocol="HTTPS" />
-    </httpn:listener-config>
+    <http:listener-config name="mainListenerConfig" basePath="test">
+        <http:listener-connection host="localhost" port="${httpsPort}" tlsContext="globalTlsContextDefaultProtocols" protocol="HTTPS" />
+    </http:listener-config>
 
     <flow name="testBothProtocolsOneCipher">
-        <httpn:listener config-ref="mainListenerConfig" path="/bothProtocolsOneCipher" allowedMethods="GET"/>
-        <httpn:request config-ref="requestConfig1" path="/" method="GET" />
+        <http:listener config-ref="mainListenerConfig" path="/bothProtocolsOneCipher" allowedMethods="GET"/>
+        <http:request config-ref="requestConfig1" path="/" method="GET" />
     </flow>
     <flow name="testValidProtocolValidCipher">
-        <httpn:listener config-ref="mainListenerConfig" path="/validProtocolValidCipher" allowedMethods="GET"/>
-        <httpn:request config-ref="requestConfig2" path="/" method="GET" />
+        <http:listener config-ref="mainListenerConfig" path="/validProtocolValidCipher" allowedMethods="GET"/>
+        <http:request config-ref="requestConfig2" path="/" method="GET" />
     </flow>
     <flow name="testValidProtocolInvalidCipher">
-        <httpn:listener config-ref="mainListenerConfig" path="/validProtocolInvalidCipher" allowedMethods="GET"/>
-        <httpn:request config-ref="requestConfig3" path="/" method="GET" />
+        <http:listener config-ref="mainListenerConfig" path="/validProtocolInvalidCipher" allowedMethods="GET"/>
+        <http:request config-ref="requestConfig3" path="/" method="GET" />
     </flow>
 
     <flow name="server1">
-        <httpn:listener config-ref="listenerConfig1" path="/" allowedMethods="GET"/>
+        <http:listener config-ref="listenerConfig1" path="/" allowedMethods="GET"/>
         <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
     <flow name="server2">
-        <httpn:listener config-ref="listenerConfig2" path="/" allowedMethods="GET"/>
+        <http:listener config-ref="listenerConfig2" path="/" allowedMethods="GET"/>
         <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
     <flow name="server3">
-        <httpn:listener config-ref="listenerConfig3" path="/" allowedMethods="GET"/>
+        <http:listener config-ref="listenerConfig3" path="/" allowedMethods="GET"/>
         <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
 

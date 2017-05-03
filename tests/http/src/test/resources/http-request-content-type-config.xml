@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:request-config name="requesterConfig">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-    </httpn:request-config>
+    <http:request-config name="requesterConfig">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
 
     <flow name="requesterContentType" >
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>
-        <httpn:request config-ref="requesterConfig" path="testPath" method="GET"/>
+        <http:request config-ref="requesterConfig" path="testPath" method="GET"/>
     </flow>
 
     <flow name="requesterBuilderContentType" >
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="text/plain" encoding="UTF-8"/>
-        <httpn:request config-ref="requesterConfig" path="testPath" method="GET">
-            <httpn:headers>
+        <http:request config-ref="requesterConfig" path="testPath" method="GET">
+            <http:headers>
                 #[mel:['content-type' : 'application/json; charset=UTF-8']]
-            </httpn:headers>
-        </httpn:request>
+            </http:headers>
+        </http:request>
     </flow>
 </mule>

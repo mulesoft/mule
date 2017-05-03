@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <configuration>
@@ -15,18 +15,18 @@
         </expression-language>
     </configuration>
 
-    <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection host="localhost" port="${port}"/>
-    </httpn:listener-config>
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${port}"/>
+    </http:listener-config>
 
     <flow name="exceptionBuildingResponseParameters">
-        <httpn:listener config-ref="listenerConfig" path="/exceptionBuildingResponseParameters">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/exceptionBuildingResponseParameters">
+            <http:response>
+                <http:headers>
                     #[{ Content-Type: contentType}]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
         <set-payload value="#[mel:inputStreamPayload]"/>
         <error-handler>
             <on-error-continue type="EXPRESSION">
@@ -40,11 +40,11 @@
     </flow>
 
     <flow name="exceptionPropagationFlow">
-        <httpn:listener config-ref="listenerConfig" path="/exceptionPropagation">
-            <httpn:error-response>
-                <httpn:headers>#[{'headerName':myHeader}]</httpn:headers>
-            </httpn:error-response>
-        </httpn:listener>
+        <http:listener config-ref="listenerConfig" path="/exceptionPropagation">
+            <http:error-response>
+                <http:headers>#[{'headerName':myHeader}]</http:headers>
+            </http:error-response>
+        </http:listener>
         <test:component throwException="true"/>
         <error-handler>
             <on-error-propagate>
@@ -55,7 +55,7 @@
     </flow>
 
     <flow name="exceptionBuildingResponse">
-        <httpn:listener config-ref="listenerConfig" path="/exceptionBuildingResponse" responseStreamingMode="NEVER"/>
+        <http:listener config-ref="listenerConfig" path="/exceptionBuildingResponse" responseStreamingMode="NEVER"/>
         <set-payload value="#[mel:inputStreamPayload]"/>
         <error-handler>
             <on-error-continue type="ANY">

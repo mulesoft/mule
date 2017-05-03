@@ -99,7 +99,7 @@ import org.slf4j.Logger;
 @Streaming
 public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
-  public static final String HTTP_NAMESPACE = "httpn";
+  public static final String HTTP_NAMESPACE = "http";
   private static final Logger LOGGER = getLogger(HttpListener.class);
   private static final String SERVER_PROBLEM = "Server encountered a problem";
   private static final String ERROR_RESPONSE_SETTINGS = "Error Response Settings";

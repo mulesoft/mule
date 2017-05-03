@@ -54,7 +54,7 @@ import org.mule.service.http.api.client.proxy.ProxyConfig;
 @Import(type = TcpClientSocketProperties.class, from = "Sockets")
 @Import(type = TcpServerSocketProperties.class, from = "Sockets")
 @ErrorTypes(HttpError.class)
-@Xml(namespace = "http://www.mulesoft.org/schema/mule/httpn", prefix = HTTP_NAMESPACE)
+@Xml(namespace = "http://www.mulesoft.org/schema/mule/http", prefix = HTTP_NAMESPACE)
 // TODO move back to package org.mule.extension.http.internal as part of MULE-10651. Now we are using this package
 // because it doesn't work in the former package since the classloader mechanism will try to load the class from another bundle.
 @Export(classes = {HttpListenerConfig.class, HttpExtensionClient.class, HttpPolicyRequestAttributes.class})

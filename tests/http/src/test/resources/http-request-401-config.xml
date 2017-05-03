@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:request-config name="basicConfig">
-        <httpn:request-connection host="localhost" port="${httpPort}">
-            <httpn:authentication>
-                <httpn:basic-authentication username="mule" password="man" preemptive="false" />
-            </httpn:authentication>
-        </httpn:request-connection>
-    </httpn:request-config>
+    <http:request-config name="basicConfig">
+        <http:request-connection host="localhost" port="${httpPort}">
+            <http:authentication>
+                <http:basic-authentication username="mule" password="man" preemptive="false" />
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
 
     <flow name="executeRequest">
-        <httpn:request config-ref="basicConfig" path="/basic" method="GET">
-            <httpn:response-validator>
-                <httpn:success-status-code-validator values="0..599" />
-            </httpn:response-validator>
-        </httpn:request>
+        <http:request config-ref="basicConfig" path="/basic" method="GET">
+            <http:response-validator>
+                <http:success-status-code-validator values="0..599" />
+            </http:response-validator>
+        </http:request>
         <object-to-string-transformer />
     </flow>
 

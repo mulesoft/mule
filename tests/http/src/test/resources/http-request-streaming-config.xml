@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-    </httpn:request-config>
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
 
-    <httpn:request-config name="requestConfigMode" requestStreamingMode="NEVER">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-    </httpn:request-config>
+    <http:request-config name="requestConfigMode" requestStreamingMode="NEVER">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
 
     <flow name="streamingAutoConfigMode">
-        <httpn:request config-ref="requestConfigMode" method="POST" path="path" />
+        <http:request config-ref="requestConfigMode" method="POST" path="path" />
         <object-to-string-transformer />
     </flow>
 
     <flow name="streamingAlwaysConfigMode">
-        <httpn:request config-ref="requestConfigMode" method="POST" path="path" requestStreamingMode="ALWAYS" />
+        <http:request config-ref="requestConfigMode" method="POST" path="path" requestStreamingMode="ALWAYS" />
         <object-to-string-transformer />
     </flow>
 
     <flow name="streamingAuto">
-        <httpn:request config-ref="requestConfig"  method="POST" path="path">
-            <httpn:headers>#[headers]</httpn:headers>
-        </httpn:request>
+        <http:request config-ref="requestConfig"  method="POST" path="path">
+            <http:headers>#[headers]</http:headers>
+        </http:request>
         <object-to-string-transformer />
     </flow>
 
     <flow name="streamingAutoBothHeaders">
-        <httpn:request config-ref="requestConfig"  method="POST" path="path">
-            <httpn:headers>
+        <http:request config-ref="requestConfig"  method="POST" path="path">
+            <http:headers>
                 #[mel:['Transfer-Encoding' : 'chunked' , 'Content-Length' : '12']]
-            </httpn:headers>
-        </httpn:request>
+            </http:headers>
+        </http:request>
         <object-to-string-transformer />
     </flow>
 
     <flow name="streamingAlways">
-        <httpn:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="ALWAYS">
-            <httpn:headers>#[headers]</httpn:headers>
-        </httpn:request>
+        <http:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="ALWAYS">
+            <http:headers>#[headers]</http:headers>
+        </http:request>
         <object-to-string-transformer />
     </flow>
 
     <flow name="streamingNever">
-        <httpn:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="NEVER">
-            <httpn:headers>#[headers]</httpn:headers>
-        </httpn:request>
+        <http:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="NEVER">
+            <http:headers>#[headers]</http:headers>
+        </http:request>
         <object-to-string-transformer />
     </flow>
 </mule>

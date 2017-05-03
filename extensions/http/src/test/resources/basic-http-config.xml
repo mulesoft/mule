@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-      http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+      http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
     
-    <httpn:request-config name="reqConfig">
-        <httpn:request-connection host="localhost" protocol="HTTP" port="${clientPort}"/>
-    </httpn:request-config>
+    <http:request-config name="reqConfig">
+        <http:request-connection host="localhost" protocol="HTTP" port="${clientPort}"/>
+    </http:request-config>
     
-    <httpn:listener-config name="lisConfig">
-        <httpn:listener-connection host="localhost" port="${serverPort}" protocol="HTTP"/>
-    </httpn:listener-config> 
+    <http:listener-config name="lisConfig">
+        <http:listener-connection host="localhost" port="${serverPort}" protocol="HTTP"/>
+    </http:listener-config>
     
     <flow name="client">
-        <httpn:request path="/" config-ref="reqConfig" outputType="ANY">
-            <httpn:headers>
+        <http:request path="/" config-ref="reqConfig" outputType="ANY">
+            <http:headers>
                 #[{'X-Custom' : 'custom-value'}]
-            </httpn:headers>
-            <httpn:query-params>
+            </http:headers>
+            <http:query-params>
                 #[{'query' : 'param'}]
-            </httpn:query-params>
-        </httpn:request>
+            </http:query-params>
+        </http:request>
         <object-to-string-transformer />
     </flow>
 
     <flow name="server">
-        <httpn:listener responseStreamingMode="AUTO" path="test" allowedMethods="GET" parseRequest="true" config-ref="lisConfig"/>
+        <http:listener responseStreamingMode="AUTO" path="test" allowedMethods="GET" parseRequest="true" config-ref="lisConfig"/>
         <custom-processor class="org.mule.test.http.BasicHttpTestCase$RequestCheckerMessageProcessor"/>
         <set-payload value="HEY"/>
     </flow>

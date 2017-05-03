@@ -25,7 +25,7 @@ import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicyPointcutParametersFactory {
 
   private final static ComponentIdentifier listenerIdentifier =
-      builder().withNamespace("httpn").withName("listener").build();
+      builder().withNamespace("http").withName("listener").build();
 
   @Override
   public boolean supportsSourceIdentifier(ComponentIdentifier sourceIdentifier) {
