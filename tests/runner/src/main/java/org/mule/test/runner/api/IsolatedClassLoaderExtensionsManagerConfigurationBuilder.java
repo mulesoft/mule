@@ -22,6 +22,7 @@ import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactor
 
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
 
   private final ExtensionManagerFactory extensionManagerFactory;
   private final List<ArtifactClassLoader> pluginsClassLoaders;
+  private final List<ExtensionModel> extensionModels = new ArrayList<>();
 
   /**
    * Creates an instance of the builder with the list of plugin class loaders. If an {@link ArtifactClassLoader} has a extension
@@ -70,19 +72,8 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
   protected void doConfigure(final MuleContext muleContext) throws Exception {
     final ExtensionManager extensionManager = createExtensionManager(muleContext);
 
-    for (Object pluginClassLoader : pluginsClassLoaders) {
-      String artifactName = (String) pluginClassLoader.getClass().getMethod("getArtifactId").invoke(pluginClassLoader);
-      ClassLoader classLoader = (ClassLoader) pluginClassLoader.getClass().getMethod("getClassLoader").invoke(pluginClassLoader);
-      Method findResource = classLoader.getClass().getMethod("findResource", String.class);
-      URL json = ((URL) findResource.invoke(classLoader, META_INF_MULE_PLUGIN));
-      if (json != null) {
-        LOGGER.debug("Discovered extension '{}'", artifactName);
-        MulePluginBasedLoaderFinder finder = new MulePluginBasedLoaderFinder(json.openStream());
-        ExtensionModel extension = finder.getLoader().loadExtensionModel(classLoader, getDefault(emptySet()), finder.getParams());
-        extensionManager.registerExtension(extension);
-      } else {
-        LOGGER.debug("Discarding plugin with artifactName '{}' due to it doesn't have an mule-plugin.json", artifactName);
-      }
+    for (ExtensionModel extensionModel : extensionModels) {
+      extensionManager.registerExtension(extensionModel);
     }
   }
 
@@ -103,5 +94,28 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
     ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
 
     return extensionManager;
+  }
+
+  public void loadExtensionModels() {
+    try {
+      for (Object pluginClassLoader : pluginsClassLoaders) {
+        String artifactName = (String) pluginClassLoader.getClass().getMethod("getArtifactId").invoke(pluginClassLoader);
+        ClassLoader classLoader =
+            (ClassLoader) pluginClassLoader.getClass().getMethod("getClassLoader").invoke(pluginClassLoader);
+        Method findResource = classLoader.getClass().getMethod("findResource", String.class);
+        URL json = ((URL) findResource.invoke(classLoader, META_INF_MULE_PLUGIN));
+        if (json != null) {
+          LOGGER.debug("Discovered extension '{}'", artifactName);
+          MulePluginBasedLoaderFinder finder = new MulePluginBasedLoaderFinder(json.openStream());
+          ExtensionModel extension =
+              finder.getLoader().loadExtensionModel(classLoader, getDefault(emptySet()), finder.getParams());
+          extensionModels.add(extension);
+        } else {
+          LOGGER.debug("Discarding plugin with artifactName '{}' due to it doesn't have an mule-plugin.json", artifactName);
+        }
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("Error while loading extension models", e);
+    }
   }
 }

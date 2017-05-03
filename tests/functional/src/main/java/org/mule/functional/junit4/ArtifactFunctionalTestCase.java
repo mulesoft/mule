@@ -97,6 +97,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   private static ClassLoader containerClassLoader;
   private static MuleServiceManager serviceRepository;
   private static ClassLoaderRepository classLoaderRepository;
+  private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder extensionsManagerConfigurationBuilder;
 
   @BeforeClass
   public static void configureClassLoaderRepository() throws RegistrationException {
@@ -133,6 +134,11 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
       throw new IllegalStateException("Plugin class loaders were already set, it cannot be set again");
     }
     pluginClassLoaders = artifactClassLoaders;
+    if (!pluginClassLoaders.isEmpty()) {
+      extensionsManagerConfigurationBuilder =
+          new IsolatedClassLoaderExtensionsManagerConfigurationBuilder(pluginClassLoaders);
+      extensionsManagerConfigurationBuilder.loadExtensionModels();
+    }
   }
 
   @ServiceClassLoadersAware
@@ -213,8 +219,8 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
           + " for defining a delegate runner to be used.");
     }
 
-    if (pluginClassLoaders != null && !pluginClassLoaders.isEmpty()) {
-      builders.add(0, new IsolatedClassLoaderExtensionsManagerConfigurationBuilder(pluginClassLoaders));
+    if (extensionsManagerConfigurationBuilder != null) {
+      builders.add(0, extensionsManagerConfigurationBuilder);
     }
 
     builders.add(0, new TestBootstrapServiceDiscovererConfigurationBuilder(containerClassLoader, getExecutionClassLoader(),
