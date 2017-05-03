@@ -40,7 +40,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.TRANSFORM_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -110,9 +109,11 @@ import org.w3c.dom.Document;
  */
 public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLoader {
 
-  public static final String SET_VARIABLE = "setVariable";
-  public static final String GENERAL = "General";
+  public static final String TRANSFORM_IDENTIFIER = "transform";
+  public static final String TRANSFORMER_SET_VARIABLE = "SetVariable";
+  public static final String TRANSFORMER_GENERAL = "General";
   public static final String SCRIPT = "script";
+
   private final DslResolvingContext context;
   private final Map<ExtensionModel, DslSyntaxResolver> resolvers;
   private final Map<String, ExtensionModel> extensionsByNamespace = new HashMap<>();
@@ -376,7 +377,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
           // handle set-payload and set-attributes
           model.getParameterGroupModels().stream()
-              .filter(g -> !g.getName().equals(GENERAL))
+              .filter(g -> !g.getName().equals(TRANSFORMER_GENERAL))
               .filter(ParameterGroupModel::isShowInDsl)
               .forEach(group -> elementDsl.getChild(group.getName())
                   .ifPresent(groupDsl -> line.getChildren().stream()
@@ -387,18 +388,21 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                       })));
 
           // handle set-variable
-          model.getAllParameterModels().stream().filter(g -> g.getName().equals(SET_VARIABLE)).findFirst().ifPresent(group -> {
-            ParameterObjectValue.Builder generalGroup = ElementDeclarer.newObjectValue();
-            ParameterListValue.Builder setVariablesListBuilder = ElementDeclarer.newListValue();
-            elementDsl.getChild(GENERAL).get().getChild(SET_VARIABLE)
-                .ifPresent(groupDsl -> line.getChildren().stream()
-                    .filter(c -> c.getIdentifier().equals(groupDsl.getElementName()))
-                    .forEach(groupConfig -> {
-                      setVariablesListBuilder.withValue(getTransformParameterBuilder(groupConfig).build());
+          model.getAllParameterModels().stream().filter(g -> g.getName().equals(TRANSFORMER_SET_VARIABLE)).findFirst()
+              .ifPresent(group -> {
+                ParameterObjectValue.Builder generalGroup = ElementDeclarer.newObjectValue();
+                ParameterListValue.Builder setVariablesListBuilder = ElementDeclarer.newListValue();
+                elementDsl.getChild(TRANSFORMER_GENERAL).get().getChild(TRANSFORMER_SET_VARIABLE)
+                    .ifPresent(groupDsl -> line.getChildren().stream()
+                        .filter(c -> c.getIdentifier().equals(groupDsl.getElementName()))
+                        .forEach(groupConfig -> {
+                          setVariablesListBuilder.withValue(getTransformParameterBuilder(groupConfig).build());
 
-                    }));
-            declarer.withParameter(GENERAL, generalGroup.withParameter(SET_VARIABLE, setVariablesListBuilder.build()).build());
-          });
+                        }));
+                declarer
+                    .withParameter(TRANSFORMER_GENERAL,
+                                   generalGroup.withParameter(TRANSFORMER_SET_VARIABLE, setVariablesListBuilder.build()).build());
+              });
 
           declarationConsumer.accept((ComponentElementDeclaration) declarer.getDeclaration());
           stop();

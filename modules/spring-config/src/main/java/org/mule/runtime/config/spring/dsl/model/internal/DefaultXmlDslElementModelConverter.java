@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.config.spring.dsl.declaration.DefaultXmlArtifactDeclarationLoader.TRANSFORM_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.DECLARED_PREFIX;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
@@ -30,7 +31,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.TRANSFORM_IDENTIFIER;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -285,6 +285,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
 
     Element nested = doc.createElementNS(namespaceURI, EE_PREFIX + ":" + config.getIdentifier().getName());
     config.getParameters().forEach(nested::setAttribute);
+    // TODO: EE-5393: Add CDATA section
     config.getNestedComponents().stream()
         .filter(inner -> inner.getValue().isPresent()).forEach(inner -> nested.setTextContent(inner.getValue().get()));
     return nested;

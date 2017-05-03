@@ -941,48 +941,6 @@
             {
               "type": {
                 "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "java.lang.Object",
-                  "classInformation": {
-                    "hasDefaultConstructor": true,
-                    "isInterface": false,
-                    "isInstantiable": true,
-                    "isAbstract": false,
-                    "isFinal": false,
-                    "implementedInterfaces": [],
-                    "parent": "",
-                    "genericTypes": []
-                  },
-                  "typeAlias": {
-                    "value": "Object"
-                  }
-                },
-                "fields": []
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "expressionSupport": "SUPPORTED",
-              "defaultValue": "#[payload]",
-              "role": "PRIMARY_CONTENT",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": false,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2
-              },
-              "name": "payload",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
                 "type": "Array",
                 "annotations": {
                   "typeId": "java.util.List"
@@ -1002,7 +960,7 @@
                       "genericTypes": []
                     },
                     "typeAlias": {
-                      "value": "setVariable"
+                      "value": "SetVariable"
                     }
                   },
                   "fields": [
@@ -1074,7 +1032,7 @@
                           "role": "BEHAVIOUR"
                         },
                         "expressionSupport": {
-                          "value": "NOT_SUPPORTED"
+                          "value": "REQUIRED"
                         },
                         "layout": {
                           "layoutModel": {
@@ -1104,7 +1062,7 @@
                 "query": false,
                 "order": 2
               },
-              "name": "setVariable",
+              "name": "SetVariable",
               "displayModel": {
                 "displayName": "Set Variables"
               },
@@ -1145,7 +1103,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
+              "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "CONTENT",
               "dslConfiguration": {
@@ -1205,7 +1163,7 @@
             }
           ],
           "showInDsl": true,
-          "name": "setPayload",
+          "name": "SetPayload",
           "description": "",
           "modelProperties": {}
         },
@@ -1236,7 +1194,7 @@
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
+              "expressionSupport": "REQUIRED",
               "defaultValue": "#[payload]",
               "role": "CONTENT",
               "dslConfiguration": {
@@ -1296,47 +1254,8 @@
             }
           ],
           "showInDsl": true,
-          "name": "setAttributes",
+          "name": "SetAttributes",
           "description": "Modifies the attributes of the message according to the provided value",
-          "modelProperties": {}
-        },
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "name": "target",
-              "displayModel": {
-                "displayName": "Target Variable"
-              },
-              "description": "The name of a variable on which the operation\u0027s output will be placed",
-              "modelProperties": {}
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "showInDsl": false,
-          "name": "Output",
-          "description": "",
           "modelProperties": {}
         }
       ],

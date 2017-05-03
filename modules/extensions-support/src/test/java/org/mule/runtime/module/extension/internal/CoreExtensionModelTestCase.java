@@ -201,7 +201,8 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertComponentDeterminesOutput(transformModel);
 
     final List<ParameterGroupModel> paramGroupModels = transformModel.getParameterGroupModels();
-    assertThat(paramGroupModels, hasSize(4));
+    assertThat(transformModel.getAllParameterModels(), hasSize(6));
+    assertThat(paramGroupModels, hasSize(3));
 
     assertThat(paramGroupModels.get(0).getName(), is("General"));
     List<ParameterModel> paramModels = paramGroupModels.get(0).getParameterModels();
@@ -212,33 +213,29 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
                is(Transformer.class.getName()));
     assertThat(paramModels.get(0).isRequired(), is(true));
 
-    assertPayload(transformModel.getAllParameterModels().get(1));
-
-    assertThat(paramModels.get(2).getName(), is("setVariable"));
-    assertThat(paramModels.get(2).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(paramModels.get(2).getType(), instanceOf(DefaultArrayType.class));
-    assertThat(paramModels.get(2).getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
+    assertThat(paramModels.get(1).getName(), is("SetVariable"));
+    assertThat(paramModels.get(1).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(paramModels.get(1).getType(), instanceOf(DefaultArrayType.class));
+    assertThat(paramModels.get(1).getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
                is(List.class.getName()));
-    assertThat(paramModels.get(2).isRequired(), is(false));
+    assertThat(paramModels.get(1).isRequired(), is(false));
 
-    assertThat(((ArrayType) paramModels.get(2).getType()).getType(), instanceOf(ObjectType.class));
-    assertThat(((ObjectType) ((ArrayType) paramModels.get(2).getType()).getType()).getFields(), hasSize(3));
-    assertThat(((ObjectType) ((ArrayType) paramModels.get(2).getType()).getType()).getFields().stream()
+    assertThat(((ArrayType) paramModels.get(1).getType()).getType(), instanceOf(ObjectType.class));
+    assertThat(((ObjectType) ((ArrayType) paramModels.get(1).getType()).getType()).getFields(), hasSize(3));
+    assertThat(((ObjectType) ((ArrayType) paramModels.get(1).getType()).getType()).getFields().stream()
         .map(MetadataTypeUtils::getLocalPart).collect(toList()), containsInAnyOrder("variableName", "resource", "script"));
 
 
-    assertThat(paramGroupModels.get(1).getName(), is("setPayload"));
+    assertThat(paramGroupModels.get(1).getName(), is("SetPayload"));
     assertScriptAndResource(paramGroupModels.get(1).getParameterModels());
 
-    assertThat(paramGroupModels.get(2).getName(), is("setAttributes"));
+    assertThat(paramGroupModels.get(2).getName(), is("SetAttributes"));
     assertScriptAndResource(paramGroupModels.get(2).getParameterModels());
-
-    assertTarget(transformModel.getAllParameterModels().get(7));
   }
 
   private void assertScriptAndResource(List<ParameterModel> paramModels) {
     assertThat(paramModels.get(0).getName(), is("script"));
-    assertThat(paramModels.get(0).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(paramModels.get(0).getExpressionSupport(), is(REQUIRED));
     assertThat(paramModels.get(0).getType(), instanceOf(DefaultObjectType.class));
     assertThat(paramModels.get(0).isRequired(), is(false));
     assertThat(paramModels.get(0).getRole(), is(CONTENT));

@@ -20,8 +20,6 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.extension.internal.dsl.syntax.DslSyntaxUtils.getId;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
-import static org.mule.runtime.internal.dsl.DslConstants.EE_NAMESPACE;
-import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
@@ -393,18 +391,6 @@ class DeclarationBasedElementModelFactory {
                     .ifPresent(value -> createSimpleParameter(value, paramDsl, parentConfig, parentElement, paramModel, false));
               }
             }));
-
-    // TODO VALIDATE
-    //if (parameterDeclarations.size() > configuredParameters.size()) {
-    //  String missing = parameterDeclarations.stream()
-    //      .filter(p -> !configuredParameters.contains(p.getName()))
-    //      .map(ElementDeclaration::getName)
-    //      .collect(joining(","));
-    //
-    //  throw new IllegalArgumentException(
-    //                                     format("The parameters [%s] were declared but they do not exist in the associated model",
-    //                                            missing));
-    //}
   }
 
   private <T extends ParameterizedModel> void addInlineGroupElement(ParameterGroupModel group,
@@ -442,8 +428,6 @@ class DeclarationBasedElementModelFactory {
                   }
 
                 });
-
-
               }
             });
 
@@ -799,29 +783,13 @@ class DeclarationBasedElementModelFactory {
         .withIdentifier(asIdentifier(listDsl));
 
     final MetadataType itemType = listType.getType();
+    listDsl.getGeneric(itemType)
+        .ifPresent(itemDsl -> list.getValues()
+            .forEach(value -> createListItemConfig(itemType, value, itemDsl, listConfig, listElement)));
 
-    DslElementSyntax itemDsl =
-        listDsl.getGeneric(itemType).isPresent() ? listDsl.getGeneric(itemType).get() : createSetVariableDslElement();
-    list.getValues().forEach(value -> createListItemConfig(itemType, value, itemDsl, listConfig, listElement));
     ComponentConfiguration result = listConfig.build();
-
-
     parentConfig.withNestedComponent(result);
     parentElement.containing(listElement.withConfig(result).build());
-  }
-
-  private DslElementSyntax createSetVariableDslElement() {
-    return DslElementSyntaxBuilder.create().supportsChildDeclaration(true)
-        .withElementName("set-variable").withNamespace(EE_PREFIX, EE_NAMESPACE)
-        .supportsTopLevelDeclaration(false)
-        .containing("script", DslElementSyntaxBuilder.create()
-            .supportsAttributeDeclaration(false)
-            .supportsChildDeclaration(true)
-            .withElementName("script")
-            .withNamespace(EE_PREFIX, EE_NAMESPACE).build())
-        .containing("resource", DslElementSyntaxBuilder.create()
-            .supportsAttributeDeclaration(true).build())
-        .build();
   }
 
   private void createObject(ParameterObjectValue objectValue, DslElementSyntax objectDsl, Object model, ObjectType objectType,
