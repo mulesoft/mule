@@ -81,11 +81,11 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
 
   protected Message runFlowWithRequest(String flowName, String requestXmlResourceName) throws Exception {
     return flowRunner(flowName)
-      .withPayload(getRequestResource(requestXmlResourceName))
-      .withVariable(HEADER_IN, getRequestResource(HEADER_IN))
-      .withVariable(HEADER_INOUT, getRequestResource(HEADER_INOUT))
-      .run()
-      .getMessage();
+        .withPayload(getRequestResource(requestXmlResourceName))
+        .withVariable(HEADER_IN, getRequestResource(HEADER_IN))
+        .withVariable(HEADER_INOUT, getRequestResource(HEADER_INOUT))
+        .run()
+        .getMessage();
   }
 
   protected abstract String getConfigurationFile();

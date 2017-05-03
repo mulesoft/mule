@@ -12,14 +12,12 @@ import static org.mule.service.http.api.HttpConstants.Method.POST;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.collection.ImmutableMapCollector;
-import org.mule.runtime.extension.api.soap.annotation.Soap;
 import org.mule.runtime.extension.api.soap.message.DispatcherResponse;
 import org.mule.runtime.extension.api.soap.message.DispatchingContext;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
-import org.mule.service.http.api.client.HttpClientFactory;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
@@ -46,8 +44,8 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
 
   public DefaultHttpMessageDispatcher(HttpService service) {
     this.client = service.getClientFactory().create(new HttpClientConfiguration.Builder()
-                                                            .setName("wsc-http-dispatcher")
-                                                            .build());
+        .setName("wsc-http-dispatcher")
+        .build());
   }
 
   @Override
@@ -66,11 +64,11 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
     parameters.putAll(context.getHeaders());
 
     HttpRequest request = HttpRequest.builder()
-      .setUri(context.getAddress())
-      .setMethod(POST)
-      .setEntity(new InputStreamHttpEntity(message))
-      .setHeaders(parameters)
-      .build();
+        .setUri(context.getAddress())
+        .setMethod(POST)
+        .setEntity(new InputStreamHttpEntity(message))
+        .setHeaders(parameters)
+        .build();
 
     try {
       HttpResponse response = client.send(request, 5000, false, null);
@@ -88,7 +86,7 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
    */
   private Map<String, ? extends List<String>> toHeadersMap(HttpResponse response) {
     return response.getHeaderNames().stream()
-      .collect(new ImmutableMapCollector<>(identity(), name -> new ArrayList<>(response.getHeaderValues(name))));
+        .collect(new ImmutableMapCollector<>(identity(), name -> new ArrayList<>(response.getHeaderValues(name))));
   }
 
   /**

@@ -29,7 +29,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  */
 public class SoapServiceConduitInitiator implements ConduitInitiator {
 
-  public static final String[] SOAP_SERVICE_KNOWN_PROTOCOLS = new String[]{"http://", "https://", "jms://"};
+  public static final String[] SOAP_SERVICE_KNOWN_PROTOCOLS = new String[] {"http://", "https://", "jms://"};
 
   @Override
   public Conduit getConduit(EndpointInfo targetInfo) throws IOException {

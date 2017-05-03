@@ -55,12 +55,12 @@ public final class HttpConfigBasedMessageDispatcher implements MessageDispatcher
   @Override
   public DispatcherResponse dispatch(InputStream message, DispatchingContext context) {
     DefaultOperationParameters params = builder().configName(configName)
-      .addParameter("method", POST.toString())
-      .addParameter("url", context.getAddress())
-      .addParameter("headers", context.getHeaders())
-      .addParameter("parseResponse", false)
-      .addParameter("body", new TypedValue<>(message, INPUT_STREAM))
-      .build();
+        .addParameter("method", POST.toString())
+        .addParameter("url", context.getAddress())
+        .addParameter("headers", context.getHeaders())
+        .addParameter("parseResponse", false)
+        .addParameter("body", new TypedValue<>(message, INPUT_STREAM))
+        .build();
     try {
       Result<Object, Object> result = client.executeAsync("HTTP", "request", params).get();
       Map<String, List<String>> headers = getHttpHeaders(result);

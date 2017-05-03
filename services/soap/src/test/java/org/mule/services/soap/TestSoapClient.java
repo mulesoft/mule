@@ -8,6 +8,7 @@ package org.mule.services.soap;
 
 import static java.util.Collections.emptyList;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.soap.security.SecurityStrategy;
 import org.mule.services.http.impl.service.HttpServiceImplementation;
 import org.mule.services.soap.api.SoapVersion;
@@ -27,6 +28,7 @@ import org.junit.rules.ExternalResource;
 public class TestSoapClient extends ExternalResource implements SoapClient {
 
   private final SoapClient soapClient;
+  private final DefaultHttpMessageDispatcher dispatcher;
 
   public TestSoapClient(String wsdlLocation,
                         String address,
@@ -38,10 +40,16 @@ public class TestSoapClient extends ExternalResource implements SoapClient {
     HttpServiceImplementation httpService = new HttpServiceImplementation(new SimpleUnitTestSupportSchedulerService());
     SoapServiceImplementation soapService = new SoapServiceImplementation();
     try {
+      this.dispatcher = new DefaultHttpMessageDispatcher(httpService);
+      try {
+        this.dispatcher.initialise();
+      } catch (InitialisationException e) {
+        throw new RuntimeException("Cannot initialize dispatcher");
+      }
       SoapClientConfigurationBuilder config = SoapClientConfiguration.builder()
           .withWsdlLocation(wsdlLocation)
           .withAddress(address)
-          .withDispatcher(new DefaultHttpMessageDispatcher(httpService))
+          .withDispatcher(dispatcher)
           .withService(service)
           .withPort(port)
           .withVersion(version);
@@ -63,10 +71,10 @@ public class TestSoapClient extends ExternalResource implements SoapClient {
   }
 
   TestSoapClient(String location,
-                        String address,
-                        boolean mtom,
-                        List<SecurityStrategy> securityStrategies,
-                        SoapVersion version) {
+                 String address,
+                 boolean mtom,
+                 List<SecurityStrategy> securityStrategies,
+                 SoapVersion version) {
     this(location, address, "TestService", "TestPort", mtom, securityStrategies, version);
   }
 
@@ -87,6 +95,6 @@ public class TestSoapClient extends ExternalResource implements SoapClient {
 
   @Override
   public void stop() {
-
+    dispatcher.dispose();
   }
 }

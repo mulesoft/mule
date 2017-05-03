@@ -93,6 +93,7 @@ public abstract class AbstractSoapServiceTestCase {
   @After
   public void tearDown() throws Exception {
     this.server.stop();
+    this.client.stop();
   }
 
   protected List<SecurityStrategy> getSecurityStrategies() {

@@ -6,11 +6,13 @@
  */
 package org.mule.services.soap.runtime;
 
+import static org.mockito.Mockito.mock;
 import static org.mule.services.soap.api.client.SoapClientConfiguration.builder;
 import static org.mule.test.allure.AllureConstants.WscFeature.WSC_EXTENSION;
 import static java.lang.Thread.currentThread;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.services.soap.AbstractSoapServiceTestCase;
 import org.mule.services.soap.SoapServiceImplementation;
 import org.mule.services.soap.api.client.SoapClientFactory;
@@ -42,6 +44,7 @@ public class SoapClientFactoryTestCase extends AbstractSoapServiceTestCase {
     factory.create(builder()
         .withPort("SoapResponderPortType")
         .withService("SoapResponder")
+        .withDispatcher(mock(MessageDispatcher.class))
         .withWsdlLocation(resource.getPath())
         .build());
   }

@@ -87,7 +87,7 @@ public class HttpBasicAuthConfigTestCase extends AbstractSoapServiceTestCase {
 
     Constraint constraint = new Constraint();
     constraint.setName(__BASIC_AUTH);
-    constraint.setRoles(new String[]{"user"});
+    constraint.setRoles(new String[] {"user"});
     constraint.setAuthenticate(true);
 
     ConstraintMapping cm = new ConstraintMapping();

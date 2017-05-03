@@ -85,7 +85,7 @@ public class MessageDispatcherInterceptor extends AbstractPhaseInterceptor<Messa
   private DispatchingContext getDispatchingContext(Message message) {
     Exchange exchange = message.getExchange();
     ImmutableMap.Builder<String, String> headers = ImmutableMap.<String, String>builder()
-      .put(CONTENT_TYPE, (String) message.get(CONTENT_TYPE));
+        .put(CONTENT_TYPE, (String) message.get(CONTENT_TYPE));
     String action = (String) exchange.get(MULE_SOAP_ACTION);
     if (action != null) {
       headers.put(SOAP_ACTION, action);
