@@ -35,7 +35,6 @@ public class GrizzlyHttpServer implements HttpServer, Supplier<ExecutorService> 
   private Scheduler scheduler;
   private boolean stopped = true;
   private boolean stopping;
-  private String ownerName;
 
   public GrizzlyHttpServer(ServerAddress serverAddress, TCPNIOTransport transport, HttpListenerRegistry listenerRegistry,
                            Supplier<Scheduler> schedulerSource, Runnable schedulerDisposer) {
@@ -68,6 +67,7 @@ public class GrizzlyHttpServer implements HttpServer, Supplier<ExecutorService> 
       transport.unbind(serverConnection);
     } finally {
       stopping = false;
+      stopped = true;
     }
   }
 

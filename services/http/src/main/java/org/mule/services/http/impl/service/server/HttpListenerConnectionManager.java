@@ -26,6 +26,7 @@ import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.HttpServerConfiguration;
 import org.mule.service.http.api.server.HttpServerFactory;
 import org.mule.service.http.api.server.ServerAddress;
+import org.mule.service.http.api.server.ServerNotFoundException;
 import org.mule.service.http.api.tcp.TcpServerSocketProperties;
 import org.mule.services.http.impl.service.server.grizzly.GrizzlyServerManager;
 
@@ -39,7 +40,7 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class HttpListenerConnectionManager implements HttpServerFactory, Initialisable, Disposable {
+public class HttpListenerConnectionManager implements ContextHttpServerFactory, Initialisable, Disposable {
 
   public static final String SERVER_ALREADY_EXISTS_FORMAT =
       "A server in port(%s) already exists for ip(%s) or one overlapping it (0.0.0.0).";
@@ -69,17 +70,13 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
     // TODO - MULE-11116: Analyze how to allow users to configure this
     TcpServerSocketProperties tcpServerSocketProperties = new DefaultTcpServerSocketProperties();
 
-    try {
-      selectorScheduler = schedulerService.customScheduler(schedulersConfig
-          .withMaxConcurrentTasks(getRuntime().availableProcessors() + 1).withName(LISTENER_THREAD_NAME_PREFIX), MAX_VALUE);
-      workerScheduler = schedulerService.ioScheduler(schedulersConfig);
-      idleTimeoutScheduler =
-          schedulerService.ioScheduler(schedulersConfig.withName(LISTENER_THREAD_NAME_PREFIX + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
-      httpServerManager = new GrizzlyServerManager(selectorScheduler, workerScheduler, idleTimeoutScheduler, httpListenerRegistry,
-                                                   tcpServerSocketProperties);
-    } catch (IOException e) {
-      throw new InitialisationException(e, this);
-    }
+    selectorScheduler = schedulerService.customScheduler(schedulersConfig
+        .withMaxConcurrentTasks(getRuntime().availableProcessors() + 1).withName(LISTENER_THREAD_NAME_PREFIX), MAX_VALUE);
+    workerScheduler = schedulerService.ioScheduler(schedulersConfig);
+    idleTimeoutScheduler =
+        schedulerService.ioScheduler(schedulersConfig.withName(LISTENER_THREAD_NAME_PREFIX + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
+    httpServerManager = new GrizzlyServerManager(selectorScheduler, workerScheduler, idleTimeoutScheduler, httpListenerRegistry,
+                                                 tcpServerSocketProperties);
 
   }
 
@@ -92,7 +89,7 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
   }
 
   @Override
-  public HttpServer create(HttpServerConfiguration configuration) throws ConnectionException {
+  public HttpServer create(HttpServerConfiguration configuration, String context) throws ConnectionException {
     ServerAddress serverAddress;
     String host = configuration.getHost();
     try {
@@ -104,24 +101,29 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
     TlsContextFactory tlsContextFactory = configuration.getTlsContextFactory();
     HttpServer httpServer;
     if (tlsContextFactory == null) {
-      httpServer = createServer(serverAddress, configuration.getSchedulerSupplier(),
-                                configuration.isUsePersistentConnections(), configuration.getConnectionIdleTimeout());
+      httpServer = createServer(serverAddress, configuration.getSchedulerSupplier(), configuration.isUsePersistentConnections(),
+                                configuration.getConnectionIdleTimeout(), new ServerIdentifier(context, configuration.getName()));
     } else {
       httpServer = createSslServer(serverAddress, tlsContextFactory, configuration.getSchedulerSupplier(),
-                                   configuration.isUsePersistentConnections(),
-                                   configuration.getConnectionIdleTimeout());
+                                   configuration.isUsePersistentConnections(), configuration.getConnectionIdleTimeout(),
+                                   new ServerIdentifier(context, configuration.getName()));
     }
 
     return httpServer;
   }
 
+  @Override
+  public HttpServer lookup(ServerIdentifier identifier) throws ServerNotFoundException {
+    return httpServerManager.lookupServer(identifier);
+  }
+
   public HttpServer createServer(ServerAddress serverAddress,
                                  Supplier<Scheduler> schedulerSupplier, boolean usePersistentConnections,
-                                 int connectionIdleTimeout) {
-    if (!containsServerFor(serverAddress)) {
+                                 int connectionIdleTimeout, ServerIdentifier identifier) {
+    if (!containsServerFor(serverAddress, identifier)) {
       try {
         return httpServerManager.createServerFor(serverAddress, schedulerSupplier, usePersistentConnections,
-                                                 connectionIdleTimeout);
+                                                 connectionIdleTimeout, identifier);
       } catch (IOException e) {
         throw new MuleRuntimeException(e);
       }
@@ -131,17 +133,17 @@ public class HttpListenerConnectionManager implements HttpServerFactory, Initial
     }
   }
 
-  public boolean containsServerFor(ServerAddress serverAddress) {
-    return httpServerManager.containsServerFor(serverAddress);
+  public boolean containsServerFor(ServerAddress serverAddress, ServerIdentifier identifier) {
+    return httpServerManager.containsServerFor(serverAddress, identifier);
   }
 
   public HttpServer createSslServer(ServerAddress serverAddress, TlsContextFactory tlsContext,
                                     Supplier<Scheduler> schedulerSupplier, boolean usePersistentConnections,
-                                    int connectionIdleTimeout) {
-    if (!containsServerFor(serverAddress)) {
+                                    int connectionIdleTimeout, ServerIdentifier identifier) {
+    if (!containsServerFor(serverAddress, identifier)) {
       try {
         return httpServerManager.createSslServerFor(tlsContext, schedulerSupplier, serverAddress, usePersistentConnections,
-                                                    connectionIdleTimeout);
+                                                    connectionIdleTimeout, identifier);
       } catch (IOException e) {
         throw new MuleRuntimeException(e);
       }

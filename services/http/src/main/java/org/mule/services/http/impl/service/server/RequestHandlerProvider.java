@@ -11,6 +11,8 @@ import org.mule.service.http.api.server.RequestHandler;
 
 /**
  * Provider of {@link RequestHandler} for a certain incoming http request.
+ *
+ * @since 4.0
  */
 public interface RequestHandlerProvider {
 

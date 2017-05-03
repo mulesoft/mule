@@ -55,7 +55,7 @@ public class TestHttpClient extends ExternalResource implements org.mule.service
     if (tlsContextFactory != null) {
       builder.setTlsContextFactory(tlsContextFactory);
     }
-    HttpClientConfiguration configuration = builder.build();
+    HttpClientConfiguration configuration = builder.setName(getClass().getSimpleName()).build();
     httpClient = httpService.getClientFactory().create(configuration);
     httpClient.start();
   }

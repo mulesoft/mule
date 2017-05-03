@@ -15,7 +15,6 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.service.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.service.http.api.HttpHeaders.Values.CLOSE;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -40,21 +39,6 @@ import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
 import org.mule.service.http.api.tcp.TcpClientSocketProperties;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.net.ssl.SSLContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.ning.http.client.AsyncHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -72,6 +56,21 @@ import com.ning.http.client.multipart.ByteArrayPart;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.net.ssl.SSLContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class GrizzlyHttpClient implements HttpClient {
 
   private static final int MAX_CONNECTION_LIFETIME = 30 * 60 * 1000;
@@ -87,12 +86,11 @@ public class GrizzlyHttpClient implements HttpClient {
   private final int connectionIdleTimeout;
   private int responseBufferSize;
 
-  private final String threadNamePrefix;
+  private final String name;
   private Scheduler selectorScheduler;
   private Scheduler workerScheduler;
   private final SchedulerService schedulerService;
   private final SchedulerConfig schedulersConfig;
-  private final String ownerName;
   private AsyncHttpClient asyncHttpClient;
   private SSLContext sslContext;
   private final TlsContextFactory defaultTlsContextFactory = TlsContextFactory.builder().buildDefault();
@@ -106,8 +104,7 @@ public class GrizzlyHttpClient implements HttpClient {
     this.usePersistentConnections = config.isUsePersistentConnections();
     this.connectionIdleTimeout = config.getConnectionIdleTimeout();
     this.responseBufferSize = config.getResponseBufferSize();
-    this.threadNamePrefix = config.getThreadNamePrefix();
-    this.ownerName = config.getOwnerName();
+    this.name = config.getName();
 
     this.schedulerService = schedulerService;
     this.schedulersConfig = schedulersConfig;
@@ -116,7 +113,7 @@ public class GrizzlyHttpClient implements HttpClient {
   @Override
   public void start() {
     selectorScheduler = schedulerService.customScheduler(schedulersConfig
-        .withMaxConcurrentTasks(getRuntime().availableProcessors() + 1).withName(threadNamePrefix), MAX_VALUE);
+        .withMaxConcurrentTasks(getRuntime().availableProcessors() + 1).withName(name), MAX_VALUE);
     workerScheduler = schedulerService.ioScheduler(schedulersConfig);
 
     AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
@@ -152,8 +149,8 @@ public class GrizzlyHttpClient implements HttpClient {
 
       if (trustStoreConfiguration != null && trustStoreConfiguration.isInsecure()) {
         logger
-            .warn(format("TLS configuration for requester %s has been set to use an insecure trust store. This means no certificate validations will be performed, rendering connections vulnerable to attacks. Use at own risk.",
-                         ownerName));
+            .warn(format("TLS configuration for client %s has been set to use an insecure trust store. This means no certificate validations will be performed, rendering connections vulnerable to attacks. Use at own risk.",
+                         name));
         // This disables hostname verification
         builder.setAcceptAnyCertificate(true);
       }

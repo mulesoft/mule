@@ -6,6 +6,7 @@
  */
 package org.mule.service.http.api.client;
 
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.service.http.api.client.proxy.ProxyConfig;
 import org.mule.service.http.api.tcp.TcpClientSocketProperties;
@@ -25,14 +26,11 @@ public class HttpClientConfiguration {
   private final boolean usePersistentConnections;
   private final int connectionIdleTimeout;
   private final int responseBufferSize;
-  private final String threadNamePrefix;
-  private final String ownerName;
+  private final String name;
 
   HttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig,
-                          TcpClientSocketProperties clientSocketProperties, int maxConnections,
-                          boolean usePersistentConnections, int connectionIdleTimeout, int responseBufferSize,
-                          String threadNamePrefix,
-                          String ownerName) {
+                          TcpClientSocketProperties clientSocketProperties, int maxConnections, boolean usePersistentConnections,
+                          int connectionIdleTimeout, int responseBufferSize, String name) {
     this.tlsContextFactory = tlsContextFactory;
     this.proxyConfig = proxyConfig;
     this.clientSocketProperties = clientSocketProperties;
@@ -40,8 +38,7 @@ public class HttpClientConfiguration {
     this.usePersistentConnections = usePersistentConnections;
     this.connectionIdleTimeout = connectionIdleTimeout;
     this.responseBufferSize = responseBufferSize;
-    this.threadNamePrefix = threadNamePrefix;
-    this.ownerName = ownerName;
+    this.name = name;
   }
 
   public TlsContextFactory getTlsContextFactory() {
@@ -72,16 +69,12 @@ public class HttpClientConfiguration {
     return responseBufferSize;
   }
 
-  public String getThreadNamePrefix() {
-    return threadNamePrefix;
-  }
-
-  public String getOwnerName() {
-    return ownerName;
+  public String getName() {
+    return name;
   }
 
   /**
-   * Builder of {@link HttpClientConfiguration}s. At the very least, a thread name prefix and an owner name must be provided.
+   * Builder of {@link HttpClientConfiguration}s. At the very least, a name must be provided.
    */
   public static class Builder {
 
@@ -92,8 +85,7 @@ public class HttpClientConfiguration {
     private boolean usePersistentConnections = true;
     private int connectionIdleTimeout = 30000;
     private int responseBufferSize = 10240;
-    private String threadNamePrefix;
-    private String ownerName;
+    private String name;
 
     /**
      * Required exclusively for HTTPS, this defines through a {@link TlsContextFactory} all the TLS related data to establish
@@ -177,24 +169,13 @@ public class HttpClientConfiguration {
     }
 
     /**
-     * Defines the prefix to use to name the {@link HttpClient}'s threads. Must be specified.
+     * Defines the name of the {@link HttpClient}. Must be specified.
      *
-     * @param threadNamePrefix a {@link String} representing the prefix
+     * @param name a {@link String} representing the prefix
      * @return this builder
      */
-    public Builder setThreadNamePrefix(String threadNamePrefix) {
-      this.threadNamePrefix = threadNamePrefix;
-      return this;
-    }
-
-    /**
-     * Defines the name of the {@link HttpClient}'s owner. Must be specified.
-     *
-     * @param ownerName a {@link String} with the name
-     * @return this builder
-     */
-    public Builder setOwnerName(String ownerName) {
-      this.ownerName = ownerName;
+    public Builder setName(String name) {
+      this.name = name;
       return this;
     }
 
@@ -202,9 +183,9 @@ public class HttpClientConfiguration {
      * @return an {@link HttpClientConfiguration} as specified.
      */
     public HttpClientConfiguration build() {
+      checkNotNull(name, "Name is mandatory.");
       return new HttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
-                                         usePersistentConnections, connectionIdleTimeout, responseBufferSize, threadNamePrefix,
-                                         ownerName);
+                                         usePersistentConnections, connectionIdleTimeout, responseBufferSize, name);
     }
   }
 }

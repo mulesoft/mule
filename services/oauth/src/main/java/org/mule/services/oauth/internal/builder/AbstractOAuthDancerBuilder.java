@@ -68,7 +68,7 @@ public abstract class AbstractOAuthDancerBuilder<D> implements OAuthDancerBuilde
     this.tokenUrl = tokenUrl;
     this.httpClientFactory = () -> {
       final Builder clientConfigBuilder =
-          new HttpClientConfiguration.Builder().setThreadNamePrefix(format("oauthToken.requester[%s]", tokenUrl));
+          new HttpClientConfiguration.Builder().setName(format("oauthToken.requester[%s]", tokenUrl));
       return httpService.getClientFactory().create(clientConfigBuilder.build());
     };
     return this;
@@ -112,7 +112,7 @@ public abstract class AbstractOAuthDancerBuilder<D> implements OAuthDancerBuilde
     this.tokenUrl = tokenUrl;
     this.httpClientFactory = () -> {
       final Builder clientConfigBuilder =
-          new HttpClientConfiguration.Builder().setThreadNamePrefix(format("oauthToken.requester[%s]", tokenUrl));
+          new HttpClientConfiguration.Builder().setName(format("oauthToken.requester[%s]", tokenUrl));
       clientConfigBuilder.setTlsContextFactory(tlsContextFactory);
       return httpService.getClientFactory().create(clientConfigBuilder.build());
     };

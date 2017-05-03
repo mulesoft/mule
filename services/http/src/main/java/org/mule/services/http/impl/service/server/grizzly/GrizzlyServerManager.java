@@ -19,13 +19,18 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.service.http.api.server.HttpServer;
+import org.mule.service.http.api.server.RequestHandler;
+import org.mule.service.http.api.server.RequestHandlerManager;
 import org.mule.service.http.api.server.ServerAddress;
+import org.mule.service.http.api.server.ServerNotFoundException;
 import org.mule.service.http.api.tcp.TcpServerSocketProperties;
 import org.mule.services.http.impl.service.client.HttpMessageLogger;
 import org.mule.services.http.impl.service.server.HttpListenerRegistry;
 import org.mule.services.http.impl.service.server.HttpServerManager;
+import org.mule.services.http.impl.service.server.ServerIdentifier;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -57,13 +62,14 @@ public class GrizzlyServerManager implements HttpServerManager {
   private final ExecutorService idleTimeoutExecutorService;
   private Logger logger = LoggerFactory.getLogger(GrizzlyServerManager.class);
   private Map<ServerAddress, GrizzlyHttpServer> servers = new ConcurrentHashMap<>();
+  private Map<ServerIdentifier, GrizzlyHttpServer> serversByIdentifier = new ConcurrentHashMap<>();
   private Map<ServerAddress, IdleExecutor> idleExecutorPerServerAddressMap = new ConcurrentHashMap<>();
+
   private boolean transportStarted;
 
   public GrizzlyServerManager(ExecutorService selectorPool, ExecutorService workerPool,
                               ExecutorService idleTimeoutExecutorService, HttpListenerRegistry httpListenerRegistry,
-                              TcpServerSocketProperties serverSocketProperties)
-      throws IOException {
+                              TcpServerSocketProperties serverSocketProperties) {
     this.httpListenerRegistry = httpListenerRegistry;
     requestHandlerFilter = new GrizzlyRequestDispatcherFilter(httpListenerRegistry);
     sslFilterDelegate = new GrizzlyAddressDelegateFilter<>();
@@ -142,8 +148,9 @@ public class GrizzlyServerManager implements HttpServerManager {
   }
 
   @Override
-  public boolean containsServerFor(final ServerAddress serverAddress) {
-    return servers.containsKey(serverAddress) || containsOverlappingServerFor(serverAddress);
+  public boolean containsServerFor(final ServerAddress serverAddress, ServerIdentifier identifier) {
+    return servers.containsKey(serverAddress) || containsOverlappingServerFor(serverAddress) ||
+        serversByIdentifier.containsKey(identifier);
   }
 
   private boolean containsOverlappingServerFor(ServerAddress newServerAddress) {
@@ -158,7 +165,7 @@ public class GrizzlyServerManager implements HttpServerManager {
   @Override
   public HttpServer createSslServerFor(TlsContextFactory tlsContextFactory, Supplier<Scheduler> schedulerSupplier,
                                        final ServerAddress serverAddress, boolean usePersistentConnections,
-                                       int connectionIdleTimeout)
+                                       int connectionIdleTimeout, ServerIdentifier identifier)
       throws IOException {
     if (logger.isDebugEnabled()) {
       logger.debug("Creating https server socket for ip {} and port {}", serverAddress.getIp(), serverAddress.getPort());
@@ -172,17 +179,19 @@ public class GrizzlyServerManager implements HttpServerManager {
     httpServerFilterDelegate.addFilterForAddress(serverAddress,
                                                  createHttpServerFilter(serverAddress, connectionIdleTimeout,
                                                                         usePersistentConnections));
-    final GrizzlyHttpServer grizzlyServer = new GrizzlyHttpServerWrapper(serverAddress, transport, httpListenerRegistry,
+    final GrizzlyHttpServer grizzlyServer = new ManagedGrizzlyHttpServer(serverAddress, transport, httpListenerRegistry,
                                                                          schedulerSupplier,
-                                                                         () -> executorProvider.removeExecutor(serverAddress));
+                                                                         () -> executorProvider.removeExecutor(serverAddress),
+                                                                         identifier);
     executorProvider.addExecutor(serverAddress, grizzlyServer);
     servers.put(serverAddress, grizzlyServer);
+    serversByIdentifier.put(identifier, grizzlyServer);
     return grizzlyServer;
   }
 
   @Override
   public HttpServer createServerFor(ServerAddress serverAddress, Supplier<Scheduler> schedulerSupplier,
-                                    boolean usePersistentConnections, int connectionIdleTimeout)
+                                    boolean usePersistentConnections, int connectionIdleTimeout, ServerIdentifier identifier)
       throws IOException {
     if (logger.isDebugEnabled()) {
       logger.debug("Creating http server socket for ip {} and port {}", serverAddress.getIp(), serverAddress.getPort());
@@ -195,12 +204,24 @@ public class GrizzlyServerManager implements HttpServerManager {
     httpServerFilterDelegate.addFilterForAddress(serverAddress,
                                                  createHttpServerFilter(serverAddress, connectionIdleTimeout,
                                                                         usePersistentConnections));
-    final GrizzlyHttpServer grizzlyServer = new GrizzlyHttpServerWrapper(serverAddress, transport, httpListenerRegistry,
+    final GrizzlyHttpServer grizzlyServer = new ManagedGrizzlyHttpServer(serverAddress, transport, httpListenerRegistry,
                                                                          schedulerSupplier,
-                                                                         () -> executorProvider.removeExecutor(serverAddress));
+                                                                         () -> executorProvider.removeExecutor(serverAddress),
+                                                                         identifier);
     executorProvider.addExecutor(serverAddress, grizzlyServer);
     servers.put(serverAddress, grizzlyServer);
+    serversByIdentifier.put(identifier, grizzlyServer);
     return grizzlyServer;
+  }
+
+  @Override
+  public HttpServer lookupServer(ServerIdentifier identifier) throws ServerNotFoundException {
+    GrizzlyHttpServer httpServer = serversByIdentifier.get(identifier);
+    if (httpServer != null) {
+      return new NoLifecycleHttpServer(httpServer);
+    } else {
+      throw new ServerNotFoundException(identifier.getName());
+    }
   }
 
   @Override
@@ -208,6 +229,7 @@ public class GrizzlyServerManager implements HttpServerManager {
     if (transportStarted) {
       transport.shutdown();
       servers.clear();
+      serversByIdentifier.clear();
     }
   }
 
@@ -262,14 +284,17 @@ public class GrizzlyServerManager implements HttpServerManager {
   /**
    * Wrapper that adds startup and disposal of manager specific data.
    */
-  private class GrizzlyHttpServerWrapper extends GrizzlyHttpServer {
+  private class ManagedGrizzlyHttpServer extends GrizzlyHttpServer {
+
+    private final ServerIdentifier identifier;
 
     // TODO - MULE-11117: Cleanup GrizzlyServerManager server specific data
 
-    public GrizzlyHttpServerWrapper(ServerAddress serverAddress, TCPNIOTransport transport,
+    public ManagedGrizzlyHttpServer(ServerAddress serverAddress, TCPNIOTransport transport,
                                     HttpListenerRegistry listenerRegistry, Supplier<Scheduler> schedulerSupplier,
-                                    Runnable schedulerDisposer) {
+                                    Runnable schedulerDisposer, ServerIdentifier identifier) {
       super(serverAddress, transport, listenerRegistry, schedulerSupplier, schedulerDisposer);
+      this.identifier = identifier;
     }
 
     @Override
@@ -283,11 +308,66 @@ public class GrizzlyServerManager implements HttpServerManager {
       super.dispose();
       ServerAddress serverAddress = this.getServerAddress();
       servers.remove(serverAddress);
+      serversByIdentifier.remove(identifier);
       httpListenerRegistry.removeHandlersFor(this);
       httpServerFilterDelegate.removeFilterForAddress(serverAddress);
       idleExecutorPerServerAddressMap.get(serverAddress).dispose();
       idleExecutorPerServerAddressMap.remove(serverAddress);
       sslFilterDelegate.removeFilterForAddress(serverAddress);
+    }
+  }
+
+
+  /**
+   * Wrapper that avoids all lifecycle operations, so that the inner server owns that exclusively.
+   */
+  private class NoLifecycleHttpServer implements HttpServer {
+
+    private final HttpServer delegate;
+
+    public NoLifecycleHttpServer(HttpServer delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public void start() throws IOException {
+      // Do nothing
+    }
+
+    @Override
+    public void stop() {
+      // Do nothing
+    }
+
+    @Override
+    public void dispose() {
+      // Do nothing
+    }
+
+    @Override
+    public ServerAddress getServerAddress() {
+      return delegate.getServerAddress();
+    }
+
+    @Override
+    public boolean isStopping() {
+      return delegate.isStopping();
+    }
+
+    @Override
+    public boolean isStopped() {
+      return delegate.isStopped();
+    }
+
+    @Override
+    public RequestHandlerManager addRequestHandler(Collection<String> methods, String path,
+                                                   RequestHandler requestHandler) {
+      return delegate.addRequestHandler(methods, path, requestHandler);
+    }
+
+    @Override
+    public RequestHandlerManager addRequestHandler(String path, RequestHandler requestHandler) {
+      return delegate.addRequestHandler(path, requestHandler);
     }
   }
 
