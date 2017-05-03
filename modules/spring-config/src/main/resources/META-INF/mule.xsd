@@ -2427,85 +2427,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="websphere-transaction-manager" type="transactionManagerType"
-                 substitutionGroup="abstract-transaction-manager">
-        <xsd:annotation>
-            <xsd:documentation>
-                The WebSphere transaction manager.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="jboss-transaction-manager" type="transactionManagerType"
-                 substitutionGroup="abstract-transaction-manager">
-        <xsd:annotation>
-            <xsd:documentation>
-                The JBoss transaction manager.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="jndiTransactionManagerType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractTransactionManagerType">
-                <xsd:sequence>
-                    <xsd:element name="environment" type="mapType" minOccurs="0" maxOccurs="1">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The JNDI environment.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="weblogic-transaction-manager" type="jndiTransactionManagerType"
-                 substitutionGroup="abstract-transaction-manager">
-        <xsd:annotation>
-            <xsd:documentation>
-                The WebLogic transaction manager.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="jrun-transaction-manager" type="transactionManagerType"
-                 substitutionGroup="abstract-transaction-manager">
-        <xsd:annotation>
-            <xsd:documentation>
-                The JRun transaction manager.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="resin-transaction-manager" type="transactionManagerType"
-                 substitutionGroup="abstract-transaction-manager">
-        <xsd:annotation>
-            <xsd:documentation>
-                The Resin transaction manager.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="jndi-transaction-manager" substitutionGroup="abstract-transaction-manager">
-        <xsd:annotation>
-            <xsd:documentation>
-                Retrieves a named transaction manager factory from JNDI.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="jndiTransactionManagerType">
-                    <xsd:attribute name="jndiName" type="xsd:string">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The name of the manager factory to retrieve (such as java:/TransactionManager).
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
     <xsd:element name="custom-transaction-manager" type="customTransactionManagerType"
                  substitutionGroup="abstract-transaction-manager">
         <xsd:annotation>
@@ -2516,8 +2437,15 @@
     </xsd:element>
     <xsd:complexType name="customTransactionManagerType">
         <xsd:complexContent>
-            <xsd:extension base="jndiTransactionManagerType">
+            <xsd:extension base="abstractTransactionManagerType">
                 <xsd:sequence>
+                    <xsd:element name="environment" type="mapType" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The JNDI environment.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
                             <xsd:documentation>

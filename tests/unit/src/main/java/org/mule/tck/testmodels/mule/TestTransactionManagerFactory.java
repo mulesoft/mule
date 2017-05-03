@@ -7,19 +7,22 @@
 package org.mule.tck.testmodels.mule;
 
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.transaction.lookup.GenericTransactionManagerLookupFactory;
+import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Map;
 
 import javax.transaction.TransactionManager;
 
 /**
- * <code>TestTransactionManagerFactory</code> TODO
+ * Provides a transaction factory for testing purposes
  */
-public class TestTransactionManagerFactory extends GenericTransactionManagerLookupFactory {
+public class TestTransactionManagerFactory implements TransactionManagerFactory {
+
+  private Map<Object, Object> environment;
 
   @Override
   public TransactionManager create(MuleConfiguration config) throws Exception {
@@ -27,9 +30,12 @@ public class TestTransactionManagerFactory extends GenericTransactionManagerLook
                                                        new InternalInvocationHandler());
   }
 
-  @Override
-  public void initialise() {
-    // shortcut super's implementation
+  public Map getEnvironment() {
+    return environment;
+  }
+
+  public void setEnvironment(Map<Object, Object> environment) {
+    this.environment = environment;
   }
 
   public class InternalInvocationHandler implements InvocationHandler {
