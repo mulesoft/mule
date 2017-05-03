@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api.transaction;
 
-import org.mule.runtime.core.transaction.constraints.ConstraintFilter;
-
 /**
  * <code>TransactionConfig</code> defines transaction configuration for a transactional endpoint.
  */
@@ -81,10 +79,6 @@ public interface TransactionConfig {
   void setAction(byte action);
 
   boolean isTransacted();
-
-  ConstraintFilter getConstraint();
-
-  void setConstraint(ConstraintFilter constraint);
 
   void setTimeout(int timeout);
 
