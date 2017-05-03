@@ -7,11 +7,10 @@
 package org.mule.test.oauth2.internal.authorizationcode.functional;
 
 import static org.mule.services.oauth.internal.OAuthConstants.CODE_PARAMETER;
+
 import org.apache.http.client.fluent.Request;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("MULE-11276 - Need a way to reuse an http listener declared in the application/domain")
 public class AuthorizationCodeLocalCallbackConfigTestCase extends AbstractAuthorizationCodeBasicTestCase {
 
   @Override

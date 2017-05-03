@@ -10,8 +10,8 @@ import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.mule.service.http.api.HttpHeaders.Names.AUTHORIZATION;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.oauth2.internal.AbstractGrantType;
 import org.mule.extension.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -22,15 +22,16 @@ import org.mule.runtime.core.util.store.SimpleObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
+import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 import org.mule.service.http.api.server.HttpServer;
+import org.mule.service.http.api.server.ServerNotFoundException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -52,9 +53,9 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
    * Listener configuration to be used instead of localCallbackUrl. Note that if using this you must also provide a
    * localCallbackConfigPath separately.
    */
-  @Config
+  @Parameter
   @Optional
-  private HttpListenerConfig localCallbackConfig;
+  private String localCallbackConfig;
 
   /**
    * Local path for the listener that will be created according to localCallbackConfig, not required if using localCallbackUrl.
@@ -131,7 +132,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
 
   private AuthorizationCodeOAuthDancer dancer;
 
-  public HttpListenerConfig getLocalCallbackConfig() {
+  public String getLocalCallbackConfig() {
     return localCallbackConfig;
   }
 
@@ -192,10 +193,10 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
           dancerBuilder = dancerBuilder.localCallback(new URL(localCallbackUrl));
         }
       } else if (localCallbackConfig != null) {
-        // TODO MULE-11276 - Need a way to reuse an http listener declared in the application/domain")
-        HttpServer server = null;
+        HttpService httpService = muleContext.getRegistry().lookupObject(HttpService.class);
+        HttpServer server = httpService.getServerFactory().lookup(localCallbackConfig);
+
         dancerBuilder = dancerBuilder.localCallback(server, localCallbackConfigPath);
-        throw new UnsupportedOperationException("Not implemented yet.");
       }
       dancerBuilder = dancerBuilder
           .localAuthorizationUrlPath(new URL(localAuthorizationUrl).getPath())
@@ -205,7 +206,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
           .authorizationUrl(authorizationUrl)
           .externalCallbackUrl(externalCallbackUrl);
       return dancerBuilder;
-    } catch (MalformedURLException e) {
+    } catch (MalformedURLException | RegistrationException | ServerNotFoundException e) {
       throw new InitialisationException(e, this);
     }
   }
