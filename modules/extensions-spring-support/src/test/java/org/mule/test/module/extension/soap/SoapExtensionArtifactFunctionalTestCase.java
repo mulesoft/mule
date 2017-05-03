@@ -52,4 +52,11 @@ public abstract class SoapExtensionArtifactFunctionalTestCase extends MuleArtifa
     return String.format("<con:%s xmlns:con=\"%s\">%s</con:%s>", tagName, ns, content, tagName);
   }
 
+  @Override
+  protected void doTearDown() throws Exception {
+    super.doTearDown();
+    footballService.stop();
+    laLigaService.stop();
+  }
+
 }
