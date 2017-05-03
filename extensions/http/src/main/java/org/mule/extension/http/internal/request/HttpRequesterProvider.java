@@ -62,7 +62,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   private static final Logger logger = LoggerFactory.getLogger(HttpRequesterProvider.class);
 
   private static final int UNLIMITED_CONNECTIONS = -1;
-  private static final String THREAD_NAME_PREFIX_PATTERN = "http.requester.%s";
+  private static final String NAME_PATTERN = "http.requester.%s";
 
   @Inject
   private MuleContext muleContext;
@@ -166,7 +166,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     if (client.isPresent()) {
       httpClient = client.get();
     } else {
-      String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, configName);
+      String name = format(NAME_PATTERN, configName);
 
       HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
           .setTlsContextFactory(tlsContext)
@@ -176,8 +176,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
           .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
           .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
           .setResponseBufferSize(connectionParams.getResponseBufferSize())
-          .setThreadNamePrefix(threadNamePrefix)
-          .setOwnerName(configName)
+          .setName(name)
           .build();
 
       httpClient = connectionManager.create(configName, configuration);

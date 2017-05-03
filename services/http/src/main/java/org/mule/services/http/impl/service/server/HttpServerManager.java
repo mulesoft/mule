@@ -10,6 +10,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.ServerAddress;
+import org.mule.service.http.api.server.ServerNotFoundException;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -19,6 +20,8 @@ import java.util.function.Supplier;
 /**
  * A Server managers is in charge to handle all ServerSocket connections and to handle incoming requests to an Execution Service
  * for processing.
+ *
+ * @since 4.0
  */
 public interface HttpServerManager {
 
@@ -63,8 +66,9 @@ public interface HttpServerManager {
    *
    * @param identifier the id of the server
    * @return an {@link Optional} with the corresponding {@link HttpServer} or an empty one, if none was found
+   * @throws ServerNotFoundException when the desired server was not found
    */
-  Optional<HttpServer> lookupServer(ServerIdentifier identifier);
+  HttpServer lookupServer(ServerIdentifier identifier) throws ServerNotFoundException;
 
   /**
    *

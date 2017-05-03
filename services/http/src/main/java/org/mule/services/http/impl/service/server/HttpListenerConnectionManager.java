@@ -26,12 +26,12 @@ import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.HttpServerConfiguration;
 import org.mule.service.http.api.server.HttpServerFactory;
 import org.mule.service.http.api.server.ServerAddress;
+import org.mule.service.http.api.server.ServerNotFoundException;
 import org.mule.service.http.api.tcp.TcpServerSocketProperties;
 import org.mule.services.http.impl.service.server.grizzly.GrizzlyServerManager;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
@@ -113,7 +113,7 @@ public class HttpListenerConnectionManager implements ContextHttpServerFactory, 
   }
 
   @Override
-  public Optional<HttpServer> lookup(ServerIdentifier identifier) {
+  public HttpServer lookup(ServerIdentifier identifier) throws ServerNotFoundException {
     return httpServerManager.lookupServer(identifier);
   }
 

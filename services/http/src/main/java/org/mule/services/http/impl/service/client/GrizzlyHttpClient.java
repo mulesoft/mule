@@ -86,12 +86,11 @@ public class GrizzlyHttpClient implements HttpClient {
   private final int connectionIdleTimeout;
   private int responseBufferSize;
 
-  private final String threadNamePrefix;
+  private final String name;
   private Scheduler selectorScheduler;
   private Scheduler workerScheduler;
   private final SchedulerService schedulerService;
   private final SchedulerConfig schedulersConfig;
-  private final String ownerName;
   private AsyncHttpClient asyncHttpClient;
   private SSLContext sslContext;
   private final TlsContextFactory defaultTlsContextFactory = TlsContextFactory.builder().buildDefault();
@@ -105,8 +104,7 @@ public class GrizzlyHttpClient implements HttpClient {
     this.usePersistentConnections = config.isUsePersistentConnections();
     this.connectionIdleTimeout = config.getConnectionIdleTimeout();
     this.responseBufferSize = config.getResponseBufferSize();
-    this.threadNamePrefix = config.getThreadNamePrefix();
-    this.ownerName = config.getOwnerName();
+    this.name = config.getName();
 
     this.schedulerService = schedulerService;
     this.schedulersConfig = schedulersConfig;
@@ -115,7 +113,7 @@ public class GrizzlyHttpClient implements HttpClient {
   @Override
   public void start() {
     selectorScheduler = schedulerService.customScheduler(schedulersConfig
-        .withMaxConcurrentTasks(getRuntime().availableProcessors() + 1).withName(threadNamePrefix), MAX_VALUE);
+        .withMaxConcurrentTasks(getRuntime().availableProcessors() + 1).withName(name), MAX_VALUE);
     workerScheduler = schedulerService.ioScheduler(schedulersConfig);
 
     AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
@@ -152,7 +150,7 @@ public class GrizzlyHttpClient implements HttpClient {
       if (trustStoreConfiguration != null && trustStoreConfiguration.isInsecure()) {
         logger
             .warn(format("TLS configuration for client %s has been set to use an insecure trust store. This means no certificate validations will be performed, rendering connections vulnerable to attacks. Use at own risk.",
-                         ownerName));
+                         name));
         // This disables hostname verification
         builder.setAcceptAnyCertificate(true);
       }

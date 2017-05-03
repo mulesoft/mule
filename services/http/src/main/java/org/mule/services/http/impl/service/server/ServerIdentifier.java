@@ -8,6 +8,8 @@ package org.mule.services.http.impl.service.server;
 
 /**
  * Allows to identify a server by it's creation context and name.
+ *
+ * @since 4.0
  */
 public class ServerIdentifier {
 
@@ -17,6 +19,10 @@ public class ServerIdentifier {
   public ServerIdentifier(String context, String name) {
     this.context = context;
     this.name = name;
+  }
+
+  public String getName() {
+    return name;
   }
 
   @Override

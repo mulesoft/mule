@@ -97,10 +97,7 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
   public static DefaultHttpMessageDispatcher create(String address, HttpService httpService) {
     String ownerName = format("wsc-default:[%s]", address);
     HttpClientFactory clientFactory = httpService.getClientFactory();
-    HttpClient client = clientFactory.create(new HttpClientConfiguration.Builder()
-        .setThreadNamePrefix(ownerName)
-        .setOwnerName(ownerName)
-        .build());
+    HttpClient client = clientFactory.create(new HttpClientConfiguration.Builder().setName(ownerName).build());
     client.start();
     return new DefaultHttpMessageDispatcher(address, client);
   }

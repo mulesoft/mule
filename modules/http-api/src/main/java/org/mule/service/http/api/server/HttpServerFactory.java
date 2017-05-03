@@ -8,8 +8,6 @@ package org.mule.service.http.api.server;
 
 import org.mule.runtime.api.connection.ConnectionException;
 
-import java.util.Optional;
-
 /**
  * Factory object for {@link HttpServer}.
  *
@@ -31,7 +29,8 @@ public interface HttpServerFactory {
    * the retrieved instance won't take effect since only the owner of the server can modify it's status.
    *
    * @param name the name the desired {@link HttpServer} was given when created (see {@link HttpServerConfiguration#getName()})
-   * @return an {@link Optional} with the server or an empty one, if none was found.
+   * @return the server found
+   * @throws ServerNotFoundException when the desired server was not found
    */
-  Optional<HttpServer> lookup(String name);
+  HttpServer lookup(String name) throws ServerNotFoundException;
 }

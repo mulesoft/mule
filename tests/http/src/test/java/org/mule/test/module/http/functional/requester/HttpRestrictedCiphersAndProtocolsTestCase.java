@@ -115,7 +115,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
   public void createHttpClient() {
     httpClientWithCertificate = getService(HttpService.class).getClientFactory()
         .create(new HttpClientConfiguration.Builder()
-            .setThreadNamePrefix(getClass().getSimpleName())
+            .setName(getClass().getSimpleName())
             .setTlsContextFactory(tlsContextFactory)
             .build());
     httpClientWithCertificate.start();

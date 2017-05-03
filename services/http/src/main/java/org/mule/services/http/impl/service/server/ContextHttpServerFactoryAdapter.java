@@ -10,11 +10,12 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.HttpServerConfiguration;
 import org.mule.service.http.api.server.HttpServerFactory;
-
-import java.util.Optional;
+import org.mule.service.http.api.server.ServerNotFoundException;
 
 /**
  * Adapts a {@link ContextHttpServerFactory} to a {@link HttpServerFactory}.
+ *
+ * @since 4.0
  */
 public class ContextHttpServerFactoryAdapter implements HttpServerFactory {
 
@@ -32,7 +33,7 @@ public class ContextHttpServerFactoryAdapter implements HttpServerFactory {
   }
 
   @Override
-  public Optional<HttpServer> lookup(String name) {
+  public HttpServer lookup(String name) throws ServerNotFoundException {
     return delegate.lookup(new ServerIdentifier(context, name));
   }
 }

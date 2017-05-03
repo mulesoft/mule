@@ -9,8 +9,6 @@ package org.mule.services.http.impl.service.server.grizzly;
 import static java.lang.Integer.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -24,6 +22,7 @@ import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.RequestHandler;
 import org.mule.service.http.api.server.RequestHandlerManager;
 import org.mule.service.http.api.server.ServerAddress;
+import org.mule.service.http.api.server.ServerNotFoundException;
 import org.mule.service.http.api.tcp.TcpServerSocketProperties;
 import org.mule.services.http.impl.service.client.HttpMessageLogger;
 import org.mule.services.http.impl.service.server.HttpListenerRegistry;
@@ -33,7 +32,6 @@ import org.mule.services.http.impl.service.server.ServerIdentifier;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
@@ -217,12 +215,12 @@ public class GrizzlyServerManager implements HttpServerManager {
   }
 
   @Override
-  public Optional<HttpServer> lookupServer(ServerIdentifier identifier) {
+  public HttpServer lookupServer(ServerIdentifier identifier) throws ServerNotFoundException {
     GrizzlyHttpServer httpServer = serversByIdentifier.get(identifier);
     if (httpServer != null) {
-      return of(new NoLifecycleHttpServer(httpServer));
+      return new NoLifecycleHttpServer(httpServer);
     } else {
-      return empty();
+      throw new ServerNotFoundException(identifier.getName());
     }
   }
 

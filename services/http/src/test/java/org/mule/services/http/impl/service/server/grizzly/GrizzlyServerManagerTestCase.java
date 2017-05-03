@@ -15,9 +15,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
 import org.mule.service.http.api.domain.message.response.HttpResponse;
 import org.mule.service.http.api.server.HttpServer;
+import org.mule.service.http.api.server.ServerNotFoundException;
 import org.mule.service.http.api.server.async.ResponseStatusCallback;
 import org.mule.service.http.api.tcp.TcpServerSocketProperties;
 import org.mule.services.http.impl.service.server.DefaultServerAddress;
@@ -37,11 +37,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public DynamicPort listenerPort = new DynamicPort("listener.port");
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   private ExecutorService selectorPool;
   private ExecutorService workerPool;
@@ -116,7 +119,7 @@ public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
                                                                    () -> muleContext.getSchedulerService().ioScheduler(), true,
                                                                    (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
                                                                    identifier);
-    final HttpServer foundServer = serverManager.lookupServer(new ServerIdentifier("context", "name")).get();
+    final HttpServer foundServer = serverManager.lookupServer(new ServerIdentifier("context", "name"));
     assertThat(createdServer.getServerAddress(), is(equalTo(foundServer.getServerAddress())));
     createdServer.dispose();
   }
@@ -129,8 +132,13 @@ public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
                                                       () -> muleContext.getSchedulerService().ioScheduler(), true,
                                                       (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
                                                       identifier);
-    assertThat(serverManager.lookupServer(new ServerIdentifier("otherContext", name)), is(empty()));
-    server.dispose();
+    try {
+      expectedException.expect(ServerNotFoundException.class);
+      expectedException.expectMessage(is("Server \"name\" could not be found."));
+      serverManager.lookupServer(new ServerIdentifier("otherContext", name));
+    } finally {
+      server.dispose();
+    }
   }
 
   @Test
@@ -171,7 +179,9 @@ public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
     server.start();
     server.stop();
     server.dispose();
-    assertThat(serverManager.lookupServer(identifier), is(empty()));
+    expectedException.expect(ServerNotFoundException.class);
+    expectedException.expectMessage(is("Server \"name\" could not be found."));
+    serverManager.lookupServer(identifier);
   }
 
   @Test
@@ -181,7 +191,7 @@ public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
                                                      () -> muleContext.getSchedulerService().ioScheduler(), true,
                                                      (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
                                                      identifier);
-    HttpServer reference = serverManager.lookupServer(identifier).get();
+    HttpServer reference = serverManager.lookupServer(identifier);
 
     assertThat(owner.isStopped(), is(true));
     assertThat(reference.isStopped(), is(true));
@@ -207,7 +217,7 @@ public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
                                                      () -> muleContext.getSchedulerService().ioScheduler(), true,
                                                      (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
                                                      identifier);
-    HttpServer reference = serverManager.lookupServer(identifier).get();
+    HttpServer reference = serverManager.lookupServer(identifier);
 
     owner.start();
 
@@ -234,7 +244,7 @@ public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
     HttpServer owner = serverManager.createServerFor(serverAddress, () -> muleContext.getSchedulerService().ioScheduler(), true,
                                                      (int) SECONDS.toMillis(DEFAULT_TEST_TIMEOUT_SECS),
                                                      identifier);
-    HttpServer reference = serverManager.lookupServer(identifier).get();
+    HttpServer reference = serverManager.lookupServer(identifier);
 
     assertThat(serverManager.containsServerFor(serverAddress, identifier), is(true));
 

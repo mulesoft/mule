@@ -9,12 +9,15 @@ package org.mule.services.http.impl.service.server;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.service.http.api.server.HttpServer;
 import org.mule.service.http.api.server.HttpServerConfiguration;
+import org.mule.service.http.api.server.ServerNotFoundException;
 
 import java.util.Optional;
 
 /**
  * Factory object for {@link HttpServer} that partitions them considering a given creation context in which they can be later
  * shared.
+ *
+ * @since 4.0
  */
 public interface ContextHttpServerFactory {
 
@@ -33,7 +36,8 @@ public interface ContextHttpServerFactory {
    *
    * @param identifier the identifier of the server
    * @return an {@link Optional} with the server or an empty one, if none was found.
+   * @throws ServerNotFoundException when the desired server was not found
    */
-  Optional<HttpServer> lookup(ServerIdentifier identifier);
+  HttpServer lookup(ServerIdentifier identifier) throws ServerNotFoundException;
 
 }

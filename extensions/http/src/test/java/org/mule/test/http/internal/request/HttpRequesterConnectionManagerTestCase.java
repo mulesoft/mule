@@ -55,7 +55,7 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
                                                      invocation -> {
                                                        HttpClientConfiguration configuration =
                                                            (HttpClientConfiguration) invocation.getArguments()[0];
-                                                       if (CONFIG_NAME.equals(configuration.getOwnerName())) {
+                                                       if (CONFIG_NAME.equals(configuration.getName())) {
                                                          return delegateHttpClient;
                                                        } else {
                                                          return otherHttpClient;
@@ -116,7 +116,7 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
 
   private HttpClientConfiguration getHttpClientConfiguration(String configName) {
     HttpClientConfiguration configuration = mock(HttpClientConfiguration.class);
-    when(configuration.getOwnerName()).thenReturn(configName);
+    when(configuration.getName()).thenReturn(configName);
     return configuration;
   }
 
