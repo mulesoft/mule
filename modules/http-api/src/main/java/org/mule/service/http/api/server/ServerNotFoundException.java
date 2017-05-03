@@ -16,8 +16,10 @@ import org.mule.runtime.api.exception.MuleException;
  */
 public class ServerNotFoundException extends MuleException {
 
+  private static final long serialVersionUID = 2587466114314625848L;
+
   public ServerNotFoundException(String serverName) {
-    super(createStaticMessage("Server \"%s\" could not be found.", serverName));
+    super(createStaticMessage("Server '%s' could not be found.", serverName));
   }
 
 }

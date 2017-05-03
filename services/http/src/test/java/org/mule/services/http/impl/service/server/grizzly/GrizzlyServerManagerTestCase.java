@@ -134,7 +134,7 @@ public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
                                                       identifier);
     try {
       expectedException.expect(ServerNotFoundException.class);
-      expectedException.expectMessage(is("Server \"name\" could not be found."));
+      expectedException.expectMessage(is("Server 'name' could not be found."));
       serverManager.lookupServer(new ServerIdentifier("otherContext", name));
     } finally {
       server.dispose();
@@ -180,7 +180,7 @@ public class GrizzlyServerManagerTestCase extends AbstractMuleContextTestCase {
     server.stop();
     server.dispose();
     expectedException.expect(ServerNotFoundException.class);
-    expectedException.expectMessage(is("Server \"name\" could not be found."));
+    expectedException.expectMessage(is("Server 'name' could not be found."));
     serverManager.lookupServer(identifier);
   }
 
