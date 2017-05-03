@@ -97,9 +97,13 @@ public class MinimalApplicationModelGenerator {
     LinkedHashMap<ComponentModel, List<ComponentModel>> componentModelDependencies = new LinkedHashMap<>();
     applicationModel.executeOnEveryMuleComponentTree(componentModel -> {
       if (componentModel.getNameAttribute() != null && componentModel.isEnabled()) {
-        List<ComponentModel> dependencies = resolveComponentModelDependencies(null, componentModel).stream()
-            .map(componentModelName -> applicationModel.findNamedComponent(componentModelName).get()).collect(toList());
-        componentModelDependencies.put(componentModel, dependencies);
+        try {
+          List<ComponentModel> dependencies = resolveComponentModelDependencies(null, componentModel).stream()
+              .map(componentModelName -> applicationModel.findNamedComponent(componentModelName).get()).collect(toList());
+          componentModelDependencies.put(componentModel, dependencies);
+        } catch (NoSuchComponentModelException e) {
+          // If a dependency cannot be found this componentModel will not be added
+        }
       }
     });
 
