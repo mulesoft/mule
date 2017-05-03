@@ -178,11 +178,11 @@ public class DancerConfigTestCase extends AbstractMuleContextTestCase {
     builder.localCallback(httpServer, "/localCallback");
 
     Object minimalDancer = startDancer(builder);
-    verify(httpServer, never()).start();
+    verify(httpServer).start();
     verify(httpServer).addRequestHandler(eq(singleton(GET.name())), eq("/localCallback"), any());
 
     stopIfNeeded(minimalDancer);
-    verify(httpServer, never()).stop();
+    verify(httpServer).stop();
   }
 
   @Test

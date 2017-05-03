@@ -23,12 +23,10 @@ import java.util.Map;
 public final class DefaultOAuthService implements OAuthService {
 
   private final HttpService httpService;
-  private final OAuthCallbackServersManager httpServersManager;
   private final SchedulerService schedulerService;
 
   public DefaultOAuthService(HttpService httpService, SchedulerService schedulerService) {
     this.httpService = httpService;
-    httpServersManager = new OAuthCallbackServersManager(httpService);
     this.schedulerService = schedulerService;
   }
 
@@ -50,7 +48,7 @@ public final class DefaultOAuthService implements OAuthService {
   public <T> OAuthAuthorizationCodeDancerBuilder authorizationCodeGrantTypeDancerBuilder(LockFactory lockProvider,
                                                                                          Map<String, T> tokensStore,
                                                                                          MuleExpressionLanguage expressionEvaluator) {
-    return new DefaultOAuthAuthorizationCodeDancerBuilder(httpServersManager, schedulerService, lockProvider,
+    return new DefaultOAuthAuthorizationCodeDancerBuilder(schedulerService, lockProvider,
                                                           (Map<String, DefaultResourceOwnerOAuthContext>) tokensStore,
                                                           httpService, expressionEvaluator);
   }

@@ -194,7 +194,6 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType {
         }
       } else if (localCallbackConfig != null) {
         HttpService httpService = muleContext.getRegistry().lookupObject(HttpService.class);
-        httpService.getServerFactory().lookup(localCallbackConfig);
         HttpServer server = httpService.getServerFactory().lookup(localCallbackConfig);
 
         dancerBuilder = dancerBuilder.localCallback(server, localCallbackConfigPath);
