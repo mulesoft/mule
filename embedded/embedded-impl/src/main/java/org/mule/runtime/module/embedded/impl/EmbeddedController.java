@@ -17,6 +17,7 @@ import static org.mule.runtime.core.util.FileUtils.deleteTree;
 import static org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader.ADD_TEST_DEPENDENCIES_KEY;
 import static org.mule.runtime.module.embedded.impl.SerializationUtils.deserialize;
 import static org.mule.runtime.module.embedded.internal.MavenUtils.createModelFromPom;
+import org.apache.maven.model.Model;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
@@ -27,6 +28,8 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
 import org.mule.runtime.module.embedded.api.ContainerInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,11 +40,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.maven.model.Model;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Controller class for the runtime. It spin ups a new container instance using a temporary folder and dynamically loading the
@@ -111,6 +109,7 @@ public class EmbeddedController {
 
     try {
       artifactResourcesRegistry.getServiceManager().start();
+      artifactResourcesRegistry.getExtensionModelLoaderManager().start();
     } catch (MuleException e) {
       throw new IllegalStateException(e);
     }
