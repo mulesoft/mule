@@ -29,8 +29,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.artifact.ArtifactProperties;
@@ -47,8 +46,9 @@ import org.mule.runtime.core.config.artifact.DefaultArtifactProperties;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.springframework.util.PropertyPlaceholderHelper;
-import org.w3c.dom.Node;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,6 +62,9 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import org.springframework.util.PropertyPlaceholderHelper;
+import org.w3c.dom.Node;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -218,7 +221,6 @@ public class ApplicationModel {
       ImmutableSet.<ComponentIdentifier>builder()
           .add(builder().withNamespace(MULE_ROOT_ELEMENT).withName("flow-ref").build())
           .add(builder().withNamespace(MULE_ROOT_ELEMENT).withName("alias").build())
-          .add(builder().withNamespace(MULE_ROOT_ELEMENT).withName("in-memory-store").build())
           .add(builder().withNamespace(MULE_ROOT_ELEMENT).withName("password-encryption-strategy")
               .build())
           .add(builder().withNamespace(MULE_ROOT_ELEMENT).withName("custom-security-provider")

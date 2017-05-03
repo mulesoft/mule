@@ -175,8 +175,6 @@ import org.mule.runtime.core.transformer.simple.MapToBean;
 import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
-import org.mule.runtime.core.util.store.InMemoryObjectStore;
-import org.mule.runtime.core.util.store.TextFileObjectStore;
 
 /**
  * This is the core namespace handler for Mule and configures all Mule configuration elements under the
@@ -432,11 +430,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
 
     // Life-cycle Adapters Factories
     registerBeanDefinitionParser("custom-lifecycle-adapter-factory", new ChildDefinitionParser("lifecycleAdapterFactory"));
-
-    // Stores
-    registerBeanDefinitionParser("in-memory-store", new ChildDefinitionParser("store", InMemoryObjectStore.class));
-    registerBeanDefinitionParser("simple-text-file-store", new ChildDefinitionParser("store", TextFileObjectStore.class));
-    registerBeanDefinitionParser("custom-object-store", new ChildDefinitionParser("store", null));
 
     // Routing: Intercepting Message Processors
     registerMuleBeanDefinitionParser("idempotent-message-validator",
