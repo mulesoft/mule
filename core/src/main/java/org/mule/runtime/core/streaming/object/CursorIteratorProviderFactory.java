@@ -17,6 +17,6 @@ import java.util.Iterator;
  *
  * @since 4.0
  */
-public interface CursorIteratorProviderFactory extends CursorProviderFactory<CursorIteratorProvider, Iterator> {
+public interface CursorIteratorProviderFactory extends CursorProviderFactory<Iterator> {
 
 }

@@ -6,11 +6,17 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static reactor.core.publisher.Mono.from;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
+import org.mule.runtime.core.internal.streaming.object.ManagedCursorIteratorProvider;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -55,19 +61,26 @@ public class CursorManager {
   }
 
   /**
-   * Becomes aware of the given {@code provider} being created by the given {@code creatorEvent}
+   * Becomes aware of the given {@code provider} and returns a replacement provider
+   * which is managed by the runtime, allowing for automatic resource handling
    *
    * @param provider     the provider to be tracked
    * @param creatorEvent the event that created the provider
-   * @return a {@link CursorProviderHandle}
+   * @return a {@link CursorContext}
    */
-  public CursorProviderHandle track(CursorProvider provider, Event creatorEvent) {
+  public CursorProvider manage(CursorProvider provider, Event creatorEvent) {
     final EventContext ownerContext = getRoot(creatorEvent.getContext());
     registerEventContext(ownerContext);
     registry.getUnchecked(ownerContext.getId()).addProvider(provider);
-    statistics.incrementOpenProviders();
 
-    return new CursorProviderHandle(provider, ownerContext);
+    final CursorContext context = new CursorContext(provider, ownerContext);
+    if (provider instanceof CursorStreamProvider) {
+      return new ManagedCursorStreamProvider(context, this);
+    } else if (provider instanceof CursorIteratorProvider) {
+      return new ManagedCursorIteratorProvider(context, this);
+    }
+
+    throw new MuleRuntimeException(createStaticMessage("Unknown cursor provider type: " + context.getClass().getName()));
   }
 
   /**
@@ -76,7 +89,7 @@ public class CursorManager {
    * @param cursor         the opnened cursor
    * @param providerHandle the handle for the provider that generated it
    */
-  public void onOpen(Cursor cursor, CursorProviderHandle providerHandle) {
+  public void onOpen(Cursor cursor, CursorContext providerHandle) {
     registry.getUnchecked(providerHandle.getOwnerContext().getId()).addCursor(providerHandle.getCursorProvider(), cursor);
     statistics.incrementOpenCursors();
   }
@@ -88,7 +101,7 @@ public class CursorManager {
    * @param cursor the closed cursor
    * @param handle the handle for the provider that generated it
    */
-  public void onClose(Cursor cursor, CursorProviderHandle handle) {
+  public void onClose(Cursor cursor, CursorContext handle) {
     final String eventId = handle.getOwnerContext().getId();
     EventStreamingState state = registry.getIfPresent(eventId);
 
@@ -131,6 +144,7 @@ public class CursorManager {
 
           @Override
           public List<Cursor> load(CursorProvider key) throws Exception {
+            statistics.incrementOpenProviders();
             return new LinkedList<>();
           }
         });

@@ -17,7 +17,7 @@ import java.io.InputStream;
  *
  * @since 4.0
  */
-public interface CursorStreamProviderFactory extends CursorProviderFactory<CursorStreamProvider, InputStream> {
+public interface CursorStreamProviderFactory extends CursorProviderFactory<InputStream> {
 
   /**
    * {@inheritDoc}

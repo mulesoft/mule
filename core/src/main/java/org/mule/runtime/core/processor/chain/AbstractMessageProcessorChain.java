@@ -24,8 +24,10 @@ import static reactor.core.publisher.Mono.empty;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -36,12 +38,14 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.processor.interceptor.ReactiveInterceptorAdapter;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;
@@ -63,7 +67,7 @@ import reactor.core.publisher.Mono;
  */
 public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject implements MessageProcessorChain {
 
-  private static final Logger log = getLogger(AbstractMessageProcessorChain.class);
+  private static final Logger LOGGER = getLogger(AbstractMessageProcessorChain.class);
 
   protected String name;
   protected List<Processor> processors;
@@ -71,6 +75,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   protected FlowConstruct flowConstruct;
   protected MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
   protected MessagingExceptionHandler messagingExceptionHandler;
+  private StreamingManager streamingManager;
 
   public AbstractMessageProcessorChain(List<Processor> processors) {
     this(null, processors);
@@ -83,8 +88,8 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public Event process(Event event) throws MuleException {
-    if (log.isDebugEnabled()) {
-      log.debug(String.format("Invoking %s with event %s", this, event));
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(String.format("Invoking %s with event %s", this, event));
     }
     if (event == null) {
       return null;
@@ -147,6 +152,22 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
         .doOnNext(event -> setCurrentEvent(event))
         .transform(next)
         .doOnNext(result -> setCurrentEvent(result)));
+
+    // #4 If the processor returns a CursorProvider, then have the StreamingManager manage it
+    interceptors.add((processor, next) -> stream -> from(stream)
+        .transform(next)
+        .map(result -> {
+          Object payload = result.getMessage().getPayload().getValue();
+          if (payload instanceof CursorProvider) {
+            Message message = Message.builder(result.getMessage()).payload(
+                                                                           streamingManager.manage((CursorProvider) payload,
+                                                                                                   result))
+                .build();
+            result = Event.builder(result).message(message).build();
+          }
+
+          return result;
+        }));
 
     // #4 Apply processor interceptors.
     muleContext.getProcessorInterceptorManager().getInterceptorFactories().stream()
@@ -332,6 +353,11 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public void initialise() throws InitialisationException {
+    try {
+      streamingManager = muleContext.getRegistry().lookupObject(StreamingManager.class);
+    } catch (RegistrationException e) {
+      throw new InitialisationException(e, this);
+    }
     initialiseIfNeeded(getMessageProcessorsForLifecycle(), true, muleContext);
   }
 
@@ -358,7 +384,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public void dispose() {
-    disposeIfNeeded(getMessageProcessorsForLifecycle(), log);
+    disposeIfNeeded(getMessageProcessorsForLifecycle(), LOGGER);
   }
 
 }

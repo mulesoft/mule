@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.core.internal.streaming.object.factory;
 
-import static org.mule.runtime.core.api.functional.Either.left;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.object.InMemoryCursorIteratorProvider;
 import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
 import org.mule.runtime.core.streaming.object.InMemoryCursorIteratorConfig;
@@ -24,11 +22,9 @@ public class InMemoryCursorIteratorProviderFactory extends AbstractCursorIterato
   /**
    * Creates a new instance
    *
-   * @param cursorManager the manager which will track the produced providers.
    * @param config        the config for the generated providers
    */
-  public InMemoryCursorIteratorProviderFactory(CursorManager cursorManager, InMemoryCursorIteratorConfig config) {
-    super(cursorManager);
+  public InMemoryCursorIteratorProviderFactory(InMemoryCursorIteratorConfig config) {
     this.config = config;
   }
 
@@ -38,7 +34,7 @@ public class InMemoryCursorIteratorProviderFactory extends AbstractCursorIterato
    * @return a new {@link CursorIteratorProvider} wrapped in an {@link Either}
    */
   @Override
-  protected Either<CursorIteratorProvider, Iterator> resolve(Iterator iterator, Event event) {
-    return left(new InMemoryCursorIteratorProvider((StreamingIterator) iterator, config));
+  protected Object resolve(Iterator iterator, Event event) {
+    return new InMemoryCursorIteratorProvider((StreamingIterator) iterator, config);
   }
 }

@@ -56,7 +56,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
 import org.mule.runtime.core.internal.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
 import org.mule.runtime.core.streaming.StreamingManager;
@@ -375,8 +374,7 @@ public final class ExtensionsTestUtils {
   }
 
   public static CursorStreamProviderFactory getDefaultCursorStreamProviderFactory() {
-    return new InMemoryCursorStreamProviderFactory(mock(CursorManager.class),
-                                                   new SimpleByteBufferManager(),
+    return new InMemoryCursorStreamProviderFactory(new SimpleByteBufferManager(),
                                                    InMemoryCursorStreamConfig.getDefault());
   }
 

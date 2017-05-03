@@ -6,14 +6,6 @@
  */
 package org.mule.runtime.core.el;
 
-import static org.mule.runtime.api.el.BindingContext.builder;
-import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
-import static org.mule.runtime.api.metadata.DataType.OBJECT;
-import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.api.metadata.DataType.fromFunction;
-import static org.mule.runtime.api.metadata.DataType.fromType;
-import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
-import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
 import static java.util.Arrays.asList;
 import static java.util.Optional.of;
 import static org.hamcrest.Matchers.equalTo;
@@ -22,18 +14,38 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import static org.mule.runtime.api.el.BindingContext.builder;
+import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.api.metadata.DataType.fromFunction;
+import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionFunction;
+import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.List;
@@ -44,12 +56,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features(EXPRESSION_LANGUAGE)
 @Stories(SUPPORT_MVEL_DW)
+@RunWith(MockitoJUnitRunner.class)
 public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCase {
 
   private static final String MY_VAR = "myVar";
@@ -57,11 +73,14 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
+  @Mock
+  private StreamingManager streamingManager;
+
   private ExtendedExpressionManager expressionManager;
 
   @Before
   public void setUp() {
-    expressionManager = new DefaultExpressionManager(muleContext);
+    expressionManager = new DefaultExpressionManager(muleContext, streamingManager);
   }
 
   @Test
@@ -219,6 +238,34 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     assertThat(expressionManager.isExpression("2*2 + #[var]"), is(true));
     assertThat(expressionManager.isExpression("#[var]"), is(true));
     assertThat(expressionManager.isExpression("${var}"), is(false));
+  }
+
+  @Test
+  public void managedCursor() throws Exception {
+    final MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+    final DefaultExpressionLanguageFactoryService mockFactory =
+        mock(DefaultExpressionLanguageFactoryService.class, RETURNS_DEEP_STUBS);
+    final ExpressionLanguage expressionLanguage = mock(ExpressionLanguage.class, RETURNS_DEEP_STUBS);
+    final CursorProvider cursorProvider = mock(CursorProvider.class);
+
+    when(mockMuleContext.getRegistry().lookupObject(DefaultExpressionLanguageFactoryService.class)).thenReturn(mockFactory);
+    when(mockMuleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE))
+        .thenReturn(mock(MVELExpressionLanguage.class, RETURNS_DEEP_STUBS));
+
+    TypedValue value = new TypedValue(cursorProvider, BYTE_ARRAY);
+    when(expressionLanguage.evaluate(anyString(), any())).thenReturn(value);
+    when(expressionLanguage.evaluate(anyString(), any(), any())).thenReturn(value);
+    when(mockFactory.create()).thenReturn(expressionLanguage);
+
+    expressionManager = new DefaultExpressionManager(mockMuleContext, streamingManager);
+    final Event event = testEvent();
+
+    expressionManager.evaluate("someExpression", event);
+    verify(streamingManager).manage(cursorProvider, event);
+
+    reset(streamingManager);
+    expressionManager.evaluate("someExpression", STRING, mock(BindingContext.class));
+    verify(streamingManager).manage(same(cursorProvider), any());
   }
 
 }

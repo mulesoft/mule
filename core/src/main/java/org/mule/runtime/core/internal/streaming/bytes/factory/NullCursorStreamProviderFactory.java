@@ -6,11 +6,8 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes.factory;
 
-import static org.mule.runtime.core.api.functional.Either.right;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
 
 import java.io.InputStream;
@@ -26,8 +23,8 @@ public class NullCursorStreamProviderFactory extends AbstractCursorStreamProvide
   /**
    * {@inheritDoc}
    */
-  public NullCursorStreamProviderFactory(CursorManager cursorManager, ByteBufferManager bufferManager) {
-    super(cursorManager, bufferManager);
+  public NullCursorStreamProviderFactory(ByteBufferManager bufferManager) {
+    super(bufferManager);
   }
 
   /**
@@ -36,7 +33,7 @@ public class NullCursorStreamProviderFactory extends AbstractCursorStreamProvide
    * @return the given {@code inputStream} wrapped in an {@link Either} instance
    */
   @Override
-  protected Either<CursorStreamProvider, InputStream> resolve(InputStream inputStream, Event event) {
-    return right(inputStream);
+  protected Object resolve(InputStream inputStream, Event event) {
+    return inputStream;
   }
 }
