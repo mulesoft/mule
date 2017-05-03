@@ -60,7 +60,7 @@ public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAw
 
   @Override
   public <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name, boolean isPersistent, int maxEntries,
-                                                                          int entryTTL, int expirationInterval) {
+                                                                          long entryTTL, long expirationInterval) {
     return internalCreateStore(getBaseStore(isPersistent), name, maxEntries, entryTTL, expirationInterval);
   }
 
@@ -69,15 +69,15 @@ public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAw
   }
 
   public <T extends ObjectStore<? extends Serializable>> T getUserObjectStore(String name, boolean isPersistent, int maxEntries,
-                                                                              int entryTTL, int expirationInterval) {
+                                                                              long entryTTL, long expirationInterval) {
     return internalCreateStore(getBaseUserStore(isPersistent), name, maxEntries, entryTTL, expirationInterval);
   }
 
   @SuppressWarnings({"unchecked"})
   synchronized public <T extends ObjectStore<? extends Serializable>> T internalCreateStore(ListableObjectStore<? extends Serializable> baseStore,
                                                                                             String name, int maxEntries,
-                                                                                            int entryTTL,
-                                                                                            int expirationInterval) {
+                                                                                            long entryTTL,
+                                                                                            long expirationInterval) {
 
     if (maxEntries < UNBOUNDED) {
       maxEntries = UNBOUNDED;
@@ -154,8 +154,8 @@ public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAw
 
   @SuppressWarnings({"rawtypes", "unchecked"})
   private <T extends ObjectStore<? extends Serializable>> T getMonitorablePartition(String name, ListableObjectStore baseStore,
-                                                                                    T store, int entryTTL, int maxEntries,
-                                                                                    int expirationInterval) {
+                                                                                    T store, long entryTTL, int maxEntries,
+                                                                                    long expirationInterval) {
     if (baseStore instanceof PartitionableExpirableObjectStore) {
       T previous = (T) stores.putIfAbsent(name, store);
       if (previous == null) {
@@ -248,10 +248,10 @@ public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAw
 
     private final String partitionName;
     private final PartitionableExpirableObjectStore<? extends Serializable> store;
-    private final int entryTTL;
+    private final long entryTTL;
     private final int maxEntries;
 
-    public Monitor(String partitionName, PartitionableExpirableObjectStore<? extends Serializable> store, int entryTTL,
+    public Monitor(String partitionName, PartitionableExpirableObjectStore<? extends Serializable> store, long entryTTL,
                    int maxEntries) {
       this.partitionName = partitionName;
       this.store = store;

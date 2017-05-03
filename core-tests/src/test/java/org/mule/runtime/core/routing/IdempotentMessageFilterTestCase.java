@@ -6,16 +6,18 @@
  */
 package org.mule.runtime.core.routing;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -26,31 +28,32 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
 
   @Test
   public void testIdempotentReceiver() throws Exception {
-    Flow flow = getTestFlow(muleContext);
-
-    MuleSession session = mock(MuleSession.class);
-
     IdempotentMessageFilter ir = new IdempotentMessageFilter();
-    ir.setIdExpression("#[mel:message.inboundProperties.id]");
-    ir.setValueExpression("#[mel:message:id]");
-    ir.setFlowConstruct(flow);
-    ir.setThrowOnUnaccepted(false);
+    ir.setMuleContext(muleContext);
     ir.setStorePrefix("foo");
-    ir.setStore(new InMemoryObjectStore<String>());
+    ir.setObjectStore(new InMemoryObjectStore<String>());
 
-    final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
+    final EventContext contextA = mock(EventContext.class);
+    when(contextA.getId()).thenReturn("1");
 
-    Message okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-    Event event = Event.builder(context).message(okMessage).flow(getTestFlow(muleContext)).session(session).build();
+    Message okMessage = InternalMessage.builder().payload("OK").build();
+    Event event = Event.builder(contextA).message(okMessage).build();
 
     // This one will process the event on the target endpoint
     Event processedEvent = ir.process(event);
-    assertNotNull(processedEvent);
+    assertThat(processedEvent, not(nullValue()));
+    verify(contextA, never()).success();
+    verify(contextA, never()).success(any());
+    verify(contextA, never()).error(any());
 
+    final EventContext contextB = mock(EventContext.class);
+    when(contextB.getId()).thenReturn("1");
     // This will not process, because the ID is a duplicate
-    okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-    event = Event.builder(context).message(okMessage).flow(getTestFlow(muleContext)).session(session).build();
+    event = Event.builder(contextB).message(okMessage).build();
     processedEvent = ir.process(event);
-    assertNull(processedEvent);
+    assertThat(processedEvent, nullValue());
+    verify(contextB).success();
+    verify(contextB, never()).success(any());
+    verify(contextB, never()).error(any());
   }
 }

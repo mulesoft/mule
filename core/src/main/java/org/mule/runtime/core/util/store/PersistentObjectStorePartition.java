@@ -7,14 +7,16 @@
 
 package org.mule.runtime.core.util.store;
 
+import static org.apache.commons.io.FileUtils.moveFileToDirectory;
+import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.mule.runtime.core.api.store.ObjectStoreManager.UNBOUNDED;
-import static org.mule.runtime.core.util.FileUtils.moveFileToDirectory;
-import static org.mule.runtime.core.util.FileUtils.newFile;
 import static org.mule.runtime.core.util.FileUtils.cleanDirectory;
-import static org.mule.runtime.core.util.FileUtils.readFileToString;
+import static org.mule.runtime.core.util.FileUtils.newFile;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.store.ExpirableObjectStore;
 import org.mule.runtime.core.api.store.ListableObjectStore;
@@ -23,8 +25,6 @@ import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreNotAvaliableException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -39,7 +39,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.collections.BidiMap;
@@ -172,20 +171,17 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
   }
 
   @Override
-  public void expire(int entryTTL, int maxEntries) throws ObjectStoreException {
+  public void expire(long entryTTL, int maxEntries) throws ObjectStoreException {
     assureLoaded();
 
     synchronized (realKeyToUUIDIndex) {
       File[] files = listValuesFiles();
-      Arrays.sort(files, new Comparator<File>() {
-
-        public int compare(File f1, File f2) {
-          int result = Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
-          if (result == 0) {
-            result = f1.getName().compareTo(f2.getName());
-          }
-          return result;
+      Arrays.sort(files, (f1, f2) -> {
+        int result = Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
+        if (result == 0) {
+          result = f1.getName().compareTo(f2.getName());
         }
+        return result;
       });
       int startIndex = trimToMaxSize(files, maxEntries);
 
@@ -232,8 +228,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
 
     try {
       File[] files = listValuesFiles();
-      for (int i = 0; i < files.length; i++) {
-        File file = files[i];
+      for (File file : files) {
         try {
           StoreValue<T> storeValue = deserialize(file);
           realKeyToUUIDIndex.put(storeValue.getKey(), file.getName());
@@ -256,13 +251,8 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
   }
 
   private File[] listValuesFiles() {
-    File[] files = partitionDirectory.listFiles(new FileFilter() {
-
-      @Override
-      public boolean accept(File file) {
-        return !file.isDirectory() && file.getName().endsWith(OBJECT_FILE_EXTENSION);
-      }
-    });
+    File[] files =
+        partitionDirectory.listFiles((FileFilter) file -> !file.isDirectory() && file.getName().endsWith(OBJECT_FILE_EXTENSION));
     if (files == null) {
       files = new File[0];
     }

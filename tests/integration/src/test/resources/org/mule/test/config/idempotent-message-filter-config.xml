@@ -6,31 +6,12 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <append-string-transformer name="appendStringTransformer" message="appended"/>
-
-    <flow name="inMemoryStore">
-        <idempotent-message-filter idExpression="#[mel:Rmessage:id]">
-            <in-memory-store entryTTL="1000" expirationInterval="2000" maxEntries="3000"/>
-        </idempotent-message-filter>
-    </flow>
-
-    <flow name="simpleTextFileStore">
-        <idempotent-message-filter>
-            <simple-text-file-store directory="${java.io.tmpdir}" entryTTL="1000"
-                expirationInterval="2000" maxEntries="3000"/>
-        </idempotent-message-filter>
-    </flow>
+    <spring:bean id="objectStore" class="org.mule.test.config.IdempotentMessageFilterNamespaceHandlerTestCase$CustomObjectStore">
+        <spring:property name="customProperty" value="the-value:customObjectStore"/>
+    </spring:bean>
 
     <flow name="customObjectStore">
-        <idempotent-message-filter>
-            <custom-object-store class="org.mule.test.config.IdempotentMessageFilterNamespaceHandlerTestCase$CustomObjectStore">
-                <spring:property name="customProperty" value="the-value:customObjectStore"/>
-            </custom-object-store>
-        </idempotent-message-filter>
-    </flow>
-
-    <flow name="idempotentFilterWithOnUnacceptedMP">
-        <idempotent-message-filter onUnaccepted="appendStringTransformer"/>
+        <idempotent-message-filter objectStore-ref="objectStore"/>
     </flow>
 
  </mule>

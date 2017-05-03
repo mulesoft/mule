@@ -7,15 +7,11 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="IdempotentSecureHashReceiverRouter">
-        <idempotent-secure-hash-message-filter messageDigestAlgorithm="SHA-128">
-            <in-memory-store name="xyz" maxEntries="1001" entryTTL="1001" expirationInterval="1001"/>
-        </idempotent-secure-hash-message-filter>
+        <idempotent-secure-hash-message-filter messageDigestAlgorithm="SHA-128"/>
     </flow>
 
     <flow name="IdempotentReceiverRouter">
-        <idempotent-message-filter idExpression="#[mel:message:id]-#[mel:message:correlationId]">
-            <simple-text-file-store directory="foo" maxEntries="10000000"/>
-        </idempotent-message-filter>
+        <idempotent-message-filter idExpression="#[id]-#[correlationId]"/>
     </flow>
 
     <flow name="CustomRouter">

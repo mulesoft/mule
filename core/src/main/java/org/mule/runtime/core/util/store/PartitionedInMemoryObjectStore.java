@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.util.store;
 
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.mule.runtime.core.api.store.ObjectStoreManager.UNBOUNDED;
+
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -20,7 +22,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
 
 public class PartitionedInMemoryObjectStore<T extends Serializable> extends AbstractPartitionedObjectStore<T>
     implements PartitionableExpirableObjectStore<T> {
@@ -131,12 +132,12 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
   }
 
   @Override
-  public void expire(int entryTTL, int maxEntries) throws ObjectStoreException {
+  public void expire(long entryTTL, int maxEntries) throws ObjectStoreException {
     expire(entryTTL, maxEntries, DEFAULT_PARTITION);
   }
 
   @Override
-  public void expire(int entryTTL, int maxEntries, String partitionName) throws ObjectStoreException {
+  public void expire(long entryTTL, int maxEntries, String partitionName) throws ObjectStoreException {
     final long now = getCurrentNanoTime();
     int expiredEntries = 0;
     ExpiryEntry oldestEntry;
@@ -150,7 +151,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
     }
 
     while ((oldestEntry = store.peek()) != null) {
-      if (TimeUnit.NANOSECONDS.toMillis(now - oldestEntry.getTime()) >= entryTTL) {
+      if (NANOSECONDS.toMillis(now - oldestEntry.getTime()) >= entryTTL) {
         oldestEntry = store.remove();
         partition.remove(oldestEntry.getKey());
         expiredEntries++;

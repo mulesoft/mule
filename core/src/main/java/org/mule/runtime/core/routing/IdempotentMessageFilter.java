@@ -7,28 +7,31 @@
 package org.mule.runtime.core.routing;
 
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.store.ObjectStoreNotAvaliableException;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 
-import java.text.MessageFormat;
-
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <code>IdempotentMessageFilter</code> ensures that only unique messages are passed on. It does this by checking the unique ID of
@@ -38,18 +41,15 @@ import org.slf4j.LoggerFactory;
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/IdempotentReceiver.html">
  * http://www.eaipatterns.com/IdempotentReceiver.html</a>
  */
-public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor implements Initialisable, Disposable {
+public class IdempotentMessageFilter extends AbstractInterceptingMessageProcessor implements Initialisable, Disposable {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(IdempotentMessageFilter.class);
+  private static final Logger LOGGER = getLogger(IdempotentMessageFilter.class);
 
   protected volatile ObjectStore<String> store;
   protected String storePrefix;
 
-  protected String idExpression = MessageFormat.format("{0}mel:message:id{1}", DEFAULT_EXPRESSION_PREFIX,
-                                                       DEFAULT_EXPRESSION_POSTFIX);
-
-  protected String valueExpression = MessageFormat.format("{0}mel:message:id{1}", DEFAULT_EXPRESSION_PREFIX,
-                                                          DEFAULT_EXPRESSION_POSTFIX);
+  protected String idExpression = format("%sid%s", DEFAULT_EXPRESSION_PREFIX, DEFAULT_EXPRESSION_POSTFIX);
+  protected String valueExpression = format("%sid%s", DEFAULT_EXPRESSION_PREFIX, DEFAULT_EXPRESSION_POSTFIX);
 
   public IdempotentMessageFilter() {
     super();
@@ -65,30 +65,25 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
       this.store = createMessageIdStore();
     }
 
-    LifecycleUtils.initialiseIfNeeded(store);
+    initialiseIfNeeded(store);
   }
 
   @Override
   public void dispose() {
-    LifecycleUtils.disposeIfNeeded(store, LOGGER);
+    disposeIfNeeded(store, LOGGER);
   }
 
   protected ObjectStore<String> createMessageIdStore() throws InitialisationException {
-    ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER);
-    return objectStoreManager.getObjectStore(storePrefix, false, -1, 60 * 5 * 1000, 6000);
-  }
-
-  @Override
-  protected Event processNext(Event event) throws MuleException {
-    return super.processNext(event);
+    ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(OBJECT_STORE_MANAGER);
+    return objectStoreManager.getObjectStore(storePrefix, false, -1, MINUTES.toMillis(5), SECONDS.toMillis(6));
   }
 
   protected String getValueForEvent(Event event) throws MessagingException {
-    return flowConstruct.getMuleContext().getExpressionManager().parse(valueExpression, event, flowConstruct);
+    return muleContext.getExpressionManager().parse(valueExpression, event, flowConstruct);
   }
 
   protected String getIdForEvent(Event event) throws MuleException {
-    return flowConstruct.getMuleContext().getExpressionManager().parse(idExpression, event, flowConstruct);
+    return muleContext.getExpressionManager().parse(idExpression, event, flowConstruct);
   }
 
   public String getIdExpression() {
@@ -99,16 +94,15 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
     this.idExpression = idExpression;
   }
 
-  public ObjectStore<String> getStore() {
+  public ObjectStore<String> getObjectStore() {
     return store;
   }
 
-  public void setStore(ObjectStore<String> store) {
+  public void setObjectStore(ObjectStore<String> store) {
     this.store = store;
   }
 
-  @Override
-  protected boolean accept(Event event, Event.Builder builder) {
+  private boolean accept(Event event) {
     if (event != null && isNewMessage(event)) {
       try {
         String id = getIdForEvent(event);
@@ -132,6 +126,27 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
     } else {
       return false;
     }
+  }
+
+  @Override
+  public final Event process(Event event) throws MuleException {
+    if (accept(event)) {
+      return processNext(event);
+    } else {
+      event.getContext().success();
+      return null;
+    }
+  }
+
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return from(publisher).<Event>handle((event, sink) -> {
+      if (accept(event)) {
+        sink.next(event);
+      } else {
+        event.getContext().success();
+      }
+    }).transform(applyNext());
   }
 
   protected boolean isNewMessage(Event event) {

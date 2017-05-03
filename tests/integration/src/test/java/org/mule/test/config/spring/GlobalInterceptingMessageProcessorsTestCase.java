@@ -6,16 +6,14 @@
  */
 package org.mule.test.config.spring;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.ReferenceProcessor;
-import org.mule.runtime.core.routing.IdempotentMessageFilter;
-import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
 import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.transformer.simple.CombineCollectionsTransformer;
@@ -38,24 +36,12 @@ public class GlobalInterceptingMessageProcessorsTestCase extends AbstractIntegra
     assertNotNull(flow1);
     List<Processor> mpList = flow1.getMessageProcessors();
 
-    Processor mp1 = muleContext.getRegistry().lookupObject("idempotentFilter");
-    assertTrue(mp1 instanceof IdempotentMessageFilter);
-    IdempotentMessageFilter imf = (IdempotentMessageFilter) mp1;
-    assertEquals(imf.getIdExpression(), "#[mel:payload:]");
-    assertMpPresent(mpList, mp1, IdempotentMessageFilter.class);
-
     Processor mp2 = muleContext.getRegistry().lookupObject("messageFilter");
     assertTrue(mp2 instanceof MessageFilter);
     MessageFilter mf = (MessageFilter) mp2;
     assertTrue(mf.getFilter() instanceof WildcardFilter);
     assertFalse(mf.isThrowOnUnaccepted());
     assertMpPresent(mpList, mp2, MessageFilter.class);
-
-    Processor mp3 = muleContext.getRegistry().lookupObject("idempotentSecureHashMessageFilter");
-    assertTrue(mp3 instanceof IdempotentSecureHashMessageFilter);
-    IdempotentSecureHashMessageFilter ishmf = (IdempotentSecureHashMessageFilter) mp3;
-    assertEquals(ishmf.getMessageDigestAlgorithm(), "MDA5");
-    assertMpPresent(mpList, mp3, IdempotentSecureHashMessageFilter.class);
 
     Processor mp4 = muleContext.getRegistry().lookupObject("combineCollectionsTransformer");
     assertTrue(mp4 instanceof CombineCollectionsTransformer);

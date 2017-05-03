@@ -53,14 +53,14 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
    * The time-to-live for each message ID, specified in milliseconds, or <em>-1</em> for entries that should never expire. <b>DO
    * NOT</b> combine this with an unbounded store!
    */
-  protected int entryTTL = -1;
+  protected long entryTTL = -1;
 
   /**
    * The interval for periodic bounded size enforcement and entry expiration, specified in milliseconds. Arbitrary positive values
    * between 1 millisecond and several hours or days are possible, but should be chosen carefully according to the expected
    * message rate to prevent out of memory conditions.
    */
-  protected int expirationInterval = 1000;
+  protected long expirationInterval = 1000;
 
   /**
    * A name for this store, can be used for logging and identification purposes.
@@ -71,8 +71,8 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
     this.baseStore = baseStore;
   }
 
-  public MonitoredObjectStoreWrapper(ListableObjectStore<StoredObject<T>> baseStore, int maxEntries, int entryTTL,
-                                     int expirationInterval) {
+  public MonitoredObjectStoreWrapper(ListableObjectStore<StoredObject<T>> baseStore, int maxEntries, long entryTTL,
+                                     long expirationInterval) {
     this.baseStore = baseStore;
     this.maxEntries = maxEntries;
     this.entryTTL = entryTTL;
@@ -203,7 +203,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
 
     if (expirationInterval <= 0) {
       throw new IllegalArgumentException(CoreMessages
-          .propertyHasInvalidValue("expirationInterval", new Integer(expirationInterval)).toString());
+          .propertyHasInvalidValue("expirationInterval", new Long(expirationInterval)).toString());
     }
 
     if (scheduler == null) {

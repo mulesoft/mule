@@ -224,16 +224,12 @@
     </flow>
 
     <flow name="idempotent-msg-filter">
-        <idempotent-message-filter idExpression="#[mel:message:id]">
-            <in-memory-store entryTTL="1000" expirationInterval="2000" maxEntries="3000"/>
-        </idempotent-message-filter>
+        <idempotent-message-filter idExpression="#[id]" objectStore-ref="objectStore"/>
         <logger level="INFO"/>
     </flow>
 
     <flow name="idempotent-secure-hash-msg-filter">
-        <idempotent-secure-hash-message-filter idExpression="#[mel:message:id]">
-            <in-memory-store entryTTL="1000" expirationInterval="2000" maxEntries="3000"/>
-        </idempotent-secure-hash-message-filter>
+        <idempotent-secure-hash-message-filter idExpression="#[id]" objectStore-ref="objectStore"/>
         <logger level="INFO"/>
     </flow>
 

@@ -42,7 +42,7 @@ public interface ObjectStoreManager {
    * @return an {@link org.mule.runtime.core.api.store.ObjectStore}
    */
   <T extends ObjectStore<? extends Serializable>> T getObjectStore(String name, boolean isPersistent, int maxEntries,
-                                                                   int entryTTL, int expirationInterval);
+                                                                   long entryTTL, long expirationInterval);
 
   /**
    * Delete all objects from the partition
