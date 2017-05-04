@@ -17,7 +17,6 @@ import static org.mule.runtime.core.util.FileUtils.deleteTree;
 import static org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader.ADD_TEST_DEPENDENCIES_KEY;
 import static org.mule.runtime.module.embedded.impl.SerializationUtils.deserialize;
 import static org.mule.runtime.module.embedded.internal.MavenUtils.createModelFromPom;
-import org.apache.maven.model.Model;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
@@ -28,18 +27,19 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
 import org.mule.runtime.module.embedded.api.ContainerInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.maven.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Controller class for the runtime. It spin ups a new container instance using a temporary folder and dynamically loading the
@@ -66,7 +66,7 @@ public class EmbeddedController {
   /**
    * Invoked by reflection
    */
-  public void start() throws IOException, URISyntaxException {
+  public void start() throws Exception {
     setUpEnvironment();
     createApplication();
 
@@ -74,7 +74,8 @@ public class EmbeddedController {
     application.start();
   }
 
-  private void createApplication() throws IOException, URISyntaxException {
+  private void createApplication()
+      throws Exception {
 
     for (Map.Entry<String, String> applicationPropertiesEntry : applicationConfiguration.getDeploymentConfiguration()
         .getArtifactProperties().entrySet()) {
@@ -87,11 +88,6 @@ public class EmbeddedController {
     if (applicationConfiguration.getDeploymentConfiguration().enableTestDependencies()) {
       setProperty(ADD_TEST_DEPENDENCIES_KEY, "true");
     }
-
-    MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
-
-    containerClassLoader =
-        new ContainerClassLoaderFactory().createContainerClassLoader(Thread.currentThread().getContextClassLoader());
 
     List<String> configResources = new ArrayList<>();
     org.mule.runtime.module.embedded.api.Application application = applicationConfiguration.getApplication();
@@ -107,24 +103,33 @@ public class EmbeddedController {
       copyFile(originalFile, destinationFile);
     }
 
-    try {
-      artifactResourcesRegistry.getServiceManager().start();
-      artifactResourcesRegistry.getExtensionModelLoaderManager().start();
-    } catch (MuleException e) {
-      throw new IllegalStateException(e);
-    }
-
     File applicationFolder = createApplicationStructure();
 
+    containerClassLoader =
+        new ContainerClassLoaderFactory().createContainerClassLoader(Thread.currentThread().getContextClassLoader());
+
     executeWithinContainerClassLoader(() -> {
-      ApplicationDescriptor applicationDescriptor =
-          artifactResourcesRegistry.getApplicationDescriptorFactory().create(applicationFolder);
-      applicationDescriptor.setConfigResources(configResources);
-      applicationDescriptor.setAbsoluteResourcePaths(configResources.toArray(new String[0]));
+      try {
+        MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
 
-      artifactResourcesRegistry.getDomainFactory().createArtifact(createDefaultDomainDir());
+        try {
+          artifactResourcesRegistry.getServiceManager().start();
+          artifactResourcesRegistry.getExtensionModelLoaderManager().start();
+        } catch (MuleException e) {
+          throw new IllegalStateException(e);
+        }
 
-      this.application = artifactResourcesRegistry.getApplicationFactory().createAppFrom(applicationDescriptor);
+        ApplicationDescriptor applicationDescriptor =
+            artifactResourcesRegistry.getApplicationDescriptorFactory().create(applicationFolder);
+        applicationDescriptor.setConfigResources(configResources);
+        applicationDescriptor.setAbsoluteResourcePaths(configResources.toArray(new String[0]));
+
+        artifactResourcesRegistry.getDomainFactory().createArtifact(createDefaultDomainDir());
+
+        this.application = artifactResourcesRegistry.getApplicationFactory().createAppFrom(applicationDescriptor);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     });
   }
 

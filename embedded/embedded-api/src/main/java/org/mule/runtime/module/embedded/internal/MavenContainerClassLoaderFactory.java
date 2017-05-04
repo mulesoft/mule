@@ -8,6 +8,7 @@
 package org.mule.runtime.module.embedded.internal;
 
 import static java.util.stream.Collectors.toList;
+import static org.codehaus.plexus.util.FileUtils.toFile;
 import org.mule.maven.client.api.BundleDependency;
 import org.mule.maven.client.api.BundleDescriptor;
 import org.mule.maven.client.api.MavenClient;
@@ -58,7 +59,7 @@ public class MavenContainerClassLoaderFactory {
           .map(BundleDependency::getBundleUrl)
           .collect(Collectors.toList());
       urls = new ArrayList<>(urls);
-      File containerFolderFile = new File(containerBaseFolder.getFile());
+      File containerFolderFile = toFile(containerBaseFolder);
       // the URL has to be constructed this way since File.toURI().toURL() gets rid of the final slash
       urls.add(new URL(new File(containerFolderFile, "conf").toURI().toString() + "/"));
       return new URLClassLoader(urls.toArray(new URL[urls.size()]), parentClassLoader);

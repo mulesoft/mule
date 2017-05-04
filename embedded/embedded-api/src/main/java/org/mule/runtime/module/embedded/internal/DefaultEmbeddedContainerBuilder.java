@@ -13,7 +13,6 @@ import static org.codehaus.plexus.util.FileUtils.toFile;
 import static org.mule.maven.client.api.BundleScope.PROVIDED;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.module.embedded.internal.Serializer.serialize;
-
 import org.mule.maven.client.api.BundleDependency;
 import org.mule.maven.client.api.BundleDescriptor;
 import org.mule.maven.client.api.MavenClient;

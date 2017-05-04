@@ -35,7 +35,7 @@ public class NotExportedClassException extends ClassNotFoundException {
    * @param filter the applied filter for the artifact.
    */
   public NotExportedClassException(String className, ClassLoaderFilter filter) {
-    super(format("Class '%s' not found in classloader for artifact '%s'.", className));
+    super(format("Class '%s' not found in classloader for artifact 'embedded'.", className));
     this.className = className;
     this.filter = filter;
   }
