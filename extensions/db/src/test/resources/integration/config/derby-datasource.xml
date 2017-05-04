@@ -7,10 +7,10 @@
 
     <db:config name="dbConfig">
         <db:derby-connection database="target/muleEmbeddedDB" create="true">
-            <db:custom-data-types>
+            <db:column-types>
                 <!-- Derby uses JAVA_OBJECT for UDT-->
-                <db:custom-data-type typeName="CONTACT_DETAILS" id="2000"/>
-            </db:custom-data-types>
+                <db:column-type typeName="CONTACT_DETAILS" id="2000"/>
+            </db:column-types>
         </db:derby-connection>
     </db:config>
 </mule>
