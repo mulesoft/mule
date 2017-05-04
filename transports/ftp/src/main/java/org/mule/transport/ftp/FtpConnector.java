@@ -675,31 +675,38 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
         String path = uri.getPath();
 
         // only change directory if one was configured
-        if (StringUtils.isNotBlank(path))
+        if (StringUtils.isBlank(path))
         {
-            // MULE-2400: if the path begins with '~' we must strip the first '/' to make things
-            // work with FTPClient
-            if ((path.length() >= 2) && (path.charAt(1) == '~'))
-            {
-                path = path.substring(1);
-            }
+            return client;
+        }
 
-            //Checking if it is a file or a directory
-            boolean isFile = this.isFile(endpoint, client);
-            if (!isFile && !client.changeWorkingDirectory(path))
+        // MULE-2400: if the path begins with '~' we must strip the first '/' to make things
+        // work with FTPClient
+        if ((path.length() >= 2) && (path.charAt(1) == '~'))
+        {
+            path = path.substring(1);
+        }
+
+        //Checking if it is a file or a directory
+        boolean isFile = this.isFile(endpoint, client);
+        if (!isFile && !client.changeWorkingDirectory(path))
+        {
+            throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
+                    path, client.getReplyCode()));
+        }
+        else if (isFile)
+        {
+            // Changing the working directory to the parent folder, it should be better if
+            // the ftpClient API would provide a way to retrieve the parent folder
+            FTPFile[] listFiles = client.listFiles(path);
+            // Files could have been consumed, e.g. by an external FTP Client
+            if (listFiles.length == 1)
             {
-                throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",
-                                                           path, client.getReplyCode()));
-            }
-            else if (isFile)
-            {
-                // Changing the working directory to the parent folder, it should be better if
-                // the ftpClient API would provide a way to retrieve the parent folder
-                FTPFile[] listFiles = client.listFiles(path);
                 String directory = path.replaceAll(listFiles[0].getName(), "");
                 client.changeWorkingDirectory(directory);
             }
         }
+
         return client;
     }
 
