@@ -172,10 +172,9 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
       // where an error is explicitly triggered via a Sink such as such as when using Mono.create in ReactorCompletionCallback
       // rather than being thrown by a reactor operator. Although changes could be made to Mule to cater for this in
       // AbstractMessageProcessorChain, this is not trivial given processor interceptors and a potent performance overhead
-      // associated with the addition of many additional flatMaps. It might be slightly create this to create this
+      // associated with the addition of many additional flatMaps. It would be slightly clearer to create the
       // MessagingException in ReactorCompletionCallback where Mono.error is used but we don't have a reference to the
-      // processor there, and while the AbstractMessageProcessorChain will add this in later if required, if we can avoid the
-      // additional instantiation then that is preferred.
+      // processor there.
       return doProcess(event, operationContext).onErrorMap(e -> !(e instanceof MessagingException),
                                                            e -> new MessagingException(event, e, this));
     }, MuleException.class, e -> {
