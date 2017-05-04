@@ -56,14 +56,6 @@ public abstract class AbstractMetadataTestCase extends AbstractSoapServiceTestCa
     return result;
   }
 
-  // @Step("Retrieve Dynamic Metadata for the Message Builder parameter")
-  // protected ObjectType getMessageBuilderType(String flow, String key) {
-  //   MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = getMetadata(flow, key);
-  //   return toObjectType(metadata.get().getModel().getAllParameterModels().stream()
-  //       .filter(p -> p.getName().equals(MESSAGE_PARAM))
-  //       .findFirst().get().getType());
-  // }
-
   protected Location location(String flow) {
     return builder().globalName(flow).addProcessorsPart().addIndexPart(0).build();
   }
