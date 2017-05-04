@@ -430,11 +430,29 @@ public class XMLUtils extends org.mule.util.XMLUtils
         }
     }
 
-    public static javax.xml.transform.Source toStreamSource(javax.xml.stream.XMLInputFactory xmlInputFactory, boolean useStaxSource, InputStream stream) throws XMLStreamException
+    public static javax.xml.transform.Source toStreamSource(javax.xml.stream.XMLInputFactory xmlInputFactory, boolean useStaxSource, final InputStream stream) throws XMLStreamException
     {
         if (useStaxSource)
         {
-            return new org.mule.module.xml.stax.StaxSource(xmlInputFactory.createXMLStreamReader(stream));
+            XMLStreamReader xmlStreamReader = new DelegateXMLStreamReader(xmlInputFactory.createXMLStreamReader(stream))
+            {
+                @Override
+                public void close() throws XMLStreamException
+                {
+                    super.close();
+
+                    try
+                    {
+                        stream.close();
+                    }
+                    catch (IOException e)
+                    {
+                        throw new XMLStreamException(e);
+                    }
+                }
+            };
+
+            return new org.mule.module.xml.stax.StaxSource(xmlStreamReader);
         }
         else 
         {
