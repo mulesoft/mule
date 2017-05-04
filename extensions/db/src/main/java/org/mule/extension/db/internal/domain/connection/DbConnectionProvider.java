@@ -19,7 +19,7 @@ import org.mule.extension.db.api.exception.connection.ConnectionClosingException
 import org.mule.extension.db.api.exception.connection.ConnectionCommitException;
 import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
 import org.mule.extension.db.api.exception.connection.DbError;
-import org.mule.extension.db.api.param.CustomDataType;
+import org.mule.extension.db.api.param.ColumnType;
 import org.mule.extension.db.internal.domain.type.ArrayResolvedDbType;
 import org.mule.extension.db.internal.domain.type.ClobResolvedDataType;
 import org.mule.extension.db.internal.domain.type.DbType;
@@ -82,12 +82,12 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
   private DbPoolingProfile poolingProfile;
 
   /**
-   * Specifies non-standard custom data types
+   * Specifies non-standard column types
    */
   @Parameter
   @Optional
   @Expression(NOT_SUPPORTED)
-  private List<CustomDataType> customDataTypes = emptyList();
+  private List<ColumnType> columnTypes = emptyList();
 
 
   private DataSourceFactory dataSourceFactory;
@@ -216,7 +216,7 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
   }
 
   protected List<DbType> resolveCustomTypes() {
-    return customDataTypes.stream().map(type -> {
+    return columnTypes.stream().map(type -> {
       final String name = type.getTypeName();
       final int id = type.getId();
       if (id == Types.ARRAY) {

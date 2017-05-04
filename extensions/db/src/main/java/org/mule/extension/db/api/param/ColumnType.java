@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  *
  * @since 4.0
  */
-public class CustomDataType {
+public class ColumnType {
 
   /**
    * Type identifier used by the JDBC driver.

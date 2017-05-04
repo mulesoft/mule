@@ -7,11 +7,11 @@
 
     <db:config name="dbConfig">
         <db:oracle-connection host="192.168.99.100" port="1521" instance="xe" user="system" password="oracle" >
-            <db:custom-data-types>
-                <db:custom-data-type id="2002" typeName="CONTACT_DETAILS"/>
-                <db:custom-data-type id="2003" typeName="CONTACT_DETAILS_ARRAY"/>
-                <db:custom-data-type id="2003" typeName="ZIPARRAY"/>
-            </db:custom-data-types>
+            <db:column-types>
+                <db:column-type id="2002" typeName="CONTACT_DETAILS"/>
+                <db:column-type id="2003" typeName="CONTACT_DETAILS_ARRAY"/>
+                <db:column-type id="2003" typeName="ZIPARRAY"/>
+            </db:column-types>
         </db:oracle-connection>
     </db:config>
 </mule>

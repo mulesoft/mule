@@ -8,10 +8,10 @@
     <db:config name="pooledJdbcConfig">
         <db:derby-connection database="target/muleEmbeddedDB" create="true" useXaTransactions="true">
             <db:pooling-profile maxPoolSize="1" minPoolSize="0" maxWait="1" maxWaitUnit="MILLISECONDS"/>
-            <db:custom-data-types>
+            <db:column-types>
                 <!-- Derby uses JAVA_OBJECT for UDT-->
-                <db:custom-data-type typeName="CONTACT_DETAILS" id="2000"/>
-            </db:custom-data-types>
+                <db:column-type typeName="CONTACT_DETAILS" id="2000"/>
+            </db:column-types>
         </db:derby-connection>
     </db:config>
 
