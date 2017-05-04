@@ -17,7 +17,7 @@
     </flow>
 
     <flow name="listenTxtOnly">
-        <file:directory-listener config-ref="file" directory="withMatcher" recursive="true" matchWith="matcher" notifyOnDelete="true" />
+        <file:directory-listener config-ref="file" directory="withMatcher" recursive="true" matcher="matcher" notifyOnDelete="true" />
         <set-payload value="Dr. Manhattan" />
         <flow-ref name="onEvent"/>
     </flow>

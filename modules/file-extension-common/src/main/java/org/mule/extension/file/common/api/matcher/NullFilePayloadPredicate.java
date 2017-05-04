@@ -15,13 +15,13 @@ import java.util.function.Predicate;
  *
  * @since 4.0
  */
-public final class NullFilePayloadPredicate implements Predicate<FileAttributes> {
+public final class NullFilePayloadPredicate<T extends FileAttributes> implements Predicate<T> {
 
   /**
    * @return {@code true}
    */
   @Override
-  public boolean test(FileAttributes fileAttributes) {
+  public boolean test(T fileAttributes) {
     return true;
   }
 }

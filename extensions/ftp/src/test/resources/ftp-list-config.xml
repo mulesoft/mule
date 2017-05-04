@@ -19,13 +19,11 @@
 
     <flow name="listWithEmbeddedPredicate">
         <ftp:list config-ref="config" directoryPath="#[path]" recursive="#[recursive]">
-            <ftp:match-with>
-                <ftp:matcher filenamePattern="*[1-2]*.html" />
-            </ftp:match-with>
+            <ftp:matcher filenamePattern="*[1-2]*.html" />
         </ftp:list>
     </flow>
 
     <flow name="listWithGlobalMatcher">
-        <ftp:list config-ref="config" directoryPath="#[path]" recursive="#[recursive]" matchWith="globalMatcher"/>
+        <ftp:list config-ref="config" directoryPath="#[path]" recursive="#[recursive]" matcher="globalMatcher"/>
     </flow>
 </mule>

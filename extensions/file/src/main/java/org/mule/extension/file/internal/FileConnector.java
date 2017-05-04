@@ -35,7 +35,6 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
  */
 @Extension(name = "File", description = "Connector to manipulate files on a locally mounted file system")
 @Operations({FileOperations.class})
-@SubTypeMapping(baseType = FilePredicateBuilder.class, subTypes = LocalFilePredicateBuilder.class)
 @ConnectionProviders(LocalFileConnectionProvider.class)
 @Sources(DirectoryListener.class)
 @ErrorTypes(FileError.class)

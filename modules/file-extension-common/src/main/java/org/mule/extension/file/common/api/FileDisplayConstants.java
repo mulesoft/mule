@@ -14,5 +14,4 @@ package org.mule.extension.file.common.api;
 public final class FileDisplayConstants {
 
   public static final String MATCHER = "Matcher";
-  public static final String MATCH_WITH = "Match with";
 }

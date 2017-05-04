@@ -25,9 +25,7 @@
 
     <flow name="list-with-embedded-predicate">
         <ftp:list directoryPath="~/" recursive="true">
-            <ftp:match-with>
-                <ftp:matcher filenamePattern="*.txt" />
-            </ftp:match-with>
+            <ftp:matcher filenamePattern="*.txt" />
         </ftp:list>
     </flow>
 

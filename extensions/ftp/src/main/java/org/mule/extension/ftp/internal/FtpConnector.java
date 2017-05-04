@@ -33,7 +33,6 @@ import javax.inject.Inject;
  */
 @Extension(name = "FTP", description = "Connector to manipulate Files on a FTP/SFTP server")
 @Operations({FtpOperations.class})
-@SubTypeMapping(baseType = FilePredicateBuilder.class, subTypes = FtpFilePredicateBuilder.class)
 @ConnectionProviders({ClassicFtpConnectionProvider.class, SftpConnectionProvider.class})
 @Export(classes = {SftpFileAttributes.class, ClassicFtpFileAttributes.class, FtpFileAttributes.class})
 @ErrorTypes(FileError.class)

@@ -127,4 +127,28 @@ public class LocalFilePredicateBuilder extends FilePredicateBuilder<LocalFilePre
     this.accessedUntil = accessedUntil;
     return this;
   }
+
+  public LocalDateTime getCreatedSince() {
+    return createdSince;
+  }
+
+  public LocalDateTime getCreatedUntil() {
+    return createdUntil;
+  }
+
+  public LocalDateTime getUpdatedSince() {
+    return updatedSince;
+  }
+
+  public LocalDateTime getUpdatedUntil() {
+    return updatedUntil;
+  }
+
+  public LocalDateTime getAccessedSince() {
+    return accessedSince;
+  }
+
+  public LocalDateTime getAccessedUntil() {
+    return accessedUntil;
+  }
 }
