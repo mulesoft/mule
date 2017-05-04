@@ -6,18 +6,18 @@
  */
 package org.mule.runtime.core.lifecycle;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.core.api.lifecycle.LifecycleManager;
-import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.transport.LegacyConnector;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectException;
+import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
+import org.mule.runtime.core.api.lifecycle.LifecycleManager;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 
 import java.util.HashSet;
@@ -51,6 +51,8 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager {
   protected Set<String> completedPhases = new LinkedHashSet<>(4);
   protected O object;
   protected LifecycleState state;
+  private String lastPhaseExecuted;
+  private boolean lastPhaseExecutionFailed;
 
   private TreeMap<String, LifecycleCallback> callbacks = new TreeMap<>();
 
@@ -82,6 +84,9 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager {
 
   @Override
   public void checkPhase(String name) throws IllegalStateException {
+    if (lastPhaseExecutionFailed) {
+      return;
+    }
     if (executingPhase != null) {
       if (name.equalsIgnoreCase(executingPhase)) {
         throw new IllegalStateException("Phase '" + name + "' is already currently being executed");
@@ -120,21 +125,30 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager {
 
   protected void invokePhase(String phase, Object object, LifecycleCallback callback) throws LifecycleException {
     try {
+      this.lastPhaseExecuted = phase;
       setExecutingPhase(phase);
       callback.onTransition(phase, object);
       setCurrentPhase(phase);
+      lastPhaseExecutionFailed = false;
     }
     // In the case of a connection exception, trigger the reconnection strategy.
     catch (ConnectException ce) {
-      MuleContext muleContext = ((LegacyConnector) ce.getFailed()).getMuleContext();
-      muleContext.getExceptionListener().handleException(ce);
+      lastPhaseExecutionFailed = true;
+      doOnConnectException(ce);
     } catch (LifecycleException le) {
+      lastPhaseExecutionFailed = true;
       throw le;
     } catch (Exception e) {
+      lastPhaseExecutionFailed = true;
       throw new LifecycleException(e, object);
     } finally {
       setExecutingPhase(null);
     }
+  }
+
+  protected void doOnConnectException(ConnectException ce) throws LifecycleException {
+    MuleContext muleContext = ((LegacyConnector) ce.getFailed()).getMuleContext();
+    muleContext.getExceptionListener().handleException(ce);
   }
 
   /**
@@ -254,5 +268,19 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager {
   @Override
   public LifecycleState getState() {
     return state;
+  }
+
+  /**
+   * @return the last phase executed name. It may be null if no phase was executed.
+   */
+  public String getLastPhaseExecuted() {
+    return lastPhaseExecuted;
+  }
+
+  /**
+   * @return true if the last phase execution failed. False otherwise.
+   */
+  public boolean isLastPhaseExecutionFailed() {
+    return lastPhaseExecutionFailed;
   }
 }

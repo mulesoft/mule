@@ -6,10 +6,15 @@
  */
 package org.mule.runtime.core.lifecycle;
 
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.lifecycle.HasLifecycleInterceptor;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
-import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 import org.mule.runtime.core.api.registry.Registry;
@@ -44,7 +49,7 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
     LifecyclePhase phase = registryLifecycleManager.phases.get(phaseName);
 
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(String.format("Applying lifecycle phase: %s for registry: %s", phase, object.getClass().getSimpleName()));
+      LOGGER.debug(format("Applying lifecycle phase: %s for registry: %s", phase, object.getClass().getSimpleName()));
     }
 
     if (phase instanceof ContainerManagedLifecyclePhase) {
@@ -77,7 +82,7 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
     }
 
     for (Object target : targetObjects) {
-      if (duplicates.contains(target)) {
+      if (duplicates.contains(target) || target == null) {
         continue;
       }
 
@@ -85,17 +90,29 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
         LOGGER.debug("lifecycle phase: " + phase.getName() + " for object: " + target);
       }
 
-      if (interceptor.beforeLifecycle(phase, target)) {
-        phase.applyLifecycle(target);
-        duplicates.add(target);
-        interceptor.afterLifecycle(phase, target);
-      } else {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug(String.format(
-                                     "Skipping the application of the '%s' lifecycle phase over a certain object "
-                                         + "because a %s interceptor of type [%s] indicated so. Object is: %s",
-                                     phase.getName(), LifecycleInterceptor.class.getSimpleName(),
-                                     interceptor.getClass().getName(), target));
+      try {
+        if (interceptor.beforePhaseExecution(phase, target)) {
+          phase.applyLifecycle(target);
+          duplicates.add(target);
+          interceptor.afterPhaseExecution(phase, target, empty());
+        } else {
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(format(
+                                "Skipping the application of the '%s' lifecycle phase over a certain object "
+                                    + "because a %s interceptor of type [%s] indicated so. Object is: %s",
+                                phase.getName(), LifecycleInterceptor.class.getSimpleName(),
+                                interceptor.getClass().getName(), target));
+          }
+        }
+      } catch (Exception e) {
+        interceptor.afterPhaseExecution(phase, target, of(e));
+        if (phase.equals(Disposable.PHASE_NAME) || phase.equals(Stoppable.PHASE_NAME)) {
+          LOGGER.info(format("Failure executing phase %s over object %s, error message is: %s", phase, target), e.getMessage());
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(e.getMessage(), e);
+          }
+        } else {
+          throw e;
         }
       }
     }

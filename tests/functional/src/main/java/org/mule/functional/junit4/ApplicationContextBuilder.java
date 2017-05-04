@@ -7,7 +7,6 @@
 package org.mule.functional.junit4;
 
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
-
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;

@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.lifecycle.phases;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
@@ -40,7 +38,7 @@ import org.slf4j.LoggerFactory;
  *
  * @see org.mule.runtime.core.api.lifecycle.LifecyclePhase
  */
-public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware {
+public class DefaultLifecyclePhase implements LifecyclePhase {
 
   protected transient final Logger logger = LoggerFactory.getLogger(DefaultLifecyclePhase.class);
   private Class<?> lifecycleClass;
@@ -50,7 +48,6 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware {
   private final String name;
   private final String oppositeLifecyclePhase;
   private Set<String> supportedPhases;
-  private MuleContext muleContext;
 
   public DefaultLifecyclePhase(String name, Class<?> lifecycleClass, String oppositeLifecyclePhase) {
     this.name = name;
@@ -58,11 +55,6 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware {
     // DefaultLifecyclePhase interface only has one method
     lifecycleMethod = lifecycleClass.getMethods()[0];
     this.oppositeLifecyclePhase = oppositeLifecyclePhase;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
   }
 
   /**

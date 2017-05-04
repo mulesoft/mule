@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
+import java.util.Optional;
+
 /**
  * Allows intercepting the application of {@link LifecyclePhase lifecycle phases} over each target object.
  *
@@ -24,19 +26,21 @@ public interface LifecycleInterceptor {
    * @param object the target object
    * @return whether the {@code phase} should be applied or cancelled for the given {@code object}
    */
-  boolean beforeLifecycle(LifecyclePhase phase, Object object);
+  boolean beforePhaseExecution(LifecyclePhase phase, Object object);
 
   /**
    * Invoked after the given {@code phase} was applied over the {@code object}.
    *
    * @param phase the phase that was applied
    * @param object the target object
+   * @param exceptionThrownOptional an optional with an exception. If present then there was an error execution the phase, otherwise the
+   *        phase execution was successful
    */
-  void afterLifecycle(LifecyclePhase phase, Object object);
+  void afterPhaseExecution(LifecyclePhase phase, Object object, Optional<Exception> exceptionThrownOptional);
 
   /**
    * Invoked when the given {@code phase} finished processing all the eligible target objects, including those for which
-   * {@link #beforeLifecycle(LifecyclePhase, Object)} return {@code false}
+   * {@link #beforePhaseExecution(LifecyclePhase, Object)} return {@code false}
    *
    * @param phase the phase that was applied
    */

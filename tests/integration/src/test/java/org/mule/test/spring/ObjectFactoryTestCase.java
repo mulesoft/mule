@@ -11,7 +11,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDNECY_INJECTION;
+import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDENCY_INJECTION;
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.ObjectFactoryStory.OBJECT_FACTORY_INECTION_AND_LIFECYCLE;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -22,7 +22,7 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
-@Features(LIFECYCLE_AND_DEPENDNECY_INJECTION)
+@Features(LIFECYCLE_AND_DEPENDENCY_INJECTION)
 @Stories(OBJECT_FACTORY_INECTION_AND_LIFECYCLE)
 public class ObjectFactoryTestCase extends MuleArtifactFunctionalTestCase {
 

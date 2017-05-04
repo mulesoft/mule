@@ -400,14 +400,13 @@ public class DefaultMuleApplication implements Application {
       return;
     }
 
-    if (artifactContext.getMuleContext().isStarted() && !artifactContext.getMuleContext().isDisposed()) {
-      try {
-        stop();
-      } catch (DeploymentStopException e) {
-        // catch the stop errors and just log, we're disposing of an app anyway
-        logger.error("Error stopping application", e);
-      }
+    try {
+      stop();
+    } catch (DeploymentStopException e) {
+      // catch the stop errors and just log, we're disposing of an app anyway
+      logger.error("Error stopping application", e);
     }
+
     if (logger.isInfoEnabled()) {
       logger.info(miniSplash(format("Disposing app '%s'", descriptor.getName())));
     }
