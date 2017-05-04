@@ -9,12 +9,13 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.util.FileUtils.createFile;
 import static org.mule.runtime.core.util.JarUtils.getUrlWithinJar;
 import static org.mule.runtime.core.util.JarUtils.getUrlsWithinJar;
 import static org.mule.runtime.core.util.JarUtils.loadFileContentFrom;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_FOLDER;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_POM;
 import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
@@ -36,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
@@ -62,7 +62,7 @@ public class MavenUtils {
    *         {@value ArtifactPluginDescriptor#MULE_PLUGIN_POM} file or the file can' be loaded
    */
   public static Model getPomModelFromJar(File artifactFile) {
-    String pomFilePath = MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_POM;
+    String pomFilePath = MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_PLUGIN_POM;
     try {
       MavenXpp3Reader reader = new MavenXpp3Reader();
       return reader.read(new ByteArrayInputStream(loadFileContentFrom(getPomUrlFromJar(artifactFile)).get()));
@@ -80,7 +80,7 @@ public class MavenUtils {
    * @return the URL to the pom file.
    */
   public static URL getPomUrlFromJar(File artifactFile) {
-    String pomFilePath = MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_POM;
+    String pomFilePath = MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_PLUGIN_POM;
     URL possibleUrl;
     try {
       possibleUrl = getUrlWithinJar(artifactFile, pomFilePath);
@@ -162,14 +162,14 @@ public class MavenUtils {
 
   private static File lookupPomFromMavenLocation(File artifactFolder) {
     File mulePluginPom = null;
-    File lookupFolder = new File(artifactFolder, "META-INF" + File.separator + "maven");
+    File lookupFolder = new File(artifactFolder, "META-INF" + separator + "maven");
     while (lookupFolder != null && lookupFolder.exists()) {
       File possiblePomLocation = new File(lookupFolder, MULE_PLUGIN_POM);
       if (possiblePomLocation.exists()) {
         mulePluginPom = possiblePomLocation;
         break;
       }
-      File[] directories = lookupFolder.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
+      File[] directories = lookupFolder.listFiles((FileFilter) DIRECTORY);
       checkState(directories != null || directories.length == 0,
                  format("No directories under %s so pom.xml file for artifact in folder %s could not be found",
                         lookupFolder.getAbsolutePath(), artifactFolder.getAbsolutePath()));

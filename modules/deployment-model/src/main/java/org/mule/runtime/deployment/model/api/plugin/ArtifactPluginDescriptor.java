@@ -22,10 +22,15 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
   private static final String META_INF = "META-INF";
   public static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
   public static final String EXTENSION_BUNDLE_TYPE = "jar";
+  public static final String MULE_ARTIFACT = "mule-artifact";
   /**
    * Target folder for any files used at deployment time or when generating the {@link ExtensionModel}
    */
-  public static final String MULE_ARTIFACT_FOLDER = META_INF + separator + "mule-artifact";
+  public static final String MULE_ARTIFACT_FOLDER = META_INF + separator + MULE_ARTIFACT;
+  /**
+   * Target path as URL for any files used at deployment time or when generating the {@link ExtensionModel}
+   */
+  public static final String MULE_ARTIFACT_PATH_INSIDE_JAR = META_INF + "/" + MULE_ARTIFACT;
   public static final String MULE_PLUGIN_JSON = "mule-plugin.json";
   public static final String MULE_PLUGIN_POM = "pom.xml";
 
