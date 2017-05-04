@@ -17,16 +17,16 @@ import static org.mule.services.soap.client.SoapCxfClient.MULE_WSC_ADDRESS;
 import static org.mule.services.soap.client.SoapCxfClient.MULE_WSC_ENCODING;
 import static org.mule.services.soap.client.SoapCxfClient.WSC_DISPATCHER;
 import static org.mule.services.soap.interceptor.SoapActionInterceptor.SOAP_ACTION;
-import org.mule.runtime.extension.api.soap.message.DispatcherResponse;
-import org.mule.runtime.extension.api.soap.message.DispatchingContext;
+import org.mule.runtime.extension.api.soap.message.DispatchingRequest;
+import org.mule.runtime.extension.api.soap.message.DispatchingResponse;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.services.soap.api.client.SoapClientConfiguration;
-
-import com.google.common.collect.ImmutableMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
@@ -51,6 +51,8 @@ public class MessageDispatcherInterceptor extends AbstractPhaseInterceptor<Messa
   }
 
   /**
+   * {@inheritDoc}
+   * <p>
    * Intercepts the SOAP message and performs the dispatch of it, receiving the response and
    * sending it to the IN intercepting processor chain.
    */
@@ -65,9 +67,7 @@ public class MessageDispatcherInterceptor extends AbstractPhaseInterceptor<Messa
     message.setAttachments(emptyList());
 
     MessageDispatcher dispatcher = (MessageDispatcher) exchange.get(WSC_DISPATCHER);
-    OutputStream content = message.getContent(OutputStream.class);
-    InputStream outgoingMessage = new ByteArrayInputStream(content.toString().getBytes());
-    DispatcherResponse response = dispatcher.dispatch(outgoingMessage, getDispatchingContext(message));
+    DispatchingResponse response = dispatcher.dispatch(getDispatchingRequest(message));
 
     // This needs to be set because we want the wsc closes the final stream,
     // otherwise cxf will close it too early when handling message in the StaxInEndingInterceptor.
@@ -82,16 +82,14 @@ public class MessageDispatcherInterceptor extends AbstractPhaseInterceptor<Messa
     messageObserver.onMessage(inMessage);
   }
 
-  private DispatchingContext getDispatchingContext(Message message) {
+  private DispatchingRequest getDispatchingRequest(Message message) {
     Exchange exchange = message.getExchange();
-    ImmutableMap.Builder<String, String> headers = ImmutableMap.<String, String>builder()
-        .put(CONTENT_TYPE, (String) message.get(CONTENT_TYPE));
     String action = (String) exchange.get(MULE_SOAP_ACTION);
+    Map<String, String> headers = new HashMap<>();
     if (action != null) {
       headers.put(SOAP_ACTION, action);
     }
-    return new DispatchingContext((String) exchange.get(MULE_WSC_ADDRESS),
-                                  (String) exchange.get(MULE_WSC_ENCODING),
-                                  headers.build());
+    InputStream content = new ByteArrayInputStream(message.getContent(OutputStream.class).toString().getBytes());
+    return new DispatchingRequest(content, (String) exchange.get(MULE_WSC_ADDRESS), (String) message.get(CONTENT_TYPE), headers);
   }
 }

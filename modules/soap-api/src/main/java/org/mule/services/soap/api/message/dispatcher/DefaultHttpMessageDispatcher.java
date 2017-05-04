@@ -8,12 +8,13 @@ package org.mule.services.soap.api.message.dispatcher;
 
 
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.util.collection.ImmutableMapCollector;
-import org.mule.runtime.extension.api.soap.message.DispatcherResponse;
-import org.mule.runtime.extension.api.soap.message.DispatchingContext;
+import org.mule.runtime.extension.api.soap.message.DispatchingRequest;
+import org.mule.runtime.extension.api.soap.message.DispatchingResponse;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
@@ -26,8 +27,6 @@ import org.mule.services.soap.api.exception.DispatchingException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
@@ -59,21 +58,24 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
    * Dispatches a Soap message through http adding the SoapAction header, if required, and the content-type.
    */
   @Override
-  public DispatcherResponse dispatch(InputStream message, DispatchingContext context) {
+  public DispatchingResponse dispatch(DispatchingRequest context) {
     ParameterMap parameters = new ParameterMap();
-    parameters.putAll(context.getHeaders());
+    context.getHeaders().forEach(parameters::put);
+
+    // It's important that content type is bundled with the headers
+    parameters.put(CONTENT_TYPE, context.getContentType());
 
     HttpRequest request = HttpRequest.builder()
         .setUri(context.getAddress())
         .setMethod(POST)
-        .setEntity(new InputStreamHttpEntity(message))
+        .setEntity(new InputStreamHttpEntity(context.getContent()))
         .setHeaders(parameters)
         .build();
 
     try {
       HttpResponse response = client.send(request, 5000, false, null);
       InputStream content = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
-      return new DispatcherResponse(response.getHeaderValueIgnoreCase(CONTENT_TYPE), content, toHeadersMap(response));
+      return new DispatchingResponse(content, response.getHeaderValueIgnoreCase(CONTENT_TYPE), toHeadersMap(response));
     } catch (IOException e) {
       throw new DispatchingException("An error occurred while sending the SOAP request");
     } catch (TimeoutException e) {
@@ -84,9 +86,9 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
   /**
    * Collects all the headers returned by the http call.
    */
-  private Map<String, ? extends List<String>> toHeadersMap(HttpResponse response) {
+  private Map<String, String> toHeadersMap(HttpResponse response) {
     return response.getHeaderNames().stream()
-        .collect(new ImmutableMapCollector<>(identity(), name -> new ArrayList<>(response.getHeaderValues(name))));
+        .collect(toMap(identity(), name -> response.getHeaderValues(name).stream().collect(joining(" "))));
   }
 
   /**

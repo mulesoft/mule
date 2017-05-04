@@ -6,6 +6,8 @@
  */
 package org.mule.services.soap.api.message.dispatcher;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
@@ -16,10 +18,12 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.extension.api.client.DefaultOperationParameters;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.soap.message.DispatcherResponse;
-import org.mule.runtime.extension.api.soap.message.DispatchingContext;
+import org.mule.runtime.extension.api.soap.message.DispatchingResponse;
+import org.mule.runtime.extension.api.soap.message.DispatchingRequest;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.services.soap.api.exception.DispatchingException;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -53,19 +57,25 @@ public final class HttpConfigBasedMessageDispatcher implements MessageDispatcher
    * the complete response stream and to pass it to the service to process it.
    */
   @Override
-  public DispatcherResponse dispatch(InputStream message, DispatchingContext context) {
+  public DispatchingResponse dispatch(DispatchingRequest context) {
+    ImmutableMap<Object, Object> headers = ImmutableMap.builder()
+        .putAll(context.getHeaders())
+        // It's important that content type is bundled with the headers
+        .put(CONTENT_TYPE, context.getContentType())
+        .build();
+
     DefaultOperationParameters params = builder().configName(configName)
         .addParameter("method", POST.toString())
         .addParameter("url", context.getAddress())
-        .addParameter("headers", context.getHeaders())
+        .addParameter("headers", headers)
         .addParameter("parseResponse", false)
-        .addParameter("body", new TypedValue<>(message, INPUT_STREAM))
+        .addParameter("body", new TypedValue<>(context.getContent(), INPUT_STREAM))
         .build();
     try {
       Result<Object, Object> result = client.executeAsync("HTTP", "request", params).get();
-      Map<String, List<String>> headers = getHttpHeaders(result);
+      Map<String, String> httpHeaders = getHttpHeaders(result);
       InputStream content = getContent(result);
-      return new DispatcherResponse(getContentType(headers), content, headers);
+      return new DispatchingResponse(content, httpHeaders.get(CONTENT_TYPE.toLowerCase()), httpHeaders);
     } catch (Exception e) {
       throw new DispatchingException("Could not dispatch soap message using the [" + configName + "] HTTP configuration", e);
     }
@@ -76,14 +86,15 @@ public final class HttpConfigBasedMessageDispatcher implements MessageDispatcher
    *
    * @param result the {@link Result} returned by the http request operation
    */
-  private Map<String, List<String>> getHttpHeaders(Result<Object, Object> result) {
+  private Map<String, String> getHttpHeaders(Result<Object, Object> result) {
     try {
       Optional httpAttributes = result.getAttributes();
       if (!httpAttributes.isPresent()) {
         throw new IllegalStateException("No Http Attributes found on the response, cannot get response headers.");
       }
       Object headers = httpAttributes.get().getClass().getMethod("getHeaders").invoke(httpAttributes.get());
-      return (Map<String, List<String>>) headers.getClass().getMethod("toListValuesMap").invoke(headers);
+      Map<String, List<String>> map = (Map<String, List<String>>) headers.getClass().getMethod("toListValuesMap").invoke(headers);
+      return map.entrySet().stream().collect(toMap(e -> e.getKey(), e -> e.getValue().stream().collect(joining(" "))));
     } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
       throw new IllegalStateException("Something went wrong when introspecting the http response attributes.", e);
     }
@@ -100,17 +111,6 @@ public final class HttpConfigBasedMessageDispatcher implements MessageDispatcher
       return (InputStream) output;
     }
     throw new IllegalStateException("Content was expected to be an stream but got a [" + output.getClass().getName() + "]");
-  }
-
-  /**
-   * Returns the content type of the response by looking the Content-Type header.
-   */
-  private String getContentType(Map<String, List<String>> headers) {
-    List<String> contentTypeValue = headers.get(CONTENT_TYPE.toLowerCase());
-    if (contentTypeValue.size() == 1) {
-      return contentTypeValue.get(0);
-    }
-    throw new IllegalStateException("Content-Type was expected to have one value but got [" + contentTypeValue.size() + "]");
   }
 
   @Override
