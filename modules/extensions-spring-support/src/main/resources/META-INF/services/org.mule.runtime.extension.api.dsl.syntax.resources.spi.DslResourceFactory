@@ -1,4 +1,4 @@
 org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaXmlResourceFactory
 org.mule.runtime.module.extension.internal.capability.xml.schema.SpringHandlerBundleResourceFactory
-org.mule.runtime.module.extension.internal.capability.xml.schema.SpringSchemaBundleResourceFactory
+org.mule.runtime.module.extension.int/ernal.capability.xml.schema.SpringSchemaBundleResourceFactory
 

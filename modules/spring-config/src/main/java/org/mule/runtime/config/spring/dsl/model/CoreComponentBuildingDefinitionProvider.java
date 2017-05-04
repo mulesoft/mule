@@ -62,6 +62,8 @@ import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEME
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.DataUnit;
+import org.mule.runtime.config.spring.CustomEncryptionStrategyDelegate;
+import org.mule.runtime.config.spring.CustomSecurityProviderDelegate;
 import org.mule.runtime.config.spring.MuleConfigurationConfigurator;
 import org.mule.runtime.config.spring.NotificationConfig;
 import org.mule.runtime.config.spring.ServerNotificationManagerConfigurator;
@@ -139,6 +141,11 @@ import org.mule.runtime.core.component.simple.NullComponent;
 import org.mule.runtime.core.component.simple.StaticComponent;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.el.ExpressionLanguageComponent;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.el.mvel.configuration.AliasEntry;
+import org.mule.runtime.core.el.mvel.configuration.ImportEntry;
+import org.mule.runtime.core.el.mvel.configuration.MVELExpressionLanguageObjectFactory;
+import org.mule.runtime.core.el.mvel.configuration.MVELGlobalFunctionsConfig;
 import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
@@ -150,6 +157,14 @@ import org.mule.runtime.core.expression.transformers.ExpressionArgument;
 import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
 import org.mule.runtime.core.interceptor.LoggingInterceptor;
 import org.mule.runtime.core.interceptor.TimerInterceptor;
+import org.mule.runtime.core.internal.enricher.MessageEnricher;
+import org.mule.runtime.core.internal.transformer.codec.XmlEntityDecoder;
+import org.mule.runtime.core.internal.transformer.codec.XmlEntityEncoder;
+import org.mule.runtime.core.internal.transformer.compression.GZipCompressTransformer;
+import org.mule.runtime.core.internal.transformer.compression.GZipUncompressTransformer;
+import org.mule.runtime.core.internal.transformer.encryption.AbstractEncryptionTransformer;
+import org.mule.runtime.core.internal.transformer.encryption.DecryptionTransformer;
+import org.mule.runtime.core.internal.transformer.encryption.EncryptionTransformer;
 import org.mule.runtime.core.internal.enricher.MessageEnricher;
 import org.mule.runtime.core.internal.transformer.codec.XmlEntityDecoder;
 import org.mule.runtime.core.internal.transformer.codec.XmlEntityEncoder;
@@ -204,6 +219,8 @@ import org.mule.runtime.core.routing.filters.logic.NotFilter;
 import org.mule.runtime.core.routing.filters.logic.OrFilter;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 import org.mule.runtime.core.routing.requestreply.SimpleAsyncRequestReplyRequester;
+import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
+import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.source.StartableCompositeMessageSource;
 import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.source.scheduler.schedule.CronScheduler;
@@ -642,6 +659,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("defaultObjectSerializer",
                                        fromSimpleReferenceParameter("defaultObjectSerializer-ref").build())
         .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(ConfigurationExtension.class).build())
+        .withSetterParameterDefinition("expressionLanguage", fromChildConfiguration(MVELExpressionLanguage.class).build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("notifications")
@@ -697,6 +715,33 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIgnoredConfigurationParameter(NAME)
         .build());
 
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-security-provider")
+        .withTypeDefinition(fromType(CustomSecurityProviderDelegate.class))
+        .withConstructorParameterDefinition(fromSimpleReferenceParameter("provider-ref").build())
+        .withConstructorParameterDefinition(fromSimpleParameter("name").build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-encryption-strategy")
+        .withTypeDefinition(fromType(CustomEncryptionStrategyDelegate.class))
+        .withConstructorParameterDefinition(fromSimpleReferenceParameter("strategy-ref").build())
+        .withConstructorParameterDefinition(fromSimpleParameter("name").build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("secret-key-encryption-strategy")
+        .withTypeDefinition(fromType(SecretKeyEncryptionStrategy.class))
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("key", fromSimpleParameter("key").build())
+        .withSetterParameterDefinition("keyFactory", fromSimpleReferenceParameter("keyFactory-ref").build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("password-encryption-strategy")
+        .withTypeDefinition(fromType(PasswordBasedEncryptionStrategy.class))
+        .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("iterationCount", fromSimpleParameter("iterationCount").build())
+        .withSetterParameterDefinition("password", fromSimpleParameter("password").build())
+        .withSetterParameterDefinition("salt", fromSimpleParameter("salt").build())
+        .build());
+
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("redelivery-policy")
         .withTypeDefinition(fromType(IdempotentRedeliveryPolicy.class))
         .withSetterParameterDefinition("maxRedeliveryCount", fromSimpleParameter("maxRedeliveryCount").build())
@@ -738,13 +783,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                                                        .build())
         .build());
 
-    componentBuildingDefinitions.add(
-                                     baseDefinition.copy().withIdentifier("expression-component")
-                                         .withTypeDefinition(fromType(ExpressionLanguageComponent.class))
-                                         .withSetterParameterDefinition("expression", fromTextContent().build())
-                                         .withSetterParameterDefinition("expressionFile", fromSimpleParameter("file").build())
-                                         .build());
-
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("expression-component")
         .withTypeDefinition(fromType(ExpressionLanguageComponent.class))
         .withSetterParameterDefinition("expression", fromTextContent().build())
@@ -771,6 +809,32 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIdentifier("custom-agent")
         .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
         .asPrototype()
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("expression-language")
+        .withTypeDefinition(fromType(MVELExpressionLanguage.class))
+        .withObjectFactoryType(MVELExpressionLanguageObjectFactory.class)
+        .withSetterParameterDefinition("autoResolveVariables", fromSimpleParameter("autoResolveVariables").build())
+        .withSetterParameterDefinition("globalFunctions", fromChildConfiguration(MVELGlobalFunctionsConfig.class).build())
+        .withSetterParameterDefinition("imports", fromChildCollectionConfiguration(ImportEntry.class).build())
+        .withSetterParameterDefinition("aliases", fromChildCollectionConfiguration(AliasEntry.class).build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("import")
+        .withTypeDefinition(fromType(ImportEntry.class))
+        .withSetterParameterDefinition("key", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("value", fromSimpleParameter("class", stringToClassConverter()).build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("alias")
+        .withTypeDefinition(fromType(AliasEntry.class))
+        .withSetterParameterDefinition("key", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("value", fromSimpleParameter("expression").build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("global-functions")
+        .withTypeDefinition(fromType(MVELGlobalFunctionsConfig.class))
+        .withSetterParameterDefinition("file", fromSimpleParameter("file").build())
         .build());
 
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());

@@ -1,2 +1,0 @@
-http\://www.mulesoft.org/schema/mule/core=org.mule.runtime.config.spring.handlers.MuleNamespaceHandler
-http\://www.mulesoft.org/schema/mule/domain=org.mule.runtime.config.spring.handlers.MuleDomainNamespaceHandler

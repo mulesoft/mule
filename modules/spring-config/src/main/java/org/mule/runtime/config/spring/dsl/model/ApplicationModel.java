@@ -134,6 +134,7 @@ public class ApplicationModel {
   public static final String PARSER_TEST_NAMESPACE = "parsers-test";
   public static final String PROPERTY_PLACEHOLDER_ELEMENT = "property-placeholder";
   public static final String GLOBAL_PROPERTY = "global-property";
+  public static final String SECURITY_MANAGER = "security-manager";
   public static final String SPRING_ENTRY_ELEMENT = "entry";
   public static final String SPRING_LIST_ELEMENT = "list";
   public static final String SPRING_MAP_ELEMENT = "map";
@@ -208,6 +209,8 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(REDELIVERY_POLICY_ELEMENT).build();
   public static final ComponentIdentifier GLOBAL_PROPERTY_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(GLOBAL_PROPERTY).build();
+  public static final ComponentIdentifier SECURITY_MANAGER_IDENTIFIER =
+      builder().withNamespace(CORE_PREFIX).withName(SECURITY_MANAGER).build();
   public static final ComponentIdentifier MODULE_OPERATION_CHAIN =
       builder().withNamespace(CORE_PREFIX).withName(MODULE_OPERATION_CHAIN_ELEMENT).build();
 

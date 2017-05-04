@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.config.spring;
 
-import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import static org.mule.runtime.config.spring.MissingParserProblemReporter.getMissingModuleOrExtensionMessage;
 import static org.mule.runtime.config.spring.MuleArtifactContext.INNER_BEAN_PREFIX;
 import static org.mule.runtime.config.spring.MuleArtifactContext.postProcessBeanDefinition;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
@@ -34,8 +35,8 @@ import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
@@ -50,7 +51,6 @@ import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -69,13 +69,11 @@ import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
-import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.DefaultBeanDefinitionDocumentReader;
 import org.springframework.beans.factory.xml.NamespaceHandler;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.xml.XmlReaderContext;
-import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -83,12 +81,9 @@ import org.w3c.dom.NodeList;
 
 
 /**
- * This parser enables Mule to parse heirarchical bean structures using spring Namespace handling There are 4 base
- * DefinitionParsers supplied in Mule that most Parsers will extend from, these are
- * {@link org.mule.runtime.config.spring.parsers.AbstractChildDefinitionParser}
- * {@link org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser}
- * {@link org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser}
- * {@link org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser}
+ * This parser enables to parse hierarchical bean structures using spring Namespace handling.
+ * <p>
+ * Mule 4 includes a new parsing mechanism but this is still required since spring beans element must used this facility.
  */
 public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinitionParserDelegate {
 
@@ -197,9 +192,9 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
           if (!element.getLocalName().equals(MULE_ROOT_ELEMENT) && !element.getLocalName().equals(MULE_DOMAIN_ROOT_ELEMENT)
               && !element.getLocalName().equals(POLICY_ROOT_ELEMENT)) {
             if (handler == null) {
-              throw new NullPointerException(format("No namespace handler found for '%s' for Mule 3 parsing mechanism; OR "
-                  + "No componentModel found for element '%s' for Mule 4 parsing mechanism",
-                                                    element.getNamespaceURI(), element.getNodeName()));
+              throw new MuleRuntimeException(createStaticMessage(
+                                                                 getMissingModuleOrExtensionMessage(componentModel.getIdentifier()
+                                                                     .toString())));
             }
 
             ParserContext parserContext = new ParserContext(getReaderContext(), this, parent);
@@ -493,35 +488,10 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     }
   }
 
-  public static void setFlag(BeanDefinition bean, String flag) {
-    bean.setAttribute(flag, Boolean.TRUE);
-  }
-
   public static boolean testFlag(BeanDefinition bean, String flag) {
     return null != bean && bean.hasAttribute(flag) && bean.getAttribute(flag) instanceof Boolean
         && ((Boolean) bean.getAttribute(flag)).booleanValue();
   }
 
-
-  /**
-   * Parse a map element.
-   */
-  public Map parseMapElement(Element mapEle, String mapElementTagName, String mapElementKeyAttributeName,
-                             String mapElementValueAttributeName) {
-    List<Element> entryEles = DomUtils.getChildElementsByTagName(mapEle, mapElementTagName);
-    ManagedMap<Object, Object> map = new ManagedMap<Object, Object>(entryEles.size());
-    map.setSource(extractSource(mapEle));
-    map.setMergeEnabled(parseMergeAttribute(mapEle));
-
-    for (Element entryEle : entryEles) {
-      // Extract key from attribute or sub-element.
-      Object key = buildTypedStringValueForMap(entryEle.getAttribute(mapElementKeyAttributeName), null, entryEle);
-      // Extract value from attribute or sub-element.
-      Object value = buildTypedStringValueForMap(entryEle.getAttribute(mapElementValueAttributeName), null, entryEle);
-      // Add final key and value to the Map.
-      map.put(key, value);
-    }
-    return map;
-  }
 
 }
