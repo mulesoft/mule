@@ -29,13 +29,16 @@ import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.Deploym
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EMBEDDED_API;
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EmbeddedApiStory.CONFIGURATION;
 import static org.slf4j.LoggerFactory.getLogger;
-
+import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.runtime.module.embedded.api.Application;
 import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
 import org.mule.runtime.module.embedded.api.DeploymentConfiguration;
 import org.mule.runtime.module.embedded.api.EmbeddedContainer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.FreePortFinder;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,10 +56,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
-
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.exceptions.UnirestException;
-
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -187,16 +186,17 @@ public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
                         getClasspathResourceAsUri(applicaitonFolder + File.separator + "pom.xml").toURL(),
                         getClasspathResourceAsUri(applicaitonFolder + File.separator + "mule-application.json").toURL());
 
-    LOGGER.info("Using folder as local repository: " + localRepositoryFolder.getRoot().getAbsolutePath());
+    File localRepositoryLocation = localRepositoryFolder.getRoot();
+    localRepositoryLocation = MavenClientProvider.discoverProvider(getClass().getClassLoader())
+        .getLocalRepositorySuppliers().environmentMavenRepositorySupplier().get();
+
+    LOGGER.info("Using folder as local repository: " + localRepositoryLocation.getAbsolutePath());
 
     EmbeddedContainer embeddedContainer = builder()
         .withMuleVersion("4.0.0-SNAPSHOT")
         .withContainerBaseFolder(containerFolder.newFolder().toURI().toURL())
         .withMavenConfiguration(newMavenConfigurationBuilder()
-            .withLocalMavenRepositoryLocation(localRepositoryFolder.getRoot())
-            .withRemoteRepository(newRemoteRepositoryBuilder().withId("maven-central")
-                .withUrl(new URL("https://repo.maven.apache.org/maven2/"))
-                .build())
+            .withLocalMavenRepositoryLocation(localRepositoryLocation)
             .withRemoteRepository(newRemoteRepositoryBuilder().withId("mulesoft-public")
                 .withUrl(new URL("https://repository.mulesoft.org/nexus/content/repositories/public"))
                 .build())

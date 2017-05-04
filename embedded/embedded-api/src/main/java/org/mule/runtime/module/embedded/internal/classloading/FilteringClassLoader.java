@@ -11,7 +11,6 @@ import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
-
 import org.mule.runtime.module.embedded.internal.NotExportedClassException;
 
 import java.io.IOException;
@@ -45,6 +44,15 @@ public class FilteringClassLoader extends ClassLoader {
   public Class<?> loadClass(String name) throws ClassNotFoundException {
     if (filter.exportsClass(name)) {
       return super.loadClass(name);
+    } else {
+      throw new NotExportedClassException(name, filter);
+    }
+  }
+
+  @Override
+  protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+    if (filter.exportsClass(name)) {
+      return super.loadClass(name, resolve);
     } else {
       throw new NotExportedClassException(name, filter);
     }
