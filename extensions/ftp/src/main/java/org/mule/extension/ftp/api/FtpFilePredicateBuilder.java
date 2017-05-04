@@ -63,4 +63,12 @@ public class FtpFilePredicateBuilder extends FilePredicateBuilder<FtpFilePredica
     this.timestampUntil = timestampUntil;
     return this;
   }
+
+  public LocalDateTime getTimestampSince() {
+    return timestampSince;
+  }
+
+  public LocalDateTime getTimestampUntil() {
+    return timestampUntil;
+  }
 }

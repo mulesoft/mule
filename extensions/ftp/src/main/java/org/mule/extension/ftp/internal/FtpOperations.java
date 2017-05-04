@@ -10,7 +10,6 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import org.mule.extension.file.common.api.BaseFileSystemOperations;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
-import org.mule.extension.file.common.api.FilePredicateBuilder;
 import org.mule.extension.file.common.api.FileSystem;
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.extension.file.common.api.exceptions.FileCopyErrorTypeProvider;
@@ -20,15 +19,16 @@ import org.mule.extension.file.common.api.exceptions.FileReadErrorTypeProvider;
 import org.mule.extension.file.common.api.exceptions.FileRenameErrorTypeProvider;
 import org.mule.extension.file.common.api.exceptions.FileWriteErrorTypeProvider;
 import org.mule.extension.ftp.api.FtpFileAttributes;
+import org.mule.extension.ftp.api.FtpFilePredicateBuilder;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.annotation.error.Throws;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -58,7 +58,7 @@ public final class FtpOperations extends BaseFileSystemOperations {
    * @param config        the config that is parameterizing this operation
    * @param directoryPath the path to the directory to be listed
    * @param recursive     whether to include the contents of sub-directories. Defaults to false.
-   * @param matchWith     a matcher used to filter the output list
+   * @param matcher     a matcher used to filter the output list
    * @return a {@link List} of {@link Message messages} each one containing each file's content in the payload and metadata in the attributes
    * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
    * @oaram mediaType the {@link MediaType} of the message which entered the operation
@@ -70,8 +70,8 @@ public final class FtpOperations extends BaseFileSystemOperations {
                                                            String directoryPath,
                                                            @Optional(defaultValue = "false") boolean recursive,
                                                            MediaType mediaType,
-                                                           @Optional @DisplayName("File Matching Rules") @Summary("Matcher to filter the listed files") FilePredicateBuilder matchWith) {
-    List result = doList(config, fileSystem, directoryPath, recursive, mediaType, matchWith);
+                                                           @Optional @DisplayName("File Matching Rules") @Summary("Matcher to filter the listed files") FtpFilePredicateBuilder matcher) {
+    List result = doList(config, fileSystem, directoryPath, recursive, mediaType, matcher);
     return (List<Result<InputStream, FtpFileAttributes>>) result;
   }
 

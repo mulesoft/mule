@@ -17,13 +17,11 @@
 
     <flow name="listWithEmbeddedPredicate">
         <file:list config-ref="file" directoryPath="#[path]" recursive="#[recursive]">
-            <file:match-with>
-                <file:matcher filenamePattern="*[1-2]*.html" />
-            </file:match-with>
+            <file:matcher filenamePattern="*[1-2]*.html" />
         </file:list>
     </flow>
 
     <flow name="listWithGlobalMatcher">
-        <file:list config-ref="file" directoryPath="#[path]" recursive="#[recursive]" matchWith="globalMatcher"/>
+        <file:list config-ref="file" directoryPath="#[path]" recursive="#[recursive]" matcher="globalMatcher"/>
     </flow>
 </mule>

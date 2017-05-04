@@ -15,14 +15,13 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.extension.file.api.FileEventType.CREATE;
 import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
-import static org.mule.extension.file.common.api.FileDisplayConstants.MATCH_WITH;
+import static org.mule.extension.file.common.api.FileDisplayConstants.MATCHER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
 import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
-import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.extension.file.common.api.FilePredicateBuilder;
+import org.mule.extension.file.api.LocalFileAttributes;
+import org.mule.extension.file.api.LocalFilePredicateBuilder;
 import org.mule.extension.file.common.api.FileSystem;
 import org.mule.extension.file.common.api.lock.NullPathLock;
 import org.mule.extension.file.common.api.matcher.NullFilePayloadPredicate;
@@ -182,9 +181,9 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
    */
   @Parameter
   @Optional
-  @Alias("matchWith")
-  @DisplayName(MATCH_WITH)
-  private FilePredicateBuilder<FilePredicateBuilder, FileAttributes> predicateBuilder;
+  @Alias("matcher")
+  @DisplayName(MATCHER)
+  private LocalFilePredicateBuilder predicateBuilder;
 
   @Inject
   private MuleContext muleContext;
@@ -197,7 +196,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
 
   private FlowConstruct flowConstruct;
   private WatchService watcher;
-  private Predicate<FileAttributes> matcher;
+  private Predicate<LocalFileAttributes> matcher;
   private Set<FileEventType> enabledEventTypes = new HashSet<>();
   private Scheduler listenerExecutor;
   private PrimaryNodeLifecycleNotificationListener clusterListener;
@@ -220,7 +219,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     calculateEnabledEventTypes();
     createWatcherService();
 
-    matcher = predicateBuilder != null ? predicateBuilder.build() : new NullFilePayloadPredicate();
+    matcher = predicateBuilder != null ? predicateBuilder.build() : new NullFilePayloadPredicate<>();
 
     listenerExecutor = schedulerService.customScheduler(muleContext.getSchedulerBaseConfig().withMaxConcurrentTasks(1)
         .withName(format("%s.file.listener", flowConstruct.getName())));
