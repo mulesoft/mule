@@ -49,7 +49,7 @@
     <flow name="toGreedyStream">
         <try>
             <marvel:to-stream config-ref="drStrange" >
-                <repeatable-in-memory-stream maxInMemorySize="1" initialBufferSize="1" bufferSizeIncrement="1" bufferUnit="BYTE" />
+                <repeatable-in-memory-stream maxBufferSize="1" initialBufferSize="1" bufferSizeIncrement="1" bufferUnit="BYTE" />
             </marvel:to-stream>
             <flow-ref name="readStream" />
             <object-to-string-transformer />

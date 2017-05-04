@@ -89,8 +89,8 @@ public class InMemoryObjectStreamBuffer<T> extends AbstractObjectStreamBuffer<T>
 
   @Override
   protected void validateMaxBufferSizeNotExceeded(int instancesCount) {
-    if (instancesCount > config.getMaxInMemoryInstances()) {
-      throw new StreamingBufferSizeExceededException(config.getMaxInMemoryInstances());
+    if (instancesCount > config.getMaxBufferSize()) {
+      throw new StreamingBufferSizeExceededException(config.getMaxBufferSize());
     }
   }
 

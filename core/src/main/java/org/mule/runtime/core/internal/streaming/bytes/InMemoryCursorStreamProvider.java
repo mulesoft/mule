@@ -20,7 +20,6 @@ import java.io.InputStream;
 public class InMemoryCursorStreamProvider extends AbstractCursorStreamProvider {
 
   private final InMemoryStreamBuffer buffer;
-  private final int bufferSize;
 
   /**
    * Creates a new instance
@@ -34,7 +33,6 @@ public class InMemoryCursorStreamProvider extends AbstractCursorStreamProvider {
                                       ByteBufferManager bufferManager) {
     super(wrappedStream, bufferManager);
     buffer = new InMemoryStreamBuffer(wrappedStream, config, bufferManager);
-    bufferSize = config.getInitialBufferSize().toBytes();
   }
 
   /**
@@ -42,7 +40,7 @@ public class InMemoryCursorStreamProvider extends AbstractCursorStreamProvider {
    */
   @Override
   protected CursorStream doOpenCursor() {
-    return new BufferedCursorStream(buffer, this, getBufferManager(), bufferSize);
+    return new BufferedCursorStream(buffer, this, getBufferManager());
   }
 
 

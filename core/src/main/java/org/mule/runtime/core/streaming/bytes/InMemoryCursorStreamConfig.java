@@ -23,7 +23,7 @@ public final class InMemoryCursorStreamConfig {
 
   private final DataSize initialBufferSize;
   private final DataSize bufferSizeIncrement;
-  private final DataSize maxInMemorySize;
+  private final DataSize maxBufferSize;
 
   /**
    * @return A new instance configured with default settings
@@ -43,15 +43,22 @@ public final class InMemoryCursorStreamConfig {
    * @param initialBufferSize   the buffer's initial size. Must be greater than zero bytes.
    * @param bufferSizeIncrement the size that the buffer should gain each time it is expanded. A value of zero bytes means no expansion.
    *                            Cannot be negative byte size.
-   * @param maxInMemorySize     the maximum amount of space that the buffer can grow to. Use {@code null} for unbounded buffers
+   * @param maxBufferSize     the maximum amount of space that the buffer can grow to. Use {@code null} for unbounded buffers
    */
-  public InMemoryCursorStreamConfig(DataSize initialBufferSize, DataSize bufferSizeIncrement, DataSize maxInMemorySize) {
-    checkArgument(initialBufferSize.toBytes() > 0, "initialBufferSize must be greater than zero bytes");
-    checkArgument(bufferSizeIncrement.toBytes() >= 0, "bufferSizeIncrement cannot be a negative byte size");
+  public InMemoryCursorStreamConfig(DataSize initialBufferSize, DataSize bufferSizeIncrement, DataSize maxBufferSize) {
+    final int initial = initialBufferSize.toBytes();
+    checkArgument(initial > 0, "initialBufferSize must be greater than zero bytes");
+    final int increment = bufferSizeIncrement.toBytes();
+    checkArgument(increment >= 0, "bufferSizeIncrement cannot be a negative byte size");
+    final int max = maxBufferSize.toBytes();
+    checkArgument(initial <= max, "initialBufferSize cannot be bigger than the maxBufferSize");
+    checkArgument(increment <= max, "bufferSizeIncrement cannot be bigger than the maxBufferSize");
+    checkArgument(initial + increment <= max, "initialBufferSize + bufferSizeIncrement cannot be bigger than the maxBufferSize, "
+        + "otherwise the buffer will never be able to expand");
 
     this.initialBufferSize = initialBufferSize;
     this.bufferSizeIncrement = bufferSizeIncrement;
-    this.maxInMemorySize = maxInMemorySize;
+    this.maxBufferSize = maxBufferSize;
   }
 
   public DataSize getInitialBufferSize() {
@@ -62,7 +69,7 @@ public final class InMemoryCursorStreamConfig {
     return bufferSizeIncrement;
   }
 
-  public DataSize getMaxInMemorySize() {
-    return maxInMemorySize;
+  public DataSize getMaxBufferSize() {
+    return maxBufferSize;
   }
 }
