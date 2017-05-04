@@ -8,14 +8,13 @@ package org.mule.extension.file.common.api.matcher;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.extension.api.util.TripleStateBoolean.ANY;
+import static org.mule.extension.file.common.api.matcher.TripleStateBoolean.ANY;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.util.TimeSinceFunction;
 import org.mule.extension.file.common.api.util.TimeUntilFunction;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.extension.api.util.TripleStateBoolean;
 
 import java.util.function.Predicate;
 

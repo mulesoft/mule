@@ -7,8 +7,8 @@
 package org.mule.extension.ftp;
 
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.extension.api.util.TripleStateBoolean.FALSE;
-import static org.mule.runtime.extension.api.util.TripleStateBoolean.TRUE;
+import static org.mule.extension.file.common.api.matcher.TripleStateBoolean.FALSE;
+import static org.mule.extension.file.common.api.matcher.TripleStateBoolean.TRUE;
 import static org.mule.test.allure.AllureConstants.FtpFeature.FTP_EXTENSION;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.FtpFileMatcher;
