@@ -7,11 +7,11 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <flow name="IdempotentSecureHashReceiverRouter">
-        <idempotent-secure-hash-message-filter messageDigestAlgorithm="SHA-128"/>
+        <idempotent-secure-hash-message-validator messageDigestAlgorithm="SHA-128"/>
     </flow>
 
     <flow name="IdempotentReceiverRouter">
-        <idempotent-message-filter idExpression="#[id]-#[correlationId]"/>
+        <idempotent-message-validator idExpression="#[id]-#[correlationId]"/>
     </flow>
 
     <flow name="CustomRouter">

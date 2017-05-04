@@ -15,35 +15,43 @@ import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.routing.filter.FilteredException;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.store.ObjectStoreNotAvaliableException;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 /**
- * <code>IdempotentMessageFilter</code> ensures that only unique messages are passed on. It does this by checking the unique ID of
+ * <code>IdempotentMessageValidator</code> ensures that only unique messages are passed on. It does this by checking the unique ID of
  * the incoming message. Note that the underlying endpoint must support unique message IDs for this to work, otherwise a
  * <code>UniqueIdNotSupportedException</code> is thrown.<br>
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/IdempotentReceiver.html">
  * http://www.eaipatterns.com/IdempotentReceiver.html</a>
  */
-public class IdempotentMessageFilter extends AbstractInterceptingMessageProcessor implements Initialisable, Disposable {
+public class IdempotentMessageValidator extends AbstractAnnotatedObject
+    implements Processor, MuleContextAware, FlowConstructAware, Initialisable, Disposable {
 
-  private static final Logger LOGGER = getLogger(IdempotentMessageFilter.class);
+  private static final Logger LOGGER = getLogger(IdempotentMessageValidator.class);
+
+  protected MuleContext muleContext;
+  protected FlowConstruct flowConstruct;
 
   protected volatile ObjectStore<String> store;
   protected String storePrefix;
@@ -51,8 +59,14 @@ public class IdempotentMessageFilter extends AbstractInterceptingMessageProcesso
   protected String idExpression = format("%sid%s", DEFAULT_EXPRESSION_PREFIX, DEFAULT_EXPRESSION_POSTFIX);
   protected String valueExpression = format("%sid%s", DEFAULT_EXPRESSION_PREFIX, DEFAULT_EXPRESSION_POSTFIX);
 
-  public IdempotentMessageFilter() {
-    super();
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
   }
 
   @Override
@@ -79,11 +93,11 @@ public class IdempotentMessageFilter extends AbstractInterceptingMessageProcesso
   }
 
   protected String getValueForEvent(Event event) throws MessagingException {
-    return muleContext.getExpressionManager().parse(valueExpression, event, flowConstruct);
+    return (String) muleContext.getExpressionManager().evaluate(valueExpression, event).getValue();
   }
 
   protected String getIdForEvent(Event event) throws MuleException {
-    return muleContext.getExpressionManager().parse(idExpression, event, flowConstruct);
+    return (String) muleContext.getExpressionManager().evaluate(idExpression, event).getValue();
   }
 
   public String getIdExpression() {
@@ -113,14 +127,14 @@ public class IdempotentMessageFilter extends AbstractInterceptingMessageProcesso
         } catch (ObjectAlreadyExistsException ex) {
           return false;
         } catch (ObjectStoreNotAvaliableException e) {
-          logger.error("ObjectStore not available: " + e.getMessage());
+          LOGGER.error("ObjectStore not available: " + e.getMessage());
           return false;
         } catch (ObjectStoreException e) {
-          logger.warn("ObjectStore exception: " + e.getMessage());
+          LOGGER.warn("ObjectStore exception: " + e.getMessage());
           return false;
         }
       } catch (MuleException e) {
-        logger.warn("Could not retrieve Id or Value for event: " + e.getMessage());
+        LOGGER.warn("Could not retrieve Id or Value for event: " + e.getMessage());
         return false;
       }
     } else {
@@ -131,22 +145,10 @@ public class IdempotentMessageFilter extends AbstractInterceptingMessageProcesso
   @Override
   public final Event process(Event event) throws MuleException {
     if (accept(event)) {
-      return processNext(event);
+      return event;
     } else {
-      event.getContext().success();
-      return null;
+      throw new FilteredException();
     }
-  }
-
-  @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
-    return from(publisher).<Event>handle((event, sink) -> {
-      if (accept(event)) {
-        sink.next(event);
-      } else {
-        event.getContext().success();
-      }
-    }).transform(applyNext());
   }
 
   protected boolean isNewMessage(Event event) {
@@ -159,7 +161,7 @@ public class IdempotentMessageFilter extends AbstractInterceptingMessageProcesso
       }
       return !store.contains(id);
     } catch (MuleException e) {
-      logger.error("Exception attempting to determine idempotency of incoming message for " + flowConstruct.getName()
+      LOGGER.error("Exception attempting to determine idempotency of incoming message for " + flowConstruct.getName()
           + " from the connector " + event.getContext().getOriginatingConnectorName(), e);
       return false;
     }

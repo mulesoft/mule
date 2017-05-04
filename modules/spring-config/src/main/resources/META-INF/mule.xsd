@@ -4087,16 +4087,16 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="idempotent-message-filter" type="idempotentMessageFilterType"
-                 substitutionGroup="abstract-intercepting-message-processor">
+    <xsd:element name="idempotent-message-validator" type="idempotentMessageValidatorType"
+                 substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the 'idExpression' attribute. By default, the expression used is '#[mel:message:id]', which means the underlying message source must support unique message IDs for this to work. Otherwise, a UniqueIdNotSupportedException is thrown.
+                Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the 'idExpression' attribute. Otherwise, a 'FILTERED' error is generated.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="idempotentMessageFilterType">
+    <xsd:complexType name="idempotentMessageValidatorType">
         <xsd:complexContent>
             <xsd:extension base="abstractInterceptingMessageProcessorType">
                 <xsd:attribute name="idExpression" type="xsd:string">
@@ -4200,6 +4200,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <!-- TODO MULE-12379 Allow inline definition of object stores in elements -->
                 <xsd:attribute name="object-store-ref" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -4211,7 +4212,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="idempotent-secure-hash-message-filter" substitutionGroup="abstract-intercepting-message-processor">
+    <xsd:element name="idempotent-secure-hash-message-validator" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Ensures that only unique messages are received by a service by calculating the hash of the message itself using a message digest algorithm. This provides a value with an infinitesimally small chance of a collision. This can be used to filter message duplicates. Keep in mind that the hash is calculated over the entire byte array representing the message, so any leading or trailing spaces or extraneous bytes (like padding) can produce different hash values for the same semantic message content. Care should be taken to ensure that messages do not contain extraneous bytes. This class is useful when the message does not support unique identifiers.
@@ -4219,7 +4220,7 @@
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:extension base="idempotentMessageFilterType">
+                <xsd:extension base="idempotentMessageValidatorType">
                     <xsd:attribute name="messageDigestAlgorithm" type="xsd:string">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -4287,6 +4288,7 @@
                     </xsd:annotation>
                 </xsd:attribute>
                 
+                <!-- TODO MULE-12379 Allow inline definition of object stores in elements -->
                 <xsd:attribute name="processed-groups-object-store-ref" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -4294,6 +4296,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <!-- TODO MULE-12379 Allow inline definition of object stores in elements -->
                 <xsd:attribute name="event-groups-object-store-ref" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -4676,6 +4679,7 @@
             <xsd:complexContent>
                 <xsd:extension base="abstractRoutingMessageProcessorType">
                     <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="1"/>
+                    <!-- TODO MULE-12379 Allow inline definition of object stores in elements -->
                     <xsd:attribute name="objectStore-ref" type="xsd:string" use="optional">
                         <xsd:annotation>
                             <xsd:documentation>

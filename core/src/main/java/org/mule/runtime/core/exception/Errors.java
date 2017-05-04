@@ -7,11 +7,11 @@
 package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.EXPRESSION_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.FILTERED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.OVERLOAD_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
@@ -20,6 +20,8 @@ import static org.mule.runtime.core.exception.Errors.Identifiers.SECURITY_ERROR_
 import static org.mule.runtime.core.exception.Errors.Identifiers.STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 
 /**
@@ -42,6 +44,11 @@ public abstract class Errors {
      * Indicates that a problem occurred when resolving an expression
      */
     public static final String EXPRESSION_ERROR_IDENTIFIER = "EXPRESSION";
+
+    /**
+     * Indicates that the execution of the current event is stopped
+     */
+    public static final String FILTERED_ERROR_IDENTIFIER = "FILTERED";
 
     /**
      * Indicates that the retry policy, of a certain component, to execute some action, eg: connectivity, delivery has been
@@ -105,6 +112,8 @@ public abstract class Errors {
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(TRANSFORMATION_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier EXPRESSION =
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(EXPRESSION_ERROR_IDENTIFIER).build();
+    public static final ComponentIdentifier FILTERED =
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(FILTERED_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier REDELIVERY_EXHAUSTED = builder()
         .withNamespace(CORE_NAMESPACE_NAME).withName(REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier RETRY_EXHAUSTED = builder()

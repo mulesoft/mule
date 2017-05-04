@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ObjectStore;
-import org.mule.runtime.core.routing.IdempotentMessageFilter;
+import org.mule.runtime.core.routing.IdempotentMessageValidator;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -25,18 +25,18 @@ import java.util.List;
 import org.junit.Test;
 
 /**
- * Tests for all object stores that can be configured on an {@link IdempotentMessageFilter}.
+ * Tests for all object stores that can be configured on an {@link IdempotentMessageValidator}.
  */
-public class IdempotentMessageFilterNamespaceHandlerTestCase extends AbstractIntegrationTestCase {
+public class IdempotentMessageValidatorNamespaceHandlerTestCase extends AbstractIntegrationTestCase {
 
-  public IdempotentMessageFilterNamespaceHandlerTestCase() {
+  public IdempotentMessageValidatorNamespaceHandlerTestCase() {
     // we just test the wiring of the objects, no need to start the MuleContext
     setStartContext(false);
   }
 
   @Override
   protected String getConfigFile() {
-    return "org/mule/test/config/idempotent-message-filter-config.xml";
+    return "org/mule/test/config/idempotent-message-validator-config.xml";
   }
 
   @Test
@@ -45,7 +45,7 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends AbstractInt
   }
 
   private void testPojoObjectStore(final String flowName) throws Exception {
-    final IdempotentMessageFilter filter = idempotentMessageFilterFromFlow(flowName);
+    final IdempotentMessageValidator filter = idempotentMessageFilterFromFlow(flowName);
 
     final ObjectStore<?> store = filter.getObjectStore();
     assertThat(store, instanceOf(CustomObjectStore.class));
@@ -54,7 +54,7 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends AbstractInt
     assertEquals("the-value:" + flowName, customStore.getCustomProperty());
   }
 
-  private IdempotentMessageFilter idempotentMessageFilterFromFlow(final String flowName) throws Exception {
+  private IdempotentMessageValidator idempotentMessageFilterFromFlow(final String flowName) throws Exception {
     final FlowConstruct flow = getFlowConstruct(flowName);
     assertTrue(flow instanceof Flow);
 
@@ -63,9 +63,9 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends AbstractInt
     assertEquals(1, processors.size());
 
     final Processor firstMP = processors.get(0);
-    assertEquals(IdempotentMessageFilter.class, firstMP.getClass());
+    assertEquals(IdempotentMessageValidator.class, firstMP.getClass());
 
-    return (IdempotentMessageFilter) firstMP;
+    return (IdempotentMessageValidator) firstMP;
   }
 
   public static class CustomObjectStore extends SimpleMemoryObjectStore<Serializable> {

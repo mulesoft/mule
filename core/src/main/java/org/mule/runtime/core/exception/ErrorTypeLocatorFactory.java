@@ -8,6 +8,7 @@ package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CONNECTIVITY;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.EXPRESSION;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.FILTERED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.OVERLOAD;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.RETRY_EXHAUSTED;
@@ -18,11 +19,12 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.TRANSF
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.api.routing.filter.FilteredException;
 import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
-import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
@@ -50,6 +52,7 @@ public class ErrorTypeLocatorFactory {
             .addExceptionMapping(ExpressionRuntimeException.class, errorTypeRepository.lookupErrorType(EXPRESSION).get())
             .addExceptionMapping(RoutingException.class, errorTypeRepository.lookupErrorType(ROUTING).get())
             .addExceptionMapping(ConnectionException.class, errorTypeRepository.lookupErrorType(CONNECTIVITY).get())
+            .addExceptionMapping(FilteredException.class, errorTypeRepository.lookupErrorType(FILTERED).get())
             .addExceptionMapping(RetryPolicyExhaustedException.class, errorTypeRepository.lookupErrorType(RETRY_EXHAUSTED).get())
             .addExceptionMapping(IOException.class, errorTypeRepository.lookupErrorType(CONNECTIVITY).get())
             .addExceptionMapping(SecurityException.class, errorTypeRepository.lookupErrorType(SECURITY).get())

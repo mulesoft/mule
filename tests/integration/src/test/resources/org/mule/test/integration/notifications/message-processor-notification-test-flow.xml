@@ -224,12 +224,12 @@
     </flow>
 
     <flow name="idempotent-msg-filter">
-        <idempotent-message-filter idExpression="#[id]" objectStore-ref="objectStore"/>
+        <idempotent-message-validator idExpression="#[id]" objectStore-ref="objectStore"/>
         <logger level="INFO"/>
     </flow>
 
     <flow name="idempotent-secure-hash-msg-filter">
-        <idempotent-secure-hash-message-filter idExpression="#[id]" objectStore-ref="objectStore"/>
+        <idempotent-secure-hash-message-validator idExpression="#[id]" objectStore-ref="objectStore"/>
         <logger level="INFO"/>
     </flow>
 

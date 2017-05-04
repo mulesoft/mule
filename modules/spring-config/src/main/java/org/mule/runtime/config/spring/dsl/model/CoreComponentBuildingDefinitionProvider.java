@@ -174,8 +174,8 @@ import org.mule.runtime.core.routing.CollectionSplitter;
 import org.mule.runtime.core.routing.ExpressionSplitter;
 import org.mule.runtime.core.routing.FirstSuccessful;
 import org.mule.runtime.core.routing.Foreach;
-import org.mule.runtime.core.routing.IdempotentMessageFilter;
-import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
+import org.mule.runtime.core.routing.IdempotentMessageValidator;
+import org.mule.runtime.core.routing.IdempotentSecureHashMessageValidator;
 import org.mule.runtime.core.routing.MapSplitter;
 import org.mule.runtime.core.routing.MessageChunkAggregator;
 import org.mule.runtime.core.routing.MessageChunkSplitter;
@@ -924,13 +924,13 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("unacceptedMessageProcessor", fromSimpleReferenceParameter("onUnaccepted").build());
 
     definitions.add(baseIdempotentMessageFilterDefinition.copy()
-        .withIdentifier("idempotent-message-filter")
-        .withTypeDefinition(fromType(IdempotentMessageFilter.class))
+        .withIdentifier("idempotent-message-validator")
+        .withTypeDefinition(fromType(IdempotentMessageValidator.class))
         .build());
 
     definitions.add(baseIdempotentMessageFilterDefinition.copy()
-        .withIdentifier("idempotent-secure-hash-message-filter")
-        .withTypeDefinition(fromType(IdempotentSecureHashMessageFilter.class))
+        .withIdentifier("idempotent-secure-hash-message-validator")
+        .withTypeDefinition(fromType(IdempotentSecureHashMessageValidator.class))
         .withSetterParameterDefinition("messageDigestAlgorithm", fromSimpleParameter("messageDigestAlgorithm").build())
         .build());
 

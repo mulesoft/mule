@@ -6,32 +6,35 @@
  */
 package org.mule.runtime.core.routing;
 
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.routing.filter.FilteredException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase {
+public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestCase {
+
+  @Rule
+  public ExpectedException expected = none();
 
   @Test
-  public void testIdempotentReceiver() throws Exception {
-    IdempotentMessageFilter ir = new IdempotentMessageFilter();
-    ir.setMuleContext(muleContext);
-    ir.setStorePrefix("foo");
-    ir.setObjectStore(new InMemoryObjectStore<String>());
+  public void idempotentReceiver() throws Exception {
+    IdempotentMessageValidator idempotent = new IdempotentMessageValidator();
+    idempotent.setMuleContext(muleContext);
+    idempotent.setStorePrefix("foo");
+    idempotent.setObjectStore(new InMemoryObjectStore<String>());
 
     final EventContext contextA = mock(EventContext.class);
     when(contextA.getId()).thenReturn("1");
@@ -40,20 +43,16 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
     Event event = Event.builder(contextA).message(okMessage).build();
 
     // This one will process the event on the target endpoint
-    Event processedEvent = ir.process(event);
-    assertThat(processedEvent, not(nullValue()));
-    verify(contextA, never()).success();
-    verify(contextA, never()).success(any());
-    verify(contextA, never()).error(any());
+    Event processedEvent = idempotent.process(event);
+    assertThat(processedEvent, sameInstance(event));
 
     final EventContext contextB = mock(EventContext.class);
     when(contextB.getId()).thenReturn("1");
+
     // This will not process, because the ID is a duplicate
     event = Event.builder(contextB).message(okMessage).build();
-    processedEvent = ir.process(event);
-    assertThat(processedEvent, nullValue());
-    verify(contextB).success();
-    verify(contextB, never()).success(any());
-    verify(contextB, never()).error(any());
+
+    expected.expect(FilteredException.class);
+    processedEvent = idempotent.process(event);
   }
 }

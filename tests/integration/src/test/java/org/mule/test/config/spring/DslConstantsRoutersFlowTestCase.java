@@ -19,8 +19,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.routing.IdempotentMessageFilter;
-import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
+import org.mule.runtime.core.routing.IdempotentMessageValidator;
+import org.mule.runtime.core.routing.IdempotentSecureHashMessageValidator;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -38,9 +38,9 @@ public class DslConstantsRoutersFlowTestCase extends AbstractIntegrationTestCase
   @Test
   public void testIdempotentSecureHashReceiverRouter() throws Exception {
     Processor router = lookupMessageProcessorFromFlow("IdempotentSecureHashReceiverRouter");
-    assertThat(router, instanceOf(IdempotentSecureHashMessageFilter.class));
+    assertThat(router, instanceOf(IdempotentSecureHashMessageValidator.class));
 
-    IdempotentSecureHashMessageFilter filter = (IdempotentSecureHashMessageFilter) router;
+    IdempotentSecureHashMessageValidator filter = (IdempotentSecureHashMessageValidator) router;
     assertThat(filter.getMessageDigestAlgorithm(), is("SHA-128"));
     assertThat(filter.getObjectStore(), not(nullValue()));
   }
@@ -48,9 +48,9 @@ public class DslConstantsRoutersFlowTestCase extends AbstractIntegrationTestCase
   @Test
   public void testIdempotentReceiverRouter() throws Exception {
     Processor router = lookupMessageProcessorFromFlow("IdempotentReceiverRouter");
-    assertThat(router, instanceOf(IdempotentMessageFilter.class));
+    assertThat(router, instanceOf(IdempotentMessageValidator.class));
 
-    IdempotentMessageFilter filter = (IdempotentMessageFilter) router;
+    IdempotentMessageValidator filter = (IdempotentMessageValidator) router;
     assertThat(filter.getIdExpression(), is("#[id]-#[correlationId]"));
     assertThat(filter.getObjectStore(), not(nullValue()));
   }

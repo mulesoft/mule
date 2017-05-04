@@ -128,8 +128,8 @@ import org.mule.runtime.core.routing.CollectionSplitter;
 import org.mule.runtime.core.routing.ExpressionSplitter;
 import org.mule.runtime.core.routing.FirstSuccessful;
 import org.mule.runtime.core.routing.Foreach;
-import org.mule.runtime.core.routing.IdempotentMessageFilter;
-import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
+import org.mule.runtime.core.routing.IdempotentMessageValidator;
+import org.mule.runtime.core.routing.IdempotentSecureHashMessageValidator;
 import org.mule.runtime.core.routing.MapSplitter;
 import org.mule.runtime.core.routing.MessageChunkAggregator;
 import org.mule.runtime.core.routing.MessageChunkSplitter;
@@ -439,10 +439,10 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerBeanDefinitionParser("custom-object-store", new ChildDefinitionParser("store", null));
 
     // Routing: Intercepting Message Processors
-    registerMuleBeanDefinitionParser("idempotent-message-filter",
-                                     new MessageFilterDefinitionParser(IdempotentMessageFilter.class));
-    registerMuleBeanDefinitionParser("idempotent-secure-hash-message-filter",
-                                     new MessageFilterDefinitionParser(IdempotentSecureHashMessageFilter.class));
+    registerMuleBeanDefinitionParser("idempotent-message-validator",
+                                     new MessageFilterDefinitionParser(IdempotentMessageValidator.class));
+    registerMuleBeanDefinitionParser("idempotent-secure-hash-message-validator",
+                                     new MessageFilterDefinitionParser(IdempotentSecureHashMessageValidator.class));
     registerBeanDefinitionParser("wire-tap", new InboundRouterDefinitionParser(WireTap.class));
     registerBeanDefinitionParser("custom-aggregator", new AggregatorDefinitionParser());
     registerBeanDefinitionParser("collection-aggregator", new AggregatorDefinitionParser(SimpleCollectionAggregator.class));

@@ -1388,7 +1388,7 @@
       "modelProperties": {}
     },
     {
-      "name": "idempotentMessageFilter",
+      "name": "idempotentMessageValidator",
       "kind": "operation",
       "blocking": true,
       "executionType": "CPU_LITE",
@@ -1564,7 +1564,7 @@
           "modelProperties": {}
         }
       ],
-      "description": "The collection splitter accepts a collection of objects and splits the collection invoking the next message processor with\neach item in the collection in sequence.",
+      "description": "Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the 'idExpression' attribute. Otherwise, a 'FILTERED' error is generated.",
       "modelProperties": {}
     },
     {
