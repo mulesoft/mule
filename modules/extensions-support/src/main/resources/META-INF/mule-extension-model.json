@@ -1062,7 +1062,7 @@
                 "query": false,
                 "order": 2
               },
-              "name": "SetVariable",
+              "name": "SetVariables",
               "displayModel": {
                 "displayName": "Set Variables"
               },

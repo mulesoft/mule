@@ -110,7 +110,7 @@ import org.w3c.dom.Document;
 public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLoader {
 
   public static final String TRANSFORM_IDENTIFIER = "transform";
-  public static final String TRANSFORMER_SET_VARIABLE = "SetVariable";
+  public static final String TRANSFORMER_SET_VARIABLE = "SetVariables";
   public static final String TRANSFORMER_GENERAL = "General";
   public static final String SCRIPT = "script";
 
@@ -394,7 +394,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
                 ParameterListValue.Builder setVariablesListBuilder = ElementDeclarer.newListValue();
                 elementDsl.getChild(TRANSFORMER_GENERAL).get().getChild(TRANSFORMER_SET_VARIABLE)
                     .ifPresent(groupDsl -> line.getChildren().stream()
-                        .filter(c -> c.getIdentifier().equals(groupDsl.getElementName()))
+                        .filter(c -> groupDsl.getElementName().contains(c.getIdentifier()))
                         .forEach(groupConfig -> {
                           setVariablesListBuilder.withValue(getTransformParameterBuilder(groupConfig).build());
 

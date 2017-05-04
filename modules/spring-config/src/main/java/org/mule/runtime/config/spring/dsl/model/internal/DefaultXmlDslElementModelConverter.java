@@ -239,7 +239,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
           if (e.getContainedElements().isEmpty() && e.getValue().isPresent()) {
             transform.setAttribute(e.getDsl().getAttributeName(), (String) e.getValue().get());
           } else {
-            e.getConfiguration().ifPresent(c -> transform.appendChild(createTextChildElement((ComponentConfiguration) c)));
+            e.getConfiguration().ifPresent(c -> transform.appendChild(createTransformTextElement((ComponentConfiguration) c)));
           }
         });
 
@@ -247,9 +247,9 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
     elementModel.getContainedElements().stream()
         .filter(e -> ((ComponentIdentifier) e.getIdentifier().get()).getName().equals("general"))
         .forEach(e -> e.getContainedElements().stream().findFirst()
-            .ifPresent(setVariableElement -> ((DslElementModel) setVariableElement).getContainedElements().stream()
+            .ifPresent(setVariablesElement -> ((DslElementModel) setVariablesElement).getContainedElements().stream()
                 .forEach(setVariable -> ((DslElementModel) setVariable).getConfiguration()
-                    .ifPresent(c -> transform.appendChild(createTextChildElement((ComponentConfiguration) c))))));
+                    .ifPresent(c -> transform.appendChild(createTransformTextElement((ComponentConfiguration) c))))));
     return transform;
   }
 
@@ -277,7 +277,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
     return nested;
   }
 
-  private Element createTextChildElement(ComponentConfiguration config) {
+  private Element createTransformTextElement(ComponentConfiguration config) {
     String namespaceURI = EE_NAMESPACE;
     String eeSchemaLocation = buildSchemaLocation(EE_PREFIX, EE_NAMESPACE);
 

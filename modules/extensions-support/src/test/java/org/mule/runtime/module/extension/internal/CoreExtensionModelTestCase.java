@@ -213,7 +213,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
                is(Transformer.class.getName()));
     assertThat(paramModels.get(0).isRequired(), is(true));
 
-    assertThat(paramModels.get(1).getName(), is("SetVariable"));
+    assertThat(paramModels.get(1).getName(), is("SetVariables"));
     assertThat(paramModels.get(1).getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(paramModels.get(1).getType(), instanceOf(DefaultArrayType.class));
     assertThat(paramModels.get(1).getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
