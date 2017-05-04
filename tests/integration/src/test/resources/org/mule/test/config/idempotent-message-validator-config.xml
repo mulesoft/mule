@@ -11,7 +11,7 @@
     </spring:bean>
 
     <flow name="customObjectStore">
-        <idempotent-message-validator objectStore-ref="objectStore"/>
+        <idempotent-message-validator objectStore="objectStore"/>
     </flow>
 
  </mule>
