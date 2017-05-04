@@ -12,17 +12,16 @@ import static java.util.Optional.of;
 import java.util.Optional;
 
 /**
- * Alternative to boxed {@link Boolean} which is disallowed as parameter types in the extensions API.
- * <p>
- * This enum is meant to model cases in which there's a boolean value which represents either true or false.
- * Traditional {@link Boolean} values are not a good fit for these, because they are represented as check boxes
- * which cannot really show the third state.
+ * Criterias used to accept or reject a matcher filter.
  *
  * @since 1.0
  */
-public enum TripleStateBoolean {
+public enum MatchPolicy {
 
-  TRUE {
+  /**
+   * Accept only the files which comply with the filter
+   */
+  ONLY {
 
     @Override
     public Optional<Boolean> asBoolean() {
@@ -30,23 +29,15 @@ public enum TripleStateBoolean {
     }
 
     @Override
-    public boolean isAny() {
+    public boolean acceptsAll() {
       return false;
     }
   },
-  FALSE {
 
-    @Override
-    public Optional<Boolean> asBoolean() {
-      return of(Boolean.FALSE);
-    }
-
-    @Override
-    public boolean isAny() {
-      return false;
-    }
-  },
-  ANY {
+  /**
+   * Accept all files
+   */
+  ACCEPTS {
 
     @Override
     public Optional<Boolean> asBoolean() {
@@ -54,8 +45,23 @@ public enum TripleStateBoolean {
     }
 
     @Override
-    public boolean isAny() {
+    public boolean acceptsAll() {
       return true;
+    }
+  },
+  /**
+   * Accept only the files which do not match the filter
+   */
+  REJECTS {
+
+    @Override
+    public Optional<Boolean> asBoolean() {
+      return of(Boolean.FALSE);
+    }
+
+    @Override
+    public boolean acceptsAll() {
+      return false;
     }
   };
 
@@ -65,7 +71,7 @@ public enum TripleStateBoolean {
   public abstract Optional<Boolean> asBoolean();
 
   /**
-   * @return Whether {@code this} is {@link #ANY}
+   * @return Whether {@code this} is {@link #ACCEPTS}
    */
-  public abstract boolean isAny();
+  public abstract boolean acceptsAll();
 }

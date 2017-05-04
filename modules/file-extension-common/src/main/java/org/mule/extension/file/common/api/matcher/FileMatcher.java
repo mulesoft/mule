@@ -7,8 +7,8 @@
 package org.mule.extension.file.common.api.matcher;
 
 import static java.lang.String.format;
+import static org.mule.extension.file.common.api.matcher.MatchPolicy.ACCEPTS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.extension.file.common.api.matcher.TripleStateBoolean.ANY;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.util.TimeSinceFunction;
 import org.mule.extension.file.common.api.util.TimeUntilFunction;
@@ -67,28 +67,28 @@ public abstract class FileMatcher<T extends FileMatcher, A extends FileAttribute
    * files which are not directories. If not set, then the criteria doesn't apply.
    */
   @Parameter
-  @Optional(defaultValue = "ANY")
+  @Optional(defaultValue = "ACCEPTS")
   @Summary("Indicates whether accept only directories or non directories files")
-  private TripleStateBoolean directoriesOnly = ANY;
+  private MatchPolicy directories = ACCEPTS;
 
   /**
    * If {@code true}, the predicate will only accept files which are not directories nor symbolic links. If {@code false}, the
    * predicate will only accept files which are directories or symbolic links. If not set, then the criteria doesn't apply.
    */
   @Parameter
-  @Optional(defaultValue = "ANY")
+  @Optional(defaultValue = "ACCEPTS")
   @Summary("Indicates whether accept only regular files (files which are not directories, nor symbolic links) "
       + "or only not regular files")
-  private TripleStateBoolean regularFilesOnly = ANY;
+  private MatchPolicy regularFiles = ACCEPTS;
 
   /**
    * If {@code true}, the predicate will only accept files which are symbolic links. If {@code false}, the predicate will only
    * accept files which are symbolic links. If not set, then the criteria doesn't apply.
    */
   @Parameter
-  @Optional(defaultValue = "ANY")
+  @Optional(defaultValue = "ACCEPTS")
   @Summary("Indicates whether accept only symbolic links files or accept only not symbolic links files")
-  private TripleStateBoolean symLinksOnly = ANY;
+  private MatchPolicy symLinks = ACCEPTS;
 
   /**
    * The minimum file size in bytes. Files smaller than this are rejected
@@ -122,16 +122,16 @@ public abstract class FileMatcher<T extends FileMatcher, A extends FileAttribute
       predicate = predicate.and(payload -> pathMatcher.test(payload.getPath()));
     }
 
-    if (!directoriesOnly.isAny()) {
-      predicate = predicate.and(attributes -> directoriesOnly.asBoolean().get().equals(attributes.isDirectory()));
+    if (!directories.acceptsAll()) {
+      predicate = predicate.and(attributes -> directories.asBoolean().get().equals(attributes.isDirectory()));
     }
 
-    if (!regularFilesOnly.isAny()) {
-      predicate = predicate.and(attributes -> regularFilesOnly.asBoolean().get().equals(attributes.isRegularFile()));
+    if (!regularFiles.acceptsAll()) {
+      predicate = predicate.and(attributes -> regularFiles.asBoolean().get().equals(attributes.isRegularFile()));
     }
 
-    if (!symLinksOnly.isAny()) {
-      predicate = predicate.and(attributes -> symLinksOnly.asBoolean().get().equals(attributes.isSymbolicLink()));
+    if (!symLinks.acceptsAll()) {
+      predicate = predicate.and(attributes -> symLinks.asBoolean().get().equals(attributes.isSymbolicLink()));
     }
 
     if (minSize != null) {
@@ -167,16 +167,16 @@ public abstract class FileMatcher<T extends FileMatcher, A extends FileAttribute
     return pathPattern;
   }
 
-  public TripleStateBoolean getDirectoriesOnly() {
-    return directoriesOnly;
+  public MatchPolicy getDirectories() {
+    return directories;
   }
 
-  public TripleStateBoolean getRegularFilesOnly() {
-    return regularFilesOnly;
+  public MatchPolicy getRegularFiles() {
+    return regularFiles;
   }
 
-  public TripleStateBoolean getSymLinksOnly() {
-    return symLinksOnly;
+  public MatchPolicy getSymLinks() {
+    return symLinks;
   }
 
   public Long getMinSize() {
@@ -197,18 +197,18 @@ public abstract class FileMatcher<T extends FileMatcher, A extends FileAttribute
     return (T) this;
   }
 
-  public T setDirectoriesOnly(TripleStateBoolean directoriesOnly) {
-    this.directoriesOnly = directoriesOnly;
+  public T setDirectories(MatchPolicy directories) {
+    this.directories = directories;
     return (T) this;
   }
 
-  public T setRegularFilesOnly(TripleStateBoolean regularFilesOnly) {
-    this.regularFilesOnly = regularFilesOnly;
+  public T setRegularFiles(MatchPolicy regularFiles) {
+    this.regularFiles = regularFiles;
     return (T) this;
   }
 
-  public T setSymLinksOnly(TripleStateBoolean symLinksOnly) {
-    this.symLinksOnly = symLinksOnly;
+  public T setSymLinks(MatchPolicy symLinks) {
+    this.symLinks = symLinks;
     return (T) this;
   }
 

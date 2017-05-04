@@ -7,8 +7,8 @@
 package org.mule.extension.file;
 
 import static org.mockito.Mockito.when;
-import static org.mule.extension.file.common.api.matcher.TripleStateBoolean.FALSE;
-import static org.mule.extension.file.common.api.matcher.TripleStateBoolean.TRUE;
+import static org.mule.extension.file.common.api.matcher.MatchPolicy.ACCEPTS;
+import static org.mule.extension.file.common.api.matcher.MatchPolicy.ONLY;
 import static org.mule.test.allure.AllureConstants.FileFeature.FILE_EXTENSION;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.api.LocalFileMatcher;
@@ -56,9 +56,9 @@ public class LocalFileMatcherTestCase
         .setUpdatedUntil(LocalDateTime.of(2013, 11, 3, 6, 0))
         .setAccessedSince(LocalDateTime.of(2013, 11, 3, 0, 0))
         .setAccessedUntil(LocalDateTime.of(2015, 4, 20, 0, 0))
-        .setRegularFilesOnly(TRUE)
-        .setDirectoriesOnly(FALSE)
-        .setSymLinksOnly(FALSE)
+        .setRegularFiles(ONLY)
+        .setDirectories(ACCEPTS)
+        .setSymLinks(ACCEPTS)
         .setMinSize(1L)
         .setMaxSize(1024L);
 

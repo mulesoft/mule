@@ -7,8 +7,8 @@
 package org.mule.extension.ftp;
 
 import static org.mockito.Mockito.when;
-import static org.mule.extension.file.common.api.matcher.TripleStateBoolean.FALSE;
-import static org.mule.extension.file.common.api.matcher.TripleStateBoolean.TRUE;
+import static org.mule.extension.file.common.api.matcher.MatchPolicy.ACCEPTS;
+import static org.mule.extension.file.common.api.matcher.MatchPolicy.ONLY;
 import static org.mule.test.allure.AllureConstants.FtpFeature.FTP_EXTENSION;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.FtpFileMatcher;
@@ -48,9 +48,9 @@ public class FtpFileMatcherTestCase
     builder.setFilenamePattern("glob:*.{java, js}").setPathPattern("glob:**.{java, js}")
         .setTimestampSince(LocalDateTime.of(1980, 1, 1, 0, 0))
         .setTimestampUntil(LocalDateTime.of(1990, 1, 1, 0, 0))
-        .setRegularFilesOnly(TRUE)
-        .setDirectoriesOnly(FALSE)
-        .setSymLinksOnly(FALSE)
+        .setRegularFiles(ONLY)
+        .setDirectories(ACCEPTS)
+        .setSymLinks(ACCEPTS)
         .setMinSize(1L)
         .setMaxSize(1024L);
 

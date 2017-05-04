@@ -11,8 +11,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.extension.file.common.api.matcher.TripleStateBoolean.FALSE;
-import static org.mule.extension.file.common.api.matcher.TripleStateBoolean.TRUE;
+import static org.mule.extension.file.common.api.matcher.MatchPolicy.ONLY;
+import static org.mule.extension.file.common.api.matcher.MatchPolicy.REJECTS;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.matcher.FileMatcher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @SmallTest
-public class FileMatcherContractTestCase<T extends FileMatcher, Attributes extends FileAttributes>
+public class FileMatcherContractTestCase<T extends FileMatcher, A extends FileAttributes>
     extends AbstractMuleTestCase {
 
   private static final String FILENAME = "Mule.java";
@@ -32,7 +32,7 @@ public class FileMatcherContractTestCase<T extends FileMatcher, Attributes exten
   private static final long SIZE = 1024;
 
   protected T builder = createPredicateBuilder();
-  protected Attributes attributes;
+  protected A attributes;
 
   @Rule
   public ExpectedException expectedException = none();
@@ -56,17 +56,17 @@ public class FileMatcherContractTestCase<T extends FileMatcher, Attributes exten
     return (T) new TestFileMatcher();
   }
 
-  protected Class<Attributes> getFileAttributesClass() {
-    return (Class<Attributes>) FileAttributes.class;
+  protected Class<A> getFileAttributesClass() {
+    return (Class<A>) FileAttributes.class;
   }
 
   @Test
   public void matchesAll() {
     builder.setFilenamePattern("glob:*.{java, js}")
         .setPathPattern("glob:**.{java, js}")
-        .setRegularFilesOnly(TRUE)
-        .setDirectoriesOnly(FALSE)
-        .setSymLinksOnly(FALSE)
+        .setRegularFiles(ONLY)
+        .setDirectories(REJECTS)
+        .setSymLinks(REJECTS)
         .setMinSize(1L)
         .setMaxSize(1024L);
 
@@ -184,42 +184,42 @@ public class FileMatcherContractTestCase<T extends FileMatcher, Attributes exten
   @Test
   public void regularFile() {
     when(attributes.isRegularFile()).thenReturn(true);
-    builder.setRegularFilesOnly(TRUE);
+    builder.setRegularFiles(ONLY);
     assertMatch();
   }
 
   @Test
   public void rejectNotRegularFile() {
     when(attributes.isRegularFile()).thenReturn(false);
-    builder.setRegularFilesOnly(TRUE);
+    builder.setRegularFiles(ONLY);
     assertReject();
   }
 
   @Test
   public void rejectRegularFile() {
     when(attributes.isRegularFile()).thenReturn(true);
-    builder.setRegularFilesOnly(FALSE);
+    builder.setRegularFiles(REJECTS);
     assertReject();
   }
 
   @Test
   public void isDirectory() {
     when(attributes.isDirectory()).thenReturn(true);
-    builder.setDirectoriesOnly(TRUE);
+    builder.setDirectories(ONLY);
     assertMatch();
   }
 
   @Test
   public void rejectNotDirectory() {
     when(attributes.isDirectory()).thenReturn(false);
-    builder.setDirectoriesOnly(TRUE);
+    builder.setDirectories(ONLY);
     assertReject();
   }
 
   @Test
   public void rejectDirectory() {
     when(attributes.isDirectory()).thenReturn(true);
-    builder.setDirectoriesOnly(FALSE);
+    builder.setDirectories(REJECTS);
     assertReject();
   }
 
@@ -227,21 +227,21 @@ public class FileMatcherContractTestCase<T extends FileMatcher, Attributes exten
   @Test
   public void isSymbolicLink() {
     when(attributes.isSymbolicLink()).thenReturn(true);
-    builder.setSymLinksOnly(TRUE);
+    builder.setSymLinks(ONLY);
     assertMatch();
   }
 
   @Test
   public void rejectNotSymbolicLink() {
     when(attributes.isSymbolicLink()).thenReturn(false);
-    builder.setSymLinksOnly(TRUE);
+    builder.setSymLinks(ONLY);
     assertReject();
   }
 
   @Test
   public void rejectSymbolicLink() {
     when(attributes.isSymbolicLink()).thenReturn(true);
-    builder.setSymLinksOnly(FALSE);
+    builder.setSymLinks(REJECTS);
     assertReject();
   }
 
