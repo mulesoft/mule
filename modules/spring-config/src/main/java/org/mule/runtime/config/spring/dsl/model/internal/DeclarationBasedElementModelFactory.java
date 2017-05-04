@@ -7,7 +7,6 @@
 package org.mule.runtime.config.spring.dsl.model.internal;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
@@ -131,6 +130,8 @@ class DeclarationBasedElementModelFactory {
                         format("Found an Operation with the given name, but expected a '%s'",
                                declaration.getClass().getName()));
           elementModel.set(createComponentElement(model, (OperationElementDeclaration) declaration));
+
+
           stop();
         }
       }
@@ -382,24 +383,14 @@ class DeclarationBasedElementModelFactory {
                   .findFirst();
 
               if (declared.isPresent()) {
-                addParameter(declared.get(), paramModel, paramDsl, parentConfig, parentElement);
+                addParameter(declared.get().getName(), declared.get().getValue(), paramModel, paramDsl, parentConfig,
+                             parentElement);
                 configuredParameters.add(declared.get().getName());
               } else {
                 getDefaultValue(paramModel)
                     .ifPresent(value -> createSimpleParameter(value, paramDsl, parentConfig, parentElement, paramModel, false));
               }
             }));
-
-    if (parameterDeclarations.size() > configuredParameters.size()) {
-      String missing = parameterDeclarations.stream()
-          .filter(p -> !configuredParameters.contains(p.getName()))
-          .map(ElementDeclaration::getName)
-          .collect(joining(","));
-
-      throw new IllegalArgumentException(
-                                         format("The parameters [%s] were declared but they do not exist in the associated model",
-                                                missing));
-    }
   }
 
   private <T extends ParameterizedModel> void addInlineGroupElement(ParameterGroupModel group,
@@ -415,8 +406,32 @@ class DeclarationBasedElementModelFactory {
 
           ComponentConfiguration.Builder groupBuilder = ComponentConfiguration.builder().withIdentifier(asIdentifier(groupDsl));
 
-          addAllDeclaredParameters(group.getParameterModels(), declaration.getParameters(), groupDsl, groupBuilder,
-                                   groupElementBuilder);
+
+          Optional<ParameterElementDeclaration> groupDeclaration = declaration.getParameters().stream()
+              .filter(p -> p.getName().equals(group.getName())).findFirst();
+
+          groupDeclaration.ifPresent(g -> {
+            g.getValue().accept(new ParameterValueVisitor() {
+
+              @Override
+              public void visitObjectValue(ParameterObjectValue objectValue) {
+                Map<String, ParameterValue> parameters = objectValue.getParameters();
+
+                group.getParameterModels().forEach(p -> {
+                  ParameterValue parameterValue = parameters.get(p.getName());
+
+                  if (parameterValue != null) {
+                    groupDsl.getContainedElement(p.getName())
+                        .ifPresent(paramDsl -> {
+                          addParameter(p.getName(), parameterValue, p, paramDsl, groupBuilder, groupElementBuilder);
+                        });
+                  }
+
+                });
+              }
+            });
+
+          });
 
           ComponentConfiguration groupConfig = groupBuilder.build();
           groupElementBuilder.withConfig(groupConfig);
@@ -426,18 +441,18 @@ class DeclarationBasedElementModelFactory {
         });
   }
 
-  private void addParameter(ParameterElementDeclaration parameter,
+  private void addParameter(String parameterName, ParameterValue value,
                             ParameterModel parameterModel,
                             DslElementSyntax paramDsl,
                             final ComponentConfiguration.Builder parentConfig,
                             final DslElementModel.Builder parentElement) {
 
     if (isInfrastructure(parameterModel)) {
-      infrastructureDelegate.addParameter(parameter, parameterModel, paramDsl, parentConfig, parentElement);
+      infrastructureDelegate.addParameter(parameterName, value, parameterModel, paramDsl, parentConfig, parentElement);
       return;
     }
 
-    parameter.getValue().accept(new ParameterValueVisitor() {
+    value.accept(new ParameterValueVisitor() {
 
       @Override
       public void visitSimpleValue(String value) {
@@ -773,7 +788,6 @@ class DeclarationBasedElementModelFactory {
             .forEach(value -> createListItemConfig(itemType, value, itemDsl, listConfig, listElement)));
 
     ComponentConfiguration result = listConfig.build();
-
     parentConfig.withNestedComponent(result);
     parentElement.containing(listElement.withConfig(result).build());
   }

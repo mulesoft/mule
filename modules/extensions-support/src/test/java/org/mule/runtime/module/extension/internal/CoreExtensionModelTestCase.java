@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -21,6 +23,8 @@ import static org.mule.runtime.api.meta.model.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.core.config.MuleManifest.getProductDescription;
 import static org.mule.runtime.core.config.MuleManifest.getProductName;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
@@ -29,7 +33,10 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.getMuleExtensionModel;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
+import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.model.impl.DefaultAnyType;
 import org.mule.metadata.api.model.impl.DefaultArrayType;
@@ -38,6 +45,7 @@ import org.mule.metadata.api.model.impl.DefaultNumberType;
 import org.mule.metadata.api.model.impl.DefaultObjectType;
 import org.mule.metadata.api.model.impl.DefaultStringType;
 import org.mule.metadata.api.model.impl.DefaultVoidType;
+import org.mule.metadata.api.utils.MetadataTypeUtils;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -48,6 +56,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.operation.RouteModel;
 import org.mule.runtime.api.meta.model.operation.RouterModel;
 import org.mule.runtime.api.meta.model.operation.ScopeModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
@@ -188,12 +197,15 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
                    .withParent(newError("TRANSFORMATION", "MULE").withParent(errorMuleAny).build()).build()));
     assertThat(transformModel.getExecutionType(), is(CPU_INTENSIVE));
 
-    // TODO MULE-11935 a way is needed to detemrine the return type of the trasformer in the extension model.
+    // TODO MULE-11935 a way is needed to determine the return type of the trasformer in the extension model.
     assertComponentDeterminesOutput(transformModel);
 
-    final List<ParameterModel> paramModels = transformModel.getAllParameterModels();
-    assertThat(paramModels, hasSize(3));
+    final List<ParameterGroupModel> paramGroupModels = transformModel.getParameterGroupModels();
+    assertThat(transformModel.getAllParameterModels(), hasSize(6));
+    assertThat(paramGroupModels, hasSize(3));
 
+    assertThat(paramGroupModels.get(0).getName(), is("General"));
+    List<ParameterModel> paramModels = paramGroupModels.get(0).getParameterModels();
     assertThat(paramModels.get(0).getName(), is("ref"));
     assertThat(paramModels.get(0).getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(paramModels.get(0).getType(), instanceOf(DefaultObjectType.class));
@@ -201,8 +213,38 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
                is(Transformer.class.getName()));
     assertThat(paramModels.get(0).isRequired(), is(true));
 
-    assertPayload(paramModels.get(1));
-    assertTarget(paramModels.get(2));
+    assertThat(paramModels.get(1).getName(), is("SetVariables"));
+    assertThat(paramModels.get(1).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(paramModels.get(1).getType(), instanceOf(DefaultArrayType.class));
+    assertThat(paramModels.get(1).getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
+               is(List.class.getName()));
+    assertThat(paramModels.get(1).isRequired(), is(false));
+
+    assertThat(((ArrayType) paramModels.get(1).getType()).getType(), instanceOf(ObjectType.class));
+    assertThat(((ObjectType) ((ArrayType) paramModels.get(1).getType()).getType()).getFields(), hasSize(3));
+    assertThat(((ObjectType) ((ArrayType) paramModels.get(1).getType()).getType()).getFields().stream()
+        .map(MetadataTypeUtils::getLocalPart).collect(toList()), containsInAnyOrder("variableName", "resource", "script"));
+
+
+    assertThat(paramGroupModels.get(1).getName(), is("SetPayload"));
+    assertScriptAndResource(paramGroupModels.get(1).getParameterModels());
+
+    assertThat(paramGroupModels.get(2).getName(), is("SetAttributes"));
+    assertScriptAndResource(paramGroupModels.get(2).getParameterModels());
+  }
+
+  private void assertScriptAndResource(List<ParameterModel> paramModels) {
+    assertThat(paramModels.get(0).getName(), is("script"));
+    assertThat(paramModels.get(0).getExpressionSupport(), is(REQUIRED));
+    assertThat(paramModels.get(0).getType(), instanceOf(DefaultObjectType.class));
+    assertThat(paramModels.get(0).isRequired(), is(false));
+    assertThat(paramModels.get(0).getRole(), is(CONTENT));
+
+    assertThat(paramModels.get(1).getName(), is("resource"));
+    assertThat(paramModels.get(1).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(paramModels.get(1).getType(), instanceOf(StringType.class));
+    assertThat(paramModels.get(1).isRequired(), is(false));
+    assertThat(paramModels.get(1).getRole(), is(BEHAVIOUR));
   }
 
   @Test

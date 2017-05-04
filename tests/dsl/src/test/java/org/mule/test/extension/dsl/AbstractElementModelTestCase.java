@@ -13,7 +13,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
-
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
@@ -35,6 +34,8 @@ import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Optional;
@@ -53,14 +54,11 @@ import org.junit.Before;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.google.common.collect.ImmutableSet;
-
 @ArtifactClassLoaderRunnerConfig(sharedRuntimeLibs = {"org.apache.derby:derby"})
 public abstract class AbstractElementModelTestCase extends MuleArtifactFunctionalTestCase {
 
   protected static final String DB_CONFIG = "dbConfig";
   protected static final String DB_NS = "db";
-  protected static final String WSC_NS = "http://www.mulesoft.org/schema/mule/wsc";
   protected static final String HTTP_LISTENER_CONFIG = "httpListener";
   protected static final String HTTP_REQUESTER_CONFIG = "httpRequester";
   protected static final String HTTP_NS = "httpn";

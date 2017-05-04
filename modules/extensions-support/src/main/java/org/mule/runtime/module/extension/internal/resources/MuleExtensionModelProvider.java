@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.extension.api.declaration.type.annotation.ExtensionTypeAnnotationsRegistry;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 
 /**
@@ -18,9 +20,12 @@ import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 public class MuleExtensionModelProvider {
 
   private static final String MODEL_JSON = "META-INF/mule-extension-model.json";
-  private static final ExtensionModel EXTENSION_MODEL = new ExtensionModelJsonSerializer(false)
-      .deserialize(IOUtils.toString(MuleExtensionModelProvider.class.getClassLoader()
-          .getResourceAsStream(MODEL_JSON)));
+  private static final String JSON = IOUtils.toString(MuleExtensionModelProvider.class.getClassLoader()
+      .getResourceAsStream(MODEL_JSON));
+  private static final ExtensionModel EXTENSION_MODEL =
+      withContextClassLoader(ExtensionTypeAnnotationsRegistry.class.getClassLoader(),
+                             () -> new ExtensionModelJsonSerializer(false).deserialize(JSON));
+
 
   /**
    * @return the {@link ExtensionModel} definition for Mule's Runtime

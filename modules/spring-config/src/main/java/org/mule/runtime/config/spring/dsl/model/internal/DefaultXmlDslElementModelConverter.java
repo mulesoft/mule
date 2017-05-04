@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.config.spring.dsl.declaration.DefaultXmlArtifactDeclarationLoader.TRANSFORM_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.DECLARED_PREFIX;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
@@ -31,6 +32,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -85,6 +87,9 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
 
     DslElementSyntax dsl = elementModel.getDsl();
     Element componentRoot = createElement(dsl, elementModel.getConfiguration());
+    if (isEETransform(componentRoot)) {
+      return populateEETransform(elementModel);
+    }
     writeApplicationElement(componentRoot, elementModel, componentRoot);
 
     return componentRoot;
@@ -97,7 +102,6 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
   }
 
   private void writeApplicationElement(Element element, DslElementModel<?> elementModel, Element parentNode) {
-
     populateInfrastructureConfiguration(element, elementModel);
 
     if (elementModel.getContainedElements().isEmpty() && elementModel.getValue().isPresent()) {
@@ -126,6 +130,11 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
     if (parentNode != element) {
       parentNode.appendChild(element);
     }
+  }
+
+  private boolean isEETransform(Element parentNode) {
+    // TODO EE-5398: Update transform namespace to ee
+    return parentNode.getNamespaceURI().equals(CORE_NAMESPACE) && parentNode.getNodeName().equals(TRANSFORM_IDENTIFIER);
   }
 
   private Element createElement(DslElementSyntax dsl, Optional<ComponentConfiguration> configuration) {
@@ -222,6 +231,28 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
             }));
   }
 
+  private Element populateEETransform(DslElementModel<?> elementModel) {
+    Element transform = doc.createElementNS(EE_NAMESPACE, EE_PREFIX + ":" + TRANSFORM_IDENTIFIER);
+    // write set-payload and set-attributes
+    elementModel.getContainedElements().stream()
+        .filter(e -> !((ComponentIdentifier) e.getIdentifier().get()).getName().equals("general")).forEach(e -> {
+          if (e.getContainedElements().isEmpty() && e.getValue().isPresent()) {
+            transform.setAttribute(e.getDsl().getAttributeName(), (String) e.getValue().get());
+          } else {
+            e.getConfiguration().ifPresent(c -> transform.appendChild(createTransformTextElement((ComponentConfiguration) c)));
+          }
+        });
+
+    // write set-variable
+    elementModel.getContainedElements().stream()
+        .filter(e -> ((ComponentIdentifier) e.getIdentifier().get()).getName().equals("general"))
+        .forEach(e -> e.getContainedElements().stream().findFirst()
+            .ifPresent(setVariablesElement -> ((DslElementModel) setVariablesElement).getContainedElements().stream()
+                .forEach(setVariable -> ((DslElementModel) setVariable).getConfiguration()
+                    .ifPresent(c -> transform.appendChild(createTransformTextElement((ComponentConfiguration) c))))));
+    return transform;
+  }
+
   private Element createTLS(ComponentConfiguration config) {
     String namespaceURI = "http://www.mulesoft.org/schema/mule/tls";
     String tlsSchemaLocation = "http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd";
@@ -243,6 +274,20 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
     Element nested = doc.createElementNS(namespaceURI, EE_PREFIX + ":" + config.getIdentifier().getName());
     config.getParameters().forEach(nested::setAttribute);
     config.getNestedComponents().forEach(inner -> nested.appendChild(clone(inner)));
+    return nested;
+  }
+
+  private Element createTransformTextElement(ComponentConfiguration config) {
+    String namespaceURI = EE_NAMESPACE;
+    String eeSchemaLocation = buildSchemaLocation(EE_PREFIX, EE_NAMESPACE);
+
+    addSchemaLocationIfNeeded(EE_PREFIX, namespaceURI, eeSchemaLocation);
+
+    Element nested = doc.createElementNS(namespaceURI, EE_PREFIX + ":" + config.getIdentifier().getName());
+    config.getParameters().forEach(nested::setAttribute);
+    // TODO: EE-5393: Add CDATA section
+    config.getNestedComponents().stream()
+        .filter(inner -> inner.getValue().isPresent()).forEach(inner -> nested.setTextContent(inner.getValue().get()));
     return nested;
   }
 
