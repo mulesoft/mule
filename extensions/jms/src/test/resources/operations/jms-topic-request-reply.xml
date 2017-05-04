@@ -10,6 +10,8 @@
             <jms:message>
                 <jms:reply-to destination="#[replyToDestination]" destinationType="TOPIC"/>
             </jms:message>
+            <jms:publish-configuration disableMessageTimestamp="true"/>
+            <jms:consume-configuration maximumWait="10000"/>
         </jms:publish-consume>
     </flow>
 
