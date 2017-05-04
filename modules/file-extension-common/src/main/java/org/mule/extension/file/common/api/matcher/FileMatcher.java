@@ -4,15 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.file.common.api;
+package org.mule.extension.file.common.api.matcher;
 
 import static java.lang.String.format;
+import static org.mule.extension.file.common.api.matcher.MatchPolicy.ACCEPTS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.extension.file.common.api.matcher.PathMatcherPredicate;
+import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.util.TimeSinceFunction;
 import org.mule.extension.file.common.api.util.TimeUntilFunction;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.util.function.Predicate;
@@ -33,10 +34,10 @@ import java.util.function.Predicate;
  * The class is also given the &quot;matcher&quot; alias to make it DSL/XML friendly.
  *
  * @param <T> {@code this} instance concrete type. It allows to extend this class while allowing setter chains
- * @param <Attributes> The concrete implementation of {@link FileAttributes} that this builder uses to assert the file properties
+ * @param <A> The concrete implementation of {@link FileAttributes} that this builder uses to assert the file properties
  * @since 4.0
  */
-public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attributes extends FileAttributes> {
+public abstract class FileMatcher<T extends FileMatcher, A extends FileAttributes> {
 
   private static final String SIZE_MUST_BE_GREATER_THAN_ZERO_MESSAGE =
       "Matcher attribute '%s' must be greater than zero but '%d' was received";
@@ -66,28 +67,28 @@ public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attri
    * files which are not directories. If not set, then the criteria doesn't apply.
    */
   @Parameter
-  @Optional
+  @Optional(defaultValue = "ACCEPTS")
   @Summary("Indicates whether accept only directories or non directories files")
-  private Boolean directory;
+  private MatchPolicy directories = ACCEPTS;
 
   /**
    * If {@code true}, the predicate will only accept files which are not directories nor symbolic links. If {@code false}, the
    * predicate will only accept files which are directories or symbolic links. If not set, then the criteria doesn't apply.
    */
   @Parameter
-  @Optional
+  @Optional(defaultValue = "ACCEPTS")
   @Summary("Indicates whether accept only regular files (files which are not directories, nor symbolic links) "
       + "or only not regular files")
-  private Boolean regularFile;
+  private MatchPolicy regularFiles = ACCEPTS;
 
   /**
    * If {@code true}, the predicate will only accept files which are symbolic links. If {@code false}, the predicate will only
    * accept files which are symbolic links. If not set, then the criteria doesn't apply.
    */
   @Parameter
-  @Optional
+  @Optional(defaultValue = "ACCEPTS")
   @Summary("Indicates whether accept only symbolic links files or accept only not symbolic links files")
-  private Boolean symbolicLink;
+  private MatchPolicy symLinks = ACCEPTS;
 
   /**
    * The minimum file size in bytes. Files smaller than this are rejected
@@ -109,8 +110,8 @@ public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attri
    *
    * @return a {@link Predicate}
    */
-  public Predicate<Attributes> build() {
-    Predicate<Attributes> predicate = payload -> true;
+  public Predicate<A> build() {
+    Predicate<A> predicate = payload -> true;
     if (filenamePattern != null) {
       PathMatcherPredicate pathMatcher = new PathMatcherPredicate(filenamePattern);
       predicate = predicate.and(payload -> pathMatcher.test(payload.getName()));
@@ -121,16 +122,16 @@ public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attri
       predicate = predicate.and(payload -> pathMatcher.test(payload.getPath()));
     }
 
-    if (directory != null) {
-      predicate = predicate.and(attributes -> directory.equals(attributes.isDirectory()));
+    if (!directories.acceptsAll()) {
+      predicate = predicate.and(attributes -> directories.asBoolean().get().equals(attributes.isDirectory()));
     }
 
-    if (regularFile != null) {
-      predicate = predicate.and(attributes -> regularFile.equals(attributes.isRegularFile()));
+    if (!regularFiles.acceptsAll()) {
+      predicate = predicate.and(attributes -> regularFiles.asBoolean().get().equals(attributes.isRegularFile()));
     }
 
-    if (symbolicLink != null) {
-      predicate = predicate.and(attributes -> symbolicLink.equals(attributes.isSymbolicLink()));
+    if (!symLinks.acceptsAll()) {
+      predicate = predicate.and(attributes -> symLinks.asBoolean().get().equals(attributes.isSymbolicLink()));
     }
 
     if (minSize != null) {
@@ -154,7 +155,7 @@ public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attri
    * @param predicate the {@link Predicate} that is about to be returned by {@link #build()}
    * @return a new instance or the same one in case no modification is required.
    */
-  protected Predicate<Attributes> addConditions(Predicate<Attributes> predicate) {
+  protected Predicate<A> addConditions(Predicate<A> predicate) {
     return predicate;
   }
 
@@ -166,16 +167,16 @@ public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attri
     return pathPattern;
   }
 
-  public Boolean getDirectory() {
-    return directory;
+  public MatchPolicy getDirectories() {
+    return directories;
   }
 
-  public Boolean getRegularFile() {
-    return regularFile;
+  public MatchPolicy getRegularFiles() {
+    return regularFiles;
   }
 
-  public Boolean getSymbolicLink() {
-    return symbolicLink;
+  public MatchPolicy getSymLinks() {
+    return symLinks;
   }
 
   public Long getMinSize() {
@@ -196,18 +197,18 @@ public abstract class FilePredicateBuilder<T extends FilePredicateBuilder, Attri
     return (T) this;
   }
 
-  public T setDirectory(Boolean directory) {
-    this.directory = directory;
+  public T setDirectories(MatchPolicy directories) {
+    this.directories = directories;
     return (T) this;
   }
 
-  public T setRegularFile(Boolean regularFile) {
-    this.regularFile = regularFile;
+  public T setRegularFiles(MatchPolicy regularFiles) {
+    this.regularFiles = regularFiles;
     return (T) this;
   }
 
-  public T setSymbolicLink(Boolean symbolicLink) {
-    this.symbolicLink = symbolicLink;
+  public T setSymLinks(MatchPolicy symLinks) {
+    this.symLinks = symLinks;
     return (T) this;
   }
 

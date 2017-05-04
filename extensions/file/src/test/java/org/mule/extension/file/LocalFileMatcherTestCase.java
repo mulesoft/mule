@@ -6,11 +6,13 @@
  */
 package org.mule.extension.file;
 
-import static org.mule.test.allure.AllureConstants.FileFeature.FILE_EXTENSION;
 import static org.mockito.Mockito.when;
+import static org.mule.extension.file.common.api.matcher.MatchPolicy.ACCEPTS;
+import static org.mule.extension.file.common.api.matcher.MatchPolicy.ONLY;
+import static org.mule.test.allure.AllureConstants.FileFeature.FILE_EXTENSION;
 import org.mule.extension.file.api.LocalFileAttributes;
-import org.mule.extension.file.api.LocalFilePredicateBuilder;
-import org.mule.test.extension.file.common.FilePredicateBuilderContractTestCase;
+import org.mule.extension.file.api.LocalFileMatcher;
+import org.mule.test.extension.file.common.FileMatcherContractTestCase;
 
 import java.time.LocalDateTime;
 
@@ -19,16 +21,16 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features(FILE_EXTENSION)
-public class LocalFilePredicateBuilderTestCase
-    extends FilePredicateBuilderContractTestCase<LocalFilePredicateBuilder, LocalFileAttributes> {
+public class LocalFileMatcherTestCase
+    extends FileMatcherContractTestCase<LocalFileMatcher, LocalFileAttributes> {
 
   private static final LocalDateTime CREATION_TIME = LocalDateTime.of(1983, 4, 20, 21, 15);
   private static final LocalDateTime MODIFIED_TIME = LocalDateTime.of(2011, 2, 5, 22, 00);
   private static final LocalDateTime ACCESSED_TIME = LocalDateTime.of(2015, 4, 20, 00, 00);
 
   @Override
-  protected LocalFilePredicateBuilder createPredicateBuilder() {
-    return new LocalFilePredicateBuilder();
+  protected LocalFileMatcher createPredicateBuilder() {
+    return new LocalFileMatcher();
   }
 
   @Override
@@ -48,10 +50,17 @@ public class LocalFilePredicateBuilderTestCase
   @Test
   public void matchesAll() {
     builder.setFilenamePattern("glob:*.{java, js}").setPathPattern("glob:**.{java, js}")
-        .setCreatedSince(LocalDateTime.of(1980, 1, 1, 0, 0)).setCreatedUntil(LocalDateTime.of(1990, 1, 1, 0, 0))
-        .setUpdatedSince(LocalDateTime.of(2010, 9, 24, 0, 0)).setUpdatedUntil(LocalDateTime.of(2013, 11, 3, 6, 0))
-        .setAccessedSince(LocalDateTime.of(2013, 11, 3, 0, 0)).setAccessedUntil(LocalDateTime.of(2015, 4, 20, 0, 0))
-        .setRegularFile(true).setDirectory(false).setSymbolicLink(false).setMinSize(1L).setMaxSize(1024L);
+        .setCreatedSince(LocalDateTime.of(1980, 1, 1, 0, 0))
+        .setCreatedUntil(LocalDateTime.of(1990, 1, 1, 0, 0))
+        .setUpdatedSince(LocalDateTime.of(2010, 9, 24, 0, 0))
+        .setUpdatedUntil(LocalDateTime.of(2013, 11, 3, 6, 0))
+        .setAccessedSince(LocalDateTime.of(2013, 11, 3, 0, 0))
+        .setAccessedUntil(LocalDateTime.of(2015, 4, 20, 0, 0))
+        .setRegularFiles(ONLY)
+        .setDirectories(ACCEPTS)
+        .setSymLinks(ACCEPTS)
+        .setMinSize(1L)
+        .setMaxSize(1024L);
 
     assertMatch();
   }

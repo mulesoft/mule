@@ -8,7 +8,7 @@ package org.mule.extension.file.internal;
 
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.extension.file.api.LocalFileAttributes;
-import org.mule.extension.file.api.LocalFilePredicateBuilder;
+import org.mule.extension.file.api.LocalFileMatcher;
 import org.mule.extension.file.common.api.BaseFileSystemOperations;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
@@ -69,7 +69,7 @@ public final class FileOperations extends BaseFileSystemOperations {
                                                              String directoryPath,
                                                              @Optional(defaultValue = "false") boolean recursive,
                                                              MediaType mediaType,
-                                                             @Optional @DisplayName("File Matching Rules") @Summary("Matcher to filter the listed files") LocalFilePredicateBuilder matcher) {
+                                                             @Optional @DisplayName("File Matching Rules") @Summary("Matcher to filter the listed files") LocalFileMatcher matcher) {
     List result = doList(config, fileSystem, directoryPath, recursive, mediaType, matcher);
     return (List<Result<InputStream, LocalFileAttributes>>) result;
   }

@@ -10,13 +10,13 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.extension.file.common.api.FilePredicateBuilder;
+import org.mule.extension.file.common.api.matcher.FileMatcher;
 
 import java.time.LocalDateTime;
 import java.util.function.Predicate;
 
 /**
- * A specialization of {@link FilePredicateBuilder} used to do assertions on files stored on a local file system. The file's
+ * A specialization of {@link FileMatcher} used to do assertions on files stored on a local file system. The file's
  * properties are to be represented on an instance of {@link LocalFileAttributes}
  * <p>
  * It adds capabilities to consider creation, update and access timestamps.
@@ -25,7 +25,7 @@ import java.util.function.Predicate;
  */
 @Alias("matcher")
 @XmlHints(allowTopLevelDefinition = true)
-public class LocalFilePredicateBuilder extends FilePredicateBuilder<LocalFilePredicateBuilder, LocalFileAttributes> {
+public class LocalFileMatcher extends FileMatcher<LocalFileMatcher, LocalFileAttributes> {
 
   /**
    * Files created before this date are rejected.
@@ -98,32 +98,32 @@ public class LocalFilePredicateBuilder extends FilePredicateBuilder<LocalFilePre
     return predicate;
   }
 
-  public LocalFilePredicateBuilder setCreatedSince(LocalDateTime createdSince) {
+  public LocalFileMatcher setCreatedSince(LocalDateTime createdSince) {
     this.createdSince = createdSince;
     return this;
   }
 
-  public LocalFilePredicateBuilder setCreatedUntil(LocalDateTime createdUntil) {
+  public LocalFileMatcher setCreatedUntil(LocalDateTime createdUntil) {
     this.createdUntil = createdUntil;
     return this;
   }
 
-  public LocalFilePredicateBuilder setUpdatedSince(LocalDateTime updatedSince) {
+  public LocalFileMatcher setUpdatedSince(LocalDateTime updatedSince) {
     this.updatedSince = updatedSince;
     return this;
   }
 
-  public LocalFilePredicateBuilder setUpdatedUntil(LocalDateTime updatedUntil) {
+  public LocalFileMatcher setUpdatedUntil(LocalDateTime updatedUntil) {
     this.updatedUntil = updatedUntil;
     return this;
   }
 
-  public LocalFilePredicateBuilder setAccessedSince(LocalDateTime accessedSince) {
+  public LocalFileMatcher setAccessedSince(LocalDateTime accessedSince) {
     this.accessedSince = accessedSince;
     return this;
   }
 
-  public LocalFilePredicateBuilder setAccessedUntil(LocalDateTime accessedUntil) {
+  public LocalFileMatcher setAccessedUntil(LocalDateTime accessedUntil) {
     this.accessedUntil = accessedUntil;
     return this;
   }

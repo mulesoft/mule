@@ -9,7 +9,7 @@ package org.mule.extension.file.common.api.exceptions;
 import static org.mule.extension.file.common.api.exceptions.FileError.ACCESS_DENIED;
 import static org.mule.extension.file.common.api.exceptions.FileError.ILLEGAL_PATH;
 import org.mule.extension.file.common.api.FileConnectorConfig;
-import org.mule.extension.file.common.api.FilePredicateBuilder;
+import org.mule.extension.file.common.api.matcher.FileMatcher;
 import org.mule.extension.file.common.api.FileSystem;
 import org.mule.extension.file.common.api.BaseFileSystemOperations;
 import org.mule.runtime.api.message.Message;
@@ -22,7 +22,7 @@ import java.util.Set;
 
 /**
  * Errors that can be thrown in the
- * {@link BaseFileSystemOperations#list(FileConnectorConfig, FileSystem, String, boolean, Message, FilePredicateBuilder)}
+ * {@link BaseFileSystemOperations#list(FileConnectorConfig, FileSystem, String, boolean, Message, FileMatcher)}
  * operation.
  *
  * @since 1.0

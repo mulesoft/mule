@@ -10,13 +10,13 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.extension.file.common.api.FilePredicateBuilder;
+import org.mule.extension.file.common.api.matcher.FileMatcher;
 
 import java.time.LocalDateTime;
 import java.util.function.Predicate;
 
 /**
- * A specialization of {@link FilePredicateBuilder} used to do assertions on files stored on an FTP server. The file's properties
+ * A specialization of {@link FileMatcher} used to do assertions on files stored on an FTP server. The file's properties
  * are to be represented on an instance of {@link FtpFileAttributes}
  * <p>
  * It adds capabilities to consider the file's unique timestamp.
@@ -25,7 +25,7 @@ import java.util.function.Predicate;
  */
 @Alias("matcher")
 @XmlHints(allowTopLevelDefinition = true)
-public class FtpFilePredicateBuilder extends FilePredicateBuilder<FtpFilePredicateBuilder, FtpFileAttributes> {
+public class FtpFileMatcher extends FileMatcher<FtpFileMatcher, FtpFileAttributes> {
 
   /**
    * Files created before this date are rejected.
@@ -54,12 +54,12 @@ public class FtpFilePredicateBuilder extends FilePredicateBuilder<FtpFilePredica
     return predicate;
   }
 
-  public FtpFilePredicateBuilder setTimestampSince(LocalDateTime timestampSince) {
+  public FtpFileMatcher setTimestampSince(LocalDateTime timestampSince) {
     this.timestampSince = timestampSince;
     return this;
   }
 
-  public FtpFilePredicateBuilder setTimestampUntil(LocalDateTime timestampUntil) {
+  public FtpFileMatcher setTimestampUntil(LocalDateTime timestampUntil) {
     this.timestampUntil = timestampUntil;
     return this;
   }

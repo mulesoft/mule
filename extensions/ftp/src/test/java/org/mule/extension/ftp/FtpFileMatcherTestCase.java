@@ -6,11 +6,13 @@
  */
 package org.mule.extension.ftp;
 
-import static org.mule.test.allure.AllureConstants.FtpFeature.FTP_EXTENSION;
 import static org.mockito.Mockito.when;
+import static org.mule.extension.file.common.api.matcher.MatchPolicy.ACCEPTS;
+import static org.mule.extension.file.common.api.matcher.MatchPolicy.ONLY;
+import static org.mule.test.allure.AllureConstants.FtpFeature.FTP_EXTENSION;
 import org.mule.extension.ftp.api.FtpFileAttributes;
-import org.mule.extension.ftp.api.FtpFilePredicateBuilder;
-import org.mule.test.extension.file.common.FilePredicateBuilderContractTestCase;
+import org.mule.extension.ftp.api.FtpFileMatcher;
+import org.mule.test.extension.file.common.FileMatcherContractTestCase;
 
 import java.time.LocalDateTime;
 
@@ -19,14 +21,14 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features(FTP_EXTENSION)
-public class FtpFilePredicateBuilderTestCase
-    extends FilePredicateBuilderContractTestCase<FtpFilePredicateBuilder, FtpFileAttributes> {
+public class FtpFileMatcherTestCase
+    extends FileMatcherContractTestCase<FtpFileMatcher, FtpFileAttributes> {
 
   private static final LocalDateTime TIMESTAMP = LocalDateTime.of(1983, 4, 20, 21, 15);
 
   @Override
-  protected FtpFilePredicateBuilder createPredicateBuilder() {
-    return new FtpFilePredicateBuilder();
+  protected FtpFileMatcher createPredicateBuilder() {
+    return new FtpFileMatcher();
   }
 
   @Override
@@ -44,8 +46,13 @@ public class FtpFilePredicateBuilderTestCase
   @Test
   public void matchesAll() {
     builder.setFilenamePattern("glob:*.{java, js}").setPathPattern("glob:**.{java, js}")
-        .setTimestampSince(LocalDateTime.of(1980, 1, 1, 0, 0)).setTimestampUntil(LocalDateTime.of(1990, 1, 1, 0, 0))
-        .setRegularFile(true).setDirectory(false).setSymbolicLink(false).setMinSize(1L).setMaxSize(1024L);
+        .setTimestampSince(LocalDateTime.of(1980, 1, 1, 0, 0))
+        .setTimestampUntil(LocalDateTime.of(1990, 1, 1, 0, 0))
+        .setRegularFiles(ONLY)
+        .setDirectories(ACCEPTS)
+        .setSymLinks(ACCEPTS)
+        .setMinSize(1L)
+        .setMaxSize(1024L);
 
     assertMatch();
   }

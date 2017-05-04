@@ -11,7 +11,7 @@
         <spring:import resource="ftp-connection.xml"/>
     </spring:beans>
 
-    <ftp:matcher name="globalMatcher" directory="true" filenamePattern="sub*" />
+    <ftp:matcher name="globalMatcher" directories="ONLY" filenamePattern="sub*" />
 
     <flow name="list">
         <ftp:list config-ref="config" directoryPath="#[path]" recursive="#[recursive]" />

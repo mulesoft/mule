@@ -12,6 +12,7 @@ import static org.mule.runtime.core.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.extension.file.common.api.exceptions.IllegalContentException;
 import org.mule.extension.file.common.api.exceptions.IllegalPathException;
+import org.mule.extension.file.common.api.matcher.FileMatcher;
 import org.mule.extension.file.common.api.matcher.NullFilePayloadPredicate;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
@@ -58,7 +59,7 @@ public abstract class BaseFileSystemOperations {
                                                              String directoryPath,
                                                              boolean recursive,
                                                              MediaType mediaType,
-                                                             FilePredicateBuilder matchWith) {
+                                                             FileMatcher matchWith) {
     fileSystem.changeToBaseDir();
     return fileSystem.list(config, directoryPath, recursive, mediaType, getPredicate(matchWith));
   }
@@ -246,7 +247,7 @@ public abstract class BaseFileSystemOperations {
     }
   }
 
-  private Predicate<FileAttributes> getPredicate(FilePredicateBuilder builder) {
+  private Predicate<FileAttributes> getPredicate(FileMatcher builder) {
     return builder != null ? builder.build() : new NullFilePayloadPredicate();
   }
 }
