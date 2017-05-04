@@ -12,6 +12,11 @@ import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.services.soap.api.message.dispatcher.HttpConfigBasedMessageDispatcher;
 
+/**
+ * {@link CustomTransportConfiguration} implementation that builds a {@link HttpConfigBasedMessageDispatcher}.
+ *
+ * @since 4.0
+ */
 @Alias("http-transport-configuration")
 public class CustomHttpTransportConfiguration implements CustomTransportConfiguration {
 
