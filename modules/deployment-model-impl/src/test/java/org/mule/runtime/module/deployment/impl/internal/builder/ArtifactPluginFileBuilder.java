@@ -16,6 +16,7 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_FOLDER;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
@@ -151,7 +152,8 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
       } catch (IOException e) {
         throw new IllegalStateException("There was an issue generating the JSON file for " + this.getId(), e);
       }
-      customResources.add(new ZipResource(jsonDescriptorFile.getAbsolutePath(), MULE_ARTIFACT_FOLDER + "/" + MULE_PLUGIN_JSON));
+      customResources
+          .add(new ZipResource(jsonDescriptorFile.getAbsolutePath(), MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_PLUGIN_JSON));
     }
 
     return customResources;

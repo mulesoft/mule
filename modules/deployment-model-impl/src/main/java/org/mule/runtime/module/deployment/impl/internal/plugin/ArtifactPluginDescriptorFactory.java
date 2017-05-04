@@ -11,7 +11,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.core.util.JarUtils.loadFileContentFrom;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_FOLDER;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -39,8 +39,6 @@ import java.util.Optional;
  */
 public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactory<ArtifactPluginDescriptor> {
 
-  private static final String MULE_PLUGIN_JSON_PATH = MULE_ARTIFACT_FOLDER + "/" + MULE_PLUGIN_JSON;
-
   private final DescriptorLoaderRepository descriptorLoaderRepository;
 
   /**
@@ -65,11 +63,13 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     try {
       checkArgument(pluginJarFile.isDirectory() || pluginJarFile.getName().endsWith(".jar"),
                     "provided file is not a plugin: " + pluginJarFile.getAbsolutePath());
-      Optional<byte[]> jsonDescriptorContentOptional =
-          loadFileContentFrom(pluginJarFile, MULE_PLUGIN_JSON_PATH);
+      // Use / instead of File.separator as the file is going to be accessed inside the jar as a URL
+      String mulePluginJsonPathInsideJarFile = MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_PLUGIN_JSON;
+      Optional<byte[]> jsonDescriptorContentOptional = loadFileContentFrom(pluginJarFile, mulePluginJsonPathInsideJarFile);
       return jsonDescriptorContentOptional
           .map(jsonDescriptorContent -> loadFromJsonDescriptor(pluginJarFile, new String(jsonDescriptorContent)))
-          .orElseThrow(() -> new ArtifactDescriptorCreateException(pluginDescriptorNotFound(pluginJarFile)));
+          .orElseThrow(() -> new ArtifactDescriptorCreateException(pluginDescriptorNotFound(pluginJarFile,
+                                                                                            mulePluginJsonPathInsideJarFile)));
     } catch (ArtifactDescriptorCreateException e) {
       throw e;
     } catch (IOException e) {
@@ -135,8 +135,8 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     return classLoaderModel;
   }
 
-  protected static String pluginDescriptorNotFound(File pluginFile) {
-    return format("The plugin descriptor '%s' on plugin file '%s' is not present", MULE_PLUGIN_JSON_PATH, pluginFile);
+  protected static String pluginDescriptorNotFound(File pluginFile, String mulePluginJsonPathInsideJarFile) {
+    return format("The plugin descriptor '%s' on plugin file '%s' is not present", mulePluginJsonPathInsideJarFile, pluginFile);
   }
 
   protected static String invalidBundleDescriptorLoaderIdError(File pluginFolder,

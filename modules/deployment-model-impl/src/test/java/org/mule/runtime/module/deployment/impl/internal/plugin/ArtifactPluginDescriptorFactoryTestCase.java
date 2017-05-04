@@ -7,12 +7,14 @@
 
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_JSON;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.invalidBundleDescriptorLoaderIdError;
@@ -128,8 +130,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     File pluginJarLocation = pluginFileBuilder.getArtifactFile();
 
     expectedException.expect(ArtifactDescriptorCreateException.class);
-    expectedException
-        .expectMessage(ArtifactPluginDescriptorFactory.pluginDescriptorNotFound(pluginJarLocation));
+    expectedException.expectMessage(containsString(MULE_PLUGIN_JSON));
     descriptorFactory.create(pluginJarLocation);
   }
 
