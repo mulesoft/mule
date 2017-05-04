@@ -16,6 +16,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
+import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.services.soap.api.SoapService;
 import org.mule.services.soap.api.client.SoapClient;
 import org.mule.services.soap.api.client.SoapClientFactory;
@@ -52,7 +53,7 @@ public class ForwardingSoapClientTestCase {
 
   @Test
   public void loadClient() throws Exception {
-    ForwardingSoapClient client = new ForwardingSoapClient(service, new TestServiceProvider());
+    ForwardingSoapClient client = new ForwardingSoapClient(service, new TestServiceProvider(), mock(MessageDispatcher.class));
     SoapClient sc = client.getSoapClient("uno");
     SoapResponse response = sc.consume(SoapRequest.empty("no-op"));
     assertThat(IOUtils.toString(response.getContent()), is("Content"));
@@ -62,13 +63,13 @@ public class ForwardingSoapClientTestCase {
   public void invalidService() throws MuleException, ConnectionException {
     expectedException.expectMessage("Could not find a soap client id [invalid]");
     expectedException.expect(IllegalArgumentException.class);
-    ForwardingSoapClient client = new ForwardingSoapClient(service, new TestServiceProvider());
+    ForwardingSoapClient client = new ForwardingSoapClient(service, new TestServiceProvider(), mock(MessageDispatcher.class));
     client.getSoapClient("invalid");
   }
 
   @Test
   public void disconnect() throws Exception {
-    ForwardingSoapClient client = new ForwardingSoapClient(service, new TestServiceProvider());
+    ForwardingSoapClient client = new ForwardingSoapClient(service, new TestServiceProvider(), mock(MessageDispatcher.class));
     TestSoapClient sc1 = (TestSoapClient) client.getSoapClient("uno");
     TestSoapClient sc2 = (TestSoapClient) client.getSoapClient("dos");
     client.disconnect();
