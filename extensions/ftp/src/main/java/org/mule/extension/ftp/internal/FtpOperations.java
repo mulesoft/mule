@@ -134,7 +134,7 @@ public final class FtpOperations extends BaseFileSystemOperations {
    */
   @Summary("Writes the given \"Content\" in the file pointed by \"Path\"")
   @Throws(FileWriteErrorTypeProvider.class)
-  public void write(@Config FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String path,
+  public void write(@Config FileConnectorConfig config, @Connection FileSystem fileSystem, String path,
                     @Content @Summary("Content to be written into the file") InputStream content,
                     @Optional @Summary("Encoding when trying to write a String file. If not set, defaults to the configuration one or the Mule default") String encoding,
                     @Optional(defaultValue = "true") boolean createParentDirectories,
