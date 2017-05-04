@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -20,6 +21,8 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -31,7 +34,8 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public final class InterceptableOperationExecutorWrapper extends AbstractInterceptable implements OperationExecutor {
+public final class InterceptableOperationExecutorWrapper extends AbstractInterceptable
+    implements OperationExecutor, OperationArgumentResolverFactory {
 
   private static final Logger LOGGER = getLogger(InterceptableOperationExecutorWrapper.class);
 
@@ -100,5 +104,11 @@ public final class InterceptableOperationExecutorWrapper extends AbstractInterce
   public void dispose() {
     super.dispose();
     disposeIfNeeded(delegate, LOGGER);
+  }
+
+  @Override
+  public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
+    return delegate instanceof OperationArgumentResolverFactory
+        ? ((OperationArgumentResolverFactory) delegate).createArgumentResolver(operationModel) : null;
   }
 }

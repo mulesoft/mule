@@ -1,7 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
+
+    <heisenberg:config name="heisenberg"
+                       cancer="true"
+                       money="1000000"
+                       finalHealth="CANCER">
+        <heisenberg:enemies>
+            <heisenberg:enemy value="Gustavo Fring"/>
+            <heisenberg:enemy value="Hank"/>
+        </heisenberg:enemies>
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
+    </heisenberg:config>
 
     <flow name="injectionInterceptionTest">
     	<logger/>
@@ -10,6 +29,18 @@
 
     <flow name="anotherFlow">
         <splitter expression="#[payload]"/>
+    </flow>
+
+    <flow name="killFromPayload">
+        <heisenberg:kill goodbyeMessage="#[goodbye]"/>
+    </flow>
+
+    <flow name="killWithCustomMessage">
+        <heisenberg:kill-with-custom-message victim="T-1000" goodbyeMessage="#[goodbye]"/>
+    </flow>
+
+    <flow name="die">
+        <heisenberg:die config-ref="heisenberg"/>
     </flow>
 
 </mule>

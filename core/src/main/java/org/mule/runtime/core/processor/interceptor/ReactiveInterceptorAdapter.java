@@ -4,7 +4,6 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.processor.interceptor;
 
 import static java.lang.String.valueOf;
@@ -26,6 +25,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.interception.DefaultInterceptionEvent;
+import org.mule.runtime.core.api.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.exception.MessagingException;
@@ -138,9 +138,6 @@ public class ReactiveInterceptorAdapter
   }
 
   private Map<String, Object> resolveParameters(Event event, Processor processor, Map<String, String> parameters) {
-    // TODO MULE-11567 properly get SDK operation parameters
-    // TODO MULE-11527 avoid doing unnecesary evaluations
-
     Map<String, Object> resolvedParameters = new HashMap<>();
     for (Map.Entry<String, String> entry : parameters.entrySet()) {
       Object value;
@@ -152,6 +149,11 @@ public class ReactiveInterceptorAdapter
         value = valueOf(paramValue);
       }
       resolvedParameters.put(entry.getKey(), value);
+    }
+
+    // TODO MULE-11527 avoid doing unnecesary evaluations
+    if (processor instanceof ParametersResolverProcessor) {
+      resolvedParameters.putAll(((ParametersResolverProcessor) processor).resolveParameters(event));
     }
     return resolvedParameters;
   }

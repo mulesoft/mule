@@ -7,11 +7,14 @@
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Decorates a {@link OperationExecutorFactory} so that the instances that it generates are also decorated through a
@@ -19,7 +22,7 @@ import java.util.List;
  *
  * @since 4.0
  */
-public final class OperationExecutorFactoryWrapper implements OperationExecutorFactory {
+public final class OperationExecutorFactoryWrapper implements OperationExecutorFactory, OperationArgumentResolverFactory {
 
   private final OperationExecutorFactory delegate;
   private final List<Interceptor> interceptors;
@@ -46,5 +49,11 @@ public final class OperationExecutorFactoryWrapper implements OperationExecutorF
     executor = new InterceptableOperationExecutorWrapper(executor, interceptors);
 
     return executor;
+  }
+
+  @Override
+  public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
+    return delegate instanceof OperationArgumentResolverFactory
+        ? ((OperationArgumentResolverFactory) delegate).createArgumentResolver(operationModel) : null;
   }
 }

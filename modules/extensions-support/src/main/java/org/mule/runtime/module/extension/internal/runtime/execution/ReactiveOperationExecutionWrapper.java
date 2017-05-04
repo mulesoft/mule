@@ -25,22 +25,26 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
+import java.util.Map;
+import java.util.function.Function;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Mono;
 
 /**
  * Decorates an {@link OperationExecutor} adding the necessary logic to execute non blocking operations.
  * <p>
- * If the operation being executed is blocking, then it delegates to the wrapped executor transparently.
- * If the operation is non blocking, then it creates and injects a {@link CompletionCallback} on which the operation
- * result will be notified.
+ * If the operation being executed is blocking, then it delegates to the wrapped executor transparently. If the operation is non
+ * blocking, then it creates and injects a {@link CompletionCallback} on which the operation result will be notified.
  * <p>
  * It also implements {@link Lifecycle} and {@link MuleContextAware}, propagating those to the decoratee if necessary
  *
  * @since 4.0
  */
-public final class ReactiveOperationExecutionWrapper implements OperationExecutor, Lifecycle, MuleContextAware {
+public final class ReactiveOperationExecutionWrapper
+    implements OperationExecutor, OperationArgumentResolverFactory, Lifecycle, MuleContextAware {
 
   private static final Logger LOGGER = getLogger(ReactiveOperationExecutionWrapper.class);
 
@@ -95,5 +99,11 @@ public final class ReactiveOperationExecutionWrapper implements OperationExecuto
   @Override
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
+  }
+
+  @Override
+  public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
+    return delegate instanceof OperationArgumentResolverFactory
+        ? ((OperationArgumentResolverFactory) delegate).createArgumentResolver(operationModel) : null;
   }
 }

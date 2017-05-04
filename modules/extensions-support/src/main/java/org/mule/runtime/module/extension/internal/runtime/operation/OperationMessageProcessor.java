@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -28,8 +29,10 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -44,6 +47,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
@@ -52,6 +56,7 @@ import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
@@ -61,13 +66,16 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
@@ -94,7 +102,7 @@ import reactor.core.publisher.Mono;
  * @since 3.7.0
  */
 public class OperationMessageProcessor extends ExtensionComponent<OperationModel>
-    implements Processor, EntityMetadataProvider, Lifecycle {
+    implements Processor, ParametersResolverProcessor, EntityMetadataProvider, Lifecycle {
 
   private static final Logger LOGGER = getLogger(OperationMessageProcessor.class);
   static final String INVALID_TARGET_MESSAGE =
@@ -157,10 +165,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     }
 
     return from(publisher).flatMap(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
-      Optional<ConfigurationInstance> configuration = getConfiguration(event);
-      Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
-      ExecutionContextAdapter<OperationModel> operationContext =
-          createExecutionContext(configuration, operationParameters, event);
+      ExecutionContextAdapter<OperationModel> operationContext = createExecutionContext(event);
 
       // While a hook in reactor is used to map Throwable to MessagingException when an error occurs this does not cover the case
       // where an error is explicitly triggered via a Sink such as such as when using Mono.create in ReactorCompletionCallback
@@ -301,5 +306,29 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   @Override
   public ProcessingType getProcessingType() {
     return asProcessingType(operationModel.getExecutionType());
+  }
+
+  @Override
+  public Map<String, Object> resolveParameters(Event event) {
+    // TODO MULE-11527 avoid doing unnecesary evaluations
+    if (operationExecutor instanceof OperationArgumentResolverFactory) {
+      try {
+        final Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver =
+            ((OperationArgumentResolverFactory) operationExecutor).createArgumentResolver(operationModel);
+        if (createArgumentResolver != null) {
+          return createArgumentResolver.apply(createExecutionContext(event));
+        } else {
+          return emptyMap();
+        }
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(e);
+      }
+    } else {
+      return emptyMap();
+    }
+  }
+
+  private ExecutionContextAdapter<OperationModel> createExecutionContext(Event event) throws MuleException {
+    return createExecutionContext(getConfiguration(event), resolverSet.resolve(event).asMap(), event);
   }
 }

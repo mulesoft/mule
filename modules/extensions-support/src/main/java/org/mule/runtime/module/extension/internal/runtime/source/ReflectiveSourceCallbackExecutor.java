@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOURCE_CALLBACK_CONTEXT_PARAM;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -43,7 +44,8 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
 
   /**
    * Creates a new instance
-   *  @param extensionModel the {@link ExtensionModel} of the owning component
+   * 
+   * @param extensionModel the {@link ExtensionModel} of the owning component
    * @param configurationInstance an {@link Optional} {@link ConfigurationInstance} in case the component requires a config
    * @param sourceModel the model of the {@code source}
    * @param source a {@link Source} instance
@@ -90,7 +92,6 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
 
   private List<ParameterGroupModel> getAllGroups(SourceModel model, Method method,
                                                  SourceCallbackModelProperty sourceCallbackModel) {
-
     List<ParameterGroupModel> callbackParameters = sourceCallbackModel.getOnSuccessMethod().filter(method::equals)
         .map(m -> sourceModel.getSuccessCallback().get().getParameterGroupModels())
         .orElseGet(() -> sourceModel.getErrorCallback().get().getParameterGroupModels());

@@ -23,9 +23,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveMethodComponentExecutor;
 
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -35,7 +38,8 @@ import org.slf4j.Logger;
  *
  * @since 3.7.0
  */
-public final class ReflectiveMethodOperationExecutor implements OperationExecutor, MuleContextAware, Lifecycle {
+public final class ReflectiveMethodOperationExecutor
+    implements OperationExecutor, OperationArgumentResolverFactory, MuleContextAware, Lifecycle {
 
   private static final Logger LOGGER = getLogger(ReflectiveMethodOperationExecutor.class);
 
@@ -85,5 +89,11 @@ public final class ReflectiveMethodOperationExecutor implements OperationExecuto
   public void setMuleContext(MuleContext context) {
     muleContext = context;
     executor.setMuleContext(muleContext);
+  }
+
+  @Override
+  public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
+    return executor instanceof OperationArgumentResolverFactory
+        ? ((OperationArgumentResolverFactory) executor).createArgumentResolver(operationModel) : null;
   }
 }
