@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <configuration>
         <expression-language>
@@ -15,180 +15,180 @@
         </expression-language>
     </configuration>
 
-    <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection host="localhost" port="${port}"/>
-    </httpn:listener-config>
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${port}"/>
+    </http:listener-config>
 
     <flow name="stringFlow">
-        <httpn:listener config-ref="listenerConfig" path="/string"/>
+        <http:listener config-ref="listenerConfig" path="/string"/>
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
     <flow name="stringWithContentLengthHeaderFlow">
-        <httpn:listener config-ref="listenerConfig" path="/stringWithContentLengthHeader">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/stringWithContentLengthHeader">
+            <http:response>
+                <http:headers>
                     #[mel:['Content-Length' : server.systemProperties['stringPayloadLength']]]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
     <flow name="stringWithTransferEncodingFlow">
-        <httpn:listener config-ref="listenerConfig" path="/stringWithTransferEncodingHeader">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/stringWithTransferEncodingHeader">
+            <http:response>
+                <http:headers>
                     #[mel:['Transfer-Encoding' : 'chunked']]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
     <flow name="stringWithTransferEncodingAndContentLengthFlow">
-        <httpn:listener config-ref="listenerConfig" path="/stringWithTransferEncodingAndContentLengthHeader">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/stringWithTransferEncodingAndContentLengthHeader">
+            <http:response>
+                <http:headers>
                     #[mel:['Transfer-Encoding' : 'chunked', 'Content-Length' : server.systemProperties['stringPayloadLength']]]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
     <flow name="inputStreamFlow">
-        <httpn:listener config-ref="listenerConfig" path="/inputStream"/>
+        <http:listener config-ref="listenerConfig" path="/inputStream"/>
         <set-payload value="#[mel:inputStreamPayload]"/>
     </flow>
 
     <flow name="inputStreamWithContentLengthHeaderFlow">
-        <httpn:listener config-ref="listenerConfig" path="/inputStreamWithContentLengthHeader">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/inputStreamWithContentLengthHeader">
+            <http:response>
+                <http:headers>
                     #[mel:['Content-Length' : server.systemProperties['stringPayloadLength']]]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
         <set-payload value="#[mel:inputStreamPayload]"/>
     </flow>
 
     <flow name="inputStreamWithTransferEncodingFlow">
-        <httpn:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingHeader">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingHeader">
+            <http:response>
+                <http:headers>
                     #[mel:['Transfer-Encoding' : 'chunked']]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
         <set-payload value="#[mel:inputStreamPayload]"/>
     </flow>
 
     <flow name="inputStreamWithTransferEncodingAndContentLengthFlow">
-        <httpn:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingAndContentLengthHeader">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/inputStreamWithTransferEncodingAndContentLengthHeader">
+            <http:response>
+                <http:headers>
                     #[mel:['Transfer-Encoding' : 'chunked', 'Content-Length' : server.systemProperties['stringPayloadLength']]]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
         <set-payload value="#[mel:inputStreamPayload]"/>
     </flow>
 
     <flow name="neverStringFlow">
-        <httpn:listener config-ref="listenerConfig" path="/neverString" responseStreamingMode="NEVER"/>
+        <http:listener config-ref="listenerConfig" path="/neverString" responseStreamingMode="NEVER"/>
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
     <flow name="neverStringTransferEncodingHeaderFlow">
-        <httpn:listener config-ref="listenerConfig" path="/neverStringTransferEncodingHeader" responseStreamingMode="NEVER">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/neverStringTransferEncodingHeader" responseStreamingMode="NEVER">
+            <http:response>
+                <http:headers>
                     #[mel:['Transfer-Encoding' : 'chunked']]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
     <flow name="neverInputStreamFlow">
-        <httpn:listener config-ref="listenerConfig" path="/neverInputStream"  responseStreamingMode="NEVER"/>
+        <http:listener config-ref="listenerConfig" path="/neverInputStream"  responseStreamingMode="NEVER"/>
         <set-payload value="#[mel:inputStreamPayload]"/>
     </flow>
 
     <flow name="neverInputStreamTransferEncodingHeaderFlow">
-        <httpn:listener config-ref="listenerConfig" path="/neverInputStreamTransferEncodingHeader"  responseStreamingMode="NEVER">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/neverInputStreamTransferEncodingHeader"  responseStreamingMode="NEVER">
+            <http:response>
+                <http:headers>
                     #[mel:['Transfer-Encoding' : 'chunked']]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
         <set-payload value="#[mel:inputStreamPayload]"/>
     </flow>
 
     <flow name="alwaysStringFlow">
-        <httpn:listener config-ref="listenerConfig" path="/alwaysString"  responseStreamingMode="ALWAYS"/>
+        <http:listener config-ref="listenerConfig" path="/alwaysString"  responseStreamingMode="ALWAYS"/>
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
     <flow name="alwaysStringContentLengthHeaderFlow">
-        <httpn:listener config-ref="listenerConfig" path="/alwaysStringContentLengthHeader" responseStreamingMode="ALWAYS">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/alwaysStringContentLengthHeader" responseStreamingMode="ALWAYS">
+            <http:response>
+                <http:headers>
                     #[mel:['Content-Length' : server.systemProperties['stringPayloadLength']]]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
     <flow name="alwaysInputStreamFlow">
-        <httpn:listener config-ref="listenerConfig" path="/alwaysInputStream" responseStreamingMode="ALWAYS"/>
+        <http:listener config-ref="listenerConfig" path="/alwaysInputStream" responseStreamingMode="ALWAYS"/>
         <set-payload value="#[mel:inputStreamPayload]"/>
     </flow>
 
     <flow name="alwaysInputStreamContentLengthHeaderFlow">
-        <httpn:listener config-ref="listenerConfig" path="/alwaysInputStreamContentLengthHeader" responseStreamingMode="ALWAYS">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/alwaysInputStreamContentLengthHeader" responseStreamingMode="ALWAYS">
+            <http:response>
+                <http:headers>
                     #[mel:['Content-Length' : server.systemProperties['stringPayloadLength']]]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
         <set-payload value="#[mel:inputStreamPayload]"/>
     </flow>
 
     <flow name="mapFlow">
-        <httpn:listener config-ref="listenerConfig" path="/map">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/map">
+            <http:response>
+                <http:headers>
                     #[mel:['Content-Type' : 'application/x-www-form-urlencoded']]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
         <set-payload value="#[mel:mapPayload]"/>
     </flow>
 
     <flow name="alwaysMapFlow">
-        <httpn:listener config-ref="listenerConfig" path="/alwaysMap" responseStreamingMode="ALWAYS">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/alwaysMap" responseStreamingMode="ALWAYS">
+            <http:response>
+                <http:headers>
                     #[mel:['Content-Type' : 'application/x-www-form-urlencoded']]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
         <set-payload value="#[mel:mapPayload]"/>
     </flow>
 
     <flow name="neverMapFlow">
-        <httpn:listener config-ref="listenerConfig" path="/neverMap" responseStreamingMode="NEVER">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener config-ref="listenerConfig" path="/neverMap" responseStreamingMode="NEVER">
+            <http:response>
+                <http:headers>
                     #[mel:['Content-Type' : 'application/x-www-form-urlencoded']]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
         <set-payload value="#[mel:mapPayload]"/>
     </flow>
 </mule>

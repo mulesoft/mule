@@ -1,9 +1,9 @@
 <mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-          http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
           http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
 
     <wsc:config name="wsc-config">
@@ -26,21 +26,21 @@
         </wsc:connection>
     </wsc:config>
 
-    <httpn:request-config name="basic-auth-requester" >
-        <httpn:request-connection host="localhost" port="${servicePort}" protocol="HTTP">
-            <httpn:authentication>
-                <httpn:basic-authentication username="juani" password="changeIt"/>
-            </httpn:authentication>
-        </httpn:request-connection>
-    </httpn:request-config>
+    <http:request-config name="basic-auth-requester" >
+        <http:request-connection host="localhost" port="${servicePort}" protocol="HTTP">
+            <http:authentication>
+                <http:basic-authentication username="juani" password="changeIt"/>
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
 
-    <httpn:request-config name="unauthorized-requester" >
-        <httpn:request-connection host="localhost" port="${servicePort}" protocol="HTTP">
-            <httpn:authentication>
-                <httpn:basic-authentication username="invalid" password="invalid"/>
-            </httpn:authentication>
-        </httpn:request-connection>
-    </httpn:request-config>
+    <http:request-config name="unauthorized-requester" >
+        <http:request-connection host="localhost" port="${servicePort}" protocol="HTTP">
+            <http:authentication>
+                <http:basic-authentication username="invalid" password="invalid"/>
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
 
     <flow name="basicAuthRequester">
         <wsc:consume config-ref="wsc-config" operation="echo">

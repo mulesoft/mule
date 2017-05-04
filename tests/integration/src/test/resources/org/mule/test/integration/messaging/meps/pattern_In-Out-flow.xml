@@ -3,9 +3,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:mule="http://www.mulesoft.org/schema/mule/core"
     xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
-    xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
@@ -16,13 +16,13 @@
         message with a NullPayload payload is returned.
     </description>
 
-    <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection host="localhost" port="${port1}"/>
-    </httpn:listener-config>
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${port1}"/>
+    </http:listener-config>
 
     <flow name="In-Out-Service">
 
-        <httpn:listener path="*" config-ref="listenerConfig"/>
+        <http:listener path="*" config-ref="listenerConfig"/>
 
         <!-- Note: auto formating this file might break the test if the script's indentation is not preserved. -->
         <script:component>

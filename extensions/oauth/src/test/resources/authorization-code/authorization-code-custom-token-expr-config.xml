@@ -2,17 +2,17 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:oauth="http://www.mulesoft.org/schema/mule/oauth"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd">
 
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection>
-            <httpn:authentication>
+    <http:request-config name="requestConfig">
+        <http:request-connection>
+            <http:authentication>
                 <oauth:authorization-code-grant-type
                         clientId="${client.id}"
                         clientSecret="${client.secret}"
@@ -25,16 +25,16 @@
                         responseRefreshToken="#[(payload match /.*&quot;refresh_token&quot;[ ]*:[ ]*&quot;([^\\&quot;]*)&quot;.*/)[1]]"
                         responseExpiresIn="#[(payload match /.*&quot;expires_in&quot;[ ]*:[ ]*&quot;([^\\&quot;]*)&quot;.*/)[1]]">
                 </oauth:authorization-code-grant-type>
-            </httpn:authentication>
-        </httpn:request-connection>
-    </httpn:request-config>
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
 
-    <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection host="localhost" port="${onCompleteUrlPort}"/>
-    </httpn:listener-config>
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${onCompleteUrlPort}"/>
+    </http:listener-config>
 
     <flow name="someFlow">
-        <httpn:listener config-ref="listenerConfig" path="/afterLogin"/>
+        <http:listener config-ref="listenerConfig" path="/afterLogin"/>
         <test:assert expression="#[mel:message.attributes.queryParams['authorizationStatus'] == System.getProperty('expectedStatusCode')]" />
     </flow>
 </mule>

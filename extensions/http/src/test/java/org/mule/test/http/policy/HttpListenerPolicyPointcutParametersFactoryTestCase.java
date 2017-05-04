@@ -30,7 +30,7 @@ import ru.yandex.qatools.allure.annotations.Features;
 public class HttpListenerPolicyPointcutParametersFactoryTestCase extends AbstractMuleTestCase {
 
   private static final ComponentIdentifier HTTP_LISTENER_COMPONENT_IDENTIFIER =
-      builder().withNamespace("httpn").withName("listener").build();
+      builder().withNamespace("http").withName("listener").build();
   private static final String TEST_REQUEST_PATH = "test-request-path";
   private static final String TEST_METHOD = "PUT";
 
@@ -49,7 +49,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
   @Test
   public void doesNotSupportHttpRequester() {
     assertThat(factory
-        .supportsSourceIdentifier(ComponentIdentifier.builder().withNamespace("httpn").withName("request").build()),
+        .supportsSourceIdentifier(ComponentIdentifier.builder().withNamespace("http").withName("request").build()),
                is(false));
   }
 

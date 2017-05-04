@@ -1,9 +1,9 @@
 <mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-          http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
           http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
 
     <wsc:config name="wsc-config">
@@ -16,9 +16,9 @@
         </wsc:connection>
     </wsc:config>
 
-    <httpn:request-config name="simple-requester" >
-        <httpn:request-connection host="localhost" port="${servicePort}" protocol="HTTP"/>
-    </httpn:request-config>
+    <http:request-config name="simple-requester" >
+        <http:request-connection host="localhost" port="${servicePort}" protocol="HTTP"/>
+    </http:request-config>
 
     <flow name="simpleRequesterConfig">
         <wsc:consume config-ref="wsc-config" operation="echo">

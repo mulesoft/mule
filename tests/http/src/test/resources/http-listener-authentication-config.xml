@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:ss="http://www.springframework.org/schema/security"
@@ -9,7 +9,7 @@
       xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
         http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
@@ -31,19 +31,19 @@
     </mule-ss:security-manager>
 
 
-    <httpn:listener-config name="listenerConfigBasicAuth">
-        <httpn:listener-connection host="localhost" port="${port}"/>
-    </httpn:listener-config>
+    <http:listener-config name="listenerConfigBasicAuth">
+        <http:listener-connection host="localhost" port="${port}"/>
+    </http:listener-config>
 
     <flow name="listenerBasicAuth">
-        <httpn:listener config-ref="listenerConfigBasicAuth" path="/basic"/>
-        <httpn:basic-security-filter realm="mule-realm" securityProviders="#[[attributes.queryParams.provider]]"/>
+        <http:listener config-ref="listenerConfigBasicAuth" path="/basic"/>
+        <http:basic-security-filter realm="mule-realm" securityProviders="#[[attributes.queryParams.provider]]"/>
         <set-payload value="TestBasicAuthOk"/>
         <error-handler>
-            <on-error-propagate type="HTTPN:UNAUTHORIZED">
+            <on-error-propagate type="http:UNAUTHORIZED">
                 <test:queue name="unauthorized"/>
             </on-error-propagate>
-            <on-error-propagate type="HTTPN:SECURITY">
+            <on-error-propagate type="http:SECURITY">
                 <test:queue name="security"/>
             </on-error-propagate>
         </error-handler>

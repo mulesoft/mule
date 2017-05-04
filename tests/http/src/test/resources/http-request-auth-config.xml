@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:request-config name="basicConfig">
-        <httpn:request-connection host="localhost" port="${httpPort}">
-            <httpn:authentication>
-                <httpn:basic-authentication username="#[mel:user]" password="#[mel:password]" preemptive="#[mel:preemptive]" />
-            </httpn:authentication>
-        </httpn:request-connection>
-    </httpn:request-config>
+    <http:request-config name="basicConfig">
+        <http:request-connection host="localhost" port="${httpPort}">
+            <http:authentication>
+                <http:basic-authentication username="#[mel:user]" password="#[mel:password]" preemptive="#[mel:preemptive]" />
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
 
     <flow name="basicAuthRequest">
-        <httpn:request config-ref="basicConfig" path="/basic" method="GET"/>
+        <http:request config-ref="basicConfig" path="/basic" method="GET"/>
         <object-to-string-transformer />
     </flow>
 
-    <httpn:request-config name="digestConfig">
-        <httpn:request-connection host="localhost" port="${httpPort}">
-            <httpn:authentication>
-                <httpn:digest-authentication username="#[mel:user]" password="#[mel:password]" />
-            </httpn:authentication>
-        </httpn:request-connection>
-    </httpn:request-config>
+    <http:request-config name="digestConfig">
+        <http:request-connection host="localhost" port="${httpPort}">
+            <http:authentication>
+                <http:digest-authentication username="#[mel:user]" password="#[mel:password]" />
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
 
     <flow name="digestAuthRequest">
-        <httpn:request config-ref="digestConfig" path="/digest" method="GET"/>
+        <http:request config-ref="digestConfig" path="/digest" method="GET"/>
         <object-to-string-transformer />
     </flow>
 

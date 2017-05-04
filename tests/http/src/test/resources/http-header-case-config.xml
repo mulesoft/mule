@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection host="localhost" port="${port}"/>
-    </httpn:listener-config>
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection host="localhost" port="${port}"/>
-    </httpn:request-config>
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${port}"/>
+    </http:listener-config>
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="${port}"/>
+    </http:request-config>
 
     <flow name="server">
-        <httpn:listener path="test" config-ref="listenerConfig">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener path="test" config-ref="listenerConfig">
+            <http:response>
+                <http:headers>
                     #[mel:['Content-Type' : 'application/x-www-form-urlencoded', 'customname1' : 'customValue']]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
         <set-payload value="#[mel:message.getAttributes().getHeaders().get('CusTomName2')]=value" />
     </flow>
 
     <flow name="client">
-        <httpn:request path="test" config-ref="requestConfig">
-            <httpn:headers>
+        <http:request path="test" config-ref="requestConfig">
+            <http:headers>
                 #[mel:['CusTomName2' : 'CustomValue']]
-            </httpn:headers>
-        </httpn:request>
+            </http:headers>
+        </http:request>
     </flow>
 
 </mule>

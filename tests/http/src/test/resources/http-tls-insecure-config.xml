@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns:context="http://www.springframework.org/schema/context"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <tls:context name="globalTlsContextInsecure" >
         <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit" insecure="true"/>
@@ -22,101 +22,101 @@
         <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
     </tls:context>
 
-    <httpn:listener-config name="mainListenerConfig" basePath="test">
-        <httpn:listener-connection host="localhost" port="${httpsPort}" tlsContext="globalTlsContextInsecure" protocol="HTTPS" />
-    </httpn:listener-config>
+    <http:listener-config name="mainListenerConfig" basePath="test">
+        <http:listener-connection host="localhost" port="${httpsPort}" tlsContext="globalTlsContextInsecure" protocol="HTTPS" />
+    </http:listener-config>
 
-    <httpn:listener-config name="globalConfigInsecure">
-        <httpn:listener-connection host="localhost" port="${https.internal.insecure}" tlsContext="globalTlsContextInsecure" protocol="HTTPS"/>
-    </httpn:listener-config>
-
-
-    <httpn:listener-config name="globalConfigSecure">
-        <httpn:listener-connection host="localhost" port="${https.internal.secure}" tlsContext="globalTlsContextSecure" protocol="HTTPS"/>
-    </httpn:listener-config>
+    <http:listener-config name="globalConfigInsecure">
+        <http:listener-connection host="localhost" port="${https.internal.insecure}" tlsContext="globalTlsContextInsecure" protocol="HTTPS"/>
+    </http:listener-config>
 
 
-    <httpn:listener-config name="globalConfigSecureInvalid">
-        <httpn:listener-connection host="localhost" port="${https.internal.secure.invalid}" protocol="HTTPS">
+    <http:listener-config name="globalConfigSecure">
+        <http:listener-connection host="localhost" port="${https.internal.secure}" tlsContext="globalTlsContextSecure" protocol="HTTPS"/>
+    </http:listener-config>
+
+
+    <http:listener-config name="globalConfigSecureInvalid">
+        <http:listener-connection host="localhost" port="${https.internal.secure.invalid}" protocol="HTTPS">
             <tls:context>
                 <tls:key-store path="tls/ssltest-keystore-invalid.jks" keyPassword="changeit" password="changeit"/>
             </tls:context>
-        </httpn:listener-connection>
-    </httpn:listener-config>
+        </http:listener-connection>
+    </http:listener-config>
 
-    <httpn:listener-config name="globalConfigDefault">
-        <httpn:listener-connection host="localhost" port="${https.internal.default}" tlsContext="globalTlsContextDefault" protocol="HTTPS" />
-    </httpn:listener-config>
+    <http:listener-config name="globalConfigDefault">
+        <http:listener-connection host="localhost" port="${https.internal.default}" tlsContext="globalTlsContextDefault" protocol="HTTPS" />
+    </http:listener-config>
 
-    <httpn:listener-config name="globalConfigDefaultInvalid">
-        <httpn:listener-connection host="localhost" port="${https.internal.default.invalid}" protocol="HTTPS">
+    <http:listener-config name="globalConfigDefaultInvalid">
+        <http:listener-connection host="localhost" port="${https.internal.default.invalid}" protocol="HTTPS">
             <tls:context>
                 <tls:key-store path="tls/ssltest-keystore-invalid.jks" keyPassword="changeit" password="changeit"/>
             </tls:context>
-        </httpn:listener-connection>
-    </httpn:listener-config>
+        </http:listener-connection>
+    </http:listener-config>
 
 
-    <httpn:request-config name="clientGlobalConfigInsecureValid">
-        <httpn:request-connection host="localhost" port="${https.internal.insecure}" tlsContext="globalTlsContextInsecure" protocol="HTTPS"/>
-    </httpn:request-config>
-    <httpn:request-config name="clientGlobalConfigSecureValid">
-        <httpn:request-connection host="localhost" port="${https.internal.secure}" tlsContext="globalTlsContextSecure" protocol="HTTPS"/>
-    </httpn:request-config>
-    <httpn:request-config name="clientGlobalConfigSecureInvalid">
-        <httpn:request-connection host="localhost" port="${https.internal.secure.invalid}" tlsContext="globalTlsContextSecure" protocol="HTTPS"/>
-    </httpn:request-config>
-    <httpn:request-config name="clientGlobalConfigDefaultValid">
-        <httpn:request-connection host="localhost" port="${https.internal.default}" tlsContext="globalTlsContextDefault" protocol="HTTPS"/>
-    </httpn:request-config>
-    <httpn:request-config name="clientGlobalConfigDefaultInvalid">
-        <httpn:request-connection host="localhost" port="${https.internal.default.invalid}" protocol="HTTPS">
+    <http:request-config name="clientGlobalConfigInsecureValid">
+        <http:request-connection host="localhost" port="${https.internal.insecure}" tlsContext="globalTlsContextInsecure" protocol="HTTPS"/>
+    </http:request-config>
+    <http:request-config name="clientGlobalConfigSecureValid">
+        <http:request-connection host="localhost" port="${https.internal.secure}" tlsContext="globalTlsContextSecure" protocol="HTTPS"/>
+    </http:request-config>
+    <http:request-config name="clientGlobalConfigSecureInvalid">
+        <http:request-connection host="localhost" port="${https.internal.secure.invalid}" tlsContext="globalTlsContextSecure" protocol="HTTPS"/>
+    </http:request-config>
+    <http:request-config name="clientGlobalConfigDefaultValid">
+        <http:request-connection host="localhost" port="${https.internal.default}" tlsContext="globalTlsContextDefault" protocol="HTTPS"/>
+    </http:request-config>
+    <http:request-config name="clientGlobalConfigDefaultInvalid">
+        <http:request-connection host="localhost" port="${https.internal.default.invalid}" protocol="HTTPS">
             <tls:context>
                 <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
                 <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
             </tls:context>
-        </httpn:request-connection>
-    </httpn:request-config>
+        </http:request-connection>
+    </http:request-config>
 
     <flow name="testFlowGlobalContextInsecure">
-        <httpn:listener config-ref="mainListenerConfig" path="/insecure" allowedMethods="GET"/>
-        <httpn:request config-ref="clientGlobalConfigInsecureValid" path="/" method="GET" />
+        <http:listener config-ref="mainListenerConfig" path="/insecure" allowedMethods="GET"/>
+        <http:request config-ref="clientGlobalConfigInsecureValid" path="/" method="GET" />
     </flow>
     <flow name="testFlowGlobalContextSecure">
-        <httpn:listener config-ref="mainListenerConfig" path="/securePass" allowedMethods="GET"/>
-        <httpn:request config-ref="clientGlobalConfigSecureValid" path="/" method="GET" />
+        <http:listener config-ref="mainListenerConfig" path="/securePass" allowedMethods="GET"/>
+        <http:request config-ref="clientGlobalConfigSecureValid" path="/" method="GET" />
     </flow>
     <flow name="testFlowGlobalContextSecureInvalid">
-        <httpn:listener config-ref="mainListenerConfig" path="/secureFails" allowedMethods="GET"/>
-        <httpn:request config-ref="clientGlobalConfigSecureInvalid" path="/" method="GET" />
+        <http:listener config-ref="mainListenerConfig" path="/secureFails" allowedMethods="GET"/>
+        <http:request config-ref="clientGlobalConfigSecureInvalid" path="/" method="GET" />
     </flow>
     <flow name="testFlowGlobalContextDefault">
-        <httpn:listener config-ref="mainListenerConfig" path="/defaultPass" allowedMethods="GET"/>
-        <httpn:request config-ref="clientGlobalConfigDefaultValid" path="/" method="GET" />
+        <http:listener config-ref="mainListenerConfig" path="/defaultPass" allowedMethods="GET"/>
+        <http:request config-ref="clientGlobalConfigDefaultValid" path="/" method="GET" />
     </flow>
     <flow name="testFlowGlobalContextDefaultInvalid">
-        <httpn:listener config-ref="mainListenerConfig" path="/defaultFails" allowedMethods="GET"/>
-        <httpn:request config-ref="clientGlobalConfigDefaultInvalid" path="/" method="GET" />
+        <http:listener config-ref="mainListenerConfig" path="/defaultFails" allowedMethods="GET"/>
+        <http:request config-ref="clientGlobalConfigDefaultInvalid" path="/" method="GET" />
     </flow>
 
     <flow name="testFlowGlobalContextInsecureClientValid">
-        <httpn:listener config-ref="globalConfigInsecure" path="/" allowedMethods="GET"/>
+        <http:listener config-ref="globalConfigInsecure" path="/" allowedMethods="GET"/>
         <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
     <flow name="testFlowGlobalContextSecureClientValid">
-        <httpn:listener config-ref="globalConfigSecure" path="/" allowedMethods="GET"/>
+        <http:listener config-ref="globalConfigSecure" path="/" allowedMethods="GET"/>
         <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
     <flow name="testFlowGlobalContextSecureClientInvalid">
-        <httpn:listener config-ref="globalConfigSecureInvalid" path="/" allowedMethods="GET"/>
+        <http:listener config-ref="globalConfigSecureInvalid" path="/" allowedMethods="GET"/>
         <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
     <flow name="testFlowGlobalContextDefaultClientValid">
-        <httpn:listener config-ref="globalConfigDefault" path="/" allowedMethods="GET"/>
+        <http:listener config-ref="globalConfigDefault" path="/" allowedMethods="GET"/>
         <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
     <flow name="testFlowGlobalContextClientDefaultInvalid">
-        <httpn:listener config-ref="globalConfigDefaultInvalid" path="/" allowedMethods="GET"/>
+        <http:listener config-ref="globalConfigDefaultInvalid" path="/" allowedMethods="GET"/>
         <expression-component>mel:payload = 'ok'</expression-component>
     </flow>
 

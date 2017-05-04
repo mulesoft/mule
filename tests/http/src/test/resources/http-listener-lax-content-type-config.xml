@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:listener-config name="httpConf">
-        <httpn:listener-connection host="localhost" port="${httpPort}"/>
-    </httpn:listener-config>
+    <http:listener-config name="httpConf">
+        <http:listener-connection host="localhost" port="${httpPort}"/>
+    </http:listener-config>
 
     <flow name="listenerContentType" >
-        <httpn:listener config-ref="httpConf" path="testInput"/>
+        <http:listener config-ref="httpConf" path="testInput"/>
 
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>
     </flow>
 
     <flow name="listenerInvalidContentType" >
-        <httpn:listener config-ref="httpConf" path="testInputInvalid">
-            <httpn:response>
-                <httpn:headers>
+        <http:listener config-ref="httpConf" path="testInputInvalid">
+            <http:response>
+                <http:headers>
                     #[mel:['Content-Type' : 'invalidMimeType']]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
 
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }"/>
     </flow>

@@ -2,11 +2,11 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:db="http://www.mulesoft.org/schema/mule/db"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
 
     <db:config name="dbConfig">
       <db:derby-connection create="true"
@@ -26,11 +26,11 @@
             </db:connection-properties>
         </db:derby-connection>
     </db:config>
-   <httpn:listener-config basePath="/"
+   <http:listener-config basePath="/"
                           interpretRequestErrors="false"
                           name="httpListener"
                           parseRequest="true">
-      <httpn:listener-connection connectionIdleTimeout="30000"
+      <http:listener-connection connectionIdleTimeout="30000"
                                  disableValidation="true"
                                  host="localhost"
                                  port="49019"
@@ -41,26 +41,26 @@
                            password="changeit"
                            path="ssltest-keystore.jks"/>
             </tls:context>
-        </httpn:listener-connection>
-    </httpn:listener-config>
-   <httpn:request-config basePath="/"
+        </http:listener-connection>
+    </http:listener-config>
+   <http:request-config basePath="/"
                          enableCookies="true"
                          followRedirects="true"
                          name="httpRequester"
                          parseResponse="true"
                          requestStreamingMode="AUTO"
                          sendBodyMode="AUTO">
-      <httpn:request-connection connectionIdleTimeout="30000"
+      <http:request-connection connectionIdleTimeout="30000"
                                 host="localhost"
                                 maxConnections="-1"
                                 port="49020"
                                 protocol="HTTP"
                                 responseBufferSize="10240"
                                 usePersistentConnections="true">
-            <httpn:authentication>
-            <httpn:basic-authentication password="pass" preemptive="true" username="user"/>
-            </httpn:authentication>
-            <httpn:client-socket-properties>
+            <http:authentication>
+            <http:basic-authentication password="pass" preemptive="true" username="user"/>
+            </http:authentication>
+            <http:client-socket-properties>
             <sockets:tcp-client-socket-properties clientTimeout="1000"
                                                   connectionTimeout="1000"
                                                   failOnUnresolvedHost="true"
@@ -70,22 +70,22 @@
                                                   reuseAddress="true"
                                                   sendBufferSize="1024"
                                                   sendTcpNoDelay="true"/>
-            </httpn:client-socket-properties>
-        </httpn:request-connection>
-    </httpn:request-config>
+            </http:client-socket-properties>
+        </http:request-connection>
+    </http:request-config>
    <flow initialState="stopped" name="testFlow">
-      <httpn:listener config-ref="httpListener"
+      <http:listener config-ref="httpListener"
                       path="testBuilder"
                       responseStreamingMode="AUTO">
             <redelivery-policy maxRedeliveryCount="2" useSecureHash="true"/>
             <reconnect blocking="true" count="1" frequency="0"/>
-            <httpn:response>
-                <httpn:body>#[{'my': 'map'}]</httpn:body>
-                <httpn:headers>
+            <http:response>
+                <http:body>#[{'my': 'map'}]</http:body>
+                <http:headers>
                     #[{{'content-type' : 'text/plain'}}]
-                </httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+                </http:headers>
+            </http:response>
+        </http:listener>
       <db:bulk-insert queryTimeout="0" queryTimeoutUnit="SECONDS">
             <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)</db:sql>
             <db:parameter-types>
@@ -93,7 +93,7 @@
                 <db:parameter-type key="position" type="INTEGER" />
             </db:parameter-types>
         </db:bulk-insert>
-      <httpn:request config-ref="httpRequester"
+      <http:request config-ref="httpRequester"
                      method="POST"
                      outputType="ANY"
                      path="/nested"/>

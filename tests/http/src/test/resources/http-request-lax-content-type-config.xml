@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:listener-config name="httpConf">
-        <httpn:listener-connection host="localhost" port="${httpPort}"/>
-    </httpn:listener-config>
+    <http:listener-config name="httpConf">
+        <http:listener-connection host="localhost" port="${httpPort}"/>
+    </http:listener-config>
 
-    <httpn:request-config name="requesterConfig">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-    </httpn:request-config>
+    <http:request-config name="requesterConfig">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
 
     <flow name="requesterInvalidContentTypeClient" >
-        <httpn:listener config-ref="httpConf" path="requestClientInvalid"/>
+        <http:listener config-ref="httpConf" path="requestClientInvalid"/>
 
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }"/>
 
-        <httpn:request config-ref="requesterConfig" path="requestServer" method="GET">
-            <httpn:headers>
+        <http:request config-ref="requesterConfig" path="requestServer" method="GET">
+            <http:headers>
                 #[mel:['Content-Type' : 'invalidMimeType']]
-            </httpn:headers>
-        </httpn:request>
+            </http:headers>
+        </http:request>
     </flow>
 
     <flow name="requesterContentTypeServer" >
-        <httpn:listener config-ref="httpConf" path="requestServer"/>
+        <http:listener config-ref="httpConf" path="requestServer"/>
 
         <set-payload value="#[mel:message.getAttributes().getHeaders().get('content-type')]"/>
     </flow>

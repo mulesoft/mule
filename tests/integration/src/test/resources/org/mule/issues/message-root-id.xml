@@ -2,18 +2,18 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection host="localhost" port="${port1}"/>
-    </httpn:listener-config>
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection host="localhost" port="${port1}"/>
-    </httpn:request-config>
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${port1}"/>
+    </http:listener-config>
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="${port1}"/>
+    </http:request-config>
 
     <flow name="flow1">
         <response>
@@ -23,7 +23,7 @@
         <set-property propertyName="where" value="flow1-request"/>
         <custom-transformer class="org.mule.issues.MessageRootIdPropagationTestCase$RootIDGatherer"/>
         <flow-ref name="flow2"/>
-        <httpn:request method="POST" path="foo" config-ref="requestConfig"/>
+        <http:request method="POST" path="foo" config-ref="requestConfig"/>
     </flow>
 
     <flow name="flow2">
@@ -33,7 +33,7 @@
     </flow>
 
     <flow name="flow3">
-        <httpn:listener path="foo" config-ref="listenerConfig"/>
+        <http:listener path="foo" config-ref="listenerConfig"/>
         <response>
             <set-property propertyName="where" value="flow3-response"/>
             <custom-transformer class="org.mule.issues.MessageRootIdPropagationTestCase$RootIDGatherer"/>

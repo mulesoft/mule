@@ -36,6 +36,6 @@ public class CustomizedXmlNamespacePrefixTestCase extends AbstractIntegrationTes
         .find(Location.builder().globalName("flow").addProcessorsPart().addIndexPart(0).build());
     assertThat(httpRequesterOptional.isPresent(), is(true));
     assertThat(httpRequesterOptional.get().getLocation().getComponentIdentifier().getIdentifier(),
-               is(buildFromStringRepresentation("httpn:request")));
+               is(buildFromStringRepresentation("http:request")));
   }
 }

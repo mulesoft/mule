@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
     xmlns:ss="http://www.springframework.org/schema/security"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-current.xsd">
 
@@ -54,45 +54,45 @@
             name="daoAuthenticationSecurityProvider1" delegate-ref="authenticationManager1" />
     </mule-ss:security-manager>
 
-    <httpn:listener-config name="listenerConfig1">
-        <httpn:listener-connection host="localhost" port="${port1}"/>
-    </httpn:listener-config>
-    <httpn:listener-config name="listenerConfig2">
-        <httpn:listener-connection host="localhost" port="${port2}"/>
-    </httpn:listener-config>
-    <httpn:listener-config name="listenerConfig3">
-        <httpn:listener-connection host="localhost" port="${port3}"/>
-    </httpn:listener-config>
+    <http:listener-config name="listenerConfig1">
+        <http:listener-connection host="localhost" port="${port1}"/>
+    </http:listener-config>
+    <http:listener-config name="listenerConfig2">
+        <http:listener-connection host="localhost" port="${port2}"/>
+    </http:listener-config>
+    <http:listener-config name="listenerConfig3">
+        <http:listener-connection host="localhost" port="${port3}"/>
+    </http:listener-config>
 
 
     <flow name="flow">
-        <httpn:listener config-ref="listenerConfig1" path="*"/>
-        <httpn:basic-security-filter realm="mule-realm" >
-            <httpn:security-providers>
-                <httpn:security-provider value="daoAuthenticationSecurityProvider1"/>
-            </httpn:security-providers>
-        </httpn:basic-security-filter>
+        <http:listener config-ref="listenerConfig1" path="*"/>
+        <http:basic-security-filter realm="mule-realm" >
+            <http:security-providers>
+                <http:security-provider value="daoAuthenticationSecurityProvider1"/>
+            </http:security-providers>
+        </http:basic-security-filter>
         <echo-component />
     </flow>
 
     <flow name="flow2">
-        <httpn:listener config-ref="listenerConfig2" path="*"/>
-        <httpn:basic-security-filter realm="mule-realm" >
-            <httpn:security-providers>
-                <httpn:security-provider value="daoAuthenticationSecurityProvider2"/>
-            </httpn:security-providers>
-        </httpn:basic-security-filter>
+        <http:listener config-ref="listenerConfig2" path="*"/>
+        <http:basic-security-filter realm="mule-realm" >
+            <http:security-providers>
+                <http:security-provider value="daoAuthenticationSecurityProvider2"/>
+            </http:security-providers>
+        </http:basic-security-filter>
         <echo-component />
     </flow>
 
     <flow name="flow3">
-        <httpn:listener config-ref="listenerConfig3" path="*"/>
-        <httpn:basic-security-filter realm="mule-realm">
-            <httpn:security-providers>
-                <httpn:security-provider value="daoAuthenticationSecurityProvider2"/>
-                <httpn:security-provider value="daoAuthenticationSecurityProvider1"/>
-            </httpn:security-providers>
-        </httpn:basic-security-filter>
+        <http:listener config-ref="listenerConfig3" path="*"/>
+        <http:basic-security-filter realm="mule-realm">
+            <http:security-providers>
+                <http:security-provider value="daoAuthenticationSecurityProvider2"/>
+                <http:security-provider value="daoAuthenticationSecurityProvider1"/>
+            </http:security-providers>
+        </http:basic-security-filter>
         <echo-component />
     </flow>
 

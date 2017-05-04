@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:request-config name="config">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-    </httpn:request-config>
+    <http:request-config name="config">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
 
     <flow name="uriParamList">
-        <httpn:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
-            <httpn:uri-params>
+        <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
+            <http:uri-params>
                 #[mel:['testParam1' : 'testValue1', paramName : paramValue]]
-            </httpn:uri-params>
-        </httpn:request>
+            </http:uri-params>
+        </http:request>
     </flow>
 
     <flow name="uriParamMap">
-        <httpn:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
-            <httpn:uri-params>
+        <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
+            <http:uri-params>
                 #[mel:params]
-            </httpn:uri-params>
-        </httpn:request>
+            </http:uri-params>
+        </http:request>
     </flow>
 
     <flow name="uriParamOverride">
-        <httpn:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
-            <httpn:uri-params>
+        <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
+            <http:uri-params>
                 #[mel:params]
-            </httpn:uri-params>
-        </httpn:request>
+            </http:uri-params>
+        </http:request>
     </flow>
 
     <flow name="uriParamNull">
-        <httpn:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
-            <httpn:uri-params>
+        <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
+            <http:uri-params>
                 #[mel:['testParam1' : 'testValue1' , 'testParam2' : payload]]
-            </httpn:uri-params>
-        </httpn:request>
+            </http:uri-params>
+        </http:request>
     </flow>
 
 </mule>

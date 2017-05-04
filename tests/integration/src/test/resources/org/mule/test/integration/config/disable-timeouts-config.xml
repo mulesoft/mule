@@ -2,29 +2,29 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+       xmlns:http="http://www.mulesoft.org/schema/mule/http"
        xmlns:test="http://www.mulesoft.org/schema/mule/test"
        xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <configuration defaultResponseTimeout="100"/>
 
-    <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection host="localhost" port="${port1}"/>
-    </httpn:listener-config>
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection host="localhost" port="${port1}"/>
-    </httpn:request-config>
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${port1}"/>
+    </http:listener-config>
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="${port1}"/>
+    </http:request-config>
 
     <flow name="HttpTimeout">
-        <httpn:request config-ref="requestConfig" path="service" responseTimeout="100"/>
+        <http:request config-ref="requestConfig" path="service" responseTimeout="100"/>
     </flow>
 
     <flow name="HttpService">
-        <httpn:listener config-ref="listenerConfig" path="service" />
+        <http:listener config-ref="listenerConfig" path="service" />
         <test:component waitTime="200" appendString=" processed"/>
     </flow>
 

@@ -2,20 +2,20 @@
 <mule-domain xmlns="http://www.mulesoft.org/schema/mule/domain"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xmlns:spring="http://www.springframework.org/schema/beans"
-             xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+             xmlns:http="http://www.mulesoft.org/schema/mule/http"
              xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
              xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/domain http://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
 
-    <httpn:listener-config name="sharedListenerConfig">
-        <httpn:listener-connection host="localhost" port="${port1}" protocol="HTTPS">
+    <http:listener-config name="sharedListenerConfig">
+        <http:listener-connection host="localhost" port="${port1}" protocol="HTTPS">
             <tls:context>
                 <tls:key-store  path="ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
             </tls:context>
-        </httpn:listener-connection>
-    </httpn:listener-config>
+        </http:listener-connection>
+    </http:listener-config>
 
 </mule-domain>

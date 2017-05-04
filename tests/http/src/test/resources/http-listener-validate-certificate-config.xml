@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <!-- HTTPS listener configured with a trust-store, client certificates should be validated. -->
-    <httpn:listener-config name="listenerConfigWithTrustStore">
-        <httpn:listener-connection protocol="HTTPS" host="localhost" port="${port1}">
+    <http:listener-config name="listenerConfigWithTrustStore">
+        <http:listener-connection protocol="HTTPS" host="localhost" port="${port1}">
             <tls:context>
                 <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
                 <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
             </tls:context>
-        </httpn:listener-connection>
-    </httpn:listener-config>
+        </http:listener-connection>
+    </http:listener-config>
 
     <flow name="listenerWithTrustStoreFlow">
-        <httpn:listener config-ref="listenerConfigWithTrustStore" path="/" allowedMethods="POST"/>
+        <http:listener config-ref="listenerConfigWithTrustStore" path="/" allowedMethods="POST"/>
         <test:assert expression="#[mel:message.getAttributes().getClientCertificate() != null]"/>
         <test:assert expression="#[mel:message.getAttributes().getClientCertificate() instanceof java.security.cert.Certificate]"/>
         <!-- Only the client certificate contains CN=OLEKSIYS-W3T this way we validate that we are actually publishing the client cert -->
@@ -31,16 +31,16 @@
 
 
     <!-- HTTPS listener configured without a trust-store, client certificates should not be validated. -->
-    <httpn:listener-config name="listenerConfigWithoutTrustStore">
-        <httpn:listener-connection protocol="HTTPS" host="localhost" port="${port2}">
+    <http:listener-config name="listenerConfigWithoutTrustStore">
+        <http:listener-connection protocol="HTTPS" host="localhost" port="${port2}">
             <tls:context>
                 <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
             </tls:context>
-        </httpn:listener-connection>
-    </httpn:listener-config>
+        </http:listener-connection>
+    </http:listener-config>
 
     <flow name="listenerWithoutTrustStoreFlow">
-        <httpn:listener config-ref="listenerConfigWithoutTrustStore" path="/" allowedMethods="POST"/>
+        <http:listener config-ref="listenerConfigWithoutTrustStore" path="/" allowedMethods="POST"/>
         <echo-component />
     </flow>
 

@@ -2,23 +2,23 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
     <notifications>
         <notification event="MESSAGE-PROCESSOR"/>
     </notifications>
 
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection host="localhost"/>
-    </httpn:request-config>
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost"/>
+    </http:request-config>
 
     <spring:bean name="notificationLogger" class="org.mule.test.core.context.notification.processors.ProcessorNotificationStore"/>
 
@@ -311,9 +311,9 @@
     <flow name="first-successful">
         <logger level="INFO"/>
         <first-successful>
-            <httpn:request path="weather-forecast" config-ref="requestConfig"/>
-            <httpn:request path="weather-forecast" config-ref="requestConfig"/>
-            <httpn:request path="weather-forecast" config-ref="requestConfig"/>
+            <http:request path="weather-forecast" config-ref="requestConfig"/>
+            <http:request path="weather-forecast" config-ref="requestConfig"/>
+            <http:request path="weather-forecast" config-ref="requestConfig"/>
             <test:queue name="dead-letter-queue"/>
         </first-successful>
     </flow>

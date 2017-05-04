@@ -1,65 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:request-config name="simpleConfig">
-        <httpn:request-connection host="localhost" port="#[port]"/>
-    </httpn:request-config>
+    <http:request-config name="simpleConfig">
+        <http:request-connection host="localhost" port="#[port]"/>
+    </http:request-config>
 
     <flow name="handled">
-        <httpn:request config-ref="simpleConfig" path="testPath" responseTimeout="1000"/>
+        <http:request config-ref="simpleConfig" path="testPath" responseTimeout="1000"/>
         <error-handler>
-            <on-error-continue type="HTTPN:BAD_REQUEST">
+            <on-error-continue type="http:BAD_REQUEST">
                 <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Bad Request']"/>
             </on-error-continue>
-            <on-error-continue type="HTTPN:UNAUTHORIZED">
+            <on-error-continue type="http:UNAUTHORIZED">
                 <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Unauthorized']"/>
             </on-error-continue>
-            <on-error-continue type="HTTPN:FORBIDDEN">
+            <on-error-continue type="http:FORBIDDEN">
                 <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Forbidden']"/>
             </on-error-continue>
-            <on-error-continue type="HTTPN:NOT_FOUND">
+            <on-error-continue type="http:NOT_FOUND">
                 <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Not Found']"/>
             </on-error-continue>
-            <on-error-continue type="HTTPN:METHOD_NOT_ALLOWED">
+            <on-error-continue type="http:METHOD_NOT_ALLOWED">
                 <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Method Not Allowed']"/>
             </on-error-continue>
-            <on-error-continue type="HTTPN:NOT_ACCEPTABLE">
+            <on-error-continue type="http:NOT_ACCEPTABLE">
                 <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Not Acceptable']"/>
             </on-error-continue>
-            <on-error-continue type="HTTPN:UNSUPPORTED_MEDIA_TYPE">
+            <on-error-continue type="http:UNSUPPORTED_MEDIA_TYPE">
                 <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Unsupported Media Type']"/>
             </on-error-continue>
-            <on-error-continue type="HTTPN:TOO_MANY_REQUESTS">
+            <on-error-continue type="http:TOO_MANY_REQUESTS">
                 <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Too Many Requests']"/>
             </on-error-continue>
-            <on-error-continue type="HTTPN:INTERNAL_SERVER_ERROR">
+            <on-error-continue type="http:INTERNAL_SERVER_ERROR">
                 <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Server Error']"/>
             </on-error-continue>
-            <on-error-continue type="HTTPN:SERVICE_UNAVAILABLE">
+            <on-error-continue type="http:SERVICE_UNAVAILABLE">
                 <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Service Unavailable']"/>
             </on-error-continue>
-            <on-error-continue type="HTTPN:RESPONSE_VALIDATION">
+            <on-error-continue type="http:RESPONSE_VALIDATION">
                 <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' not understood']"/>
             </on-error-continue>
-            <on-error-continue type="HTTPN:TIMEOUT">
+            <on-error-continue type="http:TIMEOUT">
                 <set-payload value="#[error.cause.message ++ ' timeout']"/>
             </on-error-continue>
-            <on-error-continue type="HTTPN:CONNECTIVITY">
+            <on-error-continue type="http:CONNECTIVITY">
                 <set-payload value="#[error.cause.message ++ ' connectivity']"/>
             </on-error-continue>
-            <on-error-continue type="HTTPN:PARSING">
+            <on-error-continue type="http:PARSING">
                 <set-payload value="#[error.cause.message ++ ' parsing']"/>
             </on-error-continue>
         </error-handler>
     </flow>
 
     <flow name="unhandled">
-        <httpn:request config-ref="simpleConfig" path="testPath" responseTimeout="500"/>
+        <http:request config-ref="simpleConfig" path="testPath" responseTimeout="500"/>
     </flow>
 
 </mule>

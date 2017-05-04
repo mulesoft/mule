@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:request-config name="secureRequestConfig">
-        <httpn:request-connection host="localhost" port="${port1}">
-            <httpn:authentication>
-                <httpn:basic-authentication username="marie" password="marie" preemptive="true"/>
-            </httpn:authentication>
-        </httpn:request-connection>
-    </httpn:request-config>
+    <http:request-config name="secureRequestConfig">
+        <http:request-connection host="localhost" port="${port1}">
+            <http:authentication>
+                <http:basic-authentication username="marie" password="marie" preemptive="true"/>
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
 
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection host="localhost" port="${port1}">
-            <httpn:authentication>
-                <httpn:basic-authentication username="dodgy" password="geezer" preemptive="true"/>
-            </httpn:authentication>
-        </httpn:request-connection>
-    </httpn:request-config>
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="${port1}">
+            <http:authentication>
+                <http:basic-authentication username="dodgy" password="geezer" preemptive="true"/>
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
 
     <!-- This uses the polling HTTP connector every 30 seconds -->
 
@@ -31,11 +31,11 @@
         <scheduler>
             <fixed-frequency-scheduler frequency="2000"/>
         </scheduler>
-        <httpn:request path="/" config-ref="secureRequestConfig">
-            <httpn:response-validator>
-                <httpn:success-status-code-validator values="0..599"/>
-            </httpn:response-validator>
-        </httpn:request>
+        <http:request path="/" config-ref="secureRequestConfig">
+            <http:response-validator>
+                <http:success-status-code-validator values="0..599"/>
+            </http:response-validator>
+        </http:request>
         <object-to-string-transformer />
         <test:queue name="toclient"/>
     </flow>
@@ -44,11 +44,11 @@
         <scheduler>
             <fixed-frequency-scheduler frequency="2000"/>
         </scheduler>
-        <httpn:request path="/" config-ref="requestConfig">
-            <httpn:response-validator>
-                <httpn:success-status-code-validator values="0..599"/>
-            </httpn:response-validator>
-        </httpn:request>
+        <http:request path="/" config-ref="requestConfig">
+            <http:response-validator>
+                <http:success-status-code-validator values="0..599"/>
+            </http:response-validator>
+        </http:request>
         <object-to-string-transformer />
         <test:queue name="toclient2"/>
     </flow>

@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="
-            http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
             http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd ">
 
-    <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection host="localhost" port="${port1}" usePersistentConnections="false"/>
-    </httpn:listener-config>
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${port1}" usePersistentConnections="false"/>
+    </http:listener-config>
 
     <flow name="26384076-3877-4b23-809d-14b7fd22535f">
-        <httpn:listener config-ref="listenerConfig" path="test" />
+        <http:listener config-ref="listenerConfig" path="test" />
         <component class="org.mule.cxf.weatherservice.mycode.CreateZipQuery"/>
         <cxf:jaxws-client clientClass="org.mule.cxf.weatherservice.myweather.Weather" port="WeatherSoap"
                           operation="GetCityWeatherByZIP"/>

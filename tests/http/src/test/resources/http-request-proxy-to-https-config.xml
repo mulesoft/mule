@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
 
-    <httpn:request-config name="httpProxy">
-        <httpn:request-connection host="localhost" port="${httpsPort}" protocol="HTTPS">
+    <http:request-config name="httpProxy">
+        <http:request-connection host="localhost" port="${httpsPort}" protocol="HTTPS">
             <tls:context>
                 <tls:trust-store path="tls/trustStore" password="mulepassword"/>
                 <tls:key-store path="tls/clientKeystore" keyPassword="mulepassword" password="mulepassword" />
             </tls:context>
-            <httpn:proxy-config>
-                 <httpn:proxy host="localhost" port="${httpPort}" username="user" password="password"/>
-            </httpn:proxy-config>
-        </httpn:request-connection>
-    </httpn:request-config>
+            <http:proxy-config>
+                 <http:proxy host="localhost" port="${httpPort}" username="user" password="password"/>
+            </http:proxy-config>
+        </http:request-connection>
+    </http:request-config>
 
     <flow name="httpFlow">
-        <httpn:request config-ref="httpProxy" path="testPath"/>
+        <http:request config-ref="httpProxy" path="testPath"/>
         <object-to-string-transformer />
     </flow>
 

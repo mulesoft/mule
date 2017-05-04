@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
     <spring:bean name="sensingRequestResponseProcessor" class="org.mule.tck.SensingNullRequestResponseMessageProcessor" scope="singleton" />
 
-    <httpn:listener-config name="proxyConfig">
-        <httpn:listener-connection host="localhost" port="${proxyPort}"/>
-    </httpn:listener-config>
+    <http:listener-config name="proxyConfig">
+        <http:listener-connection host="localhost" port="${proxyPort}"/>
+    </http:listener-config>
 
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-    </httpn:request-config>
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
 
     <flow name="proxyTemplate">
-        <httpn:listener config-ref="proxyConfig" path="/*" responseStreamingMode="AUTO" parseRequest="false">
-            <httpn:response statusCode="#[attributes.statusCode]" reasonPhrase="#[attributes.reasonPhrase]" >
-                <httpn:headers>#[attributes.headers]</httpn:headers>
-            </httpn:response>
-        </httpn:listener>
+        <http:listener config-ref="proxyConfig" path="/*" responseStreamingMode="AUTO" parseRequest="false">
+            <http:response statusCode="#[attributes.statusCode]" reasonPhrase="#[attributes.reasonPhrase]" >
+                <http:headers>#[attributes.headers]</http:headers>
+            </http:response>
+        </http:listener>
 
         <processor ref="sensingRequestResponseProcessor" />
 
-        <httpn:request config-ref="requestConfig" method="#[attributes.method]" path="#[attributes.requestPath]" parseResponse="false">
-            <httpn:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress}]</httpn:headers>
-            <httpn:query-params>#[attributes.queryParams]</httpn:query-params>
-        </httpn:request>
+        <http:request config-ref="requestConfig" method="#[attributes.method]" path="#[attributes.requestPath]" parseResponse="false">
+            <http:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress}]</http:headers>
+            <http:query-params>#[attributes.queryParams]</http:query-params>
+        </http:request>
 
     </flow>
 

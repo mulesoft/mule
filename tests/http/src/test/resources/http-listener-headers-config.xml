@@ -2,33 +2,33 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection host="localhost" port="${port}"/>
-    </httpn:listener-config>
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${port}"/>
+    </http:listener-config>
 
     <flow name="empty">
-        <httpn:listener config-ref="listenerConfig" path="emptyHeader"/>
+        <http:listener config-ref="listenerConfig" path="emptyHeader"/>
         <set-payload value="#[mel:message.getAttributes().getHeaders()['${header}']]"/>
     </flow>
 
     <flow name="simple">
-        <httpn:listener config-ref="listenerConfig" path="simpleHeader"/>
+        <http:listener config-ref="listenerConfig" path="simpleHeader"/>
         <set-payload value="#[mel:message.getAttributes().getHeaders()['${header}']]"/>
     </flow>
 
     <flow name="multipleString">
-        <httpn:listener config-ref="listenerConfig" path="multipleHeadersString"/>
+        <http:listener config-ref="listenerConfig" path="multipleHeadersString"/>
         <set-payload value="#[mel:message.getAttributes().getHeaders()['${header}']]"/>
     </flow>
 
     <flow name="multipleCollection">
-        <httpn:listener config-ref="listenerConfig" path="multipleHeadersCollection"/>
+        <http:listener config-ref="listenerConfig" path="multipleHeadersCollection"/>
         <set-payload value="#[mel:message.getAttributes().getHeaders().getAll('${header}').iterator().next()]"/>
     </flow>
 

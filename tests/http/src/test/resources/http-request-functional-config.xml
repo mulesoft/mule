@@ -1,46 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:request-config name="requestConfig" basePath="basePath">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-    </httpn:request-config>
+    <http:request-config name="requestConfig" basePath="basePath">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
 
-    <httpn:request-config name="requestConfigHttp">
-        <httpn:request-connection host="localhost"/>
-    </httpn:request-config>
+    <http:request-config name="requestConfigHttp">
+        <http:request-connection host="localhost"/>
+    </http:request-config>
 
 
-    <httpn:request-config name="requestConfigHttps">
-        <httpn:request-connection protocol="HTTPS" host="localhost"/>
-    </httpn:request-config>
+    <http:request-config name="requestConfigHttps">
+        <http:request-connection protocol="HTTPS" host="localhost"/>
+    </http:request-config>
 
     <flow name="requestFlow">
-        <httpn:request config-ref="requestConfig" method="POST" path="requestPath"/>
+        <http:request config-ref="requestConfig" method="POST" path="requestPath"/>
         <object-to-string-transformer />
     </flow>
 
     <!-- MULE-8956 -->
-    <httpn:request-config name="blockingRequestConfig" basePath="basePath">
-        <httpn:request-connection host="localhost" port="${blockingHttpPort}"/>
-    </httpn:request-config>
-    <httpn:listener-config name="blockingListenerConfig" basePath="basePath">
-        <httpn:listener-connection host="localhost" port="${blockingHttpPort}"/>
-    </httpn:listener-config>
+    <http:request-config name="blockingRequestConfig" basePath="basePath">
+        <http:request-connection host="localhost" port="${blockingHttpPort}"/>
+    </http:request-config>
+    <http:listener-config name="blockingListenerConfig" basePath="basePath">
+        <http:listener-connection host="localhost" port="${blockingHttpPort}"/>
+    </http:listener-config>
 
     <flow name="blockingRequestFlow">
         <flow-ref name="blockingRequest"/>
     </flow>
     <flow name="remote">
-        <httpn:listener config-ref="blockingListenerConfig" path="/remote" allowedMethods="GET"/>
+        <http:listener config-ref="blockingListenerConfig" path="/remote" allowedMethods="GET"/>
         <set-payload value="#[%output application/xml --- { root: {node: 'value'} } ]"/>
     </flow>
     <flow name="blockingRequest">
-        <httpn:request config-ref="blockingRequestConfig" path="remote" method="GET"/>
+        <http:request config-ref="blockingRequestConfig" path="remote" method="GET"/>
         <set-payload value="#[%output application/java --- payload.root.node]"/>
         <object-to-string-transformer />
     </flow>

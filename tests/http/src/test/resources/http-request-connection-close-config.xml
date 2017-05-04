@@ -8,24 +8,24 @@
 
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
 
-    <httpn:request-config name="httpsConfig">
-        <httpn:request-connection protocol="HTTPS" host="localhost" port="${httpsPort}">
+    <http:request-config name="httpsConfig">
+        <http:request-connection protocol="HTTPS" host="localhost" port="${httpsPort}">
             <tls:context>
                 <tls:trust-store path="tls/trustStore" password="mulepassword"/>
                 <tls:key-store path="tls/clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
             </tls:context>
-        </httpn:request-connection>
-    </httpn:request-config>
+        </http:request-connection>
+    </http:request-config>
 
     <flow name="testFlowHttps">
-        <httpn:request path="testPath" config-ref="httpsConfig"/>
+        <http:request path="testPath" config-ref="httpsConfig"/>
         <object-to-string-transformer />
     </flow>
 

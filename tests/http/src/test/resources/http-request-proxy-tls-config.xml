@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection host="#[mel:host]" port="${httpPort}" protocol="HTTPS">
+    <http:request-config name="requestConfig">
+        <http:request-connection host="#[mel:host]" port="${httpPort}" protocol="HTTPS">
             <tls:context>
                 <tls:trust-store path="${trustStorePath}" password="changeit"/>
             </tls:context>
-            <httpn:proxy-config>
-                <httpn:proxy host="localhost" port="${proxyPort}" />
-            </httpn:proxy-config>
-        </httpn:request-connection>
-    </httpn:request-config>
+            <http:proxy-config>
+                <http:proxy host="localhost" port="${proxyPort}" />
+            </http:proxy-config>
+        </http:request-connection>
+    </http:request-config>
 
-    <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection host="0.0.0.0" port="${httpPort}" protocol="HTTPS">
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${httpPort}" protocol="HTTPS">
             <tls:context>
                 <tls:key-store path="${keyStorePath}" keyPassword="changeit" password="changeit"/>
             </tls:context>
-        </httpn:listener-connection>
-    </httpn:listener-config>
+        </http:listener-connection>
+    </http:listener-config>
 
     <flow name="clientFlow">
-        <httpn:request config-ref="requestConfig" path="#[mel:path]" method="POST"/>
+        <http:request config-ref="requestConfig" path="#[mel:path]" method="POST"/>
         <object-to-string-transformer />
     </flow>
 
     <flow name="serverFlow">
-        <httpn:listener config-ref="listenerConfig" path="/*" />
+        <http:listener config-ref="listenerConfig" path="/*" />
         <test:component />
         <set-payload value="OK" />
     </flow>

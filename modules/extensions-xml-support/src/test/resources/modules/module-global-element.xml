@@ -3,12 +3,12 @@
         minMuleVersion="4.0.0"
         xmlns="http://www.mulesoft.org/schema/mule/module"
         xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-        xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-           http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <property name="someUserConfig" type="string" defaultValue="some-username"/>
     <property name="somePassConfig" type="string" defaultValue="some-password"/>
@@ -20,13 +20,13 @@
     That implies that the protocol using the expression #[properties.protocolConfig] will be replaced by HTTP (default value). -->
     <property name="protocolConfig" type="string" defaultValue="HTTP"/>
 
-    <httpn:request-config name="simple-config" basePath="/basic-auth/">
-        <httpn:request-connection host="localhost" protocol="#[properties.protocolConfig]" port="#[properties.port]">
-            <httpn:authentication>
-                <httpn:basic-authentication username="#[properties.someUserConfig]" password="#[properties.somePassConfig]"/>
-            </httpn:authentication>
-        </httpn:request-connection>
-    </httpn:request-config>
+    <http:request-config name="simple-config" basePath="/basic-auth/">
+        <http:request-connection host="localhost" protocol="#[properties.protocolConfig]" port="#[properties.port]">
+            <http:authentication>
+                <http:basic-authentication username="#[properties.someUserConfig]" password="#[properties.somePassConfig]"/>
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
 
     <operation name="do-login">
         <parameters>
@@ -34,11 +34,11 @@
             <parameter name="somePass" type="string" defaultValue="passwordX"/>
         </parameters>
         <body>
-            <httpn:request config-ref="simple-config" method="GET" path="/{aUser}/{aPass}">
-                <httpn:uri-params>
+            <http:request config-ref="simple-config" method="GET" path="/{aUser}/{aPass}">
+                <http:uri-params>
                     #[{"aUser" : parameters.someUser, "aPass" : parameters.somePass}]
-                </httpn:uri-params>
-            </httpn:request>
+                </http:uri-params>
+            </http:request>
             <mule:set-payload value="#['success with basic-authentication for user: ' ++ parameters.someUser]"/>
         </body>
         <output type="string"/>

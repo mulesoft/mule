@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-    </httpn:request-config>
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
 
     <flow name="default">
-        <httpn:request config-ref="requestConfig" path="status">
-            <httpn:query-params>
+        <http:request config-ref="requestConfig" path="status">
+            <http:query-params>
                 #[mel:['code' : code]]
-            </httpn:query-params>
-        </httpn:request>
+            </http:query-params>
+        </http:request>
     </flow>
 
     <flow name="success">
-        <httpn:request config-ref="requestConfig" path="status">
-            <httpn:query-params>
+        <http:request config-ref="requestConfig" path="status">
+            <http:query-params>
                 #[mel:['code' : code]]
-            </httpn:query-params>
-            <httpn:response-validator>
-                <httpn:success-status-code-validator values="409" />
-            </httpn:response-validator>
-        </httpn:request>
+            </http:query-params>
+            <http:response-validator>
+                <http:success-status-code-validator values="409" />
+            </http:response-validator>
+        </http:request>
     </flow>
 
     <flow name="failure">
-        <httpn:request config-ref="requestConfig" path="status">
-            <httpn:query-params>
+        <http:request config-ref="requestConfig" path="status">
+            <http:query-params>
                 #[mel:['code' : code]]
-            </httpn:query-params>
-            <httpn:response-validator>
-                <httpn:failure-status-code-validator values="201" />
-            </httpn:response-validator>
-        </httpn:request>
+            </http:query-params>
+            <http:response-validator>
+                <http:failure-status-code-validator values="201" />
+            </http:response-validator>
+        </http:request>
     </flow>
 
 

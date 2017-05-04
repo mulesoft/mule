@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <httpn:listener-config name="listenerConfig">
-        <httpn:listener-connection host="localhost" port="${port}"/>
-    </httpn:listener-config>
-    <httpn:request-config name="requestConfig">
-        <httpn:request-connection host="localhost" port="${port}"/>
-    </httpn:request-config>
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${port}"/>
+    </http:listener-config>
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="${port}"/>
+    </http:request-config>
 
     <flow name="flow1">
         <flow-ref name="sub-flow" />
@@ -70,7 +70,7 @@
     </sub-flow>
 
     <flow name="httpEcho">
-        <httpn:listener config-ref="listenerConfig" path="echo"/>
+        <http:listener config-ref="listenerConfig" path="echo"/>
         <echo-component/>
     </flow>
 

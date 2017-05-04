@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 
-               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <httpn:listener-config name="testLifecycleListenerConfig">
-        <httpn:listener-connection host="localhost" port="${port1}"/>
-    </httpn:listener-config>
+    <http:listener-config name="testLifecycleListenerConfig">
+        <http:listener-connection host="localhost" port="${port1}"/>
+    </http:listener-config>
 
-    <httpn:listener-config name="unchangedStateListenerConfig">
-        <httpn:listener-connection host="localhost" port="${port2}"/>
-    </httpn:listener-config>
+    <http:listener-config name="unchangedStateListenerConfig">
+        <http:listener-connection host="localhost" port="${port2}"/>
+    </http:listener-config>
 
     <flow name="catchAllWithinTestPathFlow">
-        <httpn:listener path="/path/*" config-ref="testLifecycleListenerConfig"/>
+        <http:listener path="/path/*" config-ref="testLifecycleListenerConfig"/>
         <set-payload value="catchAll"/>
     </flow>
 
     <flow name="testPathFlow">
-        <httpn:listener path="/path/subpath" config-ref="testLifecycleListenerConfig" />
+        <http:listener path="/path/subpath" config-ref="testLifecycleListenerConfig" />
         <set-payload value="ok"/>
     </flow>
 
     <flow name="unchangedListenerFlow">
-        <httpn:listener config-ref="unchangedStateListenerConfig" path="/path" />
+        <http:listener config-ref="unchangedStateListenerConfig" path="/path" />
         <set-payload value="works"/>
     </flow>
 
