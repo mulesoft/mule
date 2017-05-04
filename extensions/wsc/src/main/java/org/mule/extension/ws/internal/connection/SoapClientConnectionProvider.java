@@ -7,20 +7,23 @@
 package org.mule.extension.ws.internal.connection;
 
 import static java.lang.Thread.currentThread;
+import org.mule.extension.ws.api.message.CustomTransportConfiguration;
 import org.mule.extension.ws.internal.security.SecurityStrategyAdapter;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.client.ExtensionsClient;
+import org.mule.service.http.api.HttpService;
 import org.mule.services.soap.api.SoapService;
 import org.mule.services.soap.api.SoapVersion;
 import org.mule.services.soap.api.client.SoapClient;
 import org.mule.services.soap.api.client.SoapClientConfiguration;
 import org.mule.services.soap.api.client.SoapClientConfigurationBuilder;
+import org.mule.services.soap.api.message.dispatcher.DefaultHttpMessageDispatcher;
 
 import java.net.URL;
 import java.util.List;
@@ -40,6 +43,12 @@ public class SoapClientConnectionProvider implements PoolingConnectionProvider<S
 
   @Inject
   private SoapService soapService;
+
+  @Inject
+  private HttpService httpService;
+
+  @Inject
+  private ExtensionsClient extensionsClient;
 
   /**
    * The WSDL file URL remote or local.
@@ -76,7 +85,7 @@ public class SoapClientConnectionProvider implements PoolingConnectionProvider<S
 
   @Parameter
   @Optional
-  private String transportConfiguration;
+  private CustomTransportConfiguration customTransportConfiguration;
 
   /**
    * The soap version of the WSDL.
@@ -97,7 +106,31 @@ public class SoapClientConnectionProvider implements PoolingConnectionProvider<S
    */
   @Override
   public SoapClient connect() throws ConnectionException {
+    return soapService.getClientFactory().create(getConfiguration());
+  }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void disconnect(SoapClient client) {
+    try {
+      client.stop();
+    } catch (Exception e) {
+      LOGGER.error("Error disconnecting soap client [" + client.toString() + "]: " + e.getMessage(), e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConnectionValidationResult validate(SoapClient client) {
+    // TODO MULE-12036
+    return ConnectionValidationResult.success();
+  }
+
+  private SoapClientConfiguration getConfiguration() {
     SoapClientConfigurationBuilder configuration = SoapClientConfiguration.builder()
         .withService(service)
         .withPort(port)
@@ -111,34 +144,13 @@ public class SoapClientConnectionProvider implements PoolingConnectionProvider<S
       configuration.enableMtom();
     }
 
-    SoapClient soapClient = soapService.getClientFactory().create(configuration.build());
-    try {
-      soapClient.start();
-    } catch (Exception e) {
-      throw new ConnectionException("Could not start the soap service [" + soapClient.toString() + "]", e);
+    if (customTransportConfiguration != null) {
+      configuration.withDispatcher(customTransportConfiguration.buildDispatcher(extensionsClient));
+    } else {
+      configuration.withDispatcher(new DefaultHttpMessageDispatcher(httpService));
     }
-    return soapClient;
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void disconnect(SoapClient client) {
-    try {
-      client.stop();
-    } catch (MuleException e) {
-      LOGGER.error("Error disconnecting soap client [" + client.toString() + "]: " + e.getMessage(), e);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ConnectionValidationResult validate(SoapClient client) {
-    // TODO MULE-12036
-    return ConnectionValidationResult.success();
+    return configuration.build();
   }
 
   private String getWsdlLocation(String wsdlLocation) {

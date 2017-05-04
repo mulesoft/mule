@@ -52,7 +52,7 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
   @Parameterized.Parameter(1)
   public String serviceClass;
 
-  private Server httpServer;
+  protected Server httpServer;
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
@@ -94,37 +94,35 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
     return serviceClass;
   }
 
-  private void createWebService() throws Exception {
+  protected void createWebService() throws Exception {
     try {
       httpServer = new Server(servicePort.getNumber());
       ServletHandler servletHandler = new ServletHandler();
       httpServer.setHandler(servletHandler);
-
       CXFNonSpringServlet cxf = new CXFNonSpringServlet();
       ServletHolder servlet = new ServletHolder(cxf);
       servlet.setName("server");
       servlet.setForcedPath("/");
-
       servletHandler.addServletWithMapping(servlet, "/*");
-
       httpServer.start();
-
-      Bus bus = cxf.getBus();
-
-      Interceptor inInterceptor = buildInInterceptor();
-      if (inInterceptor != null) {
-        bus.getInInterceptors().add(inInterceptor);
-      }
-      Interceptor outInterceptor = buildOutInterceptor();
-      if (outInterceptor != null) {
-        bus.getOutInterceptors().add(outInterceptor);
-      }
-
-      BusFactory.setDefaultBus(bus);
-      Endpoint.publish("/" + getTestName(), createServiceInstance());
+      initService(cxf);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  protected void initService(CXFNonSpringServlet cxf) throws Exception {
+    Bus bus = cxf.getBus();
+    Interceptor inInterceptor = buildInInterceptor();
+    if (inInterceptor != null) {
+      bus.getInInterceptors().add(inInterceptor);
+    }
+    Interceptor outInterceptor = buildOutInterceptor();
+    if (outInterceptor != null) {
+      bus.getOutInterceptors().add(outInterceptor);
+    }
+    BusFactory.setDefaultBus(bus);
+    Endpoint.publish("/" + getTestName(), createServiceInstance());
   }
 
   protected Interceptor buildInInterceptor() {
@@ -137,7 +135,6 @@ public abstract class AbstractSoapServiceTestCase extends MuleArtifactFunctional
 
   private Object createServiceInstance() throws Exception {
     Class<?> serviceClass = this.getClass().getClassLoader().loadClass(getServiceClass());
-
     return serviceClass.newInstance();
   }
 

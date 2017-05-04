@@ -14,6 +14,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.builder.ToStringBuilder.reflectionToString;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
+import static org.mule.services.soap.api.SoapVersion.SOAP12;
 import static org.mule.services.soap.util.XmlTransformationUtils.stringToDomElement;
 import org.mule.metadata.xml.XmlTypeLoader;
 import org.mule.runtime.api.exception.MuleException;
@@ -23,6 +24,7 @@ import org.mule.services.soap.api.SoapVersion;
 import org.mule.services.soap.api.client.SoapClient;
 import org.mule.services.soap.api.client.metadata.SoapMetadataResolver;
 import org.mule.services.soap.api.exception.BadRequestException;
+import org.mule.services.soap.api.exception.DispatchingException;
 import org.mule.services.soap.api.exception.SoapFaultException;
 import org.mule.services.soap.api.exception.SoapServiceException;
 import org.mule.services.soap.api.message.SoapRequest;
@@ -77,6 +79,7 @@ public class SoapCxfClient implements SoapClient {
 
   public static final String WSC_DISPATCHER = "mule.wsc.dispatcher";
   public static final String MULE_ATTACHMENTS_KEY = "mule.wsc.attachments";
+  public static final String MULE_WSC_ADDRESS = "mule.wsc.address";
   public static final String MULE_HEADERS_KEY = "mule.wsc.headers";
   public static final String MULE_SOAP_ACTION = "mule.wsc.soap.action";
   public static final String MULE_WSC_ENCODING = "mule.wsc.encoding";
@@ -87,6 +90,7 @@ public class SoapCxfClient implements SoapClient {
   private final Client client;
   private final WsdlIntrospecter introspecter;
   private final XmlTypeLoader loader;
+  private final String address;
   private final MessageDispatcher dispatcher;
   private final SoapVersion version;
   private final boolean isMtom;
@@ -94,12 +98,14 @@ public class SoapCxfClient implements SoapClient {
   SoapCxfClient(Client client,
                 WsdlIntrospecter introspecter,
                 XmlTypeLoader typeLoader,
+                String address,
                 MessageDispatcher dispatcher,
                 SoapVersion version,
                 boolean isMtom) {
     this.client = client;
     this.introspecter = introspecter;
     this.loader = typeLoader;
+    this.address = address;
     this.dispatcher = dispatcher;
     this.version = version;
     this.isMtom = isMtom;
@@ -110,8 +116,8 @@ public class SoapCxfClient implements SoapClient {
 
   @Override
   public void stop() throws MuleException {
-    client.destroy();
     dispatcher.dispose();
+    client.destroy();
   }
 
   @Override
@@ -176,6 +182,8 @@ public class SoapCxfClient implements SoapClient {
                                              operation));
       }
       throw new SoapFaultException(f.getFaultCode(), parseExceptionDetail(f.getDetail()).orElse(null), f);
+    } catch (DispatchingException e) {
+      throw e;
     } catch (Exception e) {
       throw new SoapServiceException(format("An unexpected error occur while consuming the [%s] web service operation",
                                             operation),
@@ -210,10 +218,11 @@ public class SoapCxfClient implements SoapClient {
       props.put(MULE_ATTACHMENTS_KEY, emptyMap());
     }
 
+    props.put(MULE_WSC_ADDRESS, address);
     props.put(MULE_WSC_ENCODING, encoding);
     props.put(MULE_HEADERS_KEY, headers);
 
-    if (version == SoapVersion.SOAP12) {
+    if (version == SOAP12) {
       props.put(MULE_SOAP_ACTION, operation);
     }
 

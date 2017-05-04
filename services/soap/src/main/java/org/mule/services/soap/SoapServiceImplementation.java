@@ -6,7 +6,6 @@
  */
 package org.mule.services.soap;
 
-import org.mule.service.http.api.HttpService;
 import org.mule.services.soap.api.SoapService;
 import org.mule.services.soap.api.client.SoapClientFactory;
 import org.mule.services.soap.client.SoapCxfClientFactory;
@@ -18,12 +17,6 @@ import org.mule.services.soap.client.SoapCxfClientFactory;
  */
 public class SoapServiceImplementation implements SoapService {
 
-  private HttpService httpService;
-
-  public SoapServiceImplementation(HttpService httpService) {
-    this.httpService = httpService;
-  }
-
   @Override
   public String getName() {
     return "SOAP Service";
@@ -31,6 +24,6 @@ public class SoapServiceImplementation implements SoapService {
 
   @Override
   public SoapClientFactory getClientFactory() {
-    return new SoapCxfClientFactory(httpService);
+    return new SoapCxfClientFactory();
   }
 }

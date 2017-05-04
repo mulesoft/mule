@@ -7,6 +7,7 @@
 package org.mule.services.soap.api.client;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import static org.mule.services.soap.api.SoapVersion.SOAP11;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.runtime.extension.api.soap.security.DecryptSecurityStrategy;
 import org.mule.runtime.extension.api.soap.security.EncryptSecurityStrategy;
@@ -32,7 +33,7 @@ public class SoapClientConfigurationBuilder {
   private String address;
   private String service;
   private String port;
-  private SoapVersion version = SoapVersion.SOAP11;
+  private SoapVersion version = SOAP11;
   private boolean mtomEnabled;
   private List<SecurityStrategy> securities = new ArrayList<>();
   private MessageDispatcher dispatcher;
@@ -121,7 +122,7 @@ public class SoapClientConfigurationBuilder {
    *
    * @return this builder
    */
-  public SoapClientConfigurationBuilder withCustomDispatcher(MessageDispatcher dispatcher) {
+  public SoapClientConfigurationBuilder withDispatcher(MessageDispatcher dispatcher) {
     this.dispatcher = dispatcher;
     return this;
   }
@@ -133,6 +134,7 @@ public class SoapClientConfigurationBuilder {
     checkNotNull(wsdlLocation, "WSDL location cannot be null");
     checkNotNull(service, "Service cannot be null");
     checkNotNull(port, "Port cannot be null");
+    checkNotNull(dispatcher, "Message Dispatcher cannot be null");
     return new SoapClientConfiguration(wsdlLocation, address, service, port, version, mtomEnabled, securities, dispatcher);
   }
 }

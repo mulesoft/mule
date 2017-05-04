@@ -6,11 +6,12 @@
  */
 package org.mule.services.soap.transport;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static org.apache.cxf.wsdl.EndpointReferenceUtils.setServiceAndPortName;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -26,7 +27,9 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  *
  * @since 4.0
  */
-class SoapServiceConduitInitiator implements ConduitInitiator {
+public class SoapServiceConduitInitiator implements ConduitInitiator {
+
+  public static final String[] SOAP_SERVICE_KNOWN_PROTOCOLS = new String[] {"http://", "https://", "jms://"};
 
   @Override
   public Conduit getConduit(EndpointInfo targetInfo) throws IOException {
@@ -40,7 +43,7 @@ class SoapServiceConduitInitiator implements ConduitInitiator {
 
   @Override
   public Set<String> getUriPrefixes() {
-    return Stream.of("http://", "https://", "jms://").collect(toSet());
+    return new HashSet<>(asList(SOAP_SERVICE_KNOWN_PROTOCOLS));
   }
 
   @Override

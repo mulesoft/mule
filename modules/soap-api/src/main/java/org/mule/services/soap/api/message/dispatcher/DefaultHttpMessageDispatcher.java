@@ -4,19 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.services.soap.transport;
+package org.mule.services.soap.api.message.dispatcher;
 
 
-import static java.lang.String.format;
-import static org.apache.cxf.message.Message.CONTENT_TYPE;
+import static java.util.function.Function.identity;
 import static org.mule.service.http.api.HttpConstants.Method.POST;
+import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.util.collection.ImmutableMapCollector;
 import org.mule.runtime.extension.api.soap.message.DispatcherResponse;
+import org.mule.runtime.extension.api.soap.message.DispatchingContext;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
-import org.mule.service.http.api.client.HttpClientFactory;
 import org.mule.service.http.api.domain.ParameterMap;
 import org.mule.service.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
@@ -25,6 +26,8 @@ import org.mule.services.soap.api.exception.DispatchingException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
@@ -38,16 +41,16 @@ import java.util.concurrent.TimeoutException;
 public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
 
   private final HttpClient client;
-  private final String address;
 
-  DefaultHttpMessageDispatcher(String address, HttpClient client) {
-    this.address = address;
-    this.client = client;
+  public DefaultHttpMessageDispatcher(HttpService service) {
+    this.client = service.getClientFactory().create(new HttpClientConfiguration.Builder()
+        .setName("wsc-http-dispatcher")
+        .build());
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    // do nothing
+    client.start();
   }
 
   /**
@@ -56,13 +59,12 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
    * Dispatches a Soap message through http adding the SoapAction header, if required, and the content-type.
    */
   @Override
-  public DispatcherResponse dispatch(InputStream message, Map<String, String> properties) {
-
+  public DispatcherResponse dispatch(InputStream message, DispatchingContext context) {
     ParameterMap parameters = new ParameterMap();
-    parameters.putAll(properties);
+    parameters.putAll(context.getHeaders());
 
     HttpRequest request = HttpRequest.builder()
-        .setUri(address)
+        .setUri(context.getAddress())
         .setMethod(POST)
         .setEntity(new InputStreamHttpEntity(message))
         .setHeaders(parameters)
@@ -71,7 +73,7 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
     try {
       HttpResponse response = client.send(request, 5000, false, null);
       InputStream content = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
-      return new DispatcherResponse(response.getHeaderValueIgnoreCase(CONTENT_TYPE), content);
+      return new DispatcherResponse(response.getHeaderValueIgnoreCase(CONTENT_TYPE), content, toHeadersMap(response));
     } catch (IOException e) {
       throw new DispatchingException("An error occurred while sending the SOAP request");
     } catch (TimeoutException e) {
@@ -80,25 +82,18 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
   }
 
   /**
+   * Collects all the headers returned by the http call.
+   */
+  private Map<String, ? extends List<String>> toHeadersMap(HttpResponse response) {
+    return response.getHeaderNames().stream()
+        .collect(new ImmutableMapCollector<>(identity(), name -> new ArrayList<>(response.getHeaderValues(name))));
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override
   public void dispose() {
     client.stop();
-  }
-
-  /**
-   * Creates a default {@link DefaultHttpMessageDispatcher} using the provided {@link HttpService} and with a fixed set of attributes.
-   *
-   * @param address the address we want to dispatch http messages to.
-   * @param httpService the configured {@link HttpService} used to create the http client.
-   * @return a new {@link DefaultHttpMessageDispatcher} default instance.
-   */
-  public static DefaultHttpMessageDispatcher create(String address, HttpService httpService) {
-    String ownerName = format("wsc-default:[%s]", address);
-    HttpClientFactory clientFactory = httpService.getClientFactory();
-    HttpClient client = clientFactory.create(new HttpClientConfiguration.Builder().setName(ownerName).build());
-    client.start();
-    return new DefaultHttpMessageDispatcher(address, client);
   }
 }

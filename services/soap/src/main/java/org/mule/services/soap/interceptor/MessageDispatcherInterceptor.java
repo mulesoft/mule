@@ -8,13 +8,17 @@ package org.mule.services.soap.interceptor;
 
 import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
+import static org.apache.cxf.interceptor.StaxInEndingInterceptor.STAX_IN_NOCLOSE;
 import static org.apache.cxf.message.Message.CONTENT_TYPE;
 import static org.apache.cxf.message.Message.ENCODING;
 import static org.apache.cxf.phase.Phase.SEND_ENDING;
 import static org.mule.services.soap.client.SoapCxfClient.MULE_SOAP_ACTION;
+import static org.mule.services.soap.client.SoapCxfClient.MULE_WSC_ADDRESS;
 import static org.mule.services.soap.client.SoapCxfClient.MULE_WSC_ENCODING;
 import static org.mule.services.soap.client.SoapCxfClient.WSC_DISPATCHER;
+import static org.mule.services.soap.interceptor.SoapActionInterceptor.SOAP_ACTION;
 import org.mule.runtime.extension.api.soap.message.DispatcherResponse;
+import org.mule.runtime.extension.api.soap.message.DispatchingContext;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.services.soap.api.client.SoapClientConfiguration;
 
@@ -23,10 +27,8 @@ import com.google.common.collect.ImmutableMap;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
 
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.StaxInEndingInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -56,39 +58,40 @@ public class MessageDispatcherInterceptor extends AbstractPhaseInterceptor<Messa
   public void handleMessage(Message message) throws Fault {
     Exchange exchange = message.getExchange();
 
-    String encoding = (String) message.getExchange().get(MULE_WSC_ENCODING);
-
     // Performs all the remaining interceptions before sending.
     message.getInterceptorChain().doIntercept(message);
 
     // Wipe the request attachment list, so don't get mixed with the response ones.
     message.setAttachments(emptyList());
 
-    Map<String, String> props = buildProperties(message);
     MessageDispatcher dispatcher = (MessageDispatcher) exchange.get(WSC_DISPATCHER);
     OutputStream content = message.getContent(OutputStream.class);
-    DispatcherResponse response = dispatcher.dispatch(new ByteArrayInputStream(content.toString().getBytes()), props);
+    InputStream outgoingMessage = new ByteArrayInputStream(content.toString().getBytes());
+    DispatcherResponse response = dispatcher.dispatch(outgoingMessage, getDispatchingContext(message));
 
     // This needs to be set because we want the wsc closes the final stream,
     // otherwise cxf will close it too early when handling message in the StaxInEndingInterceptor.
-    exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, TRUE);
+    exchange.put(STAX_IN_NOCLOSE, TRUE);
 
     Message inMessage = new MessageImpl();
     // TODO make encoding policy
-    inMessage.put(ENCODING, encoding);
+    inMessage.put(ENCODING, exchange.get(MULE_WSC_ENCODING));
     inMessage.put(CONTENT_TYPE, response.getContentType());
     inMessage.setContent(InputStream.class, response.getContent());
     inMessage.setExchange(exchange);
     messageObserver.onMessage(inMessage);
   }
 
-  private Map<String, String> buildProperties(Message message) {
-    ImmutableMap.Builder<String, String> headers = ImmutableMap.builder();
-    headers.put(CONTENT_TYPE, (String) message.get(CONTENT_TYPE));
-    String soapAction = (String) message.getExchange().get(MULE_SOAP_ACTION);
-    if (soapAction != null) {
-      headers.put(SoapActionInterceptor.SOAP_ACTION, soapAction);
+  private DispatchingContext getDispatchingContext(Message message) {
+    Exchange exchange = message.getExchange();
+    ImmutableMap.Builder<String, String> headers = ImmutableMap.<String, String>builder()
+        .put(CONTENT_TYPE, (String) message.get(CONTENT_TYPE));
+    String action = (String) exchange.get(MULE_SOAP_ACTION);
+    if (action != null) {
+      headers.put(SOAP_ACTION, action);
     }
-    return headers.build();
+    return new DispatchingContext((String) exchange.get(MULE_WSC_ADDRESS),
+                                  (String) exchange.get(MULE_WSC_ENCODING),
+                                  headers.build());
   }
 }

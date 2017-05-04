@@ -9,13 +9,10 @@ package org.mule.services.soap.provider;
 import static java.util.Collections.singletonList;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.service.http.api.HttpService;
-import org.mule.services.soap.api.SoapService;
 import org.mule.services.soap.SoapServiceImplementation;
+import org.mule.services.soap.api.SoapService;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 /**
  * {@link ServiceProvider} implementation for providing a mule {@link SoapService}.
@@ -24,12 +21,9 @@ import javax.inject.Inject;
  */
 public class SoapServiceProvider implements ServiceProvider {
 
-  @Inject
-  private HttpService httpService;
-
   @Override
   public List<ServiceDefinition> providedServices() {
-    ServiceDefinition serviceDefinition = new ServiceDefinition(SoapService.class, new SoapServiceImplementation(httpService));
+    ServiceDefinition serviceDefinition = new ServiceDefinition(SoapService.class, new SoapServiceImplementation());
     return singletonList(serviceDefinition);
   }
 }

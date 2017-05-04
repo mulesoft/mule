@@ -19,6 +19,7 @@ import org.mule.services.soap.api.exception.DispatchingException;
 import org.mule.services.soap.api.exception.EncodingException;
 import org.mule.services.soap.api.exception.InvalidWsdlException;
 import org.mule.services.soap.api.exception.SoapFaultException;
+import org.mule.services.soap.api.exception.SoapServiceException;
 
 /**
  * A util class that knows how to wrap an exception throwed by the Soap Service into a {@link ModuleException}.
