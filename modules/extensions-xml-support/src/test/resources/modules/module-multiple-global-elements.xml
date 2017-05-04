@@ -15,14 +15,14 @@
     <file:config name="file">
         <file:connection workingDir="#[properties.workingDir]"/>
     </file:config>
-    <file:matcher name="globalMatcher" directory="true" filenamePattern="#[properties.filenamePattern]" />
+    <file:matcher name="globalMatcher" directoriesOnly="TRUE" filenamePattern="#[properties.filenamePattern]" />
 
     <operation name="list">
         <parameters>
             <parameter name="path" type="string"/>
         </parameters>
         <body>
-            <file:list directoryPath="#[parameters.path]" config-ref="file" matchWith="globalMatcher"/>
+            <file:list directoryPath="#[parameters.path]" config-ref="file" matcher="globalMatcher"/>
         </body>
         <output type="string"/>
     </operation>

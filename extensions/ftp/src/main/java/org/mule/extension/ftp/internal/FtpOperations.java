@@ -19,7 +19,7 @@ import org.mule.extension.file.common.api.exceptions.FileReadErrorTypeProvider;
 import org.mule.extension.file.common.api.exceptions.FileRenameErrorTypeProvider;
 import org.mule.extension.file.common.api.exceptions.FileWriteErrorTypeProvider;
 import org.mule.extension.ftp.api.FtpFileAttributes;
-import org.mule.extension.ftp.api.FtpFilePredicateBuilder;
+import org.mule.extension.ftp.api.FtpFileMatcher;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
@@ -70,7 +70,7 @@ public final class FtpOperations extends BaseFileSystemOperations {
                                                            String directoryPath,
                                                            @Optional(defaultValue = "false") boolean recursive,
                                                            MediaType mediaType,
-                                                           @Optional @DisplayName("File Matching Rules") @Summary("Matcher to filter the listed files") FtpFilePredicateBuilder matcher) {
+                                                           @Optional @DisplayName("File Matching Rules") @Summary("Matcher to filter the listed files") FtpFileMatcher matcher) {
     List result = doList(config, fileSystem, directoryPath, recursive, mediaType, matcher);
     return (List<Result<InputStream, FtpFileAttributes>>) result;
   }

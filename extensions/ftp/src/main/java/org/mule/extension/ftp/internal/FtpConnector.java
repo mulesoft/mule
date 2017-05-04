@@ -7,10 +7,8 @@
 package org.mule.extension.ftp.internal;
 
 import org.mule.extension.file.common.api.FileConnectorConfig;
-import org.mule.extension.file.common.api.FilePredicateBuilder;
 import org.mule.extension.file.common.api.exceptions.FileError;
 import org.mule.extension.ftp.api.FtpFileAttributes;
-import org.mule.extension.ftp.api.FtpFilePredicateBuilder;
 import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpConnectionProvider;
@@ -19,7 +17,6 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;

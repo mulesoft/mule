@@ -21,7 +21,7 @@ import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
 import org.mule.extension.file.api.LocalFileAttributes;
-import org.mule.extension.file.api.LocalFilePredicateBuilder;
+import org.mule.extension.file.api.LocalFileMatcher;
 import org.mule.extension.file.common.api.FileSystem;
 import org.mule.extension.file.common.api.lock.NullPathLock;
 import org.mule.extension.file.common.api.matcher.NullFilePayloadPredicate;
@@ -183,7 +183,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
   @Optional
   @Alias("matcher")
   @DisplayName(MATCHER)
-  private LocalFilePredicateBuilder predicateBuilder;
+  private LocalFileMatcher predicateBuilder;
 
   @Inject
   private MuleContext muleContext;
