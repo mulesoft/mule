@@ -7,15 +7,16 @@
 
 package org.mule.test.infrastructure.process;
 
+import static org.mule.runtime.core.util.FileUtils.newFile;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardOpenOption.APPEND;
+import static java.util.Arrays.asList;
 import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
 import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.listFiles;
-import static org.mule.runtime.core.util.FileUtils.newFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,9 +24,11 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,6 +63,7 @@ public abstract class Controller {
   protected File domainsDir;
   protected File appsDir;
   protected File libsDir;
+  protected File internalRepository;
   protected Path wrapperConf;
   protected int timeout;
 
@@ -69,6 +73,7 @@ public abstract class Controller {
     this.domainsDir = new File(muleHome + "/domains");
     this.appsDir = new File(muleHome + "/apps/");
     this.libsDir = new File(muleHome + "/lib/user");
+    this.internalRepository = new File(muleHome, "repository");
     this.wrapperConf = Paths.get(muleHome + "/conf/wrapper.conf");
     this.timeout = timeout != 0 ? timeout : DEFAULT_TIMEOUT;
   }
@@ -76,10 +81,20 @@ public abstract class Controller {
   public abstract String getMuleBin();
 
   public void start(String[] args) {
+    checkRepositoryLocationAndUpdateInternalRepoPropertyIfPresent(args);
     int error = runSync("start", args);
     if (error != 0) {
       throw new MuleControllerException("The mule instance couldn't be started");
     }
+  }
+
+  protected void checkRepositoryLocationAndUpdateInternalRepoPropertyIfPresent(String... args) {
+    Optional<String> repoVar =
+        asList(args).stream().filter(arg -> arg.contains("-M-DmuleRuntimeConfig.maven.repositoryLocation=")).findFirst();
+    if (repoVar.isPresent()) {
+      this.internalRepository = new File(repoVar.get().split("=")[1]);
+    }
+
   }
 
   public void stop(String[] args) {
@@ -260,7 +275,7 @@ public abstract class Controller {
    * @return the directory of the internal repository for the Mule runtime.
    */
   protected File getRuntimeInternalRepository() {
-    return new File(muleHome, "repository");
+    return this.internalRepository;
   }
 
   public File getLog() {
