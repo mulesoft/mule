@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.routing.filter;
+package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.api.exception.MuleException;
 
@@ -14,7 +14,7 @@ import org.mule.runtime.api.exception.MuleException;
  * 
  * @since 4.0
  */
-public class FilteredException extends MuleException {
+public class ValidationException extends MuleException {
 
   private static final long serialVersionUID = -4883468665512566234L;
 

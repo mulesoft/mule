@@ -7,8 +7,8 @@
 package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CONNECTIVITY;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.DUPLICATE_MESSAGE;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.EXPRESSION;
-import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.FILTERED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.OVERLOAD;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.RETRY_EXHAUSTED;
@@ -17,13 +17,15 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURI
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.STREAM_MAXIMUM_SIZE_EXCEEDED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.VALIDATION;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.routing.DuplicateMessageException;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.api.routing.filter.FilteredException;
+import org.mule.runtime.core.api.routing.ValidationException;
 import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -52,7 +54,8 @@ public class ErrorTypeLocatorFactory {
             .addExceptionMapping(ExpressionRuntimeException.class, errorTypeRepository.lookupErrorType(EXPRESSION).get())
             .addExceptionMapping(RoutingException.class, errorTypeRepository.lookupErrorType(ROUTING).get())
             .addExceptionMapping(ConnectionException.class, errorTypeRepository.lookupErrorType(CONNECTIVITY).get())
-            .addExceptionMapping(FilteredException.class, errorTypeRepository.lookupErrorType(FILTERED).get())
+            .addExceptionMapping(ValidationException.class, errorTypeRepository.lookupErrorType(VALIDATION).get())
+            .addExceptionMapping(DuplicateMessageException.class, errorTypeRepository.lookupErrorType(DUPLICATE_MESSAGE).get())
             .addExceptionMapping(RetryPolicyExhaustedException.class, errorTypeRepository.lookupErrorType(RETRY_EXHAUSTED).get())
             .addExceptionMapping(IOException.class, errorTypeRepository.lookupErrorType(CONNECTIVITY).get())
             .addExceptionMapping(SecurityException.class, errorTypeRepository.lookupErrorType(SECURITY).get())

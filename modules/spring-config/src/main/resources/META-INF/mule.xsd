@@ -4114,7 +4114,7 @@
                     </xsd:annotation>
                 </xsd:attribute>
                 <!-- TODO MULE-12379 Allow inline definition of object stores in elements -->
-                <xsd:attribute name="objectStore-ref" type="xsd:string" use="optional">
+                <xsd:attribute name="objectStore" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
                             The object store where the IDs of the processed events are going to be stored.
@@ -4289,7 +4289,7 @@
                 </xsd:attribute>
                 
                 <!-- TODO MULE-12379 Allow inline definition of object stores in elements -->
-                <xsd:attribute name="processed-groups-object-store-ref" type="xsd:string" use="optional">
+                <xsd:attribute name="processed-groups-object-store" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
                             The object store where the processed groups are going to be stored. It is recommended that this object store has a max capacity and an expiration interval.
@@ -4297,7 +4297,7 @@
                     </xsd:annotation>
                 </xsd:attribute>
                 <!-- TODO MULE-12379 Allow inline definition of object stores in elements -->
-                <xsd:attribute name="event-groups-object-store-ref" type="xsd:string" use="optional">
+                <xsd:attribute name="event-groups-object-store" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
                             The object store where the event groups are going to be stored.

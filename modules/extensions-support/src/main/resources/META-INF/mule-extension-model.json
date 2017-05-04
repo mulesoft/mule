@@ -201,7 +201,7 @@
                 "query": false,
                 "order": 3
               },
-              "name": "processedGroupsObjectStoreRef",
+              "name": "processedGroupsObjectStore",
               "description": "The object store where the processed groups are going to be stored. It is recommended that this object store has a max capacity and an expiration interval.",
               "modelProperties": {}
             },
@@ -243,7 +243,7 @@
                 "query": false,
                 "order": 4
               },
-              "name": "eventGroupsObjectStoreRef",
+              "name": "eventGroupsObjectStore",
               "description": "The object store where the event groups are going to be stored.",
               "modelProperties": {}
             },
@@ -1525,7 +1525,7 @@
                 "query": false,
                 "order": 3
               },
-              "name": "objectStoreRef",
+              "name": "objectStore",
               "description": "The object store where the IDs of the processed events are going to be stored.",
               "modelProperties": {}
             },

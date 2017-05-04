@@ -561,9 +561,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("failOnTimeout", fromSimpleParameter("failOnTimeout").build())
         .withSetterParameterDefinition("processedGroupsObjectStore",
-                                       fromSimpleReferenceParameter("processed-groups-object-store-ref").build())
+                                       fromSimpleReferenceParameter("processed-groups-object-store").build())
         .withSetterParameterDefinition("eventGroupsObjectStore",
-                                       fromSimpleReferenceParameter("event-groups-object-store-ref").build())
+                                       fromSimpleReferenceParameter("event-groups-object-store").build())
         .withSetterParameterDefinition("persistentStores", fromSimpleParameter("persistentStores").build())
         .withSetterParameterDefinition("storePrefix", fromSimpleParameter("storePrefix").build());
 
@@ -920,7 +920,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("valueExpression", fromSimpleParameter("valueExpression").build())
         .withSetterParameterDefinition("storePrefix", fromSimpleParameter("storePrefix").build())
         .withSetterParameterDefinition("throwOnUnaccepted", fromSimpleParameter("throwOnUnaccepted").build())
-        .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("objectStore-ref").build())
+        .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("objectStore").build())
         .withSetterParameterDefinition("unacceptedMessageProcessor", fromSimpleReferenceParameter("onUnaccepted").build());
 
     definitions.add(baseIdempotentMessageFilterDefinition.copy()

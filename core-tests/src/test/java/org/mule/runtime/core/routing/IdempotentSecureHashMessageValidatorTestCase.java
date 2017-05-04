@@ -17,7 +17,7 @@ import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.routing.filter.FilteredException;
+import org.mule.runtime.core.api.routing.ValidationException;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -64,7 +64,7 @@ public class IdempotentSecureHashMessageValidatorTestCase extends AbstractMuleCo
     okMessage = of("OK");
     event = Event.builder(context).message(okMessage).build();
 
-    expected.expect(FilteredException.class);
+    expected.expect(ValidationException.class);
     processedEvent = secureHash.process(event);
   }
 

@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.routing.filter.FilteredException;
+import org.mule.runtime.core.api.routing.ValidationException;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -29,10 +29,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
-public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContextTestCase {
+public class IdempotentMessageValidatorMule6079TestCase extends AbstractMuleContextTestCase {
 
   private ObjectStore<String> objectStore;
-  private IdempotentMessageValidator idempotentMessageFilter;
+  private IdempotentMessageValidator validator;
   private AtomicInteger processedEvents = new AtomicInteger(0);
   private Boolean errorHappenedInChildThreads = false;
 
@@ -46,10 +46,10 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
     CountDownLatch cdl = new CountDownLatch(2);
 
     objectStore = new RaceConditionEnforcingObjectStore(cdl);
-    idempotentMessageFilter = new IdempotentMessageValidator();
-    idempotentMessageFilter.setMuleContext(muleContext);
-    idempotentMessageFilter.setStorePrefix("foo");
-    idempotentMessageFilter.setObjectStore(objectStore);
+    validator = new IdempotentMessageValidator();
+    validator.setMuleContext(muleContext);
+    validator.setStorePrefix("foo");
+    validator.setObjectStore(objectStore);
 
     Thread t1 = new Thread(new TestForRaceConditionRunnable(), "thread1");
     Thread t2 = new Thread(new TestForRaceConditionRunnable(), "thread2");
@@ -71,8 +71,8 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
       Event event = Event.builder(context).message(okMessage).build();
 
       try {
-        event = idempotentMessageFilter.process(event);
-      } catch (FilteredException e) {
+        event = validator.process(event);
+      } catch (ValidationException e) {
         if (event != null) {
           processedEvents.incrementAndGet();
         }

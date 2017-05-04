@@ -11,7 +11,17 @@
     </flow>
 
     <flow name="IdempotentReceiverRouter">
-        <idempotent-message-validator idExpression="#[id]-#[correlationId]"/>
+        <idempotent-message-validator idExpression="#[id + '-' + correlationId]"/>
+    </flow>
+
+    <flow name="IdempotentReceiverRouterVar">
+        <idempotent-message-validator idExpression="#[otherId]"/>
+        <set-payload value="Not duplicate" />
+        <error-handler>
+            <on-error-continue type="DUPLICATE_MESSAGE">
+                <set-payload value="Duplicate" />
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="CustomRouter">

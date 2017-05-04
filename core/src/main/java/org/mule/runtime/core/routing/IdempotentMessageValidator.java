@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.routing.filter.FilteredException;
+import org.mule.runtime.core.api.routing.DuplicateMessageException;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -38,8 +38,8 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.slf4j.Logger;
 
 /**
- * <code>IdempotentMessageValidator</code> ensures that only unique messages are passed on. It does this by checking the unique ID of
- * the incoming message. Note that the underlying endpoint must support unique message IDs for this to work, otherwise a
+ * <code>IdempotentMessageValidator</code> ensures that only unique messages are passed on. It does this by checking the unique ID
+ * of the incoming message. Note that the underlying endpoint must support unique message IDs for this to work, otherwise a
  * <code>UniqueIdNotSupportedException</code> is thrown.<br>
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/IdempotentReceiver.html">
@@ -147,7 +147,7 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
     if (accept(event)) {
       return event;
     } else {
-      throw new FilteredException();
+      throw new DuplicateMessageException();
     }
   }
 

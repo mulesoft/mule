@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.routing.filter.FilteredException;
+import org.mule.runtime.core.api.routing.ValidationException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -52,7 +52,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     // This will not process, because the ID is a duplicate
     event = Event.builder(contextB).message(okMessage).build();
 
-    expected.expect(FilteredException.class);
+    expected.expect(ValidationException.class);
     processedEvent = idempotent.process(event);
   }
 }

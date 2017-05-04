@@ -7,6 +7,7 @@
 package org.mule.extension.validation.api;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.exception.MuleException;
 
 /**
@@ -17,6 +18,7 @@ import org.mule.runtime.api.exception.MuleException;
  *
  * @since 3.7.0
  */
+// TODO MULE-12397 merge this with org.mule.runtime.core.api.routing.ValidationException
 public class ValidationException extends MuleException {
 
   private final ValidationResult validationResult;

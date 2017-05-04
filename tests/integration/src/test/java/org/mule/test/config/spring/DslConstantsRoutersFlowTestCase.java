@@ -51,8 +51,18 @@ public class DslConstantsRoutersFlowTestCase extends AbstractIntegrationTestCase
     assertThat(router, instanceOf(IdempotentMessageValidator.class));
 
     IdempotentMessageValidator filter = (IdempotentMessageValidator) router;
-    assertThat(filter.getIdExpression(), is("#[id]-#[correlationId]"));
+    assertThat(filter.getIdExpression(), is("#[id + '-' + correlationId]"));
     assertThat(filter.getObjectStore(), not(nullValue()));
+  }
+
+  @Test
+  public void testIdempotentReceiverRouterError() throws Exception {
+    assertThat(flowRunner("IdempotentReceiverRouterVar").withVariable("otherId", "123").run()
+        .getMessage().getPayload().getValue(),
+               is("Not duplicate"));
+    assertThat(flowRunner("IdempotentReceiverRouterVar").withVariable("otherId", "123").run()
+        .getMessage().getPayload().getValue(),
+               is("Duplicate"));
   }
 
   @Test
