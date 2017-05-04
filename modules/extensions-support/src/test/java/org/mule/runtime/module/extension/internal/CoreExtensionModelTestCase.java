@@ -309,14 +309,14 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(paramModels.get(1).getType(), instanceOf(DefaultBooleanType.class));
     assertThat(paramModels.get(1).isRequired(), is(false));
 
-    assertThat(paramModels.get(2).getName(), is("processedGroupsObjectStoreRef"));
+    assertThat(paramModels.get(2).getName(), is("processedGroupsObjectStore"));
     assertThat(paramModels.get(2).getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(paramModels.get(2).getType(), instanceOf(DefaultObjectType.class));
     assertThat(paramModels.get(2).getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
                is(ObjectStore.class.getName()));
     assertThat(paramModels.get(2).isRequired(), is(false));
 
-    assertThat(paramModels.get(3).getName(), is("eventGroupsObjectStoreRef"));
+    assertThat(paramModels.get(3).getName(), is("eventGroupsObjectStore"));
     assertThat(paramModels.get(3).getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(paramModels.get(3).getType(), instanceOf(DefaultObjectType.class));
     assertThat(paramModels.get(3).getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
@@ -397,8 +397,8 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void idempotentMessagefilter() {
-    final OperationModel filterModel = coreExtensionModel.getOperationModel("idempotentMessageFilter").get();
+  public void idempotentMessageValidator() {
+    final OperationModel filterModel = coreExtensionModel.getOperationModel("idempotentMessageValidator").get();
 
     assertOutputSameAsInput(filterModel);
 
@@ -414,7 +414,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(filterModel.getAllParameterModels().get(1).getType(), instanceOf(DefaultStringType.class));
     assertThat(filterModel.getAllParameterModels().get(1).isRequired(), is(false));
 
-    assertThat(filterModel.getAllParameterModels().get(2).getName(), is("objectStoreRef"));
+    assertThat(filterModel.getAllParameterModels().get(2).getName(), is("objectStore"));
     assertThat(filterModel.getAllParameterModels().get(2).getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(filterModel.getAllParameterModels().get(2).getType(), instanceOf(DefaultObjectType.class));
     assertThat(filterModel.getAllParameterModels().get(2).isRequired(), is(false));
