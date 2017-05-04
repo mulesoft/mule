@@ -6,19 +6,18 @@
  */
 package org.mule.runtime.core.lifecycle;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.lifecycle.HasLifecycleInterceptor;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 import org.mule.runtime.core.api.registry.Registry;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextDisposePhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextInitialisePhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
@@ -38,7 +37,10 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
   protected Map<String, LifecyclePhase> phases = new HashMap<>();
   protected SortedMap<String, LifecycleCallback> callbacks = new TreeMap<>();
   protected MuleContext muleContext;
-  private final LifecycleInterceptor initDisposeLifecycleInterceptor = new InitDisposeLifecycleInterceptor();
+  private final LifecycleInterceptor initDisposeLifecycleInterceptor =
+      new PhaseErrorLifecycleInterceptor(Initialisable.PHASE_NAME, Disposable.PHASE_NAME, Initialisable.class);
+  private final LifecycleInterceptor startstopLifecycleInterceptor =
+      new PhaseErrorLifecycleInterceptor(Startable.PHASE_NAME, Stoppable.PHASE_NAME, Startable.class);
 
   public RegistryLifecycleManager(String id, Registry object, MuleContext muleContext) {
     super(id, object);
@@ -93,6 +95,9 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
       if (Initialisable.PHASE_NAME.equals(phaseName) || Disposable.PHASE_NAME.equals(phaseName)) {
         ((HasLifecycleInterceptor) callback).setLifecycleInterceptor(initDisposeLifecycleInterceptor);
       }
+      if (Startable.PHASE_NAME.equals(phaseName) || Stoppable.PHASE_NAME.equals(phaseName)) {
+        ((HasLifecycleInterceptor) callback).setLifecycleInterceptor(startstopLifecycleInterceptor);
+      }
     }
 
     phaseNames.add(phaseName);
@@ -103,7 +108,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
   @Override
   public void fireLifecycle(String destinationPhase) throws LifecycleException {
     checkPhase(destinationPhase);
-    if (isDirectTransition(destinationPhase)) {
+    if (isDirectTransition(destinationPhase) || isLastPhaseExecutionFailed()) {
       // transition to phase without going through other phases first
       invokePhase(destinationPhase, object, callbacks.get(destinationPhase));
     } else {
@@ -124,18 +129,8 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
   }
 
   @Override
-  protected void invokePhase(String phase, Object object, LifecycleCallback callback) throws LifecycleException {
-    try {
-      setExecutingPhase(phase);
-      callback.onTransition(phase, object);
-      setCurrentPhase(phase);
-    } catch (LifecycleException e) {
-      throw e;
-    } catch (MuleException e) {
-      throw new LifecycleException(CoreMessages.failedToInvokeLifecycle(phase, object), e);
-    } finally {
-      setExecutingPhase(null);
-    }
+  protected void doOnConnectException(ConnectException ce) throws LifecycleException {
+    throw new LifecycleException(ce, this);
   }
 
   /**

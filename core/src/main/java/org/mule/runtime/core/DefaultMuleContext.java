@@ -43,7 +43,6 @@ import static org.mule.runtime.core.util.ExceptionUtils.getRootCauseException;
 import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.unwrap;
-
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
@@ -134,7 +133,6 @@ import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContext {
@@ -408,7 +406,9 @@ public class DefaultMuleContext implements MuleContext {
 
   @Override
   public synchronized void dispose() {
-    if (isStarted()) {
+    if (isStarted() || (lifecycleManager.getLastPhaseExecuted() != null
+        && (lifecycleManager.getLastPhaseExecuted().equals(Startable.PHASE_NAME)
+            && lifecycleManager.isLastPhaseExecutionFailed()))) {
       try {
         stop();
       } catch (MuleException e) {

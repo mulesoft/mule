@@ -7,7 +7,6 @@
 package org.mule.runtime.core.registry;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -98,6 +97,9 @@ public abstract class AbstractRegistry implements Registry {
     } catch (InitialisationException e) {
       throw e;
     } catch (LifecycleException e) {
+      if (e.getComponent() instanceof Initialisable) {
+        throw new InitialisationException(e, (Initialisable) e.getComponent());
+      }
       throw new InitialisationException(e, this);
     }
   }

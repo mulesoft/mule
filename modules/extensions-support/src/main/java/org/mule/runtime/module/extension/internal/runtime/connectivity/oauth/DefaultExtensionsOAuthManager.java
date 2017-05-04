@@ -73,7 +73,7 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
   @Inject
   private MuleContext muleContext;
 
-  //TODO: MULE-10837 this should be a plain old @Inject
+  // TODO: MULE-10837 this should be a plain old @Inject
   private LazyValue<OAuthService> oauthService = new LazyValue<>(() -> {
     try {
       return muleContext.getRegistry().lookupObject(OAuthService.class);

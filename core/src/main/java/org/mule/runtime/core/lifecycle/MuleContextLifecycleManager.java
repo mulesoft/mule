@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.core.lifecycle;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.connector.ConnectException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 
 /**
@@ -56,19 +57,9 @@ public class MuleContextLifecycleManager extends AbstractLifecycleManager<MuleCo
     invokePhase(destinationPhase, object, callback);
   }
 
-  protected void invokePhase(String phase, Object object, LifecycleCallback callback) throws LifecycleException {
-    try {
-      setExecutingPhase(phase);
-      callback.onTransition(phase, object);
-      setCurrentPhase(phase);
-    } catch (LifecycleException e) {
-      throw e;
-    } catch (MuleException e) {
-      throw new LifecycleException(e, this);
-    } finally {
-      setExecutingPhase(null);
-    }
-
+  @Override
+  protected void doOnConnectException(ConnectException ce) throws LifecycleException {
+    throw new LifecycleException(ce, this);
   }
 
   class MuleContextLifecycleCallback implements LifecycleCallback<MuleContext> {
