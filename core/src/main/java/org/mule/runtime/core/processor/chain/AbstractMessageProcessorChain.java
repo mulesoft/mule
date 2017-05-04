@@ -46,7 +46,6 @@ import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -107,27 +106,94 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public Publisher<Event> apply(Publisher<Event> publisher) {
-    List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptorsToBeExecuted = resolveInterceptors();
+    List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptors = resolveInterceptors();
     Flux<Event> stream = from(publisher);
     for (Processor processor : getProcessorsToExecute()) {
-      stream = stream.transform(applyInterceptors(interceptorsToBeExecuted, processor));
+      // Perform assembly for processor chain by transforming the existing publisher with a publisher function for each processor
+      // along with the interceptors that decorate it.
+      stream = stream.transform(applyInterceptors(interceptors, processor));
     }
     return stream;
   }
 
   private ReactiveProcessor applyInterceptors(List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptorsToBeExecuted,
                                               Processor processor) {
-    return stream -> {
-      ReactiveProcessor processorFunction = processor;
-      for (BiFunction<Processor, ReactiveProcessor, ReactiveProcessor> interceptor : interceptorsToBeExecuted) {
-        processorFunction = interceptor.apply(processor, processorFunction);
-      }
+    ReactiveProcessor interceptorWrapperProcessorFunction = processor;
+    // Take processor publisher function itself and transform it by applying interceptor transformations onto it.
+    for (BiFunction<Processor, ReactiveProcessor, ReactiveProcessor> interceptor : interceptorsToBeExecuted) {
+      interceptorWrapperProcessorFunction = interceptor.apply(processor, interceptorWrapperProcessorFunction);
+    }
+    return interceptorWrapperProcessorFunction;
+  }
 
-      ReactiveProcessor finalProcessorFunction = processorFunction;
-      stream = from(stream).flatMap(event -> Flux.just(event)
-          .transform(finalProcessorFunction)
-          .onErrorResume(MessagingException.class, handleError(event.getContext())));
-      return stream;
+  private List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> resolveInterceptors() {
+    List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptors =
+        new ArrayList<>();
+
+    // #1 Update MessagingException with failing processor if required, create Error and set error context.
+    interceptors.add((processor, next) -> stream -> from(stream)
+        .transform(next)
+        .onErrorMap(MessagingException.class, updateMessagingException(processor)));
+
+    // #2 Fire MessageProcessor notifications before and after processor execution.
+    interceptors.add((processor, next) -> stream -> from(stream)
+        .doOnNext(preNotification(processor))
+        .transform(next)
+        .doOnNext(postNotification(processor))
+        .doOnError(MessagingException.class, errorNotification(processor)));
+
+    // #3 Update ThreadLocal event before and after processor execution.
+    interceptors.add((processor, next) -> stream -> from(stream)
+        .doOnNext(event -> setCurrentEvent(event))
+        .transform(next)
+        .doOnNext(result -> setCurrentEvent(result)));
+
+    // #4 Apply processor interceptors.
+    muleContext.getProcessorInterceptorManager().getInterceptorFactories().stream()
+        .forEach(interceptorFactory -> {
+          ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
+          reactiveInterceptorAdapter.setFlowConstruct(flowConstruct);
+          interceptors.add(0, reactiveInterceptorAdapter);
+        });
+
+    // #6 Apply processing strategy (notifications will be fired, interceptors executed on processing thread as defined by the
+    // processing strategy. Use anonymous ReactiveProcessor to apply processing strategy to processor + previous interceptors
+    // while using the processing type of the processor itself.
+    if (flowConstruct instanceof Pipeline) {
+      interceptors
+          .add((processor, next) -> ((Pipeline) flowConstruct).getProcessingStrategy().onProcessor(new ReactiveProcessor() {
+
+            @Override
+            public Publisher<Event> apply(Publisher<Event> eventPublisher) {
+              return next.apply(eventPublisher);
+            }
+
+            @Override
+            public ProcessingType getProcessingType() {
+              return processor.getProcessingType();
+            }
+          }));
+    }
+
+    // #6 Handle errors that occur during Processor execution. This is done outside to any scheduling to ensure errors in
+    // scheduling such as RejectedExecutionException's can be handled cleanly
+    interceptors.add((processor, next) -> stream -> from(stream).flatMap(event -> Flux.just(event)
+        .transform(next)
+        .onErrorResumeWith(MessagingException.class, handleError(event.getContext()))));
+
+    return interceptors;
+  }
+
+  private Function<MessagingException, MessagingException> updateMessagingException(Processor processor) {
+    return exception -> {
+      Processor failing = exception.getFailingMessageProcessor();
+      if (failing == null) {
+        failing = processor;
+        exception = new MessagingException(exception.getI18nMessage(), exception.getEvent(), exception.getCause(), processor);
+      }
+      exception
+          .setProcessedEvent(createErrorEvent(exception.getEvent(), processor, exception, muleContext.getErrorTypeLocator()));
+      return putContext(exception, failing, exception.getEvent(), flowConstruct, muleContext);
     };
   }
 
@@ -150,55 +216,6 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
             return empty();
           });
     }
-  }
-
-  private List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> resolveInterceptors() {
-    List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptors =
-        new ArrayList<>();
-
-    if (flowConstruct instanceof Pipeline) {
-      interceptors.add((processor, next) -> ((Pipeline) flowConstruct).getProcessingStrategy().onProcessor(next));
-    }
-
-    // Handle errors
-    interceptors.add((processor, next) -> stream -> from(stream)
-        .transform(next)
-        .onErrorMap(MessagingException.class, handleMessagingException(processor)));
-    // Notify
-    interceptors.add((processor, next) -> stream -> from(stream)
-        .doOnNext(preNotification(processor))
-        .transform(next)
-        .doOnNext(postNotification(processor))
-        .doOnError(MessagingException.class, errorNotification(processor)));
-    // Set ThreadLocal Event
-    interceptors.add((processor, next) -> stream -> from(stream)
-        .doOnNext(event -> setCurrentEvent(event))
-        .transform(next)
-        .doOnNext(result -> setCurrentEvent(result)));
-
-    List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptorsToBeExecuted = new LinkedList<>();
-    // TODO MULE-11521 Review how interceptors are registered!
-    muleContext.getProcessorInterceptorManager().getInterceptorFactories().stream()
-        .forEach(interceptorFactory -> {
-          ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
-          reactiveInterceptorAdapter.setFlowConstruct(flowConstruct);
-          interceptorsToBeExecuted.add(0, reactiveInterceptorAdapter);
-        });
-    interceptorsToBeExecuted.addAll(0, interceptors);
-    return interceptorsToBeExecuted;
-  }
-
-  private Function<MessagingException, MessagingException> handleMessagingException(Processor processor) {
-    return exception -> {
-      Processor failing = exception.getFailingMessageProcessor();
-      if (failing == null) {
-        failing = processor;
-        exception = new MessagingException(exception.getI18nMessage(), exception.getEvent(), exception.getCause(), processor);
-      }
-      exception
-          .setProcessedEvent(createErrorEvent(exception.getEvent(), processor, exception, muleContext.getErrorTypeLocator()));
-      return putContext(exception, failing, exception.getEvent(), flowConstruct, muleContext);
-    };
   }
 
   private Consumer<Event> preNotification(Processor processor) {
