@@ -13,6 +13,7 @@ import static org.mule.services.soap.api.client.SoapClientConfiguration.builder;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
+import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.services.soap.api.SoapService;
 import org.mule.services.soap.api.client.SoapClient;
 import org.mule.services.soap.api.client.SoapClientConfigurationBuilder;
@@ -39,10 +40,12 @@ import java.util.concurrent.ExecutionException;
 public class ForwardingSoapClient {
 
   private final LoadingCache<WebServiceDefinition, SoapClient> clientsCache;
+  private final MessageDispatcher dispatcher;
   private final SoapServiceProvider serviceProvider;
 
-  ForwardingSoapClient(SoapService service, SoapServiceProvider serviceProvider) {
+  ForwardingSoapClient(SoapService service, SoapServiceProvider serviceProvider, MessageDispatcher dispatcher) {
     this.serviceProvider = serviceProvider;
+    this.dispatcher = dispatcher;
     this.clientsCache = CacheBuilder.<WebServiceDefinition, SoapClient>newBuilder()
         .expireAfterAccess(1, MINUTES)
         .removalListener(new ForwardingClientRemovalListener())
@@ -93,13 +96,16 @@ public class ForwardingSoapClient {
       SoapClientFactory clientFactory = service.getClientFactory();
       SoapClientConfigurationBuilder configurationBuilder = builder()
           .withService(definition.getService())
+          .withDispatcher(dispatcher)
           .withPort(definition.getPort())
           .withWsdlLocation(definition.getWsdlUrl().toString());
       if (definition.getAddress() != null) {
         configurationBuilder.withAddress(definition.getAddress().toString());
       }
       serviceProvider.getSecurities().forEach(configurationBuilder::withSecurity);
-      return clientFactory.create(configurationBuilder.build());
+      SoapClient soapClient = clientFactory.create(configurationBuilder.build());
+      soapClient.start();
+      return soapClient;
     }
   }
 

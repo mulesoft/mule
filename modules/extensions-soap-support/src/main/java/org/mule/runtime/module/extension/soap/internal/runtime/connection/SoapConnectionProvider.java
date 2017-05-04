@@ -13,7 +13,9 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
+import org.mule.service.http.api.HttpService;
 import org.mule.services.soap.api.SoapService;
+import org.mule.services.soap.api.message.dispatcher.DefaultHttpMessageDispatcher;
 
 import java.util.List;
 
@@ -33,7 +35,10 @@ import javax.inject.Inject;
 public class SoapConnectionProvider implements PoolingConnectionProvider<ForwardingSoapClient> {
 
   @Inject
-  private SoapService service;
+  private SoapService soapService;
+
+  @Inject
+  private HttpService httpService;
 
   /**
    * The {@link SoapServiceProvider} that knows which services will this connection connect to.
@@ -50,7 +55,7 @@ public class SoapConnectionProvider implements PoolingConnectionProvider<Forward
    */
   @Override
   public ForwardingSoapClient connect() throws ConnectionException {
-    return new ForwardingSoapClient(service, serviceProvider);
+    return new ForwardingSoapClient(soapService, serviceProvider, new DefaultHttpMessageDispatcher(httpService));
   }
 
   /**
