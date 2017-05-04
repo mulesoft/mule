@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.core.routing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.routing.ValidationException;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -24,39 +25,31 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
-public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContextTestCase {
+public class IdempotentMessageValidatorMule6079TestCase extends AbstractMuleContextTestCase {
 
-  private MuleSession session;
-  private Flow flow;
   private ObjectStore<String> objectStore;
-  private IdempotentMessageFilter idempotentMessageFilter;
-  private Integer processedEvents = 0;
+  private IdempotentMessageValidator validator;
+  private AtomicInteger processedEvents = new AtomicInteger(0);
   private Boolean errorHappenedInChildThreads = false;
 
   /*
    * This test admits two execution paths, note that the implementation of objectStore can lock on the await call of the latch, to
    * avoid this a countDown call was added to contains method, since there is a trace that locks otherwise. See implementation of
-   * IdempotentMessageFilter.isNewMessage to understand the trace.
+   * IdempotentMessageValidator.isNewMessage to understand the trace.
    */
   @Test
   public void testRaceConditionOnAcceptAndProcess() throws Exception {
-    flow = getTestFlow(muleContext);
-
-    session = Mockito.mock(MuleSession.class);
-
     CountDownLatch cdl = new CountDownLatch(2);
 
     objectStore = new RaceConditionEnforcingObjectStore(cdl);
-    idempotentMessageFilter = new IdempotentMessageFilter();
-    idempotentMessageFilter.setIdExpression("#[mel:message.inboundProperties.id]");
-    idempotentMessageFilter.setFlowConstruct(flow);
-    idempotentMessageFilter.setThrowOnUnaccepted(false);
-    idempotentMessageFilter.setStorePrefix("foo");
-    idempotentMessageFilter.setStore(objectStore);
+    validator = new IdempotentMessageValidator();
+    validator.setMuleContext(muleContext);
+    validator.setStorePrefix("foo");
+    validator.setObjectStore(objectStore);
 
     Thread t1 = new Thread(new TestForRaceConditionRunnable(), "thread1");
     Thread t2 = new Thread(new TestForRaceConditionRunnable(), "thread2");
@@ -64,21 +57,26 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
     t2.start();
     t1.join(5000);
     t2.join(5000);
-    assertFalse("Exception in child threads", errorHappenedInChildThreads);
-    assertEquals("None or more than one message was processed by IdempotentMessageFilter", new Integer(1), processedEvents);
+    assertThat("Exception in child threads", errorHappenedInChildThreads, is(false));
+    assertThat("None or more than one message was processed by IdempotentMessageValidator", processedEvents.get(), is(1));
   }
 
   private class TestForRaceConditionRunnable implements Runnable {
 
     @Override
     public void run() {
-      Message okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-      Event event =
-          Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION)).message(okMessage).flow(flow)
-              .session(session).build();
+      Message okMessage = InternalMessage.builder().payload("OK").build();
+      EventContext context = mock(EventContext.class);
+      when(context.getId()).thenReturn("1");
+      Event event = Event.builder(context).message(okMessage).build();
 
       try {
-        event = idempotentMessageFilter.process(event);
+        event = validator.process(event);
+      } catch (ValidationException e) {
+        if (event != null) {
+          processedEvents.incrementAndGet();
+        }
+        return;
       } catch (Throwable e) {
         e.printStackTrace();
         synchronized (errorHappenedInChildThreads) {
@@ -86,12 +84,6 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
         }
       }
 
-      if (event != null) {
-        synchronized (processedEvents) // shared
-        {
-          processedEvents++;
-        }
-      }
     }
   }
 
@@ -112,7 +104,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
       boolean containsKey;
       synchronized (this) {
         // avoiding deadlock with the latch (locks if the element was already added to map, see definition of
-        // IdempotentMessageFilter.isNewMessage definition, if the element is added, it wont enter the
+        // IdempotentMessageValidator.isNewMessage definition, if the element is added, it wont enter the
         // objectStore.store method, and will lock.
         containsKey = map.containsKey(key);
         if (containsKey) {
@@ -128,7 +120,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
       if (key == null) {
         throw new ObjectStoreException();
       }
-      synchronized (map) // map is shared
+      synchronized (this) // map is shared
       {
         wasAdded = map.containsKey(key);
         map.put(key, value);

@@ -10,5 +10,5 @@ import java.io.Serializable;
 
 public interface ExpirableObjectStore<T extends Serializable> extends ObjectStore<T> {
 
-  void expire(int entryTTL, int maxEntries) throws ObjectStoreException;
+  void expire(long entryTTL, int maxEntries) throws ObjectStoreException;
 }

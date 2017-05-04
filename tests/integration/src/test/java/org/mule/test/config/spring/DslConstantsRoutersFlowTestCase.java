@@ -6,19 +6,22 @@
  */
 package org.mule.test.config.spring;
 
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.routing.IdempotentMessageFilter;
-import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
+import org.mule.runtime.core.routing.IdempotentMessageValidator;
+import org.mule.runtime.core.routing.IdempotentSecureHashMessageValidator;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
-import org.mule.runtime.core.util.store.InMemoryObjectStore;
-import org.mule.runtime.core.util.store.TextFileObjectStore;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.List;
@@ -35,36 +38,31 @@ public class DslConstantsRoutersFlowTestCase extends AbstractIntegrationTestCase
   @Test
   public void testIdempotentSecureHashReceiverRouter() throws Exception {
     Processor router = lookupMessageProcessorFromFlow("IdempotentSecureHashReceiverRouter");
-    assertTrue(router instanceof IdempotentSecureHashMessageFilter);
+    assertThat(router, instanceOf(IdempotentSecureHashMessageValidator.class));
 
-    IdempotentSecureHashMessageFilter filter = (IdempotentSecureHashMessageFilter) router;
-    assertEquals("SHA-128", filter.getMessageDigestAlgorithm());
-    assertNotNull(filter.getStore());
-    assertTrue(filter.getStore() instanceof InMemoryObjectStore);
-
-    InMemoryObjectStore<String> store = (InMemoryObjectStore<String>) filter.getStore();
-    assertEquals(1001, store.getEntryTTL());
-    assertEquals(1001, store.getExpirationInterval());
-    assertEquals(1001, store.getMaxEntries());
-    assertEquals("xyz", store.getName());
+    IdempotentSecureHashMessageValidator filter = (IdempotentSecureHashMessageValidator) router;
+    assertThat(filter.getMessageDigestAlgorithm(), is("SHA-128"));
+    assertThat(filter.getObjectStore(), not(nullValue()));
   }
 
   @Test
   public void testIdempotentReceiverRouter() throws Exception {
     Processor router = lookupMessageProcessorFromFlow("IdempotentReceiverRouter");
-    assertTrue(router instanceof IdempotentMessageFilter);
+    assertThat(router, instanceOf(IdempotentMessageValidator.class));
 
-    IdempotentMessageFilter filter = (IdempotentMessageFilter) router;
-    assertEquals("#[mel:message:id]-#[mel:message:correlationId]", filter.getIdExpression());
-    assertNotNull(filter.getStore());
-    assertTrue(filter.getStore() instanceof TextFileObjectStore);
+    IdempotentMessageValidator filter = (IdempotentMessageValidator) router;
+    assertThat(filter.getIdExpression(), is("#[id + '-' + correlationId]"));
+    assertThat(filter.getObjectStore(), not(nullValue()));
+  }
 
-    TextFileObjectStore store = (TextFileObjectStore) filter.getStore();
-    assertEquals(-1, store.getEntryTTL());
-    assertEquals(1000, store.getExpirationInterval());
-    assertEquals(10000000, store.getMaxEntries());
-    assertEquals("foo", store.getDirectory());
-    assertNotNull(store.getName());
+  @Test
+  public void testIdempotentReceiverRouterError() throws Exception {
+    assertThat(flowRunner("IdempotentReceiverRouterVar").withVariable("otherId", "123").run()
+        .getMessage().getPayload().getValue(),
+               is("Not duplicate"));
+    assertThat(flowRunner("IdempotentReceiverRouterVar").withVariable("otherId", "123").run()
+        .getMessage().getPayload().getValue(),
+               is("Duplicate"));
   }
 
   @Test

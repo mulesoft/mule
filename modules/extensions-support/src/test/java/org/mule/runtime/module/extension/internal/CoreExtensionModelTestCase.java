@@ -31,6 +31,7 @@ import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.config.MuleManifest.getVendorName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.getMuleExtensionModel;
+
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -105,7 +106,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
-    assertThat(coreExtensionModel.getOperationModels(), hasSize(15));
+    assertThat(coreExtensionModel.getOperationModels(), hasSize(16));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
 
     assertThat(coreExtensionModel.getErrorModels(),
@@ -396,6 +397,35 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
+  public void idempotentMessagefilter() {
+    final OperationModel filterModel = coreExtensionModel.getOperationModel("idempotentMessageFilter").get();
+
+    assertOutputSameAsInput(filterModel);
+
+    assertThat(filterModel.getAllParameterModels(), hasSize(4));
+
+    assertThat(filterModel.getAllParameterModels().get(0).getName(), is("idExpression"));
+    assertThat(filterModel.getAllParameterModels().get(0).getExpressionSupport(), is(SUPPORTED));
+    assertThat(filterModel.getAllParameterModels().get(0).getType(), instanceOf(DefaultObjectType.class));
+    assertThat(filterModel.getAllParameterModels().get(0).isRequired(), is(false));
+
+    assertThat(filterModel.getAllParameterModels().get(1).getName(), is("valueExpression"));
+    assertThat(filterModel.getAllParameterModels().get(1).getExpressionSupport(), is(SUPPORTED));
+    assertThat(filterModel.getAllParameterModels().get(1).getType(), instanceOf(DefaultStringType.class));
+    assertThat(filterModel.getAllParameterModels().get(1).isRequired(), is(false));
+
+    assertThat(filterModel.getAllParameterModels().get(2).getName(), is("objectStoreRef"));
+    assertThat(filterModel.getAllParameterModels().get(2).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(filterModel.getAllParameterModels().get(2).getType(), instanceOf(DefaultObjectType.class));
+    assertThat(filterModel.getAllParameterModels().get(2).isRequired(), is(false));
+
+    assertThat(filterModel.getAllParameterModels().get(3).getName(), is("storePrefix"));
+    assertThat(filterModel.getAllParameterModels().get(3).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(filterModel.getAllParameterModels().get(3).getType(), instanceOf(DefaultStringType.class));
+    assertThat(filterModel.getAllParameterModels().get(3).isRequired(), is(false));
+  }
+
+  @Test
   public void choice() {
     final RouterModel choiceModel = (RouterModel) coreExtensionModel.getOperationModel("choice").get();
 
@@ -500,7 +530,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(type.isRequired(), is(false));
   }
 
-  //TODO: MULE-12224 - Provide support for scope as top level elements
+  // TODO: MULE-12224 - Provide support for scope as top level elements
   @Test
   public void errorHandler() {
     final ScopeModel errorHandlerModel = (ScopeModel) coreExtensionModel.getOperationModel("error-handler").get();
@@ -524,7 +554,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     verifyOnError("on-error-propagate");
   }
 
-  //TODO: MULE-12265 - Provide support for "exclusive scopes"
+  // TODO: MULE-12265 - Provide support for "exclusive scopes"
   void verifyOnError(String name) {
     final ScopeModel continueModel = (ScopeModel) coreExtensionModel.getOperationModel(name).get();
 

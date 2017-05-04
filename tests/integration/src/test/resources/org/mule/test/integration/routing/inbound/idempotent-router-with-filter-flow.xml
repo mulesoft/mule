@@ -11,7 +11,7 @@
         <message-filter>
             <payload-type-filter expectedType="java.lang.String"/>
         </message-filter>
-        <idempotent-message-filter/>
+        <idempotent-message-validator/>
         <test:queue name="ToTestCase"/>
     </flow>
 

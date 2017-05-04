@@ -18,7 +18,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * <code>IdempotentSecureHashMessageFilter</code> ensures that only unique messages are received by a service. It does this by
+ * <code>IdempotentSecureHashMessageValidator</code> ensures that only unique messages are received by a service. It does this by
  * calculating the SHA-256 hash of the message itself. This provides a value with an infinitesimally small chance of a collision.
  * This can be used to filter message duplicates. Please keep in mind that the hash is calculated over the entire byte array
  * representing the message, so any leading or trailing spaces or extraneous bytes (like padding) can produce different hash
@@ -26,7 +26,7 @@ import java.security.NoSuchAlgorithmException;
  * This class is useful when the message does not support unique identifiers.
  */
 
-public class IdempotentSecureHashMessageFilter extends IdempotentMessageFilter {
+public class IdempotentSecureHashMessageValidator extends IdempotentMessageValidator {
 
   private String messageDigestAlgorithm = "SHA-256";
 

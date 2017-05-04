@@ -19,5 +19,6 @@ public enum ValidationErrorTypes implements ErrorTypeDefinition<ValidationErrorT
   /**
    * Indicates that a validation failure occurred
    */
+  // TODO MULE-12397 merge this with ComponentIdentifiers#VALIDATION
   VALIDATION
 }

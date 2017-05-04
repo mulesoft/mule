@@ -7,13 +7,14 @@
 package org.mule.runtime.core.el;
 
 import static java.util.Collections.unmodifiableMap;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
-import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionExecutionException;
@@ -42,15 +43,14 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-
 public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor {
 
-  private static final Logger logger = getLogger(DataWeaveExpressionLanguageAdaptor.class);
   public static final String PAYLOAD = "payload";
   public static final String DATA_TYPE = "dataType";
   public static final String ATTRIBUTES = "attributes";
   public static final String ERROR = "error";
+  public static final String ID = "id";
+  public static final String CORRELATION_ID = "correlationId";
   public static final String VARIABLES = "variables";
   public static final String PROPERTIES = "properties";
   public static final String PARAMETERS = "parameters";
@@ -188,6 +188,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
   private void addEventBindings(Event event, BindingContext.Builder contextBuilder) {
     if (event != null) {
+      contextBuilder.addBinding(ID, new TypedValue<>(event.getContext().getId(), STRING));
+      contextBuilder.addBinding(CORRELATION_ID, new TypedValue<>(event.getContext().getCorrelationId(), STRING));
       Map<String, TypedValue> flowVars = new HashMap<>();
       event.getVariableNames().forEach(name -> {
         TypedValue value = event.getVariable(name);

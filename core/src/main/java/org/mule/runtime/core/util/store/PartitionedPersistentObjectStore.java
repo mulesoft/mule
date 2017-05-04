@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.util.store;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableExpirableObjectStore;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.UUID;
 
@@ -44,6 +44,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
     muleContext = context;
   }
 
+  @Override
   public synchronized void open() throws ObjectStoreException {
     if (!initialized) {
       initObjectStoreDirectory();
@@ -135,9 +136,9 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
     Arrays.sort(files);
     List<String> partitions = new ArrayList<String>();
 
-    for (int i = 0; i < files.length; i++) {
-      if (files[i].isDirectory()) {
-        partitions.add(files[i].getName());
+    for (File file : files) {
+      if (file.isDirectory()) {
+        partitions.add(file.getName());
       }
     }
     return partitions;
@@ -165,13 +166,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
 
 
   private void loadPreviousStoredPartitions() throws ObjectStoreException {
-    File[] directories = storeDirectory.listFiles(new FileFilter() {
-
-      @Override
-      public boolean accept(File file) {
-        return file.isDirectory();
-      }
-    });
+    File[] directories = storeDirectory.listFiles((FileFilter) file -> file.isDirectory());
     if (directories == null) {
       return;
     }
@@ -193,7 +188,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   }
 
   @Override
-  public void expire(int entryTTL, int maxEntries) throws ObjectStoreException {
+  public void expire(long entryTTL, int maxEntries) throws ObjectStoreException {
     expire(entryTTL, maxEntries, DEFAULT_PARTITION);
   }
 
@@ -203,7 +198,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   }
 
   @Override
-  public void expire(int entryTTL, int maxEntries, String partitionName) throws ObjectStoreException {
+  public void expire(long entryTTL, int maxEntries, String partitionName) throws ObjectStoreException {
     getPartitionObjectStore(partitionName).expire(entryTTL, maxEntries);
   }
 }

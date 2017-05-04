@@ -7,6 +7,7 @@
 package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CONNECTIVITY;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.DUPLICATE_MESSAGE;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.EXPRESSION;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.OVERLOAD;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.REDELIVERY_EXHAUSTED;
@@ -15,6 +16,7 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.ROUTIN
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.STREAM_MAXIMUM_SIZE_EXCEEDED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.VALIDATION;
 
 import org.mule.runtime.api.message.ErrorType;
 
@@ -36,6 +38,8 @@ public class ErrorTypeRepositoryFactory {
     ErrorTypeRepository errorTypeRepository = new ErrorTypeRepository();
     errorTypeRepository.addErrorType(TRANSFORMATION, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addErrorType(EXPRESSION, errorTypeRepository.getAnyErrorType());
+    final ErrorType validationErrorType = errorTypeRepository.addErrorType(VALIDATION, errorTypeRepository.getAnyErrorType());
+    errorTypeRepository.addErrorType(DUPLICATE_MESSAGE, validationErrorType);
     errorTypeRepository.addErrorType(REDELIVERY_EXHAUSTED, errorTypeRepository.getAnyErrorType());
     ErrorType connectivityErrorType = errorTypeRepository.addErrorType(CONNECTIVITY, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addErrorType(RETRY_EXHAUSTED, connectivityErrorType);

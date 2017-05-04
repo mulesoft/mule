@@ -17,8 +17,8 @@
         <collection-splitter/>
         <test:component/>
         <collection-aggregator timeout="2000" failOnTimeout="false"
-            processed-groups-object-store-ref="processed-groups-object-store"
-            event-groups-object-store-ref="event-groups-object-store"/>
+            processed-groups-object-store="processed-groups-object-store"
+            event-groups-object-store="event-groups-object-store"/>
         <test:queue name="out"/>
     </flow>
 

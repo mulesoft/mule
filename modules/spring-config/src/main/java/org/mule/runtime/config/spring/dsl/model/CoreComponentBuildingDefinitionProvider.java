@@ -59,6 +59,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.DataUnit;
@@ -125,7 +126,6 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
-import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.QueueStoreObjectFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
@@ -174,8 +174,8 @@ import org.mule.runtime.core.routing.CollectionSplitter;
 import org.mule.runtime.core.routing.ExpressionSplitter;
 import org.mule.runtime.core.routing.FirstSuccessful;
 import org.mule.runtime.core.routing.Foreach;
-import org.mule.runtime.core.routing.IdempotentMessageFilter;
-import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
+import org.mule.runtime.core.routing.IdempotentMessageValidator;
+import org.mule.runtime.core.routing.IdempotentSecureHashMessageValidator;
 import org.mule.runtime.core.routing.MapSplitter;
 import org.mule.runtime.core.routing.MessageChunkAggregator;
 import org.mule.runtime.core.routing.MessageChunkSplitter;
@@ -561,9 +561,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("failOnTimeout", fromSimpleParameter("failOnTimeout").build())
         .withSetterParameterDefinition("processedGroupsObjectStore",
-                                       fromSimpleReferenceParameter("processed-groups-object-store-ref").build())
+                                       fromSimpleReferenceParameter("processed-groups-object-store").build())
         .withSetterParameterDefinition("eventGroupsObjectStore",
-                                       fromSimpleReferenceParameter("event-groups-object-store-ref").build())
+                                       fromSimpleReferenceParameter("event-groups-object-store").build())
         .withSetterParameterDefinition("persistentStores", fromSimpleParameter("persistentStores").build())
         .withSetterParameterDefinition("storePrefix", fromSimpleParameter("storePrefix").build());
 
@@ -920,17 +920,17 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("valueExpression", fromSimpleParameter("valueExpression").build())
         .withSetterParameterDefinition("storePrefix", fromSimpleParameter("storePrefix").build())
         .withSetterParameterDefinition("throwOnUnaccepted", fromSimpleParameter("throwOnUnaccepted").build())
-        .withSetterParameterDefinition("store", fromChildConfiguration(ObjectStore.class).build())
+        .withSetterParameterDefinition("objectStore", fromSimpleReferenceParameter("objectStore").build())
         .withSetterParameterDefinition("unacceptedMessageProcessor", fromSimpleReferenceParameter("onUnaccepted").build());
 
     definitions.add(baseIdempotentMessageFilterDefinition.copy()
-        .withIdentifier("idempotent-message-filter")
-        .withTypeDefinition(fromType(IdempotentMessageFilter.class))
+        .withIdentifier("idempotent-message-validator")
+        .withTypeDefinition(fromType(IdempotentMessageValidator.class))
         .build());
 
     definitions.add(baseIdempotentMessageFilterDefinition.copy()
-        .withIdentifier("idempotent-secure-hash-message-filter")
-        .withTypeDefinition(fromType(IdempotentSecureHashMessageFilter.class))
+        .withIdentifier("idempotent-secure-hash-message-validator")
+        .withTypeDefinition(fromType(IdempotentSecureHashMessageValidator.class))
         .withSetterParameterDefinition("messageDigestAlgorithm", fromSimpleParameter("messageDigestAlgorithm").build())
         .build());
 
@@ -1630,15 +1630,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     buildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-transaction")
         .withTypeDefinition(fromType(MuleTransactionConfig.class))
         .withSetterParameterDefinition("factory", fromSimpleReferenceParameter("factory-ref").build())
-        .withSetterParameterDefinition("factory", fromSimpleParameter("factory-class", new TypeConverter() {
-
-          @Override
-          public Object convert(Object o) {
-            try {
-              return ClassUtils.instanciateClass((String) o);
-            } catch (Exception e) {
-              return null;
-            }
+        .withSetterParameterDefinition("factory", fromSimpleParameter("factory-class", o -> {
+          try {
+            return ClassUtils.instanciateClass((String) o);
+          } catch (Exception e) {
+            return null;
           }
         }).build())
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
