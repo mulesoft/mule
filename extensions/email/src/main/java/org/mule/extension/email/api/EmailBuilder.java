@@ -43,6 +43,7 @@ public class EmailBuilder {
    */
   @Optional
   @Parameter
+  @NullSafe
   private List<String> ccAddresses;
 
   /**
@@ -50,6 +51,7 @@ public class EmailBuilder {
    */
   @Optional
   @Parameter
+  @NullSafe
   private List<String> bccAddresses;
 
   /**
@@ -57,6 +59,7 @@ public class EmailBuilder {
    */
   @Optional
   @Parameter
+  @NullSafe
   private List<String> replyToAddresses;
 
   /**
@@ -67,27 +70,34 @@ public class EmailBuilder {
   private String subject;
 
   /**
-   * the text body of the email.
+   * The customHeaders that this email carry.
    */
   @Optional
   @Parameter
+  @Content
   @NullSafe
-  private EmailBody body;
+  private Map<String, String> customHeaders;
 
-  /**
-   * the attachments bounded to be sent with the email.
-   */
+  public EmailAttachment getAttachment() {
+    return attachment;
+  }
+
+  public void setAttachment(EmailAttachment attachment) {
+    this.attachment = attachment;
+  }
+
   @Optional
   @Parameter
+  @Content
+  private EmailAttachment attachment;
+
+  @Optional
+  @Parameter
+  @Content
+  @NullSafe
   private List<EmailAttachment> attachments;
 
-  /**
-   * The headers that this email carry.
-   */
-  @Parameter
-  @Optional
-  @Content
-  private Map<String, String> headers;
+  private EmailBody body;
 
   /**
    * Creates a new instance.
@@ -130,10 +140,10 @@ public class EmailBuilder {
   }
 
   /**
-   * @return a {@link Map} with all the additional headers configured for the
+   * @return a {@link Map} with all the additional customHeaders configured for the
    */
-  public Map<String, String> getHeaders() {
-    return headers != null ? headers : emptyMap();
+  public Map<String, String> getCustomHeaders() {
+    return customHeaders != null ? customHeaders : emptyMap();
   }
 
   /**
@@ -141,6 +151,10 @@ public class EmailBuilder {
    */
   public EmailBody getBody() {
     return body == null ? new EmailBody() : body;
+  }
+
+  public EmailBody setBody(EmailBody emailBody) {
+    return body = emailBody;
   }
 
   /**
@@ -162,5 +176,9 @@ public class EmailBuilder {
    */
   private <T> List<T> ensureNotNullList(List<T> list) {
     return list != null ? list : emptyList();
+  }
+
+  public void setAttachments(List<EmailAttachment> attachments) {
+    this.attachments = attachments;
   }
 }

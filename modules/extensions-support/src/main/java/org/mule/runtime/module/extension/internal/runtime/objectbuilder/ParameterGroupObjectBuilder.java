@@ -46,7 +46,6 @@ public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
   public T build(ResolverSetResult result) throws MuleException {
     final Map<String, Object> resultMap = result.asMap();
     return doBuild(resultMap::containsKey, resultMap::get, getInitialiserEvent());
-
   }
 
   private T doBuild(Predicate<String> hasParameter, Function<String, Object> parameters, Event event) throws MuleException {

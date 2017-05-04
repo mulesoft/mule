@@ -407,6 +407,15 @@ class ConfigurationBasedElementModelFactory {
         .withConfig(configuration);
 
     populateParameterizedElements(model, elementDsl, builder, configuration);
+
+    if (model instanceof SourceModel) {
+      ((SourceModel) model).getSuccessCallback()
+          .ifPresent(cb -> populateParameterizedElements(cb, elementDsl, builder, configuration));
+
+      ((SourceModel) model).getErrorCallback()
+          .ifPresent(cb -> populateParameterizedElements(cb, elementDsl, builder, configuration));
+    }
+
     return builder;
   }
 
@@ -418,7 +427,7 @@ class ConfigurationBasedElementModelFactory {
 
     List<ParameterModel> inlineGroupedParameters = model.getParameterGroupModels().stream()
         .filter(ParameterGroupModel::isShowInDsl)
-        .peek(group -> addInlineGroup(elementDsl, innerComponents, parameters, group))
+        .peek(group -> addInlineGroup(elementDsl, innerComponents, parameters, builder, group))
         .flatMap(g -> g.getParameterModels().stream())
         .collect(toList());
 
@@ -429,7 +438,8 @@ class ConfigurationBasedElementModelFactory {
 
   private void addInlineGroup(DslElementSyntax elementDsl,
                               Map<ComponentIdentifier, ComponentConfiguration> innerComponents,
-                              Map<String, String> parameters, ParameterGroupModel group) {
+                              Map<String, String> parameters,
+                              DslElementModel.Builder parent, ParameterGroupModel group) {
     elementDsl.getChild(group.getName())
         .ifPresent(groupDsl -> {
           ComponentConfiguration groupComponent = getIdentifier(groupDsl).map(innerComponents::get).orElse(null);
@@ -440,8 +450,11 @@ class ConfigurationBasedElementModelFactory {
                 .withDsl(groupDsl)
                 .withConfig(groupComponent);
 
+            Map<ComponentIdentifier, ComponentConfiguration> groupInnerComponents = geteNestedComponents(groupComponent);
             group.getParameterModels()
-                .forEach(p -> addElementParameter(innerComponents, parameters, groupDsl, groupElementBuilder, p));
+                .forEach(p -> addElementParameter(groupInnerComponents, parameters, groupDsl, groupElementBuilder, p));
+
+            parent.containing(groupElementBuilder.build());
           }
         });
   }

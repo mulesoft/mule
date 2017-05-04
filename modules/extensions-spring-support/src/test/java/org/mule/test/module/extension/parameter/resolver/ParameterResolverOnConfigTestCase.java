@@ -26,6 +26,11 @@ public class ParameterResolverOnConfigTestCase extends AbstractParameterResolver
     return new String[] {"parameter-resolver-on-pojo-config.xml"};
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @Test
   public void configurationWithDynamicParameterResolvers() throws Exception {
     ParameterResolverExtension config = getPayload("configurationWithDynamicParameterResolvers");

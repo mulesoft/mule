@@ -21,9 +21,9 @@
         </parameters>
         <body>
             <jms:publish config-ref="jmsConfig" destination="#[parameters.destination]">
-                <jms:message-builder>
+                <jms:message>
                     <jms:body>#[parameters.content]</jms:body>
-                </jms:message-builder>
+                </jms:message>
             </jms:publish>
         </body>
         <output type="void"/>

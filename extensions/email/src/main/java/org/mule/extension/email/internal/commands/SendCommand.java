@@ -49,7 +49,7 @@ public final class SendCommand {
           .withAttachments(emailBuilder.getAttachments())
           .withBody(body.getContent(), body.getContentType(),
                     body.getEncoding() == null ? configuration.getDefaultEncoding() : body.getEncoding())
-          .withHeaders(emailBuilder.getHeaders())
+          .withHeaders(emailBuilder.getCustomHeaders())
           .build();
 
       Transport.send(message);

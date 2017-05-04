@@ -30,6 +30,11 @@ public class XmlHintsFunctionalTestCase extends AbstractExtensionFunctionalTestC
     return "vegan-xml-hints-config.xml";
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @Test
   public void fruitOnExpression() throws Exception {
     Event event = eatFromExpression(new Apple());

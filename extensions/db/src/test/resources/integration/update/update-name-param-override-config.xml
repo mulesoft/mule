@@ -5,35 +5,6 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <db:query name="updateTemplate">
-        <db:input-parameters>
-            #[{'position' : 4}]
-        </db:input-parameters>
-        <db:sql>update PLANET set NAME='Mercury' where POSITION= :position</db:sql>
-    </db:query>
-
-    <db:query name="overriddenUpdateParam" template="updateTemplate">
-        <db:input-parameters>
-            #[{'position' : 2}]
-        </db:input-parameters>
-    </db:query>
-
-    <flow name="defaultParams">
-        <db:update config-ref="dbConfig" template="updateTemplate" />
-    </flow>
-
-    <flow name="overriddenParams">
-        <db:update config-ref="dbConfig" template="overriddenUpdateParam" />
-    </flow>
-
-    <flow name="inlineOverriddenParams">
-        <db:update config-ref="dbConfig" template="overriddenUpdateParam">
-            <db:input-parameters>
-                #[{'position' : 3}]
-            </db:input-parameters>
-        </db:update>
-    </flow>
-
     <flow name="inlineQuery">
         <db:update config-ref="dbConfig">
             <db:sql>#["update PLANET set NAME='Mercury' where POSITION=4"]</db:sql>

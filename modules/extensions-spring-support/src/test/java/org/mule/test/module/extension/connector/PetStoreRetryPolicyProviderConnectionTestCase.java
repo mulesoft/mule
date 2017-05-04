@@ -28,6 +28,11 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExten
     return "petstore-retry-policy.xml";
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @Test
   public void retryPolicyExhaustedDueToInvalidConnectionExecutingOperation() throws Exception {
     exception.expect(MessagingException.class);

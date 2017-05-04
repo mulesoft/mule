@@ -17,7 +17,7 @@
                       priority="#[priority]"
                       timeToLive="#[timeToLive]"
                       timeToLiveUnit="#[timeToLiveUnit]">
-            <jms:message-builder contentType="#[contentType]"
+            <jms:message contentType="#[contentType]"
                                   correlationId="#[correlationId]"
                                   encoding="#[encoding]"
                                   jmsType="#[jmsType]"
@@ -28,7 +28,7 @@
                 <jms:properties>
                     #[properties]
                 </jms:properties>
-            </jms:message-builder>
+            </jms:message>
         </jms:publish>
     </flow>
 
@@ -36,7 +36,7 @@
         <jms:consume config-ref="config"
                       destination="#[destination]"
                       maximumWait="#[maximumWait]"
-                      waitTimeUnit="#[waitTimeUnit]"
+                      maximumWaitUnit="#[waitTimeUnit]"
                       encoding="#[encoding]"
                       ackMode="#[ackMode]"
                       consumerType="#[consumerType]"

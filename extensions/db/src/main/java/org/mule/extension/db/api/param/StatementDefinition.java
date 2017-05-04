@@ -6,7 +6,6 @@
  */
 package org.mule.extension.db.api.param;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.extension.db.api.param.DbNameConstants.SQL_QUERY_TEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
@@ -50,39 +49,6 @@ public abstract class StatementDefinition<T extends StatementDefinition> extends
   private List<ParameterType> parameterTypes = new LinkedList<>();
 
   /**
-   * Returns a globally defined definition this instance points to. Can be {@code null}.
-   *
-   * @return Another definition of the same type or {@code null}
-   */
-  public abstract T getTemplate();
-
-  /**
-   * Returns an instance of the same class which state has been derived from the state of the {@link #getTemplate()} and the state
-   * of {@code this} instance.
-   * <p>
-   * If {@link #getTemplate()} is {@code null} then {@code this} instance is returned.
-   * <p>
-   * This method is recursive in the sense that the template can point to another template itself.
-   */
-  public T resolveFromTemplate() {
-    T template = getTemplate();
-
-    if (template == null) {
-      return (T) this;
-    } else {
-      template = (T) template.resolveFromTemplate();
-    }
-
-    T resolvedDefinition = copy();
-
-    if (isBlank(resolvedDefinition.getSql())) {
-      resolvedDefinition.setSql(template.getSql());
-    }
-
-    return resolvedDefinition;
-  }
-
-  /**
    * Returns a shallow copy of {@code this} instance.
    *
    * @return
@@ -100,7 +66,6 @@ public abstract class StatementDefinition<T extends StatementDefinition> extends
     copy.copyInto(this);
     return (T) copy;
   }
-
 
   /**
    * Returns the type for a given parameter

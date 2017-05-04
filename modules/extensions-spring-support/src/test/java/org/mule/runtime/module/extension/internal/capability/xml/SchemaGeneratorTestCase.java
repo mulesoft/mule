@@ -47,6 +47,7 @@ import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.soap.extension.FootballSoapExtension;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
 import org.mule.test.transactional.TransactionalExtension;
+import org.mule.test.typed.value.extension.extension.TypedValueExtension;
 import org.mule.test.vegan.extension.VeganExtension;
 
 import java.io.IOException;
@@ -128,6 +129,9 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
                                                                    new SchemaGeneratorTestUnit(soapLoader,
                                                                                                FootballSoapExtension.class,
                                                                                                "soap.xsd"),
+                                                                   new SchemaGeneratorTestUnit(javaLoader,
+                                                                                               TypedValueExtension.class,
+                                                                                               "typed-value.xsd"),
                                                                    new SchemaGeneratorTestUnit(javaLoader,
                                                                                                TestOAuthExtension.class,
                                                                                                "test-oauth.xsd"));

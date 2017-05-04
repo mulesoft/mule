@@ -24,7 +24,7 @@ public final class QueueConsumer implements ConsumerType {
    * {@inheritDoc}
    */
   @Override
-  public boolean isTopic() {
+  public boolean topic() {
     return false;
   }
 }

@@ -25,14 +25,14 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class AnonymousParameterGroupParser extends ParameterGroupParser {
+public class AnonymousInlineParameterGroupParser extends ParameterGroupParser {
 
-  public AnonymousParameterGroupParser(ComponentBuildingDefinition.Builder definition,
-                                       ParameterGroupModel group,
-                                       ClassLoader classLoader,
-                                       DslElementSyntax groupDsl,
-                                       DslSyntaxResolver dslResolver,
-                                       ExtensionParsingContext context) {
+  public AnonymousInlineParameterGroupParser(ComponentBuildingDefinition.Builder definition,
+                                             ParameterGroupModel group,
+                                             ClassLoader classLoader,
+                                             DslElementSyntax groupDsl,
+                                             DslSyntaxResolver dslResolver,
+                                             ExtensionParsingContext context) {
     super(definition, group, classLoader, groupDsl, dslResolver, context);
   }
 

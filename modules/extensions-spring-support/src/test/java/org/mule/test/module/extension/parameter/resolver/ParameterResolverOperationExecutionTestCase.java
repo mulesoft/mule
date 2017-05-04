@@ -45,6 +45,11 @@ public class ParameterResolverOperationExecutionTestCase extends AbstractParamet
     return new String[] {"parameter-resolver-operation-config.xml"};
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @Test
   public void operationWithExpressionResolver() throws Exception {
     assertExpressionResolverWeapon("processWeapon", PAYLOAD, WEAPON_MATCHER);

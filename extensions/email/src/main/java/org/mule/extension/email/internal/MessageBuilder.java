@@ -188,7 +188,10 @@ public final class MessageBuilder {
     Map<String, DataHandler> attachmentsMap = new LinkedHashMap<>();
     attachments.forEach(a -> {
       try {
-        DataHandler dataHandler = toDataHandler(a.getId(), a.getContent(), a.getContentType());
+        MediaType mediaType = a.getContentType() != null
+            ? DataType.builder().mediaType(a.getContentType()).build().getMediaType()
+            : null;
+        DataHandler dataHandler = toDataHandler(a.getId(), a.getContent(), mediaType);
         attachmentsMap.put(a.getId(), dataHandler);
       } catch (Exception e) {
         throw new EmailAttachmentException(ERROR + " could not add attachments", e);

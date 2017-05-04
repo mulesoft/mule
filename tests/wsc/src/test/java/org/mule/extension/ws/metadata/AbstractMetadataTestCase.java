@@ -16,10 +16,13 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+
+import java.util.List;
 
 import org.junit.Before;
 import ru.yandex.qatools.allure.annotations.Step;
@@ -53,13 +56,13 @@ public abstract class AbstractMetadataTestCase extends AbstractSoapServiceTestCa
     return result;
   }
 
-  @Step("Retrieve Dynamic Metadata for the Message Builder parameter")
-  protected ObjectType getMessageBuilderType(String flow, String key) {
-    MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = getMetadata(flow, key);
-    return toObjectType(metadata.get().getModel().getAllParameterModels().stream()
-        .filter(p -> p.getName().equals(MESSAGE_PARAM))
-        .findFirst().get().getType());
-  }
+  // @Step("Retrieve Dynamic Metadata for the Message Builder parameter")
+  // protected ObjectType getMessageBuilderType(String flow, String key) {
+  //   MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = getMetadata(flow, key);
+  //   return toObjectType(metadata.get().getModel().getAllParameterModels().stream()
+  //       .filter(p -> p.getName().equals(MESSAGE_PARAM))
+  //       .findFirst().get().getType());
+  // }
 
   protected Location location(String flow) {
     return builder().globalName(flow).addProcessorsPart().addIndexPart(0).build();
@@ -70,9 +73,7 @@ public abstract class AbstractMetadataTestCase extends AbstractSoapServiceTestCa
     return (ObjectType) type;
   }
 
-  protected MetadataType getMessageBuilderFieldType(MetadataType messageResult, String name) {
-    ObjectType objectType = toObjectType(messageResult);
-    return objectType.getFields().stream()
-        .filter(f -> f.getKey().getName().getLocalPart().equals(name)).findAny().get().getValue();
+  protected MetadataType getParameterType(List<ParameterModel> parameters, String name) {
+    return parameters.stream().filter(p -> p.getName().equals(name)).findFirst().get().getType();
   }
 }

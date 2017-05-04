@@ -32,6 +32,11 @@ public class ConfigOverrideTestCase extends AbstractExtensionFunctionalTestCase 
     return "vegan-config-overrides.xml";
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @Test
   public void simpleParameterOverrideWithConfigDefaults() throws Exception {
     TypedValue<Integer> result = flowRunner("timeToPeelOverrideOperationWithDefaults")

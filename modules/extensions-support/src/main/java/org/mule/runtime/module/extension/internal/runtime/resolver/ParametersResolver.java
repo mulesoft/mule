@@ -17,7 +17,7 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getExpressionBasedValueResolver;
@@ -50,6 +50,7 @@ import org.mule.runtime.extension.api.declaration.type.annotation.NullSafeTypeAn
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
+import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
@@ -116,15 +117,27 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     ResolverSet resolverSet =
         getParametersAsResolverSet(model, getFlatParameters(inlineGroups, model.getAllParameterModels()), muleContext);
     for (ParameterGroupModel group : inlineGroups) {
-      String groupKey = group.getModelProperty(ParameterGroupModelProperty.class)
-          .map(mp -> getContainerName(mp.getDescriptor().getContainer()))
-          .orElseGet(() -> group.getName());
 
-      if (parameters.containsKey(groupKey)) {
-        resolverSet.add(groupKey, toValueResolver(parameters.get(groupKey), group.getModelProperties()));
-      }
+      getInlineGroupResolver(group, resolverSet, muleContext);
     }
     return resolverSet;
+  }
+
+  private void getInlineGroupResolver(ParameterGroupModel group, ResolverSet resolverSet, MuleContext muleContext) {
+    Optional<ParameterGroupDescriptor> descriptor = group.getModelProperty(ParameterGroupModelProperty.class)
+        .map(ParameterGroupModelProperty::getDescriptor);
+
+    String groupKey = descriptor
+        .map(d -> getContainerName(d.getContainer()))
+        .orElseGet(group::getName);
+
+    if (parameters.containsKey(groupKey)) {
+      resolverSet.add(groupKey, toValueResolver(parameters.get(groupKey), group.getModelProperties()));
+    } else if (descriptor.isPresent()) {
+      resolverSet.add(groupKey,
+                      NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), descriptor.get().getMetadataType(),
+                                                      muleContext, this));
+    }
   }
 
   public ResolverSet getParametersAsResolverSet(ParameterizedModel model, List<ParameterModel> parameterModels,
@@ -193,7 +206,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   public void resolveParameterGroups(ObjectType objectType, DefaultObjectBuilder builder) {
     Class<?> objectClass = getType(objectType);
     objectType.getFields().stream()
-        .filter(ExtensionMetadataTypeUtils::isParameterGroup)
+        .filter(ExtensionMetadataTypeUtils::isFlattenedParameterGroup)
         .forEach(groupField -> {
           if (!(groupField.getValue() instanceof ObjectType)) {
             return;
@@ -215,7 +228,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   @Override
   public void resolveParameters(ObjectType objectType, DefaultObjectBuilder builder) {
     final Class<?> objectClass = getType(objectType);
-    final boolean isParameterGroup = isParameterGroup(objectType);
+    final boolean isParameterGroup = isFlattenedParameterGroup(objectType);
     objectType.getFields().forEach(field -> {
       final String key = getLocalPart(field);
       ValueResolver<?> valueResolver = null;
@@ -245,7 +258,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
         } catch (InitialisationException e) {
           throw new MuleRuntimeException(e);
         }
-      } else if (field.isRequired() && !isParameterGroup(field)) {
+      } else if (field.isRequired() && !isFlattenedParameterGroup(field)) {
         throw new IllegalStateException(format("The object '%s' requires the parameter '%s' but is not set",
                                                objectClass.getSimpleName(), objectField.getName()));
       }

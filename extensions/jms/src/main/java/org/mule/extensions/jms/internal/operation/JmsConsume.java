@@ -11,24 +11,24 @@ import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_CONTENT
 import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_ENCODING;
 import static org.mule.extensions.jms.internal.common.JmsCommons.createJmsSession;
 import static org.mule.extensions.jms.internal.common.JmsCommons.evaluateMessageAck;
-import static org.mule.extensions.jms.internal.common.JmsCommons.toInternalAckMode;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageContentType;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageEncoding;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveOverride;
+import static org.mule.extensions.jms.internal.common.JmsCommons.toInternalAckMode;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
 import org.mule.extensions.jms.api.config.ConsumerAckMode;
-import org.mule.extensions.jms.internal.config.JmsConfig;
 import org.mule.extensions.jms.api.config.JmsConsumerConfig;
-import org.mule.extensions.jms.internal.connection.JmsConnection;
-import org.mule.extensions.jms.internal.connection.JmsSession;
-import org.mule.extensions.jms.internal.connection.JmsTransactionalConnection;
 import org.mule.extensions.jms.api.destination.ConsumerType;
 import org.mule.extensions.jms.api.exception.JmsConsumeErrorTypeProvider;
 import org.mule.extensions.jms.api.exception.JmsConsumeException;
 import org.mule.extensions.jms.api.exception.JmsExtensionException;
 import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.internal.config.InternalAckMode;
+import org.mule.extensions.jms.internal.config.JmsConfig;
+import org.mule.extensions.jms.internal.connection.JmsConnection;
+import org.mule.extensions.jms.internal.connection.JmsSession;
+import org.mule.extensions.jms.internal.connection.JmsTransactionalConnection;
+import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
 import org.mule.extensions.jms.internal.consume.JmsMessageConsumer;
 import org.mule.extensions.jms.internal.message.JmsResultFactory;
 import org.mule.extensions.jms.internal.metadata.JmsOutputResolver;
@@ -43,14 +43,14 @@ import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import org.slf4j.Logger;
-
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
+
+import org.slf4j.Logger;
 
 /**
  * Operation that allows the user to consume a single {@link Message} from a given {@link Destination}
@@ -113,8 +113,8 @@ public final class JmsConsume {
 
       JmsSupport jmsSupport = connection.getJmsSupport();
       JmsSession session =
-          createJmsSession(connection, resolvedAckMode, consumerType.isTopic(), sessionManager);
-      Destination jmsDestination = jmsSupport.createDestination(session.get(), destination, consumerType.isTopic());
+          createJmsSession(connection, resolvedAckMode, consumerType.topic(), sessionManager);
+      Destination jmsDestination = jmsSupport.createDestination(session.get(), destination, consumerType.topic());
 
       JmsMessageConsumer consumer = connection.createConsumer(session.get(), jmsDestination, selector, consumerType);
 
@@ -138,7 +138,7 @@ public final class JmsConsume {
                                         session.getAckId());
     } catch (Exception e) {
       String msg = format("An error occurred while consuming a message from destination [%s] of type [%s]: ",
-                          destination, consumerType.isTopic() ? "TOPIC" : "QUEUE");
+                          destination, consumerType.topic() ? "TOPIC" : "QUEUE");
       LOGGER.error(msg, e);
       throw new JmsConsumeException(msg, e);
     }

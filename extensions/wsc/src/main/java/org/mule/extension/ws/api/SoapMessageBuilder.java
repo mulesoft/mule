@@ -7,10 +7,15 @@
 package org.mule.extension.ws.api;
 
 import org.mule.extension.ws.internal.WebServiceConsumer;
+import org.mule.extension.ws.internal.metadata.SoapAttachmentsTypeResolver;
+import org.mule.extension.ws.internal.metadata.SoapBodyTypeResolver;
+import org.mule.extension.ws.internal.metadata.SoapHeadersTypeResolver;
+import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.soap.SoapAttachment;
 
 import java.util.Map;
@@ -28,6 +33,8 @@ public class SoapMessageBuilder {
   @Parameter
   @Optional
   @Content(primary = true)
+  @TypeResolver(SoapBodyTypeResolver.class)
+  @Summary("The XML body to include in the SOAP message, with all the required parameters.")
   private String body;
 
   /**
@@ -36,6 +43,8 @@ public class SoapMessageBuilder {
   @Parameter
   @Optional
   @Content
+  @TypeResolver(SoapHeadersTypeResolver.class)
+  @Summary("The XML headers to include in the SOAP message.")
   private String headers;
 
   /**
@@ -45,6 +54,8 @@ public class SoapMessageBuilder {
   @Optional
   @NullSafe
   @Content
+  @TypeResolver(SoapAttachmentsTypeResolver.class)
+  @Summary("The attachments to include in the SOAP request.")
   private Map<String, SoapAttachment> attachments;
 
   public String getBody() {

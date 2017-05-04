@@ -19,6 +19,6 @@ public interface ConsumerType {
   /**
    * @return {@code true} if this a consumer for {@link Topic}s
    */
-  boolean isTopic();
+  boolean topic();
 
 }

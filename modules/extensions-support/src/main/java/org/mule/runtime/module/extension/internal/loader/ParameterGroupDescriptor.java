@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 
 import java.lang.reflect.AnnotatedElement;
@@ -37,16 +38,23 @@ public final class ParameterGroupDescriptor {
    */
   private final AnnotatedElement container;
 
-  public ParameterGroupDescriptor(String name, Type type, AnnotatedElement container) {
+  public MetadataType getMetadataType() {
+    return metadataType;
+  }
+
+  private final MetadataType metadataType;
+
+  public ParameterGroupDescriptor(String name, Type type, MetadataType metadataType, AnnotatedElement container) {
     checkArgument(!isBlank(name), "name cannot be blank");
     checkArgument(type != null, "type cannot be null");
     this.name = name;
     this.type = type;
     this.container = container;
+    this.metadataType = metadataType;
   }
 
   public ParameterGroupDescriptor(String name, Type type) {
-    this(name, type, null);
+    this(name, type, null, null);
   }
 
   /**

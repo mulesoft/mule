@@ -30,7 +30,7 @@ public class EmailBody {
    * Text body of the message content
    */
   @Parameter
-  @Content
+  @Content(primary = true)
   @Placement(order = 1)
   private String content;
 

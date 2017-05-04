@@ -52,8 +52,6 @@ abstract class AbstractQueryResolver<T extends StatementDefinition> implements Q
 
   @Override
   public Query resolve(T statementDefinition, DbConnector connector, DbConnection connection) {
-    statementDefinition = (T) statementDefinition.resolveFromTemplate();
-
     checkArgument(!isBlank(statementDefinition.getSql()), "sql query cannot be blank");
 
     QueryTemplate queryTemplate = getQueryTemplate(connector, connection, statementDefinition);

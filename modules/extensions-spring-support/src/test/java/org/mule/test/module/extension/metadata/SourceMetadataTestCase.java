@@ -42,6 +42,11 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
     return METADATA_TEST;
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return false;
+  }
+
   @Test
   public void getSourceMetadataKeys() {
     final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getMetadataKeys(location);

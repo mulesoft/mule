@@ -17,6 +17,7 @@ import static org.mule.extensions.jms.internal.message.JMSXDefinedPropertiesName
 import org.mule.extensions.jms.internal.message.JMSXDefinedPropertiesNames;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -42,6 +43,7 @@ public final class JmsxProperties {
    */
   @Parameter
   @Optional
+  @Summary("The identity of the user sending the message")
   private String jmsxUserID;
 
   /**
@@ -49,6 +51,7 @@ public final class JmsxProperties {
    */
   @Parameter
   @Optional
+  @Summary("The identity of the application sending the message")
   private String jmsxAppID;
 
   /**
@@ -56,6 +59,7 @@ public final class JmsxProperties {
    */
   @Parameter
   @Optional
+  @Summary("The number of message delivery attempts")
   private Integer jmsxDeliveryCount;
 
   /**
@@ -63,6 +67,7 @@ public final class JmsxProperties {
    */
   @Parameter
   @Optional
+  @Summary("The identity of the message group this message is part of")
   private String jmsxGroupID;
 
   /**
@@ -70,6 +75,7 @@ public final class JmsxProperties {
    */
   @Parameter
   @Optional
+  @Summary("The sequence number of this message within the group")
   private Integer jmsxGroupSeq;
 
   /**
@@ -77,6 +83,7 @@ public final class JmsxProperties {
    */
   @Parameter
   @Optional
+  @Summary("The transaction identifier of the transaction within which this message was produced")
   private String jmsxProducerTXID;
 
   /**
@@ -84,6 +91,7 @@ public final class JmsxProperties {
    */
   @Parameter
   @Optional
+  @Summary("The transaction identifier of the transaction within which this message was consumed")
   private String jmsxConsumerTXID;
 
   /**
@@ -91,6 +99,7 @@ public final class JmsxProperties {
    */
   @Parameter
   @Optional
+  @Summary("The time JMS delivered the message to the consumer")
   private Long jmsxRcvTimestamp;
 
   public JmsxProperties() {}
@@ -129,56 +138,56 @@ public final class JmsxProperties {
   /**
    * @return the JMSXUserID {@link Message} property
    */
-  public String getJMSXUserID() {
+  public String getJmsxUserID() {
     return jmsxUserID;
   }
 
   /**
    * @return the JMSXAppID {@link Message} property
    */
-  public String getJMSXAppID() {
+  public String getJmsxAppID() {
     return jmsxAppID;
   }
 
   /**
    * @return the JMSXDeliveryCount {@link Message} property
    */
-  public int getJMSXDeliveryCount() {
+  public int getJmsxDeliveryCount() {
     return jmsxDeliveryCount;
   }
 
   /**
    * @return the JMSXGroupID {@link Message} property
    */
-  public String getJMSXGroupID() {
+  public String getJmsxGroupID() {
     return jmsxGroupID;
   }
 
   /**
    * @return the JMSXGroupSeq {@link Message} property
    */
-  public int getJMSXGroupSeq() {
+  public int getJmsxGroupSeq() {
     return jmsxGroupSeq;
   }
 
   /**
    * @return the JMSXProducerTXID {@link Message} property
    */
-  public String getJMSXProducerTXID() {
+  public String getJmsxProducerTXID() {
     return jmsxProducerTXID;
   }
 
   /**
    * @return the JMSXConsumerTXID {@link Message} property
    */
-  public String getJMSXConsumerTXID() {
+  public String getJmsxConsumerTXID() {
     return jmsxConsumerTXID;
   }
 
   /**
    * @return the JMSXRcvTimestamp
    */
-  public long getJMSXRcvTimestamp() {
+  public long getJmsxRcvTimestamp() {
     return jmsxRcvTimestamp;
   }
 

@@ -296,7 +296,19 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
       @Override
       protected void onOperation(HasOperationModels owner, OperationModel model) {
         if (!model.getName().equals(TRANSFORM_IDENTIFIER)) {
-          declareComponent(model, e -> e.newOperation(model.getName()));
+          final DslElementSyntax elementDsl = dsl.resolve(model);
+          if (elementDsl.getElementName().equals(line.getIdentifier())) {
+            ComponentElementDeclarer declarer = extensionElementsDeclarer.newOperation(model.getName());
+
+            if (line.getConfigAttributes().get(CONFIG_ATTRIBUTE_NAME) != null) {
+              declarer.withConfig(line.getConfigAttributes().get(CONFIG_ATTRIBUTE_NAME).getValue());
+            }
+
+            declareParameterizedComponent(model, elementDsl, declarer, line.getConfigAttributes(), line.getChildren());
+            declarationConsumer.accept((ComponentElementDeclaration) declarer.getDeclaration());
+            stop();
+          }
+
         } else {
           declareTransform(model, e -> e.newOperation(model.getName()));
         }
@@ -304,7 +316,27 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
       @Override
       protected void onSource(HasSourceModels owner, SourceModel model) {
-        declareComponent(model, e -> e.newSource(model.getName()));
+        final DslElementSyntax elementDsl = dsl.resolve(model);
+        if (elementDsl.getElementName().equals(line.getIdentifier())) {
+          ComponentElementDeclarer declarer = extensionElementsDeclarer.newSource(model.getName());
+
+          if (line.getConfigAttributes().get(CONFIG_ATTRIBUTE_NAME) != null) {
+            declarer.withConfig(line.getConfigAttributes().get(CONFIG_ATTRIBUTE_NAME).getValue());
+          }
+
+          declareParameterizedComponent(model, elementDsl, declarer, line.getConfigAttributes(), line.getChildren());
+
+          model.getSuccessCallback()
+              .ifPresent(cb -> declareParameterizedComponent(cb, elementDsl, declarer,
+                                                             line.getConfigAttributes(), line.getChildren()));
+
+          model.getErrorCallback()
+              .ifPresent(cb -> declareParameterizedComponent(cb, elementDsl, declarer,
+                                                             line.getConfigAttributes(), line.getChildren()));
+
+          declarationConsumer.accept((ComponentElementDeclaration) declarer.getDeclaration());
+          stop();
+        }
       }
 
       @Override
@@ -352,8 +384,8 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         }
       }
 
-      private void declareComponent(ComponentModel model,
-                                    Function<ElementDeclarer, ComponentElementDeclarer> declarerProvider) {
+      private ComponentElementDeclarer declareComponent(ComponentModel model,
+                                                        Function<ElementDeclarer, ComponentElementDeclarer> declarerProvider) {
         final DslElementSyntax elementDsl = dsl.resolve(model);
         if (elementDsl.getElementName().equals(line.getIdentifier())) {
           ComponentElementDeclarer declarer = declarerProvider.apply(extensionElementsDeclarer);
@@ -363,9 +395,10 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
           }
 
           declareParameterizedComponent(model, elementDsl, declarer, line.getConfigAttributes(), line.getChildren());
-          declarationConsumer.accept((ComponentElementDeclaration) declarer.getDeclaration());
           stop();
+          return declarer;
         }
+        return null;
       }
 
       private void declareTransform(ComponentModel model,
@@ -484,29 +517,27 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
             }));
   }
 
+
+
   private void declareInlineGroup(ParameterGroupModel model, DslElementSyntax dsl, ConfigLine config,
                                   ParameterizedBuilder<String, ParameterValue, ?> groupContainer) {
 
     ParameterObjectValue.Builder builder = ElementDeclarer.newObjectValue();
     copyExplicitAttributes(config.getConfigAttributes(), builder);
-    declareComplexParameterValue(model, dsl, config, builder);
+    declareComplexParameterValue(model, dsl, config.getChildren(), builder);
     groupContainer.withParameter(model.getName(), builder.build());
   }
 
   private void declareComplexParameterValue(ParameterGroupModel group, DslElementSyntax groupDsl,
-                                            final ConfigLine config, ParameterObjectValue.Builder groupBuilder) {
-    group.getParameterModels().stream()
-        .filter(parameter -> groupDsl.getChild(parameter.getName())
-            .map(dsl -> dsl.getElementName().equals(config.getIdentifier()))
-            .orElse(false))
+                                            final List<ConfigLine> groupChilds, ParameterObjectValue.Builder groupBuilder) {
+
+    groupChilds.forEach(child -> group.getParameterModels().stream()
+        .filter(param -> groupDsl.getChild(param.getName())
+            .map(dsl -> dsl.getElementName().equals(child.getIdentifier())).orElse(false))
         .findFirst()
-        .ifPresent(parameter -> parameter.getType().accept(
-                                                           getParameterDeclarerVisitor(config,
-                                                                                       groupDsl.getChild(parameter.getName())
-                                                                                           .get(),
-                                                                                       value -> groupBuilder
-                                                                                           .withParameter(parameter.getName(),
-                                                                                                          value))));
+        .ifPresent(param -> param.getType()
+            .accept(getParameterDeclarerVisitor(child, groupDsl.getChild(param.getName()).get(),
+                                                value -> groupBuilder.withParameter(param.getName(), value)))));
   }
 
   private MetadataTypeVisitor getParameterDeclarerVisitor(final ConfigLine config,

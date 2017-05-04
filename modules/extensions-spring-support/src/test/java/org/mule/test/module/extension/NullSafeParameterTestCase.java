@@ -30,6 +30,11 @@ public class NullSafeParameterTestCase extends AbstractExtensionFunctionalTestCa
     return "vegan-null-safe-operation.xml";
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @Test
   public void getNullSafeObject() throws Exception {
     VeganPolicy policy = (VeganPolicy) flowRunner("policy").run().getMessage().getPayload().getValue();

@@ -12,10 +12,7 @@ import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionE
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
-import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
-
-import java.math.BigDecimal;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,26 +36,27 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   public void setUp() throws Exception {
     sourceTimesStarted = 0;
     HeisenbergSource.receivedGroupOnSource = false;
+    HeisenbergSource.receivedInlineOnError = false;
+    HeisenbergSource.receivedInlineOnSuccess = false;
+    HeisenbergSource.gatheredMoney = 0;
   }
 
   @Test
   public void source() throws Exception {
     startFlow("source");
-    HeisenbergExtension heisenberg = locateConfig();
-
     new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
-        .check(new JUnitLambdaProbe(() -> HeisenbergSource.receivedGroupOnSource
-            && new BigDecimal(POLL_DELAY_MILLIS).compareTo(heisenberg.getMoney()) < 0));
+        .check(new JUnitLambdaProbe(() -> HeisenbergSource.gatheredMoney > 100
+            && HeisenbergSource.receivedGroupOnSource
+            && HeisenbergSource.receivedInlineOnSuccess));
   }
 
   @Test
   public void onException() throws Exception {
     startFlow("sourceFailed");
-    HeisenbergExtension heisenberg = locateConfig();
-
     new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
-        .check(new JUnitLambdaProbe(() -> HeisenbergSource.receivedGroupOnSource
-            && heisenberg.getMoney().longValue() == -1));
+        .check(new JUnitLambdaProbe(() -> HeisenbergSource.gatheredMoney == -1
+            && HeisenbergSource.receivedGroupOnSource
+            && HeisenbergSource.receivedInlineOnError));
   }
 
   @Test
@@ -71,10 +69,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   public void reconnectWithEnrichedException() throws Exception {
     startFlow("sourceFailedOnRuntime");
     new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new JUnitLambdaProbe(() -> sourceTimesStarted > 2));
-  }
-
-  private HeisenbergExtension locateConfig() throws Exception {
-    return (HeisenbergExtension) muleContext.getExtensionManager().getConfiguration("heisenberg", testEvent()).getValue();
   }
 
   private void startFlow(String flowName) throws Exception {

@@ -8,9 +8,9 @@ package org.mule.extension.db.api.param;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 import java.util.LinkedHashMap;
@@ -23,7 +23,6 @@ import java.util.Map;
  *
  * @since 4.0
  */
-@XmlHints(allowTopLevelDefinition = true)
 public class StoredProcedureCall extends ParameterizedStatementDefinition<StoredProcedureCall> {
 
   /**
@@ -48,18 +47,10 @@ public class StoredProcedureCall extends ParameterizedStatementDefinition<Stored
   @DisplayName("Output Parameters")
   @XmlHints(allowReferences = false)
   private List<OutputParameter> outputParameters = new LinkedList<>();
-  /**
-   * A reference to a globally defined call to be used as a template
-   */
-  @Parameter
-  @Optional
-  @XmlHints(allowInlineDefinition = false)
-  private StoredProcedureCall template;
 
   @Override
   protected StoredProcedureCall copy() {
     StoredProcedureCall copy = super.copy();
-    copy.template = template;
     copy.outputParameters = new LinkedList<>(outputParameters);
     copy.inOutParameters = new LinkedHashMap<>(inOutParameters);
 
@@ -82,8 +73,4 @@ public class StoredProcedureCall extends ParameterizedStatementDefinition<Stored
     return unmodifiableMap(inOutParameters);
   }
 
-  @Override
-  public StoredProcedureCall getTemplate() {
-    return template;
-  }
 }

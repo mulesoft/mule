@@ -82,6 +82,11 @@ public abstract class AbstractElementModelTestCase extends MuleArtifactFunctiona
     modelResolver = DslElementModelFactory.getDefault(dslContext);
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   // Scaffolding
   protected <T extends NamedObject> DslElementModel<T> resolve(ComponentConfiguration component) {
     Optional<DslElementModel<T>> elementModel = modelResolver.create(component);

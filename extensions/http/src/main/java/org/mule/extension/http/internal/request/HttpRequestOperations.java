@@ -73,9 +73,9 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   public void request(@Placement(order = 1) @ParameterGroup(name = "URI Settings") UriSettings uriSettings,
                       @Placement(order = 2) @Optional(defaultValue = "GET") String method,
                       @ParameterGroup(name = CONFIGURATION_OVERRIDES) ConfigurationOverrides overrides,
-                      @ParameterGroup(
-                          name = "Response Validation Settings") ResponseValidationSettings responseValidationSettings,
                       @Placement(order = 3) @ParameterGroup(name = REQUEST_SETTINGS) HttpRequesterRequestBuilder requestBuilder,
+                      @Placement(order = 4) @ParameterGroup(
+                          name = "Response Validation Settings") ResponseValidationSettings responseValidationSettings,
                       @ParameterGroup(name = OTHER_SETTINGS) OutputSettings outputSettings,
                       @Connection HttpExtensionClient client,
                       @Config HttpRequesterConfig config,

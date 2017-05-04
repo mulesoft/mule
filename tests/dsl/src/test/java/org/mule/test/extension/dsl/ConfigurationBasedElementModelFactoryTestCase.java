@@ -25,11 +25,11 @@ import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class ConfigurationBasedElementModelFactoryTestCase extends AbstractElementModelTestCase {
 
@@ -283,8 +283,9 @@ public class ConfigurationBasedElementModelFactoryTestCase extends AbstractEleme
     assertThat(publishElement.findElement("destination").get().getModel(), is(findParameter("destination", publishModel)));
 
     // child element contains its configuration element along with its content
-    DslElementModel<Object> builderElement = publishElement.findElement("messageBuilder").get();
-    assertThat(builderElement.getModel(), is(findParameter("messageBuilder", publishModel)));
+    DslElementModel<Object> builderElement = publishElement.findElement("Message").get();
+    assertThat(builderElement.getModel(),
+               is(publishModel.getParameterGroupModels().stream().filter(g -> g.getName().equals("Message")).findFirst().get()));
     Optional<ComponentConfiguration> messageBuilder = builderElement.getConfiguration();
     assertThat(messageBuilder.isPresent(), is(true));
 
@@ -315,8 +316,9 @@ public class ConfigurationBasedElementModelFactoryTestCase extends AbstractEleme
     assertThat(publishElement.findElement("destination").get().getConfiguration().isPresent(), is(false));
     assertThat(publishElement.getConfiguration().get().getParameters().get("destination"), is("#[finalDestination]"));
 
-    DslElementModel<Object> builderElement = publishElement.findElement("messageBuilder").get();
-    assertThat(builderElement.getModel(), is(findParameter("messageBuilder", publishModel)));
+    DslElementModel<Object> builderElement = publishElement.findElement("Message").get();
+    assertThat(builderElement.getModel(),
+               is(publishModel.getParameterGroupModels().stream().filter(g -> g.getName().equals("Message")).findFirst().get()));
     Optional<ComponentConfiguration> messageBuilder = builderElement.getConfiguration();
     assertThat(messageBuilder.isPresent(), is(true));
 

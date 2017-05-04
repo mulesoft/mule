@@ -16,7 +16,7 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getFieldDefaultValueValueResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
@@ -34,7 +34,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -90,7 +89,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
         }
 
         String requiredFields = objectType.getFields().stream()
-            .filter(f -> f.isRequired() && !isParameterGroup(f))
+            .filter(f -> f.isRequired() && !isFlattenedParameterGroup(f))
             .map(MetadataTypeUtils::getLocalPart)
             .collect(joining(", "));
 
@@ -112,7 +111,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
           Optional<String> defaultValue = getDefaultValue(objectField);
           if (defaultValue.isPresent()) {
             resolver = getFieldDefaultValueValueResolver(objectField, muleContext);
-          } else if (isParameterGroup(objectField)) {
+          } else if (isFlattenedParameterGroup(objectField)) {
             DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder(getType(objectField.getValue()));
             resolverSet.add(field.getName(), new ObjectBuilderValueResolver<>(groupBuilder, muleContext));
 

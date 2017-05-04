@@ -24,6 +24,11 @@ public class PetStoreComplexParameterTestCase extends AbstractExtensionFunctiona
     return "petstore-complex-parameter.xml";
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @Test
   public void configWithConfigReferences() throws Exception {
     PetCage cage = (PetCage) flowRunner("getCageWithReferences").run().getMessage().getPayload().getValue();

@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import org.mule.metadata.api.model.MetadataType;
@@ -18,6 +19,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.MuleContext;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 
@@ -33,9 +35,14 @@ public class ResolverUtils {
   }
 
   static ValueResolver<?> getFieldDefaultValueValueResolver(ObjectFieldType field, MuleContext muleContext) {
-    MetadataType fieldType = field.getValue();
-    String expression = getDefaultValue(field).get();
-    return getExpressionBasedValueResolver(expression, fieldType, muleContext);
+    Optional<String> defaultValue = getDefaultValue(field);
+    checkArgument(defaultValue.isPresent(), "No default value available for field :" + field.getKey().getName());
+    return getExpressionBasedValueResolver(defaultValue.get(), field.getValue(), muleContext);
+  }
+
+  static ValueResolver<?> getFieldDefaultValueValueResolver(MetadataType fieldType, String defaultValue,
+                                                            MuleContext muleContext) {
+    return getExpressionBasedValueResolver(defaultValue, fieldType, muleContext);
   }
 
   public static ValueResolver<?> getExpressionBasedValueResolver(String expression, MetadataType metadataType,

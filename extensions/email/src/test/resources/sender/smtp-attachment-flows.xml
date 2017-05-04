@@ -7,7 +7,7 @@
 
     <flow name="sendEmailWithAttachment">
         <email:send config-ref="config" >
-            <email:email-builder subject="Email Subject">
+            <email:headers>
                 <email:to-addresses>
                     <email:to-address value="pablo.musumeci@mulesoft.com"/>
                 </email:to-addresses>
@@ -18,27 +18,26 @@
                     <email:bcc-address value="esteban.wasinger@mulesoft.com"/>
                     <email:bcc-address value="alejandro.g.marra@mulesoft.com"/>
                 </email:bcc-addresses>
-                <email:body contentType="text/plain">
-                    <email:content>Email Content</email:content>
-                </email:body>
-                <email:attachments>
-                    <email:email-attachment id="text-attachment" contentType="text/plain">
-                        <email:content>
-                            #['This is the email text attachment']
-                        </email:content>
-                    </email:email-attachment>
-                    <email:email-attachment id="json-attachment">
-                        <email:content>
-                            #[app.registry.jsonAttachmentResource.url]
-                        </email:content>
-                    </email:email-attachment>
-                    <email:email-attachment id="stream-attachment" contentType="application/octet-stream">
-                        <email:content>
-                            #["This is the email text attachment" as Binary]
-                        </email:content>
-                    </email:email-attachment>
-                </email:attachments>
-            </email:email-builder>
+                <email:attachments>#[[
+                    {
+                    id: "text-attachment",
+                    contentType: "text/plain",
+                    content: "This is the email text attachment"
+                    } as Object {class: "org.mule.extension.email.api.EmailAttachment"} ,
+                    {
+                    id: "json-attachment",
+                    content: app.registry.jsonAttachmentResource.url
+                    } as Object {class: "org.mule.extension.email.api.EmailAttachment"} ,
+                    {
+                    id: "stream-attachment",
+                    contentType: "application/octet-stream",
+                    content: "This is the email text attachment" as Binary
+                    } as Object {class: "org.mule.extension.email.api.EmailAttachment"}
+                    ]]</email:attachments>
+            </email:headers>
+            <email:body contentType="text/plain">
+                <email:content>Email Content</email:content>
+            </email:body>
         </email:send>
     </flow>
 

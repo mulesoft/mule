@@ -18,12 +18,12 @@
 
     <flow name="send-payload">
         <jms:publish config-ref="config" destination="#[initialDestination]">
-            <jms:message-builder>
+            <jms:message>
                 <jms:body>#[payload]</jms:body>
                 <jms:properties>
                     #[{(initialProperty): propertyValue}]
                 </jms:properties>
-            </jms:message-builder>
+            </jms:message>
         </jms:publish>
     </flow>
 
@@ -31,10 +31,10 @@
         <jms:consume config-ref="config" destination="#[initialDestination]" maximumWait="1000"/>
         <foreach>
             <jms:publish config-ref="config" destination="#[finalDestination]">
-                <jms:message-builder jmsxProperties="#[attributes.properties.jmsxProperties]">
+                <jms:message jmsxProperties="#[attributes.properties.jmsxProperties]">
                     <jms:body>#[bridgePrefix ++ payload]</jms:body>
                     <jms:properties>#[attributes.properties.userProperties]</jms:properties>
-                </jms:message-builder>
+                </jms:message>
             </jms:publish>
             <logger message="Message Sent"/>
         </foreach>

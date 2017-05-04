@@ -54,12 +54,11 @@ import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -161,9 +160,8 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
   // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnSuccess
-  public void onSuccess(
-                        @Optional @Placement(
-                            tab = RESPONSE_SETTINGS) @NullSafe HttpListenerResponseBuilder response,
+  public void onSuccess(@Placement(tab = RESPONSE_SETTINGS) @ParameterGroup(name = "Response",
+      showInDsl = true) HttpListenerResponseBuilder response,
                         SourceCallbackContext callbackContext)
       throws Exception {
 
@@ -174,9 +172,8 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
   // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnError
-  public void onError(
-                      @Optional @Placement(
-                          tab = ERROR_RESPONSE_SETTINGS) @NullSafe HttpListenerResponseBuilder errorResponse,
+  public void onError(@Placement(tab = ERROR_RESPONSE_SETTINGS) @ParameterGroup(name = "Error Response",
+      showInDsl = true) HttpListenerResponseBuilder errorResponse,
                       SourceCallbackContext callbackContext,
                       Error error) {
     final HttpResponseBuilder failureResponseBuilder = createFailureResponseBuilder(error, errorResponse);

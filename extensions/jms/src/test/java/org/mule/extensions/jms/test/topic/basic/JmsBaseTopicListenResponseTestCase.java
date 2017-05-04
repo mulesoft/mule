@@ -15,6 +15,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import org.mule.extensions.jms.api.destination.QueueConsumer;
+import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.test.JmsAbstractTestCase;
 import org.mule.runtime.api.message.Message;
 
@@ -22,6 +23,8 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+
+import javax.jms.DeliveryMode;
 
 import org.junit.After;
 import org.junit.Before;
@@ -34,19 +37,22 @@ public abstract class JmsBaseTopicListenResponseTestCase extends JmsAbstractTest
   protected static final String LISTENER_CONFIG = "source/jms-listen-reply.xml";
   protected static final String REQUEST_REPLY_CONFIG = "operations/jms-topic-request-reply.xml";
 
-  private static final String FIRST_MESSAGE = "My First Message";
-  private static final String FIRST_RESPONSE = "First Response";
+  private final String FIRST_MESSAGE = "My First Message";
+  private final String FIRST_RESPONSE = "First Response";
 
-  private static final String REQUEST_REPLY_EXPLICIT_DEST_FLOW = "request-reply-explicit-destination";
+  private final String REQUEST_REPLY_EXPLICIT_DEST_FLOW = "request-reply-explicit-destination";
 
-  private static final String LISTENER_DESTINATION = "topicListenerDestination";
+  private final String LISTENER_DESTINATION = "topicListenerDestination";
+  private final String LISTENER_DESTINATION_OVERRIDES = "topicListenerDestinationWithOverrides";
 
-  private static final String REPLY_TO_DESTINATION_VAR = "replyToDestination";
-  private static final String REPLY_TO_DESTINATION = "replyDestination";
-  private static final String REPLY_TO_DESTINATION_TYPE_VAR = "replyToDestinationType";
-  private static final String REPLY_CONSUMER_TYPE_VAR = "consumerType";
+  private final String REPLY_TO_DESTINATION_VAR = "replyToDestination";
+  private final String REPLY_TO_DESTINATION = newDestination("replyDestination");
+  private final String REPLY_TO_DESTINATION_OVERRIDES = newDestination("replyDestinationOverrides");
+  private final String REPLY_TO_DESTINATION_TYPE_VAR = "replyToDestinationType";
+  private final String REPLY_CONSUMER_TYPE_VAR = "consumerType";
 
-  private static final String READ_MESSAGE_PREFIX = "received_";
+  private final String READ_MESSAGE_PREFIX = "received_";
+  private final String READ_MESSAGE_PREFIX_OVERRIDE = "received_override_";
 
 
   private ExecutorService executor;
@@ -76,6 +82,25 @@ public abstract class JmsBaseTopicListenResponseTestCase extends JmsAbstractTest
     Message reply = consume(REPLY_TO_DESTINATION, of(REPLY_CONSUMER_TYPE_VAR, new QueueConsumer()), -1);
     assertThat(reply, hasPayload(equalTo(READ_MESSAGE_PREFIX + payload)));
   }
+
+  @Test
+  public void listenOnceReplyToQueueWithOverrides() throws Exception {
+    final String payload = "My Overrides Message";
+
+    publish(payload, LISTENER_DESTINATION_OVERRIDES,
+            ImmutableMap.<String, Object>builder()
+                .put(REPLY_TO_DESTINATION_VAR, REPLY_TO_DESTINATION_OVERRIDES)
+                .put(REPLY_TO_DESTINATION_TYPE_VAR, "QUEUE")
+                .build());
+
+    Message reply = consume(REPLY_TO_DESTINATION_OVERRIDES, of(REPLY_CONSUMER_TYPE_VAR, new QueueConsumer()), -1);
+    assertThat(reply, hasPayload(equalTo(READ_MESSAGE_PREFIX_OVERRIDE + payload)));
+    JmsAttributes attributes = (JmsAttributes) reply.getAttributes().getValue();
+    assertThat(attributes.getProperties().getUserProperties().get("flowName"), is(equalTo("listenerOverrides")));
+    assertThat(attributes.getHeaders().getJMSPriority(), is(equalTo(8)));
+    assertThat(attributes.getHeaders().getJMSDeliveryMode(), is(equalTo(DeliveryMode.PERSISTENT)));
+  }
+
 
   @Test
   @Description("Checks that a message can be sent and then wait for the reply to an explicit replyTo destination")

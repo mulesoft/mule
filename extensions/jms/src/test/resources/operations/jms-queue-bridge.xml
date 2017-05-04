@@ -7,21 +7,22 @@
 
     <flow name="send-payload">
         <jms:publish config-ref="config" destination="#[initialDestination]">
-            <jms:message-builder>
+            <jms:message>
                 <jms:properties>
                    #[{(initialProperty): propertyValue}]
                 </jms:properties>
-            </jms:message-builder>
+            </jms:message>
         </jms:publish>
     </flow>
 
     <flow name="bridge">
         <jms:consume config-ref="config" destination="#[initialDestination]" maximumWait="1000"/>
+        <logger level="ERROR"/>
         <jms:publish config-ref="config" destination="#[finalDestination]">
-            <jms:message-builder jmsxProperties="#[attributes.properties.jmsxProperties]">
+            <jms:message jmsxProperties="#[attributes.properties.jmsxProperties]">
                 <jms:body>#[bridgePrefix ++ payload]</jms:body>
                 <jms:properties>#[attributes.properties.userProperties]</jms:properties>
-            </jms:message-builder>
+            </jms:message>
         </jms:publish>
     </flow>
 

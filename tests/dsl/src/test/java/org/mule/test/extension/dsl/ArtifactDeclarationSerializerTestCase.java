@@ -8,7 +8,6 @@ package org.mule.test.extension.dsl;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newArtifact;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newFlow;
@@ -30,7 +29,6 @@ import static org.mule.runtime.extension.api.declaration.type.RedeliveryPolicyTy
 import static org.mule.runtime.extension.api.declaration.type.RedeliveryPolicyTypeBuilder.USE_SECURE_HASH;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
-import org.mule.extension.db.api.param.QueryDefinition;
 import org.mule.extensions.jms.api.connection.caching.NoCachingConfiguration;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ParameterElementDeclaration;
@@ -127,7 +125,7 @@ public class ArtifactDeclarationSerializerTestCase extends AbstractElementModelT
             .withComponent(jms.newOperation("publish")
                 .withConfig("config")
                 .withParameter("destination", "#[initialDestination]")
-                .withParameter("messageBuilder",
+                .withParameter("Message",
                                newObjectValue()
                                    .withParameter("body", "#[payload]")
                                    .withParameter("properties", "#[{(initialProperty): propertyValue}]")
@@ -144,7 +142,7 @@ public class ArtifactDeclarationSerializerTestCase extends AbstractElementModelT
                 .withComponent(jms.newOperation("publish")
                     .withConfig("config")
                     .withParameter("destination", "#[finalDestination]")
-                    .withParameter("messageBuilder",
+                    .withParameter("Message",
                                    newObjectValue()
                                        .withParameter("jmsxProperties",
                                                       "#[attributes.properties.jmsxProperties]")
@@ -177,14 +175,6 @@ public class ArtifactDeclarationSerializerTestCase extends AbstractElementModelT
     ElementDeclarer wsc = ElementDeclarer.forExtension("Web Service Consumer");
 
     return newArtifact()
-        .withGlobalElement(db.newGlobalParameter("query")
-            .withRefName("selectQuery")
-            .withValue(newObjectValue()
-                .ofType(QueryDefinition.class.getName())
-                .withParameter("sql", "select * from PLANET where name = :name")
-                .withParameter("inputParameters", "#[mel:['name' : payload]]")
-                .build())
-            .getDeclaration())
         .withGlobalElement(db.newConfiguration("config")
             .withRefName("dbConfig")
             .withConnection(db.newConnection("derby-connection")
@@ -256,7 +246,7 @@ public class ArtifactDeclarationSerializerTestCase extends AbstractElementModelT
                                    .withParameter(COUNT, "1")
                                    .withParameter(FREQUENCY, "0")
                                    .build())
-                .withParameter("response",
+                .withParameter("Response",
                                newObjectValue()
                                    .withParameter("headers", "#[{{'content-type' : 'text/plain'}}]")
                                    .withParameter("body", "#[{'my': 'map'}]")
@@ -332,7 +322,7 @@ public class ArtifactDeclarationSerializerTestCase extends AbstractElementModelT
                 .getDeclaration())
             .withComponent(wsc.newOperation("consume")
                 .withParameter("operation", "GetCitiesByCountry")
-                .withParameter("message", newObjectValue()
+                .withParameter("Message", newObjectValue()
                     .withParameter("attachments", "#[{}]")
                     .withParameter("headers",
                                    "#[{\"headers\": {con#headerIn: \"Header In Value\",con#headerInOut: \"Header In Out Value\"}]")

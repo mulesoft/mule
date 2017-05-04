@@ -195,8 +195,11 @@ public final class ParameterModelsLoaderDelegate {
                                                                 ((NamedDeclaration) component.getDeclaration()).getName()));
     } else {
       declarer.withModelProperty(new ParameterGroupModelProperty(
-                                                                 new ParameterGroupDescriptor(groupName, type, groupParameter
-                                                                     .getDeclaringElement())));
+                                                                 new ParameterGroupDescriptor(groupName, type,
+                                                                                              groupParameter
+                                                                                                  .getMetadataType(typeLoader),
+                                                                                              groupParameter
+                                                                                                  .getDeclaringElement())));
     }
 
     type.getAnnotation(ExclusiveOptionals.class).ifPresent(annotation -> {

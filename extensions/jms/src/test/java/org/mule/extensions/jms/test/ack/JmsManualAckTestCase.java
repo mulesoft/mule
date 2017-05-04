@@ -30,6 +30,11 @@ public class JmsManualAckTestCase extends JmsAbstractAckTestCase {
     return MANUAL;
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return false;
+  }
+
   @Test
   @Description("Receives two messages which are manually acknowledged and a third one that doesn't. After a session " +
       "recover only the last message get's redelivered")

@@ -69,7 +69,7 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser {
     parseParameters(getFlatParameters(inlineGroups, sourceModel.getAllParameterModels()));
 
     for (ParameterGroupModel group : inlineGroups) {
-      parseParameterGroup(group);
+      parseInlineParameterGroup(group);
     }
   }
 }

@@ -8,7 +8,6 @@ package org.mule.extensions.jms.internal;
  */
 
 
-import org.mule.extensions.jms.internal.config.JmsConfig;
 import org.mule.extensions.jms.api.connection.caching.CachingStrategy;
 import org.mule.extensions.jms.api.connection.caching.DefaultCachingStrategy;
 import org.mule.extensions.jms.api.connection.caching.NoCachingConfiguration;
@@ -21,9 +20,10 @@ import org.mule.extensions.jms.api.destination.QueueConsumer;
 import org.mule.extensions.jms.api.destination.TopicConsumer;
 import org.mule.extensions.jms.api.exception.JmsErrors;
 import org.mule.extensions.jms.api.exception.JmsExceptionHandler;
-import org.mule.extensions.jms.internal.operation.JmsAcknowledge;
+import org.mule.extensions.jms.internal.config.JmsConfig;
 import org.mule.extensions.jms.internal.connection.provider.GenericConnectionProvider;
 import org.mule.extensions.jms.internal.connection.provider.activemq.ActiveMQConnectionProvider;
+import org.mule.extensions.jms.internal.operation.JmsAcknowledge;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;

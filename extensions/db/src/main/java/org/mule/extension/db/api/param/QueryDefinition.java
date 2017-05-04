@@ -6,39 +6,11 @@
  */
 package org.mule.extension.db.api.param;
 
-import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
-import org.mule.runtime.extension.api.annotation.param.Optional;
-
 /**
  * The definition for a DML query
  *
  * @since 4.0
  */
-@Alias("query")
-@XmlHints(allowTopLevelDefinition = true)
 public class QueryDefinition extends ParameterizedStatementDefinition<QueryDefinition> {
-
-  /**
-   * A reference to a globally defined query to be used as a template
-   */
-  @Parameter
-  @Optional
-  @XmlHints(allowInlineDefinition = false)
-  private QueryDefinition template;
-
-  @Override
-  public QueryDefinition getTemplate() {
-    return template;
-  }
-
-  @Override
-  protected QueryDefinition copy() {
-    QueryDefinition copy = super.copy();
-    copy.template = template;
-
-    return copy;
-  }
 
 }

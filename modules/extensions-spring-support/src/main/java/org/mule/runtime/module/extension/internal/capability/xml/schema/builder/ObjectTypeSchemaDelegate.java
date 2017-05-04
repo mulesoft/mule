@@ -17,7 +17,7 @@ import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpre
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getLayoutModel;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getParameterRole;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION;
@@ -310,7 +310,7 @@ final class ObjectTypeSchemaDelegate {
 
       String fieldName = field.getKey().getName().getLocalPart();
       DslElementSyntax fieldDsl = typeDsl.getContainedElement(fieldName).orElse(null);
-      if (isParameterGroup(field)) {
+      if (isFlattenedParameterGroup(field)) {
         declareGroupedFields(extension, childElements, field);
       } else {
         declareObjectField(fieldDsl, field, extension, childElements);

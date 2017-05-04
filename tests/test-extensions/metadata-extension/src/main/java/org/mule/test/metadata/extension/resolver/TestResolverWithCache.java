@@ -61,15 +61,7 @@ public class TestResolverWithCache
   @Override
   public MetadataType getOutputType(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
-    MetadataCache cache = context.getCache();
-    Optional<String> brand = cache.get(BRAND);
-    if (brand.isPresent()) {
-      String serializable = brand.get();
-      return buildMetadataType(serializable);
-    }
-    String cachedModel = BRAND_VALUE;
-    cache.put(BRAND, cachedModel);
-    return buildMetadataType(cachedModel);
+    return buildMetadataType(context.getCache().computeIfAbsent(BRAND, (k) -> BRAND_VALUE));
   }
 
   private MetadataType buildMetadataType(String model) {

@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:typed-value="http://www.mulesoft.org/schema/mule/typed-value"
-      xmlns:context="http://www.springframework.org/schema/context"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/typed-value http://www.mulesoft.org/schema/mule/typed-value/current/mule-typed-value.xsd
-               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd">
+               http://www.mulesoft.org/schema/mule/typed-value http://www.mulesoft.org/schema/mule/typed-value/current/mule-typed-value.xsd">
 
 
     <typed-value:config name="config"/>
@@ -96,28 +94,10 @@
         </typed-value:typed-value-for-string-inside-pojo>
     </flow>
 
-    <flow name="typedValueForContentWithExplicitValue">
-        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
-        <typed-value:typed-value-operation-pojo-with-content >
-            <typed-value:param >
-                <typed-value:description>
-                    #[payload]
-                </typed-value:description>
-            </typed-value:param>
-        </typed-value:typed-value-operation-pojo-with-content>
-    </flow>
-
-    <flow name="typedValueForContentWithDefaultValue">
-        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
-        <typed-value:typed-value-operation-pojo-with-content >
-            <typed-value:param />
-        </typed-value:typed-value-operation-pojo-with-content>
-    </flow>
-
     <flow name="typedValueForContentOnNullSafePojoWithDefaultValue">
         <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
         <typed-value:typed-value-operation-pojo-with-nullsafe-and-content >
-            <typed-value:param />
+            <typed-value:param/>
         </typed-value:typed-value-operation-pojo-with-nullsafe-and-content>
     </flow>
 

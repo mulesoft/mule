@@ -9,10 +9,9 @@ package org.mule.extension.ws.internal;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import org.mule.extension.ws.api.SoapMessageBuilder;
-import org.mule.extension.ws.internal.metadata.ConsumeOutputResolver;
-import org.mule.extension.ws.internal.metadata.MessageBuilderResolver;
-import org.mule.extension.ws.internal.metadata.OperationKeysResolver;
 import org.mule.extension.ws.internal.metadata.ConsumeAttributesResolver;
+import org.mule.extension.ws.internal.metadata.ConsumeOutputResolver;
+import org.mule.extension.ws.internal.metadata.OperationKeysResolver;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.metadata.DataType;
@@ -21,10 +20,8 @@ import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
-import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.NullSafe;
-import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.services.soap.api.client.SoapClient;
 import org.mule.services.soap.api.exception.SoapFaultException;
@@ -63,8 +60,7 @@ public class ConsumeOperation {
   @OutputResolver(output = ConsumeOutputResolver.class, attributes = ConsumeAttributesResolver.class)
   public Result<?, SoapAttributes> consume(@Connection SoapClient connection,
                                            @MetadataKeyId(OperationKeysResolver.class) String operation,
-                                           // TODO MULE-11235 MULE-11584
-                                           @NullSafe @Optional @TypeResolver(MessageBuilderResolver.class) SoapMessageBuilder message)
+                                           @ParameterGroup(name = "Message", showInDsl = true) SoapMessageBuilder message)
       throws SoapFaultException {
     SoapRequestBuilder requestBuilder = getSoapRequest(operation, message);
     SoapResponse response = connection.consume(requestBuilder.build());

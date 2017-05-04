@@ -7,12 +7,14 @@
 package org.mule.extension.email.internal.sender;
 
 
+import org.mule.extension.email.api.EmailBody;
 import org.mule.extension.email.api.EmailBuilder;
 import org.mule.extension.email.api.exception.EmailSenderErrorTypeProvider;
 import org.mule.extension.email.internal.commands.SendCommand;
 import org.mule.runtime.extension.api.annotation.error.Throws;
-import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
@@ -39,7 +41,10 @@ public class SenderOperations {
   @Throws(EmailSenderErrorTypeProvider.class)
   public void send(@Connection SenderConnection connection,
                    @Config SMTPConfiguration configuration,
-                   EmailBuilder emailBuilder) {
+                   @ParameterGroup(name = "Headers", showInDsl = true) EmailBuilder emailBuilder,
+                   @ParameterGroup(name = "Body", showInDsl = true) EmailBody body) {
+
+    emailBuilder.setBody(body);
     sendOperation.send(connection, configuration, emailBuilder);
   }
 }

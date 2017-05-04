@@ -8,26 +8,26 @@ package org.mule.extensions.jms.internal.common;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.mule.extensions.jms.api.message.MessageBuilder.BODY_CONTENT_TYPE_JMS_PROPERTY;
-import static org.mule.extensions.jms.api.message.MessageBuilder.BODY_ENCODING_JMS_PROPERTY;
+import static org.mule.extensions.jms.api.message.JmsMessageBuilder.BODY_CONTENT_TYPE_JMS_PROPERTY;
+import static org.mule.extensions.jms.api.message.JmsMessageBuilder.BODY_ENCODING_JMS_PROPERTY;
 import static org.mule.extensions.jms.internal.config.InternalAckMode.MANUAL;
 import static org.mule.extensions.jms.internal.config.InternalAckMode.NONE;
 import static org.mule.extensions.jms.internal.config.InternalAckMode.TRANSACTED;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
+import org.mule.extensions.jms.api.exception.JmsAckException;
+import org.mule.extensions.jms.internal.config.InternalAckMode;
 import org.mule.extensions.jms.internal.config.JmsAckMode;
 import org.mule.extensions.jms.internal.connection.JmsConnection;
 import org.mule.extensions.jms.internal.connection.JmsSession;
-import org.mule.extensions.jms.api.exception.JmsAckException;
+import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
 import org.mule.extensions.jms.internal.source.JmsListenerLock;
-import org.mule.extensions.jms.internal.config.InternalAckMode;
-
-import org.slf4j.Logger;
 
 import java.util.Optional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
+
+import org.slf4j.Logger;
 
 /**
  * Utility class to reuse logic for JMS Extension

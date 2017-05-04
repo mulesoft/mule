@@ -47,6 +47,11 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
     return "subtypes-mapping.xml";
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @Test
   public void shapeRetriever() throws Exception {
     Event responseEvent = flowRunner("shapeRetriever").withPayload("").run();

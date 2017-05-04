@@ -94,6 +94,11 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     return METADATA_TEST;
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @Test
   public void getMetadataKeysWithKeyId() throws Exception {
     location = Location.builder().globalName(OUTPUT_METADATA_WITH_KEY_ID).addProcessorsPart().addIndexPart(0).build();
@@ -356,6 +361,10 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
 
   @Test
   public void multipleCaches() throws Exception {
+    MuleMetadataService metadataManager = (MuleMetadataService) muleContext.getRegistry().lookupObject(MetadataService.class);
+    Map<String, ? extends MetadataCache> caches = metadataManager.getMetadataCaches();
+    caches.keySet().forEach(metadataManager::disposeCache);
+
     // using config
     location = Location.builder().globalName(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER).addProcessorsPart().addIndexPart(0).build();
     getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
@@ -368,8 +377,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
         .addIndexPart(0).build();
     getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
 
-    MuleMetadataService metadataManager = (MuleMetadataService) muleContext.getRegistry().lookupObject(MetadataService.class);
-    Map<String, ? extends MetadataCache> caches = metadataManager.getMetadataCaches();
+    caches = metadataManager.getMetadataCaches();
 
     assertThat(caches.keySet(), hasSize(2));
     assertThat(caches.keySet(), hasItems(CONFIG, ALTERNATIVE_CONFIG));

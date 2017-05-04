@@ -38,6 +38,11 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
     return "content-type-handling-config.xml";
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @BeforeClass
   public static void before() throws Exception {
     customEncoding = defaultCharset().name().equals(UTF_8) ? ISO_8859_1 : UTF_8;

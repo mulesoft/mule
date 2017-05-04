@@ -118,7 +118,7 @@ public class Jms20Support implements JmsSupport {
   public MessageConsumer createConsumer(Session session, Destination destination, String messageSelector, ConsumerType type)
       throws JMSException {
 
-    if (!type.isTopic()) {
+    if (!type.topic()) {
       return session.createConsumer(destination, messageSelector);
     }
 

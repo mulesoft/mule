@@ -34,6 +34,11 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
     return new String[] {"typed-value-config.xml"};
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @After
   public void cleanUp() {
     TypedValueSource.onSuccessValue = null;
@@ -123,20 +128,6 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
     Event event = flowRunner("typedValueForStringInsidePojo").run();
     DifferedKnockableDoor value = (DifferedKnockableDoor) event.getMessage().getPayload().getValue();
     assertTypedValue(value.getAddress(), "string", MediaType.APPLICATION_JSON, UTF8);
-  }
-
-  @Test
-  public void typedValueForContentWithExplicitValue() throws Exception {
-    Event event = flowRunner("typedValueForContentWithExplicitValue").run();
-    VeganProductInformation value = (VeganProductInformation) event.getMessage().getPayload().getValue();
-    assertTypedValue(value.getDescription(), "string", APPLICATION_JSON, UTF8);
-  }
-
-  @Test
-  public void typedValueForContentWithDefaultValue() throws Exception {
-    Event event = flowRunner("typedValueForContentWithDefaultValue").run();
-    VeganProductInformation value = (VeganProductInformation) event.getMessage().getPayload().getValue();
-    assertTypedValue(value.getDescription(), "string", APPLICATION_JSON, UTF8);
   }
 
   @Test
