@@ -39,8 +39,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-
 public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.EmbeddedContainerBuilder {
 
   private String muleVersion;
@@ -207,7 +205,7 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
 
   private static ClassLoader createEmbeddedImplClassLoader(ClassLoader parentClassLoader, MavenClient mavenClient,
                                                            String muleVersion)
-      throws ArtifactResolutionException, MalformedURLException {
+      throws MalformedURLException {
 
     BundleDescriptor embeddedControllerImplDescriptor = new BundleDescriptor.Builder().setGroupId("org.mule.runtime")
         .setArtifactId("mule-module-embedded-impl").setVersion(muleVersion).setType("jar").build();

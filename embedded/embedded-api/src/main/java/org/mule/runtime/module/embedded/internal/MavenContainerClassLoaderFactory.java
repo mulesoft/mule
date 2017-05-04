@@ -8,7 +8,7 @@
 package org.mule.runtime.module.embedded.internal;
 
 import static java.util.stream.Collectors.toList;
-import static org.codehaus.plexus.util.FileUtils.toFile;
+import static org.apache.commons.io.FileUtils.toFile;
 import org.mule.maven.client.api.BundleDependency;
 import org.mule.maven.client.api.BundleDescriptor;
 import org.mule.maven.client.api.MavenClient;
@@ -20,8 +20,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.eclipse.aether.resolution.ArtifactResolutionException;
 
 /**
  * Creates a {@link ClassLoader} with the {@link URL}'s for the Container.
@@ -47,8 +45,7 @@ public class MavenContainerClassLoaderFactory {
    * @param containerBaseFolder
    * @return a {@link ClassLoader} Container.
    */
-  public ClassLoader create(String version, ClassLoader parentClassLoader, URL containerBaseFolder)
-      throws ArtifactResolutionException {
+  public ClassLoader create(String version, ClassLoader parentClassLoader, URL containerBaseFolder) {
     try {
       BundleDescriptor containerBomBundleDescriptor = getContainerBomBundleDescriptor(version);
       List<BundleDependency> bundleDependencies =
