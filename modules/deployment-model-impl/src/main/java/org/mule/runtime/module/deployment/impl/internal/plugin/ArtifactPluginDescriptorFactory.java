@@ -7,7 +7,6 @@
 
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
-import static java.io.File.separator;
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.PLUGIN;
@@ -40,7 +39,7 @@ import java.util.Optional;
  */
 public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactory<ArtifactPluginDescriptor> {
 
-  private static final String MULE_PLUGIN_JSON_PATH = MULE_ARTIFACT_FOLDER + separator + MULE_PLUGIN_JSON;
+  private static final String MULE_PLUGIN_JSON_PATH = MULE_ARTIFACT_FOLDER + "/" + MULE_PLUGIN_JSON;
 
   private final DescriptorLoaderRepository descriptorLoaderRepository;
 
