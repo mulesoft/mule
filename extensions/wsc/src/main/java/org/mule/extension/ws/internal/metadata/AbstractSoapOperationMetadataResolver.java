@@ -19,7 +19,7 @@ import org.mule.services.soap.api.client.metadata.SoapOperationMetadata;
  *
  * @since 4.0
  */
-abstract class MessageBuilderResolver extends BaseWscResolver {
+abstract class AbstractSoapOperationMetadataResolver extends BaseWscResolver {
 
   /**
    * {@inheritDoc}
@@ -29,6 +29,7 @@ abstract class MessageBuilderResolver extends BaseWscResolver {
    */
   public SoapOperationMetadata getSoapMetadata(MetadataContext context, String operationName)
       throws MetadataResolvingException, ConnectionException {
+    // TODO MULE-12405: Use MetadataCache for the resolved SoapOperationMetadata
     return getMetadataResolver(context).getInputMetadata(operationName);
   }
 }

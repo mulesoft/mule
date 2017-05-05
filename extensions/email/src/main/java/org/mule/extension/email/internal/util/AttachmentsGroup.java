@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class AttachmentsGroup {
+public final class AttachmentsGroup {
 
   @Optional
   @Parameter

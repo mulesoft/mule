@@ -17,7 +17,7 @@ import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
  *
  * @since 4.0
  */
-public class SoapHeadersTypeResolver extends MessageBuilderResolver implements InputTypeResolver<String> {
+public class SoapHeadersTypeResolver extends AbstractSoapOperationMetadataResolver implements InputTypeResolver<String> {
 
   @Override
   public String getResolverName() {

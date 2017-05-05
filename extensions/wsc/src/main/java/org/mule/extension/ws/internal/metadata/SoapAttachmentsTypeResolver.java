@@ -17,7 +17,7 @@ import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
  *
  * @since 4.0
  */
-public class SoapAttachmentsTypeResolver extends MessageBuilderResolver implements InputTypeResolver<String> {
+public class SoapAttachmentsTypeResolver extends AbstractSoapOperationMetadataResolver implements InputTypeResolver<String> {
 
   @Override
   public String getResolverName() {
