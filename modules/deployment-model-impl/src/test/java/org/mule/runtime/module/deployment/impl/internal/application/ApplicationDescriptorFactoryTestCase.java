@@ -64,6 +64,7 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -226,6 +227,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     assertThat(desc.getConfigResources(), contains("mule/file1.xml", "mule/file2.xml"));
   }
 
+  @Ignore
   @Test
   public void classLoaderModelWithSingleDependency() throws Exception {
     ApplicationDescriptor desc = createApplicationDescriptor("apps/single-dependency");
@@ -240,6 +242,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     assertThat(asList(classLoaderModel.getUrls()), hasItem(commonsCollectionDependency.getBundleUrl()));
   }
 
+  @Ignore
   @Test
   public void classLoaderModelWithPluginDependency() throws Exception {
     ApplicationDescriptor desc = createApplicationDescriptor("apps/plugin-dependency");
@@ -253,6 +256,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     assertThat(asList(classLoaderModel.getUrls()), not(hasItem(classLoaderModel.getDependencies().iterator().next())));
   }
 
+  @Ignore
   @Test
   public void classLoaderModelWithPluginDependencyWithAnotherPlugin() throws Exception {
     ApplicationDescriptor desc = createApplicationDescriptor("apps/plugin-dependency-with-another-plugin");
