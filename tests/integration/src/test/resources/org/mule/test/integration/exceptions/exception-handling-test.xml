@@ -2,9 +2,11 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <spring:bean id="objectStore" class="org.mule.runtime.core.util.store.PartitionedPersistentObjectStore" />
@@ -144,6 +146,14 @@
                 </until-successful>
             </on-error-propagate>
         </error-handler>
+    </flow>
+
+    <flow name="errorThrownByOperationInForeach">
+        <foreach>
+            <file:write path="#[£$invalid]">
+                <file:content>#[payload]</file:content>
+            </file:write>
+        </foreach>
     </flow>
 
 </mule>

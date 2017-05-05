@@ -15,6 +15,9 @@ import static org.mule.test.marvel.ironman.IronManOperations.FLIGHT_PLAN;
 import static org.mule.test.marvel.model.MissileProofVillain.MISSILE_PROOF;
 import static org.mule.test.marvel.model.Villain.KABOOM;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
+
+import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.test.marvel.ironman.IronMan;
 import org.mule.test.marvel.model.MissileProofVillain;
@@ -24,6 +27,7 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentMatcher;
 
 public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -42,7 +46,16 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
 
   @Test
   public void failingNonBlockingConnectedOperation() throws Exception {
+    Processor operation = ((Pipeline) getFlowConstruct("fireMissile")).getMessageProcessors().get(1);
+
     expectedException.expect(instanceOf(MessagingException.class));
+    expectedException.expect(new ArgumentMatcher<Object>() {
+
+      @Override
+      public boolean matches(Object o) {
+        return ((MessagingException) o).getFailingMessageProcessor() == operation;
+      }
+    });
     expectedException.expectMessage(MISSILE_PROOF);
     expectedException.expectCause(instanceOf(UnsupportedOperationException.class));
 

@@ -11,6 +11,7 @@ import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -18,12 +19,12 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.runtime.core.routing.outbound.CollectionMessageSequence;
 
@@ -58,7 +59,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
   private List<Processor> messageProcessors;
-  private Processor ownedMessageProcessor;
+  private MessageProcessorChain ownedMessageProcessor;
   private AbstractMessageSequenceSplitter splitter;
   private String collectionExpression;
   private ExpressionConfig expressionConfig = new ExpressionConfig();
@@ -116,7 +117,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
       if (splitter.equals(e.getFailingMessageProcessor())) {
         // Make sure the context information for the exception is relative to the ForEach.
         e.getInfo().remove(INFO_LOCATION_KEY);
-        throw new MessagingException(event, e, this);
+        throw new MessagingException(event, e.getCause(), this);
       } else {
         throw e;
       }
@@ -178,7 +179,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     List<Processor> chainProcessors = new ArrayList<>();
     chainProcessors.add(splitter);
     chainProcessors.add(newChain(messageProcessors));
-    ownedMessageProcessor = new DefaultMessageProcessorChainBuilder().chain(chainProcessors).build();
+    ownedMessageProcessor = newChain(chainProcessors);
     super.initialise();
   }
 
