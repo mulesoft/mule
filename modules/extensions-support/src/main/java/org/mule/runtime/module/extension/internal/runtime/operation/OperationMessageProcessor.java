@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -29,9 +28,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
-import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.TypedComponentIdentifier;
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -54,8 +50,6 @@ import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
-import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
-import org.mule.runtime.dsl.api.component.config.DefaultLocationPart;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
@@ -307,23 +301,5 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   @Override
   public ProcessingType getProcessingType() {
     return asProcessingType(operationModel.getExecutionType());
-  }
-
-  @Override
-  public ComponentLocation getLocation() {
-    ComponentLocation location = super.getLocation();
-    DefaultLocationPart part = new DefaultLocationPart("part", Optional.of(new TypedComponentIdentifier() {
-
-      @Override
-      public ComponentType getType() {
-        return ComponentType.OPERATION;
-      }
-
-      @Override
-      public ComponentIdentifier getIdentifier() {
-        return ComponentIdentifier.builder().withName("dummy").withNamespace("suads").build();
-      }
-    }), empty(), empty());
-    return location != null ? location : new DefaultComponentLocation(empty(), singletonList(part));
   }
 }
