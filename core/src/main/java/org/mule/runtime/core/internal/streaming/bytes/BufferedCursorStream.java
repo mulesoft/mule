@@ -24,8 +24,9 @@ import java.nio.ByteBuffer;
  */
 public final class BufferedCursorStream extends AbstractCursorStream {
 
+  private static final int LOCAL_BUFFER_SIZE = 64;
+
   private final InputStreamBuffer streamBuffer;
-  private final int localBufferSize;
 
   /**
    * Intermediate buffer between this cursor and the {@code traversableBuffer}. This reduces contention
@@ -39,17 +40,14 @@ public final class BufferedCursorStream extends AbstractCursorStream {
    *
    * @param streamBuffer    the buffer which provides data
    * @param bufferManager   the {@link ByteBufferManager} that will be used to allocate all buffers
-   * @param localBufferSize The size of the intermediate buffer
    */
   public BufferedCursorStream(InputStreamBuffer streamBuffer,
                               CursorStreamProvider provider,
-                              ByteBufferManager bufferManager,
-                              int localBufferSize) {
+                              ByteBufferManager bufferManager) {
     super(provider);
     this.streamBuffer = streamBuffer;
-    this.localBufferSize = localBufferSize;
     this.bufferManager = bufferManager;
-    memoryBuffer = bufferManager.allocate(localBufferSize);
+    memoryBuffer = bufferManager.allocate(LOCAL_BUFFER_SIZE);
     memoryBuffer.flip();
   }
 
@@ -107,7 +105,7 @@ public final class BufferedCursorStream extends AbstractCursorStream {
   private int reloadLocalBufferIfEmpty(int len) {
     if (!memoryBuffer.hasRemaining()) {
       memoryBuffer.clear();
-      int read = streamBuffer.get(memoryBuffer, position, min(localBufferSize, len));
+      int read = streamBuffer.get(memoryBuffer, position, min(LOCAL_BUFFER_SIZE, len));
       if (read > 0) {
         memoryBuffer.flip();
         return read;

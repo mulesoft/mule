@@ -4873,7 +4873,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="maxInMemorySize" type="substitutableInt" use="optional" default="1024">
+                <xsd:attribute name="maxBufferSize" type="substitutableInt" use="optional" default="1024">
                     <xsd:annotation>
                         <xsd:documentation>
                             This is the maximum amount of memory that will be used. If more than that is used then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised.
@@ -4952,7 +4952,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="maxInMemoryInstances" type="substitutableInt" use="optional" default="500">
+                <xsd:attribute name="maxBufferSize" type="substitutableInt" use="optional" default="500">
                     <xsd:annotation>
                         <xsd:documentation>
                             This is the maximum amount of instances that will be kept in memory. If more than that are required,

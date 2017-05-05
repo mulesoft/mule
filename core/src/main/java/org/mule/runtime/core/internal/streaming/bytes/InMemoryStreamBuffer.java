@@ -52,7 +52,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
         ? config.getBufferSizeIncrement()
         : new DataSize(0, BYTE);
 
-    this.maxBufferSize = config.getMaxInMemorySize();
+    this.maxBufferSize = config.getMaxBufferSize();
   }
 
   @Override

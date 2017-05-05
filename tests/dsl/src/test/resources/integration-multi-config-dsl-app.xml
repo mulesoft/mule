@@ -75,7 +75,7 @@
          <repeatable-in-memory-stream bufferSizeIncrement="8"
                                       bufferUnit="KB"
                                       initialBufferSize="51"
-                                      maxInMemorySize="1000"/>
+                                      maxBufferSize="1000"/>
         </sockets:send-and-receive>
 
         <wsc:consume operation="GetCitiesByCountry">
