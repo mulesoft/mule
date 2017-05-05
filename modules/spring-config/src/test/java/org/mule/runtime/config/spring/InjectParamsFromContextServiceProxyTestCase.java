@@ -65,6 +65,17 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   }
 
   @Test
+  public void augmentedSubclassInvocation() throws Exception {
+    BaseService service = new AugmentedSubclassMethodService();
+
+    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
+
+    serviceProxy.augmented();
+
+    assertThat(augmentedParam, sameInstance(muleContext));
+  }
+
+  @Test
   public void augmentedWithPreferredInvocation() throws Exception {
     muleContext.getRegistry().registerObject("myBean", new MyBean());
     final MyPreferredBean preferredBean = new MyPreferredBean();
@@ -219,6 +230,15 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
     public void augmented(MuleContext context) {
       augmentedParam = context;
     }
+  }
+
+  public class AugmentedSubclassMethodService extends AugmentedMethodService {
+
+    @Override
+    public String getName() {
+      return "AugmentedSubclassMethodService";
+    }
+
   }
 
   public class AugmentedWithPreferredMethodService implements BaseService {

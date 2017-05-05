@@ -8,6 +8,7 @@ package org.mule.runtime.container.api;
 
 import static java.lang.reflect.Proxy.getInvocationHandler;
 import static java.lang.reflect.Proxy.isProxyClass;
+import static java.util.Arrays.asList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.service.Service;
@@ -16,6 +17,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Extends {@link InvocationHandler} to provide and expose metadata about the inner {@link Service} implementation.
@@ -45,7 +48,14 @@ public abstract class ServiceInvocationHandler implements InvocationHandler {
     if (isProxyClass(getService().getClass()) && getInvocationHandler(getService()) instanceof ServiceInvocationHandler) {
       return ((ServiceInvocationHandler) getInvocationHandler(getService())).getServiceImplementationDeclaredMethods();
     } else {
-      return getService().getClass().getDeclaredMethods();
+      List<Method> methods = new LinkedList<>();
+      Class<?> clazz = getService().getClass();
+      while (clazz != Object.class) {
+        methods.addAll(asList(clazz.getDeclaredMethods()));
+        clazz = clazz.getSuperclass();
+      }
+
+      return methods.toArray(new Method[methods.size()]);
     }
   }
 
