@@ -50,6 +50,6 @@ public class FootballSoapExtension implements SoapServiceProvider {
 
   @Override
   public java.util.Optional<MessageDispatcher> getCustomDispatcher() {
-    return useCustomTransport? of(new FootballTestDispatcher()) : empty();
+    return useCustomTransport ? of(new FootballTestDispatcher()) : empty();
   }
 }
