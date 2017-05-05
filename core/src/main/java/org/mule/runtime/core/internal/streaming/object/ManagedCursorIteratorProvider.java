@@ -16,12 +16,23 @@ import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+/**
+ * {@link ManagedCursorProvider} implementation for {@link CursorIteratorProvider} instances
+ *
+ * @since 4.0
+ */
 public class ManagedCursorIteratorProvider extends ManagedCursorProvider<CursorIterator> implements CursorIteratorProvider {
 
+  /**
+   * {@inheritDoc}
+   */
   public ManagedCursorIteratorProvider(CursorContext cursorContext, CursorManager cursorManager) {
     super(cursorContext, cursorManager);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   protected CursorIterator managedCursor(CursorIterator cursor, CursorContext handle) {
     return new ManagedCursorIterator(cursor, handle);
