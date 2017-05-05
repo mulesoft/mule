@@ -33,6 +33,11 @@ public class PetStoreISO8601DateParsingTestCase extends AbstractExtensionFunctio
     return "petstore-iso8601-config.xml";
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @Test
   public void testDateTimeWithTimeZone() throws Exception {
     Date date = getDate("getWithTimeZone");

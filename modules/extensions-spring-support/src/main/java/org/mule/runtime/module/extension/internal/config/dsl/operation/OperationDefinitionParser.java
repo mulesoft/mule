@@ -71,7 +71,7 @@ public class OperationDefinitionParser extends ExtensionDefinitionParser {
     parseParameters(getFlatParameters(inlineGroups, operationModel.getAllParameterModels()));
 
     for (ParameterGroupModel group : inlineGroups) {
-      parseParameterGroup(group);
+      parseInlineParameterGroup(group);
     }
   }
 }

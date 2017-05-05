@@ -12,7 +12,7 @@ import static org.mule.extensions.jms.api.exception.JmsErrors.PUBLISHING;
 import org.mule.extensions.jms.internal.config.JmsConfig;
 import org.mule.extensions.jms.internal.connection.JmsConnection;
 import org.mule.extensions.jms.api.destination.DestinationType;
-import org.mule.extensions.jms.api.message.MessageBuilder;
+import org.mule.extensions.jms.api.message.JmsMessageBuilder;
 import org.mule.extensions.jms.internal.operation.JmsPublish;
 import org.mule.extensions.jms.api.publish.JmsPublishParameters;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
@@ -24,7 +24,7 @@ import java.util.Set;
 
 /**
  * Errors that can be thrown in the
- * {@link JmsPublish#publish(JmsConfig, JmsConnection, String, DestinationType, MessageBuilder, JmsPublishParameters)} operation
+ * {@link JmsPublish#publish(JmsConfig, JmsConnection, String, DestinationType, JmsMessageBuilder, JmsPublishParameters)} operation
  * operation.
  *
  * @since 1.0

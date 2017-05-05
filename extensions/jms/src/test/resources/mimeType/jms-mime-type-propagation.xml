@@ -14,17 +14,18 @@
 
     <flow name="publishConsumer">
         <jms:publish-consume config-ref="config" destination="${destination}">
-            <jms:message-builder >
+            <jms:message>
                 <jms:reply-to destination="${destination}" destinationType="QUEUE"/>
-            </jms:message-builder>
+            </jms:message>
         </jms:publish-consume>
     </flow>
 
     <flow name="publishConsumer-with-override">
-        <jms:publish-consume config-ref="config" destination="${destination}" contentType="text/json" encoding="US-ASCII">
-            <jms:message-builder >
+        <jms:publish-consume config-ref="config" destination="${destination}">
+            <jms:message>
                 <jms:reply-to destination="${destination}" destinationType="QUEUE"/>
-            </jms:message-builder>
+            </jms:message>
+            <jms:consume-configuration inboundContentType="text/json" inboundEncoding="US-ASCII"/>
         </jms:publish-consume>
     </flow>
 
@@ -43,14 +44,15 @@
     </flow>
 
     <flow name="listener-with-override" initialState="stopped">
-        <jms:listener config-ref="config" destination="${destination}" ackMode="AUTO" contentType="text/json" encoding="US-ASCII"/>
+        <jms:listener config-ref="config" destination="${destination}" ackMode="AUTO"
+                      inboundContentType="text/json" inboundEncoding="US-ASCII"/>
         <logger level="DEBUG" message="#[payload]"/>
         <component class="org.mule.extensions.jms.test.JmsMessageStorage"/>
     </flow>
 
     <flow name="publisher-without-mimeType-propagation">
         <jms:publish config-ref="config" destination="${destination}">
-            <jms:message-builder sendContentType="false" sendEncoding="false"/>
+            <jms:message sendContentType="false" sendEncoding="false"/>
         </jms:publish>
         <logger level="DEBUG" message="#[payload]"/>
     </flow>

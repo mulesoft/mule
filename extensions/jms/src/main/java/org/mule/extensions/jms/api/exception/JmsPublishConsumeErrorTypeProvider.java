@@ -15,7 +15,7 @@ import static org.mule.extensions.jms.api.exception.JmsErrors.TIMEOUT;
 import org.mule.extensions.jms.api.config.AckMode;
 import org.mule.extensions.jms.internal.config.JmsConfig;
 import org.mule.extensions.jms.internal.connection.JmsConnection;
-import org.mule.extensions.jms.api.message.MessageBuilder;
+import org.mule.extensions.jms.api.message.JmsMessageBuilder;
 import org.mule.extensions.jms.internal.operation.JmsPublishConsume;
 import org.mule.extensions.jms.api.publish.JmsPublishParameters;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Errors that can be thrown in the
- * {@link JmsPublishConsume#publishConsume(JmsConfig, JmsConnection, String, MessageBuilder, AckMode, long, TimeUnit, JmsPublishParameters, String, String)}
+ * {@link JmsPublishConsume#publishConsume(JmsConfig, JmsConnection, String, JmsMessageBuilder, AckMode, long, TimeUnit, JmsPublishParameters, String, String)}
  * operation operation.
  *
  * @since 4.0

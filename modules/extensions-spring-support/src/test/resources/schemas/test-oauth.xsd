@@ -26,7 +26,7 @@
                 <xs:extension base="extension:abstractConnectionProviderType">
                     <xs:sequence minOccurs="0" maxOccurs="1">
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="oauth-authorization-code">
+                            <xs:element minOccurs="1" maxOccurs="1" name="oauth-authorization-code">
                             <xs:complexType>
                                 <xs:complexContent>
                                     <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
@@ -75,7 +75,7 @@
                                 </xs:complexContent>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="oauth-callback-config">
+                          <xs:element minOccurs="1" maxOccurs="1" name="oauth-callback-config">
                             <xs:complexType>
                                 <xs:complexContent>
                                     <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">

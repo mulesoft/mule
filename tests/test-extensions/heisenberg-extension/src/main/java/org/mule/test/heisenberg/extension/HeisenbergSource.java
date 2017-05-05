@@ -9,6 +9,7 @@ package org.mule.test.heisenberg.extension;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
@@ -19,18 +20,17 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.test.heisenberg.extension.model.Methylamine;
-
-import java.math.BigDecimal;
+import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
 import javax.inject.Inject;
 
@@ -62,9 +62,15 @@ public class HeisenbergSource extends Source<String, Attributes> {
   private int corePoolSize;
 
   public static boolean receivedGroupOnSource;
+  public static boolean receivedInlineOnSuccess;
+  public static boolean receivedInlineOnError;
+  public static long gatheredMoney;
 
   public HeisenbergSource() {
     receivedGroupOnSource = false;
+    receivedInlineOnSuccess = false;
+    receivedInlineOnError = false;
+    gatheredMoney = 0;
   }
 
   @Override
@@ -83,17 +89,21 @@ public class HeisenbergSource extends Source<String, Attributes> {
 
   @OnSuccess
   public void onSuccess(@Optional(defaultValue = "#[payload]") Long payment, @Optional String sameNameParameter,
-                        @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin) {
+                        @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin,
+                        @ParameterGroup(name = "Success Info", showInDsl = true) PersonalInfo successInfo) {
 
+    gatheredMoney += payment;
     receivedGroupOnSource = ricin != null && ricin.getNextDoor().getAddress() != null;
-    heisenberg.setMoney(heisenberg.getMoney().add(BigDecimal.valueOf(payment)));
+    receivedInlineOnSuccess = successInfo != null && successInfo.getAge() != null && successInfo.getKnownAddresses() != null;
   }
 
   @OnError
   public void onError(Error error, @Optional String sameNameParameter, @Optional Methylamine methylamine,
-                      @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin) {
+                      @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin,
+                      @ParameterGroup(name = "Error Info", showInDsl = true) PersonalInfo infoError) {
+    gatheredMoney = -1;
     receivedGroupOnSource = ricin != null && ricin.getNextDoor() != null && ricin.getNextDoor().getAddress() != null;
-    heisenberg.setMoney(BigDecimal.valueOf(-1));
+    receivedInlineOnError = infoError != null && infoError.getName() != null && !infoError.getName().equals(HEISENBERG);
   }
 
   @Override
@@ -106,6 +116,8 @@ public class HeisenbergSource extends Source<String, Attributes> {
         throw new RuntimeException(e);
       }
     }
+    receivedGroupOnSource = false;
+    gatheredMoney = 0;
   }
 
   private Result<String, Attributes> makeResult(SourceCallback sourceCallback) {

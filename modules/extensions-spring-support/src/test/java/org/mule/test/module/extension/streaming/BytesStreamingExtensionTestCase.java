@@ -65,6 +65,11 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
     CASTED_SPELLS.clear();
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @Test
   @Description("Fully consume a cursor stream")
   public void consumeGeneratedCursorAndCloseIt() throws Exception {

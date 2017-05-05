@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.soap;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -28,6 +29,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
+import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.soap.SoapAttachment;
@@ -141,7 +143,8 @@ public class InvokeMetadataTestCase extends SoapExtensionArtifactFunctionalTestC
   private OperationModel getMetadata(String flow) {
     Location location = Location.builder().globalName(flow).addProcessorsPart().addIndexPart(0).build();
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = metadataService.getOperationMetadata(location);
-    assertThat(result.isSuccess(), is(true));
+    assertThat(result.getFailures().stream().map(MetadataFailure::getMessage).collect(joining(", \n")),
+               result.isSuccess(), is(true));
     return result.get().getModel();
   }
 }

@@ -135,7 +135,7 @@ public class Jms102bSupport extends Jms11Support {
   public MessageConsumer createConsumer(Session session, Destination destination, String messageSelector, ConsumerType type)
       throws JMSException {
 
-    if (type.isTopic() && session instanceof TopicSession) {
+    if (type.topic() && session instanceof TopicSession) {
       TopicConsumer topicConsumer = (TopicConsumer) type;
       if (!topicConsumer.isDurable()) {
         return ((TopicSession) session).createSubscriber((Topic) destination, messageSelector, topicConsumer.isNoLocal());

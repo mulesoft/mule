@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.api;
+package org.mule.extension.email.internal.sender;
 
 
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.TEXT_PLAIN;
@@ -15,7 +15,9 @@ import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
  * Represents and enables the construction of the body of an email with a body of type "text/*" and a specific character
@@ -27,11 +29,12 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 public class EmailBody {
 
   /**
-   * Text body of the message content
+   * Text body of the message
    */
   @Parameter
-  @Content
+  @Content(primary = true)
   @Placement(order = 1)
+  @Summary("Text body of the message")
   private String content;
 
   /**
@@ -41,6 +44,8 @@ public class EmailBody {
   @Optional(defaultValue = TEXT_PLAIN)
   @DisplayName("ContentType")
   @Placement(order = 2)
+  @Summary("The content type of the body's content text")
+  @Example("text/html")
   private String contentType;
 
   /**
@@ -49,6 +54,8 @@ public class EmailBody {
   @Parameter
   @Optional
   @Placement(order = 3)
+  @Example("UTF-8")
+  @Summary("The character encoding of the message's body, If not specified, the default encoding in the mule configuration will be used")
   private String encoding;
 
   public EmailBody() {}

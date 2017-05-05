@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
 
 import java.lang.reflect.AnnotatedElement;
@@ -31,22 +32,28 @@ public final class ParameterGroupDescriptor {
   private final Type type;
 
   /**
+   * The {@link MetadataType} of the pojo which implements the group
+   */
+  private final MetadataType metadataType;
+
+  /**
    * The member in which the generated value of {@link #type} is to be assigned. For {@link ParameterGroupDescriptor}
    * used as fields of a class, this container should be parameterized as a {@link Field}. And if it is used
    * as an argument of an operation it should the corresponding {@link Method}'s {@link Parameter}.
    */
   private final AnnotatedElement container;
 
-  public ParameterGroupDescriptor(String name, Type type, AnnotatedElement container) {
+  public ParameterGroupDescriptor(String name, Type type, MetadataType metadataType, AnnotatedElement container) {
     checkArgument(!isBlank(name), "name cannot be blank");
     checkArgument(type != null, "type cannot be null");
     this.name = name;
     this.type = type;
     this.container = container;
+    this.metadataType = metadataType;
   }
 
   public ParameterGroupDescriptor(String name, Type type) {
-    this(name, type, null);
+    this(name, type, null, null);
   }
 
   /**
@@ -62,6 +69,10 @@ public final class ParameterGroupDescriptor {
 
   public Type getType() {
     return type;
+  }
+
+  public MetadataType getMetadataType() {
+    return metadataType;
   }
 
 }

@@ -32,24 +32,6 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
     return new String[] {"integration/update/update-name-param-override-config.xml"};
   }
 
-  @Test
-  public void usesDefaultParams() throws Exception {
-    Message response = flowRunner("defaultParams").run().getMessage();
-
-    assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
-    List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
-    assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
-  }
-
-  @Test
-  public void usesOverriddenParams() throws Exception {
-    Message response = flowRunner("overriddenParams").run().getMessage();
-
-    assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
-    List<Map<String, String>> result = selectData("select * from PLANET where POSITION=2", getDefaultDataSource());
-    assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 2)));
-  }
-
   public void usesInlineOverriddenParams() throws Exception {
     Message response = flowRunner("inlineOverriddenParams").run().getMessage();
 

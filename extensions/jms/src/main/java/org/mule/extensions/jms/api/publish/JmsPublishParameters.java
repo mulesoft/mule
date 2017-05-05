@@ -6,6 +6,8 @@
  */
 package org.mule.extensions.jms.api.publish;
 
+import org.mule.extensions.jms.internal.publish.PublisherParameters;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -20,7 +22,8 @@ import javax.jms.Message;
  *
  * @since 4.0
  */
-public class JmsPublishParameters {
+@XmlHints(allowTopLevelDefinition = true)
+public class JmsPublishParameters implements PublisherParameters {
 
   @Parameter
   @Optional

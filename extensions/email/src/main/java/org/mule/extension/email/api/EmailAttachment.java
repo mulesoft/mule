@@ -6,9 +6,7 @@
  */
 package org.mule.extension.email.api;
 
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
@@ -28,7 +26,6 @@ public class EmailAttachment {
    * the content of the attachment.
    */
   @Parameter
-  @Content
   private Object content;
   /**
    * the content type of the attachment content.
@@ -62,7 +59,7 @@ public class EmailAttachment {
   /**
    * @return the content type of the attachment content.
    */
-  public MediaType getContentType() {
-    return contentType != null ? DataType.builder().mediaType(contentType).build().getMediaType() : null;
+  public String getContentType() {
+    return contentType;
   }
 }

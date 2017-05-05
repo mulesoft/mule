@@ -27,6 +27,7 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
@@ -39,6 +40,7 @@ import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
@@ -64,6 +66,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.TypeUtils;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
@@ -75,10 +78,10 @@ import org.mule.runtime.module.extension.internal.config.dsl.object.MediaTypeVal
 import org.mule.runtime.module.extension.internal.config.dsl.object.ObjectParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.ParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.ValueResolverParsingDelegate;
-import org.mule.runtime.module.extension.internal.config.dsl.parameter.AnonymousParameterGroupParser;
+import org.mule.runtime.module.extension.internal.config.dsl.parameter.AnonymousInlineParameterGroupParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterObjectFactory;
-import org.mule.runtime.module.extension.internal.config.dsl.parameter.TypedParameterGroupParser;
+import org.mule.runtime.module.extension.internal.config.dsl.parameter.TypedInlineParameterGroupParser;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
@@ -246,15 +249,18 @@ public abstract class ExtensionDefinitionParser {
 
         @Override
         public void visitObject(ObjectType objectType) {
+          if (parseAsContent(objectType)) {
+            return;
+          }
+
           if (isMap(objectType)) {
-            if (!(parseAsContent(objectType))) {
-              parseMapParameters(parameter, objectType, paramDsl);
-            }
+            parseMapParameters(parameter, objectType, paramDsl);
             return;
           }
           if (isNestedProcessor(objectType)) {
             parseNestedProcessor(parameter);
           } else {
+
             if (!parsingContext.isRegistered(paramDsl.getElementName(), paramDsl.getPrefix())) {
               parsingContext.registerObjectType(paramDsl.getElementName(), paramDsl.getPrefix(), objectType);
               parseObjectParameter(parameter, paramDsl);
@@ -413,6 +419,106 @@ public abstract class ExtensionDefinitionParser {
             }
           });
         }
+      }
+    });
+  }
+
+  protected void parseFields(ObjectType type, DslElementSyntax typeDsl) {
+    type.getFields().forEach(f -> parseField(type, typeDsl, f));
+  }
+
+  private void parseField(ObjectType type, DslElementSyntax typeDsl, ObjectFieldType objectField) {
+    final MetadataType fieldType = objectField.getValue();
+    final String fieldName = objectField.getKey().getName().getLocalPart();
+    final boolean acceptsReferences = TypeUtils.acceptsReferences(objectField);
+    final Object defaultValue = getDefaultValue(fieldType).orElse(null);
+    final ExpressionSupport expressionSupport = getExpressionSupport(objectField);
+    Optional<DslElementSyntax> fieldDsl = typeDsl.getContainedElement(fieldName);
+    if (!fieldDsl.isPresent() && !isFlattenedParameterGroup(objectField)) {
+      return;
+    }
+
+    Optional<String> keyName = getInfrastructureParameterName(fieldType);
+    if (keyName.isPresent()) {
+      parseObject(fieldName, keyName.get(), (ObjectType) fieldType, defaultValue, expressionSupport, false, acceptsReferences,
+                  fieldDsl.get(), emptySet());
+      return;
+    }
+
+    final boolean isContent = TypeUtils.isContent(objectField);
+    fieldType.accept(new MetadataTypeVisitor() {
+
+      @Override
+      protected void defaultVisit(MetadataType metadataType) {
+        parseAttributeParameter(fieldName, fieldName, metadataType, defaultValue, expressionSupport, false, emptySet());
+      }
+
+      @Override
+      public void visitString(StringType stringType) {
+        if (fieldDsl.get().supportsChildDeclaration()) {
+          String elementName = fieldDsl.get().getElementName();
+          addParameter(fieldName, fromChildConfiguration(String.class).withWrapperIdentifier(elementName));
+          addDefinition(baseDefinitionBuilder.copy()
+              .withIdentifier(elementName)
+              .withTypeDefinition(fromType(String.class))
+              .withTypeConverter(value -> resolverOf(elementName, stringType, value, defaultValue,
+                                                     expressionSupport, false,
+                                                     emptySet(), acceptsReferences))
+              .build());
+        } else {
+          defaultVisit(stringType);
+        }
+      }
+
+      @Override
+      public void visitObject(ObjectType objectType) {
+        if (objectType.isOpen()) {
+          if (!parseAsContent(isContent, objectType)) {
+            parseMapParameters(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, fieldDsl.get(),
+                               emptySet());
+          }
+          return;
+        }
+
+        if (isFlattenedParameterGroup(objectField)) {
+          dslResolver.resolve(objectType)
+              .ifPresent(objectDsl -> objectType.getFields().forEach(field -> parseField(objectType, objectDsl, field)));
+          return;
+        }
+
+        if (parseAsContent(isContent, objectType)) {
+          return;
+        }
+
+        DslElementSyntax dsl = fieldDsl.get();
+        if (!parsingContext.isRegistered(dsl.getElementName(), dsl.getPrefix())) {
+          parsingContext.registerObjectType(dsl.getElementName(), dsl.getPrefix(), type);
+          parseObjectParameter(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
+                               dsl, emptySet());
+        } else {
+          parseObject(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
+                      dsl, emptySet());
+        }
+      }
+
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        if (!parseAsContent(isContent, arrayType)) {
+          parseCollectionParameter(fieldName, fieldName, arrayType, defaultValue, expressionSupport, false, fieldDsl.get(),
+                                   emptySet());
+        }
+      }
+
+      private boolean parseAsContent(boolean isContent, MetadataType type) {
+        if (isContent) {
+          parseFromTextExpression(fieldName, fieldDsl.get(), () -> value -> resolverOf(fieldName, type, value, defaultValue,
+                                                                                       expressionSupport, false, emptySet(),
+                                                                                       false));
+
+          return true;
+        }
+
+        return false;
       }
     });
   }
@@ -938,11 +1044,11 @@ public abstract class ExtensionDefinitionParser {
     parseParameters(getFlatParameters(inlineGroups, parameterizedModel.getAllParameterModels()));
 
     for (ParameterGroupModel group : inlineGroups) {
-      parseParameterGroup(group);
+      parseInlineParameterGroup(group);
     }
   }
 
-  protected void parseParameterGroup(ParameterGroupModel group) throws ConfigurationException {
+  protected void parseInlineParameterGroup(ParameterGroupModel group) throws ConfigurationException {
     ParameterGroupDescriptor descriptor =
         group.getModelProperty(ParameterGroupModelProperty.class)
             .map(ParameterGroupModelProperty::getDescriptor)
@@ -953,8 +1059,9 @@ public abstract class ExtensionDefinitionParser {
     if (descriptor != null) {
       addParameter(getChildKey(getContainerName(descriptor.getContainer())),
                    new DefaultObjectParsingDelegate().parse("", null, dslElementSyntax));
-      new TypedParameterGroupParser(baseDefinitionBuilder.copy(), group, descriptor, getContextClassLoader(), dslElementSyntax,
-                                    dslResolver, parsingContext).parse().forEach(this::addDefinition);
+      new TypedInlineParameterGroupParser(baseDefinitionBuilder.copy(), group, descriptor, getContextClassLoader(),
+                                          dslElementSyntax,
+                                          dslResolver, parsingContext).parse().forEach(this::addDefinition);
     } else {
       AttributeDefinition.Builder builder = fromChildConfiguration(Map.class);
       if (dslElementSyntax.isWrapped()) {
@@ -963,15 +1070,21 @@ public abstract class ExtensionDefinitionParser {
         builder.withIdentifier(dslElementSyntax.getElementName());
       }
       addParameter(getChildKey(group.getName()), builder);
-      new AnonymousParameterGroupParser(baseDefinitionBuilder.copy(), group, getContextClassLoader(), dslElementSyntax,
-                                        dslResolver, parsingContext).parse().forEach(this::addDefinition);
+      new AnonymousInlineParameterGroupParser(baseDefinitionBuilder.copy(), group, getContextClassLoader(), dslElementSyntax,
+                                              dslResolver, parsingContext).parse().forEach(this::addDefinition);
     }
   }
 
   protected List<ParameterModel> getFlatParameters(List<ParameterGroupModel> inlineGroups, List<ParameterModel> parameters) {
-    return parameters.stream()
-        .filter(p -> inlineGroups.stream().noneMatch(g -> g.getParameterModels().contains(p)))
-        .collect(toList());
+    List<ParameterModel> inlineParameters = inlineGroups.stream()
+        .flatMap(g -> g.getParameterModels().stream()).collect(toList());
+
+
+    return inlineParameters.isEmpty()
+        ? parameters
+        : parameters.stream()
+            .filter(p -> !inlineParameters.contains(p))
+            .collect(toList());
   }
 
   protected Optional<String> getInfrastructureParameterName(MetadataType fieldType) {

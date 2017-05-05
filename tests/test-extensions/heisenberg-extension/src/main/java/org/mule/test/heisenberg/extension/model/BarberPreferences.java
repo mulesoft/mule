@@ -31,4 +31,23 @@ public class BarberPreferences {
     return beardTrimming;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if (!(o instanceof BarberPreferences)) {
+      return false;
+    }
+
+    BarberPreferences that = (BarberPreferences) o;
+    return fullyBald == that.fullyBald && beardTrimming == that.beardTrimming;
+  }
+
+  @Override
+  public int hashCode() {
+    return 31 * (fullyBald ? 1 : 0) + beardTrimming.hashCode();
+  }
+
 }

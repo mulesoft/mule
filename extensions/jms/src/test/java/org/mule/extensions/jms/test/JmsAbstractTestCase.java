@@ -26,12 +26,12 @@ import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.slf4j.Logger;
 import ru.yandex.qatools.allure.annotations.Features;
-
-import java.util.Map;
 
 @Features(JMS_EXTENSION)
 @ArtifactClassLoaderRunnerConfig(testInclusions = {"org.apache.activemq:artemis-jms-client"})

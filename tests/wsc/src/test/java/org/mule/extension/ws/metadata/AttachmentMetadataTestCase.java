@@ -20,10 +20,12 @@ import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
@@ -38,12 +40,11 @@ public class AttachmentMetadataTestCase extends AbstractMetadataTestCase {
   @Description("Checks the Input Metadata of an operation that requires input attachments")
   public void getUploadAttachmentMetadata() {
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = getMetadata(UPLOAD_ATTACHMENT, UPLOAD_ATTACHMENT);
-    MetadataType message = result.get().getModel().getAllParameterModels().stream()
-        .filter(p -> p.getName().equals(MESSAGE_PARAM))
-        .findFirst().get().getType();
-    MetadataType body = getMessageBuilderFieldType(message, BODY_FIELD);
+    List<ParameterModel> parameters = result.get().getModel().getAllParameterModels();
+
+    MetadataType body = getParameterType(parameters, BODY_FIELD);
     assertThat(body, is(instanceOf(NullType.class)));
-    ObjectType attachments = toObjectType(getMessageBuilderFieldType(message, ATTACHMENTS_FIELD));
+    ObjectType attachments = toObjectType(getParameterType(parameters, ATTACHMENTS_FIELD));
     Collection<ObjectFieldType> attachmentFields = attachments.getFields();
     assertThat(attachmentFields, hasSize(1));
     assertThat(attachmentFields.iterator().next().getKey().getName().getLocalPart(), is("attachment"));
@@ -53,10 +54,7 @@ public class AttachmentMetadataTestCase extends AbstractMetadataTestCase {
   @Description("Checks the Input Metadata of an operation without attachments")
   public void getEchoMetadata() {
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = getMetadata(ECHO_FLOW, ECHO);
-    MetadataType message = result.get().getModel().getAllParameterModels().stream()
-        .filter(p -> p.getName().equals(MESSAGE_PARAM))
-        .findFirst().get().getType();
-    MetadataType attachments = getMessageBuilderFieldType(message, ATTACHMENTS_FIELD);
+    MetadataType attachments = getParameterType(result.get().getModel().getAllParameterModels(), ATTACHMENTS_FIELD);
     assertThat(attachments, is(instanceOf(NullType.class)));
   }
 }

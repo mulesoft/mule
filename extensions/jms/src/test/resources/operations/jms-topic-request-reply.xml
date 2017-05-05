@@ -7,9 +7,11 @@
 
     <flow name="request-reply-explicit-destination">
         <jms:publish-consume config-ref="config" destination="#[destination]">
-            <jms:message-builder>
+            <jms:message>
                 <jms:reply-to destination="#[replyToDestination]" destinationType="TOPIC"/>
-            </jms:message-builder>
+            </jms:message>
+            <jms:publish-configuration disableMessageTimestamp="true"/>
+            <jms:consume-configuration maximumWait="10000"/>
         </jms:publish-consume>
     </flow>
 

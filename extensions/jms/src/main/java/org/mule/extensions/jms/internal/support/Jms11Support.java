@@ -57,7 +57,7 @@ public class Jms11Support extends Jms20Support {
   public MessageConsumer createConsumer(Session session, Destination destination, String messageSelector, ConsumerType type)
       throws JMSException {
 
-    if (!type.isTopic()) {
+    if (!type.topic()) {
       return session.createConsumer(destination, messageSelector);
     }
 

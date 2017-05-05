@@ -6,11 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.lang.String.format;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.isObjectType;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -27,18 +31,22 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
  *
  * @since 4.0
  */
-public class TypedParameterGroupParser extends ParameterGroupParser {
+public class TypedInlineParameterGroupParser extends ParameterGroupParser {
 
-  private final MetadataType metadataType;
+  private final ObjectType metadataType;
 
-  public TypedParameterGroupParser(ComponentBuildingDefinition.Builder definition,
-                                   ParameterGroupModel group,
-                                   ParameterGroupDescriptor groupDescriptor,
-                                   ClassLoader classLoader, DslElementSyntax groupDsl,
-                                   DslSyntaxResolver dslResolver,
-                                   ExtensionParsingContext context) {
+  public TypedInlineParameterGroupParser(ComponentBuildingDefinition.Builder definition,
+                                         ParameterGroupModel group,
+                                         ParameterGroupDescriptor groupDescriptor,
+                                         ClassLoader classLoader, DslElementSyntax groupDsl,
+                                         DslSyntaxResolver dslResolver,
+                                         ExtensionParsingContext context) {
     super(definition, group, classLoader, groupDsl, dslResolver, context);
-    this.metadataType = getDefault().createTypeLoader(classLoader).load(groupDescriptor.getType().getDeclaringClass());
+    MetadataType type = getDefault().createTypeLoader(classLoader).load(groupDescriptor.getType().getDeclaringClass());
+
+    checkArgument(isObjectType(type), format("Only an ObjectType can be parsed as a TypedParameterGroup, found [%s] instead",
+                                             type.getClass().getName()));
+    metadataType = (ObjectType) type;
   }
 
 
@@ -50,6 +58,6 @@ public class TypedParameterGroupParser extends ParameterGroupParser {
         .withConstructorParameterDefinition(fromFixedValue(classLoader).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build());
 
-    this.parseParameters(group.getParameterModels());
+    parseFields(metadataType, groupDsl);
   }
 }

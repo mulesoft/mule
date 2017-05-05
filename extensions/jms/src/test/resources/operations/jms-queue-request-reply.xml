@@ -7,9 +7,9 @@
 
     <flow name="request-reply-explicit-destination">
         <jms:publish-consume config-ref="config" destination="#[destination]">
-            <jms:message-builder>
+            <jms:message>
                 <jms:reply-to destination="#[replyToDestination]" destinationType="QUEUE"/>
-            </jms:message-builder>
+            </jms:message>
         </jms:publish-consume>
     </flow>
 

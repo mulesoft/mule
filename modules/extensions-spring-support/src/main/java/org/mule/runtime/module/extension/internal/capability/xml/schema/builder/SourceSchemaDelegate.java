@@ -58,8 +58,8 @@ class SourceSchemaDelegate extends ExecutableTypeSchemaDelegate {
     builder.addInfrastructureParameters(sourceType, sourceModel, sequence);
 
     List<ParameterGroupModel> inlineGroupedParameters = getInlineGroups(sourceModel);
-    sourceModel.getErrorCallback().ifPresent(cb -> inlineGroupedParameters.addAll(getInlineGroups(cb)));
     sourceModel.getSuccessCallback().ifPresent(cb -> inlineGroupedParameters.addAll(getInlineGroups(cb)));
+    sourceModel.getErrorCallback().ifPresent(cb -> inlineGroupedParameters.addAll(getInlineGroups(cb)));
 
     List<ParameterModel> flatParameters = sourceModel.getAllParameterModels().stream()
         .filter(p -> inlineGroupedParameters.stream().noneMatch(g -> g.getParameterModels().contains(p)))

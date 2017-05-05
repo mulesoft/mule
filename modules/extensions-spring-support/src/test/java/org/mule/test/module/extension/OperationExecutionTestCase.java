@@ -82,6 +82,11 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
     return new String[] {"heisenberg-operation-config.xml", "vegan-config.xml"};
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @Test
   public void operationWithReturnValueAndWithoutParameters() throws Exception {
     assertThat(HEISENBERG, equalTo(runFlow("sayMyName").getMessage().getPayload().getValue()));

@@ -128,7 +128,7 @@ public class DeclarationBasedElementModelFactoryTestCase extends AbstractElement
                            .withParameter(COUNT, "1")
                            .withParameter(FREQUENCY, "0")
                            .build())
-        .withParameter("response",
+        .withParameter("Response",
                        newObjectValue()
                            .withParameter("headers", "#[{{'content-type' : 'text/plain'}}]")
                            .build())
@@ -309,7 +309,7 @@ public class DeclarationBasedElementModelFactoryTestCase extends AbstractElement
 
     assertHasParameter(listenerElement.getModel(), "path");
 
-    DslElementModel<ParameterModel> responseBuilderElement = getChild(listenerElement, "response");
+    DslElementModel<ParameterModel> responseBuilderElement = getChild(listenerElement, "Response");
     assertElementName(responseBuilderElement, "response");
 
     assertThat(responseBuilderElement.getDsl().getChild("headers").isPresent(), is(true));

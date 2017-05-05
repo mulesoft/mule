@@ -13,8 +13,8 @@ import static java.util.stream.Stream.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isParameterGroup;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
@@ -73,6 +73,8 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.internal.dsl.syntax.DslElementSyntaxBuilder;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -130,8 +132,6 @@ class DeclarationBasedElementModelFactory {
                         format("Found an Operation with the given name, but expected a '%s'",
                                declaration.getClass().getName()));
           elementModel.set(createComponentElement(model, (OperationElementDeclaration) declaration));
-
-
           stop();
         }
       }
@@ -334,11 +334,34 @@ class DeclarationBasedElementModelFactory {
         .withModel(model)
         .withDsl(elementDsl);
 
-    List<ParameterModel> inlineGroupedParameters = model.getParameterGroupModels().stream()
+
+    ImmutableList.Builder<ParameterModel> builder = ImmutableList.builder();
+    builder.addAll(model.getParameterGroupModels().stream()
         .filter(ParameterGroupModel::isShowInDsl)
         .peek(group -> addInlineGroupElement(group, elementDsl, parentConfig, parentElement, declaration))
         .flatMap(g -> g.getParameterModels().stream())
-        .collect(toList());
+        .collect(toList()));
+
+    if (model instanceof SourceModel) {
+      ((SourceModel) model).getSuccessCallback()
+          .ifPresent(cb -> builder.addAll(cb.getParameterGroupModels().stream()
+              .filter(ParameterGroupModel::isShowInDsl)
+              .peek(group -> addInlineGroupElement(group, elementDsl, parentConfig, parentElement,
+                                                   declaration))
+              .flatMap(g -> g.getParameterModels().stream())
+              .collect(toList())));
+
+      ((SourceModel) model).getErrorCallback()
+          .ifPresent(cb -> builder.addAll(cb.getParameterGroupModels().stream()
+              .filter(ParameterGroupModel::isShowInDsl)
+              .peek(group -> addInlineGroupElement(group, elementDsl, parentConfig, parentElement,
+                                                   declaration))
+              .flatMap(g -> g.getParameterModels().stream())
+              .collect(toList())));
+    }
+
+    List<ParameterModel> inlineGroupedParameters = builder.build();
+
 
     List<ParameterModel> nonGroupedParameters = model.getAllParameterModels().stream()
         .filter(p -> !inlineGroupedParameters.contains(p))
@@ -431,13 +454,12 @@ class DeclarationBasedElementModelFactory {
               }
             });
 
+            ComponentConfiguration groupConfig = groupBuilder.build();
+            groupElementBuilder.withConfig(groupConfig);
+
+            parentConfig.withNestedComponent(groupConfig);
+            parentElement.containing(groupElementBuilder.build());
           });
-
-          ComponentConfiguration groupConfig = groupBuilder.build();
-          groupElementBuilder.withConfig(groupConfig);
-
-          parentConfig.withNestedComponent(groupConfig);
-          parentElement.containing(groupElementBuilder.build());
         });
   }
 
@@ -816,7 +838,7 @@ class DeclarationBasedElementModelFactory {
                                            DslElementModel.Builder objectElement) {
     List<ObjectFieldType> fields = objectType.getFields()
         .stream()
-        .flatMap(f -> isParameterGroup(f) ? ((ObjectType) f.getValue()).getFields().stream() : of(f))
+        .flatMap(f -> isFlattenedParameterGroup(f) ? ((ObjectType) f.getValue()).getFields().stream() : of(f))
         .collect(toList());
 
     fields.forEach(field -> objectValue.getParameters().entrySet().stream()

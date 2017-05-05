@@ -704,11 +704,13 @@ public final class SchemaBuilder {
     LocalComplexType complexType = objectTypeDelegate.createTypeExtension(MULE_ABSTRACT_EXTENSION_TYPE);
     ExplicitGroup groupSequence = new ExplicitGroup();
 
-    List<TopLevelElement> parameters =
-        registerParameters(complexType.getComplexContent().getExtension(), group.getParameterModels());
-    addParameterToSequence(parameters, groupSequence);
+    List<ParameterModel> groupParameters = group.getParameterModels();
+    List<TopLevelElement> parameterElements =
+        registerParameters(complexType.getComplexContent().getExtension(), groupParameters);
+    addParameterToSequence(parameterElements, groupSequence);
 
-    TopLevelElement groupElement = createTopLevelElement(groupDsl.getElementName(), ZERO, MAX_ONE);
+    BigInteger minOccurs = groupParameters.stream().anyMatch(ParameterModel::isRequired) ? ONE : ZERO;
+    TopLevelElement groupElement = createTopLevelElement(groupDsl.getElementName(), minOccurs, MAX_ONE);
     groupElement.setComplexType(complexType);
 
     complexType.getComplexContent().getExtension().setSequence(groupSequence);

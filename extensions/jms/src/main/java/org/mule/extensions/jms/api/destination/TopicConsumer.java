@@ -72,7 +72,7 @@ public final class TopicConsumer implements ConsumerType, Initialisable {
    * {@inheritDoc}
    */
   @Override
-  public boolean isTopic() {
+  public boolean topic() {
     return true;
   }
 

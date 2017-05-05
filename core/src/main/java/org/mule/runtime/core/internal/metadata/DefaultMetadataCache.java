@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.metadata;
 
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataCache;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -46,6 +48,25 @@ public final class DefaultMetadataCache implements MetadataCache {
   @Override
   public <T extends Serializable> Optional<T> get(Serializable key) {
     return Optional.ofNullable((T) cache.get(key));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <T extends Serializable> T computeIfAbsent(Serializable key,
+                                                    MetadataCacheValueResolver mappingFunction)
+      throws MetadataResolvingException, ConnectionException {
+
+    Serializable value = cache.get(key);
+    if (value == null) {
+      value = mappingFunction.compute(key);
+      if (value != null) {
+        cache.putIfAbsent(key, value);
+      }
+    }
+
+    return (T) value;
   }
 
   public Map<Serializable, Serializable> asMap() {

@@ -7,12 +7,14 @@
 package org.mule.extension.email.internal.sender;
 
 
-import org.mule.extension.email.api.EmailBuilder;
 import org.mule.extension.email.api.exception.EmailSenderErrorTypeProvider;
 import org.mule.extension.email.internal.commands.SendCommand;
+import org.mule.extension.email.internal.util.AttachmentsGroup;
 import org.mule.runtime.extension.api.annotation.error.Throws;
-import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
@@ -20,9 +22,9 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
  *
  * @since 4.0
  */
-public class SenderOperations {
+public class SendOperation {
 
-  private final SendCommand sendOperation = new SendCommand();
+  private final SendCommand sendCommand = new SendCommand();
 
   /**
    * Sends an email message. The message will be sent to all recipient {@code toAddresses}, {@code ccAddresses},
@@ -33,13 +35,16 @@ public class SenderOperations {
    *
    * @param connection    Connection to use to send the message
    * @param configuration Configuration of the connector
-   * @param emailBuilder  The builder of the email that is going to be send.
+   * @param settings  The builder of the email that is going to be send.
    */
   @Summary("Sends an email message")
   @Throws(EmailSenderErrorTypeProvider.class)
   public void send(@Connection SenderConnection connection,
                    @Config SMTPConfiguration configuration,
-                   EmailBuilder emailBuilder) {
-    sendOperation.send(connection, configuration, emailBuilder);
+                   @Placement(order = 1) @ParameterGroup(name = "Settings") EmailSettings settings,
+                   @Placement(order = 2) @ParameterGroup(name = "Body", showInDsl = true) EmailBody body,
+                   @Placement(order = 3) @ParameterGroup(name = "Attachments") AttachmentsGroup attachments) {
+
+    sendCommand.send(connection, configuration, settings, body, attachments);
   }
 }

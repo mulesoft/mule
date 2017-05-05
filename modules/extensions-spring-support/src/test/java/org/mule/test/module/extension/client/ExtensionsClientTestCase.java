@@ -60,6 +60,11 @@ public abstract class ExtensionsClientTestCase extends AbstractExtensionFunction
     HeisenbergOperations.disposed = false;
   }
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @After
   public void after() {
     HeisenbergOperations.disposed = false;

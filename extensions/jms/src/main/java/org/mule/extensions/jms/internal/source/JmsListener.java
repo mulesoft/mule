@@ -10,28 +10,25 @@ import static java.lang.String.format;
 import static org.mule.extensions.jms.api.connection.JmsSpecification.JMS_2_0;
 import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_CONTENT_TYPE;
 import static org.mule.extensions.jms.internal.common.JmsCommons.EXAMPLE_ENCODING;
-import static org.mule.extensions.jms.internal.common.JmsCommons.toInternalAckMode;
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveOverride;
+import static org.mule.extensions.jms.internal.common.JmsCommons.toInternalAckMode;
 import static org.mule.extensions.jms.internal.config.InternalAckMode.AUTO;
 import static org.mule.extensions.jms.internal.config.InternalAckMode.DUPS_OK;
 import static org.mule.extensions.jms.internal.config.InternalAckMode.MANUAL;
 import static org.mule.extensions.jms.internal.config.InternalAckMode.TRANSACTED;
 import static org.mule.runtime.extension.api.tx.SourceTransactionalAction.ALWAYS_BEGIN;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.api.source.JmsListenerResponseBuilder;
-import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
 import org.mule.extensions.jms.api.config.AckMode;
-import org.mule.extensions.jms.internal.config.InternalAckMode;
-import org.mule.extensions.jms.internal.config.JmsConfig;
 import org.mule.extensions.jms.api.config.JmsConsumerConfig;
-import org.mule.extensions.jms.internal.connection.JmsSession;
-import org.mule.extensions.jms.internal.connection.JmsTransactionalConnection;
 import org.mule.extensions.jms.api.destination.ConsumerType;
 import org.mule.extensions.jms.api.destination.TopicConsumer;
 import org.mule.extensions.jms.api.exception.JmsExtensionException;
 import org.mule.extensions.jms.api.message.JmsAttributes;
-import org.mule.extensions.jms.api.message.MessageBuilder;
-import org.mule.extensions.jms.api.publish.JmsPublishParameters;
+import org.mule.extensions.jms.internal.config.InternalAckMode;
+import org.mule.extensions.jms.internal.config.JmsConfig;
+import org.mule.extensions.jms.internal.connection.JmsSession;
+import org.mule.extensions.jms.internal.connection.JmsTransactionalConnection;
+import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
 import org.mule.extensions.jms.internal.consume.JmsMessageConsumer;
 import org.mule.extensions.jms.internal.metadata.JmsOutputResolver;
 import org.mule.extensions.jms.internal.support.Jms102bSupport;
@@ -47,17 +44,15 @@ import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
-
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +63,8 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Queue;
 import javax.jms.Topic;
+
+import org.slf4j.Logger;
 
 /**
  * JMS Subscriber for {@link Destination}s, allows to listen
@@ -141,15 +138,15 @@ public class JmsListener extends Source<Object, JmsAttributes> {
   @Parameter
   @Optional
   @Example(EXAMPLE_CONTENT_TYPE)
-  private String contentType;
+  private String inboundContentType;
 
   /**
-   * The encoding of the message body
+   * The inboundEncoding of the message body
    */
   @Parameter
   @Optional
   @Example(EXAMPLE_ENCODING)
-  private String encoding;
+  private String inboundEncoding;
 
   /**
    * This makes the message listener to work synchronously, only one message at a time will be consumed, delivered
@@ -185,7 +182,8 @@ public class JmsListener extends Source<Object, JmsAttributes> {
     jmsSupport = connection.getJmsSupport();
 
     JmsMessageListenerFactory messageListenerFactory =
-        new JmsMessageListenerFactory(resolvedAckMode, encoding, contentType, config, sessionManager, jmsSupport, sourceCallback);
+        new JmsMessageListenerFactory(resolvedAckMode, inboundEncoding, inboundContentType, config, sessionManager, jmsSupport,
+                                      sourceCallback);
 
     validateNumberOfConsumers(numberOfConsumers);
 
@@ -193,14 +191,14 @@ public class JmsListener extends Source<Object, JmsAttributes> {
 
     try {
       for (int i = 0; i < numberOfConsumers; i++) {
-        JmsSession session = connection.createSession(resolvedAckMode, consumerType.isTopic());
+        JmsSession session = connection.createSession(resolvedAckMode, consumerType.topic());
 
-        final Destination jmsDestination = jmsSupport.createDestination(session.get(), destination, consumerType.isTopic());
+        final Destination jmsDestination = jmsSupport.createDestination(session.get(), destination, consumerType.topic());
         final JmsMessageConsumer consumer = connection.createConsumer(session.get(), jmsDestination, selector, consumerType);
 
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug(format("Starting Message listener on destination [%s] of type [%s]",
-                              destination, consumerType.isTopic() ? TOPIC : QUEUE));
+                              destination, consumerType.topic() ? TOPIC : QUEUE));
         }
 
         JmsListenerLock jmsLock = createJmsLock();
@@ -237,14 +235,14 @@ public class JmsListener extends Source<Object, JmsAttributes> {
   }
 
   @OnSuccess
-  public void onSuccess(@Optional @NullSafe JmsListenerResponseBuilder response,
+  public void onSuccess(@ParameterGroup(name = "Response", showInDsl = true) JmsResponseMessageBuilder messageBuilder,
                         SourceCallbackContext callbackContext) {
     callbackContext.<JmsListenerLock>getVariable(JMS_LOCK_VAR)
         .ifPresent(JmsListenerLock::unlock);
 
     callbackContext.<Destination>getVariable(REPLY_TO_DESTINATION_VAR)
         .ifPresent(replyTo -> callbackContext.<JmsSession>getVariable(JMS_SESSION_VAR)
-            .ifPresent(session -> doReply(response.getMessageBuilder(), response.getOverrides(), callbackContext, replyTo,
+            .ifPresent(session -> doReply(messageBuilder, callbackContext, replyTo,
                                           session)));
   }
 
@@ -260,7 +258,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
         });
   }
 
-  private void doReply(MessageBuilder messageBuilder, JmsPublishParameters overrides,
+  private void doReply(JmsResponseMessageBuilder messageBuilder,
                        SourceCallbackContext callbackContext, Destination replyTo, JmsSession session) {
     try {
       boolean replyToTopic = replyDestinationIsTopic(replyTo);
@@ -278,7 +276,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
 
       JmsSession replySession = connection.createSession(AUTO, replyToTopic);
       connection.createProducer(replySession.get(), replyTo, replyToTopic)
-          .publish(message, config.getProducerConfig(), overrides);
+          .publish(message, config.getProducerConfig(), messageBuilder);
 
     } catch (Exception e) {
       LOGGER.error("An error occurred during reply: ", e);
@@ -288,7 +286,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
 
   private boolean replyDestinationIsTopic(Destination destination) {
     // TODO: MULE-11156 - take into account the special logic in 3.x for handling Weblogic 8.x and 9.x
-    // see 'org.mule.transport.jms.weblogic.WeblogicJmsTopicResolver#isTopic'
+    // see 'org.mule.transport.jms.weblogic.WeblogicJmsTopicResolver#topic'
 
     if (destination instanceof Topic && destination instanceof Queue
         && jmsSupport instanceof Jms102bSupport) {
@@ -312,7 +310,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
           + "]. The number should be 1 or greater.");
     }
 
-    if (numberOfConsumers > 1 && consumerType.isTopic()) {
+    if (numberOfConsumers > 1 && consumerType.topic()) {
       TopicConsumer topicConsumer = (TopicConsumer) consumerType;
 
       if (!isCapableOfMultiConsumersOnTopic(topicConsumer)) {

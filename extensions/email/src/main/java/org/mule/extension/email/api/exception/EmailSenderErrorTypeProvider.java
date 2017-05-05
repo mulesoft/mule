@@ -7,10 +7,10 @@
 package org.mule.extension.email.api.exception;
 
 import static org.mule.extension.email.api.exception.EmailError.ATTACHMENT;
-import org.mule.extension.email.api.EmailBuilder;
+import org.mule.extension.email.internal.sender.EmailSettings;
 import org.mule.extension.email.internal.sender.SMTPConfiguration;
 import org.mule.extension.email.internal.sender.SenderConnection;
-import org.mule.extension.email.internal.sender.SenderOperations;
+import org.mule.extension.email.internal.sender.SendOperation;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
@@ -19,7 +19,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 
 /**
- * Errors that can be thrown in the {@link SenderOperations#send(SenderConnection, SMTPConfiguration, EmailBuilder)} operation.
+ * Errors that can be thrown in the {@link SendOperation#send(SenderConnection, SMTPConfiguration, EmailSettings)} operation.
  * 
  * @since 4.0
  */

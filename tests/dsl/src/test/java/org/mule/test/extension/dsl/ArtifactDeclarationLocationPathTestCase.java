@@ -32,12 +32,14 @@ import org.junit.Test;
 
 public class ArtifactDeclarationLocationPathTestCase extends AbstractElementModelTestCase {
 
+  public static final String ORIGINAL_CONFIG = "multi-flow-dsl-app.xml";
+  public static final String EXPECTED_UPDATED_CONFIG = "location-path-update-multi-flow-dsl-app.xml";
   public ArtifactDeclaration multiFlowDeclaration;
   private ArtifactDeclarationXmlSerializer serializer;
 
   @Override
   protected String getConfigFile() {
-    return "multi-flow-dsl-app.xml";
+    return ORIGINAL_CONFIG;
   }
 
 
@@ -79,6 +81,6 @@ public class ArtifactDeclarationLocationPathTestCase extends AbstractElementMode
         .getDeclaration());
 
     String serialized = serializer.serialize(multiFlowDeclaration);
-    compareXML(getResourceAsString("location-path-update-multi-flow-dsl-app.xml", getClass()), serialized);
+    compareXML(getResourceAsString(EXPECTED_UPDATED_CONFIG, getClass()), serialized);
   }
 }

@@ -19,7 +19,7 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
  *
  * @since 4.0
  */
-@Operations(SenderOperations.class)
+@Operations(SendOperation.class)
 @ConnectionProviders({SMTPProvider.class, SMTPSProvider.class})
 @Configuration(name = "smtp")
 @DisplayName("SMTP")

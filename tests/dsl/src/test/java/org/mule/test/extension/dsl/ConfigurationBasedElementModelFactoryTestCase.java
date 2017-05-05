@@ -283,8 +283,9 @@ public class ConfigurationBasedElementModelFactoryTestCase extends AbstractEleme
     assertThat(publishElement.findElement("destination").get().getModel(), is(findParameter("destination", publishModel)));
 
     // child element contains its configuration element along with its content
-    DslElementModel<Object> builderElement = publishElement.findElement("messageBuilder").get();
-    assertThat(builderElement.getModel(), is(findParameter("messageBuilder", publishModel)));
+    DslElementModel<Object> builderElement = publishElement.findElement("Message").get();
+    assertThat(builderElement.getModel(),
+               is(publishModel.getParameterGroupModels().stream().filter(g -> g.getName().equals("Message")).findFirst().get()));
     Optional<ComponentConfiguration> messageBuilder = builderElement.getConfiguration();
     assertThat(messageBuilder.isPresent(), is(true));
 
@@ -315,8 +316,9 @@ public class ConfigurationBasedElementModelFactoryTestCase extends AbstractEleme
     assertThat(publishElement.findElement("destination").get().getConfiguration().isPresent(), is(false));
     assertThat(publishElement.getConfiguration().get().getParameters().get("destination"), is("#[finalDestination]"));
 
-    DslElementModel<Object> builderElement = publishElement.findElement("messageBuilder").get();
-    assertThat(builderElement.getModel(), is(findParameter("messageBuilder", publishModel)));
+    DslElementModel<Object> builderElement = publishElement.findElement("Message").get();
+    assertThat(builderElement.getModel(),
+               is(publishModel.getParameterGroupModels().stream().filter(g -> g.getName().equals("Message")).findFirst().get()));
     Optional<ComponentConfiguration> messageBuilder = builderElement.getConfiguration();
     assertThat(messageBuilder.isPresent(), is(true));
 

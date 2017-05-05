@@ -17,11 +17,8 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Base class for {@link StatementDefinition} implementations which have a {@link Map} of input parameters.
@@ -41,18 +38,18 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
    * The map's values will contain the actual assignation for each parameter.
    */
   @Parameter
-  @Optional(defaultValue = "#[{}]")
-  @Example("#[{'name': \"Max\", 'nickname': \"The Mule\", 'company': \"MuleSoft\"}]")
   @Content
-  @Placement(order = 2)
+  @Optional(defaultValue = "#[{}]")
   @TypeResolver(DbInputMetadataResolver.class)
+  @Placement(order = 2)
+  @Example("#[{'name': \"Max\", 'nickname': \"The Mule\", 'company': \"MuleSoft\"}]")
   protected Map<String, Object> inputParameters = new LinkedHashMap<>();
 
   /**
    * Returns a {@link Map} which keys are the names of the input parameters and the values are its values
    */
   public Map<String, Object> getParameterValues() {
-    return unmodifiableMap(inputParameters);
+    return unmodifiableMap(getInputParameters());
   }
 
   /**
@@ -62,7 +59,7 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
    * @return an {@link Optional} {@link ParameterType}
    */
   public java.util.Optional<Object> getInputParameter(String name) {
-    return findParameter(inputParameters, name);
+    return findParameter(getInputParameters(), name);
   }
 
   protected java.util.Optional<Object> findParameter(Map<String, Object> parameters, String name) {
@@ -86,44 +83,12 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
     inputParameters.put(paramName, value);
   }
 
-  private void resolveTemplateParameters(T template, T resolvedDefinition) {
-    Map<String, Object> templateParamValues = null;
-    if (template != null) {
-      template = (T) template.resolveFromTemplate();
-      templateParamValues = template.getParameterValues();
-    }
-
-    Map<String, Object> resolvedParameterValues = new HashMap<>();
-    if (templateParamValues != null) {
-      resolvedParameterValues.putAll(templateParamValues);
-    }
-
-    resolvedParameterValues.putAll(getParameterValues());
-
-    final Set<String> paramNames = new HashSet<>(resolvedDefinition.getInputParameters().keySet());
-    paramNames.forEach(paramName -> {
-      if (resolvedParameterValues.containsKey(paramName)) {
-        resolvedDefinition.addInputParameter(paramName, resolvedParameterValues.get(paramName));
-        resolvedParameterValues.remove(paramName);
-      }
-    });
-
-    resolvedParameterValues.forEach((key, value) -> resolvedDefinition.inputParameters.put(key, value));
-  }
-
   @Override
   protected T copy() {
     T copy = super.copy();
-    copy.inputParameters = new LinkedHashMap(inputParameters);
+    getInputParameters().forEach(copy::addInputParameter);
 
     return copy;
   }
 
-  @Override
-  public T resolveFromTemplate() {
-    T resolved = super.resolveFromTemplate();
-    resolveTemplateParameters((T) resolved.getTemplate(), resolved);
-
-    return resolved;
-  }
 }

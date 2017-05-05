@@ -8,10 +8,10 @@
 package org.mule.test.typed.value.extension.extension;
 
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.extension.api.annotation.param.Content;
-import org.mule.runtime.extension.api.annotation.param.NullSafe;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.vegan.extension.VeganProductInformation;
@@ -60,11 +60,8 @@ public class TypedValueParameterOperations {
     return extension;
   }
 
-  public VeganProductInformation typedValueOperationPojoWithContent(@Optional VeganProductInformation param) {
-    return param;
-  }
-
-  public VeganProductInformation typedValueOperationPojoWithNullsafeAndContent(@NullSafe @Optional VeganProductInformation param) {
+  public VeganProductInformation typedValueOperationPojoWithNullsafeAndContent(@ParameterGroup(name = "param",
+      showInDsl = true) VeganProductInformation param) {
     return param;
   }
 

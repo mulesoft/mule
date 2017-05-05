@@ -7,12 +7,13 @@
 package org.mule.extension.email.internal.commands;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
-import org.mule.extension.email.api.EmailBody;
-import org.mule.extension.email.api.EmailBuilder;
+import org.mule.extension.email.internal.sender.EmailBody;
+import org.mule.extension.email.internal.sender.EmailSettings;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.internal.MessageBuilder;
 import org.mule.extension.email.internal.sender.SMTPConfiguration;
 import org.mule.extension.email.internal.sender.SenderConnection;
+import org.mule.extension.email.internal.util.AttachmentsGroup;
 
 import java.util.Calendar;
 
@@ -29,27 +30,27 @@ public final class SendCommand {
 
   /**
    * Send an email message. The message will be sent to all recipient {@code toAddresses}, {@code ccAddresses},
-   * {@code bccAddresses} specified in the {@code emailBuilder}.
-   *
-   * @param connection    the connection associated to the operation.
-   * @param configuration the specified configuration to send the email.
-   * @param emailBuilder       the email emailBuilder used to create the email that is going to be sent.
+   * {@code bccAddresses} specified in the {@code settings}.
+   *  @param connection    the connection associated to the operation.
+   * @param smtpConfiguration the specified smtpConfiguration to send the email.
+   * @param settings       the email settings used to create the email that is going to be sent.
+   * @param body
+   * @param attachments
    */
-  public void send(SenderConnection connection, SMTPConfiguration configuration, EmailBuilder emailBuilder) {
+  public void send(SenderConnection connection, SMTPConfiguration smtpConfiguration,
+                   EmailSettings settings, EmailBody body, AttachmentsGroup attachments) {
     try {
-      EmailBody body = emailBuilder.getBody();
-
       Message message = MessageBuilder.newMessage(connection.getSession())
           .withSentDate(Calendar.getInstance().getTime())
-          .fromAddresses(isNotBlank(emailBuilder.getFromAddress()) ? emailBuilder.getFromAddress() : configuration.getFrom())
-          .to(emailBuilder.getToAddresses())
-          .cc(emailBuilder.getCcAddresses())
-          .bcc(emailBuilder.getBccAddresses())
-          .withSubject(emailBuilder.getSubject())
-          .withAttachments(emailBuilder.getAttachments())
+          .fromAddresses(isNotBlank(settings.getFromAddress()) ? settings.getFromAddress() : smtpConfiguration.getFrom())
+          .to(settings.getToAddresses())
+          .cc(settings.getCcAddresses())
+          .bcc(settings.getBccAddresses())
+          .withSubject(settings.getSubject())
+          .withAttachments(attachments.getAttachments())
           .withBody(body.getContent(), body.getContentType(),
-                    body.getEncoding() == null ? configuration.getDefaultEncoding() : body.getEncoding())
-          .withHeaders(emailBuilder.getHeaders())
+                    body.getEncoding() == null ? smtpConfiguration.getDefaultEncoding() : body.getEncoding())
+          .withHeaders(settings.getHeaders())
           .build();
 
       Transport.send(message);

@@ -6,12 +6,7 @@
  */
 package org.mule.extension.ws.internal.metadata;
 
-import static org.mule.services.soap.internal.metadata.SoapOutputTypeBuilder.ATTACHMENTS_FIELD;
-import static org.mule.services.soap.internal.metadata.SoapOutputTypeBuilder.BODY_FIELD;
-import static org.mule.services.soap.internal.metadata.SoapOutputTypeBuilder.HEADERS_FIELD;
 import org.mule.extension.ws.api.SoapMessageBuilder;
-import org.mule.metadata.api.builder.ObjectTypeBuilder;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -24,12 +19,7 @@ import org.mule.services.soap.api.client.metadata.SoapOperationMetadata;
  *
  * @since 4.0
  */
-public class MessageBuilderResolver extends BaseWscResolver implements InputTypeResolver<String> {
-
-  @Override
-  public String getResolverName() {
-    return "ConsumeInputResolver";
-  }
+abstract class AbstractSoapOperationMetadataResolver extends BaseWscResolver {
 
   /**
    * {@inheritDoc}
@@ -37,14 +27,9 @@ public class MessageBuilderResolver extends BaseWscResolver implements InputType
    * Creates a complex object that represents the {@link SoapMessageBuilder} that contains a body, a Set of headers an a set of
    * attachments. Any component can be represented as a {@link NullType} if there is no required data for the field.
    */
-  @Override
-  public MetadataType getInputMetadata(MetadataContext context, String operationName)
+  public SoapOperationMetadata getSoapMetadata(MetadataContext context, String operationName)
       throws MetadataResolvingException, ConnectionException {
-    SoapOperationMetadata metadata = getMetadataResolver(context).getInputMetadata(operationName);
-    ObjectTypeBuilder object = context.getTypeBuilder().objectType();
-    object.addField().key(HEADERS_FIELD).value(metadata.getHeadersType());
-    object.addField().key(BODY_FIELD).value(metadata.getBodyType());
-    object.addField().key(ATTACHMENTS_FIELD).value(metadata.getAttachmentsType());
-    return object.build();
+    // TODO MULE-12405: Use MetadataCache for the resolved SoapOperationMetadata
+    return getMetadataResolver(context).getInputMetadata(operationName);
   }
 }

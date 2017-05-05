@@ -12,24 +12,24 @@ import static org.mule.extensions.jms.internal.common.JmsCommons.resolveMessageE
 import static org.mule.extensions.jms.internal.common.JmsCommons.resolveOverride;
 import static org.mule.extensions.jms.internal.config.InternalAckMode.TRANSACTED;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
+import org.mule.extensions.jms.api.exception.JmsExtensionException;
+import org.mule.extensions.jms.api.message.JmsAttributes;
 import org.mule.extensions.jms.internal.config.InternalAckMode;
 import org.mule.extensions.jms.internal.config.JmsConfig;
 import org.mule.extensions.jms.internal.connection.JmsSession;
-import org.mule.extensions.jms.api.exception.JmsExtensionException;
-import org.mule.extensions.jms.api.message.JmsAttributes;
+import org.mule.extensions.jms.internal.connection.session.JmsSessionManager;
 import org.mule.extensions.jms.internal.message.JmsResultFactory;
 import org.mule.extensions.jms.internal.support.JmsSupport;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
-import org.slf4j.Logger;
-
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+
+import org.slf4j.Logger;
 
 /**
  * {@link MessageListener} for the {@link JmsListener} to subscribe to a TOPIC or QUEUE receives {@link Message} and
@@ -83,6 +83,10 @@ public final class JmsMessageListener implements MessageListener {
    */
   @Override
   public void onMessage(Message message) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Received message on session: " + session.get().toString());
+    }
+
     SourceCallbackContext context = sourceCallback.createContext();
     if (ackMode.equals(TRANSACTED)) {
       sessionManager.bindToTransaction(session);
