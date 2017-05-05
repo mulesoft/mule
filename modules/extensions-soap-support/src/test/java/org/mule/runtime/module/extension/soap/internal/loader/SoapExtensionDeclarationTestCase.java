@@ -32,6 +32,7 @@ import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeO
 import static org.mule.test.soap.extension.CalcioServiceProvider.CALCIO_DESC;
 import static org.mule.test.soap.extension.CalcioServiceProvider.CALCIO_ID;
 import org.mule.metadata.api.model.BinaryType;
+import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.UnionType;
@@ -81,7 +82,8 @@ public class SoapExtensionDeclarationTestCase {
     assertThat(providers, hasSize(3));
 
     assertConnectionProvider(providers.get(0), "base-connection", "",
-                             new ParameterProber("leaguesAddress", "http://some-url.com", StringType.class, false));
+                             new ParameterProber("leaguesAddress", "http://some-url.com", StringType.class, false),
+                             new ParameterProber("useCustomTransport", null, BooleanType.class, false));
 
     assertConnectionProvider(providers.get(1), "la-liga-connection", "",
                              new ParameterProber("firstDivision", StringType.class),
