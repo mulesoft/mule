@@ -26,7 +26,7 @@ public class ProxySoapVersionTestCase extends AbstractServiceAndFlowTestCase
 {
     private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
 
-    String doGoogleSearch = "<urn:doGoogleSearch xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:urn=\"urn:GoogleSearch\">";
+    String doGoogleSearch = "<urn:doGoogleSearch xmlns:urn=\"urn:GoogleSearch\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">";
 
     // Message using Soap 1.2 version
     String msgWithComment = "<soap12:Envelope xmlns:soap12=\"http://www.w3.org/2003/05/soap-envelope\">"

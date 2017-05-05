@@ -295,12 +295,6 @@
                 <exclude>commons-logging:commons-logging</exclude>
                 <exclude>com.lmax:disruptor</exclude>
 
-                <!-- lib/endorsed -->
-                <exclude>xml-apis:xml-apis</exclude>
-                <exclude>xerces:xercesImpl</exclude>
-                <exclude>xerces:xml-serializer</exclude>
-                <exclude>xalan:xalan</exclude>
-
                 <!-- Distributed separately in profiler pack -->
                 <exclude>com.yourkit:yjp-controller-api-redist</exclude>
 
@@ -316,25 +310,6 @@
                 <include>junit:junit</include>
                 <include>xmlunit:xmlunit</include>
                 <include>org.mule.tests:mule-tests-functional</include>
-            </includes>
-        </dependencySet>
-
-        <!--
-            These XML dependencies end up in the "endorsed" directory
-            and must be excluded from other dependencySets, otherwise
-            the inclusions here will cause other artifacts to pull them
-            in as well. If that happens, the MAVP blacklisting mechanism
-            should kick in, since only jars in the endorsed directory are
-            explicitly blacklisted by full path.
-        -->
-        <dependencySet>
-            <outputDirectory>lib/endorsed</outputDirectory>
-            <useStrictFiltering>true</useStrictFiltering>
-            <includes>
-                <include>xml-apis:xml-apis</include>
-                <include>xerces:xercesImpl</include>
-                <include>xerces:xml-serializer</include>
-                <include>xalan:xalan</include>
             </includes>
         </dependencySet>
     </dependencySets>

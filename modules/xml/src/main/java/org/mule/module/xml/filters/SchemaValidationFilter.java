@@ -224,8 +224,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
                 schemas[i] = new StreamSource(schemaStream);
             }
             
-            SchemaFactory schemaFactory = SchemaFactory.newInstance(getSchemaLanguage());
-            XMLSecureFactories.createDefault().configureSchemaFactory(schemaFactory);
+            SchemaFactory schemaFactory = XMLSecureFactories.createDefault().getSchemaFactory(getSchemaLanguage());
 
             if (logger.isInfoEnabled())
             {

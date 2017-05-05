@@ -17,11 +17,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <javax.xml.transform.TransformerFactory>org.apache.xalan.processor.TransformerFactoryImpl</javax.xml.transform.TransformerFactory>
-                    </systemPropertyVariables>
-                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -68,28 +63,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-            <version>${xalanVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>${xercesVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-            <version>${xmlApisVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

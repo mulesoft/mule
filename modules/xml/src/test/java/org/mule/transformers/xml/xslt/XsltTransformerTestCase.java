@@ -12,6 +12,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mule.module.xml.util.XMLUtils.SAXON_TRANSFORMER_FACTORY;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
@@ -147,24 +149,11 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     public void testCustomTransformerFactoryClass() throws InitialisationException
     {
         XsltTransformer t = new XsltTransformer();
-        t.setXslTransformerFactory("com.nosuchclass.TransformerFactory");
         t.setXslFile(VALID_XSL_FILENAME);
-
-        try
-        {
-            t.initialise();
-            fail("should have failed with ClassNotFoundException");
-        }
-        catch (InitialisationException iex)
-        {
-            assertEquals(ClassNotFoundException.class, iex.getCause().getClass());
-        }
-
-        t = new XsltTransformer();
-        t.setXslFile(VALID_XSL_FILENAME);
-        // try again with JDK default
-        t.setXslTransformerFactory(null);
         t.initialise();
+
+        assertEquals(t.getTransformerFactory().getClass().getName(), SAXON_TRANSFORMER_FACTORY);
+
     }
 
     @Test

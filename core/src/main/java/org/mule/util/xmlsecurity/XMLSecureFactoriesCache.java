@@ -14,6 +14,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.validation.SchemaFactory;
 
 /**
  * Avoid configuring factories each time they are used. Since we started using setFeature to avoid security issues,
@@ -53,59 +54,73 @@ public class XMLSecureFactoriesCache
         });
     }
 
-    public DocumentBuilderFactory getDocumentBuilderFactory(final Boolean externalEntities, final Boolean expandEntities)
+    public DocumentBuilderFactory getDocumentBuilderFactory(final DefaultXMLSecureFactories secureFactories)
     {
-        XMLFactoryConfig config = new XMLFactoryConfig(externalEntities, expandEntities, DocumentBuilderFactory.class.toString())
+        XMLFactoryConfig config = new XMLFactoryConfig(secureFactories, null, DocumentBuilderFactory.class.toString())
         {
             @Override
             public Object createFactory()
             {
-                return DefaultXMLSecureFactories.createDocumentBuilderFactory(this.externalEntities, this.expandEntities);
+                return secureFactories.createDocumentBuilderFactory();
             }
         };
 
         return (DocumentBuilderFactory) cache.getUnchecked(config);
     }
 
-    public SAXParserFactory getSAXParserFactory(Boolean externalEntities, Boolean expandEntities)
+    public SAXParserFactory getSAXParserFactory(final DefaultXMLSecureFactories secureFactories)
     {
-        XMLFactoryConfig config = new XMLFactoryConfig(externalEntities, expandEntities, SAXParserFactory.class.toString())
+        XMLFactoryConfig config = new XMLFactoryConfig(secureFactories, null, SAXParserFactory.class.toString())
         {
             @Override
             public Object createFactory()
             {
-                return DefaultXMLSecureFactories.createSaxParserFactory(this.externalEntities, this.expandEntities);
+                return secureFactories.createSaxParserFactory();
             }
         };
 
         return (SAXParserFactory) cache.getUnchecked(config);
     }
 
-    public XMLInputFactory getXMLInputFactory(Boolean externalEntities, Boolean expandEntities)
+    public XMLInputFactory getXMLInputFactory(final DefaultXMLSecureFactories secureFactories)
     {
-        XMLFactoryConfig config = new XMLFactoryConfig(externalEntities, expandEntities, XMLInputFactory.class.toString())
+        XMLFactoryConfig config = new XMLFactoryConfig(secureFactories, null, XMLInputFactory.class.toString())
         {
             @Override
             public Object createFactory()
             {
-                return DefaultXMLSecureFactories.createXmlInputFactory(this.externalEntities, this.expandEntities);
+                return secureFactories.createXMLInputFactory();
             }
         };
 
         return (XMLInputFactory) cache.getUnchecked(config);
     }
 
-    public TransformerFactory getTransformerFactory(Boolean externalEntities, Boolean expandEntities)
+    public TransformerFactory getTransformerFactory(final DefaultXMLSecureFactories secureFactories)
     {
-        XMLFactoryConfig config = new XMLFactoryConfig(externalEntities, expandEntities, TransformerFactory.class.toString())
+        XMLFactoryConfig config = new XMLFactoryConfig(secureFactories, null, TransformerFactory.class.toString())
         {
             @Override
             public Object createFactory()
             {
-                return DefaultXMLSecureFactories.createTransformerFactory(this.externalEntities, this.expandEntities);
+                return secureFactories.createTransformerFactory();
             }
         };
 
         return (TransformerFactory) cache.getUnchecked(config);
+    }
+
+    public SchemaFactory getSchemaFactory(final DefaultXMLSecureFactories secureFactories, String schemaLanguage)
+    {
+        XMLFactoryConfig config = new XMLFactoryConfig(secureFactories, schemaLanguage, SchemaFactory.class.toString())
+        {
+            @Override
+            public Object createFactory()
+            {
+                return secureFactories.createSchemaFactory(schemaLanguage);
+            }
+        };
+
+        return (SchemaFactory) cache.getUnchecked(config);
     }
 }

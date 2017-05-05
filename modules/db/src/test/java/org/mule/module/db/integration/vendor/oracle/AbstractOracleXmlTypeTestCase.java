@@ -30,10 +30,6 @@ import org.junit.internal.matchers.TypeSafeMatcher;
  * <p/>
  * These test required to include xdb.jar and xmlparserv2.jar libraries into
  * the project.
- * <p/>
- * Also pass this property into the JVM runtime to force the usage of xerces
- * instead of oracle's implementation:
- * -Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
  */
 public abstract class AbstractOracleXmlTypeTestCase extends AbstractDbIntegrationTestCase
 {

@@ -6,6 +6,8 @@
  */
 package org.mule.util.xmlsecurity;
 
+import java.util.Objects;
+
 /**
  * Cache key for {@link XMLSecureFactoriesCache}. Also creates the corresponding factory.
  */
@@ -13,12 +15,14 @@ public abstract class XMLFactoryConfig
 {
     protected Boolean externalEntities;
     protected Boolean expandEntities;
+    protected String schemaLanguage;
     protected String factoryName;
 
-    public XMLFactoryConfig(Boolean externalEntities, Boolean expandEntities, String factoryName)
+    public XMLFactoryConfig(DefaultXMLSecureFactories secureFactories, String schemaLanguage, String factoryName)
     {
-        this.externalEntities = externalEntities;
-        this.expandEntities = expandEntities;
+        this.externalEntities = secureFactories.getExternalEntities();
+        this.expandEntities = secureFactories.getExpandEntities();
+        this.schemaLanguage = schemaLanguage;
         this.factoryName = factoryName;
     }
 
@@ -30,6 +34,7 @@ public abstract class XMLFactoryConfig
             XMLFactoryConfig otherConfig = (XMLFactoryConfig) other;
             return this.externalEntities.equals(otherConfig.externalEntities) &&
                    this.expandEntities.equals(otherConfig.expandEntities) &&
+                   Objects.equals(this.schemaLanguage, otherConfig.schemaLanguage) &&
                    this.factoryName.equals(otherConfig.factoryName);
         }
         else
@@ -45,6 +50,9 @@ public abstract class XMLFactoryConfig
 
         int result = this.externalEntities.hashCode();
         result = primeNumber * result + this.expandEntities.hashCode();
+        if (this.schemaLanguage != null) {
+            result = primeNumber * result + this.schemaLanguage.hashCode();
+        }
         result = primeNumber * result + this.factoryName.hashCode();
 
         return result;

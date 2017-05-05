@@ -6,6 +6,11 @@
  */
 package org.mule.transformers.xml.xslt;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mule.util.xmlsecurity.DefaultXMLSecureFactories.TRANSFORMER_FACTORY;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
@@ -17,6 +22,7 @@ import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformers.xml.AbstractXmlTransformerTestCase;
 import org.mule.util.IOUtils;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -25,13 +31,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.TransformerFactory;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransformerTestCase
 {
@@ -48,12 +50,18 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
     @Override
     public Transformer getTransformer() throws Exception
     {
-        XsltTransformer transformer = new XsltTransformer();
+        XsltTransformer transformer = new XsltTransformer()
+        {
+            @Override
+            public TransformerFactory getTransformerFactory()
+            {
+                // Will default to JDK instead of Saxon
+                return XMLSecureFactories.createDefault().getTransformerFactory();
+            }
+        };
         transformer.setReturnDataType(DataTypeFactory.STRING);
         transformer.setXslFile("cdcatalog.xsl");
         transformer.setMaxActiveTransformers(42);
-        //Will default to JDK
-        transformer.setXslTransformerFactory(null);
         initialiseObject(transformer);
         return transformer;
     }
@@ -124,25 +132,18 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
     @Test
     public void testCustomTransformerFactoryClass() throws InitialisationException
     {
-        XsltTransformer t = new XsltTransformer();
-        t.setXslTransformerFactory("com.nosuchclass.TransformerFactory");
-        t.setXslFile("cdcatalog.xsl");
-
-        try
+        XsltTransformer t = new XsltTransformer()
         {
-            t.initialise();
-            fail("should have failed with ClassNotFoundException");
-        }
-        catch (InitialisationException iex)
-        {
-            assertEquals(ClassNotFoundException.class, iex.getCause().getClass());
-        }
-
-        t = new XsltTransformer();
+            @Override
+            public TransformerFactory getTransformerFactory()
+            {
+                return XMLSecureFactories.createDefault().getTransformerFactory();
+            }
+        };
         t.setXslFile("cdcatalog.xsl");
-        // try again with JDK default
-        t.setXslTransformerFactory(null);
         t.initialise();
+
+        assertEquals(t.getTransformerFactory().getClass().getName(), TRANSFORMER_FACTORY);
     }
 
     @Test

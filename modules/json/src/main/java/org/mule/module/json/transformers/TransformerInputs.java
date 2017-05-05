@@ -9,8 +9,6 @@ package org.mule.module.json.transformers;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.util.ClassUtils;
-import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -21,16 +19,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
 
-import javax.xml.transform.TransformerFactory;
-import javax.xml.validation.SchemaFactory;
-
 public class TransformerInputs
 {
-    private static final String PREFERRED_TRANSFORMATION_FACTORY_CLASS_NAME =
-        "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
-
-    private static final String PREFERRED_SCHEMA_FACTORY_CLASS_NAME =
-        "com.sun.org.apache.xerces.internal.jaxp.validation.XMLSchemaFactory";
     /**
      * Turn whatever we got as the transformer's source into either an input stream or a reader
      */
@@ -86,51 +76,6 @@ public class TransformerInputs
     public Reader getReader()
     {
         return reader;
-    }
-
-    public static TransformerFactory createTransformerFactory()
-    {
-        TransformerFactory transformerFactory;
-
-        try
-        {
-            // Create a factory we know to be STAX-compliant
-            transformerFactory = (TransformerFactory) Class.forName(PREFERRED_TRANSFORMATION_FACTORY_CLASS_NAME).newInstance();
-            XMLSecureFactories.createDefault().configureTransformerFactory(transformerFactory);
-        }
-        catch (Exception ex)
-        {
-            // Fall back to default factory
-            transformerFactory = XMLSecureFactories.createDefault().getTransformerFactory();
-        }
-
-        return transformerFactory;
-    }
-
-    public static SchemaFactory createSchemaFactory(String schemaLanguage)
-    {
-        SchemaFactory schemaFactory;
-
-        try
-        {
-            // Create a factory we know to be STAX-compliant
-            schemaFactory = (SchemaFactory) ClassUtils.instanciateClass(PREFERRED_SCHEMA_FACTORY_CLASS_NAME);
-        }
-        catch (Exception ex)
-        {
-            System.out.println(ex.getMessage());
-            // Fall back to default factory
-            schemaFactory = SchemaFactory.newInstance(schemaLanguage);
-        }
-
-        XMLSecureFactories.createDefault().configureSchemaFactory(schemaFactory);
-
-        return schemaFactory;
-    }
-
-    public static String getPreferredTransactionFactoryClassname()
-    {
-        return PREFERRED_TRANSFORMATION_FACTORY_CLASS_NAME;
     }
 
 }

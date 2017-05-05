@@ -15,6 +15,7 @@ import org.mule.module.xml.stax.StaxSource;
 import org.mule.module.xml.transformer.DelayedResult;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.xmlsecurity.XMLSecureFactories;
 
@@ -33,6 +34,7 @@ import java.util.List;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -41,6 +43,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
@@ -81,6 +84,10 @@ public class XMLUtils extends org.mule.util.XMLUtils
     // JAXP implementation)
     public static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
     public static final String JAXP_PROPERTIES_SCHEMA_LANGUAGE_VALUE = "http://www.w3.org/2001/XMLSchema";
+
+    // Shipped with Mule
+    public static final String SAXON_TRANSFORMER_FACTORY = "net.sf.saxon.TransformerFactoryImpl";
+    public static final String WSTX_INPUT_FACTORY = "com.ctc.wstx.stax.WstxInputFactory";
 
     /**
      * Converts a DOM to an XML string.
@@ -149,7 +156,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
         {                
             return reader.read((org.xml.sax.InputSource) obj);
         }
-        else if (obj instanceof javax.xml.transform.Source || obj instanceof javax.xml.stream.XMLStreamReader)
+        else if (obj instanceof javax.xml.transform.Source || obj instanceof XMLStreamReader)
         {                
             // TODO Find a more direct way to do this
             XmlToDomDocument tr = new XmlToDomDocument();
@@ -205,7 +212,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
         {
             return parseXML((InputSource) payload);
         }
-        else if (payload instanceof javax.xml.transform.Source || payload instanceof javax.xml.stream.XMLStreamReader)
+        else if (payload instanceof javax.xml.transform.Source || payload instanceof XMLStreamReader)
         {
             DOMResult result = new DOMResult();
             Transformer idTransformer = getTransformer();
@@ -256,10 +263,10 @@ public class XMLUtils extends org.mule.util.XMLUtils
      * Returns an XMLStreamReader for an object of unknown type if possible.
      * @return null if no XMLStreamReader can be created for the object type
      * @throws XMLStreamException
-     * @deprecated As of 3.7.0, use {@link #toXMLStreamReader(javax.xml.stream.XMLInputFactory, org.mule.api.MuleEvent, Object)} instead.
+     * @deprecated As of 3.7.0, use {@link #toXMLStreamReader(XMLInputFactory, org.mule.api.MuleEvent, Object)} instead.
      */
     @Deprecated
-    public static javax.xml.stream.XMLStreamReader toXMLStreamReader(javax.xml.stream.XMLInputFactory factory, Object obj) throws XMLStreamException
+    public static XMLStreamReader toXMLStreamReader(XMLInputFactory factory, Object obj) throws XMLStreamException
     {
         return toXMLStreamReader(factory, RequestContext.getEvent(), obj);
     }
@@ -269,11 +276,11 @@ public class XMLUtils extends org.mule.util.XMLUtils
      * @return null if no XMLStreamReader can be created for the object type
      * @throws XMLStreamException
      */
-    public static javax.xml.stream.XMLStreamReader toXMLStreamReader(javax.xml.stream.XMLInputFactory factory, MuleEvent event, Object obj) throws XMLStreamException
+    public static XMLStreamReader toXMLStreamReader(XMLInputFactory factory, MuleEvent event, Object obj) throws XMLStreamException
     {
-        if (obj instanceof javax.xml.stream.XMLStreamReader)
+        if (obj instanceof XMLStreamReader)
         {
-            return (javax.xml.stream.XMLStreamReader) obj;
+            return (XMLStreamReader) obj;
         }
         else if (obj instanceof org.mule.module.xml.stax.StaxSource)
         {
@@ -289,6 +296,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
         }
         else if (obj instanceof org.w3c.dom.Document)
         {
+            // this requires Woodstox factory
             return factory.createXMLStreamReader(new javax.xml.transform.dom.DOMSource((org.w3c.dom.Document) obj));
         }
         else if (obj instanceof org.dom4j.Document)
@@ -365,7 +373,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
     /**
      * Convert our object to a Source type efficiently.
      */ 
-    public static javax.xml.transform.Source toXmlSource(javax.xml.stream.XMLInputFactory xmlInputFactory, boolean useStaxSource, Object src) throws Exception
+    public static javax.xml.transform.Source toXmlSource(XMLInputFactory xmlInputFactory, boolean useStaxSource, Object src) throws Exception
     {
         if (src instanceof javax.xml.transform.Source)
         {
@@ -430,7 +438,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
         }
     }
 
-    public static javax.xml.transform.Source toStreamSource(javax.xml.stream.XMLInputFactory xmlInputFactory, boolean useStaxSource, final InputStream stream) throws XMLStreamException
+    public static javax.xml.transform.Source toStreamSource(XMLInputFactory xmlInputFactory, boolean useStaxSource, final InputStream stream) throws XMLStreamException
     {
         if (useStaxSource)
         {
@@ -727,7 +735,45 @@ public class XMLUtils extends org.mule.util.XMLUtils
             return nodeList;
     }
 
+    public static Object createInstance(String className)
+    {
+        Object factory;
 
+        try
+        {
+            factory = ClassUtils.instanciateClass(className, ClassUtils.NO_ARGS, XMLUtils.class);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        return factory;
+    }
+
+    public static TransformerFactory createSaxonTransformerFactory() {
+        TransformerFactory factory = (TransformerFactory) createInstance(SAXON_TRANSFORMER_FACTORY);
+
+        XMLSecureFactories.createDefault().configureTransformerFactory(factory);
+
+        return factory;
+    }
+
+    public static XMLInputFactory createWstxXmlInputFactory() {
+        XMLInputFactory factory = (XMLInputFactory) createInstance(WSTX_INPUT_FACTORY);
+
+        XMLSecureFactories.createDefault().configureXMLInputFactory(factory);
+
+        return factory;
+    }
+
+    public static XMLInputFactory createWstxXmlInputFactory(Boolean externalEntities, Boolean expandEntities) {
+        XMLInputFactory factory = (XMLInputFactory) createInstance(WSTX_INPUT_FACTORY);
+
+        XMLSecureFactories.createWithConfig(externalEntities, expandEntities).configureXMLInputFactory(factory);
+
+        return factory;
+    }
 
     /**
      * The default namespace context that will read namespaces from the current document if the

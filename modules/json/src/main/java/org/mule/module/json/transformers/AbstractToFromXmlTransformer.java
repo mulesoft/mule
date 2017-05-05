@@ -7,6 +7,9 @@
 package org.mule.module.json.transformers;
 
 import org.mule.transformer.AbstractTransformer;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
+
+import java.io.StringWriter;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -14,11 +17,9 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stax.StAXResult;
-import java.io.StringWriter;
 
 /**
  * Superclass for transformers that convert JSON to and from XML
@@ -29,7 +30,7 @@ public abstract class AbstractToFromXmlTransformer extends AbstractTransformer
 
     protected AbstractToFromXmlTransformer()
     {
-        transformerFactory = TransformerInputs.createTransformerFactory();
+        transformerFactory = XMLSecureFactories.createDefault().getTransformerFactory();
     }
 
     /**
