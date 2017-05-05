@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.deepEquals;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.ClassUtils.findImplementedInterfaces;
 
@@ -95,7 +96,9 @@ public class InjectParamsFromContextServiceProxy extends ServiceInvocationHandle
           && serviceImplMethod.getName().equals(method.getName())
           && serviceImplMethod.getAnnotationsByType(Inject.class).length > 0
           && equivalentParams(method.getParameters(), serviceImplMethod.getParameters())) {
-        if (candidate != null) {
+        if (candidate != null
+            && !(candidate.getName().equals(serviceImplMethod.getName())
+                && deepEquals(candidate.getParameterTypes(), serviceImplMethod.getParameterTypes()))) {
           throw new IllegalDependencyInjectionException(format(MANY_CANDIDATES_ERROR_MSG_TEMPLATE, method.getName(),
                                                                getService().getName()));
         }
