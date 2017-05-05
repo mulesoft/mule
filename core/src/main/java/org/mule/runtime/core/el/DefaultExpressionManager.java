@@ -30,6 +30,7 @@ import org.mule.runtime.core.api.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.util.OneTimeWarning;
 import org.mule.runtime.core.util.TemplateParser;
 
 import java.util.Collection;
@@ -45,7 +46,10 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public static final String DW_PREFIX = "dw";
   public static final String MEL_PREFIX = "mel";
   public static final String PREFIX_EXPR_SEPARATOR = ":";
-  private static final Logger logger = getLogger(DefaultExpressionManager.class);
+  private static final Logger LOGGER = getLogger(DefaultExpressionManager.class);
+
+  private final OneTimeWarning parseWarning = new OneTimeWarning(LOGGER,
+                                                                 "Expression parsing is deprecated, regular evaluations should be used instead.");
 
   private MuleContext muleContext;
   private ExtendedExpressionLanguageAdaptor expressionLanguage;
@@ -70,7 +74,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
       expressionLanguage.addGlobalBindings(contextProvider.getBindingContext());
     }
     if (melDefault) {
-      logger.warn("Using MEL as the default expression language.");
+      LOGGER.warn("Using MEL as the default expression language.");
     }
   }
 
@@ -197,7 +201,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
           return nonBooleanReturnsTrue;
         }
       } else {
-        logger.warn("Expression: " + expression + ", returned an non-boolean result. Returning: " + nonBooleanReturnsTrue);
+        LOGGER.warn("Expression: " + expression + ", returned an non-boolean result. Returning: " + nonBooleanReturnsTrue);
         return nonBooleanReturnsTrue;
       }
     }
@@ -211,7 +215,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   @Override
   public String parse(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct)
       throws ExpressionRuntimeException {
-    logger.warn("Expression parsing is deprecated, regular evaluations should be used instead.");
+    parseWarning.warn();
     if (hasMelExpression(expression) || melDefault) {
       return parser.parse(token -> {
         Object result = evaluate(token, event, eventBuilder, flowConstruct).getValue();
@@ -231,8 +235,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
                                              e);
       }
     } else {
-      if (logger.isDebugEnabled()) {
-        logger.debug(String.format("No expression marker found in expression '%s'. Parsing as plain String.", expression));
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(String.format("No expression marker found in expression '%s'. Parsing as plain String.", expression));
       }
       return expression;
     }
@@ -264,8 +268,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   @Override
   public ValidationResult validate(String expression) {
     if (!muleContext.getConfiguration().isValidateExpressions()) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Validate expressions is turned off, no checking done for: " + expression);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Validate expressions is turned off, no checking done for: " + expression);
       }
       return new DefaultValidationResult(true, null);
     }
