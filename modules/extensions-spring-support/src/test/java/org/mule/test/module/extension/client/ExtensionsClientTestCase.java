@@ -24,11 +24,11 @@ import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.tck.message.IntegerAttributes;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
+import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.vegan.extension.VeganPolicy;
 

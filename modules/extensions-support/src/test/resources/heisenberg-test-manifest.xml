@@ -7,7 +7,6 @@
     <exportedPackages>
         <package>org.mule.test.heisenberg.extension.model.types</package>
         <package>org.mule.test.heisenberg.extension.exception</package>
-        <package>org.mule.tck.message</package>
         <package>org.mule.test.heisenberg.extension</package>
         <package>org.mule.test.heisenberg.extension.model</package>
     </exportedPackages>

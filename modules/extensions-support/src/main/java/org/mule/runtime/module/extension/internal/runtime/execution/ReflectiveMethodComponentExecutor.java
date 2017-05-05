@@ -14,10 +14,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.ReflectionUtils.invokeMethod;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -25,7 +27,10 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 
@@ -35,7 +40,8 @@ import org.slf4j.Logger;
  * @param <M> the generic type of the associated {@link ComponentModel}
  * @since 4.0
  */
-public class ReflectiveMethodComponentExecutor<M extends ComponentModel> implements MuleContextAware, Lifecycle {
+public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
+    implements MuleContextAware, Lifecycle, OperationArgumentResolverFactory {
 
   private static class NoArgumentsResolverDelegate implements ArgumentResolverDelegate {
 
@@ -48,8 +54,7 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel> impleme
   }
 
   private static final Logger LOGGER = getLogger(ReflectiveMethodOperationExecutor.class);
-  private static final ArgumentResolverDelegate NO_ARGS_DELEGATE =
-      new ReflectiveMethodComponentExecutor.NoArgumentsResolverDelegate();
+  private static final ArgumentResolverDelegate NO_ARGS_DELEGATE = new NoArgumentsResolverDelegate();
 
   private final Method method;
   private final Object componentInstance;
@@ -104,5 +109,19 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel> impleme
     if (componentInstance instanceof MuleContextAware) {
       ((MuleContextAware) componentInstance).setMuleContext(context);
     }
+  }
+
+  @Override
+  public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
+    return ec -> {
+      // TODO MULE-11527 avoid doing unnecesary evaluations
+      final Object[] resolved = argumentResolverDelegate.resolve(ec, method.getParameterTypes());
+
+      final Map<String, Object> resolvedParams = new HashMap<String, Object>();
+      for (int i = 0; i < method.getParameterCount(); ++i) {
+        resolvedParams.put(method.getParameters()[i].getName(), resolved[i]);
+      }
+      return resolvedParams;
+    };
   }
 }
