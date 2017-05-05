@@ -25,7 +25,7 @@
             <jms:message>
                 <jms:reply-to destination="${destination}" destinationType="QUEUE"/>
             </jms:message>
-            <jms:consume-configuration consumeContentType="text/json" consumeEncoding="US-ASCII"/>
+            <jms:consume-configuration inboundContentType="text/json" inboundEncoding="US-ASCII"/>
         </jms:publish-consume>
     </flow>
 
@@ -45,7 +45,7 @@
 
     <flow name="listener-with-override" initialState="stopped">
         <jms:listener config-ref="config" destination="${destination}" ackMode="AUTO"
-                      inputContentType="text/json" inputEncoding="US-ASCII"/>
+                      inboundContentType="text/json" inboundEncoding="US-ASCII"/>
         <logger level="DEBUG" message="#[payload]"/>
         <component class="org.mule.extensions.jms.test.JmsMessageStorage"/>
     </flow>

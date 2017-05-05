@@ -7,12 +7,10 @@
 
 
     <flow name="sendEmail">
-        <email:send config-ref="config">
-            <email:headers subject="Email Subject">
-                <email:to-addresses>
-                    <email:to-address value="juan.desimoni@mulesoft.com"/>
-                </email:to-addresses>
-            </email:headers>
+        <email:send config-ref="config" subject="Email Subject">
+            <email:to-addresses>
+                <email:to-address value="juan.desimoni@mulesoft.com"/>
+            </email:to-addresses>
             <email:body contentType="text/plain">
                 <email:content>Email Content</email:content>
             </email:body>
@@ -20,14 +18,12 @@
     </flow>
 
     <flow name="sendEmailHeaders">
-        <email:send config-ref="config-custom-headers">
-            <email:headers subject="Email Subject">
-                <email:to-addresses>
-                    <email:to-address value="juan.desimoni@mulesoft.com"/>
-                </email:to-addresses>
-                <email:custom-headers>
-                    #[{'CustomOperationHeader' : 'Dummy'}]
-                </email:custom-headers>
+        <email:send config-ref="config-custom-headers" subject="Email Subject">
+            <email:to-addresses>
+                <email:to-address value="juan.desimoni@mulesoft.com"/>
+            </email:to-addresses>
+            <email:headers>
+                #[{'CustomOperationHeader' : 'Dummy'}]
             </email:headers>
             <email:body contentType="text/plain">
                 <email:content>Email Content</email:content>
@@ -41,12 +37,10 @@
     </spring:bean>
 
     <flow name="sendEncodedMessage">
-        <email:send config-ref="config">
-            <email:headers subject="Email Subject">
-                <email:to-addresses>
-                    <email:to-address value="pablo.musumeci@mulesoft.com"/>
-                </email:to-addresses>
-            </email:headers>
+        <email:send config-ref="config" subject="Email Subject">
+            <email:to-addresses>
+                <email:to-address value="pablo.musumeci@mulesoft.com"/>
+            </email:to-addresses>
             <email:body encoding="#[variables.encoding]">
                 <email:content>#[payload]</email:content>
             </email:body>
@@ -54,13 +48,10 @@
     </flow>
 
     <flow name="sendEmailWithoutBody">
-        <email:send config-ref="config">
-            <email:headers subject="Email Subject">
-                <email:to-addresses>
-                    <email:to-address value="juan.desimoni@mulesoft.com"/>
-                </email:to-addresses>
-            </email:headers>
-            <email:body></email:body>
+        <email:send config-ref="config" subject="Email Subject">
+            <email:to-addresses>
+                <email:to-address value="juan.desimoni@mulesoft.com"/>
+            </email:to-addresses>
         </email:send>
     </flow>
 </mule>

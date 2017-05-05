@@ -138,15 +138,15 @@ public class JmsListener extends Source<Object, JmsAttributes> {
   @Parameter
   @Optional
   @Example(EXAMPLE_CONTENT_TYPE)
-  private String inputContentType;
+  private String inboundContentType;
 
   /**
-   * The inputEncoding of the message body
+   * The inboundEncoding of the message body
    */
   @Parameter
   @Optional
   @Example(EXAMPLE_ENCODING)
-  private String inputEncoding;
+  private String inboundEncoding;
 
   /**
    * This makes the message listener to work synchronously, only one message at a time will be consumed, delivered
@@ -182,7 +182,7 @@ public class JmsListener extends Source<Object, JmsAttributes> {
     jmsSupport = connection.getJmsSupport();
 
     JmsMessageListenerFactory messageListenerFactory =
-        new JmsMessageListenerFactory(resolvedAckMode, inputEncoding, inputContentType, config, sessionManager, jmsSupport,
+        new JmsMessageListenerFactory(resolvedAckMode, inboundEncoding, inboundContentType, config, sessionManager, jmsSupport,
                                       sourceCallback);
 
     validateNumberOfConsumers(numberOfConsumers);

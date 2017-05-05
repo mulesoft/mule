@@ -4,14 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.api;
+package org.mule.extension.email.internal.sender;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Example;
+import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class EmailBuilder {
+public class EmailSettings {
 
   /**
    * The "From" sender address. The person that is going to send the messages,
@@ -30,6 +31,8 @@ public class EmailBuilder {
    */
   @Optional
   @Parameter
+  @Summary("The sender 'From' address. If not provided, it defaults to the address specified in the config")
+  @Example("example@company.com")
   private String fromAddress;
 
   /**
@@ -44,6 +47,7 @@ public class EmailBuilder {
   @Optional
   @Parameter
   @NullSafe
+  @Summary("The recipient addresses of 'Cc' (carbon copy) type")
   private List<String> ccAddresses;
 
   /**
@@ -52,14 +56,16 @@ public class EmailBuilder {
   @Optional
   @Parameter
   @NullSafe
+  @Summary("The recipient addresses of 'Bcc' (blind carbon copy) type")
   private List<String> bccAddresses;
 
   /**
-   * The email addresses to which this email should reply.
+   * The email addresses to which this email should be replied.
    */
   @Optional
   @Parameter
   @NullSafe
+  @Summary("The email addresses to which this email should be replied")
   private List<String> replyToAddresses;
 
   /**
@@ -67,42 +73,25 @@ public class EmailBuilder {
    */
   @Optional(defaultValue = "[No Subject]")
   @Parameter
+  @Summary("The subject of the email")
   private String subject;
 
   /**
-   * The customHeaders that this email carry.
+   * The headers that this email carry.
    */
   @Optional
   @Parameter
   @Content
   @NullSafe
-  private Map<String, String> customHeaders;
+  @Summary("The custom headers that this email will carry")
+  @Example("#[{'X-MC-Autotext': 'yes'}]")
+  private Map<String, String> headers;
 
-  public EmailAttachment getAttachment() {
-    return attachment;
-  }
-
-  public void setAttachment(EmailAttachment attachment) {
-    this.attachment = attachment;
-  }
-
-  @Optional
-  @Parameter
-  @Content
-  private EmailAttachment attachment;
-
-  @Optional
-  @Parameter
-  @Content
-  @NullSafe
-  private List<EmailAttachment> attachments;
-
-  private EmailBody body;
 
   /**
    * Creates a new instance.
    */
-  public EmailBuilder() {}
+  public EmailSettings() {}
 
   /**
    * @return the configured subject for the built outgoing email.
@@ -115,46 +104,35 @@ public class EmailBuilder {
    * @return a {@link List} with the addresses that this mail should be replied to configured in the built outgoing email.
    */
   public List<String> getReplyToAddresses() {
-    return ensureNotNullList(replyToAddresses);
+    return replyToAddresses;
   }
 
   /**
    * @return a {@link List} with the primary recipients configured in the built outgoing email.
    */
   public List<String> getToAddresses() {
-    return ensureNotNullList(toAddresses);
+    return toAddresses;
   }
 
   /**
    * @return a {@link List} with the cc recipients configured in the built outgoing email.
    */
   public List<String> getCcAddresses() {
-    return ensureNotNullList(ccAddresses);
+    return ccAddresses;
   }
 
   /**
    * @return a {@link List} with the bcc recipients configured in the built outgoing email.
    */
   public List<String> getBccAddresses() {
-    return ensureNotNullList(bccAddresses);
+    return bccAddresses;
   }
 
   /**
-   * @return a {@link Map} with all the additional customHeaders configured for the
+   * @return a {@link Map} with all the additional headers configured for the
    */
-  public Map<String, String> getCustomHeaders() {
-    return customHeaders != null ? customHeaders : emptyMap();
-  }
-
-  /**
-   * @return the body of built outgoing email.
-   */
-  public EmailBody getBody() {
-    return body == null ? new EmailBody() : body;
-  }
-
-  public EmailBody setBody(EmailBody emailBody) {
-    return body = emailBody;
+  public Map<String, String> getHeaders() {
+    return headers != null ? headers : emptyMap();
   }
 
   /**
@@ -164,21 +142,4 @@ public class EmailBuilder {
     return fromAddress;
   }
 
-  /**
-   * @return a {@link List} of attachments configured in the built outgoing email.
-   */
-  public List<EmailAttachment> getAttachments() {
-    return ensureNotNullList(attachments);
-  }
-
-  /**
-   * @return an emptyList if the list is {@code null}, the {@link List} instance otherwise.
-   */
-  private <T> List<T> ensureNotNullList(List<T> list) {
-    return list != null ? list : emptyList();
-  }
-
-  public void setAttachments(List<EmailAttachment> attachments) {
-    this.attachments = attachments;
-  }
 }

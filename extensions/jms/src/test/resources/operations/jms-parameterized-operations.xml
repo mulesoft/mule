@@ -17,9 +17,9 @@
                       priority="#[priority]"
                       timeToLive="#[timeToLive]"
                       timeToLiveUnit="#[timeToLiveUnit]">
-            <jms:message contentType="#[contentType]"
+            <jms:message outboundContentType="#[contentType]"
                                   correlationId="#[correlationId]"
-                                  encoding="#[encoding]"
+                         outboundEncoding="#[encoding]"
                                   jmsType="#[jmsType]"
                                   sendContentType="#[sendContentType]"
                                   sendEncoding="#[sendEncoding]">
@@ -37,10 +37,10 @@
                       destination="#[destination]"
                       maximumWait="#[maximumWait]"
                       maximumWaitUnit="#[waitTimeUnit]"
-                      encoding="#[encoding]"
+                      inboundEncoding="#[encoding]"
                       ackMode="#[ackMode]"
                       consumerType="#[consumerType]"
-                      contentType="#[contentType]"
+                      inboundContentType="#[contentType]"
                       selector="#[selector]"/>
     </flow>
 

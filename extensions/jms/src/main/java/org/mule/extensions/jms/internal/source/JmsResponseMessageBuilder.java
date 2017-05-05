@@ -26,7 +26,7 @@ public class JmsResponseMessageBuilder extends JmsMessageBuilder implements Publ
 
   @Parameter
   @Optional
-  @Summary("If true; the Message will be sent using the PERSISTENT JMSDeliveryMode")
+  @Summary("Whether or not the delivery should be done with a persistent configuration")
   private Boolean persistentDelivery;
 
   @Parameter

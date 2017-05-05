@@ -49,14 +49,14 @@ public class JmsConsumeParameters {
   @Example(EXAMPLE_CONTENT_TYPE)
   @Summary("The content type of the message body to be consumed")
   @DisplayName("Content Type")
-  private String consumeContentType;
+  private String inboundContentType;
 
   @Parameter
   @Optional
   @Example(EXAMPLE_ENCODING)
   @Summary("The encoding of the message body to be consumed")
   @DisplayName("Encoding")
-  private String consumeEncoding;
+  private String inboundEncoding;
 
   public ConsumerAckMode getAckMode() {
     return ackMode;
@@ -70,11 +70,11 @@ public class JmsConsumeParameters {
     return maximumWaitUnit;
   }
 
-  public String getConsumeContentType() {
-    return consumeContentType;
+  public String getInboundContentType() {
+    return inboundContentType;
   }
 
-  public String getConsumeEncoding() {
-    return consumeEncoding;
+  public String getInboundEncoding() {
+    return inboundEncoding;
   }
 }

@@ -154,9 +154,9 @@ public class JmsPublishConsume {
 
       return resultFactory.createResult(received, connection.getJmsSupport().getSpecification(),
                                         resolveOverride(resolveMessageContentType(received, config.getContentType()),
-                                                        consumeParameters.getConsumeContentType()),
+                                                        consumeParameters.getInboundContentType()),
                                         resolveOverride(resolveMessageEncoding(received, config.getEncoding()),
-                                                        consumeParameters.getConsumeEncoding()),
+                                                        consumeParameters.getInboundEncoding()),
                                         session.getAckId());
     } catch (Exception e) {
       LOGGER.error("An error occurred while listening for the reply: ", e);

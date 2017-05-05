@@ -60,7 +60,7 @@ public class JmsMessageBuilder {
   @Parameter
   @XmlHints(allowReferences = false)
   @Content(primary = true)
-  @DisplayName("Body")
+  @Summary("The body of the Message")
   private TypedValue<Object> body;
 
   /**
@@ -68,6 +68,7 @@ public class JmsMessageBuilder {
    */
   @Parameter
   @Optional
+  @Summary("The JMSType identifier header of the Message")
   private String jmsType;
 
   /**
@@ -75,6 +76,7 @@ public class JmsMessageBuilder {
    */
   @Parameter
   @Optional
+  @Summary("The JMSCorrelationID header of the Message")
   private String correlationId;
 
   /**
@@ -82,6 +84,7 @@ public class JmsMessageBuilder {
    */
   @Parameter
   @Optional(defaultValue = "true")
+  @Summary("Whether or not the body content type should be sent as a property")
   private boolean sendContentType;
 
   /**
@@ -92,25 +95,25 @@ public class JmsMessageBuilder {
   @DisplayName("ContentType")
   @Example(EXAMPLE_CONTENT_TYPE)
   @Summary("The content type of the message's body")
-  private String contentType;
+  private String outboundContentType;
 
   /**
-   * {@code true} if the body encoding should be sent as a {@link Message} property
+   * {@code true} if the body outboundEncoding should be sent as a {@link Message} property
    */
   @Parameter
   @Optional(defaultValue = "true")
-  @Summary("Whether or not the body encoding should be sent as a Message property")
+  @Summary("Whether or not the body outboundEncoding should be sent as a Message property")
   private boolean sendEncoding;
 
   /**
-   * The encoding of the message's {@code body}
+   * The outboundEncoding of the message's {@code body}
    */
   @Parameter
   @Optional
   @DisplayName("Encoding")
   @Example(EXAMPLE_ENCODING)
   @Summary("The encoding of the message's body")
-  private String encoding;
+  private String outboundEncoding;
 
   /**
    * The JMSReplyTo header information of the {@link Destination} where
@@ -166,7 +169,7 @@ public class JmsMessageBuilder {
       setContentTypeProperty(message, body.getDataType());
     }
     if (sendEncoding) {
-      setEncodingProperty(message, body.getDataType(), resolveOverride(config.getEncoding(), encoding));
+      setEncodingProperty(message, body.getDataType(), resolveOverride(config.getEncoding(), outboundEncoding));
     }
 
     return message;
@@ -196,7 +199,7 @@ public class JmsMessageBuilder {
 
   private void setContentTypeProperty(Message message, DataType dataType) {
     try {
-      String value = isBlank(contentType) ? dataType.getMediaType().toRfcString() : contentType;
+      String value = isBlank(outboundContentType) ? dataType.getMediaType().toRfcString() : outboundContentType;
       message.setStringProperty(BODY_CONTENT_TYPE_JMS_PROPERTY, value);
     } catch (JMSException e) {
       LOGGER.error(format("Unable to set property [%s] of type String: ", BODY_CONTENT_TYPE_JMS_PROPERTY), e);
@@ -262,8 +265,8 @@ public class JmsMessageBuilder {
     return sendContentType;
   }
 
-  public String getContentType() {
-    return contentType;
+  public String getOutboundContentType() {
+    return outboundContentType;
   }
 
   public Map<String, Object> getProperties() {
@@ -290,7 +293,7 @@ public class JmsMessageBuilder {
     return sendEncoding;
   }
 
-  public String getEncoding() {
-    return encoding;
+  public String getOutboundEncoding() {
+    return outboundEncoding;
   }
 }

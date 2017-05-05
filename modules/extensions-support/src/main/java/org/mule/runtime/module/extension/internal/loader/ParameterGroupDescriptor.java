@@ -32,17 +32,16 @@ public final class ParameterGroupDescriptor {
   private final Type type;
 
   /**
+   * The {@link MetadataType} of the pojo which implements the group
+   */
+  private final MetadataType metadataType;
+
+  /**
    * The member in which the generated value of {@link #type} is to be assigned. For {@link ParameterGroupDescriptor}
    * used as fields of a class, this container should be parameterized as a {@link Field}. And if it is used
    * as an argument of an operation it should the corresponding {@link Method}'s {@link Parameter}.
    */
   private final AnnotatedElement container;
-
-  public MetadataType getMetadataType() {
-    return metadataType;
-  }
-
-  private final MetadataType metadataType;
 
   public ParameterGroupDescriptor(String name, Type type, MetadataType metadataType, AnnotatedElement container) {
     checkArgument(!isBlank(name), "name cannot be blank");
@@ -70,6 +69,10 @@ public final class ParameterGroupDescriptor {
 
   public Type getType() {
     return type;
+  }
+
+  public MetadataType getMetadataType() {
+    return metadataType;
   }
 
 }
