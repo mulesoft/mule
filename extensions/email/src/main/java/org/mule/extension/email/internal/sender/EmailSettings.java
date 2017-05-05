@@ -7,11 +7,13 @@
 package org.mule.extension.email.internal.sender;
 
 import static java.util.Collections.emptyMap;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 import java.util.List;
@@ -85,6 +87,7 @@ public class EmailSettings {
   @NullSafe
   @Summary("The custom headers that this email will carry")
   @Example("#[{'X-MC-Autotext': 'yes'}]")
+  @Placement(tab = ADVANCED_TAB)
   private Map<String, String> headers;
 
 
