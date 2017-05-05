@@ -430,15 +430,15 @@
                             </xs:complexType>
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="known-addresses">
-                          <xs:complexType>
-                            <xs:sequence>
-                              <xs:element minOccurs="0" maxOccurs="unbounded" name="known-address">
-                                <xs:complexType>
-                                  <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                </xs:complexType>
-                              </xs:element>
-                            </xs:sequence>
-                          </xs:complexType>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="known-address">
+                                        <xs:complexType>
+                                            <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="inline-barber-preferences">
                             <xs:complexType>
@@ -576,61 +576,61 @@
                         </xs:complexType>
                     </xs:element>
                     <xs:element minOccurs="1" maxOccurs="1" name="success-info">
-                    <xs:complexType>
-                      <xs:complexContent>
-                        <xs:extension base="mule:abstractExtensionType">
-                          <xs:sequence>
-                            <xs:element minOccurs="0" maxOccurs="1" name="known-addresses">
-                              <xs:complexType>
-                                <xs:sequence>
-                                  <xs:element minOccurs="0" maxOccurs="unbounded" name="known-address">
-                                    <xs:complexType>
-                                      <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                    </xs:complexType>
-                                  </xs:element>
-                                </xs:sequence>
-                              </xs:complexType>
-                            </xs:element>
-                          </xs:sequence>
-                          <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
-                          <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
-                          <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfConception"></xs:attribute>
-                          <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfBirth"></xs:attribute>
-                          <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfDeath"></xs:attribute>
-                          <xs:attribute type="mule:substitutableDateTime" use="optional" name="dateOfGraduation"></xs:attribute>
-                          <xs:attribute type="mule:expressionList" use="optional" name="knownAddresses"></xs:attribute>
-                        </xs:extension>
-                      </xs:complexContent>
-                    </xs:complexType>
-                  </xs:element>
-                  <xs:element minOccurs="1" maxOccurs="1" name="error-info">
-                    <xs:complexType>
-                      <xs:complexContent>
-                        <xs:extension base="mule:abstractExtensionType">
-                          <xs:sequence>
-                            <xs:element minOccurs="0" maxOccurs="1" name="known-addresses">
-                              <xs:complexType>
-                                <xs:sequence>
-                                  <xs:element minOccurs="0" maxOccurs="unbounded" name="known-address">
-                                    <xs:complexType>
-                                      <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                    </xs:complexType>
-                                  </xs:element>
-                                </xs:sequence>
-                              </xs:complexType>
-                            </xs:element>
-                          </xs:sequence>
-                          <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
-                          <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
-                          <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfConception"></xs:attribute>
-                          <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfBirth"></xs:attribute>
-                          <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfDeath"></xs:attribute>
-                          <xs:attribute type="mule:substitutableDateTime" use="optional" name="dateOfGraduation"></xs:attribute>
-                          <xs:attribute type="mule:expressionList" use="optional" name="knownAddresses"></xs:attribute>
-                        </xs:extension>
-                      </xs:complexContent>
-                    </xs:complexType>
-                  </xs:element>
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension base="mule:abstractExtensionType">
+                                    <xs:sequence>
+                                        <xs:element minOccurs="0" maxOccurs="1" name="known-addresses">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="known-address">
+                                                        <xs:complexType>
+                                                            <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
+                                    <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
+                                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfConception"></xs:attribute>
+                                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfBirth"></xs:attribute>
+                                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfDeath"></xs:attribute>
+                                    <xs:attribute type="mule:substitutableDateTime" use="optional" name="dateOfGraduation"></xs:attribute>
+                                    <xs:attribute type="mule:expressionList" use="optional" name="knownAddresses"></xs:attribute>
+                                </xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="1" maxOccurs="1" name="error-info">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension base="mule:abstractExtensionType">
+                                    <xs:sequence>
+                                        <xs:element minOccurs="0" maxOccurs="1" name="known-addresses">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="known-address">
+                                                        <xs:complexType>
+                                                            <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
+                                    <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
+                                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfConception"></xs:attribute>
+                                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfBirth"></xs:attribute>
+                                    <xs:attribute type="mule:expressionDateTime" use="optional" name="dateOfDeath"></xs:attribute>
+                                    <xs:attribute type="mule:substitutableDateTime" use="optional" name="dateOfGraduation"></xs:attribute>
+                                    <xs:attribute type="mule:expressionList" use="optional" name="knownAddresses"></xs:attribute>
+                                </xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
@@ -1601,6 +1601,14 @@
                         <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="ThrowErrorType" substitutionGroup="heisenberg-empire" name="throw-error"></xs:element>
+    <xs:complexType name="ThrowErrorType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
