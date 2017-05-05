@@ -43,7 +43,7 @@ public class SendOperation {
                    @Config SMTPConfiguration configuration,
                    @Placement(order = 1) @ParameterGroup(name = "Settings") EmailSettings settings,
                    @Placement(order = 2) @ParameterGroup(name = "Body", showInDsl = true) EmailBody body,
-                   @Placement(order = 3) @ParameterGroup(name = "Attachments") AttachmentsGroup attachments) {
+                   @Placement(order = 3, tab = "Advanced") @ParameterGroup(name = "Attachments") AttachmentsGroup attachments) {
 
     sendCommand.send(connection, configuration, settings, body, attachments);
   }
