@@ -9,16 +9,14 @@ package org.mule.runtime.core.streaming;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.functional.Either;
 
 /**
  * Creates instances of {@link org.mule.runtime.api.streaming.bytes.CursorStreamProvider}
  *
- * @param <C> the generic type of the {@link Cursor cursors} being created
  * @param <T> the generic type of the streams being cursored
  * @since 4.0
  */
-public interface CursorProviderFactory<C extends CursorProvider, T> {
+public interface CursorProviderFactory<T> {
 
   /**
    * Optionally creates a new {@link CursorProvider} to buffer the given {@code value}.
@@ -28,9 +26,9 @@ public interface CursorProviderFactory<C extends CursorProvider, T> {
    *
    * @param event the event on which buffering is talking place
    * @param value the stream to be cursored
-   * @return {@link Either} a {@link CursorProvider} or the same given {@code inputStream}
+   * @return A {@link CursorProvider} or the same given {@code inputStream}
    */
-  Either<C, T> of(Event event, T value);
+  Object of(Event event, T value);
 
   /**
    * @param value a stream

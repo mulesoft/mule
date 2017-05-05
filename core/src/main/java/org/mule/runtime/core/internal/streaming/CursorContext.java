@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.EventContext;
  *
  * @since 4.0
  */
-public class CursorProviderHandle {
+public final class CursorContext {
 
   private final CursorProvider cursorProvider;
   private final EventContext ownerContext;
@@ -22,16 +22,16 @@ public class CursorProviderHandle {
   /**
    * Creates a new instance
    *
-   * @param cursorProvider the {@link CursorProvider} which will be tracked
+   * @param cursorProvider the {@link CursorProvider} which will be managed
    * @param ownerContext   the {@link EventContext} which owns the {@code cursorProvider}
    */
-  public CursorProviderHandle(CursorProvider cursorProvider, EventContext ownerContext) {
+  public CursorContext(CursorProvider cursorProvider, EventContext ownerContext) {
     this.cursorProvider = cursorProvider;
     this.ownerContext = ownerContext;
   }
 
   /**
-   * @return the {@link CursorProvider} being tracked
+   * @return the {@link CursorProvider} being managed
    */
   public CursorProvider getCursorProvider() {
     return cursorProvider;

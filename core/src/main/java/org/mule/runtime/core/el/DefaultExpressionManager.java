@@ -21,6 +21,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -30,6 +31,7 @@ import org.mule.runtime.core.api.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.util.OneTimeWarning;
 import org.mule.runtime.core.util.TemplateParser;
 
@@ -51,15 +53,18 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   private final OneTimeWarning parseWarning = new OneTimeWarning(LOGGER,
                                                                  "Expression parsing is deprecated, regular evaluations should be used instead.");
 
-  private MuleContext muleContext;
-  private ExtendedExpressionLanguageAdaptor expressionLanguage;
+  private final MuleContext muleContext;
+  private final StreamingManager streamingManager;
+  private final ExtendedExpressionLanguageAdaptor expressionLanguage;
   // Default style parser
-  private TemplateParser parser = TemplateParser.createMuleStyleParser();
-  private boolean melDefault;
+  private final TemplateParser parser = TemplateParser.createMuleStyleParser();
+  private final boolean melDefault;
+
 
   @Inject
-  public DefaultExpressionManager(MuleContext muleContext) {
+  public DefaultExpressionManager(MuleContext muleContext, StreamingManager streamingManager) {
     this.muleContext = muleContext;
+    this.streamingManager = streamingManager;
     final DataWeaveExpressionLanguageAdaptor dwExpressionLanguage = new DataWeaveExpressionLanguageAdaptor(muleContext);
     final MVELExpressionLanguage mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
     this.expressionLanguage = new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage);
@@ -121,7 +126,16 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   @Override
   public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
                              BindingContext context) {
-    return expressionLanguage.evaluate(expression, event, eventBuilder, flowConstruct, context);
+    return handleStreaming(expressionLanguage.evaluate(expression, event, eventBuilder, flowConstruct, context), event);
+  }
+
+  private TypedValue handleStreaming(TypedValue value, Event event) {
+    Object payload = value.getValue();
+    if (payload instanceof CursorProvider) {
+      value = new TypedValue(streamingManager.manage((CursorProvider) payload, event), value.getDataType());
+    }
+
+    return value;
   }
 
   @Override
@@ -136,7 +150,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   @Override
   public TypedValue evaluate(String expression, DataType outputType, BindingContext context, Event event) {
-    TypedValue result = expressionLanguage.evaluate(expression, outputType, event, context);
+    TypedValue result = handleStreaming(expressionLanguage.evaluate(expression, outputType, event, context), event);
     DataType sourceType = result.getDataType();
     try {
       return transform(result, sourceType, outputType);

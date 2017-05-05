@@ -12,6 +12,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager;
@@ -59,11 +61,11 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   }
 
   protected ByteStreamingManager createByteStreamingManager() {
-    return new DefaultByteStreamingManager(cursorManager, bufferManager);
+    return new DefaultByteStreamingManager(bufferManager);
   }
 
   protected ObjectStreamingManager createObjectStreamingManager() {
-    return new DefaultObjectStreamingManager(cursorManager);
+    return new DefaultObjectStreamingManager();
   }
 
   /**
@@ -99,12 +101,19 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
    * {@inheritDoc}
    */
   @Override
-  public StreamingStatistics getStreamingStatistics() {
-    return statistics;
+  public CursorProvider manage(CursorProvider provider, Event creatorEvent) {
+    if (provider instanceof ManagedCursorProvider) {
+      return provider;
+    }
+    return cursorManager.manage(provider, creatorEvent);
   }
 
-  protected CursorManager getCursorManager() {
-    return cursorManager;
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public StreamingStatistics getStreamingStatistics() {
+    return statistics;
   }
 
   protected ByteBufferManager getBufferManager() {

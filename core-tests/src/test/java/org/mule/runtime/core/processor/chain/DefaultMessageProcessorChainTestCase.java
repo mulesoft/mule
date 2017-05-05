@@ -34,7 +34,6 @@ import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKIN
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -84,7 +83,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.Mockito;
 import org.reactivestreams.Publisher;
 
 @RunWith(Parameterized.class)
@@ -547,7 +545,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     AppendingInterceptingMP mp1 = new AppendingInterceptingMP("1");
     AppendingInterceptingMP mp2 = new AppendingInterceptingMP("2");
     Processor chain = builder.chain(mp1, mp2).build();
-    ((MuleContextAware) chain).setMuleContext(mock(MuleContext.class, Mockito.RETURNS_DEEP_STUBS));
+    ((MuleContextAware) chain).setMuleContext(muleContext);
     ((FlowConstructAware) chain).setFlowConstruct(mock(FlowConstruct.class));
     ((Lifecycle) chain).initialise();
     ((Lifecycle) chain).start();
@@ -566,7 +564,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     AppendingInterceptingMP mpa = new AppendingInterceptingMP("a");
     AppendingInterceptingMP mpb = new AppendingInterceptingMP("b");
     Processor chain = builder.chain(mp1, nestedBuilder.chain(mpa, mpb).build(), mp2).build();
-    ((MuleContextAware) chain).setMuleContext(mock(MuleContext.class, Mockito.RETURNS_DEEP_STUBS));
+    ((MuleContextAware) chain).setMuleContext(muleContext);
     ((FlowConstructAware) chain).setFlowConstruct(mock(FlowConstruct.class));
     ((Lifecycle) chain).initialise();
     ((Lifecycle) chain).start();

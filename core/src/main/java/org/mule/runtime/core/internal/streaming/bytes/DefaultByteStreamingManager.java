@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
 import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
 import org.mule.runtime.core.streaming.bytes.ByteStreamingManager;
@@ -20,11 +19,9 @@ import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
  */
 public class DefaultByteStreamingManager implements ByteStreamingManager {
 
-  private final CursorManager cursorManager;
   private final ByteBufferManager bufferManager;
 
-  public DefaultByteStreamingManager(CursorManager cursorManager, ByteBufferManager bufferManager) {
-    this.cursorManager = cursorManager;
+  public DefaultByteStreamingManager(ByteBufferManager bufferManager) {
     this.bufferManager = bufferManager;
   }
 
@@ -33,7 +30,7 @@ public class DefaultByteStreamingManager implements ByteStreamingManager {
    */
   @Override
   public CursorStreamProviderFactory getInMemoryCursorProviderFactory(InMemoryCursorStreamConfig config) {
-    return new InMemoryCursorStreamProviderFactory(cursorManager, bufferManager, config);
+    return new InMemoryCursorStreamProviderFactory(bufferManager, config);
   }
 
   /**
@@ -41,7 +38,7 @@ public class DefaultByteStreamingManager implements ByteStreamingManager {
    */
   @Override
   public CursorStreamProviderFactory getNullCursorProviderFactory() {
-    return new NullCursorStreamProviderFactory(cursorManager, bufferManager);
+    return new NullCursorStreamProviderFactory(bufferManager);
   }
 
   /**
@@ -49,11 +46,7 @@ public class DefaultByteStreamingManager implements ByteStreamingManager {
    */
   @Override
   public CursorStreamProviderFactory getDefaultCursorProviderFactory() {
-    return new InMemoryCursorStreamProviderFactory(cursorManager, bufferManager, InMemoryCursorStreamConfig.getDefault());
-  }
-
-  protected CursorManager getCursorManager() {
-    return cursorManager;
+    return new InMemoryCursorStreamProviderFactory(bufferManager, InMemoryCursorStreamConfig.getDefault());
   }
 
   protected ByteBufferManager getBufferManager() {

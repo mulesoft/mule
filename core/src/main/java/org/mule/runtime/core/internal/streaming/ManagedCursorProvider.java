@@ -21,26 +21,26 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
 
   private final CursorProvider<T> delegate;
   private final CursorManager cursorManager;
-  private final CursorProviderHandle cursorProviderHandle;
+  private final CursorContext cursorContext;
 
-  protected ManagedCursorProvider(CursorProviderHandle cursorProviderHandle, CursorManager cursorManager) {
-    this.delegate = (CursorProvider<T>) cursorProviderHandle.getCursorProvider();
-    this.cursorProviderHandle = cursorProviderHandle;
+  protected ManagedCursorProvider(CursorContext cursorContext, CursorManager cursorManager) {
+    this.delegate = (CursorProvider<T>) cursorContext.getCursorProvider();
+    this.cursorContext = cursorContext;
     this.cursorManager = cursorManager;
   }
 
   /**
-   * Gets a cursor from the {@link #delegate} and registers it through {@link CursorManager#onOpen(Cursor, CursorProviderHandle)}.
+   * Gets a cursor from the {@link #delegate} and registers it through {@link CursorManager#onOpen(Cursor, CursorContext)}.
    * <p>
-   * The returned cursor will also be managed through the means of {@link #managedCursor(Cursor, CursorProviderHandle)}
+   * The returned cursor will also be managed through the means of {@link #managedCursor(Cursor, CursorContext)}
    *
    * @return a new {@link Cursor}
    */
   @Override
   public final T openCursor() {
     T cursor = delegate.openCursor();
-    cursorManager.onOpen(cursor, cursorProviderHandle);
-    return managedCursor(cursor, cursorProviderHandle);
+    cursorManager.onOpen(cursor, cursorContext);
+    return managedCursor(cursor, cursorContext);
   }
 
   /**
@@ -49,10 +49,10 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
    * should be that a new instance will be returned.
    *
    * @param cursor the cursor to manage
-   * @param handle the {@link CursorProviderHandle}
+   * @param handle the {@link CursorContext}
    * @return a managed {@link Cursor}
    */
-  protected abstract T managedCursor(T cursor, CursorProviderHandle handle);
+  protected abstract T managedCursor(T cursor, CursorContext handle);
 
   @Override
   public void releaseResources() {
@@ -67,5 +67,9 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
   @Override
   public boolean isClosed() {
     return delegate.isClosed();
+  }
+
+  protected CursorManager getCursorManager() {
+    return cursorManager;
   }
 }

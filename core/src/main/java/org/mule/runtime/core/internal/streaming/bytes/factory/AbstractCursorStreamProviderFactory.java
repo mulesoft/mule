@@ -6,19 +6,12 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes.factory;
 
-import static org.mule.runtime.core.api.functional.Either.left;
-import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.streaming.CursorManager;
-import org.mule.runtime.core.internal.streaming.CursorProviderHandle;
-import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -32,17 +25,14 @@ import java.io.InputStream;
  */
 public abstract class AbstractCursorStreamProviderFactory implements CursorStreamProviderFactory {
 
-  private final CursorManager cursorManager;
   private final ByteBufferManager bufferManager;
 
   /**
    * Creates a new instance
    *
-   * @param cursorManager the manager which will track the produced providers.
-   * @param bufferManager    the {@link ByteBufferManager} that will be used to allocate all buffers
+   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    */
-  protected AbstractCursorStreamProviderFactory(CursorManager cursorManager, ByteBufferManager bufferManager) {
-    this.cursorManager = cursorManager;
+  protected AbstractCursorStreamProviderFactory(ByteBufferManager bufferManager) {
     this.bufferManager = bufferManager;
   }
 
@@ -50,16 +40,12 @@ public abstract class AbstractCursorStreamProviderFactory implements CursorStrea
    * {@inheritDoc}
    */
   @Override
-  public final Either<CursorStreamProvider, InputStream> of(Event event, InputStream inputStream) {
+  public final Object of(Event event, InputStream inputStream) {
     if (inputStream instanceof CursorStream) {
-      return left((CursorStreamProvider) ((CursorStream) inputStream).getProvider());
+      return ((CursorStream) inputStream).getProvider();
     }
 
-    Either<CursorStreamProvider, InputStream> value = resolve(inputStream, event);
-    return value.mapLeft(provider -> {
-      CursorProviderHandle handle = cursorManager.track(provider, event);
-      return new ManagedCursorStreamProvider(handle, cursorManager);
-    });
+    return resolve(inputStream, event);
   }
 
   /**
@@ -76,102 +62,6 @@ public abstract class AbstractCursorStreamProviderFactory implements CursorStrea
    * @param event
    * @return
    */
-  protected abstract Either<CursorStreamProvider, InputStream> resolve(InputStream inputStream, Event event);
+  protected abstract Object resolve(InputStream inputStream, Event event);
 
-  private class ManagedCursorStreamProvider extends ManagedCursorProvider<CursorStream> implements CursorStreamProvider {
-
-    protected ManagedCursorStreamProvider(CursorProviderHandle cursorProviderHandle, CursorManager cursorManager) {
-      super(cursorProviderHandle, cursorManager);
-    }
-
-    @Override
-    protected CursorStream managedCursor(CursorStream cursor, CursorProviderHandle handle) {
-      return new ManagedCursorDecorator(cursor, handle);
-    }
-  }
-
-  private class ManagedCursorDecorator extends CursorStream {
-
-    private final CursorStream delegate;
-    private final CursorProviderHandle cursorProviderHandle;
-
-    private ManagedCursorDecorator(CursorStream delegate, CursorProviderHandle cursorProviderHandle) {
-      this.delegate = delegate;
-      this.cursorProviderHandle = cursorProviderHandle;
-    }
-
-    @Override
-    public void close() throws IOException {
-      try {
-        delegate.close();
-      } finally {
-        cursorManager.onClose(delegate, cursorProviderHandle);
-      }
-    }
-
-    @Override
-    public long getPosition() {
-      return delegate.getPosition();
-    }
-
-    @Override
-    public void seek(long position) throws IOException {
-      delegate.seek(position);
-    }
-
-    @Override
-    public boolean isReleased() {
-      return delegate.isReleased();
-    }
-
-    @Override
-    public void release() {
-      delegate.release();
-    }
-
-    @Override
-    public CursorProvider getProvider() {
-      return delegate.getProvider();
-    }
-
-    @Override
-    public int read() throws IOException {
-      return delegate.read();
-    }
-
-    @Override
-    public int read(byte[] b) throws IOException {
-      return delegate.read(b);
-    }
-
-    @Override
-    public int read(byte[] b, int off, int len) throws IOException {
-      return delegate.read(b, off, len);
-    }
-
-    @Override
-    public long skip(long n) throws IOException {
-      return delegate.skip(n);
-    }
-
-    @Override
-    public int available() throws IOException {
-      return delegate.available();
-    }
-
-    @Override
-    public void mark(int readlimit) {
-      delegate.mark(readlimit);
-    }
-
-    @Override
-    public void reset() throws IOException {
-      delegate.reset();
-    }
-
-    @Override
-    public boolean markSupported() {
-      return delegate.markSupported();
-    }
-  }
 }

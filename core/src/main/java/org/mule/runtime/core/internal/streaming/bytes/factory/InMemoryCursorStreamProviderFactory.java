@@ -6,11 +6,8 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes.factory;
 
-import static org.mule.runtime.core.api.functional.Either.left;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.bytes.InMemoryCursorStreamProvider;
 import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
@@ -31,14 +28,11 @@ public class InMemoryCursorStreamProviderFactory extends AbstractCursorStreamPro
   /**
    * Creates a new instance
    *
-   * @param cursorManager the manager which will track the produced providers.
    * @param config           the config for the generated providers
    * @param bufferManager    the {@link ByteBufferManager} that will be used to allocate all buffers
    */
-  public InMemoryCursorStreamProviderFactory(CursorManager cursorManager,
-                                             ByteBufferManager bufferManager,
-                                             InMemoryCursorStreamConfig config) {
-    super(cursorManager, bufferManager);
+  public InMemoryCursorStreamProviderFactory(ByteBufferManager bufferManager, InMemoryCursorStreamConfig config) {
+    super(bufferManager);
     this.config = config;
   }
 
@@ -48,7 +42,7 @@ public class InMemoryCursorStreamProviderFactory extends AbstractCursorStreamPro
    * @return a new {@link InMemoryCursorStreamProvider} wrapped in an {@link Either}
    */
   @Override
-  protected Either<CursorStreamProvider, InputStream> resolve(InputStream inputStream, Event event) {
-    return left(new InMemoryCursorStreamProvider(inputStream, config, getBufferManager()));
+  protected Object resolve(InputStream inputStream, Event event) {
+    return new InMemoryCursorStreamProvider(inputStream, config, getBufferManager());
   }
 }

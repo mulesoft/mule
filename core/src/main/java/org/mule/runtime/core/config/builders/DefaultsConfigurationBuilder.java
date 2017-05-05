@@ -32,6 +32,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MA
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME;
@@ -53,11 +54,13 @@ import org.mule.runtime.core.internal.connector.MuleConnectorOperationLocator;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+import org.mule.runtime.core.internal.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.core.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.core.security.DefaultMuleSecurityManager;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.util.DefaultStreamCloserService;
 import org.mule.runtime.core.util.queue.DelegateQueueManager;
 import org.mule.runtime.core.util.queue.QueueManager;
@@ -118,7 +121,9 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_CONVERTER_RESOLVER, new DynamicDataTypeConversionResolver(muleContext), muleContext);
 
     registerObject(OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(muleContext), muleContext);
-    registerObject(OBJECT_EXPRESSION_MANAGER, new DefaultExpressionManager(muleContext), muleContext);
+    StreamingManager streamingManager = new DefaultStreamingManager();
+    registerObject(OBJECT_STREAMING_MANAGER, streamingManager, muleContext);
+    registerObject(OBJECT_EXPRESSION_MANAGER, new DefaultExpressionManager(muleContext, streamingManager), muleContext);
     registerObject(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR, new MuleConnectorOperationLocator(), muleContext);
     registerObject(OBJECT_TIME_SUPPLIER, new TimeSupplier(), muleContext);
     registerObject(OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager(muleContext), muleContext);

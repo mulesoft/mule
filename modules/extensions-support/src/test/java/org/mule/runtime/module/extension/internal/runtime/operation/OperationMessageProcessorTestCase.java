@@ -42,10 +42,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.T
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
-
-import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.TypedComponentIdentifier;
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
@@ -62,10 +58,11 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.internal.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -73,7 +70,6 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.size.SmallTest;
-import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
 
 import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
 
@@ -247,7 +243,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(context.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE)).thenReturn(new MVELExpressionLanguage(context));
     when(context.getRegistry().lookupObject(DefaultExpressionLanguageFactoryService.class))
         .thenReturn(new WeaveDefaultExpressionLanguageFactoryService());
-    doReturn(new DefaultExpressionManager(context)).when(context).getExpressionManager();
+    doReturn(new DefaultExpressionManager(context, new DefaultStreamingManager())).when(context)
+        .getExpressionManager();
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     when(flowConstruct.getName()).thenReturn(flowName);
 

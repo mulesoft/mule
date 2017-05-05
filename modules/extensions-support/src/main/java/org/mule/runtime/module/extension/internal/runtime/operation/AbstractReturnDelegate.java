@@ -11,7 +11,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollection;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessageIterator;
-import static org.mule.runtime.core.util.message.MessageUtils.valueOrStreamProvider;
+import static org.mule.runtime.core.util.message.MessageUtils.streamingContent;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
@@ -79,7 +79,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
         value = toMessageIterator((Iterator<Result>) value, mediaType, cursorProviderFactory, event);
       }
       return Message.builder()
-          .payload(valueOrStreamProvider(value, cursorProviderFactory, event).getValue().orElse(null))
+          .payload(streamingContent(value, cursorProviderFactory, event))
           .mediaType(mediaType)
           .attributes(NULL_ATTRIBUTES).build();
     }

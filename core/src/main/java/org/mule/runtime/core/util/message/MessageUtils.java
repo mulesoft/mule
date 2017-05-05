@@ -8,13 +8,9 @@ package org.mule.runtime.core.util.message;
 
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.core.api.functional.Either.right;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -60,19 +56,17 @@ public final class MessageUtils {
                                   CursorProviderFactory cursorProviderFactory,
                                   Event event) {
     return Message.builder()
-        .payload(valueOrStreamProvider(result.getOutput(), cursorProviderFactory, event).getValue().orElse(null))
+        .payload(streamingContent(result.getOutput(), cursorProviderFactory, event))
         .mediaType(mediaType)
-        .attributes((Attributes) result.getAttributes().orElse(NULL_ATTRIBUTES))
+        .attributes(result.getAttributes().orElse(NULL_ATTRIBUTES))
         .build();
   }
 
-  public static <T> Either<CursorStreamProvider, T> valueOrStreamProvider(T value,
-                                                                          CursorProviderFactory cursorProviderFactory,
-                                                                          Event event) {
+  public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, Event event) {
     if (cursorProviderFactory != null && cursorProviderFactory.accepts(value)) {
-      return (Either<CursorStreamProvider, T>) cursorProviderFactory.of(event, value);
+      return cursorProviderFactory.of(event, value);
     } else {
-      return right(value);
+      return value;
     }
   }
 
