@@ -50,4 +50,7 @@
         <heisenberg:fail-to-execute/>
     </flow>
 
+    <flow name="throwError">
+        <heisenberg:throw-error/>
+    </flow>
 </mule>

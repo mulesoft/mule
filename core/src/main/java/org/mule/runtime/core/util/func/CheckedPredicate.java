@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util.func;
 
-import static reactor.core.Exceptions.propagate;
+import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 
 import java.util.function.Predicate;
 
@@ -18,7 +18,7 @@ public interface CheckedPredicate<T> extends Predicate<T> {
     try {
       return testChecked(t);
     } catch (Throwable throwable) {
-      throw propagate(throwable);
+      throw propagateWrappingFatal(throwable);
     }
   }
 

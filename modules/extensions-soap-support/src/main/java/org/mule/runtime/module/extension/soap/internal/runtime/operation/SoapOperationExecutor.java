@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.soap.internal.runtime.operation;
 
+import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.ATTACHMENTS_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.HEADERS_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.OPERATION_PARAM;
@@ -14,6 +15,7 @@ import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeO
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_HEADERS_PARAM;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.justOrEmpty;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -64,6 +66,8 @@ public final class SoapOperationExecutor implements OperationExecutor {
       return justOrEmpty(response.getAsResult());
     } catch (Exception e) {
       return error(soapExceptionEnricher.enrich(e));
+    } catch (Throwable t) {
+      return error(wrapFatal(t));
     }
   }
 

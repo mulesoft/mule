@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util.func;
 
-import static reactor.core.Exceptions.propagate;
+import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 
 import java.util.function.Supplier;
 
@@ -29,7 +29,7 @@ public interface CheckedSupplier<T> extends Supplier<T> {
   }
 
   default T handleException(Throwable throwable) {
-    throw propagate(throwable);
+    throw propagateWrappingFatal(throwable);
   }
 
   T getChecked() throws Throwable;

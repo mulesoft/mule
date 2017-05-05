@@ -166,6 +166,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   private static final String PROCESS_WEAPON_WITH_DEFAULT_VALUE = "processWeaponWithDefaultValue";
   private static final String PROCESS_INFO = "processSale";
   private static final String FAIL_TO_EXECUTE = "failToExecute";
+  private static final String THROW_ERROR = "throwError";
 
   @Before
   public void setUp() {
@@ -449,7 +450,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(33));
+    assertThat(extensionDeclaration.getOperations(), hasSize(34));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
     assertThat(withOperationsDeclaration.getOperations().size(), is(8));
@@ -483,6 +484,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(extensionDeclaration, PROCESS_WEAPON_LIST, "");
     assertOperation(extensionDeclaration, PROCESS_WEAPON_WITH_DEFAULT_VALUE, "");
     assertOperation(extensionDeclaration, FAIL_TO_EXECUTE, "");
+    assertOperation(extensionDeclaration, THROW_ERROR, "");
 
     OperationDeclaration operation = getOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION);
     assertThat(operation, is(notNullValue()));
@@ -685,6 +687,13 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertTransactional(operation, false);
 
     operation = getOperation(extensionDeclaration, FAIL_TO_EXECUTE);
+    assertThat(operation, is(notNullValue()));
+    assertThat(operation.getAllParameters(), is(empty()));
+    assertThat(operation.getOutput().getType(), is(instanceOf(VoidType.class)));
+    assertConnected(operation, false);
+    assertTransactional(operation, false);
+
+    operation = getOperation(extensionDeclaration, THROW_ERROR);
     assertThat(operation, is(notNullValue()));
     assertThat(operation.getAllParameters(), is(empty()));
     assertThat(operation.getOutput().getType(), is(instanceOf(VoidType.class)));
