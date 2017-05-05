@@ -6,25 +6,37 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
+import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-public class ForeachTestCase extends AbstractMuleContextTestCase {
+public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   protected Foreach simpleForeach;
   protected Foreach nestedForeach;
@@ -33,6 +45,13 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   private static String ERR_NUMBER_MESSAGES = "Not a correct number of messages processed";
   private static String ERR_PAYLOAD_TYPE = "Type error on processed payloads";
   private static String ERR_OUTPUT = "Messages processed incorrectly";
+
+  @Rule
+  public ExpectedException expectedException = none();
+
+  public ForeachTestCase(Mode mode) {
+    super(mode);
+  }
 
   @Before
   public void initialise() throws MuleException {
@@ -77,7 +96,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     List<String> arrayList = new ArrayList<>();
     arrayList.add("bar");
     arrayList.add("zip");
-    simpleForeach.process(eventBuilder().message(of(arrayList)).build());
+    process(simpleForeach, eventBuilder().message(of(arrayList)).build());
 
     assertSimpleProcessedMessages();
   }
@@ -87,7 +106,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     String[] array = new String[2];
     array[0] = "bar";
     array[1] = "zip";
-    simpleForeach.process(eventBuilder().message(of(array)).build());
+    process(simpleForeach, eventBuilder().message(of(array)).build());
 
     assertSimpleProcessedMessages();
   }
@@ -97,8 +116,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     List<Message> list = new ArrayList<>();
     list.add(of("bar"));
     list.add(of("zip"));
-    Message msgCollection = of(list);
-    simpleForeach.process(eventBuilder().message(msgCollection).build());
+    process(simpleForeach, eventBuilder().message(of(list)).build());
 
     assertSimpleProcessedMessages();
   }
@@ -107,7 +125,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   public void iterablePayload() throws Exception {
     Iterable<String> iterable = new DummySimpleIterableClass();
     final Event testEvent = eventBuilder().message(of(iterable)).build();
-    simpleForeach.process(testEvent);
+    process(simpleForeach, testEvent);
 
     assertSimpleProcessedMessages();
   }
@@ -115,7 +133,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   @Test
   public void iteratorPayload() throws Exception {
     Iterable<String> iterable = new DummySimpleIterableClass();
-    simpleForeach.process(eventBuilder().message(of(iterable.iterator())).build());
+    process(simpleForeach, eventBuilder().message(of(iterable.iterator())).build());
 
     assertSimpleProcessedMessages();
   }
@@ -136,7 +154,8 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     payload.add(elem2);
     payload.add(elem3);
 
-    nestedForeach.process(eventBuilder().message(of(payload)).build());
+    process(nestedForeach, eventBuilder().message(of(payload)).build());
+
     assertNestedProcessedMessages();
   }
 
@@ -150,7 +169,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     payload[2][0] = "b2";
     payload[2][1] = "c1";
 
-    nestedForeach.process(eventBuilder().message(of(payload)).build());
+    process(nestedForeach, eventBuilder().message(of(payload)).build());
     assertNestedProcessedMessages();
   }
 
@@ -173,7 +192,8 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     parentList.add(of(list2));
     Message parentCollection = of(parentList);
 
-    nestedForeach.process(eventBuilder().message(parentCollection).build());
+    process(nestedForeach, eventBuilder().message(parentCollection).build());
+
     assertNestedProcessedMessages();
   }
 
@@ -181,7 +201,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   public void nestedIterablePayload() throws Exception {
     Iterable iterable = new DummyNestedIterableClass();
 
-    nestedForeach.process(eventBuilder().message(of(iterable)).build());
+    process(nestedForeach, eventBuilder().message(of(iterable)).build());
     assertNestedProcessedMessages();
   }
 
@@ -189,8 +209,40 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   public void nestedIteratorPayload() throws Exception {
     Iterable iterable = new DummyNestedIterableClass();
 
-    nestedForeach.process(eventBuilder().message(of(iterable.iterator())).build());
+    process(nestedForeach, eventBuilder().message(of(iterable)).build());
     assertNestedProcessedMessages();
+  }
+
+  @Test
+  public void failingNestedProcessor() throws Exception {
+    RuntimeException throwable = new BufferOverflowException();
+
+    Foreach foreach = new Foreach();
+    foreach.setMuleContext(muleContext);
+    Processor failingProcessor = event -> {
+      throw throwable;
+    };
+    foreach.setMessageProcessors(singletonList(failingProcessor));
+    foreach.initialise();
+
+    expectedException.expect(is(MessagingException.class));
+    expectedException.expect(new FailingProcessorMatcher(failingProcessor));
+    expectedException.expectCause(is(throwable));
+    process(foreach, eventBuilder().message(of(new DummyNestedIterableClass().iterator())).build(), false);
+  }
+
+  @Test
+  public void failingExpression() throws Exception {
+    Foreach foreach = new Foreach();
+    foreach.setMuleContext(muleContext);
+    foreach.setCollectionExpression("!@INVALID");
+    foreach.setMessageProcessors(getSimpleMessageProcessors());
+    foreach.initialise();
+
+    expectedException.expect(instanceOf(MessagingException.class));
+    expectedException.expect(new FailingProcessorMatcher(foreach));
+    expectedException.expectCause(instanceOf(ExpressionRuntimeException.class));
+    process(foreach, eventBuilder().message(of(new DummyNestedIterableClass().iterator())).build(), false);
   }
 
   private void assertSimpleProcessedMessages() {
@@ -249,6 +301,25 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     @Override
     public Iterator<DummySimpleIterableClass> iterator() {
       return iterables.iterator();
+    }
+  }
+
+  private static class FailingProcessorMatcher extends BaseMatcher<MessagingException> {
+
+    private Processor expectedFailingProcessor;
+
+    FailingProcessorMatcher(Processor processor) {
+      this.expectedFailingProcessor = processor;
+    }
+
+    @Override
+    public boolean matches(Object o) {
+      return o instanceof MessagingException && ((MessagingException) o).getFailingMessageProcessor() == expectedFailingProcessor;
+    }
+
+    @Override
+    public void describeTo(Description description) {
+      description.appendText("Exception is not a MessagingException or failing processor does not match.");
     }
   }
 
