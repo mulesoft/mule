@@ -6,11 +6,9 @@
  */
 package org.mule.test.integration.domain.http;
 
+import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.SystemProperty;
-
-import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -18,15 +16,15 @@ import org.junit.Ignore;
 @Ignore("MULE-10633")
 public class HttpsSharePortTestCase extends HttpSharePortTestCase {
 
-  private DefaultTlsContextFactory tlsContextFactory;
+  private TlsContextFactory tlsContextFactory;
 
   @Before
-  public void setup() throws IOException {
-    tlsContextFactory = new DefaultTlsContextFactory();
-
+  public void setup() throws CreateException {
     // Configure trust store in the client with the certificate of the server.
-    tlsContextFactory.setTrustStorePath("ssltest-cacerts.jks");
-    tlsContextFactory.setTrustStorePassword("changeit");
+    tlsContextFactory = TlsContextFactory.builder()
+        .setTrustStorePath("ssltest-cacerts.jks")
+        .setTrustStorePassword("changeit")
+        .build();
   }
 
   @Override

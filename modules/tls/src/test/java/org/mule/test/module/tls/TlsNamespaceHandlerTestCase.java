@@ -44,7 +44,7 @@ public class TlsNamespaceHandlerTestCase extends MuleArtifactFunctionalTestCase 
     assertThat(tlsContextFactory.getKeyStorePath(), endsWith("serverKeystore"));
     assertThat(tlsContextFactory.getKeyStorePassword(), equalTo(PASSWORD));
     assertThat(tlsContextFactory.getKeyStoreType(), equalTo(TYPE));
-    assertThat(tlsContextFactory.getKeyManagerPassword(), equalTo(PASSWORD));
+    assertThat(tlsContextFactory.getKeyPassword(), equalTo(PASSWORD));
     assertThat(tlsContextFactory.getKeyManagerAlgorithm(), equalTo(ALGORITHM));
     assertThat(tlsContextFactory.getKeyAlias(), equalTo(ALIAS));
     assertThat(tlsContextFactory.isTrustStoreInsecure(), is(false));

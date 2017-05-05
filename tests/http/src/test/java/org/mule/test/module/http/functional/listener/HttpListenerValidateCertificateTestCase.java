@@ -6,17 +6,14 @@
  */
 package org.mule.test.module.http.functional.listener;
 
-import static org.mule.functional.functional.FlowAssert.verify;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.service.http.api.HttpConstants.Method.POST;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.registry.RegistrationException;
+import static org.mule.functional.functional.FlowAssert.verify;
+import static org.mule.service.http.api.HttpConstants.Method.POST;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
@@ -47,7 +44,8 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
   // Uses a new HttpClient because it is needed to configure the TLS context per test
   public HttpClient httpClientWithCertificate;
 
-  private DefaultTlsContextFactory tlsContextFactory;
+  private TlsContextFactory tlsContextFactory;
+  private TlsContextFactoryBuilder tlsContextFactoryBuilder = TlsContextFactory.builder();
 
   @Override
   protected String getConfigFile() {
@@ -55,12 +53,10 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
   }
 
   @Before
-  public void setup() throws RegistrationException, IOException, InitialisationException {
-    tlsContextFactory = new DefaultTlsContextFactory();
-
+  public void setup() {
     // Configure trust store in the client with the certificate of the server.
-    tlsContextFactory.setTrustStorePath("tls/trustStore");
-    tlsContextFactory.setTrustStorePassword("mulepassword");
+    tlsContextFactoryBuilder.setTrustStorePath("tls/trustStore");
+    tlsContextFactoryBuilder.setTrustStorePassword("mulepassword");
   }
 
   @After
@@ -72,7 +68,7 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
 
   @Test(expected = IOException.class)
   public void serverWithValidationRejectsRequestWithInvalidCertificate() throws Exception {
-    initialiseIfNeeded(tlsContextFactory);
+    tlsContextFactory = tlsContextFactoryBuilder.build();
     createHttpClient();
 
     // Send a request without configuring key store in the client.
@@ -82,7 +78,7 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
   @Test
   public void serverWithValidationAcceptsRequestWithValidCertificate() throws Exception {
     configureClientKeyStore();
-    initialiseIfNeeded(tlsContextFactory);
+    tlsContextFactory = tlsContextFactoryBuilder.build();
     createHttpClient();
 
     assertValidRequest(getUrl(portWithValidation.getNumber()));
@@ -91,7 +87,7 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
 
   @Test
   public void serverWithoutValidationAcceptsRequestWithInvalidCertificate() throws Exception {
-    initialiseIfNeeded(tlsContextFactory);
+    tlsContextFactory = tlsContextFactoryBuilder.build();
     createHttpClient();
 
     // Send a request without configuring key store in the client.
@@ -101,7 +97,7 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
   @Test
   public void serverWithoutValidationAcceptsRequestWithValidCertificate() throws Exception {
     configureClientKeyStore();
-    initialiseIfNeeded(tlsContextFactory);
+    tlsContextFactory = tlsContextFactoryBuilder.build();
     createHttpClient();
 
     assertValidRequest(getUrl(portWithoutValidation.getNumber()));
@@ -130,10 +126,10 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
   /**
    * Configure key store for the client (the server contains this certificate in its trust store)
    */
-  private void configureClientKeyStore() throws IOException {
-    tlsContextFactory.setKeyStorePath("tls/ssltest-keystore.jks");
-    tlsContextFactory.setKeyStorePassword("changeit");
-    tlsContextFactory.setKeyManagerPassword("changeit");
+  private void configureClientKeyStore() {
+    tlsContextFactoryBuilder.setKeyStorePath("tls/ssltest-keystore.jks");
+    tlsContextFactoryBuilder.setKeyStorePassword("changeit");
+    tlsContextFactoryBuilder.setKeyPassword("changeit");
   }
 
   private String getUrl(int port) {

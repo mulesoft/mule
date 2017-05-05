@@ -49,7 +49,7 @@ public class DefaultTlsContextFactoryObjectFactory extends AbstractAnnotatedObje
 
     if (keyStore != null) {
       tlsContextFactory.setKeyAlias(keyStore.getAlias());
-      tlsContextFactory.setKeyManagerPassword(keyStore.getKeyPassword());
+      tlsContextFactory.setKeyPassword(keyStore.getKeyPassword());
       if (keyStore.getPath() != null) {
         tlsContextFactory.setKeyStorePath(keyStore.getPath());
       }

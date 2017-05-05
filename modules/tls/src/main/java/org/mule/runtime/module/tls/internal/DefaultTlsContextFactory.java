@@ -14,7 +14,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
-import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.security.tls.RestrictedSSLServerSocketFactory;
 import org.mule.runtime.core.api.security.tls.RestrictedSSLSocketFactory;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
@@ -140,11 +140,11 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
     tlsConfiguration.setKeyStorePassword(storePassword);
   }
 
-  public String getKeyManagerPassword() {
+  public String getKeyPassword() {
     return tlsConfiguration.getKeyPassword();
   }
 
-  public void setKeyManagerPassword(String keyManagerPassword) {
+  public void setKeyPassword(String keyManagerPassword) {
     tlsConfiguration.setKeyPassword(keyManagerPassword);
   }
 
@@ -278,7 +278,7 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
 
       @Override
       public String getKeyPassword() {
-        return getKeyManagerPassword();
+        return DefaultTlsContextFactory.this.getKeyPassword();
       }
 
       @Override

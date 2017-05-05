@@ -14,15 +14,16 @@ import static org.mule.service.http.api.HttpConstants.Method.POST;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.service.http.api.domain.entity.HttpEntity;
@@ -71,13 +72,12 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
   @Rule
   public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).tlsContextFactory(() -> {
     try {
-      DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
       // Configure trust store in the client with the certificate of the server.
-      tlsContextFactory.setTrustStorePath("ssltest-cacerts.jks");
-      tlsContextFactory.setTrustStorePassword("changeit");
-
-      return tlsContextFactory;
-    } catch (IOException e) {
+      return TlsContextFactory.builder()
+          .setTrustStorePath("ssltest-cacerts.jks")
+          .setTrustStorePassword("changeit")
+          .build();
+    } catch (CreateException e) {
       throw new MuleRuntimeException(e);
     }
   }).build();
