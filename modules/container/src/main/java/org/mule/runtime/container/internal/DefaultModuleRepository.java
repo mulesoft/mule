@@ -7,17 +7,23 @@
 
 package org.mule.runtime.container.internal;
 
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Defines a {@link ModuleRepository} that uses a {@link ModuleDiscoverer} to find the available
  * modules.
  */
 public class DefaultModuleRepository implements ModuleRepository {
+
+  protected static final Logger logger = LoggerFactory.getLogger(DefaultModuleRepository.class);
 
   private final ModuleDiscoverer moduleDiscoverer;
   private List<MuleModule> modules;
@@ -39,6 +45,10 @@ public class DefaultModuleRepository implements ModuleRepository {
       synchronized (this) {
         if (modules == null) {
           modules = discoverModules();
+
+          if (logger.isDebugEnabled()) {
+            logger.debug("Found {} modules: ", modules.size(), modules.stream().map(m -> m.getName()).collect(toList()));
+          }
         }
       }
     }

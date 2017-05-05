@@ -8,15 +8,16 @@
 package org.mule.test.runner.classloader;
 
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import org.mule.runtime.container.api.ModuleRepository;
+import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.JreModuleDiscoverer;
-import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import com.google.common.collect.ImmutableSet;
@@ -41,6 +42,7 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
   private final Set<String> extraBootPackages;
   private final URL[] urls;
   private final URLClassLoader classLoader;
+  private final DefaultModuleRepository testContainerModuleRepository;
   private ArtifactClassLoader containerClassLoader;
 
   /**
@@ -53,13 +55,14 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
    * @param moduleRepository provides access to the modules available on the container. Non null.
    */
   public TestContainerClassLoaderFactory(final List<String> extraBootPackages, final URL[] urls,
-                                         DefaultModuleRepository moduleRepository) {
+                                         ModuleRepository moduleRepository) {
     super(moduleRepository);
 
     this.extraBootPackages = ImmutableSet.<String>builder().addAll(super.getBootPackages()).addAll(extraBootPackages)
         .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
     this.urls = urls;
     this.classLoader = new URLClassLoader(urls, null);
+    this.testContainerModuleRepository = new DefaultModuleRepository(new ContainerModuleDiscoverer(classLoader));
   }
 
   /**
@@ -71,7 +74,7 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
    */
   @Override
   public ArtifactClassLoader createContainerClassLoader(final ClassLoader parentClassLoader) {
-    final List<MuleModule> muleModules = withContextClassLoader(classLoader, () -> discoverModules());
+    final List<MuleModule> muleModules = withContextClassLoader(classLoader, () -> testContainerModuleRepository.getModules());
 
     MuleClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(Collections.emptyMap(), getBootPackages());
 
@@ -106,7 +109,8 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
         new MuleArtifactClassLoader(containerDescriptor.getName(), containerDescriptor, urls, parentClassLoader,
                                     containerLookupPolicy);
 
-    return createContainerFilteringClassLoader(withContextClassLoader(classLoader, () -> discoverModules()),
+    return createContainerFilteringClassLoader(withContextClassLoader(classLoader,
+                                                                      () -> testContainerModuleRepository.getModules()),
                                                containerClassLoader);
   }
 
@@ -125,14 +129,7 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
   }
 
   public ClassLoaderLookupPolicy getContainerClassLoaderLookupPolicy(ClassLoader classLoader) {
-    return withContextClassLoader(classLoader, () -> super.getContainerClassLoaderLookupPolicy(classLoader, discoverModules()));
-  }
-
-  /**
-   * @return discovers modules using TCCL
-   */
-  private List<MuleModule> discoverModules() {
-    return new ContainerModuleDiscoverer(Thread.currentThread().getContextClassLoader()).discover();
+    return super.getContainerClassLoaderLookupPolicy(classLoader, testContainerModuleRepository.getModules());
   }
 
   /**
