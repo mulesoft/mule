@@ -109,7 +109,6 @@ public class ForwardingSoapClient {
     }
   }
 
-
   /**
    * {@link RemovalListener} implementation stop {@link SoapClient}s.
    */
@@ -123,10 +122,7 @@ public class ForwardingSoapClient {
           client.stop();
         }
       } catch (Exception e) {
-        throw new MuleRuntimeException(
-                                       createStaticMessage("A problem occurred while disconnecting client: '%s'",
-                                                           client.toString()),
-                                       e);
+        throw new MuleRuntimeException(createStaticMessage("A problem occurred while disconnecting client: '%s'", client), e);
       }
     }
   }

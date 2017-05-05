@@ -10,6 +10,10 @@
         <soap:base-connection leaguesAddress="${footballAddress}"/>
     </soap:config>
 
+    <soap:config name="custom-transport">
+        <soap:base-connection leaguesAddress="${footballAddress}" useCustomTransport="true"/>
+    </soap:config>
+
     <soap:config name="laLiga">
         <soap:la-liga-connection wsdlLocation="${laLigaAddress}?wsdl" firstDivision="A" secondDivision="B"/>
     </soap:config>
@@ -65,5 +69,10 @@
             }]
             </soap:attachments>
         </soap:invoke>
+    </flow>
+
+    <flow name="withCustomTransport">
+        <!-- Executes any operation the response is hardcoded in the test custom transport -->
+        <soap:invoke config-ref="custom-transport" service="leagues" operation="getLeagues"/>
     </flow>
 </mule>

@@ -114,12 +114,22 @@ public class SoapCxfClient implements SoapClient {
     this.responseGenerator = new SoapResponseGenerator(getResponseEnricher(isMtom));
   }
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Disposes the CXF client and the {@link MessageDispatcher} bounded to this client.
+   */
   @Override
   public void stop() throws MuleException {
     dispatcher.dispose();
     client.destroy();
   }
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Initialises the {@link MessageDispatcher} bounded to this client.
+   */
   @Override
   public void start() throws MuleException {
     dispatcher.initialise();
@@ -152,7 +162,8 @@ public class SoapCxfClient implements SoapClient {
 
   /**
    * Invokes a Web Service Operation with the specified parameters.
-   *  @param operation   the operation that is going to be invoked.
+   *
+   * @param operation   the operation that is going to be invoked.
    * @param payload     the request body to be bounded in the envelope.
    * @param headers     the request headers to be bounded in the envelope.
    * @param attachments the set of attachments that aims to be sent with the request.
@@ -168,7 +179,7 @@ public class SoapCxfClient implements SoapClient {
     try {
       BindingOperationInfo bop = getInvocationOperation();
       Map<String, Object> ctx =
-          getInvocationContext(operation, encoding, transformToCxfHeaders(headers), transformToCxfAttachments(attachments));
+        getInvocationContext(operation, encoding, transformToCxfHeaders(headers), transformToCxfAttachments(attachments));
       return client.invoke(bop, new Object[] {payload}, ctx, exchange);
     } catch (SoapFault sf) {
       throw new SoapFaultException(sf.getFaultCode(), sf.getSubCode(), parseExceptionDetail(sf.getDetail()).orElse(null),
@@ -178,8 +189,8 @@ public class SoapCxfClient implements SoapClient {
     } catch (Fault f) {
       if (f.getMessage().contains("COULD_NOT_READ_XML")) {
         throw new BadRequestException(
-                                      format("Error consuming the operation [%s], the request body is not a valid XML",
-                                             operation));
+          format("Error consuming the operation [%s], the request body is not a valid XML",
+                 operation));
       }
       throw new SoapFaultException(f.getFaultCode(), parseExceptionDetail(f.getDetail()).orElse(null), f);
     } catch (DispatchingException e) {
@@ -238,14 +249,14 @@ public class SoapCxfClient implements SoapClient {
       return emptyList();
     }
     return headers.entrySet().stream()
-        .map(header -> {
-          try {
-            return new SoapHeader(new QName(null, header.getKey()), stringToDomElement(header.getValue()));
-          } catch (Exception e) {
-            throw new BadRequestException("Cannot parse input header [" + header.getKey() + "]", e);
-          }
-        })
-        .collect(toList());
+      .map(header -> {
+        try {
+          return new SoapHeader(new QName(null, header.getKey()), stringToDomElement(header.getValue()));
+        } catch (Exception e) {
+          throw new BadRequestException("Cannot parse input header [" + header.getKey() + "]", e);
+        }
+      })
+      .collect(toList());
   }
 
   private Map<String, Attachment> transformToCxfAttachments(Map<String, SoapAttachment> attachments) {
