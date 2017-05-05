@@ -56,7 +56,6 @@ import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
@@ -71,7 +70,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -313,13 +311,8 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     // TODO MULE-11527 avoid doing unnecesary evaluations
     if (operationExecutor instanceof OperationArgumentResolverFactory) {
       try {
-        final Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver =
-            ((OperationArgumentResolverFactory) operationExecutor).createArgumentResolver(operationModel);
-        if (createArgumentResolver != null) {
-          return createArgumentResolver.apply(createExecutionContext(event));
-        } else {
-          return emptyMap();
-        }
+        return ((OperationArgumentResolverFactory) operationExecutor).createArgumentResolver(operationModel)
+            .apply(createExecutionContext(event));
       } catch (MuleException e) {
         throw new MuleRuntimeException(e);
       }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -109,6 +110,7 @@ public final class InterceptableOperationExecutorWrapper extends AbstractInterce
   @Override
   public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
     return delegate instanceof OperationArgumentResolverFactory
-        ? ((OperationArgumentResolverFactory) delegate).createArgumentResolver(operationModel) : null;
+        ? ((OperationArgumentResolverFactory) delegate).createArgumentResolver(operationModel)
+        : ec -> emptyMap();
   }
 }

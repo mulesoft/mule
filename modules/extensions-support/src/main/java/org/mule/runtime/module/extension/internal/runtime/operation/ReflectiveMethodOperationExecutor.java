@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -94,6 +95,7 @@ public final class ReflectiveMethodOperationExecutor
   @Override
   public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
     return executor instanceof OperationArgumentResolverFactory
-        ? ((OperationArgumentResolverFactory) executor).createArgumentResolver(operationModel) : null;
+        ? ((OperationArgumentResolverFactory) executor).createArgumentResolver(operationModel)
+        : ec -> emptyMap();
   }
 }

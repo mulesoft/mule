@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
+import static java.util.Collections.emptyMap;
+
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
@@ -54,6 +56,7 @@ public final class OperationExecutorFactoryWrapper implements OperationExecutorF
   @Override
   public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
     return delegate instanceof OperationArgumentResolverFactory
-        ? ((OperationArgumentResolverFactory) delegate).createArgumentResolver(operationModel) : null;
+        ? ((OperationArgumentResolverFactory) delegate).createArgumentResolver(operationModel)
+        : ec -> emptyMap();
   }
 }
