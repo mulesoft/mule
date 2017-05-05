@@ -13,7 +13,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Implementations provide a {@link Function} to get the parameters from an {@link OperationModel}.
+ * Implementations provide a {@link Function} to get the parameters that will be passed to an operation from an
+ * {@link OperationModel}.
  * 
  * @since 4.0
  */
