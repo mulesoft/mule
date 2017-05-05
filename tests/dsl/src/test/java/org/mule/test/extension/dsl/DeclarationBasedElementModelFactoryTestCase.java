@@ -181,8 +181,8 @@ public class DeclarationBasedElementModelFactoryTestCase extends AbstractElement
     DslElementModel<ConfigurationModel> configElement = resolve(dbConfig);
     DslElementModel<ConnectionProviderModel> connectionElement = getChild(configElement, derbyConnection.getName());
 
-    assertHasParameter(connectionElement.getModel(), "customDataTypes");
-    assertThat(connectionElement.findElement("customDataTypes").isPresent(), is(false));
+    assertHasParameter(connectionElement.getModel(), "columnTypes");
+    assertThat(connectionElement.findElement("columnTypes").isPresent(), is(false));
   }
 
   @Test

@@ -25,11 +25,11 @@ import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class ConfigurationBasedElementModelFactoryTestCase extends AbstractElementModelTestCase {
 
@@ -114,8 +114,8 @@ public class ConfigurationBasedElementModelFactoryTestCase extends AbstractEleme
 
     DslElementModel<ConnectionProviderModel> connectionElement = getChild(configElement, connection);
 
-    assertHasParameter(connectionElement.getModel(), "customDataTypes");
-    assertThat(connectionElement.findElement("customDataTypes").isPresent(), is(false));
+    assertHasParameter(connectionElement.getModel(), "columnTypes");
+    assertThat(connectionElement.findElement("columnTypes").isPresent(), is(false));
   }
 
   @Test
