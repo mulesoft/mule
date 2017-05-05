@@ -61,6 +61,7 @@ public final class SoapConnectionProviderObjectBuilder extends ConnectionProvide
   @Override
   public ConnectionProvider build(ResolverSetResult result) throws MuleException {
     SoapServiceProvider serviceProvider = objectBuilder.build(result);
+    muleContext.getInjector().inject(serviceProvider);
     ConnectionProvider<ForwardingSoapClient> provider = new ForwardingSoapClientConnectionProvider(serviceProvider);
     provider = new PoolingConnectionProviderWrapper<>(provider, poolingProfile, disableValidation, retryPolicyTemplate);
     provider = new ErrorTypeHandlerConnectionProviderWrapper<>(provider, muleContext, extensionModel, retryPolicyTemplate);
