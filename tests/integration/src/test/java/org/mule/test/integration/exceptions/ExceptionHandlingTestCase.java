@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -15,6 +16,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+
 import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -24,9 +26,11 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorHandler;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.MessagingExceptionHandlerToSystemAdapter;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -154,6 +158,13 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
   public void testUntilSuccessfulInExceptionStrategyRollback() throws Exception {
     testExceptionStrategy("untilSuccessfulInExceptionStrategyRollback", emptyMap());
     assertThat(injectedMessagingExceptionHandler, is(instanceOf(MessagingExceptionHandlerToSystemAdapter.class)));
+  }
+
+  @Test
+  public void errorThrownByOperationInForeach() throws Exception {
+    MessagingException messagingException =
+        flowRunner("errorThrownByOperationInForeach").withPayload(asList("1", "2", "3")).runExpectingException();
+    assertThat(messagingException.getCause(), instanceOf(ExpressionRuntimeException.class));
   }
 
   private Map<String, Serializable> getMessageProperties() {
