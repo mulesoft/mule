@@ -36,11 +36,11 @@ public class InvokeOperationExecutionTestCase extends SoapExtensionArtifactFunct
   @Test
   public void uploadAttachment() throws Exception {
     Message message = flowRunner("uploadResult")
-      .withPayload(getBodyXml("uploadResult", ""))
-      .withVariable("att", new ByteArrayInputStream("Barcelona Won".getBytes()))
-      .withVariable("attCt", MediaType.HTML)
-      .keepStreamsOpen()
-      .run().getMessage();
+        .withPayload(getBodyXml("uploadResult", ""))
+        .withVariable("att", new ByteArrayInputStream("Barcelona Won".getBytes()))
+        .withVariable("attCt", MediaType.HTML)
+        .keepStreamsOpen()
+        .run().getMessage();
     String response = getBodyXml("uploadResultResponse", "<message>Ok</message>");
     assertSimilarXml(response, IOUtils.toString((CursorStreamProvider) message.getPayload().getValue()));
   }
@@ -48,8 +48,8 @@ public class InvokeOperationExecutionTestCase extends SoapExtensionArtifactFunct
   @Test
   public void withCustomTransport() throws Exception {
     String response = "<con:football xmlns:con=\"http://extension.soap.test.mule.org\">"
-      + "<text>Sent using Custom Transport</text>"
-      + "</con:football>";
+        + "<text>Sent using Custom Transport</text>"
+        + "</con:football>";
     Message message = flowRunner("withCustomTransport").keepStreamsOpen().run().getMessage();
     assertSimilarXml(response, IOUtils.toString((CursorStreamProvider) message.getPayload().getValue()));
   }
