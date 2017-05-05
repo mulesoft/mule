@@ -150,7 +150,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
             {
                 threadingProfile = muleContext.getDefaultThreadingProfile();
             }
-            this.untilSuccessfulStrategy = new AsynchronousUntilSuccessfulProcessingStrategy();
+            this.untilSuccessfulStrategy = new AsynchronousUntilSuccessfulProcessingStrategy(muleContext);
             ((MessagingExceptionHandlerAware) this.untilSuccessfulStrategy).setMessagingExceptionHandler(messagingExceptionHandler);
         }
         this.untilSuccessfulStrategy.setUntilSuccessfulConfiguration(this);
