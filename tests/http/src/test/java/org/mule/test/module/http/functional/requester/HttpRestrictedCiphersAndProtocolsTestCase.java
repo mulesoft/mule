@@ -6,18 +6,17 @@
  */
 package org.mule.test.module.http.functional.requester;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.service.http.api.HttpConstants.Method.POST;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.service.http.api.HttpConstants.Method.POST;
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.functional.junit4.rules.ExpectedError;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.client.HttpClient;
 import org.mule.service.http.api.client.HttpClientConfiguration;
@@ -60,7 +59,8 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
   // Uses a new HttpClient because it is needed to configure the TLS context per test
   public HttpClient httpClientWithCertificate;
 
-  private DefaultTlsContextFactory tlsContextFactory;
+  private TlsContextFactory tlsContextFactory;
+  private TlsContextFactoryBuilder tlsContextFactoryBuilder = TlsContextFactory.builder();
 
   @Override
   protected String getConfigFile() {
@@ -68,10 +68,9 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
   }
 
   @Before
-  public void setUp() throws IOException {
-    tlsContextFactory = new DefaultTlsContextFactory();
-    tlsContextFactory.setTrustStorePath("tls/trustStore");
-    tlsContextFactory.setTrustStorePassword("mulepassword");
+  public void setUp() {
+    tlsContextFactoryBuilder.setTrustStorePath("tls/trustStore");
+    tlsContextFactoryBuilder.setTrustStorePassword("mulepassword");
   }
 
   @After
@@ -89,7 +88,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
 
   @Test
   public void worksWithProtocolMatch() throws Exception {
-    initialiseIfNeeded(tlsContextFactory);
+    tlsContextFactory = tlsContextFactoryBuilder.build();
     createHttpClient();
 
     // Uses default ciphers and protocols
@@ -101,8 +100,8 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
 
   @Test
   public void worksWithCipherSuiteMatch() throws Exception {
-    tlsContextFactory.setEnabledCipherSuites(cipherSuites.getValue());
-    initialiseIfNeeded(tlsContextFactory);
+    tlsContextFactoryBuilder.setEnabledCipherSuites(cipherSuites.getValue());
+    tlsContextFactory = tlsContextFactoryBuilder.build();
     createHttpClient();
 
     // Forces TLS_DHE_DSS_WITH_AES_128_CBC_SHA

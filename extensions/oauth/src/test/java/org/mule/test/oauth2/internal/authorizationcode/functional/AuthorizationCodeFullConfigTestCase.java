@@ -29,14 +29,9 @@ import static org.mule.services.oauth.internal.OAuthConstants.CODE_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.EXPIRES_IN_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.REFRESH_TOKEN_PARAMETER;
 import static org.mule.services.oauth.internal.OAuthConstants.STATE_PARAMETER;
-import com.github.tomakehurst.wiremock.verification.LoggedRequest;
-import com.google.common.collect.ImmutableMap;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.service.http.api.HttpService;
 import org.mule.service.http.api.domain.message.request.HttpRequest;
 import org.mule.services.http.TestHttpClient;
@@ -45,10 +40,16 @@ import org.mule.test.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.test.oauth2.asserter.AuthorizationRequestAsserter;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import java.io.IOException;
+import com.github.tomakehurst.wiremock.verification.LoggedRequest;
+import com.google.common.collect.ImmutableMap;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizationTestCase {
@@ -155,15 +156,14 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
 
   private TlsContextFactory createClientTlsContextFactory() {
     try {
-      DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
-      tlsContextFactory.setTrustStorePath("ssltest-cacerts.jks");
-      tlsContextFactory.setTrustStorePassword("changeit");
-      tlsContextFactory.setKeyStorePath("ssltest-keystore.jks");
-      tlsContextFactory.setKeyStorePassword("changeit");
-      tlsContextFactory.setKeyManagerPassword("changeit");
-
-      return tlsContextFactory;
-    } catch (IOException e) {
+      return TlsContextFactory.builder()
+          .setTrustStorePath("ssltest-cacerts.jks")
+          .setTrustStorePassword("changeit")
+          .setKeyStorePath("ssltest-keystore.jks")
+          .setKeyStorePassword("changeit")
+          .setKeyPassword("changeit")
+          .build();
+    } catch (CreateException e) {
       throw new MuleRuntimeException(e);
     }
   }

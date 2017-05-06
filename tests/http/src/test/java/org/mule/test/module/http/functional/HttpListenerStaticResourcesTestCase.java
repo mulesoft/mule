@@ -15,14 +15,11 @@ import static org.mule.runtime.core.util.ClassUtils.getClassPathRoot;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
-
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.CreateException;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-
-import java.io.IOException;
 
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -52,7 +49,7 @@ public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
   private int responseCode;
   private String payload;
   private String contentType;
-  private DefaultTlsContextFactory tlsContextFactory;
+  private TlsContextFactory tlsContextFactory;
 
   @Override
   protected String getConfigFile() {
@@ -60,13 +57,12 @@ public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
   }
 
   @Before
-  public void setup() throws IOException, InitialisationException {
-    tlsContextFactory = new DefaultTlsContextFactory();
-
+  public void setup() throws CreateException {
     // Configure trust store in the client with the certificate of the server.
-    tlsContextFactory.setTrustStorePath("tls/trustStore");
-    tlsContextFactory.setTrustStorePassword("mulepassword");
-    tlsContextFactory.initialise();
+    tlsContextFactory = TlsContextFactory.builder()
+        .setTrustStorePath("tls/trustStore")
+        .setTrustStorePassword("mulepassword")
+        .build();
   }
 
   @Test

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.security.tls;
 
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-import org.mule.runtime.core.api.lifecycle.CreateException;
+import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.security.TlsDirectKeyStore;
 import org.mule.runtime.core.api.security.TlsDirectTrustStore;
 import org.mule.runtime.core.api.security.TlsIndirectKeyStore;

@@ -8,9 +8,9 @@ package org.mule.test.module.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.File;
@@ -91,10 +91,10 @@ public abstract class AbstractServerTlsRestrictedProtocolsAndCiphersTestCase
 
 
   private SSLSocket createSocket(String[] cipherSuites, String[] enabledProtocols) throws Exception {
-    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
-    tlsContextFactory.setTrustStorePath("tls/trustStore");
-    tlsContextFactory.setTrustStorePassword("mulepassword");
-    tlsContextFactory.initialise();
+    TlsContextFactory tlsContextFactory = TlsContextFactory.builder()
+        .setTrustStorePath("tls/trustStore")
+        .setTrustStorePassword("mulepassword")
+        .build();
 
     SSLContext sslContext = tlsContextFactory.createSslContext();
     SSLSocketFactory socketFactory = sslContext.getSocketFactory();
