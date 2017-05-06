@@ -38,22 +38,24 @@ public class StatementStreamingResultSetCloser {
    * Closes all tracked {@link ResultSet}s
    */
   public void closeResultSets() {
-    for (ResultSet resultSet : resultSets) {
-      close(connection, resultSet);
+    try {
+      for (ResultSet resultSet : resultSets) {
+        close(resultSet);
+      }
+    } finally {
+      resultSets.clear();
+      connection.endStreaming();
+      connection.release();
     }
-    resultSets.clear();
   }
 
-  private void close(DbConnection connection, ResultSet resultSet) {
+  private void close(ResultSet resultSet) {
     try {
       if (!resultSet.isClosed()) {
         resultSet.close();
       }
     } catch (SQLException e) {
       LOGGER.warn("Error attempting to close resultSet", e);
-    } finally {
-      connection.endStreaming();
-      connection.release();
     }
   }
 
