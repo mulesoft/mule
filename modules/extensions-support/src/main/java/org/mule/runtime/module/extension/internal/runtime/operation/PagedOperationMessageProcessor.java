@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -21,7 +20,6 @@ import org.mule.runtime.core.internal.streaming.object.iterator.ListConsumer;
 import org.mule.runtime.core.internal.streaming.object.iterator.Producer;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
@@ -69,7 +67,7 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
       }
 
       Producer<?> producer =
-          new PagingProviderProducer(pagingProvider, (ConfigurationInstance) operationContext.getConfiguration().get(),
+          new PagingProviderProducer(pagingProvider, operationContext.getConfiguration().get(),
                                      operationContext, connectionSupplier);
       Consumer<?> consumer = new ListConsumer(producer);
 

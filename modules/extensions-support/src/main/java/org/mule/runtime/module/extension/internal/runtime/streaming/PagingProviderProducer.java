@@ -36,18 +36,18 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
   private PagingProvider<Object, T> delegate;
   private final ConfigurationInstance config;
-  private final ExtensionConnectionSupplier connectionAdapter;
+  private final ExtensionConnectionSupplier connectionSupplier;
   private final ExecutionContextAdapter executionContext;
   private final ConnectionSupplierFactory connectionSupplierFactory;
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
                                 ConfigurationInstance config,
                                 ExecutionContextAdapter executionContext,
-                                ExtensionConnectionSupplier connectionAdapter) {
+                                ExtensionConnectionSupplier connectionSupplier) {
     this.delegate = new PagingProviderWrapper(delegate);
     this.config = config;
     this.executionContext = executionContext;
-    this.connectionAdapter = connectionAdapter;
+    this.connectionSupplier = connectionSupplier;
 
     this.connectionSupplierFactory = createConnectionSupplierFactory();
   }
@@ -126,7 +126,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
     @Override
     public ConnectionSupplier getConnectionSupplier() throws MuleException {
-      return new DefaultConnectionSupplier(connectionAdapter.getConnection(executionContext));
+      return new DefaultConnectionSupplier(connectionSupplier.getConnection(executionContext));
     }
 
     @Override
@@ -142,7 +142,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
       @Override
       public ConnectionSupplier getChecked() throws Throwable {
-        StickyConnectionSupplierFactory.this.connectionHandler = connectionAdapter.getConnection(executionContext);
+        StickyConnectionSupplierFactory.this.connectionHandler = connectionSupplier.getConnection(executionContext);
         return new StickyConnectionSupplier(StickyConnectionSupplierFactory.this.connectionHandler.getConnection());
       }
     });

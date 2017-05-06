@@ -29,7 +29,7 @@ import javax.inject.Inject;
 public final class ConnectionInterceptor implements Interceptor {
 
   @Inject
-  private ExtensionConnectionSupplier connectionAdapter;
+  private ExtensionConnectionSupplier connectionSupplier;
 
   /**
    * Adds a {@code Connection} as a parameter in the {@code operationContext}, following the considerations in this type's
@@ -62,6 +62,6 @@ public final class ConnectionInterceptor implements Interceptor {
 
   private ConnectionHandler<?> getConnection(ExecutionContextAdapter<? extends ComponentModel> operationContext)
       throws ConnectionException, TransactionException {
-    return connectionAdapter.getConnection(operationContext);
+    return connectionSupplier.getConnection(operationContext);
   }
 }

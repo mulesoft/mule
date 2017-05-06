@@ -85,9 +85,27 @@ public class DataSourcePoolingTestCase extends AbstractDbIntegrationTestCase {
     return responses;
   }
 
+
+  @Test
+  public void waitForever() throws Exception {
+    setConcurrentRequests(3);
+    for (int i = 0; i < 3; i++) {
+      new Thread(() -> doRunFlow("waitForever")).start();
+    }
+    assertThat(connectionLatch.await(5, SECONDS), is(false));
+  }
+
   private void doRequest(Message[] responses, int index) {
     try {
-      responses[index] = flowRunner("queryAndJoin").run().getMessage();
+      responses[index] = doRunFlow("queryAndJoin");
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private Message doRunFlow(String flowName) {
+    try {
+      return flowRunner(flowName).run().getMessage();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

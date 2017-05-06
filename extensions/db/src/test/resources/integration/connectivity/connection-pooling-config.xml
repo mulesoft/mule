@@ -20,4 +20,14 @@
             </error-handler>
         </try>
     </flow>
+
+    <flow name="waitForever" processingStrategy="synchronous">
+        <try transactionalAction="ALWAYS_BEGIN">
+            <db:delete config-ref="waitForeverJdbcConfig">
+                <db:sql>delete from PLANET</db:sql>
+            </db:delete>
+            <set-payload value="OK" />
+            <component class="org.mule.extension.db.integration.connectivity.DataSourcePoolingTestCase$JoinRequests"/>
+        </try>
+    </flow>
 </mule>
