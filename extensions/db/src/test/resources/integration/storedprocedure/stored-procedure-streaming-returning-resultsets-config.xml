@@ -10,28 +10,16 @@
             <db:sql>{ call getSplitTestRecords() }</db:sql>
         </db:stored-procedure>
 
-        <set-variable variableName="records" value="#[mel:new ArrayList()]"/>
+        <set-variable variableName="records" value="#[[]]"/>
 
-        <enricher target="mel:flowVars.unused">
-            <processor-chain>
-                <set-payload value="#[mel:payload.get('resultSet1')]"/>
+        <foreach collection="#[payload.resultSet1]">
+            <set-variable variableName="records" value="#[records ++ [payload]]"/>
+        </foreach>
 
-                <foreach>
-                    <expression-component>mel:flowVars['records'].add(payload)</expression-component>
-                </foreach>
-            </processor-chain>
-        </enricher>
+        <foreach collection="#[payload.resultSet2]">
+            <set-variable variableName="records" value="#[records ++ [payload]]"/>
+        </foreach>
 
-        <enricher target="mel:flowVars.unused">
-            <processor-chain>
-                <set-payload value="#[mel:payload.get('resultSet2')]"/>
-
-                <foreach>
-                    <expression-component>mel:flowVars['records'].add(payload)</expression-component>
-                </foreach>
-            </processor-chain>
-        </enricher>
-
-        <set-payload value="#[mel:flowVars['records']]"/>
+        <set-payload value="#[records]"/>
     </flow>
 </mule>

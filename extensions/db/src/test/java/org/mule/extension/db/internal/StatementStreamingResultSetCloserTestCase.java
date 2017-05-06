@@ -22,32 +22,31 @@ import org.junit.Test;
 @SmallTest
 public class StatementStreamingResultSetCloserTestCase extends AbstractMuleTestCase {
 
-  private final StatementStreamingResultSetCloser resultSetCloser = new StatementStreamingResultSetCloser();
   private final DbConnection connection = mock(DbConnection.class);
+  private final StatementStreamingResultSetCloser resultSetCloser = new StatementStreamingResultSetCloser(connection);
   private final ResultSet resultSet1 = mock(ResultSet.class);
   private final ResultSet resultSet2 = mock(ResultSet.class);
 
   @After
   public void after() {
-    assertThat(resultSetCloser.getLocksCount(), is(0));
+    assertThat(resultSetCloser.getOpenResultSets(), is(0));
   }
 
   @Test
   public void closesRegisteredResultSet() throws Exception {
-    resultSetCloser.trackResultSet(connection, resultSet1);
+    resultSetCloser.trackResultSet(resultSet1);
 
-    resultSetCloser.close(connection, resultSet1);
+    resultSetCloser.closeResultSets();
 
     verify(resultSet1).close();
   }
 
   @Test
   public void tracksMultipleResultSetFromConnection() throws Exception {
-    resultSetCloser.trackResultSet(connection, resultSet1);
-    resultSetCloser.trackResultSet(connection, resultSet2);
+    resultSetCloser.trackResultSet(resultSet1);
+    resultSetCloser.trackResultSet(resultSet2);
 
-    resultSetCloser.close(connection, resultSet1);
-    resultSetCloser.close(connection, resultSet2);
+    resultSetCloser.closeResultSets();
 
     verify(resultSet1).close();
     verify(resultSet2).close();

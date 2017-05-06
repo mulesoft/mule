@@ -8,12 +8,10 @@ package org.mule.extension.db.integration.select;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.DerbyTestDatabase;
-import org.mule.extension.db.internal.StatementStreamingResultSetCloser;
 import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.List;
@@ -53,18 +51,6 @@ public class SelectExceptionTestCase extends AbstractDbIntegrationTestCase {
       } catch (MessagingException e) {
         assertThat("Iteration " + i, e.getMessage(), containsString("Table/View 'NOT_EXISTS' does not exist."));
       }
-    }
-  }
-
-  @Test
-  public void selectExceptionClosesPreviousResultSets() throws Exception {
-    try {
-      flowRunner("selectExceptionClosesPreviousResultSets").run().getMessage();
-      fail("Was expecting faillure");
-    } catch (MessagingException e) {
-      StatementStreamingResultSetCloser resultSetCloser =
-          muleContext.getRegistry().lookupObject(StatementStreamingResultSetCloser.class);
-      assertThat(resultSetCloser.getOpenResultSets(), is(0));
     }
   }
 }

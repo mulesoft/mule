@@ -109,7 +109,7 @@ public abstract class AbstractConsumer<T, P> implements Consumer<T> {
       this.close();
     } catch (Exception e) {
       if (logger.isWarnEnabled()) {
-        logger.warn("Expection was trapped trying to close consumer", e);
+        logger.warn("Exception was trapped trying to close consumer", e);
       }
     }
   }
