@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.routing.ValidationException;
-import org.mule.runtime.core.util.store.InMemoryObjectStore;
+import org.mule.tck.core.util.store.InMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;

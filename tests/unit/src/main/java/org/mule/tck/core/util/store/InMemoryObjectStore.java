@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.store;
+package org.mule.tck.core.util.store;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.util.store.AbstractMonitoredObjectStore;
 
 /**
  * <code>InMemoryObjectStore</code> implements an optionally bounded in-memory store for message IDs with periodic expiry of old
