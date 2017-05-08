@@ -160,6 +160,7 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
     assertThat(threads, not(hasItem(startsWith(IO))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
 }

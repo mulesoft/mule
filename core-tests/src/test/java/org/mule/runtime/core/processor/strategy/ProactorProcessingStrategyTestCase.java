@@ -148,7 +148,7 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(1l));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
-
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Override
@@ -160,6 +160,7 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), between(1l, 2l));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), between(1l, 2l));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), between(1l, 3l));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Override
