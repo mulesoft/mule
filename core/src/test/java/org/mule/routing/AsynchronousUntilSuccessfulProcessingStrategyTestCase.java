@@ -504,7 +504,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
 
     private AsynchronousUntilSuccessfulProcessingStrategy createProcessingStrategy() throws Exception
     {
-        AsynchronousUntilSuccessfulProcessingStrategy processingStrategy = new AsynchronousUntilSuccessfulProcessingStrategy()
+        AsynchronousUntilSuccessfulProcessingStrategy processingStrategy = new AsynchronousUntilSuccessfulProcessingStrategy(mockUntilSuccessfulConfiguration.getMuleContext())
         {
             @Override
             protected MuleEvent threadSafeCopy(MuleEvent event)
