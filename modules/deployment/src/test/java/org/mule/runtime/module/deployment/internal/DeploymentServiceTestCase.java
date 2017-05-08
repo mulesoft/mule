@@ -211,8 +211,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Object[]> parameters() {
     return asList(new Object[][] {
-        {false}/*,
-               {true}*/
+        {false},
+        {true}
     });
   }
 
