@@ -9,6 +9,7 @@ package org.mule.runtime.core.routing.outbound;
 import static java.util.Collections.emptySet;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -109,11 +110,11 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     // Nothing to do
   }
 
-  private void initEventBuilder(Object payload, Event originalEvent, Builder builder, Set<String> flowVarsFromLastResult) {
-    if (payload instanceof EventBuilderConfigurer) {
-      ((EventBuilderConfigurer) payload).configure(builder);
-    } else if (payload instanceof Event) {
-      final Event payloadAsEvent = (Event) payload;
+  private void initEventBuilder(Object sequenceValue, Event originalEvent, Builder builder, Set<String> flowVarsFromLastResult) {
+    if (sequenceValue instanceof EventBuilderConfigurer) {
+      ((EventBuilderConfigurer) sequenceValue).configure(builder);
+    } else if (sequenceValue instanceof Event) {
+      final Event payloadAsEvent = (Event) sequenceValue;
       builder.message(payloadAsEvent.getMessage());
       for (String flowVarName : payloadAsEvent.getVariableNames()) {
         if (!flowVarsFromLastResult.contains(flowVarName)) {
@@ -121,10 +122,14 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
                               payloadAsEvent.getVariable(flowVarName).getDataType());
         }
       }
-    } else if (payload instanceof Message) {
-      builder.message((Message) payload);
+    } else if (sequenceValue instanceof Message) {
+      final Message message = (Message) sequenceValue;
+      builder.message(message);
+    } else if (sequenceValue instanceof TypedValue) {
+      builder.message(Message.builder().payload(((TypedValue) sequenceValue).getValue())
+          .mediaType(((TypedValue) sequenceValue).getDataType().getMediaType()).build());
     } else {
-      builder.message(Message.builder(originalEvent.getMessage()).payload(payload).build());
+      builder.message(Message.builder(originalEvent.getMessage()).payload(sequenceValue).build());
     }
   }
 

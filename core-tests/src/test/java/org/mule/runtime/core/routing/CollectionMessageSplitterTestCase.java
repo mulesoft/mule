@@ -120,6 +120,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
     Message toSplit = Message.of(payload);
     CollectionSplitter splitter = new CollectionSplitter();
     splitter.setMuleContext(muleContext);
+    splitter.initialise();
     Event event = eventBuilder().message(toSplit).session(session).build();
     assertSame(event, splitter.process(event));
   }
@@ -158,6 +159,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
     Grabber grabber = new Grabber();
     splitter.setMuleContext(muleContext);
     splitter.setListener(grabber);
+    splitter.initialise();
 
     final Builder eventBuilder = eventBuilder().message(toSplit).session(session);
     for (Map.Entry<String, Object> entry : invocationProps.entrySet()) {

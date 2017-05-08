@@ -10,14 +10,14 @@
             <db:sql>{ call getSplitTestRecords() }</db:sql>
         </db:stored-procedure>
 
-        <set-variable variableName="records" value="#[[]]"/>
+        <set-variable variableName="records" value="#[[]]" mimeType="application/java"/>
 
         <foreach collection="#[payload.resultSet1]">
-            <set-variable variableName="records" value="#[records ++ [payload]]"/>
+            <set-variable variableName="records" value="#[records ++ [payload]]" mimeType="application/java"/>
         </foreach>
 
         <foreach collection="#[payload.resultSet2]">
-            <set-variable variableName="records" value="#[records ++ [payload]]"/>
+            <set-variable variableName="records" value="#[records ++ [payload]]" mimeType="application/java"/>
         </foreach>
 
         <set-payload value="#[records]"/>

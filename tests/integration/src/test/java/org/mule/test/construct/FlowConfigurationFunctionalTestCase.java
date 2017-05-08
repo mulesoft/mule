@@ -49,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTestCase {
@@ -158,6 +159,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     assertTrue(results.contains(orange));
   }
 
+  @Ignore("MULE-12407")
   @Test
   public void testSplitNoParts() throws Exception {
     String MESSAGE = "<Order></Order>";

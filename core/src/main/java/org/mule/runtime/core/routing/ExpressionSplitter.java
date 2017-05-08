@@ -6,26 +6,12 @@
  */
 package org.mule.runtime.core.routing;
 
-import static java.util.Collections.singletonList;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.routing.MapSplitter.MAP_ENTRY_KEY;
-import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.expression.ExpressionConfig;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.w3c.dom.NodeList;
 
 /**
  * Splits a message using the expression provided invoking the next message processor one for each split part.
@@ -35,6 +21,7 @@ import org.w3c.dom.NodeList;
 public class ExpressionSplitter extends AbstractSplitter implements Initialisable {
 
   protected ExpressionConfig config = new ExpressionConfig();
+  private ExpressionSplittingStrategy expressionSplitterStrategy;
 
   public ExpressionSplitter() {
     // Used by spring
@@ -47,50 +34,12 @@ public class ExpressionSplitter extends AbstractSplitter implements Initialisabl
   @Override
   public void initialise() throws InitialisationException {
     config.validate();
+    expressionSplitterStrategy = new ExpressionSplittingStrategy(muleContext.getExpressionManager(), config.getFullExpression());
   }
 
   @Override
-  protected List<Event> splitMessage(Event event) {
-    Object result =
-        muleContext.getExpressionManager().evaluate(config.getFullExpression(), event, flowConstruct)
-            .getValue();
-    if (result instanceof Object[]) {
-      result = Arrays.asList((Object[]) result);
-    }
-    if (result instanceof Iterable<?>) {
-      List<Event> messages = new ArrayList<>();
-      ((Iterable<?>) result).iterator()
-          .forEachRemaining(value -> messages
-              .add(Event.builder(event).message(of(value)).build()));
-      return messages;
-    } else if (result instanceof Iterator<?>) {
-      List<Event> messages = new ArrayList<>();
-      ((Iterator) result).forEachRemaining(value -> messages
-          .add(Event.builder(event).message(of(value)).build()));
-      return messages;
-    } else if (result instanceof Map<?, ?>) {
-      List<Event> list = new LinkedList<>();
-      Set<Map.Entry<?, ?>> set = ((Map) result).entrySet();
-      for (Entry<?, ?> entry : set) {
-        Event newEvent = Event.builder(event).message(of(entry.getValue())).addVariable(MAP_ENTRY_KEY, entry.getKey()).build();
-        list.add(newEvent);
-      }
-      return list;
-    } else if (result instanceof Message) {
-      return singletonList(Event.builder(event).message((Message) result).build());
-    } else if (result instanceof NodeList) {
-      NodeList nodeList = (NodeList) result;
-      List<Event> messages = new ArrayList<>(nodeList.getLength());
-      for (int i = 0; i < nodeList.getLength(); i++) {
-        messages.add(Event.builder(event).message(of(nodeList.item(i))).build());
-      }
-      return messages;
-    } else if (result == null) {
-      return new ArrayList<>();
-    } else {
-      logger.info("The expression does not evaluate to a type that can be split: " + result.getClass().getName());
-      return singletonList(Event.builder(event).message(of(result)).build());
-    }
+  protected List<?> splitMessage(Event event) {
+    return expressionSplitterStrategy.split(event);
   }
 
   public String getExpression() {

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.util;
 
 import static java.util.regex.Pattern.DOTALL;
+import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -86,6 +87,18 @@ public class AttributeEvaluator {
     } else {
       Class<?> type = attributeValue == null ? Object.class : String.class;
       return new TypedValue(attributeValue, DataType.builder().type(type).build());
+    }
+  }
+
+  public TypedValue resolveTypedValue(Event event, DataType expectedDataType) {
+    if (isExpression()) {
+      return expressionManager.evaluate(attributeValue, expectedDataType, BindingContext.builder().build(), event);
+    } else if (isParseExpression()) {
+      final String value = expressionManager.parse(attributeValue, event, null);
+      return new TypedValue(value, DataType.builder().type(String.class).build());
+    } else {
+      Class<?> type = attributeValue == null ? Object.class : String.class;
+      return new TypedValue(attributeValue, DataType.builder().type(expectedDataType.getType()).build());
     }
   }
 

@@ -61,7 +61,7 @@ public class MVELSplitDataIterator implements Iterator<TypedValue<?>> {
     } else if (result instanceof Iterator<?>) {
       iter = (Iterator<Object>) result;
     } else if (result instanceof Map<?, ?>) {
-      iter = ((Map) result).entrySet().iterator();
+      iter = ((Map) result).values().iterator();
     } else if (result == null) {
       iter = emptyIterator();
     } else {

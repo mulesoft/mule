@@ -209,11 +209,11 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     protected MessageSequence<?> splitMessageIntoSequence(Event event) {
       Object payload = event.getMessage().getPayload().getValue();
       if (payload instanceof Map<?, ?>) {
-        List<Event> list = new LinkedList<>();
+        List<Object> list = new LinkedList<>();
         Set<Map.Entry<?, ?>> set = ((Map) payload).entrySet();
         for (Entry<?, ?> entry : set) {
           // TODO MULE-9502 Support "key" flowVar with MapSplitter in Mule 4
-          list.add(Event.builder(event).message(of(entry.getValue())).build());
+          list.add(entry.getValue());
         }
         return new CollectionMessageSequence(list);
       }

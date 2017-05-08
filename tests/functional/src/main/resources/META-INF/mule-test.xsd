@@ -218,7 +218,23 @@
     <xsd:complexType name="queueType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:element name="content" type="xsd:string" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Content to be sent to the queue. By default it will be the payload content
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="name"/>
+                <xsd:attribute name="contentJavaType">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Content type to use to transform the content parameter into a java type.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

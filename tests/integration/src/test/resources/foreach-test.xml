@@ -85,7 +85,7 @@
     </flow>
 
     <flow name="process-order-update">
-        <foreach collection="#[payload.PurchaseOrder.Items.Item]">
+        <foreach collection="#[[ payload.PurchaseOrder.Items ]]">
             <set-variable variableName="total" value="#[counter]" />
         </foreach>
     </flow>
@@ -228,7 +228,55 @@
 		<flow-ref name="setTestProperties" />
 	</flow>
 
-	<sub-flow name="setTestProperties">
+    <flow name="splitStringValueFromPayload">
+        <foreach collection="#[payload splitBy '-']">
+            <test:queue name="splitStringOutQueue"/>
+        </foreach>
+    </flow>
+
+    <flow name="splitStringHardcodedValue">
+        <foreach collection="#['a-b-c' splitBy '-']">
+            <test:queue name="splitStringOutQueue"/>
+        </foreach>
+    </flow>
+
+    <flow name="splitJson">
+        <foreach collection="#[[ payload.name, payload.lastname ]]">
+            <test:queue name="splitJsonOutQueue" contentJavaType="java.lang.String"/>
+        </foreach>
+    </flow>
+
+    <flow name="splitJsonArray">
+        <foreach>
+            <test:queue name="splitJsonArrayOutQueue" contentJavaType="java.lang.String"/>
+        </foreach>
+    </flow>
+
+    <flow name="splitJsonComplexValue">
+        <foreach collection="#[content.users]" batchSize="2">
+            <foreach>
+                <test:queue name="splitJsonComplexValueOutQueue" contentJavaType="java.lang.String">
+                    <test:content>#["$(payload.name) $(payload.lastname)"]</test:content>
+                </test:queue>
+            </foreach>
+        </foreach>
+    </flow>
+
+    <flow name="splitXml">
+        <foreach collection="#[%output application/java --- [ payload.person.name, payload.person.lastname ]]">
+            <test:queue name="splitXmlOutQueue"/>
+        </foreach>
+    </flow>
+
+    <flow name="splitXmlComplexValue">
+        <foreach collection="#[[ payload.PurchaseOrder.Items ]]">
+            <test:queue name="splitXmlComplexValueOutQueue" contentJavaType="java.lang.String">
+                <test:content>#["$(payload.@PartNumber) $(payload.Price)"]</test:content>
+            </test:queue>
+        </foreach>
+    </flow>
+
+    <sub-flow name="setTestProperties">
 		<set-variable variableName="value1" value="value1" />
 		<set-variable variableName="value2" value="value2" />
 

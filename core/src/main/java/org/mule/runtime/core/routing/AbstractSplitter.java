@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.runtime.core.routing.outbound.CollectionMessageSequence;
 
@@ -30,13 +29,12 @@ public abstract class AbstractSplitter extends AbstractMessageSequenceSplitter {
   }
 
   /**
-   * Performs the split of the message payload in the current event, creating a new
-   * {@link InternalMessage} and in turn a new {@link Event} for each split part.
+   * Performs the split of the message payload in the current event.
    *
-   * @param event the event continaing the {@link InternalMessage} whose payload is to be split.
-   * @return a list of {@link Event}s each containing a new {@link InternalMessage} with a split part.
-   * @throws MuleException if an error occurs doing spltting.
+   * @param event the event to be split.
+   * @return a list of values with the result of the split.
+   * @throws MuleException if an error occurs doing splitting.
    */
-  protected abstract List<Event> splitMessage(Event event) throws MuleException;
+  protected abstract List<?> splitMessage(Event event) throws MuleException;
 
 }

@@ -8,31 +8,54 @@
 package org.mule.functional.client;
 
 import static org.mule.functional.client.TestConnectorConfig.DEFAULT_CONFIG_ID;
-
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
+import static org.mule.runtime.api.metadata.DataType.fromType;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.util.AttributeEvaluator;
 
 /**
  * Writes {@link Event} to a test connector's queue.
  */
-public class QueueWriterMessageProcessor extends AbstractAnnotatedObject implements Processor, MuleContextAware {
+public class QueueWriterMessageProcessor extends AbstractAnnotatedObject implements Processor, MuleContextAware, Initialisable {
 
   private MuleContext muleContext;
   private String name;
+  private AttributeEvaluator content;
+  private Class contentJavaType;
 
   @Override
   public Event process(Event event) throws MuleException {
     TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(DEFAULT_CONFIG_ID);
-    Event copy = Event.builder(event).session(new DefaultMuleSession(event.getSession()))
-        // Queue works based on MuleEvent for testing purposes. A real operation
-        // would not be aware of the error field and just the plain message would be sent.
-        .error(null)
-        .build();
+    Event copy;
+    if (content == null) {
+      copy = Event.builder(event).session(new DefaultMuleSession(event.getSession()))
+          // Queue works based on MuleEvent for testing purposes. A real operation
+          // would not be aware of the error field and just the plain message would be sent.
+          .error(null)
+          .build();;
+    } else {
+      Object payloadValue;
+      if (contentJavaType != null) {
+        payloadValue = content.resolveTypedValue(event, fromType(contentJavaType)).getValue();
+      } else {
+        payloadValue = content.resolveValue(event);
+      }
+      copy = Event.builder(event).message(Message.builder(event.getMessage()).payload(payloadValue).build())
+          .session(new DefaultMuleSession(event.getSession()))
+          // Queue works based on MuleEvent for testing purposes. A real operation
+          // would not be aware of the error field and just the plain message would be sent.
+          .error(null)
+          .build();
+    }
+
     connectorConfig.write(name, copy);
 
     return event;
@@ -43,11 +66,29 @@ public class QueueWriterMessageProcessor extends AbstractAnnotatedObject impleme
     muleContext = context;
   }
 
+  public void setContent(String content) {
+    this.content = new AttributeEvaluator(content);
+  }
+
   public String getName() {
     return name;
   }
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public void setContentJavaType(Class contentJavaType) {
+    this.contentJavaType = contentJavaType;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (content != null) {
+      content.initialize(muleContext.getExpressionManager());
+    } else if (contentJavaType != null) {
+      content = new AttributeEvaluator("#[payload]");
+      content.initialize(muleContext.getExpressionManager());
+    }
   }
 }

@@ -23,9 +23,12 @@ import static org.mockito.Mockito.when;
 import static org.mule.functional.junit4.TestLegacyMessageUtils.getOutboundProperty;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.metadata.DataType.JSON_STRING;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.junit4.TestLegacyMessageBuilder;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -42,6 +45,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -227,14 +231,78 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     assertThat(getOutboundProperty(result, "totalMessages"), is(names.size()));
   }
 
-  static String sampleXml = "<PurchaseOrder>" + "<Address><Name>Ellen Adams</Name></Address>" + "<Items>"
-      + "<Item PartNumber=\"872-AA\"><Price>140</Price></Item>" + "<Item PartNumber=\"926-AA\"><Price>35</Price></Item>"
-      + "</Items>" + "</PurchaseOrder>";
+  @Test
+  public void splitStringWithHardcodedValue() throws Exception {
+    flowRunner("splitStringHardcodedValue").run();
+    assertSplitedString();
+  }
 
   @Test
-  public void xmlUpdate() throws Exception {
-    xml(sampleXml);
+  public void splitStringWithStringFromPayload() throws Exception {
+    flowRunner("splitStringHardcodedValue").withPayload("a-b-c").run();
+    assertSplitedString();
   }
+
+  @Test
+  public void splitJson() throws Exception {
+    flowRunner("splitJson").withPayload("{\"name\":\"Pepe\", \"lastname\":\"Le Pew\"}").withMediaType(APPLICATION_JSON).run();
+    assertQueueValueIs("splitJsonOutQueue", "Pepe");
+    assertQueueValueIs("splitJsonOutQueue", "Le Pew");
+  }
+
+  @Test
+  public void splitJsonArrayWithoutExpression() throws Exception {
+    flowRunner("splitJsonArray").withPayload("[ \"1\", \"2\" ]").withMediaType(APPLICATION_JSON).run();
+    assertQueueValueIs("splitJsonArrayOutQueue", "1");
+    assertQueueValueIs("splitJsonArrayOutQueue", "2");
+  }
+
+  @Test
+  public void splitJsonComplexValue() throws Exception {
+    String jsonUsers = "{ \"users\": [" +
+        "{ \"name\": \"Pepe\", \"lastname\": \"Le Pew\" }," +
+        "{ \"name\": \"Chuck\", \"lastname\": \"Jones\" }," +
+        "{ \"name\": \"Dick\", \"lastname\": \"Dastardly\" }," +
+        "{ \"name\": \"William\", \"lastname\": \"Hanna\" }" +
+        "] }";
+    flowRunner("splitJsonComplexValue").withVariable("content", jsonUsers, JSON_STRING).withMediaType(APPLICATION_JSON)
+        .run();
+    assertQueueValueIs("splitJsonComplexValueOutQueue", "Pepe Le Pew");
+    assertQueueValueIs("splitJsonComplexValueOutQueue", "Chuck Jones");
+    assertQueueValueIs("splitJsonComplexValueOutQueue", "Dick Dastardly");
+    assertQueueValueIs("splitJsonComplexValueOutQueue", "William Hanna");
+  }
+
+  @Test
+  public void splitXml() throws Exception {
+    flowRunner("splitXml").withPayload("<person><name>Pepe</name><lastname>Le Pew</lastname></person>")
+        .withMediaType(APPLICATION_XML).run();
+    assertQueueValueIs("splitXmlOutQueue", "Pepe");
+    assertQueueValueIs("splitXmlOutQueue", "Le Pew");
+  }
+
+  @Ignore("MULE-12407")
+  @Test
+  public void spliXmlComplexValue() throws Exception {
+    flowRunner("splitXmlComplexValue").withPayload(sampleXml).withMediaType(APPLICATION_XML).run();
+    assertQueueValueIs("splitXmlComplexValueOutQueue", "872-AA 140");
+    assertQueueValueIs("splitXmlComplexValueOutQueue", "926-AA 35");
+  }
+
+  private void assertQueueValueIs(String queueName, Object queueValue) throws MuleException {
+    Message receivedMessage = muleContext.getClient().request("test://" + queueName, 1000).getRight().get();
+    assertThat(receivedMessage.getPayload().getValue(), Is.is(queueValue));
+  }
+
+  private void assertSplitedString() throws MuleException {
+    assertQueueValueIs("splitStringOutQueue", "a");
+    assertQueueValueIs("splitStringOutQueue", "b");
+    assertQueueValueIs("splitStringOutQueue", "c");
+  }
+
+  static String sampleXml = "<PurchaseOrder><Address><Name>Ellen Adams</Name></Address><Items>"
+      + "<Item PartNumber=\"872-AA\"><Price>140</Price></Item><Item PartNumber=\"926-AA\"><Price>35</Price></Item>"
+      + "</Items></PurchaseOrder>";
 
   private void xml(Object payload) throws Exception {
     Event result = flowRunner("process-order-update").withPayload(payload).withMediaType(APPLICATION_XML).run();

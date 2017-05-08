@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.util.collection;
 
-import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.util.Copiable;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.routing.ExpressionSplittingStrategy;
 import org.mule.runtime.core.routing.MessageSequence;
 import org.mule.runtime.core.routing.outbound.ArrayMessageSequence;
 import org.mule.runtime.core.routing.outbound.CollectionMessageSequence;
@@ -24,6 +25,16 @@ import java.util.LinkedList;
 import org.w3c.dom.NodeList;
 
 public class EventToMessageSequenceSplittingStrategy implements SplittingStrategy<Event, MessageSequence<?>> {
+
+  private ExpressionSplittingStrategy expressionSplitterStrategy;
+
+  /**
+   * @param expressionSplitterStrategy expression splitter strategy to use as default mechanism if there was supported mechanism
+   *        to split the payload
+   */
+  public EventToMessageSequenceSplittingStrategy(ExpressionSplittingStrategy expressionSplitterStrategy) {
+    this.expressionSplitterStrategy = expressionSplitterStrategy;
+  }
 
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
@@ -47,10 +58,15 @@ public class EventToMessageSequenceSplittingStrategy implements SplittingStrateg
     } else if (payload instanceof NodeList) {
       return new NodeListMessageSequence((NodeList) payload);
     } else {
-      throw new IllegalArgumentException(CoreMessages
-          .objectNotOfCorrectType(payload != null ? payload.getClass() : null,
-                                  new Class[] {Iterable.class, Iterator.class, MessageSequence.class, Collection.class})
-          .getMessage());
+      try {
+        // Let's try to split the payload using the expression manager since it may support based on the mimeType.
+        return new CollectionMessageSequence<>(expressionSplitterStrategy.split(event));
+      } catch (Exception e) {
+        throw new IllegalArgumentException(CoreMessages
+            .objectNotOfCorrectType(payload != null ? payload.getClass() : null,
+                                    new Class[] {Iterable.class, Iterator.class, MessageSequence.class, Collection.class})
+            .getMessage());
+      }
     }
   }
 
