@@ -94,7 +94,7 @@ class InfrastructureElementModelDelegate {
             parentElement.containing(DslElementModel.builder()
                 .withModel(parameterModel)
                 .withDsl(paramDsl)
-                .withValue(text.getValue()) //FIXME
+                .withValue(text.getValue())
                 .build());
           }
         });
