@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.config.spring.dsl.model.internal;
 
+import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.join;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
@@ -31,6 +34,9 @@ import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.IntStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,6 +49,8 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Default implementation of {@link ArtifactDeclarationXmlSerializer}
@@ -117,11 +125,14 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
 
       artifact.getGlobalElements().forEach(declaration -> declaration.accept(declarationVisitor));
 
+      List<String> cDataElements = getCDataElements(doc.getDocumentElement());
+
       // write the content into xml file
       TransformerFactory transformerFactory = XMLSecureFactories.createDefault().getTransformerFactory();
 
       Transformer transformer = transformerFactory.newTransformer();
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, join(cDataElements, " "));
       transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
       DOMSource source = new DOMSource(doc);
@@ -130,10 +141,8 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
       return writer.getBuffer().toString();
 
     } catch (Exception e) {
-      throw new MuleRuntimeException(
-                                     createStaticMessage("Failed to serialize the declaration for the artifact ["
-                                         + artifact.getName() + "]"),
-                                     e);
+      throw new MuleRuntimeException(createStaticMessage("Failed to serialize the declaration for the artifact ["
+          + artifact.getName() + "]: " + e.getMessage()), e);
     }
   }
 
@@ -172,6 +181,19 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
                                   ElementDeclaration declaration) {
     modelResolver.create(declaration)
         .ifPresent(e -> parent.appendChild(converter.asXml(e)));
+  }
+
+  private List<String> getCDataElements(Node element) {
+
+    if (element.getChildNodes().getLength() == 1 && element.getFirstChild().getNodeType() == Node.CDATA_SECTION_NODE) {
+      return singletonList(format("{%s}%s", element.getNamespaceURI(), element.getLocalName()));
+    } else {
+      List<String> identifiers = new LinkedList<>();
+      NodeList childs = element.getChildNodes();
+      IntStream.range(0, childs.getLength()).mapToObj(childs::item)
+          .forEach(c -> identifiers.addAll(getCDataElements(c)));
+      return identifiers;
+    }
   }
 
 }

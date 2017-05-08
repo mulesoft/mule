@@ -45,10 +45,30 @@
             <redelivery-policy maxRedeliveryCount="2" useSecureHash="true"/>
             <reconnect blocking="true" count="1" frequency="0"/>
             <http:response>
-                <http:body>#[{'my': 'map'}]</http:body>
-                <http:headers>
-                    #[{{'content-type' : 'text/plain'}}]
-                </http:headers>
+                <http:body><![CDATA[#[
+                    %dw 1.0
+                    %output application/json
+                    %input payload application/xml
+                    %var baseUrl="http://sample.cloudhub.io/api/v1.0/"
+                    ---
+                    using (pageSize = payload.getItemsResponse.PageInfo.pageSize) {
+                         links: [
+                            {
+                                href: fullUrl,
+                                rel : "self"
+                            }
+                         ],
+                         collection: {
+                            size: pageSize,
+                            items: payload.getItemsResponse.*Item map {
+                                id: $.id,
+                                type: $.type,
+                                name: $.name
+                            }
+                         }
+                    }
+                ]]></http:body>
+                <http:headers><![CDATA[#[{{'content-type' : 'text/plain'}}]]]></http:headers>
             </http:response>
         </http:listener>
 
@@ -93,7 +113,7 @@
             <repeatable-in-memory-stream bufferSizeIncrement="8"
                                          bufferUnit="KB"
                                          initialBufferSize="51"
-                                         maxBufferSize="1000"/>
+                                         maxInMemorySize="1000"/>
         </sockets:send-and-receive>
 
         <wsc:consume operation="GetCitiesByCountry">

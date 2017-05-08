@@ -13,6 +13,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.spring.dsl.declaration.DefaultXmlArtifactDeclarationLoader.TRANSFORM_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.DECLARED_PREFIX;
+import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.IS_CDATA;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
@@ -145,13 +146,19 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
 
   private void setTextContentElement(Element element, DslElementModel<?> elementModel, Element parentNode) {
     getCustomizedValue(elementModel).ifPresent(value -> {
-      if (elementModel.getDsl().supportsChildDeclaration() && !elementModel.getDsl().supportsAttributeDeclaration()) {
-        element.setTextContent(value);
+      DslElementSyntax dsl = elementModel.getDsl();
+      if (dsl.supportsChildDeclaration() && !dsl.supportsAttributeDeclaration()) {
+        if (elementModel.getConfiguration().map(c -> c.getProperty(IS_CDATA).isPresent()).orElse(false)) {
+          element.appendChild(doc.createCDATASection(value));
+        } else {
+          element.setTextContent(value);
+        }
+
         if (parentNode != element) {
           parentNode.appendChild(element);
         }
       } else {
-        parentNode.setAttribute(elementModel.getDsl().getAttributeName(), value);
+        parentNode.setAttribute(dsl.getAttributeName(), value);
       }
     });
   }
@@ -287,7 +294,8 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
     config.getParameters().forEach(nested::setAttribute);
     // TODO: EE-5393: Add CDATA section
     config.getNestedComponents().stream()
-        .filter(inner -> inner.getValue().isPresent()).forEach(inner -> nested.setTextContent(inner.getValue().get()));
+        .filter(inner -> inner.getValue().isPresent())
+        .forEach(inner -> nested.appendChild(doc.createCDATASection(inner.getValue().get())));
     return nested;
   }
 

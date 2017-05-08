@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring.dsl.processor.xml;
 
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_CONTEXT_NAMESPACE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SPRING_NAMESPACE;
+import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.IS_CDATA;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_NAMESPACE;
@@ -144,6 +145,7 @@ public class XmlApplicationParser {
         if (isTextContent(child)) {
           builder.setTextContent(child.getNodeValue());
           if (child.getNodeType() == Node.CDATA_SECTION_NODE) {
+            builder.addCustomAttribute(IS_CDATA, Boolean.TRUE);
             break;
           }
         } else {
