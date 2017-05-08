@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.extension.internal.loader.catalog.model.resolver;
 
+import static java.lang.String.format;
 import com.google.common.base.Preconditions;
-import org.apache.commons.io.FileUtils;
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.annotation.TypeAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
@@ -15,7 +15,9 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.impl.BaseMetadataType;
 import org.mule.metadata.json.JsonTypeLoader;
+import org.mule.runtime.core.util.IOUtils;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Map;
@@ -35,8 +37,16 @@ public class SingleTypeResolver implements TypeResolver {
   public SingleTypeResolver(String typeIdentifier, URL schemaUrl) {
     Preconditions.checkNotNull(typeIdentifier);
     Preconditions.checkNotNull(schemaUrl);
-    typeLoader = new JsonTypeLoader(FileUtils.toFile(schemaUrl));
+    typeLoader = new JsonTypeLoader(getSchemaData(schemaUrl));
     this.typeIdentifier = typeIdentifier;
+  }
+
+  private String getSchemaData(URL schemaUrl) {
+    try {
+      return IOUtils.toString(schemaUrl.openStream());
+    } catch (IOException e) {
+      throw new RuntimeException(format("There was an issue while trying to read the schema from [%s]", schemaUrl.toString()), e);
+    }
   }
 
   @Override
