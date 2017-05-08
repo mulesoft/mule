@@ -6,6 +6,8 @@
  */
 package org.mule.plugin.scripting;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -19,7 +21,6 @@ import javax.script.ScriptEngineManager;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,7 +65,7 @@ public class ScriptEnginePresenceTestCase extends AbstractMuleTestCase {
     for (ScriptEngineFactory scriptEngineFactory : engineFactories) {
       scriptEngineFactory.getScriptEngine();
     }
-    Assert.assertThat(engineFactories, CoreMatchers.hasItem(new TypeSafeMatcher<ScriptEngineFactory>() {
+    assertThat(engineFactories, CoreMatchers.hasItem(new TypeSafeMatcher<ScriptEngineFactory>() {
 
       @Override
       public void describeTo(Description description) {
@@ -85,11 +86,11 @@ public class ScriptEnginePresenceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void findEngineByName() throws Exception {
-    Assert.assertThat(scriptEngineManager.getEngineByName(engineName), CoreMatchers.notNullValue());
+    assertThat(scriptEngineManager.getEngineByName(engineName), notNullValue());
   }
 
   @Test
   public void findEngineByExtension() throws Exception {
-    Assert.assertThat(scriptEngineManager.getEngineByExtension(extension), CoreMatchers.notNullValue());
+    assertThat(scriptEngineManager.getEngineByExtension(extension), notNullValue());
   }
 }

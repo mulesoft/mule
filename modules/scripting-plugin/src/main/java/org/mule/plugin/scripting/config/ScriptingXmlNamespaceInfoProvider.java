@@ -7,6 +7,7 @@
 package org.mule.plugin.scripting.config;
 
 import static java.util.Arrays.asList;
+import static org.mule.plugin.scripting.config.ScriptingComponentBuildingDefinitionProvider.SCRIPTING_NAMESPACE;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 
@@ -30,7 +31,7 @@ public class ScriptingXmlNamespaceInfoProvider implements XmlNamespaceInfoProvid
 
       @Override
       public String getNamespace() {
-        return ScriptingComponentBuildingDefinitionProvider.SCRIPTING_NAMESPACE;
+        return SCRIPTING_NAMESPACE;
       }
     });
   }

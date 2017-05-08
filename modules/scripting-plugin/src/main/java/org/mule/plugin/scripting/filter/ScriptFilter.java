@@ -6,6 +6,7 @@
  */
 package org.mule.plugin.scripting.filter;
 
+import static org.mule.plugin.scripting.component.Scriptable.BINDING_MESSAGE;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
@@ -54,7 +55,7 @@ public class ScriptFilter extends AbstractFilteringMessageProcessor implements F
       // TODO MULE-9356 ScriptFilter should rethrow exceptions, or at least log, not ignore them
       return false;
     } finally {
-      builder.message((Message) bindings.get(Scriptable.BINDING_MESSAGE));
+      builder.message((Message) bindings.get(BINDING_MESSAGE));
     }
   }
 

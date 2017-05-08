@@ -6,6 +6,7 @@
  */
 package org.mule.plugin.scripting.config;
 
+import static org.mule.runtime.config.spring.dsl.model.CoreComponentBuildingDefinitionProvider.getTransformerBaseBuilder;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
@@ -19,7 +20,6 @@ import org.mule.plugin.scripting.component.Scriptable;
 import org.mule.plugin.scripting.component.ScriptingProperty;
 import org.mule.plugin.scripting.filter.ScriptFilter;
 import org.mule.plugin.scripting.transformer.ScriptTransformer;
-import org.mule.runtime.config.spring.dsl.model.CoreComponentBuildingDefinitionProvider;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
@@ -84,19 +84,19 @@ public class ScriptingComponentBuildingDefinitionProvider implements ComponentBu
         .withSetterParameterDefinition("interceptors", fromChildCollectionConfiguration(Interceptor.class).build())
         .build());
 
-    componentBuildingDefinitions.add(CoreComponentBuildingDefinitionProvider.getTransformerBaseBuilder(ScriptTransformer.class,
-                                                                                                       KeyAttributeDefinitionPair
-                                                                                                           .newBuilder()
-                                                                                                           .withKey(SCRIPT)
-                                                                                                           .withAttributeDefinition(fromChildConfiguration(Scriptable.class)
-                                                                                                               .build())
-                                                                                                           .build())
-        .withSetterParameterDefinition("commonConfiguratorType",
-                                       fromFixedValue(ScriptingTransformerConfigurator.class)
-                                           .build())
-        .withIdentifier(TRANSFORMER)
-        .withNamespace(SCRIPTING_NAMESPACE)
-        .build());
+    componentBuildingDefinitions.add(getTransformerBaseBuilder(ScriptTransformer.class,
+                                                               KeyAttributeDefinitionPair
+                                                                   .newBuilder()
+                                                                   .withKey(SCRIPT)
+                                                                   .withAttributeDefinition(fromChildConfiguration(Scriptable.class)
+                                                                       .build())
+                                                                   .build())
+                                                                       .withSetterParameterDefinition("commonConfiguratorType",
+                                                                                                      fromFixedValue(ScriptingTransformerConfigurator.class)
+                                                                                                          .build())
+                                                                       .withIdentifier(TRANSFORMER)
+                                                                       .withNamespace(SCRIPTING_NAMESPACE)
+                                                                       .build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(FILTER)
         .withTypeDefinition(fromType(ScriptFilter.class))

@@ -10,8 +10,6 @@
         "org.codehaus.groovy.control"
       ],
       "exportedResources": [
-        "META-INF/services/org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider",
-        "META-INF/services/org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider",
         "META-INF/spring.schemas",
         "META-INF/mule-scripting.xsd"
       ]

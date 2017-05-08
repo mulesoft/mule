@@ -146,8 +146,7 @@ class ExtensionPluginMetadataGenerator {
     scanner.addIncludeFilter(new AnnotationTypeFilter(Extension.class));
     try (URLClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), null)) {
       scanner.setResourceLoader(new PathMatchingResourcePatternResolver(classLoader));
-      Set<BeanDefinition> extensionsAnnotatedClasses;
-      extensionsAnnotatedClasses = scanner.findCandidateComponents("");
+      Set<BeanDefinition> extensionsAnnotatedClasses = scanner.findCandidateComponents("");
       if (!extensionsAnnotatedClasses.isEmpty()) {
         if (extensionsAnnotatedClasses.size() > 1) {
           logger
