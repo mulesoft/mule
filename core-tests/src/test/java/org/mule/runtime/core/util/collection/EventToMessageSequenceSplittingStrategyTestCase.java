@@ -19,7 +19,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.util.Copiable;
-import org.mule.runtime.core.routing.ExpressionSplitterStrategy;
+import org.mule.runtime.core.routing.ExpressionSplittingStrategy;
 import org.mule.runtime.core.routing.MessageSequence;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -41,7 +41,7 @@ public class EventToMessageSequenceSplittingStrategyTestCase extends AbstractMul
   private Event event;
 
   private EventToMessageSequenceSplittingStrategy strategy =
-      new EventToMessageSequenceSplittingStrategy(new ExpressionSplitterStrategy(mock(ExpressionManager.class)));
+      new EventToMessageSequenceSplittingStrategy(new ExpressionSplittingStrategy(mock(ExpressionManager.class)));
   private Collection<String> testCollection = Arrays.asList("Apple", "Banana", "Kiwi");
 
   @Test

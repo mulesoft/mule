@@ -11,7 +11,7 @@ import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.util.Copiable;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.routing.ExpressionSplitterStrategy;
+import org.mule.runtime.core.routing.ExpressionSplittingStrategy;
 import org.mule.runtime.core.routing.MessageSequence;
 import org.mule.runtime.core.routing.outbound.ArrayMessageSequence;
 import org.mule.runtime.core.routing.outbound.CollectionMessageSequence;
@@ -26,9 +26,13 @@ import org.w3c.dom.NodeList;
 
 public class EventToMessageSequenceSplittingStrategy implements SplittingStrategy<Event, MessageSequence<?>> {
 
-  private ExpressionSplitterStrategy expressionSplitterStrategy;
+  private ExpressionSplittingStrategy expressionSplitterStrategy;
 
-  public EventToMessageSequenceSplittingStrategy(ExpressionSplitterStrategy expressionSplitterStrategy) {
+  /**
+   * @param expressionSplitterStrategy expression splitter strategy to use as default mechanism if there was supported mechanism
+   *        to split the payload
+   */
+  public EventToMessageSequenceSplittingStrategy(ExpressionSplittingStrategy expressionSplitterStrategy) {
     this.expressionSplitterStrategy = expressionSplitterStrategy;
   }
 
@@ -56,7 +60,7 @@ public class EventToMessageSequenceSplittingStrategy implements SplittingStrateg
     } else {
       try {
         // Let's try to split the payload using the expression manager since it may support based on the mimeType.
-        return new CollectionMessageSequence<>(expressionSplitterStrategy.splitMessage(event, "#[payload]"));
+        return new CollectionMessageSequence<>(expressionSplitterStrategy.split(event));
       } catch (Exception e) {
         throw new IllegalArgumentException(CoreMessages
             .objectNotOfCorrectType(payload != null ? payload.getClass() : null,

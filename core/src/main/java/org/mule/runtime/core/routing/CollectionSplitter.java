@@ -27,9 +27,8 @@ public class CollectionSplitter extends AbstractMessageSequenceSplitter implemen
     return this.strategy.split(event);
   }
 
-
   @Override
   public void initialise() throws InitialisationException {
-    strategy = new EventToMessageSequenceSplittingStrategy(new ExpressionSplitterStrategy(muleContext.getExpressionManager()));
+    strategy = new EventToMessageSequenceSplittingStrategy(new ExpressionSplittingStrategy(muleContext.getExpressionManager()));
   }
 }

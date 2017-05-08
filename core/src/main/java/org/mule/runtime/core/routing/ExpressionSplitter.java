@@ -21,7 +21,7 @@ import java.util.List;
 public class ExpressionSplitter extends AbstractSplitter implements Initialisable {
 
   protected ExpressionConfig config = new ExpressionConfig();
-  private ExpressionSplitterStrategy expressionSplitterStrategy;
+  private ExpressionSplittingStrategy expressionSplitterStrategy;
 
   public ExpressionSplitter() {
     // Used by spring
@@ -34,12 +34,12 @@ public class ExpressionSplitter extends AbstractSplitter implements Initialisabl
   @Override
   public void initialise() throws InitialisationException {
     config.validate();
-    expressionSplitterStrategy = new ExpressionSplitterStrategy(muleContext.getExpressionManager());
+    expressionSplitterStrategy = new ExpressionSplittingStrategy(muleContext.getExpressionManager(), config.getFullExpression());
   }
 
   @Override
   protected List<?> splitMessage(Event event) {
-    return expressionSplitterStrategy.splitMessage(event, config.getFullExpression());
+    return expressionSplitterStrategy.split(event);
   }
 
   public String getExpression() {
