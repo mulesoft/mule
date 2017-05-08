@@ -12,9 +12,11 @@
 
     <flow name="customException">
         <processor ref="processor"/>
-        <default-exception-strategy>
-            <test:queue name="out"/>
-        </default-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <test:queue name="out"/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
 </mule>

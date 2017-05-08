@@ -26,18 +26,18 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NON
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createScopeExecutionTemplate;
 import static org.mule.runtime.core.transaction.TransactionTemplateTestUtils.getFailureTransactionCallbackStartsTransaction;
-
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.ErrorHandler;
+import org.mule.runtime.core.exception.ErrorHandlerFactory;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.TransactionCoordination;
@@ -193,16 +193,17 @@ public class TransactionalErrorHandlingExecutionTemplateTestCase extends Transac
 
   private Event configureExceptionListenerCall() {
     final Event mockResultEvent = mock(Event.class, RETURNS_DEEP_STUBS.get());
+    when(mockResultEvent.getError()).thenReturn(empty());
     when(mockMessagingException.getEvent()).thenReturn(mockEvent).thenReturn(mockResultEvent);
     when(mockEvent.getError()).thenReturn(empty());
     when(mockMessagingExceptionHandler.handleException(mockMessagingException, mockEvent)).thenAnswer(invocationOnMock -> {
-      DefaultMessagingExceptionStrategy defaultMessagingExceptionStrategy = new DefaultMessagingExceptionStrategy();
+      ErrorHandler errorHandler = new ErrorHandlerFactory().createDefault();
       when(mockMuleContext.getNotificationManager()).thenReturn(mock(ServerNotificationManager.class));
       when(mockMuleContext.getRegistry()).thenReturn(mock(MuleRegistry.class));
-      defaultMessagingExceptionStrategy.setMuleContext(mockMuleContext);
-      defaultMessagingExceptionStrategy.setFlowConstruct(mockFlow);
-      defaultMessagingExceptionStrategy.handleException((MessagingException) invocationOnMock.getArguments()[0],
-                                                        (Event) invocationOnMock.getArguments()[1]);
+      errorHandler.setMuleContext(mockMuleContext);
+      errorHandler.setFlowConstruct(mockFlow);
+      errorHandler.handleException((MessagingException) invocationOnMock.getArguments()[0],
+                                   (Event) invocationOnMock.getArguments()[1]);
       return mockResultEvent;
     });
     return mockResultEvent;

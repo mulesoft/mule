@@ -280,8 +280,8 @@ public interface MuleContext extends Lifecycle {
   Map<QName, Set<Object>> getConfigurationAnnotations();
 
   /**
-   * @return default exception strategy. If no default exception strategy was configured it returns
-   *         {@link org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy}
+   * @return default exception strategy. If no default error handler was configured it returns one with a catch all
+   * <on-error-propagate> element.
    */
   MessagingExceptionHandler getDefaultErrorHandler();
 

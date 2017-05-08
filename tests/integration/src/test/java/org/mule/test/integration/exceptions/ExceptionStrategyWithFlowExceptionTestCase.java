@@ -6,15 +6,16 @@
  */
 package org.mule.test.integration.exceptions;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import org.mule.functional.junit4.TestLegacyMessageUtils;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
@@ -32,8 +33,8 @@ public class ExceptionStrategyWithFlowExceptionTestCase extends AbstractIntegrat
     MuleClient client = muleContext.getClient();
     Message message = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
 
-    assertNotNull("request returned no message", message);
-    assertTrue(message.getPayload().getValue() instanceof ExceptionMessage);
+    assertThat(message, is(notNullValue()));
+    assertThat(TestLegacyMessageUtils.getExceptionPayload(message), is(notNullValue()));
   }
 
   public static class ExceptionThrower implements Processor {

@@ -26,7 +26,6 @@
             <append-string-transformer message="c" />
         </processor-chain>
         <append-string-transformer message="3" />
-        <default-exception-strategy />
     </flow>
 
     <flow name="flow2">

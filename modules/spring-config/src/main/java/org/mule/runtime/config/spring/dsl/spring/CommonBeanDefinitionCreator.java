@@ -12,7 +12,6 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperty;
 import static org.mule.runtime.api.meta.AnnotatedObject.PROPERTY_NAME;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
-import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.DEFAULT_ES_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FILTER_ELEMENT_SUFFIX;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MESSAGE_FILTER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_IDENTIFIER;
@@ -28,7 +27,6 @@ import static org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionP
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -77,7 +75,6 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
       new ImmutableSet.Builder<ComponentIdentifier>()
           .add(MESSAGE_FILTER_ELEMENT_IDENTIFIER)
           .add(MULE_IDENTIFIER)
-          .add(DEFAULT_ES_ELEMENT_IDENTIFIER)
           .build();
 
   private Set<ComponentIdentifier> genericPropertiesCustomProcessingIdentifiers =

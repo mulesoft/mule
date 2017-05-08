@@ -97,8 +97,8 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
+import org.mule.runtime.core.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.MessagingException;
@@ -869,17 +869,17 @@ public class DefaultMuleContext implements MuleContext {
 
   @Override
   public MessagingExceptionHandler getDefaultErrorHandler() {
-    MessagingExceptionHandler defaultExceptionStrategy;
+    MessagingExceptionHandler defaultErrorHandler;
     if (config.getDefaultErrorHandlerName() != null) {
-      defaultExceptionStrategy = getRegistry().lookupObject(config.getDefaultErrorHandlerName());
-      if (defaultExceptionStrategy == null) {
+      defaultErrorHandler = getRegistry().lookupObject(config.getDefaultErrorHandlerName());
+      if (defaultErrorHandler == null) {
         throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("No global error handler named %s",
                                                                                       config.getDefaultErrorHandlerName())));
       }
     } else {
-      defaultExceptionStrategy = new DefaultMessagingExceptionStrategy(this);
+      defaultErrorHandler = new ErrorHandlerFactory().createDefault();
     }
-    return defaultExceptionStrategy;
+    return defaultErrorHandler;
   }
 
   @Override

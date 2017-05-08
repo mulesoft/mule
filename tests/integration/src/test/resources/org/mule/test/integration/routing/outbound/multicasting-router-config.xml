@@ -12,18 +12,22 @@
             <flow-ref name="handler"/>
             <flow-ref name="handler"/>
         </all>
-        <default-exception-strategy>
-            <test:queue name="errors"/>
-        </default-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <test:queue name="errors"/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
     <flow name="first-successful">
         <first-successful>
             <flow-ref name="handler"/>
         </first-successful>
-        <default-exception-strategy>
-            <test:queue name="errors2"/>
-        </default-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <test:queue name="errors2"/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
     <flow name="handler">

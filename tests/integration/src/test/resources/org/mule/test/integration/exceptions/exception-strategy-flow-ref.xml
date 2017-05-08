@@ -8,20 +8,24 @@
 
     <flow name="exceptionHandlingBlock" processingStrategy="synchronous">
         <flow-ref name="blockWithOwnExceptionStrategy"/>
-        <default-exception-strategy>
-            <processor-chain>
-                <set-property propertyName="mainEs" value="yes"/>
-                <set-property propertyName="flowRefEs" value="#[mel:flowVars.flowRefEs]" />
-                <test:queue name="dlq"/>
-            </processor-chain>
-        </default-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <processor-chain>
+                    <set-property propertyName="mainEs" value="yes"/>
+                    <set-property propertyName="flowRefEs" value="#[mel:flowVars.flowRefEs]" />
+                    <test:queue name="dlq"/>
+                </processor-chain>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
     <flow name="blockWithOwnExceptionStrategy" processingStrategy="synchronous">
         <test:component throwException="true"/>
-        <default-exception-strategy>
-            <set-variable variableName="flowRefEs" value="yes"/>
-        </default-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <set-variable variableName="flowRefEs" value="yes"/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
 </mule>

@@ -99,7 +99,6 @@ import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.el.ExpressionLanguageComponent;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.enricher.MessageEnricher.EnrichExpressionPair;
-import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
@@ -203,8 +202,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerMuleBeanDefinitionParser("import", new ImportMapEntryDefinitionParser("import"));
 
     // Exception Strategies
-    registerBeanDefinitionParser("default-exception-strategy",
-                                 new ExceptionStrategyDefinitionParser(DefaultMessagingExceptionStrategy.class));
     registerBeanDefinitionParser("on-error-continue",
                                  new ExceptionStrategyDefinitionParser(OnErrorContinueHandler.class));
     registerBeanDefinitionParser("on-error-propagate",

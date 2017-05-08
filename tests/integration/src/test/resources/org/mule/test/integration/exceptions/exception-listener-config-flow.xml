@@ -9,9 +9,11 @@
     <flow name="mycomponent">
         <test:component throwException="true"/>
         <test:queue name="component.out"/>
-        <default-exception-strategy>
-            <test:queue name="error.queue"/>
-        </default-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <test:queue name="error.queue"/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
 </mule>
