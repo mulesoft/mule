@@ -7,12 +7,11 @@
 package org.mule.test.config.spring.parsers;
 
 import static org.hamcrest.Matchers.containsString;
-
-import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -20,7 +19,7 @@ import org.junit.rules.ExpectedException;
 /**
  * A stripped-down version of FunctionalTestCase that allows us to test the parsing of a bad configuration.
  */
-public abstract class AbstractBadConfigTestCase extends MuleArtifactFunctionalTestCase {
+public abstract class AbstractBadConfigTestCase extends AbstractIntegrationTestCase {
 
   @Rule
   public ExpectedException expected = ExpectedException.none();

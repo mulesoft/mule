@@ -18,9 +18,6 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import org.junit.Assert;
-import org.junit.Test;
-import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -33,7 +30,7 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultLocationPart;
 import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
-import ru.yandex.qatools.allure.annotations.Description;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,8 +40,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.junit.Assert;
+import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Description;
+
 @Description("Test suite to ensure XML connectors do properly generate the paths")
-public class ModuleComponentPathTestCase extends MuleArtifactFunctionalTestCase {
+public class ModuleComponentPathTestCase extends AbstractIntegrationTestCase {
 
   private static final String COLON_SEPARATOR = ":";
   private static final String MODULE_SIMPLE_XML = "module-simple.xml";

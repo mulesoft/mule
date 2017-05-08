@@ -1,0 +1,22 @@
+{
+  "name": "Scripting Plugin",
+  "minMuleVersion": "4.0.0",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "maven",
+    "attributes": {
+      "exportedPackages": [
+        "org.mule.plugin.scripting.config",
+        "org.mule.plugin.scripting.component",
+        "org.codehaus.groovy.control"
+      ],
+      "exportedResources": [
+        "META-INF/spring.schemas",
+        "META-INF/mule-scripting.xsd"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "maven",
+    "attributes": {}
+  }
+}

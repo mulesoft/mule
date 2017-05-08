@@ -158,8 +158,6 @@
                 <include>org.mule.runtime:mule-module-jbossts</include>
                 <include>org.mule.runtime:mule-module-policy-api</include>
                 <include>org.mule.runtime:mule-module-repository</include>
-                <include>org.mule.runtime:mule-module-scripting</include>
-                <include>org.mule.runtime:mule-module-scripting-jruby</include>
                 <include>org.mule.runtime:mule-module-schedulers</include>
                 <include>org.mule.runtime:mule-module-spring-config</include>
                 <include>org.mule.runtime:mule-module-spring-security</include>
@@ -242,8 +240,6 @@
                 <exclude>org.mule.runtime:mule-module-policy-api</exclude>
                 <exclude>org.mule.runtime:mule-module-reboot</exclude>
                 <exclude>org.mule.runtime:mule-module-repository</exclude>
-                <exclude>org.mule.runtime:mule-module-scripting</exclude>
-                <exclude>org.mule.runtime:mule-module-scripting-jruby</exclude>
                 <exclude>org.mule.runtime:mule-module-schedulers</exclude>
                 <exclude>org.mule.runtime:mule-module-spring-config</exclude>
                 <exclude>org.mule.runtime:mule-module-spring-security</exclude>

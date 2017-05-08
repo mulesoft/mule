@@ -8,15 +8,12 @@ package org.mule.test.integration.messaging.meps;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.functional.functional.FunctionalTestNotificationListener;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.test.AbstractIntegrationTestCase;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("MULE-10184 - ArtifactClassLoaderRunner: groovy issue")
 public class InOnlyTestCase extends AbstractIntegrationTestCase {
 
   public static final long TIMEOUT = 3000;

@@ -13,8 +13,8 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDENCY_INJECTION;
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.ObjectFactoryStory.OBJECT_FACTORY_INECTION_AND_LIFECYCLE;
-import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.test.config.spring.parsers.beans.TestObject;
 import org.mule.test.config.spring.parsers.beans.TestObjectFactory;
 
@@ -24,7 +24,7 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features(LIFECYCLE_AND_DEPENDENCY_INJECTION)
 @Stories(OBJECT_FACTORY_INECTION_AND_LIFECYCLE)
-public class ObjectFactoryTestCase extends MuleArtifactFunctionalTestCase {
+public class ObjectFactoryTestCase extends AbstractIntegrationTestCase {
 
   @Override
   protected String getConfigFile() {
