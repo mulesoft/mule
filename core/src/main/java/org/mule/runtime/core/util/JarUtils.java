@@ -23,7 +23,6 @@ import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -115,7 +114,7 @@ public final class JarUtils {
     Enumeration<JarEntry> entries = jarFile.entries();
     while (entries.hasMoreElements()) {
       JarEntry jarEntry = entries.nextElement();
-      if (!jarEntry.isDirectory() && jarEntry.getName().startsWith(directory + File.separator)) {
+      if (!jarEntry.isDirectory() && jarEntry.getName().startsWith(directory + "/")) {
         urls.add(getUrlWithinJar(file, jarEntry.getName()));
       }
     }

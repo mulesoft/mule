@@ -17,6 +17,7 @@ import static org.mule.runtime.core.util.JarUtils.getUrlsWithinJar;
 import static org.mule.runtime.core.util.JarUtils.loadFileContentFrom;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_POM;
+import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -87,11 +88,11 @@ public class MavenUtils {
       try (InputStream ignored = possibleUrl.openStream()) {
         return possibleUrl;
       } catch (Exception e) {
-        List<URL> jarMavenUrls = getUrlsWithinJar(artifactFile, Paths.get("META-INF", "maven").toString());
+        List<URL> jarMavenUrls = getUrlsWithinJar(artifactFile, META_INF + "/" + "maven");
         Optional<URL> pomUrl = jarMavenUrls.stream().filter(url -> url.toString().endsWith("pom.xml")).findAny();
         if (!pomUrl.isPresent()) {
           throw new ArtifactDescriptorCreateException(format("The identifier '%s' requires the file '%s' within the artifact(error found while reading plugin '%s')",
-                                                             artifactFile.getName()));
+                                                             artifactFile.getName(), "pom.xml", artifactFile.getAbsolutePath()));
         }
         return pomUrl.get();
       }
