@@ -8,14 +8,18 @@ package org.mule.routing;
 
 import static org.mule.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
+import static org.mule.util.Preconditions.checkArgument;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAware;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
@@ -23,6 +27,8 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.context.notification.MuleContextNotification;
+import org.mule.context.notification.NotificationException;
 import org.mule.retry.RetryPolicyExhaustedException;
 import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.queue.objectstore.QueueKey;
@@ -49,7 +55,7 @@ import org.apache.commons.logging.LogFactory;
  * will be routed to the defined dead letter queue route or in case there is no dead letter
  * queue route then it will be handled by the flow exception strategy.
  */
-public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilSuccessfulProcessingStrategy implements Initialisable, Startable, Stoppable, MessagingExceptionHandlerAware
+public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilSuccessfulProcessingStrategy implements Initialisable, Disposable, Startable, Stoppable, MessagingExceptionHandlerAware
 {
 
     private static final Random random = new Random();
@@ -57,6 +63,19 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     private MessagingExceptionHandler messagingExceptionHandler;
     private ExecutorService pool;
     private ScheduledExecutorService scheduledRetriesPool;
+    private MuleContextNotificationListener<MuleContextNotification> contextStartListener;
+    private final MuleContext muleContext;
+
+    /**
+     * Creates a new instance
+     *
+     * @param muleContext the MuleContext for the current Mule artifact. Non null
+     */
+    public AsynchronousUntilSuccessfulProcessingStrategy(MuleContext muleContext)
+    {
+        checkArgument(muleContext != null, "muleContext cannot be null");
+        this.muleContext = muleContext;
+    }
 
     @Override
     public void initialise() throws InitialisationException
@@ -67,6 +86,31 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
                     MessageFactory.createStaticMessage("A ListableObjectStore must be configured on UntilSuccessful."),
                     this);
         }
+
+
+        contextStartListener = new MuleContextNotificationListener<MuleContextNotification>()
+        {
+            @Override
+            public void onNotification(MuleContextNotification notification)
+            {
+                if (notification.getAction() == MuleContextNotification.CONTEXT_STARTED)
+                {
+                    muleContext.unregisterListener(this);
+                    contextStartListener = null;
+
+                    scheduleAllPendingEventsForProcessing();
+                }
+            }
+        };
+
+        try
+        {
+            muleContext.registerListener(contextStartListener);
+        }
+        catch (NotificationException e)
+        {
+            throw new InitialisationException(e, this);
+        }
     }
 
     @Override
@@ -76,8 +120,6 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
                                                   getUntilSuccessfulConfiguration().getFlowConstruct().getName(), "until-successful");
         pool = getUntilSuccessfulConfiguration().getThreadingProfile().createPool(threadPrefix);
         scheduledRetriesPool = getUntilSuccessfulConfiguration().createScheduledRetriesPool(threadPrefix);
-
-        scheduleAllPendingEventsForProcessing();
     }
 
     @Override
@@ -300,4 +342,12 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         this.messagingExceptionHandler = messagingExceptionHandler;
     }
 
+    @Override
+    public void dispose()
+    {
+        if (contextStartListener != null)
+        {
+            muleContext.unregisterListener(contextStartListener);
+        }
+    }
 }
