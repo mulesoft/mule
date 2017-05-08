@@ -12,6 +12,7 @@ import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.IS_CDATA;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
@@ -45,6 +46,7 @@ import org.mule.runtime.api.app.declaration.SourceElementDeclaration;
 import org.mule.runtime.api.app.declaration.TopLevelParameterDeclaration;
 import org.mule.runtime.api.app.declaration.fluent.ParameterListValue;
 import org.mule.runtime.api.app.declaration.fluent.ParameterObjectValue;
+import org.mule.runtime.api.app.declaration.fluent.ParameterSimpleValue;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.NamedObject;
@@ -411,7 +413,8 @@ class DeclarationBasedElementModelFactory {
                 configuredParameters.add(declared.get().getName());
               } else {
                 getDefaultValue(paramModel)
-                    .ifPresent(value -> createSimpleParameter(value, paramDsl, parentConfig, parentElement, paramModel, false));
+                    .ifPresent(value -> createSimpleParameter((ParameterSimpleValue) ParameterSimpleValue.of(value),
+                                                              paramDsl, parentConfig, parentElement, paramModel, false));
               }
             }));
   }
@@ -477,10 +480,10 @@ class DeclarationBasedElementModelFactory {
     value.accept(new ParameterValueVisitor() {
 
       @Override
-      public void visitSimpleValue(String value) {
+      public void visitSimpleValue(ParameterSimpleValue text) {
         checkArgument(paramDsl.supportsAttributeDeclaration() || isContent(parameterModel) || isText(parameterModel),
                       "Simple values can only be declared for parameters of simple type, or those with Content role");
-        createSimpleParameter(value, paramDsl, parentConfig, parentElement, parameterModel, true);
+        createSimpleParameter(text, paramDsl, parentConfig, parentElement, parameterModel, true);
       }
 
       @Override
@@ -550,12 +553,12 @@ class DeclarationBasedElementModelFactory {
               .ifPresent(valueDsl -> value.accept(new ParameterValueVisitor() {
 
                 @Override
-                public void visitSimpleValue(String value) {
-                  entryConfigBuilder.withParameter(VALUE_ATTRIBUTE_NAME, value);
+                public void visitSimpleValue(ParameterSimpleValue text) {
+                  entryConfigBuilder.withParameter(VALUE_ATTRIBUTE_NAME, text.getValue());
                   entryElement.containing(DslElementModel.builder()
                       .withModel(valueType)
                       .withDsl(valueDsl)
-                      .withValue(value)
+                      .withValue(text.getValue())
                       .build());
                 }
 
@@ -633,22 +636,24 @@ class DeclarationBasedElementModelFactory {
     parentElement.containing(wrapperElement.withConfig(result).build());
   }
 
-  private void createSimpleParameter(String value, DslElementSyntax paramDsl, ComponentConfiguration.Builder parentConfig,
+  private void createSimpleParameter(ParameterSimpleValue value, DslElementSyntax paramDsl,
+                                     ComponentConfiguration.Builder parentConfig,
                                      DslElementModel.Builder parentElement, ParameterModel parameterModel, boolean explicit) {
     if (paramDsl.supportsAttributeDeclaration()) {
       // attribute parameters imply no further nesting in the configs
-      parentConfig.withParameter(paramDsl.getAttributeName(), value);
+      parentConfig.withParameter(paramDsl.getAttributeName(), value.getValue());
       parentElement.containing(DslElementModel.<ParameterModel>builder()
           .withModel(parameterModel)
           .withDsl(paramDsl)
-          .withValue(value)
+          .withValue(value.getValue())
           .isExplicitInDsl(explicit)
           .build());
     } else {
-      // we are in the content case, so we have one more nesting level
+      // we are in the text or content case, so we have one more nesting level
       ComponentConfiguration parameterConfig = ComponentConfiguration.builder()
           .withIdentifier(asIdentifier(paramDsl))
-          .withValue(value)
+          .withValue(value.getValue())
+          .withProperty(IS_CDATA, value.isCData() ? true : null)
           .build();
 
       parentConfig.withNestedComponent(parameterConfig);
@@ -657,6 +662,7 @@ class DeclarationBasedElementModelFactory {
           .withDsl(paramDsl)
           .withConfig(parameterConfig)
           .isExplicitInDsl(explicit)
+          .withValue(value.getValue())
           .build());
     }
   }
@@ -678,12 +684,12 @@ class DeclarationBasedElementModelFactory {
     itemValue.accept(new ParameterValueVisitor() {
 
       @Override
-      public void visitSimpleValue(String value) {
+      public void visitSimpleValue(ParameterSimpleValue text) {
         itemDsl.getContainedElement(VALUE_ATTRIBUTE_NAME)
             .ifPresent(valueDsl -> {
               ComponentConfiguration item = ComponentConfiguration.builder()
                   .withIdentifier(asIdentifier(itemDsl))
-                  .withParameter(VALUE_ATTRIBUTE_NAME, value)
+                  .withParameter(VALUE_ATTRIBUTE_NAME, text.getValue())
                   .build();
 
               parentConfig.withNestedComponent(item);
@@ -694,7 +700,7 @@ class DeclarationBasedElementModelFactory {
                   .containing(DslElementModel.builder()
                       .withModel(itemValueType)
                       .withDsl(valueDsl)
-                      .withValue(value)
+                      .withValue(text.getValue())
                       .build())
                   .build());
             });
@@ -745,18 +751,19 @@ class DeclarationBasedElementModelFactory {
     fieldValue.accept(new ParameterValueVisitor() {
 
       @Override
-      public void visitSimpleValue(String value) {
+      public void visitSimpleValue(ParameterSimpleValue text) {
         if (fieldDsl.supportsAttributeDeclaration()) {
-          objectConfig.withParameter(fieldDsl.getAttributeName(), value);
+          objectConfig.withParameter(fieldDsl.getAttributeName(), text.getValue());
           objectElement.containing(DslElementModel.builder()
               .withModel(fieldType)
               .withDsl(fieldDsl)
-              .withValue(value)
+              .withValue(text.getValue())
               .build());
         } else {
           ComponentConfiguration contentConfiguration = ComponentConfiguration.builder()
               .withIdentifier(asIdentifier(fieldDsl))
-              .withValue(value)
+              .withValue(text.getValue())
+              .withProperty(IS_CDATA, text.isCData() ? true : null)
               .build();
 
           objectConfig.withNestedComponent(contentConfiguration);
@@ -764,6 +771,7 @@ class DeclarationBasedElementModelFactory {
               .withModel(fieldType)
               .withDsl(fieldDsl)
               .withConfig(contentConfiguration)
+              .withValue(text.getValue())
               .build());
         }
       }

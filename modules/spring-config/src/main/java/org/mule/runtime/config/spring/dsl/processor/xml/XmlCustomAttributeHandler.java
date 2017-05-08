@@ -18,6 +18,7 @@ import org.w3c.dom.Node;
  */
 public class XmlCustomAttributeHandler {
 
+  public static final String IS_CDATA = "IS_CDATA";
   public static final String DECLARED_PREFIX = "DECLARED_PREFIX";
   public static final String NAMESPACE_URI = "NAMESPACE_URI";
   public static final String XML_NODE = "XML_NODE";

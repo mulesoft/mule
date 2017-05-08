@@ -30,6 +30,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import org.mule.runtime.api.app.declaration.ParameterValue;
 import org.mule.runtime.api.app.declaration.ParameterValueVisitor;
 import org.mule.runtime.api.app.declaration.fluent.ParameterObjectValue;
+import org.mule.runtime.api.app.declaration.fluent.ParameterSimpleValue;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.config.spring.dsl.model.DslElementModel;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
@@ -88,12 +89,12 @@ class InfrastructureElementModelDelegate {
         value.accept(new ParameterValueVisitor() {
 
           @Override
-          public void visitSimpleValue(String value) {
-            parentConfig.withParameter(parameterName, value);
+          public void visitSimpleValue(ParameterSimpleValue text) {
+            parentConfig.withParameter(parameterName, text.getValue());
             parentElement.containing(DslElementModel.builder()
                 .withModel(parameterModel)
                 .withDsl(paramDsl)
-                .withValue(value)
+                .withValue(text.getValue()) //FIXME
                 .build());
           }
         });
@@ -109,8 +110,8 @@ class InfrastructureElementModelDelegate {
     value.accept(new ParameterValueVisitor() {
 
       @Override
-      public void visitSimpleValue(String value) {
-        parentConfig.withParameter(TLS_PARAMETER_NAME, value);
+      public void visitSimpleValue(ParameterSimpleValue text) {
+        parentConfig.withParameter(TLS_PARAMETER_NAME, text.getValue());
         parentElement.containing(DslElementModel.builder()
             .withModel(parameterModel)
             .withDsl(paramDsl)
@@ -130,8 +131,8 @@ class InfrastructureElementModelDelegate {
             .forEach((name, value) -> value.accept(new ParameterValueVisitor() {
 
               @Override
-              public void visitSimpleValue(String value) {
-                tlsConfig.withParameter(name, value);
+              public void visitSimpleValue(ParameterSimpleValue text) {
+                tlsConfig.withParameter(name, text.getValue());
               }
 
               @Override
@@ -213,8 +214,8 @@ class InfrastructureElementModelDelegate {
         .forEach((name, value) -> value.accept(new ParameterValueVisitor() {
 
           @Override
-          public void visitSimpleValue(String value) {
-            redeliveryConfig.withParameter(name, value);
+          public void visitSimpleValue(ParameterSimpleValue text) {
+            redeliveryConfig.withParameter(name, text.getValue());
           }
 
         }));

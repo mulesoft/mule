@@ -13,8 +13,11 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newFlow;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newObjectValue;
+import static org.mule.runtime.api.app.declaration.fluent.ParameterSimpleValue.cdata;
+import static org.mule.runtime.api.app.declaration.fluent.ParameterSimpleValue.plain;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
+import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.IS_CDATA;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.mule.runtime.extension.api.ExtensionConstants.DISABLE_CONNECTION_VALIDATION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
@@ -450,9 +453,19 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
     // add DW script text content to script parameter
     if (groupConfig.getTextContent() != null) {
-      objectBuilder.withParameter(SCRIPT, ParameterSimpleValue.of(groupConfig.getTextContent()));
+      ParameterValue value;
+      if (isCData(groupConfig)) {
+        value = plain(groupConfig.getTextContent());
+      } else {
+        value = cdata(groupConfig.getTextContent());
+      }
+      objectBuilder.withParameter(SCRIPT, value);
     }
     return objectBuilder;
+  }
+
+  private boolean isCData(ConfigLine config) {
+    return config.getCustomAttributes().get(IS_CDATA) != null;
   }
 
   private Optional<RouteElementDeclaration> declareRoute(RouteModel model, DslElementSyntax elementDsl, ConfigLine line,
@@ -548,7 +561,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
       @Override
       protected void defaultVisit(MetadataType metadataType) {
         if (config.getTextContent() != null) {
-          valueConsumer.accept(ParameterSimpleValue.of(config.getTextContent()));
+          valueConsumer.accept(isCData(config) ? cdata(config.getTextContent()) : plain(config.getTextContent()));
         }
       }
 
