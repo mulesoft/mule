@@ -158,6 +158,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     assertTrue(results.contains(orange));
   }
 
+  @Ignore("MULE-12407")
   @Test
   public void testSplitNoParts() throws Exception {
     String MESSAGE = "<Order></Order>";

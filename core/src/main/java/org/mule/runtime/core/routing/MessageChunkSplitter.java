@@ -39,7 +39,7 @@ public class MessageChunkSplitter extends AbstractSplitter {
   }
 
   @Override
-  protected List<Event> splitMessage(Event event) throws RoutingException {
+  protected List<?> splitMessage(Event event) throws RoutingException {
     List<Event> messageParts = new ArrayList<>();
     byte[] data;
     try {

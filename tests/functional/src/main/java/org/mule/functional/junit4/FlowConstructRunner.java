@@ -9,9 +9,9 @@ package org.mule.functional.junit4;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.fail;
-
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -180,6 +180,20 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    */
   public R withVariable(String key, Object value) {
     eventBuilder.withVariable(key, value);
+
+    return (R) this;
+  }
+
+  /**
+   * Prepares a flow variable with the given key and value to be set in the {@link Message} to the configured flow.
+   *
+   * @param key the key of the flow variable to put
+   * @param value the value of the flow variable to put
+   * @param dataType the value data type
+   * @return this {@link FlowRunner}
+   */
+  public R withVariable(String key, Object value, DataType dataType) {
+    eventBuilder.withVariable(key, value, dataType);
 
     return (R) this;
   }

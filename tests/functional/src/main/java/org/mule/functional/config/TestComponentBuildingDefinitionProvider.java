@@ -12,6 +12,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromTextContent;
+import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToClassConverter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import org.mule.functional.client.QueueWriterMessageProcessor;
@@ -52,6 +53,15 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIdentifier("queue")
         .withTypeDefinition(fromType(QueueWriterMessageProcessor.class))
         .withSetterParameterDefinition("name", fromSimpleParameter("name").build())
+        .withSetterParameterDefinition("content", fromChildConfiguration(String.class).build())
+        .withSetterParameterDefinition("contentJavaType",
+                                       fromSimpleParameter("contentJavaType", stringToClassConverter())
+                                           .build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy()
+        .withIdentifier("content")
+        .withTypeDefinition(fromType(String.class))
         .build());
 
     ComponentBuildingDefinition.Builder baseComponentDefinition = baseDefinition.copy()

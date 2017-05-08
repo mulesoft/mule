@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.routing;
 
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.runtime.core.util.collection.EventToMessageSequenceSplittingStrategy;
@@ -17,11 +19,17 @@ import org.mule.runtime.core.util.collection.SplittingStrategy;
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http ://www.eaipatterns.com/Sequencer.html</a>
  */
-public class CollectionSplitter extends AbstractMessageSequenceSplitter {
+public class CollectionSplitter extends AbstractMessageSequenceSplitter implements Initialisable {
 
-  private SplittingStrategy<Event, MessageSequence<?>> strategy = new EventToMessageSequenceSplittingStrategy();
+  private SplittingStrategy<Event, MessageSequence<?>> strategy;
 
   protected MessageSequence<?> splitMessageIntoSequence(Event event) {
     return this.strategy.split(event);
+  }
+
+
+  @Override
+  public void initialise() throws InitialisationException {
+    strategy = new EventToMessageSequenceSplittingStrategy(new ExpressionSplitterStrategy(muleContext.getExpressionManager()));
   }
 }
