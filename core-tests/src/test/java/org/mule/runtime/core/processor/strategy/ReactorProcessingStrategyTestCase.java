@@ -64,7 +64,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
       + " cpu light threads.")
   public void singleCpuLightConcurrent() throws Exception {
     super.singleCpuLightConcurrent();
-    assertThat(threads.size(), between(1, 2));
+    assertThat(threads, hasSize(between(1, 2)));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), between(1l, 2l));
     assertThat(threads, not(hasItem(startsWith(IO))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
