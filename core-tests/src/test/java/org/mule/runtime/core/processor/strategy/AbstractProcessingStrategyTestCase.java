@@ -10,10 +10,14 @@ import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.ASYNC;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
@@ -50,6 +54,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -91,9 +96,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
   protected Processor asyncProcessor = new ThreadTrackingProcessor() {
 
     @Override
-    public Publisher<Event> apply(Publisher<Event> publisher) {
-      return from(publisher).transform(processorPublisher -> super.apply(processorPublisher))
-          .publishOn(fromExecutorService(custom));
+    public ProcessingType getProcessingType() {
+      return ASYNC;
     }
   };
 
@@ -138,7 +142,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     cpuLight = new TestScheduler(3, CPU_LIGHT);
     blocking = new TestScheduler(3, IO);
     cpuIntensive = new TestScheduler(3, CPU_INTENSIVE);
-    custom = new TestScheduler(10, CUSTOM);
+    custom = new TestScheduler(1, CUSTOM);
     asyncExecutor = muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
 
     flow = builder("test", muleContext)
@@ -278,6 +282,33 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
     process(flow, testEvent());
   }
+
+  @Test
+  public void asyncCpuLightConcurrent() throws Exception {
+    internalAsyncCpuLightConcurrent(false);
+  }
+
+  protected void internalAsyncCpuLightConcurrent(boolean blocks) throws MuleException, InterruptedException {
+    FirstInvocationLatchedProcessor latchedProcessor = new FirstInvocationLatchedProcessor(CPU_LITE);
+
+    flow.setMessageProcessors(asList(asyncProcessor, latchedProcessor));
+    flow.initialise();
+    flow.start();
+
+    asyncExecutor.submit(() -> process(flow, newEvent()));
+
+    latchedProcessor.getFirstCalledLatch().await();
+
+    asyncExecutor.submit(() -> process(flow, newEvent()));
+    assertThat(latchedProcessor.getSecondCalledLatch().await(BLOCK_TIMEOUT, MILLISECONDS), is(!blocks));
+
+    latchedProcessor.releaseFirst();
+
+    if (blocks) {
+      assertThat(latchedProcessor.getSecondCalledLatch().await(BLOCK_TIMEOUT, MILLISECONDS), is(true));
+    }
+  }
+
 
   @Test
   public void stream() throws Exception {
@@ -449,5 +480,23 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
       return event;
     }
 
+    @Override
+    public Publisher<Event> apply(Publisher<Event> publisher) {
+      if (getProcessingType() == ASYNC) {
+        return from(publisher).transform(processorPublisher -> Processor.super.apply(publisher))
+            .publishOn(fromExecutorService(custom));
+      } else {
+        return Processor.super.apply(publisher);
+      }
+    }
+
+  }
+
+  public static Matcher<Integer> between(int min, int max) {
+    return allOf(greaterThanOrEqualTo(min), lessThanOrEqualTo(max));
+  }
+
+  public static Matcher<Long> between(long min, long max) {
+    return allOf(greaterThanOrEqualTo(min), lessThanOrEqualTo(max));
   }
 }

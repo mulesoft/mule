@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.ASYNC;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -97,6 +98,15 @@ public class WorkQueueProcessingStrategyFactory extends AbstractRingBufferProces
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
       return publisher -> from(publisher)
           .flatMap(event -> just(event).transform(pipeline).subscribeOn(fromExecutorService(ioScheduler)), concurrency);
+    }
+
+    @Override
+    public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
+      if (processor.getProcessingType() == ASYNC) {
+        return publisher -> from(publisher).transform(processor).publishOn(fromExecutorService(ioScheduler));
+      } else {
+        return super.onProcessor(processor);
+      }
     }
 
     @Override

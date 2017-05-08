@@ -18,6 +18,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.ASYNC;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
@@ -303,7 +305,14 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
 
   @Override
   public ProcessingType getProcessingType() {
-    return asProcessingType(operationModel.getExecutionType());
+    ProcessingType processingType = asProcessingType(operationModel.getExecutionType());
+    if (processingType == CPU_LITE && !operationModel.isBlocking()) {
+      // If processing type is CPU_LITE and operation is non-blocking then use ASYNC processing type so that the Flow can return
+      // processing to a Flow thread.
+      return ASYNC;
+    } else {
+      return processingType;
+    }
   }
 
   @Override

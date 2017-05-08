@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
@@ -18,7 +19,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 
@@ -147,14 +147,27 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   }
 
   @Override
-  @Description("When the ReactorProcessingStrategy is configured and a transaction is active processing fails with an error")
+  @Description("When the WorkQueueProcessingStrategy is configured any async processing will be returned to IO thread. "
+      + "This helps avoid deadlocks when there are reduced number of threads used by async processor.")
   public void asyncCpuLight() throws Exception {
     super.asyncCpuLight();
-    assertThat(threads, hasSize(2));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
+    assertThat(threads.size(), between(1, 2));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), between(1l, 2l));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(0l));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CUSTOM)).count(), equalTo(1l));
+    assertThat(threads.stream().filter(name -> name.startsWith(CUSTOM)).count(), equalTo(0l));
+  }
+
+  @Override
+  @Description("When the WorkQueueProcessingStrategy is configured any async processing will be returned to IO thread. "
+      + "This helps avoid deadlocks when there are reduced number of threads used by async processor.")
+  public void asyncCpuLightConcurrent() throws Exception {
+    super.asyncCpuLightConcurrent();
+    assertThat(threads.size(), between(2, 3));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(0l));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), between(2l, 3l));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
+    assertThat(threads.stream().filter(name -> name.startsWith(CUSTOM)).count(), equalTo(0l));
   }
 
   private void assertSynchronousIOScheduler(int concurrency) {

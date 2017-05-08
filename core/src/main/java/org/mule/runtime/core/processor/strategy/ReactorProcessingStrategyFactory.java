@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.ASYNC;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
@@ -82,6 +83,16 @@ public class ReactorProcessingStrategyFactory extends AbstractRingBufferProcessi
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
       return publisher -> from(publisher).publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)))
           .transform(pipeline);
+    }
+
+    @Override
+    public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
+      if (processor.getProcessingType() == ASYNC) {
+        return publisher -> from(publisher).transform(processor)
+            .publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)));
+      } else {
+        return super.onProcessor(processor);
+      }
     }
 
     protected ExecutorService getExecutorService(Scheduler scheduler) {

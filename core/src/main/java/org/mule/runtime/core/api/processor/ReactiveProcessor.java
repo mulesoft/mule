@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.processor;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
@@ -50,17 +51,25 @@ public interface ReactiveProcessor extends Function<Publisher<Event>, Publisher<
     CPU_LITE,
 
     /**
-     * Blocking processing that use {@link Thread#sleep(long)}, {@link Lock#lock()} or any other technique to block
-     * the current thread during processing.
+     * Blocking processing that use {@link Thread#sleep(long)}, {@link Lock#lock()} or any other technique to block the current
+     * thread during processing.
      */
     BLOCKING,
 
     /**
-     * Blocking IO read/write operations. This is treated separately to {@link #BLOCKING} to allow for potential optimizations when
-     * IO is fast and/or message sizes smalls.
+     * Blocking IO read/write operations. This is treated separately to {@link #BLOCKING} to allow for potential optimizations
+     * when IO is fast and/or message sizes smalls.
      */
-    IO_RW
+    IO_RW,
 
+    /**
+     * Denotes a processor that is {@link #CPU_LITE} but is also asynchronous and uses another thread to continue processing.
+     * <p/>
+     * <b>NOTE:</b> This processing type is primarily for extension operations and custom components where the callback thread
+     * used is a custom or connector thread. Mule routers that by design use multiple {@link SchedulerService#cpuLightScheduler()}
+     * threads to implement the desired functionality should not be considered {@link #ASYNC}.
+     */
+    ASYNC
   }
 
 }
