@@ -86,7 +86,15 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
@@ -166,16 +174,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
-
 @RunWith(Parameterized.class)
 public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
@@ -213,8 +211,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Object[]> parameters() {
     return asList(new Object[][] {
-        {false},
-        {true}
+        {false}/*,
+               {true}*/
     });
   }
 
@@ -1733,9 +1731,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   private ArtifactPluginFileBuilder getByeXmlPlugin() {
-    String moduleFileName = "module-bye.xml";
+    final String prefixModuleName = "module-bye";
     String extensionName = "bye-extension";
-    String moduleDestination = "org/mule/module/" + moduleFileName;
+    final String resources = "org/mule/module/";
+    String moduleDestination = resources + prefixModuleName + ".xml";
     MulePluginModelBuilder builder = new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
     builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
                                                                                                   moduleDestination);
@@ -1744,6 +1743,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     return new ArtifactPluginFileBuilder(extensionName)
         .containingResource("module-byeSource.xml", moduleDestination)
+        .containingResource("module-using-bye-catalogSource.xml", resources + prefixModuleName + "-catalog.xml")
+        .containingResource("module-bye-type-schemaSource.json", resources + "type1-schema.json")
+        .containingResource("module-bye-type-schemaSource.json", resources + "inner/folder/type2-schema.json")
+        .containingResource("module-bye-type-schemaSource.json", "org/mule/type3-schema.json")
         .describedBy(builder.build());
   }
 

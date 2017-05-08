@@ -16,4 +16,18 @@
         <output type="string"/>
     </operation>
 
+    <operation name="custom-type-op">
+        <!-- dummy operation to assert that on deployment, JAR plugins are properly read when discovering types -->
+        <parameters>
+            <parameter name="customParameter1" type="Type_same_folder"/>
+            <parameter name="customParameter2" type="Type_sub_folder"/>
+            <parameter name="customParameter3" type="Type_upper_folder"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="bye bye"/>
+        </body>
+        <output type="void"/>
+    </operation>
+
+
 </module>
