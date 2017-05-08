@@ -100,7 +100,7 @@ public class ResolverSetResult {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof HashableResolverSetResult) {
+    if (obj instanceof HashedResolverSetResult) {
       ResolverSetResult other = (ResolverSetResult) obj;
       return evaluationResult.entrySet()
           .stream()

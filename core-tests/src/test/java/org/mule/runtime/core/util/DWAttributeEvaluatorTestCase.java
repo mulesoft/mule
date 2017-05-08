@@ -11,7 +11,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
@@ -27,13 +30,14 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.el.DefaultExpressionManager;
-import org.mule.runtime.core.internal.streaming.DefaultStreamingManager;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.InputStream;
@@ -51,10 +55,12 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   private Event mockMuleEvent = mock(Event.class);
   private DefaultExpressionManager expressionManager;
 
+  @Mock
+  private StreamingManager streamingManager;
+
   @Before
   public void setUp() throws RegistrationException {
-    DefaultStreamingManager streamingManager = new DefaultStreamingManager();
-    initialiseObject(streamingManager);
+    when(streamingManager.manage(any(CursorProvider.class), any(Event.class))).then(returnsFirstArg());
     expressionManager = new DefaultExpressionManager(muleContext, streamingManager);
   }
 

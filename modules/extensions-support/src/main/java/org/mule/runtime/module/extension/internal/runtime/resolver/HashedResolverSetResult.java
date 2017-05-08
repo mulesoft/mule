@@ -21,13 +21,13 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class HashableResolverSetResult extends ResolverSetResult {
+public class HashedResolverSetResult extends ResolverSetResult {
 
   private int hashCode;
 
   /**
-   * A builder for creating instances of {@link HashableResolverSetResult}. You should use a new builder for each
-   * {@link HashableResolverSetResult} you want to create
+   * A builder for creating instances of {@link HashedResolverSetResult}. You should use a new builder for each
+   * {@link HashedResolverSetResult} you want to create
    *
    * @since 4.0
    */
@@ -53,7 +53,7 @@ public class HashableResolverSetResult extends ResolverSetResult {
      */
     @Override
     public ResolverSetResult build() {
-      return new HashableResolverSetResult(unmodifiableMap(values), hashCode);
+      return new HashedResolverSetResult(unmodifiableMap(values), hashCode);
     }
   }
 
@@ -61,7 +61,7 @@ public class HashableResolverSetResult extends ResolverSetResult {
     return new Builder();
   }
 
-  private HashableResolverSetResult(Map<String, Object> evaluationResult, int hashCode) {
+  private HashedResolverSetResult(Map<String, Object> evaluationResult, int hashCode) {
     super(evaluationResult);
     this.hashCode = hashCode;
   }

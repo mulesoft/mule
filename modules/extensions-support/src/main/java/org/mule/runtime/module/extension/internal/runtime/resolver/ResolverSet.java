@@ -90,22 +90,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
    */
   @Override
   public ResolverSetResult resolve(Event event) throws MuleException {
-    return resolve(event, false);
-  }
-
-  /**
-   * Evaluates all the added {@link ValueResolver}s and returns the results into a {@link ResolverSetResult}
-   *
-   * @param event a not {@code null} {@link Event}
-   * @param hashable indicates if the created {@link ResolverSetResult} supports to be compared by the hash of their
-   *                 components
-   * @return a {@link ResolverSetResult}
-   * @throws MuleException if an error occurs creating the {@link ResolverSetResult}
-   */
-  public ResolverSetResult resolve(Event event, boolean hashable) throws MuleException {
-    ResolverSetResult.Builder builder = hashable
-        ? HashableResolverSetResult.newBuilder()
-        : ResolverSetResult.newBuilder();
+    ResolverSetResult.Builder builder = getResolverSetBuilder();
 
     for (Map.Entry<String, ValueResolver> entry : resolvers.entrySet()) {
       builder.add(entry.getKey(), resolveValue(entry.getValue(), event));
@@ -150,5 +135,9 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  ResolverSetResult.Builder getResolverSetBuilder() {
+    return ResolverSetResult.newBuilder();
   }
 }

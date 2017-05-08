@@ -69,7 +69,7 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
    */
   @Override
   public T build(Event event) throws MuleException {
-    return build(resolverSet.resolve(event, true));
+    return build(resolverSet.resolve(event));
   }
 
   public T build(ResolverSetResult result) throws MuleException {

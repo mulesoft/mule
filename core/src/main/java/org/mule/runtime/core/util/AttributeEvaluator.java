@@ -34,7 +34,7 @@ public class AttributeEvaluator {
 
   private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = Pattern.compile("^#\\[(?:(?!#\\[).)*]$", DOTALL);
   private static final BindingContext NULL_BINDING_CONTEXT = BindingContext.builder().build();
-  private static final List<Class<?>> blackListTypes = Arrays.asList(Object.class, InputStream.class);
+  private static final List<Class<?>> BLACK_LIST_TYPES = Arrays.asList(Object.class, InputStream.class);
   public static final DataType INTEGER = DataType.fromType(Integer.class);
   private String attributeValue;
   private ExtendedExpressionManager expressionManager;
@@ -77,17 +77,17 @@ public class AttributeEvaluator {
   }
 
   private void configureStaticAttribute() {
-    parseResolver = (event -> this.attributeValue);
-    expressionResolver = (event -> new TypedValue<>(this.attributeValue, this.attributeValue == null ? OBJECT : STRING));
+    parseResolver = event -> this.attributeValue;
+    expressionResolver = event -> new TypedValue<>(this.attributeValue, this.attributeValue == null ? OBJECT : STRING);
   }
 
   private void configureParseAttribute() {
-    parseResolver = (event -> expressionManager.parse(this.attributeValue, event, null));
-    expressionResolver = (event -> new TypedValue<>(parseResolver.apply(event), STRING));
+    parseResolver = event -> expressionManager.parse(this.attributeValue, event, null);
+    expressionResolver = event -> new TypedValue<>(parseResolver.apply(event), STRING);
   }
 
   private void configureExpressionAttribute(DataType expectedDataType) {
-    expressionResolver = expectedDataType != null && !blackListTypes.contains(expectedDataType.getType())
+    expressionResolver = expectedDataType != null && !BLACK_LIST_TYPES.contains(expectedDataType.getType())
         ? event -> expressionManager.evaluate(this.attributeValue, expectedDataType, NULL_BINDING_CONTEXT, event)
         : event -> expressionManager.evaluate(this.attributeValue, event);
   }

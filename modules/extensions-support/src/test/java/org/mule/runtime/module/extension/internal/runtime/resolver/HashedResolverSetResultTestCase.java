@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class HashableResolverSetResultTestCase extends AbstractMuleTestCase {
+public class HashedResolverSetResultTestCase extends AbstractMuleTestCase {
 
   private static final String NAME = "MG";
   private static final int AGE = 31;
@@ -97,7 +97,7 @@ public class HashableResolverSetResultTestCase extends AbstractMuleTestCase {
   }
 
   private ResolverSetResult.Builder getBuilder() {
-    return HashableResolverSetResult.newBuilder().add(nameParameterModel.getName(), NAME).add(ageParameterModel.getName(), AGE)
+    return HashedResolverSetResult.newBuilder().add(nameParameterModel.getName(), NAME).add(ageParameterModel.getName(), AGE)
         .add(healthParameterModel.getName(), HEALTH);
   }
 }

@@ -162,7 +162,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   private TypedValue transform(TypedValue target, DataType sourceType, DataType outputType) throws TransformerException {
-    if (!isInstance(outputType.getType(), target.getValue()) && target.getValue() != null) {
+    if (target.getValue() != null && !isInstance(outputType.getType(), target.getValue())) {
       Object result = muleContext.getRegistry().lookupTransformer(sourceType, outputType).transform(target.getValue());
       return new TypedValue<>(result, outputType);
     } else {

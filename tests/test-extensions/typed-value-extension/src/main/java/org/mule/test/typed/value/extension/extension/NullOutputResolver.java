@@ -12,6 +12,9 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
+/**
+ * Dummy resolver for operations that returns {@link Object}
+ */
 public class NullOutputResolver implements OutputTypeResolver {
 
   @Override

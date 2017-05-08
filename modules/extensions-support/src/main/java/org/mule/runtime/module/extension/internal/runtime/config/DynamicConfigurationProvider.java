@@ -107,10 +107,10 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   @Override
   public ConfigurationInstance get(Object event) {
     return withContextClassLoader(getExtensionClassLoader(), () -> {
-      ResolverSetResult result = resolverSet.resolve((Event) event, true);
+      ResolverSetResult result = resolverSet.resolve((Event) event);
       ResolverSetResult providerResult = null;
       if (connectionProviderResolver.getResolverSet().isPresent()) {
-        providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve((Event) event, true);
+        providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve((Event) event);
       }
       return getConfiguration(new Pair<>(result, providerResult), (Event) event);
     });

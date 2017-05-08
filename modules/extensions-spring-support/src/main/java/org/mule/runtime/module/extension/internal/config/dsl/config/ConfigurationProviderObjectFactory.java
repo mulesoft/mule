@@ -75,7 +75,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   }
 
   private ConfigurationProvider createInnerInstance() throws ConfigurationException {
-    ResolverSet resolverSet = parametersResolver.getParametersAsResolverSet(configurationModel, muleContext);
+    ResolverSet resolverSet = parametersResolver.getParametersAsHashedResolverSet(configurationModel, muleContext);
     final ConnectionProviderValueResolver connectionProviderResolver = getConnectionProviderResolver();
     connectionProviderResolver.getResolverSet()
         .ifPresent((CheckedConsumer) resolver -> initialiseIfNeeded(resolver, true, muleContext));
