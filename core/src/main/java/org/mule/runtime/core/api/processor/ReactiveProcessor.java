@@ -67,9 +67,9 @@ public interface ReactiveProcessor extends Function<Publisher<Event>, Publisher<
      * <p/>
      * <b>NOTE:</b> This processing type is primarily for extension operations and custom components where the callback thread
      * used is a custom or connector thread. Mule routers that by design use multiple {@link SchedulerService#cpuLightScheduler()}
-     * threads to implement the desired functionality should not be considered {@link #ASYNC}.
+     * threads to implement the desired functionality should not be considered {@link #CPU_LITE_ASYNC}.
      */
-    ASYNC
+    CPU_LITE_ASYNC
   }
 
 }

@@ -17,9 +17,9 @@ import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.construct.Flow.builder;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.ASYNC;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.Exceptions.bubble;
 import static reactor.core.publisher.Flux.from;
@@ -97,7 +97,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
     @Override
     public ProcessingType getProcessingType() {
-      return ASYNC;
+      return CPU_LITE_ASYNC;
     }
   };
 
@@ -482,7 +482,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
     @Override
     public Publisher<Event> apply(Publisher<Event> publisher) {
-      if (getProcessingType() == ASYNC) {
+      if (getProcessingType() == CPU_LITE_ASYNC) {
         return from(publisher).transform(processorPublisher -> Processor.super.apply(publisher))
             .publishOn(fromExecutorService(custom));
       } else {

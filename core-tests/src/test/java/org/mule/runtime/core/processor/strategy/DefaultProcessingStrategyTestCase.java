@@ -6,15 +6,18 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static java.lang.Integer.MAX_VALUE;
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
-import static java.lang.Integer.MAX_VALUE;
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -63,9 +66,10 @@ public class DefaultProcessingStrategyTestCase extends ProactorProcessingStrateg
     process(flow, testEvent());
 
     assertThat(threads.size(), equalTo(1));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
 }

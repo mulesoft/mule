@@ -6,21 +6,23 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static org.hamcrest.Matchers.hasSize;
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.WORK_QUEUE;
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -153,9 +155,9 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     super.asyncCpuLight();
     assertThat(threads.size(), between(1, 2));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), between(1l, 2l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CUSTOM)).count(), equalTo(0l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Override
@@ -164,17 +166,18 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   public void asyncCpuLightConcurrent() throws Exception {
     super.asyncCpuLightConcurrent();
     assertThat(threads.size(), between(2, 3));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(0l));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), between(2l, 3l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CUSTOM)).count(), equalTo(0l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   private void assertSynchronousIOScheduler(int concurrency) {
     assertThat(threads.size(), equalTo(concurrency));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo((long) concurrency));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
 }
