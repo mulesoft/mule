@@ -1,2 +1,0 @@
-def echo2(text) {text}
-def echo(text) {text+'OTHER'}

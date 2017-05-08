@@ -1,3 +1,0 @@
-<ns2:echoResponse xmlns:ns2="http://service.ws.extension.mule.org/">
-    <text>test response</text>
-</ns2:echoResponse>
