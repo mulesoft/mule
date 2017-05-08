@@ -6,6 +6,7 @@
  */
 package org.mule.plugin.scripting;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -18,7 +19,6 @@ import java.util.List;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
-import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
@@ -65,7 +65,7 @@ public class ScriptEnginePresenceTestCase extends AbstractMuleTestCase {
     for (ScriptEngineFactory scriptEngineFactory : engineFactories) {
       scriptEngineFactory.getScriptEngine();
     }
-    assertThat(engineFactories, CoreMatchers.hasItem(new TypeSafeMatcher<ScriptEngineFactory>() {
+    assertThat(engineFactories, hasItem(new TypeSafeMatcher<ScriptEngineFactory>() {
 
       @Override
       public void describeTo(Description description) {

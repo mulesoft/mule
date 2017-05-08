@@ -6,11 +6,11 @@
  */
 package org.mule.test.plugin.scripting;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -23,42 +23,39 @@ public class GroovyScriptServiceFunctionalTestCase extends AbstractScriptingFunc
 
   @Test
   public void testInlineScript() throws Exception {
-    MuleClient client = AbstractMuleContextTestCase.muleContext.getClient();
+    MuleClient client = muleContext.getClient();
     flowRunner("inlineScript").withPayload("Important Message").run();
-    Message response = client.request("test://inlineScriptTestOut", AbstractMuleContextTestCase.RECEIVE_TIMEOUT).getRight().get();
-    Assert.assertNotNull(response);
-    Assert.assertEquals("Important Message Received", getPayloadAsString(response));
+    Message response = client.request("test://inlineScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
+    assertNotNull(response);
+    assertEquals("Important Message Received", getPayloadAsString(response));
   }
 
   @Ignore("MULE-6926: flaky test")
   @Test
   public void testFileBasedScript() throws Exception {
-    MuleClient client = AbstractMuleContextTestCase.muleContext.getClient();
+    MuleClient client = muleContext.getClient();
     flowRunner("fileBasedScript").withPayload("Important Message").run();
-    Message response =
-        client.request("test://fileBasedScriptTestOut", AbstractMuleContextTestCase.RECEIVE_TIMEOUT).getRight().get();
-    Assert.assertNotNull(response);
-    Assert.assertEquals("Important Message Received", getPayloadAsString(response));
+    Message response = client.request("test://fileBasedScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
+    assertNotNull(response);
+    assertEquals("Important Message Received", getPayloadAsString(response));
   }
 
   @Test
   public void testReferencedScript() throws Exception {
-    MuleClient client = AbstractMuleContextTestCase.muleContext.getClient();
+    MuleClient client = muleContext.getClient();
     flowRunner("referencedScript").withPayload("Important Message").run();
-    Message response =
-        client.request("test://referencedScriptTestOut", AbstractMuleContextTestCase.RECEIVE_TIMEOUT).getRight().get();
-    Assert.assertNotNull(response);
-    Assert.assertEquals("Important Message Received", getPayloadAsString(response));
+    Message response = client.request("test://referencedScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
+    assertNotNull(response);
+    assertEquals("Important Message Received", getPayloadAsString(response));
   }
 
   @Ignore("MULE-6926: flaky test")
   @Test
   public void testScriptVariables() throws Exception {
-    MuleClient client = AbstractMuleContextTestCase.muleContext.getClient();
+    MuleClient client = muleContext.getClient();
     flowRunner("scriptVariables").withPayload("Important Message").run();
-    Message response =
-        client.request("test://scriptVariablesTestOut", AbstractMuleContextTestCase.RECEIVE_TIMEOUT).getRight().get();
-    Assert.assertNotNull(response);
-    Assert.assertEquals("Important Message Received A-OK", getPayloadAsString(response));
+    Message response = client.request("test://scriptVariablesTestOut", RECEIVE_TIMEOUT).getRight().get();
+    assertNotNull(response);
+    assertEquals("Important Message Received A-OK", getPayloadAsString(response));
   }
 }

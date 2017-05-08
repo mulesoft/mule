@@ -6,10 +6,10 @@
  */
 package org.mule.test.plugin.scripting;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.mule.runtime.api.message.Message;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 public class GroovyRegistryLookupTestCase extends AbstractScriptingFunctionalTestCase {
@@ -23,14 +23,14 @@ public class GroovyRegistryLookupTestCase extends AbstractScriptingFunctionalTes
   protected void doSetUp() throws Exception {
     super.doSetUp();
 
-    AbstractMuleContextTestCase.muleContext.getRegistry().registerObject("hello", new Hello());
+    muleContext.getRegistry().registerObject("hello", new Hello());
   }
 
   @Test
   public void testBindingCallout() throws Exception {
     Message response = flowRunner("sayHello").withPayload("").run().getMessage();
-    Assert.assertNotNull(response);
-    Assert.assertEquals("hello", getPayloadAsString(response));
+    assertNotNull(response);
+    assertEquals("hello", getPayloadAsString(response));
   }
 
   public static class Hello {
