@@ -28,7 +28,6 @@
         <module>launcher</module>
         <module>http-api</module>
         <module>http-policy-api</module>
-        <module>jboss-transactions</module>
         <module>oauth-api</module>
         <module>policy-api</module>
         <module>reboot</module>

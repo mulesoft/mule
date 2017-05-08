@@ -23,13 +23,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-jbossts</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
         </dependency>

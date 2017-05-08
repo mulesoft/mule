@@ -139,7 +139,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-soap-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-xml-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-global-config-4.0.0-SNAPSHOT.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-jbossts-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-launcher-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-deployment-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-deployment-model-${productVersion}.jar
@@ -214,8 +213,6 @@
 /mule-standalone-${productVersion}/lib/opt/jaxb-api-2.1.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-impl-2.1.13.jar
 /mule-standalone-${productVersion}/lib/opt/jaxen-1.1.1.jar
-/mule-standalone-${productVersion}/lib/opt/jboss-logging-3.0.0.Beta5.jar
-/mule-standalone-${productVersion}/lib/opt/jbossjta-4.15.0.Final.jar
 /mule-standalone-${productVersion}/lib/opt/jgrapht-jdk1.5-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/joda-time-2.9.1.jar
 /mule-standalone-${productVersion}/lib/opt/mail-1.4.3.jar
