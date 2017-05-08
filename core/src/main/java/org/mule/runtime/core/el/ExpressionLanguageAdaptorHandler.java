@@ -75,9 +75,10 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
 
   @Override
   public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, FlowConstruct flowConstruct,
-                             BindingContext context)
+                             BindingContext context, boolean failOnNull)
       throws ExpressionRuntimeException {
-    return selectExpressionLanguage(expression).evaluate(expression, expectedOutputType, event, flowConstruct, context);
+    return selectExpressionLanguage(expression).evaluate(expression, expectedOutputType, event, flowConstruct, context,
+                                                         failOnNull);
   }
 
   @Override

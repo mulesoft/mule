@@ -36,6 +36,8 @@ import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.MuleInstanceContext;
 import org.mule.runtime.core.el.context.ServerContext;
 
+import org.slf4j.Logger;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -109,7 +111,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
   @Override
   public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, FlowConstruct flowConstruct,
-                             BindingContext context)
+                             BindingContext context, boolean failOnNull)
       throws ExpressionRuntimeException {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
     addFlowBindings(flowConstruct, contextBuilder);

@@ -32,8 +32,9 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
-import javax.inject.Inject;
+import java.util.concurrent.ScheduledFuture;
 
+import javax.inject.Inject;
 
 @Alias("ListenPayments")
 @EmitsResponse
@@ -47,6 +48,7 @@ public class HeisenbergSource extends Source<String, Attributes> {
   private SchedulerService schedulerService;
 
   private Scheduler executor;
+  private ScheduledFuture<?> scheduledFuture;
 
   @Config
   private HeisenbergExtension heisenberg;
@@ -60,7 +62,6 @@ public class HeisenbergSource extends Source<String, Attributes> {
   @Parameter
   @Optional(defaultValue = "1")
   private int corePoolSize;
-
   public static boolean receivedGroupOnSource;
   public static boolean receivedInlineOnSuccess;
   public static boolean receivedInlineOnError;
@@ -84,7 +85,8 @@ public class HeisenbergSource extends Source<String, Attributes> {
     }
 
     executor = schedulerService.cpuLightScheduler();
-    executor.scheduleAtFixedRate(() -> sourceCallback.handle(makeResult(sourceCallback)), 0, 100, MILLISECONDS);
+    scheduledFuture = executor.scheduleAtFixedRate(() -> sourceCallback.handle(makeResult(sourceCallback)), 0, 300, MILLISECONDS);
+
   }
 
   @OnSuccess
@@ -109,12 +111,8 @@ public class HeisenbergSource extends Source<String, Attributes> {
   @Override
   public void onStop() {
     if (executor != null) {
-      executor.shutdown();
-      try {
-        executor.awaitTermination(500, MILLISECONDS);
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
+      scheduledFuture.cancel(true);
+      executor.stop();
     }
     receivedGroupOnSource = false;
     gatheredMoney = 0;

@@ -48,10 +48,6 @@ import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,6 +58,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Features(EXPRESSION_LANGUAGE)
 @Stories(SUPPORT_MVEL_DW)
@@ -108,8 +108,8 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     };
 
     BindingContext globalContext = builder()
-        .addBinding("aNum", new TypedValue(4, fromType(Integer.class)))
-        .addBinding("times", new TypedValue(multiply, fromFunction(multiply)))
+        .addBinding("aNum", new TypedValue<>(4, fromType(Integer.class)))
+        .addBinding("times", new TypedValue<>(multiply, fromFunction(multiply)))
         .build();
 
     expressionManager.addGlobalBindings(globalContext);

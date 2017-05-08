@@ -9,16 +9,17 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.ClassUtils.isInstance;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.function.BiConsumer;
 
 import javax.inject.Inject;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * A {@link ValueResolver} which evaluates a MEL expressions
@@ -47,20 +48,20 @@ public class ExpressionValueResolver<T> implements ValueResolver<T> {
         }
       };
 
-  public ExpressionValueResolver(String expression) {
+  ExpressionValueResolver(String expression, DataType dataType) {
     checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
 
-    this.evaluator = new AttributeEvaluator(expression);
+    this.evaluator = new AttributeEvaluator(expression, dataType);
   }
 
-  public void setExtendedExpressionManager(ExtendedExpressionManager extendedExpressionManager) {
+  void setExtendedExpressionManager(ExtendedExpressionManager extendedExpressionManager) {
     this.extendedExpressionManager = extendedExpressionManager;
   }
 
   @Override
   public T resolve(Event event) throws MuleException {
     initEvaluator();
-    TypedValue typedValue = evaluator.resolveTypedValue(event, Event.builder(event));
+    TypedValue typedValue = evaluator.resolveTypedValue(event);
 
     Object value = typedValue.getValue();
 

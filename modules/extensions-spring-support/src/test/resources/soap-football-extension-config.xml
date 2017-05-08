@@ -60,7 +60,8 @@
             <soap:attachments>
             #[{
                 result: {
-                    content: att, contentType: attCt
+                    content: att,
+                    contentType: attCt
                 } as Object { class :"org.mule.runtime.extension.api.soap.SoapAttachment"}
             }]
             </soap:attachments>

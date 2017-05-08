@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -19,13 +20,13 @@ import org.mule.runtime.core.util.AttributeEvaluator;
 import javax.inject.Inject;
 
 /**
- * A {@link ValueResolver} which evaluates a MEL expressions and tries to ensure that the output is always of a certain type.
+ * A {@link ValueResolver} which evaluates expressions and tries to ensure that the output is always of a certain type.
  * <p>
- * If the MEL expression does not return a value of that type, then it tries to locate a {@link Transformer} which can do the
+ * If the expression does not return a value of that type, then it tries to locate a {@link Transformer} which can do the
  * transformation from the obtained type to the expected one.
  * <p>
- * It resolves the expressions by making use of the {@link AttributeEvaluator} so that it's compatible with simple expressions and
- * templates alike
+ * It resolves the expressions by making use of the {@link AttributeEvaluator} so that it's compatible with simple
+ * expressions and templates alike
  *
  * @param <T>
  * @since 3.7.0
@@ -38,6 +39,7 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
 
   @Inject
   private TransformationService transformationService;
+
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
 
@@ -62,10 +64,9 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
 
   @Override
   public void initialise() throws InitialisationException {
-    ExpressionValueResolver resolver = new ExpressionValueResolver(expression);
+    ExpressionValueResolver resolver = new ExpressionValueResolver(expression, fromType(expectedType));
     resolver.setExtendedExpressionManager(extendedExpressionManager);
-    delegate =
-        new TypeSafeValueResolverWrapper<>(resolver, expectedType);
+    delegate = new TypeSafeValueResolverWrapper<>(resolver, expectedType);
     delegate.setTransformationService(transformationService);
     delegate.initialise();
   }

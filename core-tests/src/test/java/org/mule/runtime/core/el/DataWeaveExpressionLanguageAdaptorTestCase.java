@@ -36,7 +36,6 @@ import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PROPER
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.VARIABLES;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
@@ -48,23 +47,22 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.message.BaseAttributes;
 
 import com.google.common.collect.Sets;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import ru.yandex.qatools.allure.annotations.Features;
+import ru.yandex.qatools.allure.annotations.Stories;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features(EXPRESSION_LANGUAGE)
 @Stories(SUPPORT_DW)
@@ -140,7 +138,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     String expressionThatThrowsException = "payload + 'foo'";
 
     expectedEx.expect(ExpressionRuntimeException.class);
-    expectedEx.expectMessage(containsString("Type mismatch for '+' function"));
+    expectedEx.expectMessage(containsString("You called the function '+' with these arguments"));
     expectedEx.expectMessage(containsString("evaluating expression: \"" + expressionThatThrowsException));
 
     expressionLanguage.evaluate(expressionThatThrowsException, event, BindingContext.builder().build());

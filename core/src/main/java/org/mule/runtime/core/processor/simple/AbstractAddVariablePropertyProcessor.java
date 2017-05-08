@@ -17,11 +17,11 @@ import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 
-import java.nio.charset.Charset;
-import java.text.MessageFormat;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.charset.Charset;
+import java.text.MessageFormat;
 
 public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMessageProcessor {
 
@@ -46,7 +46,7 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
       return event;
     } else {
       final Builder builder = Event.builder(event);
-      TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event, builder);
+      TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event);
       event = builder.build();
       if (typedValue.getValue() == null) {
         if (logger.isDebugEnabled()) {

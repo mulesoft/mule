@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/typed-value" attributeFormDefault="unqualified" elementFormDefault="qualified">
     <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
     <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
@@ -124,6 +125,37 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueForInputStreamType" substitutionGroup="mule:abstract-operator" name="typed-value-for-input-stream"></xs:element>
+    <xs:complexType name="TypedValueForInputStreamType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="input-stream"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueForObjectType" substitutionGroup="mule:abstract-operator" name="typed-value-for-object"></xs:element>
+    <xs:complexType name="TypedValueForObjectType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="object-typed-value"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueForStringInsidePojoType" substitutionGroup="mule:abstract-operator" name="typed-value-for-string-inside-pojo"></xs:element>
     <xs:complexType name="TypedValueForStringInsidePojoType">
         <xs:complexContent>
@@ -220,8 +252,8 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationPojoWithNullsafeAndContentType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-pojo-with-nullsafe-and-content"></xs:element>
-  <xs:complexType name="TypedValueOperationPojoWithNullsafeAndContentType">
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/typed-value" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TypedValueOperationPojoWithNullsafeAndContentType" substitutionGroup="mule:abstract-operator" name="typed-value-operation-pojo-with-nullsafe-and-content"></xs:element>
+    <xs:complexType name="TypedValueOperationPojoWithNullsafeAndContentType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence minOccurs="0" maxOccurs="1">
@@ -229,14 +261,14 @@
                         <xs:complexType>
                             <xs:complexContent>
                                 <xs:extension base="mule:abstractExtensionType">
-                                  <xs:sequence>
-                                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
-                                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="brand-name"></xs:element>
-                                </xs:sequence>
-                                <xs:attribute type="mule:expressionInt" use="optional" name="weight"></xs:attribute>
-                            </xs:extension>
-                        </xs:complexContent>
-                      </xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="description"></xs:element>
+                                        <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="brand-name"></xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute type="mule:expressionInt" use="optional" name="weight"></xs:attribute>
+                                </xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
                     </xs:element>
                 </xs:sequence>
                 <xs:attribute type="xs:string" use="optional" name="target">

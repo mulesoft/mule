@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.parameter.resolver.extension.extension.ParameterResolverExtension;
@@ -41,18 +42,6 @@ public class ParameterResolverOnConfigTestCase extends AbstractParameterResolver
     assertParameterResolver(doorResolver, of("#[app.registry.staticDoor]"), is(instanceOf(KnockeableDoor.class)));
     assertParameterResolver(stringResolver, of("#[payload]"), is("this is the payload"));
     assertThat(config.getLiteralDoor().getLiteralValue().get(), equalTo("#[aDoor]"));
-  }
-
-  @Test
-  public void configurationWithDynamicParameterResolversWithDynamicPojo() throws Exception {
-    ParameterResolverExtension config = getPayload("configurationWithDynamicParameterResolversWithDynamicPojo");
-
-    ParameterResolver<KnockeableDoor> doorResolver = config.getDoorResolver();
-    ParameterResolver<String> stringResolver = config.getStringResolver();
-    doorResolver.resolve();
-
-    assertParameterResolver(doorResolver, of("#[app.registry.dynamicDoor]"), is(instanceOf(KnockeableDoor.class)));
-    assertParameterResolver(stringResolver, of("#[payload]"), is("this is the payload"));
   }
 
   @Test

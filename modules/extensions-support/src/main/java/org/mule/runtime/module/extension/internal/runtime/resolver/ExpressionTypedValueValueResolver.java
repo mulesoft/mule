@@ -35,7 +35,7 @@ public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolve
   private TransformationService transformationService;
 
   public ExpressionTypedValueValueResolver(String expression, Class<T> expectedClass) {
-    super(expression);
+    super(expression, DataType.fromType(expectedClass));
     this.expectedClass = expectedClass;
   }
 
@@ -43,16 +43,17 @@ public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolve
   public TypedValue<T> resolve(Event event) throws MuleException {
     initEvaluator();
 
-    TypedValue typedValue = evaluator.resolveTypedValue(event, Event.builder(event));
-    if (isInstance(expectedClass, typedValue.getValue())) {
-      return typedValue;
-    } else {
+    TypedValue typedValue = evaluator.resolveTypedValue(event);
+    if (!isInstance(expectedClass, typedValue.getValue())) {
       DataType expectedDataType =
-          DataType.builder().type(expectedClass).mediaType(typedValue.getDataType().getMediaType()).build();
-      return new TypedValue<>((T) typeSafeTransformer.transform(typedValue.getValue(), typedValue.getDataType(), expectedDataType,
-                                                                event),
+          DataType.builder()
+              .type(expectedClass)
+              .mediaType(typedValue.getDataType().getMediaType())
+              .build();
+      return new TypedValue<>(typeSafeTransformer.<T>transform(typedValue.getValue(), typedValue.getDataType(), expectedDataType),
                               expectedDataType);
     }
+    return typedValue;
   }
 
   public void setTransformationService(TransformationService transformationService) {

@@ -6,17 +6,26 @@
  */
 package org.mule.test.module.extension.typed.value;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.test.typed.value.extension.extension.TypedValueParameterOperations.THIS_IS_A_DEFAULT_STRING;
-import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
 import org.mule.test.typed.value.extension.extension.TypedValueSource;
 import org.mule.test.vegan.extension.VeganProductInformation;
 
+import org.junit.After;
+import org.junit.Test;
+
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,10 +33,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Test;
-
 public class TypedValueParameterOperationExecutionTestCase extends AbstractTypedValueTestCase {
+
+  private static final String STRING_VALUE = "string";
+  private static final String JSON_OBJECT = "{\n" +
+      "  \"a\": \"json value\"\n" +
+      "}";
+  private static final String THIS_IS_A_STRING = "This is a string";
 
   @Override
   protected String[] getConfigFiles() {
@@ -46,17 +58,17 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
 
   @Test
   public void typedValueForString() throws Exception {
-    runAndAssertTypedValue("typedValueForString", "This is a string", MediaType.APPLICATION_JSON, UTF8);
+    runAndAssertTypedValue("typedValueForString", THIS_IS_A_STRING, WILDCARD, null);
   }
 
   @Test
   public void typedValueForStringFromByteArray() throws Exception {
-    runAndAssertTypedValue("typedValueForStringFromByteArray", "This is a string", MediaType.APPLICATION_JSON, UTF8);
+    runAndAssertTypedValue("typedValueForStringFromByteArray", THIS_IS_A_STRING, WILDCARD, null);
   }
 
   @Test
   public void typedValueForStringWithDefaultValue() throws Exception {
-    runAndAssertTypedValue("typedValueForStringWithDefaultValue", THIS_IS_A_DEFAULT_STRING, MediaType.ANY, null);
+    runAndAssertTypedValue("typedValueForStringWithDefaultValue", THIS_IS_A_DEFAULT_STRING, ANY, null);
   }
 
   @Test
@@ -64,7 +76,7 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
     List<Object> strings = new ArrayList<>();
     strings.add("string");
     strings.add("string");
-    runAndAssertTypedValue("typedValueForStringList", strings, APPLICATION_JAVA, UTF8);
+    runAndAssertTypedValue("typedValueForStringList", strings, WILDCARD, null);
   }
 
   @Test
@@ -72,95 +84,111 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
     List<Object> strings = new ArrayList<>();
     strings.add("string");
     strings.add("string");
-    runAndAssertTypedValue("typedValueForStringListAsChild", strings, MediaType.ANY, null);
+    runAndAssertTypedValue("typedValueForStringListAsChild", strings, ANY, null);
   }
 
   @Test
   public void typedValueForStringMap() throws Exception {
-    HashMap<Object, Object> map = new HashMap<>();
+    HashMap<Object, Object> map = new LinkedHashMap<>();
     map.put("string", "string");
-    runAndAssertTypedValue("typedValueForStringMap", map, APPLICATION_JAVA, UTF8);
+    runAndAssertTypedValue("typedValueForStringMap", map, WILDCARD, null);
   }
 
   @Test
   public void typedValueForStringMapAsChild() throws Exception {
     HashMap<Object, Object> map = new LinkedHashMap<>();
     map.put("string", "string");
-    runAndAssertTypedValue("typedValueForStringMapAsChild", map, MediaType.ANY, null);
+    runAndAssertTypedValue("typedValueForStringMapAsChild", map, ANY, null);
   }
 
   @Test
   public void typedValueForDoorAsChild() throws Exception {
-    runAndAssertTypedValue("typedValueForDoorAsChild", DOOR, MediaType.ANY, null);
+    runAndAssertTypedValue("typedValueForDoorAsChild", DOOR, ANY, null);
   }
 
   @Test
   public void typedValueForDoorListAsChild() throws Exception {
     ArrayList<Object> doors = new ArrayList<>();
     doors.add(DOOR);
-    runAndAssertTypedValue("typedValueForDoorListAsChild", doors, MediaType.ANY, null);
+    runAndAssertTypedValue("typedValueForDoorListAsChild", doors, ANY, null);
   }
 
   @Test
   public void typedValueForDoorMapAsChild() throws Exception {
     Map<Object, Object> doors = new LinkedHashMap<>();
     doors.put("key", DOOR);
-    runAndAssertTypedValue("typedValueForDoorMapAsChild", doors, MediaType.ANY, null);
+    runAndAssertTypedValue("typedValueForDoorMapAsChild", doors, ANY, null);
   }
 
   @Test
   public void typedValueOperationStringMapListParameter() throws Exception {
     Map<Object, Object> mapStringList = new LinkedHashMap<>();
     mapStringList.put("key", Collections.singletonList("string"));
-    runAndAssertTypedValue("typedValueOperationStringMapListParameter", mapStringList, MediaType.ANY, null);
+    runAndAssertTypedValue("typedValueOperationStringMapListParameter", mapStringList, ANY, null);
   }
 
   @Test
   public void typedValueForStringOnSourceOnSuccess() throws Exception {
     Flow flow = (Flow) getFlowConstruct("typedValueForStringOnSourceOnSuccess");
     flow.start();
-    new PollingProber(RECEIVE_TIMEOUT, 100).check(new JUnitLambdaProbe(() -> TypedValueSource.onSuccessValue != null));
-    assertTypedValue(TypedValueSource.onSuccessValue, "string", MediaType.APPLICATION_JSON, UTF8);
+    new PollingProber(100000, 100).check(new JUnitLambdaProbe(() -> TypedValueSource.onSuccessValue != null));
+    assertTypedValue(TypedValueSource.onSuccessValue, STRING_VALUE, WILDCARD, null);
   }
 
   @Test
   public void typedValueForStringInsidePojo() throws Exception {
     Event event = flowRunner("typedValueForStringInsidePojo").run();
     DifferedKnockableDoor value = (DifferedKnockableDoor) event.getMessage().getPayload().getValue();
-    assertTypedValue(value.getAddress(), "string", MediaType.APPLICATION_JSON, UTF8);
+    assertTypedValue(value.getAddress(), STRING_VALUE, WILDCARD, null);
   }
 
   @Test
   public void typedValueForContentOnNullSafePojoWithDefaultValue() throws Exception {
     Event event = flowRunner("typedValueForContentOnNullSafePojoWithDefaultValue").run();
     VeganProductInformation value = (VeganProductInformation) event.getMessage().getPayload().getValue();
-    assertTypedValue(value.getDescription(), "string", APPLICATION_JSON, UTF8);
+    assertTypedValue(value.getDescription(), STRING_VALUE, WILDCARD, null);
   }
 
   @Test
   public void typedValueForContentOnNullSafePojoWithDefaultValueWithOutDefiningPojo() throws Exception {
     Event event = flowRunner("typedValueForContentOnNullSafePojoWithDefaultValueWithOutDefiningPojo").run();
     VeganProductInformation value = (VeganProductInformation) event.getMessage().getPayload().getValue();
-    assertTypedValue(value.getDescription(), "string", APPLICATION_JSON, UTF8);
+    assertTypedValue(value.getDescription(), STRING_VALUE, WILDCARD, null);
   }
 
   @Test
   public void typedValueOnContentOnNullSafeWithExplicitValues() throws Exception {
     Event event = flowRunner("typedValueOnContentOnNullSafeWithExplicitValues").run();
     VeganProductInformation value = (VeganProductInformation) event.getMessage().getPayload().getValue();
-    assertTypedValue(value.getDescription(), "string", APPLICATION_JSON, UTF8);
-    assertTypedValue(value.getBrandName(), "string", APPLICATION_JSON, UTF8);
-    assertTypedValue(value.getWeight(), 5, APPLICATION_JAVA, UTF8);
+    assertTypedValue(value.getDescription(), STRING_VALUE, WILDCARD, null);
+    assertTypedValue(value.getBrandName(), STRING_VALUE, WILDCARD, null);
+    assertTypedValue(value.getWeight(), 5, WILDCARD, null);
+  }
+
+  @Test
+  public void typedValueForObject() throws Exception {
+    Event event = flowRunner("typedValueForObject").run();
+    TypedValue jsonObject = (TypedValue) event.getMessage().getPayload().getValue();
+    assertThat(IOUtils.toString((InputStream) jsonObject.getValue()), is(JSON_OBJECT));
+    assertThat(jsonObject.getDataType(), is(like(jsonObject.getDataType().getType(), APPLICATION_JSON, UTF8)));
+  }
+
+  @Test
+  public void typedValueForInputStream() throws Exception {
+    Event event = flowRunner("typedValueForInputStream").run();
+    TypedValue jsonObject = (TypedValue) event.getMessage().getPayload().getValue();
+    assertThat(IOUtils.toString((InputStream) jsonObject.getValue()), is(JSON_OBJECT));
+    assertThat(jsonObject.getDataType(), is(like(jsonObject.getDataType().getType(), APPLICATION_JSON, UTF8)));
   }
 
   @Test
   public void typedValueOperationWithExplicitStringContent() throws Exception {
-    runAndAssertTypedValue("typedValueOperationWithExplicitStringContent", "string", APPLICATION_JSON, UTF8);
+    runAndAssertTypedValue("typedValueOperationWithExplicitStringContent", STRING_VALUE, WILDCARD, null);
   }
 
   @Test
   public void typedValueOperationWithDefaultStringContent() throws Exception {
-    runAndAssertTypedValue("typedValueOperationWithDefaultStringContent", "string", APPLICATION_JSON, UTF8);
+    runAndAssertTypedValue("typedValueOperationWithDefaultStringContent", STRING_VALUE, WILDCARD, null);
   }
 
   @Test

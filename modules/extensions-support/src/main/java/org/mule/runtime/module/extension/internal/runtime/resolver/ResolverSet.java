@@ -11,7 +11,10 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.Cursor;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
@@ -25,12 +28,12 @@ import java.util.Map;
 /**
  * A {@link ValueResolver} which is based on associating a set of keys -&gt; {@link ValueResolver} pairs. The result of evaluating
  * this resolver is a {@link ResolverSetResult}.
- * <p/>
+ * <p>
  * The general purpose of this class is to repeatedly evaluate a set of {@link ValueResolver}s which results are to be used in the
  * construction of an object, so that the structure of such can be described only once (by the set of keys and
  * {@link ValueResolver}s but evaluated many times. With this goal in mind is that the return value of this resolver will always
  * be a {@link ResolverSetResult} which then can be used by a {@link ObjectBuilder} to generate an actual object.
- * <p/>
+ * <p>
  * Instances of this class are to be considered thread safe and reusable
  *
  * @since 3.7.0
@@ -49,7 +52,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
    * Links the given {@link ValueResolver} to the given {@link ParameterModel}. If such {@code parameter} was already added, then
    * the associated {@code resolver} is replaced.
    *
-   * @param key a not {@code null} {@link ParameterModel}
+   * @param key      a not {@code null} {@link ParameterModel}
    * @param resolver a not {@code null} {@link ValueResolver}
    * @return this resolver set to allow chaining
    * @throws IllegalArgumentException is either {@code parameter} or {@code resolver} are {@code null}
@@ -83,11 +86,27 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
    *
    * @param event a not {@code null} {@link Event}
    * @return a {@link ResolverSetResult}
-   * @throws Exception
+   * @throws MuleException if an error occurs creating the {@link ResolverSetResult}
    */
   @Override
   public ResolverSetResult resolve(Event event) throws MuleException {
-    ResolverSetResult.Builder builder = ResolverSetResult.newBuilder();
+    return resolve(event, false);
+  }
+
+  /**
+   * Evaluates all the added {@link ValueResolver}s and returns the results into a {@link ResolverSetResult}
+   *
+   * @param event a not {@code null} {@link Event}
+   * @param hashable indicates if the created {@link ResolverSetResult} supports to be compared by the hash of their
+   *                 components
+   * @return a {@link ResolverSetResult}
+   * @throws MuleException if an error occurs creating the {@link ResolverSetResult}
+   */
+  public ResolverSetResult resolve(Event event, boolean hashable) throws MuleException {
+    ResolverSetResult.Builder builder = hashable
+        ? HashableResolverSetResult.newBuilder()
+        : ResolverSetResult.newBuilder();
+
     for (Map.Entry<String, ValueResolver> entry : resolvers.entrySet()) {
       builder.add(entry.getKey(), resolveValue(entry.getValue(), event));
     }
@@ -100,10 +119,18 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
     Object value = resolver.resolve(event);
     if (value instanceof ValueResolver) {
       return resolveValue((ValueResolver<?>) value, event);
-    }
-
-    if (value instanceof CursorStreamProvider) {
-      value = ((CursorStreamProvider) value).openCursor();
+    } else if (value instanceof CursorProvider) {
+      return ((CursorProvider) value).openCursor();
+    } else if (value instanceof TypedValue) {
+      TypedValue typedValue = (TypedValue) value;
+      Object objectValue = typedValue.getValue();
+      if (objectValue instanceof CursorProvider) {
+        Cursor cursor = ((CursorProvider) objectValue).openCursor();
+        return new TypedValue<>(cursor, DataType.builder()
+            .type(cursor.getClass())
+            .mediaType(typedValue.getDataType().getMediaType())
+            .build());
+      }
     }
 
     return value;
