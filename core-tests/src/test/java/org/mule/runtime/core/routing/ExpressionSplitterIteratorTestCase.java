@@ -14,8 +14,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.DataType.fromType;
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -64,7 +64,7 @@ public class ExpressionSplitterIteratorTestCase extends AbstractMuleTestCase {
   private List<TypedValue<?>> createListOfIntegers() {
     List<TypedValue<?>> integers = new ArrayList<>(3);
     for (int i = 0; i < 3; i++) {
-      integers.add(new TypedValue<>(i, DataType.fromType(Integer.class)));
+      integers.add(new TypedValue<>(i, fromType(Integer.class)));
     }
     return integers;
   }
