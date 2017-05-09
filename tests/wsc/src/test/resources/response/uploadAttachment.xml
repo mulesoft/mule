@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ns2:uploadAttachmentResponse xmlns:ns2="http://service.ws.extension.mule.org/">
-    <result>Ok</result>
-</ns2:uploadAttachmentResponse>
