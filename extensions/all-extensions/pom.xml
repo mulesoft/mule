@@ -20,31 +20,6 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-email</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-plugin</classifier>
-            <exclusions>
-                <!--TODO(gfernandes): remove this, see validation's comment -->
-                <exclusion>
-                    <groupId>commons-collections</groupId>
-                    <artifactId>commons-collections</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-lang</groupId>
-                    <artifactId>commons-lang</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.mail</groupId>
-                    <artifactId>javax.mail</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-file</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
