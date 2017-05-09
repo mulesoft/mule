@@ -1419,7 +1419,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                 .withDefaultValue(DEFAULT_BYTE_STREAMING_BUFFER_INCREMENT_SIZE)
                                                 .build())
         .withConstructorParameterDefinition(
-                                            fromSimpleParameter("maxInMemorySize")
+                                            fromSimpleParameter("maxBufferSize")
                                                 .withDefaultValue(DEFAULT_BYTES_STREAMING_MAX_BUFFER_SIZE)
                                                 .build())
         .withConstructorParameterDefinition(
@@ -1452,7 +1452,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                 .withDefaultValue(DEFAULT_OBJECT_STREAMING_BUFFER_INCREMENT_SIZE)
                                                 .build())
         .withConstructorParameterDefinition(
-                                            fromSimpleParameter("maxInMemoryInstances")
+                                            fromSimpleParameter("maxBufferSize")
                                                 .withDefaultValue(DEFAULT_OBJECT_STREAMING_MAX_BUFFER_SIZE)
                                                 .build())
         .build());

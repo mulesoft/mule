@@ -51,10 +51,13 @@ public final class InMemoryCursorStreamConfig {
     final int increment = bufferSizeIncrement.toBytes();
     checkArgument(increment >= 0, "bufferSizeIncrement cannot be a negative byte size");
     final int max = maxBufferSize.toBytes();
-    checkArgument(initial <= max, "initialBufferSize cannot be bigger than the maxBufferSize");
-    checkArgument(increment <= max, "bufferSizeIncrement cannot be bigger than the maxBufferSize");
-    checkArgument(initial + increment <= max, "initialBufferSize + bufferSizeIncrement cannot be bigger than the maxBufferSize, "
-        + "otherwise the buffer will never be able to expand");
+    if (max > 0) {
+      checkArgument(initial <= max, "initialBufferSize cannot be bigger than the maxBufferSize");
+      checkArgument(increment <= max, "bufferSizeIncrement cannot be bigger than the maxBufferSize");
+      checkArgument(initial + increment <= max,
+                    "initialBufferSize + bufferSizeIncrement cannot be bigger than the maxBufferSize, "
+                        + "otherwise the buffer will never be able to expand");
+    }
 
     this.initialBufferSize = initialBufferSize;
     this.bufferSizeIncrement = bufferSizeIncrement;
