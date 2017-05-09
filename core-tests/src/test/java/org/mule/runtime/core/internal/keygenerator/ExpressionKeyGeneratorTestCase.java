@@ -31,7 +31,7 @@ import org.junit.Test;
 public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase {
 
   private static final String RESOLVED_KEY = "KEY";
-  private static final String SINGLE_EXPRESSION = "#[mel:expression]";
+  private static final String SINGLE_EXPRESSION = "#[expression]";
 
   private ExpressionMuleEventKeyGenerator keyGenerator;
   private InternalMessage message;

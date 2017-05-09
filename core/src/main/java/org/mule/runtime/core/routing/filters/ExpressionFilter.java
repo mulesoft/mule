@@ -6,21 +6,16 @@
  */
 package org.mule.runtime.core.routing.filters;
 
-import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.expression.ExpressionConfig;
-
-import java.text.MessageFormat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,19 +67,8 @@ public class ExpressionFilter implements Filter, MuleContextAware {
    */
   @Override
   public boolean accept(Message message, Event.Builder builder) {
-    String expr = getFullExpression();
-    if (delegateFilter != null) {
-      boolean result = delegateFilter.accept(message, builder);
-      if (logger.isDebugEnabled()) {
-        logger.debug(MessageFormat.format("Result of expression filter: {0} is: {1}", expr, result));
-      }
-      return result;
-    }
-
     // TODO MULE-9341 Remove Filters. Expression filter will be replaced by something that uses MuleEvent.
-    Flow flowConstruct = builder("ExpressionFilterFlow", muleContext).build();
-    return accept(Event.builder(create(flowConstruct, fromSingleComponent("ExpressionFilter"))).message(message)
-        .flow(flowConstruct).build(), builder);
+    return accept(builder.message(message).build(), builder);
   }
 
   /**

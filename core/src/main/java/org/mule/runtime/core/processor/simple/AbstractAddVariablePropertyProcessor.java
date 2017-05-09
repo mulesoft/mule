@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.core.processor.simple;
 
+import static java.text.MessageFormat.format;
+import static java.util.Objects.requireNonNull;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
@@ -17,30 +21,30 @@ import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 
+import java.nio.charset.Charset;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.charset.Charset;
-import java.text.MessageFormat;
 
 public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMessageProcessor {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractAddVariablePropertyProcessor.class);
 
   private AttributeEvaluator identifierEvaluator;
+  private String value;
   private AttributeEvaluator valueEvaluator;
   private DataType returnType = DataType.OBJECT;
 
   @Override
   public void initialise() throws InitialisationException {
     identifierEvaluator.initialize(muleContext.getExpressionManager());
+    valueEvaluator = new AttributeEvaluator(value, getReturnDataType());
     valueEvaluator.initialize(muleContext.getExpressionManager());
   }
 
   @Override
   public Event process(Event event) throws MuleException {
-    Object keyValue = identifierEvaluator.resolveValue(event);
-    String key = (keyValue == null ? null : keyValue.toString());
+    String key = identifierEvaluator.resolveValue(event);
     if (key == null) {
       logger.error("Setting Null variable keys is not supported, this entry is being ignored");
       return event;
@@ -50,9 +54,9 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
       event = builder.build();
       if (typedValue.getValue() == null) {
         if (logger.isDebugEnabled()) {
-          logger.debug(MessageFormat.format(
-                                            "Variable with key \"{0}\", not found on message using \"{1}\". Since the value was marked optional, nothing was set on the message for this variable",
-                                            key, valueEvaluator.getRawValue()));
+          logger.debug(format(
+                              "Variable with key '{0}', not found on message using '{1}'. Since the value was marked optional, nothing was set on the message for this variable",
+                              key, valueEvaluator.getRawValue()));
         }
         return removeProperty(event, key);
       } else {
@@ -97,14 +101,12 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
     if (StringUtils.isBlank(identifier)) {
       throw new IllegalArgumentException("Key cannot be blank");
     }
-    this.identifierEvaluator = new AttributeEvaluator(identifier);
+    this.identifierEvaluator = new AttributeEvaluator(identifier, STRING);
   }
 
   public void setValue(String value) {
-    if (value == null) {
-      throw new IllegalArgumentException("Value must not be null");
-    }
-    this.valueEvaluator = new AttributeEvaluator(value);
+    requireNonNull(value);
+    this.value = value;
   }
 
   public void setReturnDataType(DataType type) {

@@ -9,6 +9,7 @@ package org.mule.runtime.core.routing;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
@@ -16,6 +17,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -49,6 +51,8 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
     implements Processor, MuleContextAware, FlowConstructAware, Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(IdempotentMessageValidator.class);
+
+  private static final BindingContext NULL_BINDING_CONTEXT = BindingContext.builder().build();
 
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;
@@ -93,11 +97,11 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
   }
 
   protected String getValueForEvent(Event event) throws MessagingException {
-    return (String) muleContext.getExpressionManager().evaluate(valueExpression, event).getValue();
+    return (String) muleContext.getExpressionManager().evaluate(valueExpression, STRING, NULL_BINDING_CONTEXT, event).getValue();
   }
 
   protected String getIdForEvent(Event event) throws MuleException {
-    return (String) muleContext.getExpressionManager().evaluate(idExpression, event).getValue();
+    return (String) muleContext.getExpressionManager().evaluate(idExpression, STRING, NULL_BINDING_CONTEXT, event).getValue();
   }
 
   public String getIdExpression() {

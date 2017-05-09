@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -24,8 +25,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * UntilSuccessful attempts to route a message to the message processor it contains. Routing is considered successful if no
@@ -60,14 +59,13 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
   @Override
   public void initialise() throws InitialisationException {
     if (routes.isEmpty()) {
-      throw new InitialisationException(I18nMessageFactory
-          .createStaticMessage("One message processor must be configured within UntilSuccessful."), this);
+      throw new InitialisationException(createStaticMessage("One message processor must be configured within UntilSuccessful."),
+                                        this);
     }
 
     if (routes.size() > 1) {
-      throw new InitialisationException(I18nMessageFactory
-          .createStaticMessage("Only one message processor is allowed within UntilSuccessful."
-              + " Use a Processor Chain to group several message processors into one."), this);
+      throw new InitialisationException(createStaticMessage("Only one message processor is allowed within UntilSuccessful."
+          + " Use a Processor Chain to group several message processors into one."), this);
     }
 
     setWaitTime();
@@ -82,7 +80,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     failureExpressionFilter.setMuleContext(muleContext);
 
     if ((ackExpression != null) && (!muleContext.getExpressionManager().isExpression(ackExpression))) {
-      throw new InitialisationException(I18nMessageFactory.createStaticMessage("Invalid ackExpression: " + ackExpression), this);
+      throw new InitialisationException(createStaticMessage("Invalid ackExpression: " + ackExpression), this);
     }
 
     if (synchronous) {
@@ -117,7 +115,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
           .warn("You're using the secondsBetweenRetries in the until-successful router. That attribute was deprecated in favor of the new millisBetweenRetries."
               + "Please consider updating your config since the old attribute will be removed in Mule 4");
 
-      setMillisBetweenRetries(TimeUnit.SECONDS.toMillis(secondsBetweenRetries));
+      setMillisBetweenRetries(SECONDS.toMillis(secondsBetweenRetries));
     } else if (!hasMillis) {
       millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
     }

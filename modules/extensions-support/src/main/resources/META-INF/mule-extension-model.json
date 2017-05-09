@@ -396,7 +396,7 @@
           "modelProperties": {}
         }
       ],
-      "description": "Configures a Collection Response Router. This will return a MuleMessageCollection message type that will contain all messages\nreceived for a each correlation group.\nexeception if the router is waiting for a correlation group and times out before all group enties are received.\njava.util.List. When true (default), a CorrelationTimeoutException is thrown and\nRoutingNotification.CORRELATION_TIMEOUT is fired. The component doesn\u0027t receive any messages in this case.\nthat this object store has a max capacity and an expiration interval.\nbuilt object stores.\nstores.",
+      "description": "Configures a Collection Response Router. This will return a MuleMessageCollection message type that will contain all messages received for a each correlation group. exeception if the router is waiting for a correlation group and times out before all group enties are received. java.util.List. When true (default), a CorrelationTimeoutException is thrown and RoutingNotification.CORRELATION_TIMEOUT is fired. The component doesn\u0027t receive any messages in this case. that this object store has a max capacity and an expiration interval. built object stores. stores.",
       "modelProperties": {}
     },
     {
@@ -544,7 +544,7 @@
           "modelProperties": {}
         }
       ],
-      "description": "The collection splitter accepts a collection of objects and splits the collection invoking the next message processor with\neach item in the collection in sequence.",
+      "description": "The collection splitter accepts a collection of objects and splits the collection invoking the next message processor with each item in the collection in sequence.",
       "modelProperties": {}
     },
     {
@@ -679,7 +679,7 @@
           "modelProperties": {}
         }
       ],
-      "description": "Performs logging using an expression that determines what should be logged. By default the current messages is logged using\nthe DEBUG level to the \u0027org.mule.runtime.core.api.processor.LoggerMessageProcessor\u0027 category but the level and category can\nboth be configured to suit your needs.\nmessage is specified then the current message is used.",
+      "description": "Performs logging using an expression that determines what should be logged. By default the current messages is logged using the DEBUG level to the \u0027org.mule.runtime.core.api.processor.LoggerMessageProcessor\u0027 category but the level and category can both be configured to suit your needs. message is specified then the current message is used.",
       "modelProperties": {}
     },
     {
@@ -826,7 +826,7 @@
           "modelProperties": {}
         }
       ],
-      "description": "The simple splitter splits incoming message into parts using the configured expression passing on each part in turn to the\nnext message processor.",
+      "description": "The simple splitter splits incoming message into parts using the configured expression passing on each part in turn to the next message processor.",
       "modelProperties": {}
     },
     {
@@ -1734,7 +1734,7 @@
           "modelProperties": {}
         }
       ],
-      "description": "Allows a \u0027flow\u0027 to be referenced such that the message processing will continue in the referenced flow before returning.\nMessage processing in the referenced \u0027flow\u0027 will occur within the context of the referenced flow and will therefore use its\nexception strategy etc.",
+      "description": "Allows a \u0027flow\u0027 to be referenced such that the message processing will continue in the referenced flow before returning. Message processing in the referenced \u0027flow\u0027 will occur within the context of the referenced flow and will therefore use its exception strategy etc.",
       "modelProperties": {}
     },
     {
@@ -1969,7 +1969,7 @@
           "modelProperties": {}
         }
       ],
-      "description": "The foreach Processor allows iterating over a collection payload, or any collection obtained by an\nexpression, generating a message for each element.",
+      "description": "The foreach Processor allows iterating over a collection payload, or any collection obtained by an expression, generating a message for each element.",
       "modelProperties": {}
     },
     {
@@ -2404,7 +2404,7 @@
           "modelProperties": {}
         }
       ],
-      "description": "The try Processor executes the nested list of message processors, within a transaction and \nwith it's own error handler if required.",
+      "description": "The try Processor executes the nested list of message processors, within a transaction and with it's own error handler if required.",
       "modelProperties": {}
     },
     {
@@ -2462,7 +2462,7 @@
           "modelProperties": {}
         }
       ],
-      "description": "Allows the definition of internal selective handlers. It will route the error to the first\nhandler that matches it. If there's no match, then a default error handler will be executed.",
+      "description": "Allows the definition of internal selective handlers. It will route the error to the first handler that matches it. If there's no match, then a default error handler will be executed.",
       "modelProperties": {}
     },
     {
@@ -2564,7 +2564,7 @@
                 "order": 1
               },
               "name": "type",
-              "description": "The full name of the error type to match against or a comma separated list of full names,\nto match against any of them.",
+              "description": "The full name of the error type to match against or a comma separated list of full names, to match against any of them.",
               "modelProperties": {}
             },
             {
@@ -2592,7 +2592,7 @@
                 "order": 2
               },
               "name": "when",
-              "description": "The expression that will be evaluated to determine if this exception strategy\nshould be executed. This should always be a boolean expression.",
+              "description": "The expression that will be evaluated to determine if this exception strategy should be executed. This should always be a boolean expression.",
               "modelProperties": {}
             },
             {
@@ -2622,7 +2622,7 @@
                 "order": 3
               },
               "name": "logException",
-              "description": "Determines whether the handled exception will be logged to its standard logger in the\nERROR level before being handled. Default is true.",
+              "description": "Determines whether the handled exception will be logged to its standard logger in the ERROR level before being handled. Default is true.",
               "modelProperties": {}
             },
             {
@@ -2652,7 +2652,7 @@
                 "order": 4
               },
               "name": "enableNotifications",
-              "description": "Determines whether ExceptionNotifications will be fired from this strategy when\nan exception occurs. Default is true.",
+              "description": "Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs. Default is true.",
               "modelProperties": {}
             }
           ],
@@ -2765,7 +2765,7 @@
                 "order": 1
               },
               "name": "type",
-              "description": "The full name of the error type to match against or a comma separated list of full names,\nto match against any of them.",
+              "description": "The full name of the error type to match against or a comma separated list of full names, to match against any of them.",
               "modelProperties": {}
             },
             {
@@ -2793,7 +2793,7 @@
                 "order": 2
               },
               "name": "when",
-              "description": "The expression that will be evaluated to determine if this exception strategy\nshould be executed. This should always be a boolean expression.",
+              "description": "The expression that will be evaluated to determine if this exception strategy should be executed. This should always be a boolean expression.",
               "modelProperties": {}
             },
             {
@@ -2823,7 +2823,7 @@
                 "order": 3
               },
               "name": "logException",
-              "description": "Determines whether the handled exception will be logged to its standard logger in the\nERROR level before being handled. Default is true.",
+              "description": "Determines whether the handled exception will be logged to its standard logger in the ERROR level before being handled. Default is true.",
               "modelProperties": {}
             },
             {
@@ -2853,7 +2853,7 @@
                 "order": 4
               },
               "name": "enableNotifications",
-              "description": "Determines whether ExceptionNotifications will be fired from this strategy when\nan exception occurs. Default is true.",
+              "description": "Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs. Default is true.",
               "modelProperties": {}
             }
           ],

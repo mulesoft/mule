@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.contains;
@@ -18,7 +17,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.tck.size.SmallTest;
 
-import java.util.HashSet;
+import java.util.Set;
 
 @SmallTest
 public class RemoveFlowVariableProcessorTestCase extends AbstractRemoveVariablePropertyProcessorTestCase {
@@ -28,7 +27,7 @@ public class RemoveFlowVariableProcessorTestCase extends AbstractRemoveVariableP
   }
 
   @Override
-  protected void addMockedPropeerties(Event mockEvent, HashSet properties) {
+  protected void addMockedPropeerties(Event mockEvent, Set<String> properties) {
     when(mockEvent.getVariableNames()).thenReturn(properties);
   }
 

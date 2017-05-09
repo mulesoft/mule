@@ -10,39 +10,51 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.io.IOException;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
+
+  private Builder eventBuilder;
+
+  @Before
+  public void before() throws MuleException {
+    eventBuilder = Event.builder(DefaultEventContext.create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION));
+  }
 
   @Test
   public void testHeaderFilterEL() throws Exception {
     ExpressionFilter filter = new ExpressionFilter("mel:message.outboundProperties['foo']=='bar'");
     filter.setMuleContext(muleContext);
     Message message = of("blah");
-    assertTrue(!filter.accept(message, mock(Event.Builder.class)));
+    assertTrue(!filter.accept(message, eventBuilder));
 
     message = InternalMessage.builder(message).addOutboundProperty("foo", "bar").build();
-    assertTrue(filter.accept(message, mock(Event.Builder.class)));
+    assertTrue(filter.accept(message, eventBuilder));
   }
 
   @Test
   public void testVariableFilterEL() throws Exception {
     ExpressionFilter filter = new ExpressionFilter("mel:flowVars['foo']=='bar'");
     filter.setMuleContext(muleContext);
-    assertTrue(!filter.accept(testEvent(), mock(Event.Builder.class)));
+    assertTrue(!filter.accept(testEvent(), eventBuilder));
     Event event = Event.builder(testEvent()).addVariable("foo", "bar").build();
-    assertTrue(filter.accept(event, mock(Event.Builder.class)));
+    assertTrue(filter.accept(event, eventBuilder));
   }
 
   @Test
@@ -52,11 +64,11 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
 
     Message message = of("blah");
 
-    assertTrue(filter.accept(message, mock(Event.Builder.class)));
+    assertTrue(filter.accept(message, eventBuilder));
     message = InternalMessage.builder(message).addOutboundProperty("foo", "bar").build();
-    assertTrue(!filter.accept(message, mock(Event.Builder.class)));
+    assertTrue(!filter.accept(message, eventBuilder));
     message = InternalMessage.builder(message).addOutboundProperty("foo", "car").build();
-    assertTrue(filter.accept(message, mock(Event.Builder.class)));
+    assertTrue(filter.accept(message, eventBuilder));
   }
 
   @Test
@@ -64,11 +76,11 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
     ExpressionFilter filter = new ExpressionFilter("mel:flowVars['foo']!='bar'");
     filter.setMuleContext(muleContext);
 
-    assertTrue(filter.accept(testEvent(), mock(Event.Builder.class)));
+    assertTrue(filter.accept(testEvent(), eventBuilder));
     Event event = Event.builder(testEvent()).addVariable("foo", "bar").build();
-    assertTrue(!filter.accept(event, mock(Event.Builder.class)));
+    assertTrue(!filter.accept(event, eventBuilder));
     event = Event.builder(event).addVariable("foo", "car").build();
-    assertTrue(filter.accept(event, mock(Event.Builder.class)));
+    assertTrue(filter.accept(event, eventBuilder));
   }
 
   private Message removeProperty(Message message) {
@@ -82,11 +94,11 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
 
     Message message = of("blah");
 
-    assertTrue(!filter.accept(message, mock(Event.Builder.class)));
+    assertTrue(!filter.accept(message, eventBuilder));
     message = removeProperty(message);
-    assertTrue(!filter.accept(message, mock(Event.Builder.class)));
+    assertTrue(!filter.accept(message, eventBuilder));
     message = InternalMessage.builder(message).addOutboundProperty("foo", "car").build();
-    assertTrue(filter.accept(message, mock(Event.Builder.class)));
+    assertTrue(filter.accept(message, eventBuilder));
   }
 
   @Test
@@ -94,11 +106,11 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
     ExpressionFilter filter = new ExpressionFilter("mel:flowVars['foo']!=null");
     filter.setMuleContext(muleContext);
 
-    assertTrue(!filter.accept(testEvent(), mock(Event.Builder.class)));
+    assertTrue(!filter.accept(testEvent(), eventBuilder));
     Event event = Event.builder(testEvent()).message(removeProperty(testEvent().getMessage())).build();
-    assertTrue(!filter.accept(event, mock(Event.Builder.class)));
+    assertTrue(!filter.accept(event, eventBuilder));
     event = Event.builder(event).addVariable("foo", "car").build();
-    assertTrue(filter.accept(event, mock(Event.Builder.class)));
+    assertTrue(filter.accept(event, eventBuilder));
   }
 
   @Test
@@ -125,9 +137,9 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
 
     assertNotNull(filter.getExpression());
 
-    assertTrue(filter.accept(of("The number is 4"), mock(Event.Builder.class)));
-    assertFalse(filter.accept(of("Say again?"), mock(Event.Builder.class)));
-    assertFalse(filter.accept(of("The number is 0"), mock(Event.Builder.class)));
+    assertTrue(filter.accept(of("The number is 4"), eventBuilder));
+    assertFalse(filter.accept(of("Say again?"), eventBuilder));
+    assertFalse(filter.accept(of("The number is 0"), eventBuilder));
   }
 
   @Test
@@ -137,13 +149,13 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
 
     Message m = of("test");
     m = InternalMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test"))).build();
-    assertTrue(filter.accept(m, mock(Event.Builder.class)));
+    assertTrue(filter.accept(m, eventBuilder));
 
     filter = new ExpressionFilter("mel:exception.getCause() is java.io.IOException");
     filter.setMuleContext(muleContext);
-    assertTrue(!filter.accept(m, mock(Event.Builder.class)));
+    assertTrue(!filter.accept(m, eventBuilder));
     m = InternalMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IOException("test"))).build();
-    assertTrue(filter.accept(m, mock(Event.Builder.class)));
+    assertTrue(filter.accept(m, eventBuilder));
   }
 
   @Test
@@ -153,13 +165,13 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
 
     Message m = of("test");
     m = InternalMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test"))).build();
-    assertTrue(filter.accept(m, mock(Event.Builder.class)));
+    assertTrue(filter.accept(m, eventBuilder));
 
     filter = new ExpressionFilter("mel:exception.getCause() is java.io.IOException");
     filter.setMuleContext(muleContext);
-    assertTrue(!filter.accept(m, mock(Event.Builder.class)));
+    assertTrue(!filter.accept(m, eventBuilder));
     m = InternalMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IOException("test"))).build();
-    assertTrue(filter.accept(m, mock(Event.Builder.class)));
+    assertTrue(filter.accept(m, eventBuilder));
   }
 
   @Test
@@ -167,13 +179,13 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
     ExpressionFilter filter = new ExpressionFilter("mel:payload is org.mule.tck.testmodels.fruit.Apple");
     filter.setMuleContext(muleContext);
 
-    assertTrue(filter.accept(of(new Apple()), mock(Event.Builder.class)));
-    assertTrue(!filter.accept(of("test"), mock(Event.Builder.class)));
+    assertTrue(filter.accept(of(new Apple()), eventBuilder));
+    assertTrue(!filter.accept(of("test"), eventBuilder));
 
     filter = new ExpressionFilter("mel:payload is String");
     filter.setMuleContext(muleContext);
-    assertTrue(filter.accept(of("test"), mock(Event.Builder.class)));
-    assertTrue(!filter.accept(of(new Exception("test")), mock(Event.Builder.class)));
+    assertTrue(filter.accept(of("test"), eventBuilder));
+    assertTrue(!filter.accept(of(new Exception("test")), eventBuilder));
   }
 
   @Test
@@ -183,9 +195,9 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
 
     filter.setNullReturnsTrue(true);
 
-    assertTrue(filter.accept(of("true"), mock(Event.Builder.class)));
-    assertTrue(filter.accept(of("TRUE"), mock(Event.Builder.class)));
-    assertTrue(filter.accept(of("tRuE"), mock(Event.Builder.class)));
+    assertTrue(filter.accept(of("true"), eventBuilder));
+    assertTrue(filter.accept(of("TRUE"), eventBuilder));
+    assertTrue(filter.accept(of("tRuE"), eventBuilder));
   }
 
   @Test
@@ -195,9 +207,9 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
 
     filter.setNullReturnsTrue(false);
 
-    assertFalse(filter.accept(of("false"), mock(Event.Builder.class)));
-    assertFalse(filter.accept(of("FALSE"), mock(Event.Builder.class)));
-    assertFalse(filter.accept(of("faLSe"), mock(Event.Builder.class)));
+    assertFalse(filter.accept(of("false"), eventBuilder));
+    assertFalse(filter.accept(of("FALSE"), eventBuilder));
+    assertFalse(filter.accept(of("faLSe"), eventBuilder));
   }
 
 }

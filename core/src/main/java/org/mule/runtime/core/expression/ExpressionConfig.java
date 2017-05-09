@@ -9,7 +9,6 @@ package org.mule.runtime.core.expression;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 
-import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
