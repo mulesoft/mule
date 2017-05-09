@@ -1,4 +1,0 @@
-http\://www.mulesoft.org/schema/mule/nest-example-base/current/nest-example-base.xsd=META-INF/nest-example-base.xsd
-http\://www.mulesoft.org/schema/mule/nest-example-extension/current/nest-example-extension.xsd=META-INF/nest-example-extension.xsd
-http\://www.mulesoft.org/schema/mule/parsers-test/current/mule-parsers-test.xsd=META-INF/mule-parsers-test.xsd
-http\://www.mulesoft.org/schema/mule/pojo-test/current/mule-pojo-test.xsd=META-INF/mule-pojo-test.xsd
