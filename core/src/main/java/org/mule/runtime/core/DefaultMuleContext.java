@@ -877,7 +877,7 @@ public class DefaultMuleContext implements MuleContext {
                                                                                       config.getDefaultErrorHandlerName())));
       }
     } else {
-      defaultErrorHandler = new ErrorHandlerFactory().createDefault();
+      defaultErrorHandler = new ErrorHandlerFactory().createDefault(this);
     }
     return defaultErrorHandler;
   }

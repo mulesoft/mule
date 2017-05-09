@@ -197,7 +197,7 @@ public class TransactionalErrorHandlingExecutionTemplateTestCase extends Transac
     when(mockMessagingException.getEvent()).thenReturn(mockEvent).thenReturn(mockResultEvent);
     when(mockEvent.getError()).thenReturn(empty());
     when(mockMessagingExceptionHandler.handleException(mockMessagingException, mockEvent)).thenAnswer(invocationOnMock -> {
-      ErrorHandler errorHandler = new ErrorHandlerFactory().createDefault();
+      ErrorHandler errorHandler = new ErrorHandlerFactory().createDefault(mockMuleContext);
       when(mockMuleContext.getNotificationManager()).thenReturn(mock(ServerNotificationManager.class));
       when(mockMuleContext.getRegistry()).thenReturn(mock(MuleRegistry.class));
       errorHandler.setMuleContext(mockMuleContext);

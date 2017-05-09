@@ -79,7 +79,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     muleContext = mockContextWithServices();
     when(muleContext.getStatistics()).thenReturn(new AllStatistics());
     when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
-    when(muleContext.getDefaultErrorHandler()).thenReturn(new ErrorHandlerFactory().createDefault());
+    when(muleContext.getDefaultErrorHandler()).thenReturn(new ErrorHandlerFactory().createDefault(muleContext));
     notificationManager = mock(ServerNotificationManager.class);
     when(muleContext.getNotificationManager()).thenReturn(notificationManager);
     ErrorTypeLocator errorTypeLocator = mock(ErrorTypeLocator.class);
@@ -114,7 +114,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   @Test
   public void requestResponseException() throws Exception {
-    pipeline.setExceptionListener(new ErrorHandlerFactory().createDefault());
+    pipeline.setExceptionListener(new ErrorHandlerFactory().createDefault(muleContext));
     List<Processor> processors = new ArrayList<>();
     processors.add(new ExceptionThrowingMessageProcessor());
     pipeline.setMessageProcessors(processors);
