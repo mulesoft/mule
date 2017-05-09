@@ -136,18 +136,6 @@ public class AttributeEvaluator {
     return expressionResolver.apply(event);
   }
 
-  public TypedValue resolveTypedValue(Event event, DataType expectedDataType) {
-    if (isExpression()) {
-      return expressionManager.evaluate(attributeValue, expectedDataType, BindingContext.builder().build(), event);
-    } else if (isParseExpression()) {
-      final String value = expressionManager.parse(attributeValue, event, null);
-      return new TypedValue(value, DataType.builder().type(String.class).build());
-    } else {
-      Class<?> type = attributeValue == null ? Object.class : String.class;
-      return new TypedValue(attributeValue, DataType.builder().type(expectedDataType.getType()).build());
-    }
-  }
-
   public Object resolveValue(Event event) {
     return resolveTypedValue(event).getValue();
   }

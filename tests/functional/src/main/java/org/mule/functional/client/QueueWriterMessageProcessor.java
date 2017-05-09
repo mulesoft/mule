@@ -28,26 +28,22 @@ public class QueueWriterMessageProcessor extends AbstractAnnotatedObject impleme
 
   private MuleContext muleContext;
   private String name;
-  private AttributeEvaluator content;
+  private AttributeEvaluator attributeEvaluator;
+  private String content;
   private Class contentJavaType;
 
   @Override
   public Event process(Event event) throws MuleException {
     TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(DEFAULT_CONFIG_ID);
     Event copy;
-    if (content == null) {
+    if (attributeEvaluator == null) {
       copy = Event.builder(event).session(new DefaultMuleSession(event.getSession()))
           // Queue works based on MuleEvent for testing purposes. A real operation
           // would not be aware of the error field and just the plain message would be sent.
           .error(null)
-          .build();;
+          .build();
     } else {
-      Object payloadValue;
-      if (contentJavaType != null) {
-        payloadValue = content.resolveTypedValue(event, fromType(contentJavaType)).getValue();
-      } else {
-        payloadValue = content.resolveValue(event);
-      }
+      Object payloadValue = attributeEvaluator.resolveTypedValue(event).getValue();
       copy = Event.builder(event).message(Message.builder(event.getMessage()).payload(payloadValue).build())
           .session(new DefaultMuleSession(event.getSession()))
           // Queue works based on MuleEvent for testing purposes. A real operation
@@ -67,7 +63,7 @@ public class QueueWriterMessageProcessor extends AbstractAnnotatedObject impleme
   }
 
   public void setContent(String content) {
-    this.content = new AttributeEvaluator(content);
+    this.content = content;
   }
 
   public String getName() {
@@ -84,11 +80,14 @@ public class QueueWriterMessageProcessor extends AbstractAnnotatedObject impleme
 
   @Override
   public void initialise() throws InitialisationException {
-    if (content != null) {
-      content.initialize(muleContext.getExpressionManager());
-    } else if (contentJavaType != null) {
-      content = new AttributeEvaluator("#[payload]");
-      content.initialize(muleContext.getExpressionManager());
+    if (attributeEvaluator == null) {
+      String attribute = content == null ? "#[payload]" : content;
+      if (contentJavaType != null) {
+        attributeEvaluator = new AttributeEvaluator(attribute, fromType(contentJavaType));
+      } else {
+        attributeEvaluator = new AttributeEvaluator(attribute);
+      }
     }
+    attributeEvaluator.initialize(muleContext.getExpressionManager());
   }
 }
