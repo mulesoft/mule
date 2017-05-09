@@ -139,7 +139,7 @@ public class ProactorProcessingStrategyFactory extends AbstractRingBufferProcess
       } else if (processor.getProcessingType() == CPU_INTENSIVE) {
         return proactor(processor, cpuIntensiveScheduler);
       } else {
-        return publisher -> from(publisher).transform(processor);
+        return super.onProcessor(processor);
       }
     }
 

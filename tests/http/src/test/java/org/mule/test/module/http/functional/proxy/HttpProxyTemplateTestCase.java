@@ -57,7 +57,6 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   private RequestHandlerExtender handlerExtender;
   private boolean consumeAllRequest = true;
   private static String CPU_LIGHT_THREAD_PREFIX = "[MuleRuntime].cpuLight";
-  private static String IO_THREAD_PREFIX = "[MuleRuntime].io";
 
   @Override
   protected String getConfigFile() {
@@ -248,7 +247,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
     assertRequestOk(getProxyUrl(""), null);
     SensingNullRequestResponseMessageProcessor requestResponseProcessor = getSensingNullRequestResponseMessageProcessor();
     assertThat(requestResponseProcessor.requestThread, not(equalTo(requestResponseProcessor.responseThread)));
-    assertThat(requestResponseProcessor.responseThread.getName(), startsWith(IO_THREAD_PREFIX));
+    assertThat(requestResponseProcessor.responseThread.getName(), startsWith(CPU_LIGHT_THREAD_PREFIX));
   }
 
   private SensingNullRequestResponseMessageProcessor getSensingNullRequestResponseMessageProcessor() {

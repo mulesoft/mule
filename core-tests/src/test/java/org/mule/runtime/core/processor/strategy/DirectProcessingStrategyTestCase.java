@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.SYNCHRONOUS;
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -125,25 +128,39 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
 
   @Override
   @Description("Regardless of processor type, when the DirectProcessingStrategy is configured, the pipeline is executed "
-      + "synchronously in a caller thread but async processors will cause additional threads to be used.")
+      + "synchronously in a caller thread but async processors will cause additional threads to be used. Flow processing "
+      + "continues using async processor thread.")
   public void asyncCpuLight() throws Exception {
     super.asyncCpuLight();
     assertAsyncCpuLight();
   }
 
+  @Override
+  @Description("When using DirectProcessingStrategy continued processing is carried out using async processor thread which can "
+      + "cause processing to block if there are concurrent requests and the number of custom async processor threads are reduced")
+  public void asyncCpuLightConcurrent() throws Exception {
+    super.internalAsyncCpuLightConcurrent(true);
+    assertThat(threads, hasSize(3));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads.stream().filter(name -> name.startsWith(CUSTOM)).count(), equalTo(1l));
+  }
+
   protected void assertAsyncCpuLight() {
     assertThat(threads, hasSize(2));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads.stream().filter(name -> name.startsWith(CUSTOM)).count(), equalTo(1l));
   }
 
   protected void assertSynchronous(int concurrency) {
     assertThat(threads, hasSize(concurrency));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
 }

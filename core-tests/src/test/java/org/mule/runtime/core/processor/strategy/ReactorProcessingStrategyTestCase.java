@@ -7,13 +7,13 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
@@ -64,12 +64,11 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
       + " cpu light threads.")
   public void singleCpuLightConcurrent() throws Exception {
     super.singleCpuLightConcurrent();
-    assertThat(threads.size(), allOf(greaterThanOrEqualTo(1), lessThanOrEqualTo(2)));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), allOf(
-                                                                                          greaterThanOrEqualTo(1l),
-                                                                                          lessThanOrEqualTo(2l)));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
+    assertThat(threads, hasSize(between(1, 2)));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), between(1l, 2l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Override
@@ -131,8 +130,9 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   private void assertEverythingOnEventLoop() {
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Override
@@ -151,14 +151,27 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   }
 
   @Override
-  @Description("When the ReactorProcessingStrategy is configured and a transaction is active processing fails with an error")
+  @Description("When the ReactorProcessingStrategy is configured any async processing will be returned to CPU_LIGHT thread. "
+      + "This helps avoid deadlocks when there are reduced number of threads used by async processor.")
   public void asyncCpuLight() throws Exception {
     super.asyncCpuLight();
-    assertThat(threads, hasSize(2));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CUSTOM)).count(), equalTo(1l));
+    assertThat(threads.size(), between(1, 2));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), between(1l, 2l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Override
+  @Description("When the ReactorProcessingStrategy is configured any async processing will be returned to CPU_LIGHT thread. "
+      + "This helps avoid deadlocks when there are reduced number of threads used by async processor.")
+  public void asyncCpuLightConcurrent() throws Exception {
+    super.asyncCpuLightConcurrent();
+    assertThat(threads.size(), between(2, 3));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), between(2l, 3l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
 }

@@ -43,4 +43,13 @@ public class BlockingProcessingStrategyTestCase extends DirectProcessingStrategy
     assertSynchronous(1);
   }
 
+  @Override
+  @Description("Regardless of processor type, when the BlockingProcessingStrategy is configured, the pipeline is executed "
+      + "synchronously in a caller thread and the pipeline will block caller thread until any async processors complete " +
+      "before continuing in the caller thread.")
+  public void asyncCpuLightConcurrent() throws Exception {
+    super.internalAsyncCpuLightConcurrent(false);
+    assertSynchronous(2);
+  }
+
 }

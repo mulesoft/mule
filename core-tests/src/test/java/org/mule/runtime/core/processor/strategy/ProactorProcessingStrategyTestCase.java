@@ -6,21 +6,21 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -62,10 +62,11 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
       + " cpu light thread.")
   public void singleCpuLight() throws Exception {
     super.singleCpuLight();
-    assertThat(threads.size(), equalTo(1));
+    assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Override
@@ -73,12 +74,11 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
       + " cpu light threads. MULE-11132 is needed for true reactor behaviour.")
   public void singleCpuLightConcurrent() throws Exception {
     super.singleCpuLightConcurrent();
-    assertThat(threads.size(), allOf(greaterThanOrEqualTo(1), lessThanOrEqualTo(2)));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), allOf(
-                                                                                          greaterThanOrEqualTo(1l),
-                                                                                          lessThanOrEqualTo(2l)));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
+    assertThat(threads, hasSize(between(1, 2)));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), between(1l, 2l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Override
@@ -86,20 +86,22 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
       + " cpu light thread.")
   public void multipleCpuLight() throws Exception {
     super.multipleCpuLight();
-    assertThat(threads.size(), equalTo(1));
+    assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Override
   @Description("With the ProactorProcessingStrategy, a BLOCKING message processor is scheduled on a IO thread.")
   public void singleBlocking() throws Exception {
     super.singleBlocking();
-    assertThat(threads.size(), equalTo(1));
+    assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Override
@@ -107,22 +109,22 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
       + "may not, be the same thread.")
   public void multipleBlocking() throws Exception {
     super.multipleBlocking();
-    assertThat(threads.size(), allOf(greaterThanOrEqualTo(1), lessThanOrEqualTo(3)));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), allOf(
-                                                                                   greaterThanOrEqualTo(1l),
-                                                                                   lessThanOrEqualTo(3l)));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
+    assertThat(threads, hasSize(between(1, 3)));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), between(1l, 3l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Override
   @Description("With the ProactorProcessingStrategy, a CPU_INTENSIVE message processor is scheduled on a CPU intensive thread.")
   public void singleCpuIntensive() throws Exception {
     super.singleCpuIntensive();
-    assertThat(threads.size(), equalTo(1));
+    assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(1l));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(0l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Override
@@ -130,12 +132,11 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
       + " These may, or may not, be the same thread.")
   public void multipleCpuIntensive() throws Exception {
     super.multipleCpuIntensive();
-    assertThat(threads.size(), allOf(greaterThanOrEqualTo(1), lessThanOrEqualTo(3)));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), allOf(
-                                                                                              greaterThanOrEqualTo(1l),
-                                                                                              lessThanOrEqualTo(3l)));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(0l));
+    assertThat(threads, hasSize(between(1, 3)));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), between(1l, 3l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Override
@@ -143,11 +144,11 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
       + "scheduled on the correct scheduler.")
   public void mix() throws Exception {
     super.mix();
-    assertThat(threads.size(), equalTo(3));
+    assertThat(threads, hasSize(equalTo(3)));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(1l));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
-
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Override
@@ -155,14 +156,11 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
       + "scheduled on the correct scheduler.")
   public void mix2() throws Exception {
     super.mix2();
-    assertThat(threads.size(), allOf(greaterThanOrEqualTo(3), lessThanOrEqualTo(7)));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(),
-               allOf(greaterThanOrEqualTo(1l), lessThanOrEqualTo(2l)));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(),
-               allOf(greaterThanOrEqualTo(1l), lessThanOrEqualTo(2l)));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), allOf(
-                                                                                          greaterThanOrEqualTo(1l),
-                                                                                          lessThanOrEqualTo(3l)));
+    assertThat(threads, hasSize(between(3, 7)));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), between(1l, 2l));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), between(1l, 2l));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), between(1l, 3l));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Override
@@ -184,11 +182,11 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
   @Description("When the ReactorProcessingStrategy is configured and a transaction is active processing fails with an error")
   public void asyncCpuLight() throws Exception {
     super.asyncCpuLight();
-    assertThat(threads, hasSize(2));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
-    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(0l));
-    assertThat(threads.stream().filter(name -> name.startsWith(CUSTOM)).count(), equalTo(1l));
+    assertThat(threads, hasSize(between(1, 2)));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), between(1l, 2l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
 }
