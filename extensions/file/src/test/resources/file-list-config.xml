@@ -9,7 +9,7 @@
         <file:connection workingDir="${workingDir}" />
     </file:config>
 
-    <file:matcher name="globalMatcher" directories="ONLY" filenamePattern="sub*" />
+    <file:matcher name="globalMatcher" directories="REQUIRE" filenamePattern="sub*" />
 
     <flow name="list">
         <file:list config-ref="file" directoryPath="#[path]" recursive="#[recursive]" />

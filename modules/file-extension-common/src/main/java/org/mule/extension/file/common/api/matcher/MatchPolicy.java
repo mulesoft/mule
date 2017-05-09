@@ -21,7 +21,7 @@ public enum MatchPolicy {
   /**
    * Accept only the files which comply with the filter
    */
-  ONLY {
+  REQUIRE {
 
     @Override
     public Optional<Boolean> asBoolean() {
@@ -37,7 +37,7 @@ public enum MatchPolicy {
   /**
    * Accept all files
    */
-  ACCEPTS {
+  INCLUDE {
 
     @Override
     public Optional<Boolean> asBoolean() {
@@ -52,7 +52,7 @@ public enum MatchPolicy {
   /**
    * Accept only the files which do not match the filter
    */
-  REJECTS {
+  EXCLUDE {
 
     @Override
     public Optional<Boolean> asBoolean() {
@@ -71,7 +71,7 @@ public enum MatchPolicy {
   public abstract Optional<Boolean> asBoolean();
 
   /**
-   * @return Whether {@code this} is {@link #ACCEPTS}
+   * @return Whether {@code this} is {@link #INCLUDE}
    */
   public abstract boolean acceptsAll();
 }
