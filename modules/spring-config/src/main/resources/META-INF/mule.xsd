@@ -2437,7 +2437,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
+                        <xsd:restriction base="substitutableName">
                             <xsd:enumeration value="started"/>
                             <xsd:enumeration value="stopped"/>
                         </xsd:restriction>
@@ -2584,7 +2584,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
+                        <xsd:restriction base="substitutableName">
                             <xsd:enumeration value="started"/>
                             <xsd:enumeration value="stopped"/>
                         </xsd:restriction>
