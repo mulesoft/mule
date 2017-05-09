@@ -34,7 +34,7 @@ public class ResolverSetResult {
    */
   public static class Builder {
 
-    Map<String, Object> values = new LinkedHashMap<>();
+    LinkedHashMap<String, Object> values = new LinkedHashMap<>();
 
     Builder() {}
 
@@ -100,7 +100,7 @@ public class ResolverSetResult {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof HashedResolverSetResult) {
+    if (obj instanceof ResolverSetResult) {
       ResolverSetResult other = (ResolverSetResult) obj;
       return evaluationResult.entrySet()
           .stream()
@@ -108,6 +108,11 @@ public class ResolverSetResult {
     }
 
     return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return evaluationResult.hashCode();
   }
 
   public Map<String, Object> asMap() {
