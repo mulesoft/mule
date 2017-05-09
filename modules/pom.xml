@@ -32,8 +32,6 @@
         <module>policy-api</module>
         <module>reboot</module>
         <module>schedulers</module>
-        <module>scripting</module>
-        <module>scripting-jruby</module>
         <module>scripting-plugin</module>
         <module>spring-config</module>
         <module>service</module>
