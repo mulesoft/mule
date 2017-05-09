@@ -121,6 +121,7 @@ public class MessagingException extends MuleException {
     this.failingMessageProcessor = original.getFailingMessageProcessor();
     this.causeRollback = original.causedRollback();
     this.handled = original.handled();
+    original.getInfo().forEach((key, value) -> addInfo((String) key, value));
     extractMuleMessage(event);
     setMessage(original.getMessage());
   }
