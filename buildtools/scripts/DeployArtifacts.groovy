@@ -20,7 +20,6 @@ import groovy.transform.Field
 @Field deploySignatures = true
 @Field packagingExceptions = ['geomail': 'war']
 @Field deployExceptions = []
-@Field artifactIdExceptions = ['jboss-transactions'      : 'mule-module-jbossts']
 
 parseArguments(args)
 deployJars()
@@ -85,11 +84,6 @@ def deployJars()
                 String packaging = 'jar'
                 packaging = packagingExceptions.get(module.text()) ? packagingExceptions.get(module.text()) : packaging
                 String artifact = "mule-${group}-${module.text()}"
-                artifact = artifactIdExceptions.get(module.text()) ? artifactIdExceptions.get(module.text()) : artifact
-                if (deployExceptions.contains(module.text()))
-                {
-                    return
-                }
                 deployToRemote(ceRepoUrl, ceRepoId, pom.groupId, artifact, version, packaging)
             }
         }

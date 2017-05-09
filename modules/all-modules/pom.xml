@@ -47,11 +47,6 @@
     </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-jbossts</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-policy-api</artifactId>
             <version>${mulePolicyApiVersion}</version>
         </dependency>
