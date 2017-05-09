@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 
 import com.google.common.base.Objects;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,11 +19,7 @@ import java.util.Map;
 /**
  * This class represents the outcome of the evaluation of a {@link ResolverSet}. This class maps a set of {@link ParameterModel}
  * to a set of result {@link Object}s.
- * <p/>
- * This classes {@link #equals(Object)} and {@link #hashCode()} methods have been redefined to be consistent with the result
- * objects. This is so that given two instances of this class you can determine if the evaluations they represent have an
- * equivalent outcome
- * <p/>
+ * <p>
  * Instances of this class can only be created through a {@link Builder} obtained via {@link #newBuilder()}
  *
  * @since 3.7.0
@@ -36,12 +32,11 @@ public class ResolverSetResult {
    *
    * @since 3.7.0
    */
-  public static final class Builder {
+  public static class Builder {
 
-    private int hashCode = 1;
-    private Map<String, Object> values = new LinkedHashMap<>();
+    LinkedHashMap<String, Object> values = new LinkedHashMap<>();
 
-    private Builder() {}
+    Builder() {}
 
     /**
      * Adds a new result {@code value} for the given {@code key}
@@ -54,7 +49,6 @@ public class ResolverSetResult {
     public Builder add(String key, Object value) {
       checkArgument(key != null, "parameter cannot be null");
       values.put(key, value);
-      hashCode = 31 * hashCode + (value == null ? 0 : value.hashCode());
       return this;
     }
 
@@ -64,7 +58,7 @@ public class ResolverSetResult {
      * @return the build instance
      */
     public ResolverSetResult build() {
-      return new ResolverSetResult(Collections.unmodifiableMap(values), hashCode);
+      return new ResolverSetResult(unmodifiableMap(values));
     }
   }
 
@@ -78,11 +72,9 @@ public class ResolverSetResult {
   }
 
   private final Map<String, Object> evaluationResult;
-  private final int hashCode;
 
-  private ResolverSetResult(Map<String, Object> evaluationResult, int hashCode) {
+  ResolverSetResult(Map<String, Object> evaluationResult) {
     this.evaluationResult = new HashMap<>(evaluationResult);
-    this.hashCode = hashCode;
   }
 
   /**
@@ -95,16 +87,12 @@ public class ResolverSetResult {
     return evaluationResult.get(parameterName);
   }
 
-  public Map<String, Object> asMap() {
-    return evaluationResult;
-  }
-
   /**
    * Defines equivalence by comparing the values in both objects. To consider that two instances are equal, they both must have
    * equivalent results for every registered {@link ParameterModel}. Values will be tested for equality using their own
    * implementation of {@link Object#equals(Object)}. For the case of a {@code null} value, equality requires the other one to be
    * {@code null} as well.
-   * <p/>
+   * <p>
    * This implementation fails fast. Evaluation is finished at the first non equal value, returning {@code false}
    *
    * @param obj the object to test for equality
@@ -114,20 +102,28 @@ public class ResolverSetResult {
   public boolean equals(Object obj) {
     if (obj instanceof ResolverSetResult) {
       ResolverSetResult other = (ResolverSetResult) obj;
-      return !evaluationResult.entrySet().stream().filter(entry -> !Objects.equal(entry.getValue(), other.get(entry.getKey())))
-          .findFirst().isPresent();
+      return evaluationResult.entrySet()
+          .stream()
+          .allMatch(entry -> Objects.equal(entry.getValue(), other.get(entry.getKey())));
     }
 
     return false;
   }
 
-  /**
-   * A hashCode calculated based on the results
-   *
-   * @return a hashCode
-   */
   @Override
   public int hashCode() {
-    return hashCode;
+    int hashcode = 1;
+    for (Object val : evaluationResult.values()) {
+      hashcode = calculateValueHash(hashcode, val);
+    }
+    return hashcode;
+  }
+
+  static int calculateValueHash(int hashcode, Object val) {
+    return 31 * hashcode + (val == null ? 0 : val.hashCode());
+  }
+
+  public Map<String, Object> asMap() {
+    return evaluationResult;
   }
 }

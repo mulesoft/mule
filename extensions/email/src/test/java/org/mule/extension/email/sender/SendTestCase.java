@@ -7,23 +7,21 @@
 package org.mule.extension.email.sender;
 
 import static java.nio.charset.Charset.availableCharsets;
-import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.text.IsEmptyString.isEmptyString;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT;
-
 import org.mule.runtime.core.util.IOUtils;
+
+import org.junit.Test;
 
 import java.io.InputStream;
 
 import javax.activation.DataHandler;
 import javax.mail.Message;
 import javax.mail.Multipart;
-
-import org.hamcrest.CoreMatchers;
-import org.junit.Test;
 
 public class SendTestCase extends SMTPTestCase {
 
@@ -79,7 +77,7 @@ public class SendTestCase extends SMTPTestCase {
   @Test
   public void sendEncodedMessage() throws Exception {
     final String defaultEncoding = muleContext.getConfiguration().getDefaultEncoding();
-    assertThat(defaultEncoding, CoreMatchers.is(notNullValue()));
+    assertThat(defaultEncoding, is(notNullValue()));
 
     final String customEncoding =
         availableCharsets().keySet().stream().filter(encoding -> !encoding.equals(defaultEncoding)).findFirst().orElse(null);

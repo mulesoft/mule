@@ -45,10 +45,6 @@ import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import com.google.common.collect.ImmutableList;
-
-import java.util.List;
-import java.util.Optional;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -58,6 +54,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.List;
+import java.util.Optional;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)

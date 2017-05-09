@@ -8,6 +8,7 @@
 package org.mule.test.typed.value.extension.extension;
 
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -16,6 +17,7 @@ import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.vegan.extension.VeganProductInformation;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -67,5 +69,14 @@ public class TypedValueParameterOperations {
 
   public TypedValue<String> typedValueOperationWithStringContent(@Content TypedValue<String> stringDescription) {
     return stringDescription;
+  }
+
+  @OutputResolver(output = NullOutputResolver.class)
+  public TypedValue<Object> typedValueForObject(@Content TypedValue<Object> objectTypedValue) {
+    return objectTypedValue;
+  }
+
+  public TypedValue<InputStream> typedValueForInputStream(@Content TypedValue<InputStream> inputStream) {
+    return inputStream;
   }
 }

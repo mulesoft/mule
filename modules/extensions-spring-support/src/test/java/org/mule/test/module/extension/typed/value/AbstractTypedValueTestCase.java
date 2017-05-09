@@ -21,7 +21,13 @@ public abstract class AbstractTypedValueTestCase extends AbstractExtensionFuncti
 
   static final Charset UTF8 = Charset.forName("UTF-8");
   static final MediaType APPLICATION_JAVA = MediaType.parse("application/java");
+  static final MediaType WILDCARD = MediaType.parse("*/*");
   static final KnockeableDoor DOOR = new KnockeableDoor("Saul");
+
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
 
   void runAndAssertTypedValue(String flowName, Object payloadValue, MediaType mediaType, Charset charset)
       throws Exception {

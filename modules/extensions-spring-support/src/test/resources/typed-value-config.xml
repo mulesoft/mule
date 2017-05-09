@@ -9,12 +9,12 @@
     <typed-value:config name="config"/>
 
     <flow name="typedValueForString">
-        <set-payload value="This is a string" mimeType="application/json" encoding="UTF-8"/>
+        <set-payload value="&quot;This is a string&quot;" mimeType="application/json" encoding="UTF-8"/>
         <typed-value:typed-value-operation-string-parameter stringValue="#[payload]"/>
     </flow>
 
     <flow name="typedValueForStringFromByteArray">
-        <set-payload value="#[mel:'This is a string'.getBytes()]" mimeType="application/json" encoding="UTF-8"/>
+        <set-payload value="&quot;This is a string&quot;" mimeType="application/json" encoding="UTF-8"/>
         <typed-value:typed-value-operation-string-parameter stringValue="#[payload]"/>
     </flow>
 
@@ -23,8 +23,7 @@
     </flow>
 
     <flow name="typedValueForStringList">
-        <set-payload value="#[mel:['string','string']]" mimeType="application/java" encoding="UTF-8"/>
-        <typed-value:typed-value-operation-string-list-parameter stringValues="#[payload]"/>
+        <typed-value:typed-value-operation-string-list-parameter stringValues="#[['string','string']]"/>
     </flow>
     <flow name="typedValueForStringListAsChild">
         <typed-value:typed-value-operation-string-list-parameter>
@@ -36,8 +35,7 @@
     </flow>
 
     <flow name="typedValueForStringMap">
-        <set-payload value="#[mel:['string':'string']]" mimeType="application/java" encoding="UTF-8"/>
-        <typed-value:typed-value-operation-string-map-parameter stringMapValues="#[payload]"/>
+        <typed-value:typed-value-operation-string-map-parameter stringMapValues="#[{string:'string'}]"/>
     </flow>
 
     <flow name="typedValueForStringMapAsChild">
@@ -84,30 +82,31 @@
 
     <flow name="typedValueForStringOnSourceOnSuccess" initialState="stopped">
         <typed-value:source stringValue="#[payload]"/>
-        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <logger level="ERROR" message="#[payload]"/>
+        <set-payload value="&quot;string&quot;" mimeType="application/json" encoding="UTF-8"/>
     </flow>
 
     <flow name="typedValueForStringInsidePojo">
-        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <set-payload value="&quot;string&quot;" mimeType="application/json" encoding="UTF-8"/>
         <typed-value:typed-value-for-string-inside-pojo>
             <typed-value:differed-door address="#[payload]"/>
         </typed-value:typed-value-for-string-inside-pojo>
     </flow>
 
     <flow name="typedValueForContentOnNullSafePojoWithDefaultValue">
-        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <set-payload value="&quot;string&quot;" mimeType="application/json" encoding="UTF-8"/>
         <typed-value:typed-value-operation-pojo-with-nullsafe-and-content >
             <typed-value:param/>
         </typed-value:typed-value-operation-pojo-with-nullsafe-and-content>
     </flow>
 
     <flow name="typedValueForContentOnNullSafePojoWithDefaultValueWithOutDefiningPojo">
-        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <set-payload value="&quot;string&quot;" mimeType="application/json" encoding="UTF-8"/>
         <typed-value:typed-value-operation-pojo-with-nullsafe-and-content />
     </flow>
 
     <flow name="typedValueOnContentOnNullSafeWithExplicitValues">
-        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <set-payload value="&quot;string&quot;" mimeType="application/json" encoding="UTF-8"/>
         <typed-value:typed-value-operation-pojo-with-nullsafe-and-content >
             <typed-value:param weight="#[5]">
                 <typed-value:description>
@@ -121,7 +120,7 @@
     </flow>
 
     <flow name="typedValueOperationWithExplicitStringContent">
-        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <set-payload value="&quot;string&quot;" mimeType="application/json" encoding="UTF-8"/>
         <typed-value:typed-value-operation-with-string-content>
             <typed-value:string-description>
                 #[payload]
@@ -130,16 +129,40 @@
     </flow>
 
     <flow name="typedValueOperationWithDefaultStringContent">
-        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <set-payload value="&quot;string&quot;" mimeType="application/json" encoding="UTF-8"/>
         <typed-value:typed-value-operation-with-string-content/>
     </flow>
 
     <flow name="typedValueOperationWithExplicitNullContent">
-        <set-payload value="string" mimeType="application/json" encoding="UTF-8"/>
+        <set-payload value="&quot;string&quot;" mimeType="application/json" encoding="UTF-8"/>
         <typed-value:typed-value-operation-with-string-content>
             <typed-value:string-description>
                 #[null]
             </typed-value:string-description>
         </typed-value:typed-value-operation-with-string-content>
+    </flow>
+
+    <flow name="typedValueForObject">
+        <typed-value:typed-value-for-object>
+            <typed-value:object-typed-value>
+                #[%output application/json
+                ---
+                {
+                a : "json value"
+                }]
+            </typed-value:object-typed-value>
+        </typed-value:typed-value-for-object>
+    </flow>
+
+    <flow name="typedValueForInputStream">
+        <typed-value:typed-value-for-input-stream>
+            <typed-value:input-stream>
+                #[%output application/json
+                ---
+                {
+                a : "json value"
+                }]
+            </typed-value:input-stream>
+        </typed-value:typed-value-for-input-stream>
     </flow>
 </mule>

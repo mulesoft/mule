@@ -198,12 +198,12 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor
   @Override
   public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, BindingContext context)
       throws ExpressionRuntimeException {
-    return evaluate(expression, expectedOutputType, event, null, context);
+    return evaluate(expression, expectedOutputType, event, null, context, false);
   }
 
   @Override
   public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, FlowConstruct flowConstruct,
-                             BindingContext context)
+                             BindingContext context, boolean failOnNull)
       throws ExpressionRuntimeException {
     return evaluate(expression, event, flowConstruct, context);
   }

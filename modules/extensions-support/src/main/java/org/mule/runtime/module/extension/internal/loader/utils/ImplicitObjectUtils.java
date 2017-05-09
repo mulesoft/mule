@@ -11,6 +11,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.resolver.HashedResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NullSafeValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -36,7 +37,7 @@ public final class ImplicitObjectUtils {
    * @return a {@link ResolverSet}
    */
   public static ResolverSet buildImplicitResolverSet(ParameterizedModel parameterizedModel, MuleContext muleContext) {
-    ResolverSet resolverSet = new ResolverSet(muleContext);
+    ResolverSet resolverSet = new HashedResolverSet(muleContext);
     ParametersResolver parametersResolver =
         ParametersResolver.fromDefaultValues(parameterizedModel, muleContext);
 

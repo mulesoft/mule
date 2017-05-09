@@ -15,6 +15,11 @@ import org.hamcrest.Matcher;
 
 public abstract class AbstractParameterResolverTestCase extends AbstractExtensionFunctionalTestCase {
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   protected <T> T getPayload(String flowName) throws Exception {
     return (T) flowRunner(flowName).run().getMessage().getPayload().getValue();
   }

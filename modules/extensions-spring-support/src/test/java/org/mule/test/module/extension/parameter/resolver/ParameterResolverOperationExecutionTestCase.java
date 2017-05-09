@@ -17,20 +17,17 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
-
-import java.util.Optional;
 
 import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.ArgumentMatcher;
+
+import java.util.Optional;
 
 public class ParameterResolverOperationExecutionTestCase extends AbstractParameterResolverTestCase {
 
@@ -78,15 +75,7 @@ public class ParameterResolverOperationExecutionTestCase extends AbstractParamet
 
   @Test
   public void operationWithExpressionResolverNegative() throws Exception {
-    expectedException.expect(new ArgumentMatcher<MessagingException>() {
-
-      @Override
-      public boolean matches(Object o) {
-        return o instanceof MuleRuntimeException &&
-            ((MuleRuntimeException) o).getCause().getCause() instanceof TransformerException;
-      }
-    });
-
+    expectedException.expect(ExpressionRuntimeException.class);
     final ParameterResolver<Weapon> weapon =
         (ParameterResolver<Weapon>) flowRunner("processWrongWeapon").run().getMessage().getPayload().getValue();
     weapon.resolve();

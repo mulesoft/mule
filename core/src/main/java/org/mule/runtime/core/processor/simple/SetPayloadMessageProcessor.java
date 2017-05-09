@@ -31,7 +31,7 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
     final org.mule.runtime.core.api.Event.Builder eventBuilder = Event.builder(event);
 
     if (dataType == null) {
-      final TypedValue typedValue = resolveTypedValue(event, eventBuilder);
+      final TypedValue typedValue = resolveTypedValue(event);
       builder.payload(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType());
     } else {
       Object value = resolveValue(event);
@@ -53,11 +53,11 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
     return value;
   }
 
-  private TypedValue resolveTypedValue(Event event, Event.Builder eventBuilder) {
+  private TypedValue resolveTypedValue(Event event) {
     if (valueEvaluator.getRawValue() == null) {
       return new TypedValue(null, DataType.OBJECT);
     } else {
-      return valueEvaluator.resolveTypedValue(event, eventBuilder);
+      return valueEvaluator.resolveTypedValue(event);
     }
   }
 

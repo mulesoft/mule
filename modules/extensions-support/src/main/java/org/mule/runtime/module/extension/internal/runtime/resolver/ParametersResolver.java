@@ -123,6 +123,24 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     return resolverSet;
   }
 
+  /**
+   * Constructs a {@link ResolverSet} from the parameters, using {@link #toValueResolver(Object, Set)} to process the values.
+   *
+   * @return a {@link ResolverSet}
+   */
+  public ResolverSet getParametersAsHashedResolverSet(ParameterizedModel model, MuleContext muleContext)
+      throws ConfigurationException {
+
+    List<ParameterGroupModel> inlineGroups = getInlineGroups(model);
+    ResolverSet resolverSet =
+        getParametersAsHashedResolverSet(model, getFlatParameters(inlineGroups, model.getAllParameterModels()), muleContext);
+    for (ParameterGroupModel group : inlineGroups) {
+
+      getInlineGroupResolver(group, resolverSet, muleContext);
+    }
+    return resolverSet;
+  }
+
   private void getInlineGroupResolver(ParameterGroupModel group, ResolverSet resolverSet, MuleContext muleContext) {
     Optional<ParameterGroupDescriptor> descriptor = group.getModelProperty(ParameterGroupModelProperty.class)
         .map(ParameterGroupModelProperty::getDescriptor);
@@ -144,6 +162,19 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
                                                 MuleContext muleContext)
       throws ConfigurationException {
     ResolverSet resolverSet = new ResolverSet(muleContext);
+    return getResolverSet(model, parameterModels, muleContext, resolverSet);
+  }
+
+  public ResolverSet getParametersAsHashedResolverSet(ParameterizedModel model, List<ParameterModel> parameterModels,
+                                                      MuleContext muleContext)
+      throws ConfigurationException {
+    ResolverSet resolverSet = new HashedResolverSet(muleContext);
+    return getResolverSet(model, parameterModels, muleContext, resolverSet);
+  }
+
+  private ResolverSet getResolverSet(ParameterizedModel model, List<ParameterModel> parameterModels, MuleContext muleContext,
+                                     ResolverSet resolverSet)
+      throws ConfigurationException {
     parameterModels.forEach(p -> {
       final String parameterName = getMemberName(p, p.getName());
       ValueResolver<?> resolver;

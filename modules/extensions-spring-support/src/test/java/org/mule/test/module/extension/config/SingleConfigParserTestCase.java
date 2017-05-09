@@ -25,6 +25,11 @@ import org.junit.Test;
 
 public class SingleConfigParserTestCase extends AbstractConfigParserTestCase {
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   @Test
   public void configWithExpressionFunctionIsSameInstanceForDifferentEvents() throws Exception {
     Event event = getHeisenbergEvent();

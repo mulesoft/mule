@@ -11,6 +11,11 @@ import org.mule.runtime.api.metadata.MetadataService;
 
 public abstract class AbstractMetadataOperationTestCase extends MetadataExtensionFunctionalTestCase<OperationModel> {
 
+  @Override
+  protected boolean isDisposeContextPerClass() {
+    return true;
+  }
+
   public AbstractMetadataOperationTestCase(ResolutionType resolutionType) {
     super(resolutionType);
     this.provider = resolutionType == ResolutionType.EXPLICIT_RESOLUTION ? MetadataService::getOperationMetadata

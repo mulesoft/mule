@@ -20,7 +20,6 @@ import java.util.Iterator;
 /**
  * Binds Mule Core concepts {@link Event} or {@link FlowConstruct} and executes the underlying {@link ExpressionLanguage}.
  *
- *
  * @since 4.0
  */
 public interface ExpressionLanguageAdaptor {
@@ -37,9 +36,9 @@ public interface ExpressionLanguageAdaptor {
   /**
    * Evaluates an expression according to a given {@link BindingContext}, an {@link Event} and a {@link FlowConstruct}.
    *
-   * @param expression the expression to be executed
-   * @param event the current event being processed
-   * @param flowConstruct the flow where the event is being processed
+   * @param expression     the expression to be executed
+   * @param event          the current event being processed
+   * @param flowConstruct  the flow where the event is being processed
    * @param bindingContext the bindings to consider
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
@@ -51,7 +50,7 @@ public interface ExpressionLanguageAdaptor {
    * Evaluates an expression according to a given {@link BindingContext}.
    *
    * @param expression the expression to be executed
-   * @param event the current event being processed
+   * @param event      the current event being processed
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
@@ -60,10 +59,10 @@ public interface ExpressionLanguageAdaptor {
   /**
    * Evaluates an expression according to a given {@link BindingContext} and outputs .
    *
-   * @param expression the expression to be executed
-   * @param event the current event being processed
+   * @param expression         the expression to be executed
+   * @param event              the current event being processed
    * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
-   *        type.
+   *                           type.
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
@@ -73,17 +72,18 @@ public interface ExpressionLanguageAdaptor {
   /**
    * Evaluates an expression according to a given {@link BindingContext}, an {@link Event} and a {@link FlowConstruct}.
    *
-   * @param expression the expression to be executed
+   * @param expression         the expression to be executed
    * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
-   *        type.
-   * @param event the current event being processed
-   * @param flowConstruct the flow where the event is being processed
-   * @param context the bindings to consider
+   *                           type.
+   * @param event              the current event being processed
+   * @param flowConstruct      the flow where the event is being processed
+   * @param context            the bindings to consider
+   * @param failOnNull         indicates if should fail if the evaluation result is {@code null}
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
   TypedValue evaluate(String expression, DataType expectedOutputType, Event event, FlowConstruct flowConstruct,
-                      BindingContext context)
+                      BindingContext context, boolean failOnNull)
       throws ExpressionRuntimeException;
 
   /**
@@ -98,9 +98,9 @@ public interface ExpressionLanguageAdaptor {
    * Splits using the specified expression and group it with the batch size. If batch size is less or equals to zero then no batching is done.
    * The expression should return a collection of elements.
    *
-   * @param expression the expression to be executed
-   * @param event the current event being processed
-   * @param flowConstruct the flow where the event is being processed
+   * @param expression     the expression to be executed
+   * @param event          the current event being processed
+   * @param flowConstruct  the flow where the event is being processed
    * @param bindingContext the bindings to consider
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
@@ -113,8 +113,8 @@ public interface ExpressionLanguageAdaptor {
    * Splits using the specified expression and group it with the batch size. If batch size is less or equals to zero then no batching is done.
    * The expression should return a collection of elements.
    *
-   * @param expression the expression to be executed
-   * @param event the current event being processed
+   * @param expression     the expression to be executed
+   * @param event          the current event being processed
    * @param bindingContext the bindings to consider
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression

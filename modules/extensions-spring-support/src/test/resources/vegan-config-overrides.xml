@@ -46,7 +46,7 @@
     </flow>
 
     <flow name="timeToPeelOverrideOperationWithBananaDynamic">
-        <vegan:get-time-to-peel config-ref="bananaDynamic" timeToPeel="#[declaredVar]"/>
+        <vegan:get-time-to-peel config-ref="bananaDynamic" timeToPeel="#[variables.declaredVar]"/>
     </flow>
 
 
@@ -107,12 +107,12 @@
     <!-- source -->
     <flow name="sourceOverrideWithDefaults">
         <vegan:harvest-apples config-ref="apple" flowName="sourceOverrideWithDefaults"/>
-        <logger level="ERROR"/>
+        <logger level="DEBUG"/>
     </flow>
 
     <flow name="sourceOverrideWithCustom">
         <vegan:harvest-apples config-ref="appleCustom" flowName="sourceOverrideWithCustom"/>
-        <logger level="ERROR"/>
+        <logger level="DEBUG"/>
     </flow>
 
     <flow name="sourceDeclareValueInlineWithCustom">
@@ -125,7 +125,7 @@
                 <vegan:taste-profile tasty="false"/>
             </vegan:sample>
         </vegan:harvest-apples>
-        <logger level="ERROR"/>
+        <logger level="DEBUG"/>
     </flow>
 
 
