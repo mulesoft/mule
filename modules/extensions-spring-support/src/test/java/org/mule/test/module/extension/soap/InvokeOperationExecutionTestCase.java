@@ -44,4 +44,13 @@ public class InvokeOperationExecutionTestCase extends SoapExtensionArtifactFunct
     String response = getBodyXml("uploadResultResponse", "<message>Ok</message>");
     assertSimilarXml(response, IOUtils.toString((CursorStreamProvider) message.getPayload().getValue()));
   }
+
+  @Test
+  public void withCustomTransport() throws Exception {
+    String response = "<con:football xmlns:con=\"http://extension.soap.test.mule.org\">"
+        + "<text>Sent using Custom Transport</text>"
+        + "</con:football>";
+    Message message = flowRunner("withCustomTransport").keepStreamsOpen().run().getMessage();
+    assertSimilarXml(response, IOUtils.toString((CursorStreamProvider) message.getPayload().getValue()));
+  }
 }

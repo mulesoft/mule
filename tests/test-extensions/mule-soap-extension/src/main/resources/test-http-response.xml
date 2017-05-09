@@ -1,0 +1,7 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+<soap:Body>
+    <con:football xmlns:con="http://extension.soap.test.mule.org">
+        <text>Sent using Custom Transport</text>
+    </con:football>
+</soap:Body>
+</soap:Envelope>

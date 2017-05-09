@@ -26,7 +26,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.services.soap.api.client.SoapClient;
 
 /**
- * Implementation of {@link ConnectionProviderObjectBuilder} which produces instances of {@link SoapConnectionProvider}.
+ * Implementation of {@link ConnectionProviderObjectBuilder} which produces instances of {@link ForwardingSoapClientConnectionProvider}.
  *
  * @since 4.0
  */
@@ -52,16 +52,17 @@ public final class SoapConnectionProviderObjectBuilder extends ConnectionProvide
   }
 
   /**
-   * Build a new {@link SoapConnectionProvider} based on a {@link SoapServiceProvider} instance.
+   * Build a new {@link ForwardingSoapClientConnectionProvider} based on a {@link SoapServiceProvider} instance.
    *
    * @param result the {@link ResolverSetResult} with the values for the {@link SoapServiceProvider} instance.
-   * @return a wrapped {@link SoapConnectionProvider} with error handling and polling mechanisms.
+   * @return a wrapped {@link ForwardingSoapClientConnectionProvider} with error handling and polling mechanisms.
    * @throws MuleException
    */
   @Override
   public ConnectionProvider build(ResolverSetResult result) throws MuleException {
     SoapServiceProvider serviceProvider = objectBuilder.build(result);
-    ConnectionProvider<ForwardingSoapClient> provider = new SoapConnectionProvider(serviceProvider);
+    muleContext.getInjector().inject(serviceProvider);
+    ConnectionProvider<ForwardingSoapClient> provider = new ForwardingSoapClientConnectionProvider(serviceProvider);
     provider = new PoolingConnectionProviderWrapper<>(provider, poolingProfile, disableValidation, retryPolicyTemplate);
     provider = new ErrorTypeHandlerConnectionProviderWrapper<>(provider, muleContext, extensionModel, retryPolicyTemplate);
     return provider;
