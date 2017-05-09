@@ -20,6 +20,11 @@ import static org.mule.service.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.service.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static org.mule.service.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.decodeUrlEncodedBody;
+import static reactor.core.publisher.Mono.defer;
+import static reactor.core.publisher.Mono.error;
+import static reactor.core.publisher.Mono.just;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpMessageParsingException;
 import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBuilder;
@@ -27,6 +32,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
@@ -56,8 +62,10 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
 
 /**
  * Component that transforms an HTTP response to a proper {@link Result}.
@@ -79,26 +87,33 @@ public class HttpResponseToResult {
     this.muleContext = muleContext;
   }
 
-  public Result<Object, HttpResponseAttributes> convert(MediaType mediaType, HttpResponse response, String uri)
+  public Publisher<Result<Object, HttpResponseAttributes>> convert(MediaType mediaType, HttpResponse response, String uri,
+                                                                   Scheduler scheduler)
       throws HttpMessageParsingException {
     String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
     if (isEmpty(responseContentType) && !ANY.matches(mediaType)) {
       responseContentType = mediaType.toRfcString();
     }
+    final String finalResponseContentType = responseContentType;
 
     InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
     Charset encoding = getMediaType(responseContentType, getDefaultEncoding(muleContext)).getCharset().get();
 
-    Object payload = responseInputStream;
+    Mono<?> payload = just(responseInputStream);
     if (responseContentType != null && parseResponse) {
       if (responseContentType.startsWith(MULTI_PART_PREFIX)) {
-        try {
-          payload = multiPartPayloadForAttachments(responseContentType, responseInputStream);
-        } catch (IOException e) {
-          throw new HttpMessageParsingException(createStaticMessage("Unable to process multipart response"), e);
-        }
+        // Given we need to read whole payload in this scenario, do this using IO scheduler for avoid deadlock
+        payload = defer(() -> {
+          try {
+            return just(multiPartPayloadForAttachments(finalResponseContentType, responseInputStream));
+          } catch (IOException e) {
+            return error(new HttpMessageParsingException(createStaticMessage("Unable to process multipart response"), e));
+          }
+        }).subscribeOn(fromExecutorService(scheduler));
       } else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
-        payload = decodeUrlEncodedBody(IOUtils.toString(responseInputStream), encoding);
+        // Given we need to read whole payload in this scenario, do this using IO scheduler for avoid deadlock
+        payload = defer(() -> just(decodeUrlEncodedBody(IOUtils.toString(responseInputStream), encoding)))
+            .subscribeOn(fromExecutorService(scheduler));
       }
     }
 
@@ -109,15 +124,16 @@ public class HttpResponseToResult {
     HttpResponseAttributes responseAttributes = createAttributes(response);
 
     mediaType = DataType.builder().mediaType(mediaType).charset(encoding).build().getMediaType();
-    final Result.Builder builder = Result.builder().output(payload);
 
+    final Result.Builder builder = Result.builder();
     if (isEmpty(responseContentType)) {
       builder.mediaType(mediaType);
     } else {
       builder.mediaType(MediaType.parse(responseContentType));
     }
+    builder.attributes(responseAttributes);
 
-    return builder.attributes(responseAttributes).build();
+    return payload.map(p -> builder.output(p).build());
   }
 
   private static MultiPartPayload multiPartPayloadForAttachments(String responseContentType, InputStream responseInputStream)

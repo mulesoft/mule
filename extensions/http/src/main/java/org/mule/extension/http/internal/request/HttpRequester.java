@@ -9,6 +9,8 @@ package org.mule.extension.http.internal.request;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
 import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
+import static reactor.core.publisher.Mono.from;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
@@ -83,8 +85,8 @@ public class HttpRequester {
                         CompletionCallback<Object, HttpResponseAttributes> callback) {
     HttpRequest httpRequest = eventToHttpRequest.create(requestBuilder, authentication, muleContext);
 
-    //TODO: MULE-10340 - Add notifications to HTTP request
-    //notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_BEGIN);
+    // TODO: MULE-10340 - Add notifications to HTTP request
+    // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_BEGIN);
     client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication),
                 createResponseHandler(muleContext, requestBuilder, client, httpRequest, checkRetry,
                                       callback));
@@ -98,26 +100,26 @@ public class HttpRequester {
 
       @Override
       public void onCompletion(HttpResponse response) {
-        //TODO: MULE-11310 - Make HTTP request scheduling fine grained
-        scheduler.execute(() -> {
-          HttpResponseToResult httpResponseToResult = new HttpResponseToResult(config, parseResponse, muleContext);
-          try {
-            MediaType mediaType = requestBuilder.getBody().getDataType().getMediaType();
-            Result<Object, HttpResponseAttributes> result = httpResponseToResult.convert(mediaType, response,
-                                                                                         httpRequest.getUri());
-            //TODO: MULE-10340 - Add notifications to HTTP request
-            //notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
-            if (resendRequest(result, checkRetry, authentication)) {
-              consumePayload(result);
-              doRequest(client, requestBuilder, false, muleContext, callback);
-            } else {
-              responseValidator.validate(result);
-              callback.success(result);
-            }
-          } catch (Exception e) {
-            callback.error(e);
-          }
-        });
+        HttpResponseToResult httpResponseToResult = new HttpResponseToResult(config, parseResponse, muleContext);
+        MediaType mediaType = requestBuilder.getBody().getDataType().getMediaType();
+        from(httpResponseToResult.convert(mediaType, response, httpRequest.getUri(), scheduler))
+            .doOnNext(result -> {
+              // TODO: MULE-10340 - Add notifications to HTTP request
+              // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
+              try {
+                if (resendRequest(result, checkRetry, authentication)) {
+                  scheduler.submit(() -> consumePayload(result));
+                  doRequest(client, requestBuilder, false, muleContext, callback);
+                } else {
+                  responseValidator.validate(result);
+                  callback.success(result);
+                }
+              } catch (MuleException e) {
+                callback.error(e);
+              }
+            })
+            .doOnError(Exception.class, exception -> callback.error(exception))
+            .subscribe();
       }
 
       @Override
