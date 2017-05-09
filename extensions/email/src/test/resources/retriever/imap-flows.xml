@@ -37,13 +37,13 @@
 
     <flow name="retrieveOnlyNotReadEmails">
         <email:list-imap config-ref="config">
-            <email:imap-matcher seen="false"/>
+            <email:imap-matcher seen="EXCLUDE"/>
         </email:list-imap>
     </flow>
 
     <flow name="retrieveOnlyRecentEmails">
         <email:list-imap config-ref="config">
-            <email:imap-matcher recent="true"/>
+            <email:imap-matcher recent="REQUIRE"/>
         </email:list-imap>
     </flow>
 
