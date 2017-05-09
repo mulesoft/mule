@@ -11,11 +11,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.extension.email.api.predicate.EmailFilterPolicy.EXCLUDE;
+import static org.mule.extension.email.api.predicate.EmailFilterPolicy.INCLUDE;
+import static org.mule.extension.email.api.predicate.EmailFilterPolicy.REQUIRE;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import org.mule.extension.email.api.EmailFlags;
 import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
-import org.mule.extension.email.api.predicate.EmailFilterPolicy;
 import org.mule.extension.email.api.predicate.IMAPEmailPredicateBuilder;
 
 import java.time.LocalDateTime;
@@ -34,10 +36,10 @@ public class EmailPredicateTestCase {
   @Before
   public void before() {
     builder = new IMAPEmailPredicateBuilder();
-    builder.setAnswered(EmailFilterPolicy.INCLUDE);
-    builder.setDeleted(EmailFilterPolicy.INCLUDE);
-    builder.setRecent(EmailFilterPolicy.INCLUDE);
-    builder.setSeen(EmailFilterPolicy.INCLUDE);
+    builder.setAnswered(INCLUDE);
+    builder.setDeleted(INCLUDE);
+    builder.setRecent(INCLUDE);
+    builder.setSeen(INCLUDE);
 
 
     EmailFlags flags = mock(EmailFlags.class);
@@ -78,29 +80,29 @@ public class EmailPredicateTestCase {
     assertReject();
   }
 
-  //@Test
-  //public void matchSeen() {
-  //  builder.setSeen(true);
-  //  assertMatch();
-  //}
-  //
-  //@Test
-  //public void rejectSeen() {
-  //  builder.setSeen(false);
-  //  assertReject();
-  //}
-  //
-  //@Test
-  //public void matchRecent() {
-  //  builder.setRecent(true);
-  //  assertMatch();
-  //}
-  //
-  //@Test
-  //public void rejectRecent() {
-  //  builder.setRecent(false);
-  //  assertReject();
-  //}
+  @Test
+  public void matchSeen() {
+    builder.setSeen(REQUIRE);
+    assertMatch();
+  }
+
+  @Test
+  public void rejectSeen() {
+    builder.setSeen(EXCLUDE);
+    assertReject();
+  }
+
+  @Test
+  public void matchRecent() {
+    builder.setRecent(REQUIRE);
+    assertMatch();
+  }
+
+  @Test
+  public void rejectRecent() {
+    builder.setRecent(EXCLUDE);
+    assertReject();
+  }
 
   @Test
   public void matchReceivedDate() {
