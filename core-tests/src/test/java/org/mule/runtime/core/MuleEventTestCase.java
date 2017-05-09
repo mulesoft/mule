@@ -210,7 +210,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   public void eventContextSerializationEventContextGarbageCollected() throws Exception {
 
     Flow flow = getTestFlow(muleContext);
-    Event before = eventBuilder().flow(flow).build();
+    Event before = eventBuilder().message(of(null)).flow(flow).build();
     String beforeId = before.getContext().getId();
 
     byte[] bytes = SerializationUtils.serialize(before);
@@ -224,7 +224,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   @Test
   public void eventContextSerializationPublisherConserved() throws Exception {
     Event result = testEvent();
-    Event before = eventBuilder().flow(getTestFlow(muleContext)).build();
+    Event before = eventBuilder().message(of(null)).flow(getTestFlow(muleContext)).build();
 
     Event after = (Event) SerializationUtils.deserialize(SerializationUtils.serialize(before), muleContext);
 

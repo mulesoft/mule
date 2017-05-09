@@ -9,9 +9,11 @@ package org.mule.runtime.core;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -25,10 +27,15 @@ import org.mule.tck.size.SmallTest;
 import java.nio.charset.Charset;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @SmallTest
 public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
+
+  @Rule
+  public ExpectedException expected = none();
 
   public static final Charset CUSTOM_ENCODING = UTF_8;
   public static final String PROPERTY_NAME = "test";
@@ -80,5 +87,17 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
 
     DataType actualDataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
     assertThat(actualDataType, DataTypeMatcher.like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
+  }
+
+  @Test
+  public void setNullMessage() throws Exception {
+    expected.expect(NullPointerException.class);
+    Event.builder(messageContext).message(null);
+  }
+
+  @Test
+  public void dontsetMessage() throws Exception {
+    expected.expect(NullPointerException.class);
+    muleEvent = Event.builder(messageContext).build();
   }
 }
