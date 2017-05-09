@@ -16,7 +16,7 @@ import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Test;
 
-public class InvokeOperationErrorsTestCase extends SoapExtensionArtifactFunctionalTestCase {
+public class InvokeOperationErrorsTestCase extends SoapFootballExtensionArtifactFunctionalTestCase {
 
   @Test
   public void badRequest() throws Exception {

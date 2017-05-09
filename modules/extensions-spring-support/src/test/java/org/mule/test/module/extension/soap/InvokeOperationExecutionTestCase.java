@@ -16,7 +16,7 @@ import java.io.ByteArrayInputStream;
 
 import org.junit.Test;
 
-public class InvokeOperationExecutionTestCase extends SoapExtensionArtifactFunctionalTestCase {
+public class InvokeOperationExecutionTestCase extends SoapFootballExtensionArtifactFunctionalTestCase {
 
   @Test
   public void simpleNoParamsOperation() throws Exception {

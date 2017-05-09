@@ -81,6 +81,13 @@ public class ForwardingSoapClient {
   }
 
   /**
+   * @return the {@link MessageDispatcher} bounded to this connection.
+   */
+  MessageDispatcher getDispatcher() {
+    return dispatcher;
+  }
+
+  /**
    * {@link CacheLoader} implementation to load lazily {@link SoapClient}s.
    */
   private class SoapClientCacheLoader extends CacheLoader<WebServiceDefinition, SoapClient> {
@@ -109,7 +116,6 @@ public class ForwardingSoapClient {
     }
   }
 
-
   /**
    * {@link RemovalListener} implementation stop {@link SoapClient}s.
    */
@@ -123,10 +129,7 @@ public class ForwardingSoapClient {
           client.stop();
         }
       } catch (Exception e) {
-        throw new MuleRuntimeException(
-                                       createStaticMessage("A problem occurred while disconnecting client: '%s'",
-                                                           client.toString()),
-                                       e);
+        throw new MuleRuntimeException(createStaticMessage("A problem occurred while disconnecting client: '%s'", client), e);
       }
     }
   }

@@ -54,8 +54,7 @@ public final class DefaultMetadataCache implements MetadataCache {
    * {@inheritDoc}
    */
   @Override
-  public <T extends Serializable> T computeIfAbsent(Serializable key,
-                                                    MetadataCacheValueResolver mappingFunction)
+  public <T extends Serializable> T computeIfAbsent(Serializable key, MetadataCacheValueResolver mappingFunction)
       throws MetadataResolvingException, ConnectionException {
 
     Serializable value = cache.get(key);

@@ -12,10 +12,11 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
+import org.mule.runtime.extension.api.soap.SoapTransportProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
+import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.service.http.api.HttpService;
 import org.mule.services.soap.api.SoapService;
-import org.mule.services.soap.api.message.dispatcher.DefaultHttpMessageDispatcher;
 
 import java.util.List;
 
@@ -32,7 +33,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class SoapConnectionProvider implements PoolingConnectionProvider<ForwardingSoapClient> {
+public class ForwardingSoapClientConnectionProvider implements PoolingConnectionProvider<ForwardingSoapClient> {
 
   @Inject
   private SoapService soapService;
@@ -43,10 +44,17 @@ public class SoapConnectionProvider implements PoolingConnectionProvider<Forward
   /**
    * The {@link SoapServiceProvider} that knows which services will this connection connect to.
    */
-  private SoapServiceProvider serviceProvider;
+  private final SoapServiceProvider serviceProvider;
 
-  SoapConnectionProvider(SoapServiceProvider serviceProvider) {
+  /**
+   * The {@link SoapTransportProvider} used to get {@link MessageDispatcher} instances.
+   */
+  private final SoapTransportProvider<MessageDispatcher> transportProvider;
+
+  ForwardingSoapClientConnectionProvider(SoapServiceProvider serviceProvider,
+                                         SoapTransportProvider<? extends MessageDispatcher> transportProvider) {
     this.serviceProvider = serviceProvider;
+    this.transportProvider = (SoapTransportProvider<MessageDispatcher>) transportProvider;
   }
 
   /**
@@ -55,7 +63,8 @@ public class SoapConnectionProvider implements PoolingConnectionProvider<Forward
    */
   @Override
   public ForwardingSoapClient connect() throws ConnectionException {
-    return new ForwardingSoapClient(soapService, serviceProvider, new DefaultHttpMessageDispatcher(httpService));
+    MessageDispatcher dispatcher = transportProvider.connect();
+    return new ForwardingSoapClient(soapService, serviceProvider, dispatcher);
   }
 
   /**
@@ -66,6 +75,7 @@ public class SoapConnectionProvider implements PoolingConnectionProvider<Forward
    */
   @Override
   public void disconnect(ForwardingSoapClient connection) {
+    transportProvider.disconnect(connection.getDispatcher());
     connection.disconnect();
   }
 

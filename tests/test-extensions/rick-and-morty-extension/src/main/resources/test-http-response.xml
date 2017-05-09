@@ -1,0 +1,7 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <con:ram xmlns:con="http://ram.test.mule.org">
+            <text>%s</text>
+        </con:ram>
+    </soap:Body>
+</soap:Envelope>
