@@ -49,4 +49,8 @@
     <db:config name="oracleConfigUnknownHost">
         <db:oracle-connection host="invalidHost" port="49161" instance="xe" user="system" password="oracle"/>
     </db:config>
+
+    <db:config name="driverClassNotFound">
+        <db:generic-connection driverClassName="invalid.driver.Driver" url="jdbc:derby://127.0.0.1:28812/test;create=true"/>
+    </db:config>
 </mule>

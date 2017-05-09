@@ -8,20 +8,18 @@ package org.mule.extension.db.internal.domain.connection.oracle;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.extension.db.api.exception.connection.DbError.CANNOT_REACH;
 import static org.mule.extension.db.api.exception.connection.DbError.INVALID_CREDENTIALS;
 import static org.mule.extension.db.api.exception.connection.DbError.INVALID_DATABASE;
 import static org.mule.extension.db.internal.domain.connection.DbConnectionProvider.DRIVER_FILE_NAME_PATTERN;
 import static org.mule.extension.db.internal.domain.connection.oracle.OracleConnectionParameters.DRIVER_CLASS_NAME;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
-import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
 import org.mule.extension.db.api.exception.connection.DbError;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.extension.db.internal.domain.connection.JdbcConnectionFactory;
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -72,7 +70,7 @@ public class OracleDbConnectionProvider extends DbConnectionProvider {
   }
 
   @Override
-  public Optional<DbError> getDbErrorType(SQLException e) {
+  public Optional<DbError> getDbVendorErrorType(SQLException e) {
     String message = e.getMessage();
     if (message.contains(INVALID_CREDENTIALS_ORACLE_CODE)) {
       return of(INVALID_CREDENTIALS);

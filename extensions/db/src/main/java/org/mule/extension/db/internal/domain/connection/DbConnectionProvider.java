@@ -8,6 +8,8 @@ package org.mule.extension.db.internal.domain.connection;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.mule.extension.db.api.exception.connection.DbError.CANNOT_LOAD_DRIVER;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -34,8 +36,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.tx.MuleXaObject;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
@@ -65,6 +67,8 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
   private static final Logger LOGGER = getLogger(DbConnectionProvider.class);
   public static final String DRIVER_FILE_NAME_PATTERN = "(.*)\\.jar";
   protected static final String CONNECTION_ERROR_MESSAGE = "Could not obtain connection from data source";
+  private static final String ERROR_TRYING_TO_LOAD_DRIVER = "Error trying to load driver";
+
 
   @ConfigName
   private String configName;
@@ -105,7 +109,15 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
 
   private DataSource dataSource;
 
-  public java.util.Optional<DbError> getDbErrorType(SQLException e) {
+  private java.util.Optional<DbError> getDbErrorType(SQLException e) {
+    String message = e.getMessage();
+    if (message.contains(ERROR_TRYING_TO_LOAD_DRIVER)) {
+      return of(CANNOT_LOAD_DRIVER);
+    }
+    return getDbVendorErrorType(e);
+  }
+
+  protected java.util.Optional<DbError> getDbVendorErrorType(SQLException e) {
     return empty();
   }
 
