@@ -11,8 +11,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.extension.file.common.api.matcher.MatchPolicy.ONLY;
-import static org.mule.extension.file.common.api.matcher.MatchPolicy.REJECTS;
+import static org.mule.extension.file.common.api.matcher.MatchPolicy.REQUIRE;
+import static org.mule.extension.file.common.api.matcher.MatchPolicy.EXCLUDE;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.matcher.FileMatcher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -64,9 +64,9 @@ public class FileMatcherContractTestCase<T extends FileMatcher, A extends FileAt
   public void matchesAll() {
     builder.setFilenamePattern("glob:*.{java, js}")
         .setPathPattern("glob:**.{java, js}")
-        .setRegularFiles(ONLY)
-        .setDirectories(REJECTS)
-        .setSymLinks(REJECTS)
+        .setRegularFiles(REQUIRE)
+        .setDirectories(EXCLUDE)
+        .setSymLinks(EXCLUDE)
         .setMinSize(1L)
         .setMaxSize(1024L);
 
@@ -184,42 +184,42 @@ public class FileMatcherContractTestCase<T extends FileMatcher, A extends FileAt
   @Test
   public void regularFile() {
     when(attributes.isRegularFile()).thenReturn(true);
-    builder.setRegularFiles(ONLY);
+    builder.setRegularFiles(REQUIRE);
     assertMatch();
   }
 
   @Test
   public void rejectNotRegularFile() {
     when(attributes.isRegularFile()).thenReturn(false);
-    builder.setRegularFiles(ONLY);
+    builder.setRegularFiles(REQUIRE);
     assertReject();
   }
 
   @Test
   public void rejectRegularFile() {
     when(attributes.isRegularFile()).thenReturn(true);
-    builder.setRegularFiles(REJECTS);
+    builder.setRegularFiles(EXCLUDE);
     assertReject();
   }
 
   @Test
   public void isDirectory() {
     when(attributes.isDirectory()).thenReturn(true);
-    builder.setDirectories(ONLY);
+    builder.setDirectories(REQUIRE);
     assertMatch();
   }
 
   @Test
   public void rejectNotDirectory() {
     when(attributes.isDirectory()).thenReturn(false);
-    builder.setDirectories(ONLY);
+    builder.setDirectories(REQUIRE);
     assertReject();
   }
 
   @Test
   public void rejectDirectory() {
     when(attributes.isDirectory()).thenReturn(true);
-    builder.setDirectories(REJECTS);
+    builder.setDirectories(EXCLUDE);
     assertReject();
   }
 
@@ -227,21 +227,21 @@ public class FileMatcherContractTestCase<T extends FileMatcher, A extends FileAt
   @Test
   public void isSymbolicLink() {
     when(attributes.isSymbolicLink()).thenReturn(true);
-    builder.setSymLinks(ONLY);
+    builder.setSymLinks(REQUIRE);
     assertMatch();
   }
 
   @Test
   public void rejectNotSymbolicLink() {
     when(attributes.isSymbolicLink()).thenReturn(false);
-    builder.setSymLinks(ONLY);
+    builder.setSymLinks(REQUIRE);
     assertReject();
   }
 
   @Test
   public void rejectSymbolicLink() {
     when(attributes.isSymbolicLink()).thenReturn(true);
-    builder.setSymLinks(REJECTS);
+    builder.setSymLinks(EXCLUDE);
     assertReject();
   }
 

@@ -7,7 +7,7 @@
 package org.mule.extension.file.common.api.matcher;
 
 import static java.lang.String.format;
-import static org.mule.extension.file.common.api.matcher.MatchPolicy.ACCEPTS;
+import static org.mule.extension.file.common.api.matcher.MatchPolicy.INCLUDE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.util.TimeSinceFunction;
@@ -67,28 +67,28 @@ public abstract class FileMatcher<T extends FileMatcher, A extends FileAttribute
    * files which are not directories. If not set, then the criteria doesn't apply.
    */
   @Parameter
-  @Optional(defaultValue = "ACCEPTS")
+  @Optional(defaultValue = "INCLUDE")
   @Summary("Indicates whether accept only directories or non directories files")
-  private MatchPolicy directories = ACCEPTS;
+  private MatchPolicy directories = INCLUDE;
 
   /**
    * If {@code true}, the predicate will only accept files which are not directories nor symbolic links. If {@code false}, the
    * predicate will only accept files which are directories or symbolic links. If not set, then the criteria doesn't apply.
    */
   @Parameter
-  @Optional(defaultValue = "ACCEPTS")
+  @Optional(defaultValue = "INCLUDE")
   @Summary("Indicates whether accept only regular files (files which are not directories, nor symbolic links) "
       + "or only not regular files")
-  private MatchPolicy regularFiles = ACCEPTS;
+  private MatchPolicy regularFiles = INCLUDE;
 
   /**
    * If {@code true}, the predicate will only accept files which are symbolic links. If {@code false}, the predicate will only
    * accept files which are symbolic links. If not set, then the criteria doesn't apply.
    */
   @Parameter
-  @Optional(defaultValue = "ACCEPTS")
+  @Optional(defaultValue = "INCLUDE")
   @Summary("Indicates whether accept only symbolic links files or accept only not symbolic links files")
-  private MatchPolicy symLinks = ACCEPTS;
+  private MatchPolicy symLinks = INCLUDE;
 
   /**
    * The minimum file size in bytes. Files smaller than this are rejected
