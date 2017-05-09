@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static org.mule.runtime.api.util.DataUnit.BYTE;
-import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static java.lang.Math.toIntExact;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.api.util.DataUnit.BYTE;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
@@ -55,6 +55,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
 
   private final int halfDataLength;
   private final int bufferSize;
+  private final int maxBufferSize;
   protected final ScheduledExecutorService executorService;
 
   private CursorStreamProvider streamProvider;
@@ -66,6 +67,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     super(dataSize);
     executorService = newScheduledThreadPool(2);
     this.bufferSize = bufferSize;
+    this.maxBufferSize = maxBufferSize;
     halfDataLength = data.length() / 2;
     final ByteArrayInputStream dataStream = new ByteArrayInputStream(data.getBytes());
 
@@ -257,6 +259,20 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
       assertThat(cursor.read(dest, 0, len), is(len));
       assertThat(toString(dest), equalTo(data.substring(position, position + len)));
     });
+  }
+
+  @Test
+  public void dataLengthMatchesMaxBufferSizeExactly() throws Exception {
+    data = randomAlphabetic(maxBufferSize);
+    final ByteArrayInputStream dataStream = new ByteArrayInputStream(data.getBytes());
+
+    InMemoryCursorStreamConfig config =
+        new InMemoryCursorStreamConfig(new DataSize(maxBufferSize, BYTE),
+                                       new DataSize(0, BYTE),
+                                       new DataSize(maxBufferSize, BYTE));
+
+    streamProvider = new InMemoryCursorStreamProvider(dataStream, config, bufferManager);
+    withCursor(cursor -> assertThat(IOUtils.toString(cursor), equalTo(data)));
   }
 
   private void doAsync(CheckedRunnable task1, CheckedRunnable task2) throws Exception {

@@ -8,13 +8,12 @@ package org.mule.runtime.core.internal.streaming.bytes;
 
 import static java.lang.Math.min;
 import static java.lang.Math.toIntExact;
+import static java.nio.ByteBuffer.allocate;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.DataUnit.BYTE;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
-import org.mule.runtime.api.util.DataSize;
 import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
 
 import java.io.IOException;
@@ -35,8 +34,8 @@ import java.util.Optional;
  */
 public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
 
-  private final DataSize bufferSizeIncrement;
-  private final DataSize maxBufferSize;
+  private final int bufferSizeIncrement;
+  private final int maxBufferSize;
   private long bufferTip = 0;
 
   /**
@@ -49,10 +48,10 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
     super(stream, bufferManager, config.getInitialBufferSize().toBytes());
 
     this.bufferSizeIncrement = config.getBufferSizeIncrement() != null
-        ? config.getBufferSizeIncrement()
-        : new DataSize(0, BYTE);
+        ? config.getBufferSizeIncrement().toBytes()
+        : 0;
 
-    this.maxBufferSize = config.getMaxBufferSize();
+    this.maxBufferSize = config.getMaxBufferSize().toBytes();
   }
 
   @Override
@@ -127,20 +126,26 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
 
   /**
    * {@inheritDoc}
-   * If {@code buffer} doesn't have any remaining capacity, then {@link #expandBuffer(int)}
+   * If {@code buffer} doesn't have any remaining capacity, then {@link #expandBuffer()}
    * is invoked before attempting to consume new information.
    *
    * @throws StreamingBufferSizeExceededException if the buffer is not big enough and cannot be expanded
    */
   @Override
   public int consumeForwardData() throws IOException {
-    if (!buffer.hasRemaining()) {
-      buffer = expandBuffer(buffer.capacity());
-    }
+    ByteBuffer readBuffer = buffer.hasRemaining()
+        ? buffer
+        : allocate(bufferSizeIncrement > 0 ? bufferSizeIncrement : 10);
 
-    int read = consumeStream();
+    int read = consumeStream(readBuffer);
 
     if (read > 0) {
+      if (readBuffer != buffer) {
+        buffer = expandBuffer();
+        readBuffer.flip();
+        buffer.put(readBuffer);
+      }
+
       bufferTip += read;
     }
 
@@ -148,15 +153,14 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
   }
 
   /**
-   * Expands the size of the buffer by {@code bytesIncrement}
+   * Expands the size of the buffer by {@link #bufferSizeIncrement}
    *
-   * @param bytesIncrement how many bytes to gain
    * @return a new, expanded {@link ByteBuffer}
    */
-  private ByteBuffer expandBuffer(int bytesIncrement) {
-    int newSize = buffer.capacity() + bytesIncrement;
+  private ByteBuffer expandBuffer() {
+    int newSize = buffer.capacity() + bufferSizeIncrement;
     if (!canBeExpandedTo(newSize)) {
-      throw new StreamingBufferSizeExceededException(maxBufferSize.toBytes());
+      throw new StreamingBufferSizeExceededException(maxBufferSize);
     }
 
     ByteBuffer newBuffer = bufferManager.allocate(newSize);
@@ -170,12 +174,12 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
   }
 
   private boolean canBeExpandedTo(int newSize) {
-    if (bufferSizeIncrement.getSize() <= 0) {
+    if (bufferSizeIncrement <= 0) {
       return false;
-    } else if (maxBufferSize == null) {
+    } else if (maxBufferSize == 0) {
       return true;
     }
 
-    return newSize <= maxBufferSize.toBytes();
+    return newSize <= maxBufferSize;
   }
 }
