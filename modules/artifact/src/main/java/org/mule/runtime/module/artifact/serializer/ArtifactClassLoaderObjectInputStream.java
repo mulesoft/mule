@@ -40,13 +40,13 @@ public class ArtifactClassLoaderObjectInputStream extends ObjectInputStream {
 
   @Override
   protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-    int val = readByte();
+    int val = readInt();
     if (val == -1) {
       return super.resolveClass(desc);
     }
 
     byte[] bytes = new byte[val];
-    if (read(bytes) == -1) {
+    if (read(bytes) < val) {
       throw new IOException("Stream does not contain a classloader ID");
     }
 

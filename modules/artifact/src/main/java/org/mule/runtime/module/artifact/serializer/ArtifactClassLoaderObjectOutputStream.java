@@ -41,10 +41,10 @@ public class ArtifactClassLoaderObjectOutputStream extends ObjectOutputStream {
   protected void annotateClass(Class<?> clazz) throws IOException {
     Optional<String> id = classLoaderRepository.getId(clazz.getClassLoader());
     if (id.isPresent()) {
-      this.writeByte(id.get().length());
+      this.writeInt(id.get().length());
       this.writeBytes(id.get());
     } else {
-      this.writeByte(-1);
+      this.writeInt(-1);
     }
   }
 }

@@ -171,6 +171,90 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
         .add(new DefaultLocationPart("route", empty(), empty(), empty())).build());
   }
 
+  /**
+   * A location part represent an specific location of a component within another component.
+   * 
+   * @since 4.0
+   */
+  public static class DefaultLocationPart implements LocationPart, Serializable {
+
+    private String partPath;
+    private TypedComponentIdentifier partIdentifier;
+    private String fileName;
+    private Integer lineInFile;
+
+    /**
+     * @param partPath the path of this part
+     * @param partIdentifier the component identifier of the part if it's not a synthetic part
+     * @param fileName the file name in which the component was defined
+     * @param lineInFile the line number in which the component was defined
+     */
+    public DefaultLocationPart(String partPath, Optional<TypedComponentIdentifier> partIdentifier, Optional<String> fileName,
+                               Optional<Integer> lineInFile) {
+      this.partPath = partPath;
+      this.partIdentifier = partIdentifier.orElse(null);
+      fileName.ifPresent(configFileName -> this.fileName = configFileName);
+      lineInFile.ifPresent(line -> this.lineInFile = line);
+    }
+
+    /**
+     * @return the string representation of the part
+     */
+    public String getPartPath() {
+      return partPath;
+    }
+
+    /**
+     * @return if it's a synthetic part this is null, if not then it's the identifier of the configuration element.
+     */
+    public Optional<TypedComponentIdentifier> getPartIdentifier() {
+      return ofNullable(partIdentifier);
+    }
+
+    @Override
+    public Optional<String> getFileName() {
+      return ofNullable(fileName);
+    }
+
+    @Override
+    public Optional<Integer> getLineInFile() {
+      return ofNullable(lineInFile);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      DefaultLocationPart that = (DefaultLocationPart) o;
+
+      if (!getPartPath().equals(that.getPartPath())) {
+        return false;
+      }
+      if (getPartIdentifier() != null ? !getPartIdentifier().equals(that.getPartIdentifier())
+          : that.getPartIdentifier() != null) {
+        return false;
+      }
+      if (getFileName() != null ? !getFileName().equals(that.getFileName()) : that.getFileName() != null) {
+        return false;
+      }
+      return getLineInFile() != null ? getLineInFile().equals(that.getLineInFile()) : that.getLineInFile() == null;
+    }
+
+    @Override
+    public int hashCode() {
+      int result = getPartPath().hashCode();
+      result = 31 * result + (getPartIdentifier() != null ? getPartIdentifier().hashCode() : 0);
+      result = 31 * result + (getFileName() != null ? getFileName().hashCode() : 0);
+      result = 31 * result + (getLineInFile() != null ? getLineInFile().hashCode() : 0);
+      return result;
+    }
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
