@@ -8,7 +8,7 @@ package org.mule.test.ram;
 
 import static org.mule.test.ram.RickAndMortyExtension.RICKS_PHRASE;
 
-public class MiniverseTransportProvider extends AbstractScienceTransportProvider {
+public class MiniverseDispatcherProvider extends AbstractScienceTransportProvider {
 
   @Override
   protected String getResponseWord() {

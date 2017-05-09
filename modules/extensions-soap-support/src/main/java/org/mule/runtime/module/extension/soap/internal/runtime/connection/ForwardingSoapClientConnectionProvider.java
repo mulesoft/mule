@@ -12,7 +12,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
-import org.mule.runtime.extension.api.soap.SoapTransportProvider;
+import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.service.http.api.HttpService;
@@ -47,14 +47,14 @@ public class ForwardingSoapClientConnectionProvider implements PoolingConnection
   private final SoapServiceProvider serviceProvider;
 
   /**
-   * The {@link SoapTransportProvider} used to get {@link MessageDispatcher} instances.
+   * The {@link MessageDispatcherProvider} used to get {@link MessageDispatcher} instances.
    */
-  private final SoapTransportProvider<MessageDispatcher> transportProvider;
+  private final MessageDispatcherProvider<MessageDispatcher> transportProvider;
 
   ForwardingSoapClientConnectionProvider(SoapServiceProvider serviceProvider,
-                                         SoapTransportProvider<? extends MessageDispatcher> transportProvider) {
+                                         MessageDispatcherProvider<? extends MessageDispatcher> transportProvider) {
     this.serviceProvider = serviceProvider;
-    this.transportProvider = (SoapTransportProvider<MessageDispatcher>) transportProvider;
+    this.transportProvider = (MessageDispatcherProvider<MessageDispatcher>) transportProvider;
   }
 
   /**

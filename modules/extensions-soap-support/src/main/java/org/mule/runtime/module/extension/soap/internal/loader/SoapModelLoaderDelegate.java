@@ -21,7 +21,7 @@ import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.soap.SoapTransportProvider;
+import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.module.extension.internal.loader.enricher.ErrorsModelFactory;
 import org.mule.runtime.module.extension.internal.loader.java.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
@@ -29,7 +29,7 @@ import org.mule.runtime.module.extension.internal.loader.java.TypeAwareConfigura
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
-import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapCustomTransportProviderTypeWrapper;
+import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.MessageDispatcherProviderTypeWrapper;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapExtensionTypeWrapper;
 import org.mule.services.soap.api.exception.error.SoapErrors;
 
@@ -62,7 +62,7 @@ final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
    */
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
     final SoapExtensionTypeWrapper<?> extension = getSoapExtensionType(this.extensionType);
-    List<SoapCustomTransportProviderTypeWrapper> customTransportProviders = extension.getCustomTransportProviders();
+    List<MessageDispatcherProviderTypeWrapper> customTransportProviders = extension.getDispatcherProviders();
     ExtensionDeclarer extensionDeclarer = getExtensionDeclarer(context);
     declareSubtypes(extensionDeclarer, customTransportProviders);
     Set<ErrorModel> soapErrors = getSoapErrors(extensionDeclarer);
@@ -73,10 +73,11 @@ final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
     return extensionDeclarer;
   }
 
-  private void declareSubtypes(ExtensionDeclarer extension, List<SoapCustomTransportProviderTypeWrapper> transportProviders) {
+  private void declareSubtypes(ExtensionDeclarer extension, List<MessageDispatcherProviderTypeWrapper> transportProviders) {
     if (!transportProviders.isEmpty()) {
       List<MetadataType> types = transportProviders.stream().map(tp -> typeLoader.load(tp.getDeclaringClass())).collect(toList());
-      extension.withSubTypes(typeLoader.load(SoapTransportProvider.class), types);
+      // TODO check alias.
+      extension.withSubTypes(typeLoader.load(MessageDispatcherProvider.class), types);
     }
   }
 

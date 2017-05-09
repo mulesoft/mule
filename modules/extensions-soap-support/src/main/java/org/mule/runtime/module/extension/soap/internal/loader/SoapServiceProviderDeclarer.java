@@ -16,7 +16,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
-import org.mule.runtime.extension.api.soap.SoapTransportProvider;
+import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.ParameterModelsLoaderDelegate;
@@ -73,7 +73,7 @@ public class SoapServiceProviderDeclarer {
     if (hasCustomTransports) {
       providerDeclarer.onParameterGroup(CUSTOM_TRANSPORT + "Group")
           .withRequiredParameter(CUSTOM_TRANSPORT)
-          .ofType(typeLoader.load(SoapTransportProvider.class))
+          .ofType(typeLoader.load(MessageDispatcherProvider.class))
           .withLayout(LayoutModel.builder().build())
           .withExpressionSupport(NOT_SUPPORTED);
     }

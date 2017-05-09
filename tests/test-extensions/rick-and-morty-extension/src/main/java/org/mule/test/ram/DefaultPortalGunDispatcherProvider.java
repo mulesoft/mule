@@ -8,7 +8,7 @@ package org.mule.test.ram;
 
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-public class DefaultPortalGunTransportProvider extends AbstractScienceTransportProvider {
+public class DefaultPortalGunDispatcherProvider extends AbstractScienceTransportProvider {
 
   @Parameter
   private String responseMessage;

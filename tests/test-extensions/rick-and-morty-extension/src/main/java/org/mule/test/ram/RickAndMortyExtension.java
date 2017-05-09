@@ -11,19 +11,18 @@ import static org.mule.runtime.extension.api.soap.WebServiceDefinition.builder;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.soap.HttpMessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 import org.mule.runtime.extension.api.soap.annotation.SoapTransportProviders;
-import org.mule.runtime.extension.api.soap.annotation.DefaultHttpTransportProvider;
-import org.mule.runtime.extension.api.soap.annotation.HttpConfigTransportProvider;
 
 import java.util.List;
 
 @Extension(name = "RAM")
 @Xml(prefix = "ram")
-@DefaultHttpTransportProvider
-@HttpConfigTransportProvider
-@SoapTransportProviders({MiniverseTransportProvider.class, DefaultPortalGunTransportProvider.class})
+@SoapTransportProviders({MiniverseDispatcherProvider.class,
+    DefaultPortalGunDispatcherProvider.class,
+    HttpMessageDispatcherProvider.class})
 public class RickAndMortyExtension implements SoapServiceProvider {
 
   public static final String RICKS_PHRASE = "WUBBA LUBBA DUB DUB";

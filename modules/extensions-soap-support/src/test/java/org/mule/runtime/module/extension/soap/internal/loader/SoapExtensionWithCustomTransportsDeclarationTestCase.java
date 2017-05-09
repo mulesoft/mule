@@ -24,11 +24,10 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.soap.SoapTransportProvider;
-import org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpTransportProvider;
-import org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.HttpConfigTransportProvider;
-import org.mule.test.ram.DefaultPortalGunTransportProvider;
-import org.mule.test.ram.MiniverseTransportProvider;
+import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
+import org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpMessageDispatcherProvider;
+import org.mule.test.ram.DefaultPortalGunDispatcherProvider;
+import org.mule.test.ram.MiniverseDispatcherProvider;
 import org.mule.test.ram.RickAndMortyExtension;
 
 import java.util.HashMap;
@@ -64,12 +63,11 @@ public class SoapExtensionWithCustomTransportsDeclarationTestCase extends Abstra
 
   private void assertSubtypes(ExtensionModel model) {
     SubTypesModel subtypes = model.getSubTypes().iterator().next();
-    assertThat(getTypeId(subtypes.getBaseType()).get(), is(SoapTransportProvider.class.getName()));
+    assertThat(getTypeId(subtypes.getBaseType()).get(), is(MessageDispatcherProvider.class.getName()));
     subtypes.getSubTypes().forEach(subtype -> {
-      assertThat(getTypeId(subtype).get(), isOneOf(DefaultHttpTransportProvider.class.getName(),
-                                                   HttpConfigTransportProvider.class.getName(),
-                                                   DefaultPortalGunTransportProvider.class.getName(),
-                                                   MiniverseTransportProvider.class.getName()));
+      assertThat(getTypeId(subtype).get(), isOneOf(DefaultHttpMessageDispatcherProvider.class.getName(),
+                                                   DefaultPortalGunDispatcherProvider.class.getName(),
+                                                   MiniverseDispatcherProvider.class.getName()));
     });
   }
 }

@@ -10,10 +10,8 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
-import org.mule.runtime.extension.api.soap.annotation.SoapTransportProviders;
-import org.mule.runtime.extension.api.soap.annotation.DefaultHttpTransportProvider;
-import org.mule.runtime.extension.api.soap.annotation.HttpConfigTransportProvider;
 import org.mule.runtime.extension.api.soap.annotation.Soap;
+import org.mule.runtime.extension.api.soap.annotation.SoapTransportProviders;
 
 import com.google.common.collect.ImmutableList;
 
@@ -42,26 +40,12 @@ public class SoapExtensionTypeWrapper<T> extends SoapComponentWrapper {
     return serviceProviders.build();
   }
 
-  public List<SoapCustomTransportProviderTypeWrapper> getCustomTransportProviders() {
-    ImmutableList.Builder<SoapCustomTransportProviderTypeWrapper> transportProviders = ImmutableList.builder();
+  public List<MessageDispatcherProviderTypeWrapper> getDispatcherProviders() {
+    ImmutableList.Builder<MessageDispatcherProviderTypeWrapper> transportProviders = ImmutableList.builder();
     Optional<SoapTransportProviders> customTransport = this.getAnnotation(SoapTransportProviders.class);
     customTransport.ifPresent(ct -> transportProviders.addAll(stream(ct.value())
-        .map(SoapCustomTransportProviderTypeWrapper::new)
+        .map(MessageDispatcherProviderTypeWrapper::new)
         .collect(toList())));
-    getHttpConfigTransportProvider().ifPresent(transportProviders::add);
-    getDefaultHttpTransportProvider().ifPresent(transportProviders::add);
     return transportProviders.build();
-  }
-
-  private Optional<SoapCustomTransportProviderTypeWrapper> getHttpConfigTransportProvider() {
-    return this.getAnnotation(HttpConfigTransportProvider.class)
-        .map(a -> new SoapCustomTransportProviderTypeWrapper(
-                                                             org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.HttpConfigTransportProvider.class));
-  }
-
-  private Optional<SoapCustomTransportProviderTypeWrapper> getDefaultHttpTransportProvider() {
-    return this.getAnnotation(DefaultHttpTransportProvider.class)
-        .map(a -> new SoapCustomTransportProviderTypeWrapper(
-                                                             org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpTransportProvider.class));
   }
 }

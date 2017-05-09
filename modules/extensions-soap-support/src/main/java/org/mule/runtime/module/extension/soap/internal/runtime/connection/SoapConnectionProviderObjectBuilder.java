@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
-import org.mule.runtime.extension.api.soap.SoapTransportProvider;
+import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
@@ -28,7 +28,7 @@ import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProvi
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpTransportProvider;
+import org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpMessageDispatcherProvider;
 import org.mule.services.soap.api.client.SoapClient;
 
 /**
@@ -67,7 +67,7 @@ public final class SoapConnectionProviderObjectBuilder extends ConnectionProvide
   @Override
   public ConnectionProvider build(ResolverSetResult result) throws MuleException {
     SoapServiceProvider serviceProvider = objectBuilder.build(result);
-    SoapTransportProvider<? extends MessageDispatcher> transport = getCustomTransport(result);
+    MessageDispatcherProvider<? extends MessageDispatcher> transport = getCustomTransport(result);
     Injector injector = muleContext.getInjector();
     injector.inject(serviceProvider);
     injector.inject(transport);
@@ -77,10 +77,10 @@ public final class SoapConnectionProviderObjectBuilder extends ConnectionProvide
     return provider;
   }
 
-  private SoapTransportProvider<? extends MessageDispatcher> getCustomTransport(ResolverSetResult resultSet)
+  private MessageDispatcherProvider<? extends MessageDispatcher> getCustomTransport(ResolverSetResult resultSet)
       throws RegistrationException {
-    SoapTransportProvider transportProvider = (SoapTransportProvider) resultSet.get(CUSTOM_TRANSPORT);
-    return transportProvider != null ? transportProvider : new DefaultHttpTransportProvider();
+    MessageDispatcherProvider transportProvider = (MessageDispatcherProvider) resultSet.get(CUSTOM_TRANSPORT);
+    return transportProvider != null ? transportProvider : new DefaultHttpMessageDispatcherProvider();
   }
 
   /**

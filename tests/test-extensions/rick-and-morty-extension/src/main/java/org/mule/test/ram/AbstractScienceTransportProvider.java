@@ -10,7 +10,7 @@ import static java.util.Collections.emptyMap;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.extension.api.soap.SoapTransportProvider;
+import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.message.DispatchingRequest;
 import org.mule.runtime.extension.api.soap.message.DispatchingResponse;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
@@ -20,7 +20,7 @@ import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 
-public abstract class AbstractScienceTransportProvider implements SoapTransportProvider<MessageDispatcher> {
+public abstract class AbstractScienceTransportProvider implements MessageDispatcherProvider<MessageDispatcher> {
 
   @Override
   public MessageDispatcher connect() throws ConnectionException {
