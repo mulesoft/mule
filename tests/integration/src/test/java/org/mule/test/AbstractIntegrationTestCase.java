@@ -9,7 +9,6 @@ package org.mule.test;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.test.runner.ArtifactClassLoaderRunner;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 /**
  * Base {@link Class} for functional integration tests, it will run the functional test case with
@@ -18,7 +17,7 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
  *
  * @since 4.0
  */
-@ArtifactClassLoaderRunnerConfig(sharedRuntimeLibs = {"org.mule.tests:mule-tests-unit", "org.mule.tests:mule-tests-functional"})
-public abstract class AbstractIntegrationTestCase extends MuleArtifactFunctionalTestCase {
+public abstract class AbstractIntegrationTestCase extends MuleArtifactFunctionalTestCase
+    implements IntegrationTestCaseRunnerConfig {
 
 }
