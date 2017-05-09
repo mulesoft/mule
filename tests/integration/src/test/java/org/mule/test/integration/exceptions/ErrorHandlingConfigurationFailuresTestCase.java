@@ -76,16 +76,6 @@ public class ErrorHandlingConfigurationFailuresTestCase extends AbstractMuleTest
     loadConfiguration("org/mule/test/integration/exceptions/exception-strategy-in-choice-without-expression.xml");
   }
 
-  @Test(expected = ConfigurationException.class)
-  public void errorHandlerCantHaveDefaultExceptionStrategy() throws Exception {
-    loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-in-choice.xml");
-  }
-
-  @Test(expected = ConfigurationException.class)
-  public void defaultEsFailsAsReferencedExceptionStrategy() throws Exception {
-    loadConfiguration("org/mule/test/integration/exceptions/default-es-as-referenced-exception-strategy.xml");
-  }
-
   // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
   @Test(expected = InitialisationException.class)
   public void defaultExceptionStrategyReferencesNonExistentExceptionStrategy() throws Exception {

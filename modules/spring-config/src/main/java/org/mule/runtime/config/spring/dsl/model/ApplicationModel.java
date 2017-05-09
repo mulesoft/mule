@@ -89,7 +89,6 @@ public class ApplicationModel {
   public static final String ANNOTATIONS = "annotations";
   public static final String ERROR_HANDLER = "error-handler";
   public static final String ERROR_MAPPING = "error-mapping";
-  public static final String DEFAULT_EXCEPTION_STRATEGY = "default-exception-strategy";
   public static final String MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE = "maxRedeliveryAttempts";
   public static final String WHEN_CHOICE_ES_ATTRIBUTE = "when";
   public static final String TYPE_ES_ATTRIBUTE = "type";
@@ -169,8 +168,6 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(ANNOTATION_ELEMENT).build();
   public static final ComponentIdentifier MESSAGE_FILTER_ELEMENT_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(MESSAGE_FILTER_ELEMENT).build();
-  public static final ComponentIdentifier DEFAULT_ES_ELEMENT_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(DEFAULT_EXCEPTION_STRATEGY).build();
   public static final ComponentIdentifier PROCESSOR_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(PROCESSOR_REFERENCE_ELEMENT).build();
   public static final ComponentIdentifier TRANSFORMER_IDENTIFIER =
@@ -514,8 +511,7 @@ public class ApplicationModel {
     validateNameIsOnlyOnTopLevelElements();
     validateErrorMappings();
     validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice();
-    validateChoiceExceptionStrategyStructure();
-    validateNoDefaultExceptionStrategyAsGlobal();
+    validateErrorHandlerStructure();
     validateParameterAndChildForSameAttributeAreNotDefinedTogether();
     if (componentBuildingDefinitionRegistry.isPresent()) {
       validateNamedTopLevelElementsHaveName(componentBuildingDefinitionRegistry.get());
@@ -550,17 +546,6 @@ public class ApplicationModel {
       }
     }
     return empty();
-  }
-
-  private void validateNoDefaultExceptionStrategyAsGlobal() {
-    executeOnEveryMuleComponentTree(componentModel -> {
-      if (componentModel.isRoot() && DEFAULT_ES_ELEMENT_IDENTIFIER.equals(componentModel.getIdentifier())) {
-        if (componentModel.getNameAttribute() != null) {
-          throw new MuleRuntimeException(createStaticMessage(format("Component %s is not supported as global",
-                                                                    DEFAULT_ES_ELEMENT_IDENTIFIER.getName())));
-        }
-      }
-    });
   }
 
   private void validateNameIsNotRepeated() {
@@ -615,7 +600,7 @@ public class ApplicationModel {
     return sourceType == null || sourceType.equals(ANY_IDENTIFIER);
   }
 
-  private void validateChoiceExceptionStrategyStructure() {
+  private void validateErrorHandlerStructure() {
     executeOnEveryMuleComponentTree(component -> {
       if (component.getIdentifier().equals(ERROR_HANDLER_IDENTIFIER)) {
         validateExceptionStrategiesHaveWhenAttribute(component);

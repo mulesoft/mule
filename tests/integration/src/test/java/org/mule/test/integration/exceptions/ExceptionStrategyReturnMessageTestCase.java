@@ -8,7 +8,7 @@ package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -34,7 +34,7 @@ public class ExceptionStrategyReturnMessageTestCase extends AbstractIntegrationT
       flowRunner("InputService2").withPayload("Test Message").run();
     } catch (MessagingException e) {
       assertThat(e.getCause(), is(instanceOf(ComponentException.class)));
-      assertThat(e.getEvent().getMessage().getPayload().getValue(), is(nullValue()));
+      assertThat(e.getEvent().getMessage().getPayload().getValue(), is(notNullValue()));
     }
   }
 

@@ -30,13 +30,17 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.routing.filters.WildcardFilter;
+import org.mule.runtime.core.exception.OnErrorContinueHandler;
+import org.mule.runtime.core.exception.OnErrorPropagateHandler;
+import org.mule.runtime.core.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.mule.TestTransaction;
+
+import java.util.Collections;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
@@ -64,7 +68,8 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
   protected TestTransaction mockTransaction = new TestTransaction(mockMuleContext);
   @Mock
   protected MessagingExceptionHandler mockMessagingExceptionHandler;
-
+  @Mock
+  private ErrorHandler errorHandler;
 
   @Before
   public void unbindTransaction() throws Exception {
@@ -167,11 +172,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
     ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
     TransactionCoordination.getInstance().bindTransaction(mockTransaction);
     configureExceptionListener(null, "org.mule.runtime.core.exception.MessagingException");
-    try {
-      executionTemplate.execute(getFailureTransactionCallback(new MessagingException(mockEvent, (Throwable) null)));
-      fail("MessagingException must be thrown");
-    } catch (MessagingException e) {
-    }
+    executionTemplate.execute(getFailureTransactionCallback(new MessagingException(mockEvent, (Throwable) null)));
     verify(mockTransaction, times(0)).setRollbackOnly();
     verify(mockTransaction, times(0)).commit();
     verify(mockTransaction, times(0)).rollback();
@@ -258,17 +259,22 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
     when(mockMuleContext.getRegistry()).thenReturn(mock(MuleRegistry.class));
     when(mockMessagingExceptionHandler.handleException(any(MessagingException.class), any(Event.class)))
         .thenAnswer(invocationOnMock -> {
-          DefaultMessagingExceptionStrategy defaultMessagingExceptionStrategy = new DefaultMessagingExceptionStrategy();
-          defaultMessagingExceptionStrategy.setMuleContext(mockMuleContext);
-          defaultMessagingExceptionStrategy.setFlowConstruct(mockFlow);
+          ErrorHandler errorHandler = new ErrorHandler();
+          errorHandler.setMuleContext(mockMuleContext);
+          errorHandler.setFlowConstruct(mockFlow);
+          TemplateOnErrorHandler onError;
           if (rollbackFilter != null) {
-            defaultMessagingExceptionStrategy.setRollbackTxFilter(new WildcardFilter(rollbackFilter));
+            onError = new OnErrorPropagateHandler();
+          } else if (commitFilter != null) {
+            onError = new OnErrorContinueHandler();
+          } else {
+            onError = new OnErrorPropagateHandler();
           }
-          if (commitFilter != null) {
-            defaultMessagingExceptionStrategy.setCommitTxFilter(new WildcardFilter(commitFilter));
-          }
-          defaultMessagingExceptionStrategy.handleException((MessagingException) invocationOnMock.getArguments()[0],
-                                                            (Event) invocationOnMock.getArguments()[1]);
+          onError.setMuleContext(mockMuleContext);
+          onError.setFlowConstruct(mockFlow);
+          errorHandler.setExceptionListeners(Collections.singletonList(onError));
+          errorHandler.handleException((MessagingException) invocationOnMock.getArguments()[0],
+                                       (Event) invocationOnMock.getArguments()[1]);
           return null;
         });
   }

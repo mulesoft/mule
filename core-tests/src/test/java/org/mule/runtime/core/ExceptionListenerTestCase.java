@@ -9,10 +9,9 @@ package org.mule.runtime.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.AbstractExceptionListener;
-import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testAddGoodEndpoint() throws Exception {
-    AbstractExceptionListener router = new DefaultMessagingExceptionStrategy(null);
+    AbstractExceptionListener router = new OnErrorPropagateHandler();
     Processor messageProcessor = Mockito.mock(Processor.class);
     router.addEndpoint(messageProcessor);
     assertNotNull(router.getMessageProcessors());
@@ -38,7 +37,7 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase {
     list.add(Mockito.mock(Processor.class));
     list.add(Mockito.mock(Processor.class));
 
-    AbstractExceptionListener router = new DefaultMessagingExceptionStrategy(null);
+    AbstractExceptionListener router = new OnErrorPropagateHandler();
     assertNotNull(router.getMessageProcessors());
     assertEquals(0, router.getMessageProcessors().size());
 

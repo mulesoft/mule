@@ -12,10 +12,6 @@
     <flow name="testService1">
         <inbound-endpoint address="test://test1" exchange-pattern="one-way"/>
         <test:component/>
-        <default-exception-strategy enableNotifications="false">
-            <commit-transaction exception-pattern="java.io.*"/>
-            <rollback-transaction exception-pattern="org.mule.*, javax.*"/>
-        </default-exception-strategy>
     </flow>
     
 </mule>

@@ -2048,7 +2048,6 @@
                     </xsd:choice>
                     <xsd:choice minOccurs="0" maxOccurs="1">
                         <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-                        <xsd:element ref="default-exception-strategy" minOccurs="0"/>
                     </xsd:choice>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="nonBlankString" use="required">
@@ -3760,14 +3759,6 @@
     <!--   Exception strategies                                       -->
     <!--==============================================================-->
 
-    <xsd:element name="default-exception-strategy" type="serviceExceptionStrategyType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Provides default exception handling.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
     <xsd:element name="on-error-continue" type="onErrorContinueType"
                  substitutionGroup="abstract-on-error">
         <xsd:annotation>
@@ -3839,20 +3830,6 @@
                         </xsd:annotation>
                     </xsd:group>
                 </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="serviceExceptionStrategyType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractExceptionStrategyType">
-                <xsd:attribute name="stopMessageProcessing" type="substitutableBoolean" default="false" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Stop the flow/service when an exception occurs.  You will need to restart the flow/service manually after this (e.g, using JMX).
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

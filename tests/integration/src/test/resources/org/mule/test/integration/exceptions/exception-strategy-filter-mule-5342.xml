@@ -12,8 +12,10 @@
             <custom-filter class="org.mule.test.integration.exceptions.ExceptionStrategyFilterMule5342TestCase$FalseFilter"/>
         </message-filter>
         <test:component appendString=" Received"/>
-        <default-exception-strategy>
-            <test:queue name="handleException"/>
-        </default-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <test:queue name="handleException"/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 </mule>

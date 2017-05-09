@@ -12,11 +12,13 @@
     
     <flow name="RequestFlow">
         <test:component throwException="true"/>
-        <default-exception-strategy>
-            <async>
-                <flow-ref name="ExceptionFlow"/>
-            </async>
-        </default-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <async>
+                    <flow-ref name="ExceptionFlow"/>
+                </async>
+            </on-error-propagate>
+        </error-handler>
     </flow>
     
     <flow name="ExceptionFlow">

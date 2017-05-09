@@ -321,14 +321,6 @@
         <test:assert expression="#[mel:P2]" />
     </flow>
 
-    <flow name="defaultExceptionStrategy">
-        <processor ref="addP1" />
-        <test:component throwException="true" />
-        <default-exception-strategy>
-            <test:assert expression="#[mel:P1]" />
-        </default-exception-strategy>
-    </flow>
-
     <flow name="catchExceptionStrategy">
         <processor ref="addP1" />
         <test:component throwException="true" />
@@ -346,14 +338,16 @@
         <message-filter throwOnUnaccepted="true">
             <payload-type-filter expectedType="java.lang.NoSuchFieldError"/>
         </message-filter>
-        <default-exception-strategy>
-           <processor-chain>
-               <processor-chain>
-                   <test:assert expression="#[mel:flowVars.P1]" />
-                   <test:assert expression="#[mel:flowVars.P2]" />
-               </processor-chain>
-            </processor-chain>
-        </default-exception-strategy>
+        <error-handler>
+            <on-error-propagate>
+                <processor-chain>
+                    <processor-chain>
+                        <test:assert expression="#[mel:flowVars.P1]" />
+                        <test:assert expression="#[mel:flowVars.P2]" />
+                    </processor-chain>
+                </processor-chain>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
     <sub-flow name="TestSubFlow">

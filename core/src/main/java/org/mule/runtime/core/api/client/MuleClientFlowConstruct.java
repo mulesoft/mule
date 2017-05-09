@@ -12,7 +12,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 
 /**
@@ -43,7 +42,7 @@ public class MuleClientFlowConstruct implements FlowConstruct {
 
   @Override
   public MessagingExceptionHandler getExceptionListener() {
-    return new DefaultMessagingExceptionStrategy(muleContext);
+    return muleContext.getDefaultErrorHandler();
   }
 
   @Override

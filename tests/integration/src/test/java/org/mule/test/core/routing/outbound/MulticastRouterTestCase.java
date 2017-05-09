@@ -10,11 +10,12 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import org.mule.functional.junit4.TestLegacyMessageUtils;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -58,9 +59,9 @@ public class MulticastRouterTestCase extends AbstractIntegrationTestCase {
     assertThat(message, is(notNullValue()));
     Object payload = message.getPayload().getValue();
     assertThat(payload, is(notNullValue()));
-    assertThat(payload, is(instanceOf(ExceptionMessage.class)));
-    ExceptionMessage exceptionMessage = (ExceptionMessage) payload;
-    assertThat(exceptionMessage.getException(), is(instanceOf(MessagingException.class)));
-    assertThat(exceptionMessage.getException().getCause(), is(instanceOf(RoutingException.class)));
+    ExceptionPayload exceptionPayload = TestLegacyMessageUtils.getExceptionPayload(message);
+    assertThat(exceptionPayload, is(notNullValue()));
+    assertThat(exceptionPayload.getException(), is(instanceOf(MessagingException.class)));
+    assertThat(exceptionPayload.getException().getCause(), is(instanceOf(RoutingException.class)));
   }
 }

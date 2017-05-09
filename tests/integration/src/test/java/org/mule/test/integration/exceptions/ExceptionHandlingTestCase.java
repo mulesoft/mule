@@ -8,15 +8,16 @@ package org.mule.test.integration.exceptions;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-
 import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -25,13 +26,14 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.MessagingExceptionHandlerToSystemAdapter;
+import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
@@ -65,9 +67,13 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     final Event muleEvent = runFlow("customProcessorInFlow");
     Message response = muleEvent.getMessage();
 
-    assertNotNull(response);
-    assertTrue((Boolean) muleEvent.getVariable("expectedHandler").getValue());
-    assertTrue(injectedMessagingExceptionHandler instanceof DefaultMessagingExceptionStrategy);
+    assertThat(response, is(notNullValue()));
+    assertThat(muleEvent.getVariable("expectedHandler").getValue(), is(true));
+    assertThat(injectedMessagingExceptionHandler, is(instanceOf(ErrorHandler.class)));
+    assertThat(((ErrorHandler) injectedMessagingExceptionHandler).getExceptionListeners(), hasSize(1));
+    MessagingExceptionHandlerAcceptor handler = ((ErrorHandler) injectedMessagingExceptionHandler).getExceptionListeners().get(0);
+    assertThat(handler, is(instanceOf(OnErrorPropagateHandler.class)));
+    assertThat(handler.acceptsAll(), is(true));
   }
 
   @Test
