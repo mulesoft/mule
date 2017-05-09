@@ -44,7 +44,7 @@ public class HashedResolverSetResult extends ResolverSetResult {
      */
     public Builder add(String key, Object value) {
       super.add(key, value);
-      hashCode = 31 * hashCode + (value == null ? 0 : value.hashCode());
+      hashCode = calculateValueHash(hashCode, value);
       return this;
     }
 

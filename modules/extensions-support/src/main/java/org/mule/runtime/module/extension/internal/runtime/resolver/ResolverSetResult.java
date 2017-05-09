@@ -112,7 +112,15 @@ public class ResolverSetResult {
 
   @Override
   public int hashCode() {
-    return evaluationResult.hashCode();
+    int hashcode = 1;
+    for (Object val : evaluationResult.values()) {
+      hashcode = calculateValueHash(hashcode, val);
+    }
+    return hashcode;
+  }
+
+  static int calculateValueHash(int hashcode, Object val) {
+    return 31 * hashcode + (val == null ? 0 : val.hashCode());
   }
 
   public Map<String, Object> asMap() {
