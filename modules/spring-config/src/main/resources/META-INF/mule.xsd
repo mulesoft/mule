@@ -2584,10 +2584,17 @@
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="started"/>
-                            <xsd:enumeration value="stopped"/>
-                        </xsd:restriction>
+                        <xsd:union>
+                            <xsd:simpleType>
+                                <xsd:restriction base="propertyPlaceholderType"/>
+                            </xsd:simpleType>
+                            <xsd:simpleType>
+                                <xsd:restriction base="xsd:NMTOKEN">
+                                    <xsd:enumeration value="started"/>
+                                    <xsd:enumeration value="stopped"/>
+                                </xsd:restriction>
+                            </xsd:simpleType>
+                        </xsd:union>
                     </xsd:simpleType>
                 </xsd:attribute>
            </xsd:extension>

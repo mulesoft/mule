@@ -16,4 +16,8 @@
 		<inbound-endpoint address="test://in.stopped" />
 		<echo-component />
 	</flow>
+	<flow name="placeholderFlow" initialState="${state}">
+		<inbound-endpoint address="test://in.placeholder" />
+		<echo-component />
+	</flow>
 </mule>

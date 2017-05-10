@@ -10,16 +10,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.api.transport.MessageReceiver;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.AbstractConnector;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 public class FlowStateTestCase extends FunctionalTestCase
 {
+    @Rule
+    public SystemProperty flowState = new SystemProperty("state", "started");
+
     @Override
     protected String getConfigFile()
     {
@@ -36,6 +40,12 @@ public class FlowStateTestCase extends FunctionalTestCase
     public void testStartedInitialstate() throws Exception
     {
         doTestStarted("started");
+    }
+
+    @Test
+    public void testPlaceholderStartedInitialstate() throws Exception
+    {
+        doTestStarted("placeholder");
     }
 
     protected void doTestStarted(String flowName) throws Exception
