@@ -16,6 +16,7 @@
         <module>unit</module>
         <module>functional</module>
         <module>infrastructure</module>
+        <module>performance</module>
         <module>test-extensions</module>
         <module>test-policies</module>
         <module>test-services</module>
