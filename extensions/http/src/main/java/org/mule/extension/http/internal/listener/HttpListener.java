@@ -208,7 +208,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
           .setStatusCode(attributes.getStatusCode())
           .setReasonPhrase(attributes.getReasonPhrase());
       attributes.getHeaders().forEach(failureResponseBuilder::addHeader);
-      if (errorResponse.getBody().getValue() == null) {
+      if (errorResponse.getBody() == null || errorResponse.getBody().getValue() == null) {
         errorResponse.setBody(errorMessage.getPayload());
       }
     } else if (error != null) {

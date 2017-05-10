@@ -26,7 +26,7 @@ public class HttpListenerErrorResponseBuilder extends HttpListenerResponseBuilde
    */
   @Parameter
   @Optional(defaultValue = "#[error.description]")
-  @Content(primary = true)
+  @Content
   private TypedValue<Object> body;
 
   /**
