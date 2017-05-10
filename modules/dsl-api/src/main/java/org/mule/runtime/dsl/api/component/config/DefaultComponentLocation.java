@@ -178,6 +178,8 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
    */
   public static class DefaultLocationPart implements LocationPart, Serializable {
 
+    private static final long serialVersionUID = 5757545892752260058L;
+
     private String partPath;
     private TypedComponentIdentifier partIdentifier;
     private String fileName;
