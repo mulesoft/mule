@@ -38,12 +38,12 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCase {
+public class SplitterTestCase extends AbstractMuleContextTestCase {
 
   private static final List<String> TEST_LIST_MULTIPLE = Arrays.asList("abc", "def", "ghi");
   private static final List<String> TEST_LIST_SINGLE = Arrays.asList("abc");
 
-  public CollectionMessageSplitterTestCase() {
+  public SplitterTestCase() {
     setStartContext(true);
   }
 
@@ -118,7 +118,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
     Object payload = Collections.emptySet();
     MuleSession session = new DefaultMuleSession();
     Message toSplit = Message.of(payload);
-    CollectionSplitter splitter = new CollectionSplitter();
+    Splitter splitter = new Splitter();
     splitter.setMuleContext(muleContext);
     splitter.initialise();
     Event event = eventBuilder().message(toSplit).session(session).build();
@@ -155,7 +155,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
 
     Message toSplit =
         InternalMessage.builder().payload(payload).inboundProperties(inboundProps).outboundProperties(outboundProps).build();
-    CollectionSplitter splitter = new CollectionSplitter();
+    Splitter splitter = new Splitter();
     Grabber grabber = new Grabber();
     splitter.setMuleContext(muleContext);
     splitter.setListener(grabber);

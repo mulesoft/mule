@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.routing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -20,18 +21,19 @@ import org.junit.Test;
 
 public class MapSplitterTestCase extends AbstractMuleContextTestCase {
 
-  private MapSplitter mapSplitter;
-  private List<String> splitPayloads = new ArrayList<>();
+  private Splitter mapSplitter;
+  private List<Map.Entry<String, String>> splitPayloads = new ArrayList<>();
 
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    mapSplitter = new MapSplitter();
+    mapSplitter = new Splitter();
     mapSplitter.setListener(event -> {
-      splitPayloads.add(event.getMessageAsString(muleContext));
+      splitPayloads.add((Map.Entry<String, String>) event.getMessage().getPayload().getValue());
       return event;
     });
     mapSplitter.setMuleContext(muleContext);
+    mapSplitter.initialise();
   }
 
   @Test
@@ -43,9 +45,13 @@ public class MapSplitterTestCase extends AbstractMuleContextTestCase {
 
     mapSplitter.process(eventBuilder().message(of(testMap)).build());
 
-    assertEquals(3, splitPayloads.size());
-    assertTrue(splitPayloads.contains("one"));
-    assertTrue(splitPayloads.contains("two"));
-    assertTrue(splitPayloads.contains("three"));
+    assertThat(3, is(splitPayloads.size()));
+    assertThat(splitPayloads.get(0), instanceOf(Map.Entry.class));
+    assertThat(splitPayloads.get(0).getKey(), is("1"));
+    assertThat(splitPayloads.get(0).getValue(), is("one"));
+    assertThat(splitPayloads.get(1).getKey(), is("2"));
+    assertThat(splitPayloads.get(1).getValue(), is("two"));
+    assertThat(splitPayloads.get(2).getKey(), is("3"));
+    assertThat(splitPayloads.get(2).getValue(), is("three"));
   }
 }

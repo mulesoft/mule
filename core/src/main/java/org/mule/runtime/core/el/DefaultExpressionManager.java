@@ -337,7 +337,13 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     return expressionLanguage.split(expression, bachSize, null, context);
   }
 
-  private boolean hasMelExpression(String expression) {
+  /**
+   * Checks if an expression has MEL prefix.
+   * 
+   * @param expression the expression to check to see if is a MEL expression.
+   * @return true if the expression is a MEL expression
+   */
+  public static boolean hasMelExpression(String expression) {
     return expression.contains(DEFAULT_EXPRESSION_PREFIX + MEL_PREFIX + PREFIX_EXPR_SEPARATOR);
   }
 }
