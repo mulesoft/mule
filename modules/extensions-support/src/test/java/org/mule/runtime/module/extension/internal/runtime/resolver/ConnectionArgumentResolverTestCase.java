@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
@@ -26,7 +27,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ConnectionArgumentResolverTestCase extends AbstractMuleTestCase {
 
-  @Mock
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private ExecutionContextAdapter operationContext;
 
   private ConnectionArgumentResolver resolver = new ConnectionArgumentResolver();
@@ -43,6 +44,7 @@ public class ConnectionArgumentResolverTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalArgumentException.class)
   public void noConnection() {
+    when(operationContext.getVariable(CONNECTION_PARAM)).thenReturn(null);
     resolver.resolve(operationContext);
   }
 }

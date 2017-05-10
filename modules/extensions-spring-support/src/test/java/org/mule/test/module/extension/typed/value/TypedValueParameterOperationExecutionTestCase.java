@@ -13,6 +13,7 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.test.typed.value.extension.extension.TypedValueParameterOperations.THIS_IS_A_DEFAULT_STRING;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.util.IOUtils;
@@ -22,9 +23,6 @@ import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
 import org.mule.test.typed.value.extension.extension.TypedValueSource;
 import org.mule.test.vegan.extension.VeganProductInformation;
 
-import org.junit.After;
-import org.junit.Test;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +30,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.After;
+import org.junit.Test;
 
 public class TypedValueParameterOperationExecutionTestCase extends AbstractTypedValueTestCase {
 
@@ -167,9 +168,10 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
 
   @Test
   public void typedValueForObject() throws Exception {
-    Event event = flowRunner("typedValueForObject").run();
+    Event event = flowRunner("typedValueForObject").keepStreamsOpen().run();
     TypedValue jsonObject = (TypedValue) event.getMessage().getPayload().getValue();
-    assertThat(IOUtils.toString((InputStream) jsonObject.getValue()), is(JSON_OBJECT));
+    InputStream content = ((CursorStreamProvider) jsonObject.getValue()).openCursor();
+    assertThat(IOUtils.toString(content), is(JSON_OBJECT));
     assertThat(jsonObject.getDataType(), is(like(jsonObject.getDataType().getType(), APPLICATION_JSON, UTF8)));
   }
 
