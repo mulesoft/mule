@@ -12,7 +12,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
+import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -21,7 +23,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.junit4.matcher.DataTypeMatcher;
 import org.mule.tck.size.SmallTest;
 
 import java.nio.charset.Charset;
@@ -50,7 +51,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   public void before() throws Exception {
     flow = getTestFlow(muleContext);
     messageContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
-    muleEvent = Event.builder(messageContext).message(muleMessage).flow(flow).build();
+    muleEvent = builder(messageContext).message(muleMessage).flow(flow).build();
   }
 
   @Test
@@ -58,7 +59,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     muleEvent = Event.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE).build();
 
     DataType dataType = muleEvent.getVariable(PROPERTY_NAME).getDataType();
-    assertThat(dataType, DataTypeMatcher.like(String.class, MediaType.ANY, null));
+    assertThat(dataType, like(String.class, MediaType.ANY, null));
   }
 
   @Test
@@ -68,7 +69,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     muleEvent = Event.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType).build();
 
     DataType actualDataType = muleEvent.getVariable(PROPERTY_NAME).getDataType();
-    assertThat(actualDataType, DataTypeMatcher.like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
+    assertThat(actualDataType, like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
   }
 
   @Test
@@ -76,7 +77,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE);
 
     DataType dataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
-    assertThat(dataType, DataTypeMatcher.like(String.class, MediaType.ANY, null));
+    assertThat(dataType, like(String.class, MediaType.ANY, null));
   }
 
   @Test
@@ -86,18 +87,18 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE, dataType);
 
     DataType actualDataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
-    assertThat(actualDataType, DataTypeMatcher.like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
+    assertThat(actualDataType, like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
   }
 
   @Test
   public void setNullMessage() throws Exception {
     expected.expect(NullPointerException.class);
-    Event.builder(messageContext).message(null);
+    builder(messageContext).message(null);
   }
 
   @Test
-  public void dontsetMessage() throws Exception {
+  public void dontSetMessage() throws Exception {
     expected.expect(NullPointerException.class);
-    muleEvent = Event.builder(messageContext).build();
+    muleEvent = builder(messageContext).build();
   }
 }
