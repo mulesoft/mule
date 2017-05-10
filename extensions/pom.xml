@@ -30,7 +30,6 @@
         <module>sockets</module>
         <module>validation</module>
         <module>wsc</module>
-        <module>jms</module>
     </modules>
 
     <dependencies>
