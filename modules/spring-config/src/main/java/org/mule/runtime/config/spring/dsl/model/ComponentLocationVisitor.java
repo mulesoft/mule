@@ -21,12 +21,13 @@ import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isP
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isRouter;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isTemplateOnErrorHandler;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.resolveComponentType;
-import com.google.common.collect.ImmutableList;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
-import org.mule.runtime.dsl.api.component.config.DefaultLocationPart;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
+
+import com.google.common.collect.ImmutableList;
 
 import java.util.Collections;
 import java.util.List;
