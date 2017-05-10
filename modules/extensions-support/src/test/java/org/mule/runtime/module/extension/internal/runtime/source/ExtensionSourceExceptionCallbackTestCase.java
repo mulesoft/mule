@@ -15,9 +15,12 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
@@ -68,7 +71,7 @@ public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCa
   @Before
   public void before() {
     when(event.getError()).thenReturn(empty());
-    when(event.getMessage()).thenReturn(null);
+    when(event.getMessage()).thenReturn(mock(Message.class));
     when(errorTypeLocator.lookupErrorType(any(Exception.class))).thenReturn(errorType);
     when(messageProcessContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
     when(messageProcessContext.getMessageSource()).thenReturn(messageSource);
