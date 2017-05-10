@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.soap.internal.runtime.connection.transport;
 
 import static java.util.Objects.isNull;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -23,6 +22,8 @@ import org.mule.services.soap.api.message.dispatcher.HttpConfigBasedMessageDispa
 import javax.inject.Inject;
 
 /**
+ * Default implementation of {@link HttpMessageDispatcherProvider} sends a soap message over http using a default configuration or
+ * using an http requester configuration if configured.
  *
  * @since 4.0
  */
@@ -54,8 +55,4 @@ public class DefaultHttpMessageDispatcherProvider implements HttpMessageDispatch
     return success();
   }
 
-  @Override
-  public java.util.Optional<String> getConfigRef() {
-    return ofNullable(configRef);
-  }
 }

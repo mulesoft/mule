@@ -11,7 +11,7 @@ import static java.util.stream.Collectors.toList;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.annotation.Soap;
-import org.mule.runtime.extension.api.soap.annotation.SoapTransportProviders;
+import org.mule.runtime.extension.api.soap.annotation.SoapMessageDispatcherProviders;
 
 import com.google.common.collect.ImmutableList;
 
@@ -42,7 +42,7 @@ public class SoapExtensionTypeWrapper<T> extends SoapComponentWrapper {
 
   public List<MessageDispatcherProviderTypeWrapper> getDispatcherProviders() {
     ImmutableList.Builder<MessageDispatcherProviderTypeWrapper> transportProviders = ImmutableList.builder();
-    Optional<SoapTransportProviders> customTransport = this.getAnnotation(SoapTransportProviders.class);
+    Optional<SoapMessageDispatcherProviders> customTransport = this.getAnnotation(SoapMessageDispatcherProviders.class);
     customTransport.ifPresent(ct -> transportProviders.addAll(stream(ct.value())
         .map(MessageDispatcherProviderTypeWrapper::new)
         .collect(toList())));

@@ -14,13 +14,13 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.soap.HttpMessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
-import org.mule.runtime.extension.api.soap.annotation.SoapTransportProviders;
+import org.mule.runtime.extension.api.soap.annotation.SoapMessageDispatcherProviders;
 
 import java.util.List;
 
 @Extension(name = "RAM")
 @Xml(prefix = "ram")
-@SoapTransportProviders({MiniverseDispatcherProvider.class,
+@SoapMessageDispatcherProviders({MiniverseDispatcherProvider.class,
     DefaultPortalGunDispatcherProvider.class,
     HttpMessageDispatcherProvider.class})
 public class RickAndMortyExtension implements SoapServiceProvider {
