@@ -34,6 +34,8 @@ import java.util.Optional;
  */
 public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
 
+  private static final int STREAM_FINISHED_PROBE = 10;
+  
   private final int bufferSizeIncrement;
   private final int maxBufferSize;
   private long bufferTip = 0;
@@ -135,7 +137,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
   public int consumeForwardData() throws IOException {
     ByteBuffer readBuffer = buffer.hasRemaining()
         ? buffer
-        : allocate(bufferSizeIncrement > 0 ? bufferSizeIncrement : 10);
+        : allocate(bufferSizeIncrement > 0 ? bufferSizeIncrement : STREAM_FINISHED_PROBE);
 
     int read = consumeStream(readBuffer);
 
