@@ -186,13 +186,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             // For the "One-way" scenario, we can resolve the Correlation ID.
             // For the "Request-Response" scenario, this cannot be done because we are supporting only the
             // JMS Message ID Pattern. In Mule 4 JMS should support this pattern, and the JMS Correlation ID Pattern
-            if(!endpoint.getExchangePattern().hasResponse())
+            if(endpoint.getExchangePattern().hasResponse())
             {
-                jmsMessage.setJMSCorrelationID(resolveJmsCorrelationId(event));
+                jmsMessage.setJMSCorrelationID(getCorrelationId(event));
             }
             else
             {
-                jmsMessage.setJMSCorrelationID(event.getMessage().getCorrelationId());
+                jmsMessage.setJMSCorrelationID(resolveJmsCorrelationId(event));
             }
 
             //Allow overrides to alter the message if necessary
@@ -741,5 +741,10 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     protected boolean isSupportsNonBlocking()
     {
         return true;
+    }
+
+    protected String getCorrelationId (MuleEvent event)
+    {
+        return event.getMessage().getCorrelationId();
     }
 }
