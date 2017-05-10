@@ -76,7 +76,6 @@ final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
   private void declareSubtypes(ExtensionDeclarer extension, List<MessageDispatcherProviderTypeWrapper> transportProviders) {
     if (!transportProviders.isEmpty()) {
       List<MetadataType> types = transportProviders.stream().map(tp -> typeLoader.load(tp.getDeclaringClass())).collect(toList());
-      // TODO check alias.
       extension.withSubTypes(typeLoader.load(MessageDispatcherProvider.class), types);
     }
   }

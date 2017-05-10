@@ -40,7 +40,7 @@ public class ConnectionArgumentResolver implements ArgumentResolver<Object> {
   @Override
   public Object resolve(ExecutionContext executionContext) {
     ConnectionHandler connectionHandler =
-      ((ExecutionContextAdapter<ComponentModel>) executionContext).getVariable(CONNECTION_PARAM);
+        ((ExecutionContextAdapter<ComponentModel>) executionContext).getVariable(CONNECTION_PARAM);
     checkArgument(connectionHandler != null,
                   "No connection was provided for the component [" + executionContext.getComponentModel().getName() + "]");
 
