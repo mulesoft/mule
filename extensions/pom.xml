@@ -29,7 +29,6 @@
         <module>oauth</module>
         <module>sockets</module>
         <module>wsc</module>
-        <module>jms</module>
     </modules>
 
     <dependencies>
