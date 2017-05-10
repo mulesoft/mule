@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.embedded.api;
 
-import org.mule.maven.client.api.MavenConfiguration;
+import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.module.embedded.internal.DefaultEmbeddedContainerBuilder;
 
 import java.net.URL;

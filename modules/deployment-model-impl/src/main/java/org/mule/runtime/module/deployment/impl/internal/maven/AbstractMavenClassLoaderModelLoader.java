@@ -11,7 +11,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.maven.client.api.BundleScope.PROVIDED;
+import static org.mule.maven.client.api.model.BundleScope.PROVIDED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
@@ -119,7 +119,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                                                               localMavenRepositoryLocation),
                               localRepositorySupplierFactory.fixedFolderSupplier(localMavenRepositoryLocation));
     File mavenRepository = compositeRepoLocationSupplier.get();
-    List<org.mule.maven.client.api.BundleDependency> dependencies =
+    List<org.mule.maven.client.api.model.BundleDependency> dependencies =
         mavenClient.resolveArtifactDependencies(artifactFile, enabledTestDependencies(), of(mavenRepository),
                                                 of(new File(mavenRepository, ".mule")));
     final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
@@ -134,7 +134,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     return classLoaderModelBuilder.build();
   }
 
-  protected BundleDependency convertBundleDependency(org.mule.maven.client.api.BundleDependency mavenClientDependency) {
+  protected BundleDependency convertBundleDependency(org.mule.maven.client.api.model.BundleDependency mavenClientDependency) {
     BundleDependency.Builder builder = new BundleDependency.Builder()
         .setScope(BundleScope.valueOf(mavenClientDependency.getScope().name()))
         .setBundleUrl(mavenClientDependency.getBundleUrl())
@@ -142,7 +142,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     return builder.build();
   }
 
-  private BundleDescriptor convertBundleDescriptor(org.mule.maven.client.api.BundleDescriptor descriptor) {
+  private BundleDescriptor convertBundleDescriptor(org.mule.maven.client.api.model.BundleDescriptor descriptor) {
     BundleDescriptor.Builder builder = new BundleDescriptor.Builder().setGroupId(descriptor.getGroupId())
         .setArtifactId(descriptor.getArtifactId())
         // Use baseVersion as it will refer to the unresolved meta version (case of SNAPSHOTS instead of timestamp versions)

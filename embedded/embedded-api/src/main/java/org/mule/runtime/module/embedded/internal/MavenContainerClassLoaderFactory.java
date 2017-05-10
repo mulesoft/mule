@@ -9,8 +9,8 @@ package org.mule.runtime.module.embedded.internal;
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
-import org.mule.maven.client.api.BundleDependency;
-import org.mule.maven.client.api.BundleDescriptor;
+import org.mule.maven.client.api.model.BundleDependency;
+import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.maven.client.api.MavenClient;
 
 import java.io.File;

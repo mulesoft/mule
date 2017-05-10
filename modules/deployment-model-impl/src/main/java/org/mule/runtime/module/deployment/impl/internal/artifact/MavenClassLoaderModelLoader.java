@@ -12,7 +12,7 @@ import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConst
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
-import org.mule.maven.client.api.MavenConfiguration;
+import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
