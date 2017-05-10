@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 
@@ -76,8 +75,10 @@ abstract class AbstractCursorStream extends CursorStream {
 
   protected abstract void doRelease();
 
-  protected void assertNotDisposed() {
-    checkState(!released, "Stream is closed");
+  protected void assertNotDisposed() throws IOException {
+    if (released) {
+      throw new IOException("Stream is closed");
+    }
   }
 
   /**
