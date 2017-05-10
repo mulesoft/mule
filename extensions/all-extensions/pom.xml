@@ -235,35 +235,5 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-validation</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-plugin</classifier>
-            <!--TODO(gfernandes): https://www.mulesoft.org/jira/browse/MULE-9810 
-                Remove explicit exclusions whenever this issue is fixed (this applies to 
-                all the zip type dependencies -->
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-validator</groupId>
-                    <artifactId>commons-validator</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-lang</groupId>
-                    <artifactId>commons-lang</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.reflections</groupId>
-                    <artifactId>reflections</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
     </dependencies>
 </project>

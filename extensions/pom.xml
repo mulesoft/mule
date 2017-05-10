@@ -28,7 +28,6 @@
         <module>http</module>
         <module>oauth</module>
         <module>sockets</module>
-        <module>validation</module>
         <module>wsc</module>
         <module>jms</module>
     </modules>
