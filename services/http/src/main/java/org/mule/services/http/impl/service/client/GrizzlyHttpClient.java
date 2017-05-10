@@ -419,7 +419,7 @@ public class GrizzlyHttpClient implements HttpClient {
       try {
         closeOut();
       } catch (IOException e) {
-        // ignore
+        logger.warn("Error closing HTTP response stream: ", e);
       }
       if (!handled.getAndSet(true)) {
         Exception exception;
@@ -431,6 +431,8 @@ public class GrizzlyHttpClient implements HttpClient {
           exception = new IOException(t);
         }
         responseHandler.onFailure(exception);
+      } else {
+        logger.warn("Error handling HTTP response stream: ", t);
       }
     }
 

@@ -11,11 +11,11 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 /**
- * Base class for a {@link HttpMessageBuilder} which returns errors responses
+ * Base class for a {@link HttpMessageBuilder} which returns responses
  *
  * @since 4.0
  */
-public class HttpListenerResponseBuilder extends HttpMessageBuilder {
+public abstract class HttpListenerResponseBuilder extends HttpMessageBuilder {
 
   /**
    * HTTP status code the response should have.
@@ -46,4 +46,5 @@ public class HttpListenerResponseBuilder extends HttpMessageBuilder {
   public void setReasonPhrase(String reasonPhrase) {
     this.reasonPhrase = reasonPhrase;
   }
+
 }
