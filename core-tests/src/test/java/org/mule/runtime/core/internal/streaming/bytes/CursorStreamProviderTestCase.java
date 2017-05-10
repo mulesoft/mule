@@ -275,6 +275,13 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     withCursor(cursor -> assertThat(IOUtils.toString(cursor), equalTo(data)));
   }
 
+  @Test(expected = IOException.class)
+  public void ioExceptionIfClosed() throws Exception {
+    CursorStream cursor = streamProvider.openCursor();
+    cursor.close();
+    cursor.read();
+  }
+
   private void doAsync(CheckedRunnable task1, CheckedRunnable task2) throws Exception {
     resetLatches();
     Future future1 = doAsync(() -> {
