@@ -7,8 +7,10 @@
 package org.mule.runtime.core.message;
 
 
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -25,17 +27,15 @@ import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.internal.message.DefaultMessageBuilder;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.internal.message.DefaultMessageBuilder;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -46,6 +46,9 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultEventBuilder implements Event.Builder {
 
@@ -99,6 +102,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
   @Override
   public Event.Builder message(Message message) {
+    requireNonNull(message);
     this.message = message;
     this.modified = true;
     return this;
@@ -205,6 +209,8 @@ public class DefaultEventBuilder implements Event.Builder {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
+      requireNonNull(message);
+
       return new EventImplementation(context, message, flowVariables, moduleProperties, moduleParameters, flow, session,
                                      replyToDestination,
                                      replyToHandler,

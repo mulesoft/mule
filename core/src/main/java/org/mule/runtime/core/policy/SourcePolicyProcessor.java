@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.policy;
 
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.builder;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -57,7 +58,7 @@ public class SourcePolicyProcessor implements Processor {
    *
    * @param sourceEvent the event with the data created from the source message that must be used to execute the source policy.
    * @return the result of processing the {@code event} through the policy chain.
-   * @throws Exception
+   * @throws MuleException
    */
   @Override
   public Event process(Event sourceEvent) throws MuleException {
@@ -68,7 +69,8 @@ public class SourcePolicyProcessor implements Processor {
       return policyEventConverter.createEvent(nextProcessorResult, nextProcessorEvent);
     });
     Event sourcePolicyResult =
-        policy.getPolicyChain().process(policyEventConverter.createEvent(sourceEvent, builder(sourceEvent.getContext()).build()));
+        policy.getPolicyChain().process(policyEventConverter
+            .createEvent(sourceEvent, builder(sourceEvent.getContext()).message(of(null)).build()));
     return policyEventConverter.createEvent(sourcePolicyResult, sourceEvent);
   }
 

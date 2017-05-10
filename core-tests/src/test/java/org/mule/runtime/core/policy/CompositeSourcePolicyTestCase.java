@@ -70,6 +70,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
     firstPolicyResultEvent = createTestEvent();
     secondPolicyResultEvent = createTestEvent();
 
+    when(nextProcessResultEvent.getMessage()).thenReturn(mock(Message.class));
     when(flowExecutionProcessor.process(any())).thenReturn(nextProcessResultEvent);
     when(firstPolicy.getPolicyChain().process(any())).thenReturn(firstPolicyResultEvent);
     when(secondPolicy.getPolicyChain().process(any())).thenReturn(secondPolicyResultEvent);

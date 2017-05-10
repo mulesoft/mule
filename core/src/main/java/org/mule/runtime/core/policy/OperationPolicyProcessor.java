@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.policy;
 
+import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -50,15 +52,15 @@ public class OperationPolicyProcessor implements Processor {
    *
    * @param operationEvent the event with the data to execute the operation
    * @return the result of processing the {@code event} through the policy chain.
-   * @throws Exception
+   * @throws MuleException
    */
   @Override
-  public Event process(Event operationEvent)
-      throws MuleException {
+  public Event process(Event operationEvent) throws MuleException {
     try {
       PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getId(), policy.getPolicyId());
       Optional<Event> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
-      Event variablesProviderEvent = latestPolicyState.orElseGet(() -> Event.builder(operationEvent.getContext()).build());
+      Event variablesProviderEvent =
+          latestPolicyState.orElseGet(() -> Event.builder(operationEvent.getContext()).message(of(null)).build());
       policyStateHandler.updateState(policyStateId, variablesProviderEvent);
       Event policyEvent = policyEventConverter.createEvent(operationEvent, variablesProviderEvent);
       Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent);

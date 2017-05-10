@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
@@ -64,6 +65,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
     when(mockMuleContext.getErrorTypeLocator()).thenReturn(mockErrorTypeLocator);
     when(mockMuleEvent.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(mockMuleEvent.getError()).thenReturn(of(mockError));
+    when(mockMuleEvent.getMessage()).thenReturn(Message.of(null));
     when(mockErrorTypeLocator.lookupErrorType((Exception) any())).thenReturn(mockErrorType);
 
     cut = new ExceptionToMessagingExceptionExecutionInterceptor();

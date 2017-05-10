@@ -528,7 +528,7 @@ public class DefaultMessageBuilder
     }
 
     protected void serializeValue(ObjectOutputStream out) throws Exception {
-      if (typedValue.getValue() instanceof Serializable) {
+      if (typedValue.getValue() == null || typedValue.getValue() instanceof Serializable) {
         out.writeBoolean(true);
         out.writeObject(typedValue.getValue());
         out.writeObject(typedValue.getDataType());
