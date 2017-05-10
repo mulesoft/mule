@@ -147,7 +147,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     return buffer;
   }
 
-  protected int consumeStream() throws IOException {
+  protected int consumeStream(ByteBuffer buffer) throws IOException {
     int result;
     try {
       result = streamChannel.read(buffer);
