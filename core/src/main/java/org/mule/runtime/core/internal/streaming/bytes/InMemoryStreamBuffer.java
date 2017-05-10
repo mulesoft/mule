@@ -35,7 +35,7 @@ import java.util.Optional;
 public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
 
   private static final int STREAM_FINISHED_PROBE = 10;
-  
+
   private final int bufferSizeIncrement;
   private final int maxBufferSize;
   private long bufferTip = 0;
