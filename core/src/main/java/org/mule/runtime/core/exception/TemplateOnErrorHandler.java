@@ -7,6 +7,7 @@
 package org.mule.runtime.core.exception;
 
 import static java.util.Arrays.stream;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -39,6 +40,8 @@ import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,6 +80,17 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         sink.error(exception);
       }
     });
+  }
+
+  @Override
+  public void setMessageProcessors(List<Processor> processors) {
+    super.setMessageProcessors(processors);
+    configuredMessageProcessors = newChain(getMessageProcessors());
+  }
+
+  @Override
+  protected List<Processor> getOwnedMessageProcessors() {
+    return configuredMessageProcessors == null ? new ArrayList<>() : singletonList(configuredMessageProcessors);
   }
 
   private class ExceptionMessageProcessor extends AbstractRequestResponseMessageProcessor {
@@ -205,10 +219,12 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   protected void doInitialise(MuleContext muleContext) throws InitialisationException {
     super.doInitialise(muleContext);
-    configuredMessageProcessors = newChain(getMessageProcessors());
-    configuredMessageProcessors.setFlowConstruct(flowConstruct);
-    configuredMessageProcessors.setMuleContext(muleContext);
-    configuredMessageProcessors.setMessagingExceptionHandler(messagingExceptionHandler);
+
+    if (configuredMessageProcessors != null) {
+      configuredMessageProcessors.setFlowConstruct(flowConstruct);
+      configuredMessageProcessors.setMuleContext(muleContext);
+      configuredMessageProcessors.setMessagingExceptionHandler(messagingExceptionHandler);
+    }
 
     errorTypeMatcher = createErrorType();
   }

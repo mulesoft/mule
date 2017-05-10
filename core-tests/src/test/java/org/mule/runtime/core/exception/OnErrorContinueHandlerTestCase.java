@@ -23,6 +23,8 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
+
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.DefaultEventContext;
@@ -35,6 +37,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
@@ -55,8 +58,8 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @RunWith(MockitoJUnitRunner.class)
 public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase {
 
-  private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
   protected MuleContext muleContext = mockContextWithServices();
+  private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
 
   @Rule
   public ExpectedException expectedException = none();
@@ -70,6 +73,8 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
 
   @Mock
   private StreamCloserService mockStreamCloserService;
+  @Mock
+  private StreamingManager mockStreamingManager;
   @Spy
   private TestTransaction mockTransaction = new TestTransaction(mockMuleContext);
   @Spy
@@ -94,6 +99,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     onErrorContinueHandler.setMuleContext(mockMuleContext);
     onErrorContinueHandler.setFlowConstruct(flow);
     when(mockMuleContext.getStreamCloserService()).thenReturn(mockStreamCloserService);
+    when(mockMuleContext.getRegistry().lookupObject(StreamingManager.class)).thenReturn(mockStreamingManager);
 
     context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
     muleEvent = Event.builder(context).message(muleMessage).flow(flow).build();

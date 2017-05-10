@@ -67,9 +67,9 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   @Override
   protected List<Processor> getOwnedMessageProcessors() {
-    List<Processor> messageProcessors = new ArrayList<>(super.getMessageProcessors().size()
+    List<Processor> messageProcessors = new ArrayList<>(super.getOwnedMessageProcessors().size()
         + (redeliveryExceeded == null ? 0 : redeliveryExceeded.getMessageProcessors().size()));
-    messageProcessors.addAll(super.getMessageProcessors());
+    messageProcessors.addAll(super.getOwnedMessageProcessors());
     if (redeliveryExceeded != null) {
       messageProcessors.addAll(redeliveryExceeded.getMessageProcessors());
     }
