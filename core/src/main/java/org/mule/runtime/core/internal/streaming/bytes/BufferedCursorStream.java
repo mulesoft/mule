@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static java.lang.Math.min;
+import static org.mule.runtime.api.util.DataUnit.KB;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 
@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
  */
 public final class BufferedCursorStream extends AbstractCursorStream {
 
-  private static final int LOCAL_BUFFER_SIZE = 64;
+  private static final int LOCAL_BUFFER_SIZE = KB.toBytes(32);
 
   private final InputStreamBuffer streamBuffer;
 
@@ -105,7 +105,7 @@ public final class BufferedCursorStream extends AbstractCursorStream {
   private int reloadLocalBufferIfEmpty(int len) {
     if (!memoryBuffer.hasRemaining()) {
       memoryBuffer.clear();
-      int read = streamBuffer.get(memoryBuffer, position, min(LOCAL_BUFFER_SIZE, len));
+      int read = streamBuffer.get(memoryBuffer, position, LOCAL_BUFFER_SIZE);
       if (read > 0) {
         memoryBuffer.flip();
         return read;
