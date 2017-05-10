@@ -145,7 +145,7 @@
         <asyncHttpClientVersion>1.9.39</asyncHttpClientVersion>
         <apacheHttpClientVersion>4.5.2</apacheHttpClientVersion>
         <awaitilityVersion>1.7.0</awaitilityVersion>
-        <bouncycastleVersion>1.54</bouncycastleVersion>
+        <bouncycastleVersion>1.56</bouncycastleVersion>
         <c3p0Version>0.9.5.2</c3p0Version>
         <cometdVersion>6.1.26</cometdVersion>
         <commonsBeanUtilsVersion>1.9.2</commonsBeanUtilsVersion>
