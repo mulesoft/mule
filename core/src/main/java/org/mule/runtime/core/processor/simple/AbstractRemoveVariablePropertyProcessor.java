@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.processor.simple;
 
-import org.mule.runtime.core.api.Event;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.AttributeEvaluator;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.WildcardAttributeEvaluator;
 
 import java.util.Set;
@@ -42,9 +45,9 @@ public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMess
       });
       return resultEvent.get();
     } else {
-      Object keyValue = identifierEvaluator.resolveValue(event);
-      if (keyValue != null) {
-        return removeProperty(event, keyValue.toString());
+      String key = identifierEvaluator.resolveValue(event);
+      if (key != null) {
+        return removeProperty(event, key);
       } else {
         logger.info("Key expression return null, no property will be removed");
         return event;
@@ -64,10 +67,10 @@ public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMess
   }
 
   public void setIdentifier(String identifier) {
-    if (identifier == null) {
+    if (StringUtils.isBlank(identifier)) {
       throw new IllegalArgumentException("Remove with null identifier is not supported");
     }
-    this.identifierEvaluator = new AttributeEvaluator(identifier);
+    this.identifierEvaluator = new AttributeEvaluator(identifier, STRING);
     this.wildcardAttributeEvaluator = new WildcardAttributeEvaluator(identifier);
   }
 

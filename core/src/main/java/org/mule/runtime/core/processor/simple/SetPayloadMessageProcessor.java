@@ -22,8 +22,8 @@ import org.mule.runtime.core.util.AttributeEvaluator;
 public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
   private DataType dataType;
-  private AttributeEvaluator valueEvaluator = new AttributeEvaluator(null);
-
+  private String value;
+  private AttributeEvaluator valueEvaluator;
 
   @Override
   public Event process(Event event) throws MuleException {
@@ -78,11 +78,12 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
   }
 
   public void setValue(String value) {
-    valueEvaluator = new AttributeEvaluator(value);
+    this.value = value;
   }
 
   @Override
   public void initialise() throws InitialisationException {
+    valueEvaluator = new AttributeEvaluator(value, dataType);
     valueEvaluator.initialize(muleContext.getExpressionManager());
   }
 }

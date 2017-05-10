@@ -6,26 +6,28 @@
  */
 package org.mule.runtime.core.el;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
+import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
+import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.IOUtils;
+
+import java.io.IOException;
 
 import javax.inject.Inject;
-import java.io.IOException;
 
 public class ExpressionLanguageComponent extends AbstractAnnotatedObject
     implements Processor, FlowConstructAware, Initialisable {
 
   @Inject
-  protected MuleContext muleContext;
+  private ExtendedExpressionManager expressionMgr;
   protected FlowConstruct flowConstruct;
   protected String expression;
   protected String expressionFile;
@@ -34,19 +36,19 @@ public class ExpressionLanguageComponent extends AbstractAnnotatedObject
   public void initialise() throws InitialisationException {
     if (expressionFile != null) {
       try {
-        expression = IOUtils.getResourceAsString(expressionFile, getClass());
+        expression = getResourceAsString(expressionFile, getClass());
       } catch (IOException e) {
         throw new InitialisationException(e, this);
       }
     } else if (expression == null) {
-      throw new InitialisationException(CoreMessages.objectIsNull("expression"), this);
+      throw new InitialisationException(objectIsNull("expression"), this);
     }
   }
 
   @Override
   public Event process(Event event) throws MuleException {
     Event.Builder eventBuilder = Event.builder(event);
-    muleContext.getExpressionManager().evaluate(expression, event, eventBuilder, flowConstruct);
+    expressionMgr.evaluate(expression, event, eventBuilder, flowConstruct);
     return eventBuilder.build();
   }
 
@@ -56,10 +58,6 @@ public class ExpressionLanguageComponent extends AbstractAnnotatedObject
 
   public void setExpressionFile(String expressionFile) {
     this.expressionFile = expressionFile;
-  }
-
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
   }
 
   @Override

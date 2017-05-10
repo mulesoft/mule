@@ -15,12 +15,14 @@ import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -34,15 +36,15 @@ import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -162,8 +164,8 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void resolveIntegerValueFromJsonObject() throws MuleException {
-    AttributeEvaluator attributeEvaluator = getAttributeEvaluator("#[payload.port]");
-    Integer port = attributeEvaluator.resolveIntegerValue(newEvent(HOST_PORT_JSON, APPLICATION_JSON));
+    AttributeEvaluator attributeEvaluator = getAttributeEvaluator("#[payload.port]", NUMBER);
+    Integer port = attributeEvaluator.resolveValue(newEvent(HOST_PORT_JSON, APPLICATION_JSON));
     assertThat(port, is(8081));
   }
 
@@ -176,15 +178,15 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void resolveStringValue() throws MuleException {
-    AttributeEvaluator attributeEvaluator = getAttributeEvaluator("#[payload.port]");
-    String port = attributeEvaluator.resolveStringValue(newEvent(HOST_PORT_JSON, APPLICATION_JSON));
+    AttributeEvaluator attributeEvaluator = getAttributeEvaluator("#[payload.port]", STRING);
+    String port = attributeEvaluator.resolveValue(newEvent(HOST_PORT_JSON, APPLICATION_JSON));
     assertThat(port, is("8081"));
   }
 
   @Test
   public void getBooleanValue() throws MuleException {
-    AttributeEvaluator attributeEvaluator = getAttributeEvaluator("#[payload.ok]");
-    Boolean bool = attributeEvaluator.resolveBooleanValue(newEvent("{\"ok\" : true}", APPLICATION_JSON));
+    AttributeEvaluator attributeEvaluator = getAttributeEvaluator("#[payload.ok]", BOOLEAN);
+    Boolean bool = attributeEvaluator.resolveValue(newEvent("{\"ok\" : true}", APPLICATION_JSON));
     assertThat(bool, is(true));
   }
 

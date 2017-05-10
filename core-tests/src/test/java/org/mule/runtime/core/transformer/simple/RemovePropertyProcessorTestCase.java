@@ -11,13 +11,14 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
+
 import org.mule.functional.transformer.simple.AbstractRemoveVariablePropertyProcessorTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.processor.simple.RemovePropertyProcessor;
 import org.mule.tck.size.SmallTest;
 
-import java.util.HashSet;
+import java.util.Set;
 
 @SmallTest
 public class RemovePropertyProcessorTestCase extends AbstractRemoveVariablePropertyProcessorTestCase {
@@ -27,7 +28,7 @@ public class RemovePropertyProcessorTestCase extends AbstractRemoveVariablePrope
   }
 
   @Override
-  protected void addMockedPropeerties(Event mockEvent, HashSet properties) {
+  protected void addMockedPropeerties(Event mockEvent, Set<String> properties) {
     InternalMessage mockMessage = (InternalMessage) mockEvent.getMessage();
     when(mockMessage.getOutboundPropertyNames()).thenReturn(properties);
   }

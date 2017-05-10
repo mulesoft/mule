@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.transformer.simple;
 
+import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -30,7 +31,6 @@ import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,8 +38,8 @@ import org.junit.Test;
 public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
   private static final String PLAIN_TEXT = "This is a plain text";
-  private static final String EXPRESSION = "#[mel:testVariable]";
-  private static final Charset CUSTOM_ENCODING = StandardCharsets.UTF_16;
+  private static final String EXPRESSION = "#[testVariable]";
+  private static final Charset CUSTOM_ENCODING = UTF_16;
 
   private SetPayloadMessageProcessor setPayloadMessageProcessor;
   private MuleContext muleContext;

@@ -18,7 +18,7 @@ import java.util.Collection;
 import org.springframework.beans.factory.FactoryBean;
 
 public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotatedObject
-    implements FactoryBean, MuleContextAware {
+    implements FactoryBean<AbstractSelectiveRouter>, MuleContextAware {
 
   private Processor defaultProcessor;
   private Collection<MessageProcessorFilterPair> conditionalMessageProcessors;
@@ -36,7 +36,8 @@ public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotat
     this.conditionalMessageProcessors = conditionalMessageProcessors;
   }
 
-  public Object getObject() throws Exception {
+  @Override
+  public AbstractSelectiveRouter getObject() throws Exception {
     final AbstractSelectiveRouter router = newAbstractSelectiveRouter();
     router.setAnnotations(getAnnotations());
     router.setDefaultRoute(defaultProcessor);
@@ -51,6 +52,7 @@ public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotat
 
   protected abstract AbstractSelectiveRouter newAbstractSelectiveRouter();
 
+  @Override
   public boolean isSingleton() {
     return true;
   }

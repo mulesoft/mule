@@ -6,22 +6,22 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang.builder.ToStringBuilder.reflectionToString;
+import static org.apache.commons.lang.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
@@ -35,8 +35,8 @@ public class MessageProcessorFilterPair extends AbstractAnnotatedObject
   private final Filter filter;
 
   public MessageProcessorFilterPair(Processor messageProcessor, Filter filter) {
-    Validate.notNull(messageProcessor, "messageProcessor can't be null");
-    Validate.notNull(filter, "filter can't be null");
+    requireNonNull(messageProcessor, "messageProcessor can't be null");
+    requireNonNull(filter, "filter can't be null");
     this.messageProcessor = messageProcessor;
     this.filter = filter;
   }
@@ -51,12 +51,13 @@ public class MessageProcessorFilterPair extends AbstractAnnotatedObject
 
   @Override
   public String toString() {
-    return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+    return reflectionToString(this, SHORT_PREFIX_STYLE);
   }
 
   // This class being just a logic-less tuple, it directly delegates lifecyle
   // events to its members, without any control.
 
+  @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     if (messageProcessor instanceof FlowConstructAware) {
       ((FlowConstructAware) messageProcessor).setFlowConstruct(flowConstruct);
@@ -66,6 +67,7 @@ public class MessageProcessorFilterPair extends AbstractAnnotatedObject
     }
   }
 
+  @Override
   public void setMuleContext(MuleContext context) {
     if (messageProcessor instanceof MuleContextAware) {
       ((MuleContextAware) messageProcessor).setMuleContext(context);
@@ -75,6 +77,7 @@ public class MessageProcessorFilterPair extends AbstractAnnotatedObject
     }
   }
 
+  @Override
   public void initialise() throws InitialisationException {
     if (messageProcessor instanceof Initialisable) {
       ((Initialisable) messageProcessor).initialise();
@@ -84,6 +87,7 @@ public class MessageProcessorFilterPair extends AbstractAnnotatedObject
     }
   }
 
+  @Override
   public void start() throws MuleException {
     if (messageProcessor instanceof Startable) {
       ((Startable) messageProcessor).start();
@@ -93,6 +97,7 @@ public class MessageProcessorFilterPair extends AbstractAnnotatedObject
     }
   }
 
+  @Override
   public void stop() throws MuleException {
     if (messageProcessor instanceof Stoppable) {
       ((Stoppable) messageProcessor).stop();
@@ -102,6 +107,7 @@ public class MessageProcessorFilterPair extends AbstractAnnotatedObject
     }
   }
 
+  @Override
   public void dispose() {
     if (messageProcessor instanceof Disposable) {
       ((Disposable) messageProcessor).dispose();

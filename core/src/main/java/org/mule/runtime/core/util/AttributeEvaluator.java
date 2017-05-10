@@ -6,47 +6,44 @@
  */
 package org.mule.runtime.core.util;
 
+import static java.util.Arrays.asList;
 import static java.util.regex.Pattern.DOTALL;
-import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
+import static java.util.regex.Pattern.compile;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
 /**
- * This class acts as a wrapper for configuration attributes that support simple text, expression or regular expressions.
- * It can be extended to support other cases too.
+ * This class acts as a wrapper for configuration attributes that support simple text, expression or regular expressions. It can
+ * be extended to support other cases too.
  */
 public class AttributeEvaluator {
 
-  private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = Pattern.compile("^#\\[(?:(?!#\\[).)*]$", DOTALL);
+  private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = compile("^#\\[(?:(?!#\\[).)*]$", DOTALL);
   private static final BindingContext NULL_BINDING_CONTEXT = BindingContext.builder().build();
-  private static final List<Class<?>> BLACK_LIST_TYPES = Arrays.asList(Object.class, InputStream.class);
-  public static final DataType INTEGER = DataType.fromType(Integer.class);
+  private static final List<Class<?>> BLACK_LIST_TYPES = asList(Object.class, InputStream.class);
+
   private String attributeValue;
   private ExtendedExpressionManager expressionManager;
-  private AttributeType attributeType;
   private Function<Event, TypedValue> expressionResolver;
-  private Function<Event, String> parseResolver;
 
   /**
    * Creates a new Attribute Evaluator instance with a given attribute value
    *
    * @param attributeValue the value for an attribute, this value can be treated as {@link AttributeType#EXPRESSION},
-   *                       {@link AttributeType#PARSE_EXPRESSION} or as a {@link AttributeType#STATIC_VALUE}
+   *        {@link AttributeType#PARSE_EXPRESSION} or as a {@link AttributeType#STATIC_VALUE}
    */
   public AttributeEvaluator(String attributeValue) {
     this(attributeValue, null);
@@ -56,40 +53,28 @@ public class AttributeEvaluator {
    * Creates a new Attribute Evaluator instance with a given attribute value and the expected {@link DataType}
    *
    * @param attributeValue the value for an attribute, this value can be treated as {@link AttributeType#EXPRESSION},
-   *                       {@link AttributeType#PARSE_EXPRESSION} or as a {@link AttributeType#STATIC_VALUE}
+   *        {@link AttributeType#PARSE_EXPRESSION} or as a {@link AttributeType#STATIC_VALUE}
    * @param expectedDataType specifies that the expression should be evaluated a coerced to the given expected {@link DataType}.
-   *                         This value will be ignored for {@link AttributeType#PARSE_EXPRESSION} and {@link AttributeType#STATIC_VALUE}
+   *        This value will be ignored for {@link AttributeType#PARSE_EXPRESSION} and {@link AttributeType#STATIC_VALUE}
    */
   public AttributeEvaluator(String attributeValue, DataType expectedDataType) {
     this.attributeValue = sanitize(attributeValue);
-    resolveAttributeType();
 
-    switch (attributeType) {
+    switch (resolveAttributeType()) {
       case EXPRESSION:
-        configureExpressionAttribute(expectedDataType);
+        if (!(expectedDataType == null || BLACK_LIST_TYPES.contains(expectedDataType.getType()))) {
+          expressionResolver =
+              event -> expressionManager.evaluate(this.attributeValue, expectedDataType, NULL_BINDING_CONTEXT, event);
+        } else {
+          expressionResolver = event -> expressionManager.evaluate(this.attributeValue, event);
+        }
         break;
       case PARSE_EXPRESSION:
-        configureParseAttribute();
+        expressionResolver = event -> new TypedValue<>(expressionManager.parse(this.attributeValue, event, null), STRING);
         break;
       case STATIC_VALUE:
-        configureStaticAttribute();
+        expressionResolver = event -> new TypedValue<>(this.attributeValue, this.attributeValue == null ? OBJECT : STRING);
     }
-  }
-
-  private void configureStaticAttribute() {
-    parseResolver = event -> this.attributeValue;
-    expressionResolver = event -> new TypedValue<>(this.attributeValue, this.attributeValue == null ? OBJECT : STRING);
-  }
-
-  private void configureParseAttribute() {
-    parseResolver = event -> expressionManager.parse(this.attributeValue, event, null);
-    expressionResolver = event -> new TypedValue<>(parseResolver.apply(event), STRING);
-  }
-
-  private void configureExpressionAttribute(DataType expectedDataType) {
-    expressionResolver = expectedDataType != null && !BLACK_LIST_TYPES.contains(expectedDataType.getType())
-        ? event -> expressionManager.evaluate(this.attributeValue, expectedDataType, NULL_BINDING_CONTEXT, event)
-        : event -> expressionManager.evaluate(this.attributeValue, event);
   }
 
   public AttributeEvaluator initialize(final ExtendedExpressionManager expressionManager) {
@@ -105,13 +90,13 @@ public class AttributeEvaluator {
     return attributeValue;
   }
 
-  private void resolveAttributeType() {
+  private AttributeType resolveAttributeType() {
     if (attributeValue != null && SINGLE_EXPRESSION_REGEX_PATTERN.matcher(attributeValue).matches()) {
-      this.attributeType = AttributeType.EXPRESSION;
+      return AttributeType.EXPRESSION;
     } else if (attributeValue != null && isParseExpression(attributeValue)) {
-      this.attributeType = AttributeType.PARSE_EXPRESSION;
+      return AttributeType.PARSE_EXPRESSION;
     } else {
-      this.attributeType = AttributeType.STATIC_VALUE;
+      return AttributeType.STATIC_VALUE;
     }
   }
 
@@ -124,54 +109,13 @@ public class AttributeEvaluator {
     return remainingString.contains(DEFAULT_EXPRESSION_POSTFIX);
   }
 
-  public boolean isExpression() {
-    return this.attributeType.equals(AttributeType.EXPRESSION);
-  }
-
-  public boolean isParseExpression() {
-    return attributeType.equals(AttributeType.PARSE_EXPRESSION);
-  }
-
-  public TypedValue resolveTypedValue(Event event) {
+  public <T> TypedValue<T> resolveTypedValue(Event event) {
     return expressionResolver.apply(event);
   }
 
-  public Object resolveValue(Event event) {
-    return resolveTypedValue(event).getValue();
-  }
-
-  private TypedValue resolveValue(Event event, DataType expectedDataType) {
-    return expressionManager.evaluate(this.attributeValue, expectedDataType, NULL_BINDING_CONTEXT, event);
-  }
-
-  public Integer resolveIntegerValue(Event event) {
-    Object value = resolveValue(event, INTEGER).getValue();
-    if (value == null) {
-      return null;
-    } else if (value instanceof Number) {
-      return ((Number) value).intValue();
-    } else if (value instanceof String) {
-      return Integer.parseInt((String) value);
-    } else {
-      throw new MuleRuntimeException(CoreMessages
-          .createStaticMessage(String.format("Value was required as integer but is of type: %s", value.getClass().getName())));
-    }
-  }
-
-  public String resolveStringValue(Event event) {
-    Object value = resolveValue(event, STRING).getValue();
-    if (value == null) {
-      return null;
-    }
-    return value.toString();
-  }
-
-  public Boolean resolveBooleanValue(Event event) {
-    final Object value = resolveValue(event, BOOLEAN).getValue();
-    if (value == null || value instanceof Boolean) {
-      return (Boolean) value;
-    }
-    return Boolean.valueOf(value.toString());
+  public <T> T resolveValue(Event event) {
+    final TypedValue<T> resolveTypedValue = resolveTypedValue(event);
+    return resolveTypedValue.getValue();
   }
 
   public String getRawValue() {

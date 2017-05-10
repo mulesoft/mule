@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.core.routing.AbstractMessageSequence;
 import org.mule.runtime.core.routing.MessageSequence;
 
 import java.util.Collection;
 import java.util.Iterator;
-
-import org.apache.commons.lang.Validate;
 
 /**
  * A {@link MessageSequence} that retrieves elements from a {@link Collection}. Its estimated size is initially the size of the
@@ -27,7 +27,7 @@ public final class CollectionMessageSequence<T> extends AbstractMessageSequence<
   private int remaining;
 
   public CollectionMessageSequence(Collection<T> collection) {
-    Validate.notNull(collection);
+    requireNonNull(collection);
     if (collection instanceof EventBuilderConfigurerList) {
       this.iter = ((EventBuilderConfigurerList) collection).eventBuilderConfigurerIterator();
     } else {

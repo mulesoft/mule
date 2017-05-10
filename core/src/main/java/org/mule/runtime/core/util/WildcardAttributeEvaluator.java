@@ -10,7 +10,6 @@ import java.util.Collection;
 
 public class WildcardAttributeEvaluator {
 
-  private String attributeValue;
   private String escapedValue;
   private Boolean hasWildcards;
 
@@ -18,7 +17,6 @@ public class WildcardAttributeEvaluator {
     if (attributeValue == null) {
       throw new IllegalArgumentException("null not allowed");
     }
-    this.attributeValue = attributeValue;
     this.escapedValue = attributeValue.replaceAll("\\*", "*");
     hasWildcards = attributeValue.startsWith("*") || (attributeValue.endsWith("*") && !attributeValue.endsWith("\\*"))
         || attributeValue.equals("*");

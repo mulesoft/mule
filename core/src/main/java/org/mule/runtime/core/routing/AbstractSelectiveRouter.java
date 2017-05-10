@@ -6,9 +6,14 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableList;
+import static org.apache.commons.collections.ListUtils.union;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static org.mule.runtime.core.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
@@ -34,19 +39,16 @@ import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.api.routing.RouterStatisticsRecorder;
 import org.mule.runtime.core.api.routing.SelectiveRouter;
 import org.mule.runtime.core.api.routing.filter.Filter;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
-
 import org.mule.runtime.core.management.stats.RouterStatistics;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.collections.ListUtils;
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject implements SelectiveRouter,
@@ -64,7 +66,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   private MuleContext muleContext;
 
   public AbstractSelectiveRouter() {
-    routerStatistics = new RouterStatistics(RouterStatistics.TYPE_OUTBOUND);
+    routerStatistics = new RouterStatistics(TYPE_OUTBOUND);
   }
 
   @Override
@@ -203,16 +205,13 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
     if (!selectedProcessors.isEmpty()) {
       return selectedProcessors;
     } else if (defaultProcessor != null) {
-      return Collections.singleton(defaultProcessor);
+      return singleton(defaultProcessor);
     } else {
       if (getRouterStatistics() != null && getRouterStatistics().isEnabled()) {
         getRouterStatistics().incrementNoRoutedMessage();
       }
 
-      throw new RoutePathNotFoundException(
-                                           CoreMessages
-                                               .createStaticMessage("Can't process message because no route has been found " +
-                                                   "matching any filter and no default route is defined"),
+      throw new RoutePathNotFoundException(createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined"),
                                            this);
     }
   }
@@ -227,7 +226,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
       return conditionalMessageProcessors;
     }
 
-    return ListUtils.union(conditionalMessageProcessors, singletonList(defaultProcessor));
+    return union(conditionalMessageProcessors, singletonList(defaultProcessor));
   }
 
   private <O> O transitionLifecycleManagedObjectForAddition(O managedObject) {
@@ -270,10 +269,6 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
     return managedObject;
   }
 
-  private Event routeWithProcessor(Processor processor, Event event) throws MuleException {
-    return routeWithProcessors(Collections.singleton(processor), event);
-  }
-
   private Event routeWithProcessors(Collection<Processor> processors, Event event) throws MuleException {
     List<Event> results = new ArrayList<>();
 
@@ -294,7 +289,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   }
 
   public List<MessageProcessorFilterPair> getConditionalMessageProcessors() {
-    return Collections.unmodifiableList(conditionalMessageProcessors);
+    return unmodifiableList(conditionalMessageProcessors);
   }
 
   private interface RoutesUpdater {

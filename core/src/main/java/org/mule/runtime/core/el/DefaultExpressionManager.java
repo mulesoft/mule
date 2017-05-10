@@ -14,6 +14,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.util.ClassUtils.isInstance;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultValidationResult;
 import org.mule.runtime.api.el.ValidationResult;
@@ -24,6 +25,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
@@ -36,13 +38,13 @@ import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.util.OneTimeWarning;
 import org.mule.runtime.core.util.TemplateParser;
 
-import org.slf4j.Logger;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 public class DefaultExpressionManager implements ExtendedExpressionManager, Initialisable {
 
@@ -124,9 +126,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     return evaluate(expression, event, Event.builder(event), flowConstruct, context);
   }
 
-  @Override
-  public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
-                             BindingContext context) {
+  private TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
+                              BindingContext context) {
     return handleStreaming(expressionLanguage.evaluate(expression, event, eventBuilder, flowConstruct, context), event);
   }
 
@@ -168,11 +169,6 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     } else {
       return target;
     }
-  }
-
-  @Override
-  public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct, Object object) {
-    expressionLanguage.enrich(expression, event, eventBuilder, flowConstruct, object);
   }
 
   @Override
@@ -219,11 +215,35 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   @Override
   public String parse(String expression, Event event, FlowConstruct flowConstruct) throws ExpressionRuntimeException {
-    return parse(expression, event, Event.builder(event), flowConstruct);
+    Builder eventBuilder = Event.builder(event);
+    parseWarning.warn();
+    if (hasMelExpression(expression) || melDefault) {
+      return parser.parse(token -> {
+        Object result = evaluate(token, event, eventBuilder, flowConstruct).getValue();
+        if (result instanceof Message) {
+          return ((Message) result).getPayload().getValue();
+        } else {
+          return result;
+        }
+      }, expression);
+    } else if (isExpression(expression)) {
+      TypedValue evaluation = evaluate(expression, event, eventBuilder, flowConstruct);
+      try {
+        return (String) transform(evaluation, evaluation.getDataType(), STRING).getValue();
+      } catch (TransformerException e) {
+        throw new ExpressionRuntimeException(createStaticMessage(format("Failed to transform %s to %s.", evaluation.getDataType(),
+                                                                        STRING)),
+                                             e);
+      }
+    } else {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(String.format("No expression marker found in expression '%s'. Parsing as plain String.", expression));
+      }
+      return expression;
+    }
   }
 
-  @Override
-  public String parse(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct)
+  private String parse(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct)
       throws ExpressionRuntimeException {
     parseWarning.warn();
     if (hasMelExpression(expression) || melDefault) {

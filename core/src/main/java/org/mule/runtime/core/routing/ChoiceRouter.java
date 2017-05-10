@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
 import java.util.Collection;
-import java.util.Collections;
 
 /**
  * Routes the event to a single<code>MessageProcessor</code> using a {@link Filter} to evaluate the event being processed and find
@@ -28,11 +30,11 @@ public class ChoiceRouter extends AbstractSelectiveRouter implements Processor {
   protected Collection<Processor> selectProcessors(Event event, Event.Builder builder) {
     for (MessageProcessorFilterPair mpfp : getConditionalMessageProcessors()) {
       if (mpfp.getFilter().accept(event, builder)) {
-        return Collections.singleton(mpfp.getMessageProcessor());
+        return singleton(mpfp.getMessageProcessor());
       }
     }
 
-    return Collections.emptySet();
+    return emptySet();
   }
 
   @Override

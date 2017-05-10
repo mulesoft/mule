@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
@@ -15,7 +17,6 @@ import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.util.ObjectUtils;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -112,7 +113,7 @@ public class WireTap extends AbstractMessageProcessorOwner implements Processor 
 
   @Override
   protected List<Processor> getOwnedMessageProcessors() {
-    return Collections.singletonList(tap);
+    return singletonList(tap);
   }
 
 }
