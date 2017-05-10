@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.soap.internal.loader;
 
-import static java.util.Arrays.stream;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
@@ -40,7 +39,6 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors;
 import org.mule.services.soap.api.exception.error.SoapErrors;
 import org.mule.test.soap.extension.FootballSoapExtension;
@@ -50,14 +48,11 @@ import com.google.common.collect.ImmutableList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Test;
 
-public class SoapExtensionDeclarationTestCase {
-
-  private SoapExtensionModelLoader loader = new SoapExtensionModelLoader();
+public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDeclarationTestCase {
 
   @Test
   public void assertSoapExtensionModel() {
@@ -116,69 +111,5 @@ public class SoapExtensionDeclarationTestCase {
     // the `1` is added because the sdk adds the target parameter automatically
     assertThat(operation.getAllParameterModels(), hasSize(probers.length + 1));
     assertParameters(operation.getAllParameterModels(), probers);
-  }
-
-  private void assertConnectionProvider(ConnectionProviderModel provider,
-                                        String name,
-                                        String description,
-                                        ParameterProber... probers) {
-    List<ParameterModel> parameterModels = provider.getAllParameterModels();
-    assertThat(provider.getName(), is(name));
-    assertThat(provider.getDescription(), is(description));
-    // the `3` is added because the SDK adds the infrastructure parameters for pooling connection providers.
-    assertThat(parameterModels, hasSize(probers.length + 3));
-    assertParameters(parameterModels, probers);
-  }
-
-  private void assertParameters(List<ParameterModel> parameterModels, ParameterProber... probers) {
-    if (!parameterModels.isEmpty()) {
-      stream(probers).forEach(prober -> {
-        String name = prober.getName();
-        Optional<ParameterModel> parameter = parameterModels.stream().filter(p -> name.equals(p.getName())).findAny();
-        assertParameter(parameter.orElseThrow(() -> new RuntimeException("parameter [" + name + "] not found")), prober);
-      });
-    }
-  }
-
-  private void assertParameter(ParameterModel param, ParameterProber prober) {
-    assertThat(param.getName(), is(prober.getName()));
-    assertThat(param.getType(), instanceOf(prober.getType()));
-    assertThat(param.getDefaultValue(), is(prober.getDefaultValue()));
-    assertThat(param.isRequired(), is(prober.isRequired()));
-  }
-
-  private class ParameterProber {
-
-    private final String name;
-    private final String defaultValue;
-    private final Class type;
-    private final boolean required;
-
-    ParameterProber(String name, String defaultValue, Class type, boolean required) {
-      this.name = name;
-      this.defaultValue = defaultValue;
-      this.type = type;
-      this.required = required;
-    }
-
-    ParameterProber(String name, Class type) {
-      this(name, null, type, true);
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public boolean isRequired() {
-      return required;
-    }
-
-    public String getDefaultValue() {
-      return defaultValue;
-    }
-
-    public Class getType() {
-      return type;
-    }
   }
 }

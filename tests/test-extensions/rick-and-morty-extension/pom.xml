@@ -9,10 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mule-football-soap-extension</artifactId>
+    <artifactId>mule-rick-and-morty-extension</artifactId>
 
-    <name>Mule Football Test SOAP Extension</name>
-    <description>A Mule extension for testing Soap Connect</description>
+    <name>Mule Rick And Morty Test SOAP Extension</name>
+    <description>A Mule extension for testing Soap Connect Custom Transports</description>
 
     <properties>
         <testExtensionModelLoaderId>soap</testExtensionModelLoaderId>

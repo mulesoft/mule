@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.soap.internal.loader.type.runtime;
 
 
+import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.module.extension.internal.loader.java.type.ParameterizableTypeElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
@@ -28,5 +30,14 @@ public class SoapServiceProviderWrapper extends SoapComponentWrapper implements 
   @Override
   public Class<? extends SoapServiceProvider> getDeclaringClass() {
     return (Class<? extends SoapServiceProvider>) super.getDeclaringClass();
+  }
+
+  @Override
+  public String getAlias() {
+    String finalName = hyphenize(super.getAlias())
+        .replace("-service-provider", "")
+        .replace("-connection", "")
+        .replace("-extension", "");
+    return finalName + "-" + DEFAULT_CONNECTION_PROVIDER_NAME;
   }
 }

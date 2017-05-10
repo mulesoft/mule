@@ -7,13 +7,16 @@
 package org.mule.runtime.module.extension.soap.internal.loader.type.runtime;
 
 import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.annotation.Soap;
+import org.mule.runtime.extension.api.soap.annotation.SoapMessageDispatcherProviders;
 
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * {@link SoapComponentWrapper} implementation for the {@link Extension} annotated class, which is a Soap Extension either
@@ -32,8 +35,17 @@ public class SoapExtensionTypeWrapper<T> extends SoapComponentWrapper {
     if (SoapServiceProvider.class.isAssignableFrom(this.getDeclaringClass())) {
       serviceProviders.add(new SoapServiceProviderWrapper((Class<? extends SoapServiceProvider>) this.getDeclaringClass()));
     }
-    this.getAnnotation(Soap.class)
-        .ifPresent(soap -> stream(soap.value()).forEach(sp -> serviceProviders.add(new SoapServiceProviderWrapper(sp))));
+    this.getAnnotation(Soap.class).ifPresent(soap -> stream(soap.value())
+        .forEach(sp -> serviceProviders.add(new SoapServiceProviderWrapper(sp))));
     return serviceProviders.build();
+  }
+
+  public List<MessageDispatcherProviderTypeWrapper> getDispatcherProviders() {
+    ImmutableList.Builder<MessageDispatcherProviderTypeWrapper> transportProviders = ImmutableList.builder();
+    Optional<SoapMessageDispatcherProviders> customTransport = this.getAnnotation(SoapMessageDispatcherProviders.class);
+    customTransport.ifPresent(ct -> transportProviders.addAll(stream(ct.value())
+        .map(MessageDispatcherProviderTypeWrapper::new)
+        .collect(toList())));
+    return transportProviders.build();
   }
 }

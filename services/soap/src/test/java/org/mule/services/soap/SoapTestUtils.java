@@ -39,29 +39,14 @@ import ru.yandex.qatools.allure.annotations.Step;
 
 public class SoapTestUtils {
 
-  public static final String SIMPLE_ATTACHMENT = "simpleAttachment.txt";
-
   public static final String XML = ".xml";
 
   // Operations
   public static final String ECHO = "echo";
-  public static final String ECHO_HEADERS = "echoWithHeaders";
-  public static final String ECHO_ACCOUNT = "echoAccount";
   public static final String NO_PARAMS = "noParams";
-  public static final String NO_PARAMS_HEADER = "noParamsWithHeader";
   public static final String FAIL = "fail";
   public static final String UPLOAD_ATTACHMENT = "uploadAttachment";
   public static final String DOWNLOAD_ATTACHMENT = "downloadAttachment";
-
-  // Headers
-  public static final String HEADER_INOUT = "headerInOut";
-  public static final String HEADER_IN = "headerIn";
-  public static final String HEADER_OUT = "headerOut";
-
-  public static void assertSoapResponse(String expectedResponseResourceName, String outputResponse) throws Exception {
-    String expected = getResponseResource(expectedResponseResourceName);
-    assertSimilarXml(expected, outputResponse);
-  }
 
   public static String getResponseResource(final String responseResourceName) throws IOException, XMLStreamException {
     return resourceAsString("response/" + responseResourceName + XML);

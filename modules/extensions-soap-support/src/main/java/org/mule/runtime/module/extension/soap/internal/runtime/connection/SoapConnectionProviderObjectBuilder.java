@@ -7,26 +7,32 @@
 package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 
 import static java.lang.String.format;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapServiceProviderDeclarer.CUSTOM_TRANSPORT;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
+import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
+import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpMessageDispatcherProvider;
 import org.mule.services.soap.api.client.SoapClient;
 
 /**
- * Implementation of {@link ConnectionProviderObjectBuilder} which produces instances of {@link SoapConnectionProvider}.
+ * Implementation of {@link ConnectionProviderObjectBuilder} which produces instances of {@link ForwardingSoapClientConnectionProvider}.
  *
  * @since 4.0
  */
@@ -52,19 +58,29 @@ public final class SoapConnectionProviderObjectBuilder extends ConnectionProvide
   }
 
   /**
-   * Build a new {@link SoapConnectionProvider} based on a {@link SoapServiceProvider} instance.
+   * Build a new {@link ForwardingSoapClientConnectionProvider} based on a {@link SoapServiceProvider} instance.
    *
    * @param result the {@link ResolverSetResult} with the values for the {@link SoapServiceProvider} instance.
-   * @return a wrapped {@link SoapConnectionProvider} with error handling and polling mechanisms.
+   * @return a wrapped {@link ForwardingSoapClientConnectionProvider} with error handling and polling mechanisms.
    * @throws MuleException
    */
   @Override
   public ConnectionProvider build(ResolverSetResult result) throws MuleException {
     SoapServiceProvider serviceProvider = objectBuilder.build(result);
-    ConnectionProvider<ForwardingSoapClient> provider = new SoapConnectionProvider(serviceProvider);
+    MessageDispatcherProvider<? extends MessageDispatcher> transport = getCustomTransport(result);
+    Injector injector = muleContext.getInjector();
+    injector.inject(serviceProvider);
+    injector.inject(transport);
+    ConnectionProvider<ForwardingSoapClient> provider = new ForwardingSoapClientConnectionProvider(serviceProvider, transport);
     provider = new PoolingConnectionProviderWrapper<>(provider, poolingProfile, disableValidation, retryPolicyTemplate);
     provider = new ErrorTypeHandlerConnectionProviderWrapper<>(provider, muleContext, extensionModel, retryPolicyTemplate);
     return provider;
+  }
+
+  private MessageDispatcherProvider<? extends MessageDispatcher> getCustomTransport(ResolverSetResult resultSet)
+      throws RegistrationException {
+    MessageDispatcherProvider transportProvider = (MessageDispatcherProvider) resultSet.get(CUSTOM_TRANSPORT);
+    return transportProvider != null ? transportProvider : new DefaultHttpMessageDispatcherProvider();
   }
 
   /**

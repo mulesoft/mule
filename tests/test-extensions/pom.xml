@@ -31,6 +31,7 @@
         <module>typed-value-extension</module>
         <module>parameter-resolver-extension</module>
         <module>mule-soap-extension</module>
+        <module>rick-and-morty-extension</module>
     </modules>
 
     <build>

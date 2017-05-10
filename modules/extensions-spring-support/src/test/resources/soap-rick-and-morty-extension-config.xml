@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ram="http://www.mulesoft.org/schema/mule/ram"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/ram http://www.mulesoft.org/schema/mule/ram/current/mule-ram.xsd">
+
+    <ram:config name="miniverse">
+         <ram:rick-and-morty-connection wsdlUrl="${serviceAddress}?wsdl" service="CableService" port="CablePort">
+             <ram:custom-transport>
+                 <ram:miniverse-dispatcher-provider/>
+             </ram:custom-transport>
+         </ram:rick-and-morty-connection>
+    </ram:config>
+
+    <ram:config name="portal-gun">
+         <ram:rick-and-morty-connection wsdlUrl="${serviceAddress}?wsdl" service="CableService" port="CablePort">
+             <ram:custom-transport>
+                 <ram:default-portal-gun-dispatcher-provider responseMessage="CUSTOM RESPONSE"/>
+             </ram:custom-transport>
+         </ram:rick-and-morty-connection>
+    </ram:config>
+
+    <ram:config name="http-default">
+         <ram:rick-and-morty-connection wsdlUrl="${serviceAddress}?wsdl" service="CableService" port="CablePort">
+             <ram:custom-transport>
+                 <ram:default-http-message-dispatcher-provider />
+             </ram:custom-transport>
+         </ram:rick-and-morty-connection>
+    </ram:config>
+
+    <flow name="customTransport">
+        <ram:invoke config-ref="miniverse" service="ram" operation="getChannels">
+            <ram:request>#[payload]</ram:request>
+        </ram:invoke>
+    </flow>
+
+    <flow name="customTransportWithParams">
+        <ram:invoke config-ref="portal-gun" service="ram" operation="getChannels">
+            <ram:request>#[payload]</ram:request>
+        </ram:invoke>
+    </flow>
+
+    <flow name="withDefaultHttp">
+        <ram:invoke config-ref="http-default" service="ram" operation="getChannels">
+            <ram:request>#[payload]</ram:request>
+        </ram:invoke>
+    </flow>
+</mule>

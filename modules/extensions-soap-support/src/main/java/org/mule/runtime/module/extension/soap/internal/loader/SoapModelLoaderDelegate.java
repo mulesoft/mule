@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.soap.internal.loader;
 
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionTypeFactory.getSoapExtensionType;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
@@ -19,6 +21,7 @@ import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.module.extension.internal.loader.enricher.ErrorsModelFactory;
 import org.mule.runtime.module.extension.internal.loader.java.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
@@ -26,9 +29,11 @@ import org.mule.runtime.module.extension.internal.loader.java.TypeAwareConfigura
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
+import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.MessageDispatcherProviderTypeWrapper;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapExtensionTypeWrapper;
 import org.mule.services.soap.api.exception.error.SoapErrors;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -57,12 +62,22 @@ final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
    */
   public ExtensionDeclarer declare(ExtensionLoadingContext context) {
     final SoapExtensionTypeWrapper<?> extension = getSoapExtensionType(this.extensionType);
+    List<MessageDispatcherProviderTypeWrapper> customTransportProviders = extension.getDispatcherProviders();
     ExtensionDeclarer extensionDeclarer = getExtensionDeclarer(context);
+    declareSubtypes(extensionDeclarer, customTransportProviders);
     Set<ErrorModel> soapErrors = getSoapErrors(extensionDeclarer);
     soapErrors.forEach(extensionDeclarer::withErrorModel);
     ConfigurationDeclarer configDeclarer = getConfigDeclarer(extensionDeclarer, extension, soapErrors);
-    extension.getSoapServiceProviders().forEach(provider -> serviceProviderDeclarer.declare(configDeclarer, provider));
+    extension.getSoapServiceProviders()
+        .forEach(provider -> serviceProviderDeclarer.declare(configDeclarer, provider, !customTransportProviders.isEmpty()));
     return extensionDeclarer;
+  }
+
+  private void declareSubtypes(ExtensionDeclarer extension, List<MessageDispatcherProviderTypeWrapper> transportProviders) {
+    if (!transportProviders.isEmpty()) {
+      List<MetadataType> types = transportProviders.stream().map(tp -> typeLoader.load(tp.getDeclaringClass())).collect(toList());
+      extension.withSubTypes(typeLoader.load(MessageDispatcherProvider.class), types);
+    }
   }
 
   private ExtensionDeclarer getExtensionDeclarer(ExtensionLoadingContext context) {

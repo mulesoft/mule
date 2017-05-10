@@ -6,10 +6,7 @@
  */
 package org.mule.runtime.module.extension.soap.internal.loader.type.runtime;
 
-import static java.util.Collections.emptyList;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
-
-import java.util.List;
 
 /**
  * {@link TypeWrapper} Base implementation for classes that are annotated with the SoapTransportProviders annotation.
@@ -20,9 +17,5 @@ abstract class SoapComponentWrapper extends TypeWrapper {
 
   SoapComponentWrapper(Class<?> aClass) {
     super(aClass);
-  }
-
-  public List<SoapTransportProviderTypeWrapper> getTransportProviders() {
-    return emptyList();
   }
 }

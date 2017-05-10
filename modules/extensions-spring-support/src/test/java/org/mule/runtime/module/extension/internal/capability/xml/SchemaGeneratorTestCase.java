@@ -44,6 +44,7 @@ import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
+import org.mule.test.ram.RickAndMortyExtension;
 import org.mule.test.soap.extension.FootballSoapExtension;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
 import org.mule.test.transactional.TransactionalExtension;
@@ -129,6 +130,9 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
                                                                    new SchemaGeneratorTestUnit(soapLoader,
                                                                                                FootballSoapExtension.class,
                                                                                                "soap.xsd"),
+                                                                   new SchemaGeneratorTestUnit(soapLoader,
+                                                                                               RickAndMortyExtension.class,
+                                                                                               "ram.xsd"),
                                                                    new SchemaGeneratorTestUnit(javaLoader,
                                                                                                TypedValueExtension.class,
                                                                                                "typed-value.xsd"),
@@ -192,27 +196,27 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
     return loader.loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
   }
 
-  private static class SchemaGeneratorTestUnit {
+  static class SchemaGeneratorTestUnit {
 
-    private final ExtensionModelLoader loader;
-    private Class<?> extensionClass;
-    private final String fileName;
+    final ExtensionModelLoader loader;
+    final Class<?> extensionClass;
+    final String fileName;
 
-    public SchemaGeneratorTestUnit(ExtensionModelLoader loader, Class<?> extensionClass, String fileName) {
+    SchemaGeneratorTestUnit(ExtensionModelLoader loader, Class<?> extensionClass, String fileName) {
       this.loader = loader;
       this.extensionClass = extensionClass;
       this.fileName = fileName;
     }
 
-    public ExtensionModelLoader getLoader() {
+    ExtensionModelLoader getLoader() {
       return loader;
     }
 
-    public Class<?> getExtensionClass() {
+    Class<?> getExtensionClass() {
       return extensionClass;
     }
 
-    public String getFileName() {
+    String getFileName() {
       return fileName;
     }
   }

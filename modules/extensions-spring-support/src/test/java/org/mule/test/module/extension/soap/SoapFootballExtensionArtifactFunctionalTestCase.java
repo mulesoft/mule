@@ -7,13 +7,7 @@
 package org.mule.test.module.extension.soap;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.service.http.api.HttpService;
-import org.mule.services.http.impl.service.HttpServiceImplementation;
-import org.mule.services.soap.SoapServiceImplementation;
 import org.mule.services.soap.TestHttpSoapServer;
-import org.mule.services.soap.api.SoapService;
-import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.soap.services.FootballService;
@@ -23,7 +17,7 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import org.junit.Rule;
 
 @ArtifactClassLoaderRunnerConfig(sharedRuntimeLibs = {"org.mule.tests:mule-tests-unit"})
-public abstract class SoapExtensionArtifactFunctionalTestCase extends MuleArtifactFunctionalTestCase {
+public abstract class SoapFootballExtensionArtifactFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 
   private static final String SOAP_CONFIG = "soap-football-extension-config.xml";
 
