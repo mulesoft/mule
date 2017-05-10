@@ -52,7 +52,9 @@ public final class ImplicitObjectUtils {
       }
 
       if (parameterModel.getModelProperty(NullSafeModelProperty.class).isPresent()) {
-        resolver = NullSafeValueResolverWrapper.of(resolver, parameterModel.getType(), muleContext, parametersResolver);
+        resolver = NullSafeValueResolverWrapper
+            .of(resolver, parameterModel.getModelProperty(NullSafeModelProperty.class).get().defaultType(), muleContext,
+                parametersResolver);
       }
 
       resolverSet.add(parameterModel.getName(), resolver);
