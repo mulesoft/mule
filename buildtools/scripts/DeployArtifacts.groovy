@@ -60,7 +60,7 @@ def deployJars()
 {
     deployToRemote(ceRepoUrl, ceRepoId, 'org.mule', 'mule', version, 'pom')
     deployToRemote(ceRepoUrl, ceRepoId, 'org.mule.extensions', 'mule-extensions', version, 'pom')
-    deployToRemote(ceRepoUrl, ceRepoId, 'org.mule.modules', 'mule-module-validation', version, 'jar')
+    deployToRemote(ceRepoUrl, ceRepoId, 'org.mule.modules', 'mule-validation-module', '1.0.0-SNAPSHOT', 'jar')
     deployToRemote(ceRepoUrl, ceRepoId, 'org.mule', 'mule-core', version, 'jar')
     [
             'modules',
