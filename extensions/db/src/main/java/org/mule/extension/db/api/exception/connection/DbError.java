@@ -19,7 +19,7 @@ import java.util.Optional;
  */
 public enum DbError implements ErrorTypeDefinition<DbError> {
   CONNECTIVITY(MuleErrors.CONNECTIVITY), INVALID_CREDENTIALS(CONNECTIVITY), INVALID_DATABASE(CONNECTIVITY), CANNOT_REACH(
-      CONNECTIVITY);
+      CONNECTIVITY), CANNOT_LOAD_DRIVER(CONNECTIVITY);
 
   private ErrorTypeDefinition<? extends Enum<?>> parent;
 

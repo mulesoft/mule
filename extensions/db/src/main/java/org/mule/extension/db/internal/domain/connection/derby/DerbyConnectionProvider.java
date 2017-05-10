@@ -12,19 +12,18 @@ import static org.mule.extension.db.api.exception.connection.DbError.CANNOT_REAC
 import static org.mule.extension.db.internal.domain.connection.DbConnectionProvider.DRIVER_FILE_NAME_PATTERN;
 import static org.mule.extension.db.internal.domain.connection.derby.DerbyConnectionParameters.DERBY_DRIVER_CLASS;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
-import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
 import org.mule.extension.db.api.exception.connection.DbError;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Optional;
+
+import javax.sql.DataSource;
 
 /**
  * Creates connections to a Derby database
@@ -54,7 +53,7 @@ public class DerbyConnectionProvider extends DbConnectionProvider {
   }
 
   @Override
-  public Optional<DbError> getDbErrorType(SQLException e) {
+  public Optional<DbError> getDbVendorErrorType(SQLException e) {
     if (e.getMessage().contains(FAILED_TO_START_DATABASE)) {
       return Optional.of(CANNOT_REACH);
     } else if (e.getMessage().contains(NOT_FOUND)) {

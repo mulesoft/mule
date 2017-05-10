@@ -14,19 +14,18 @@ import static org.mule.extension.db.api.exception.connection.DbError.INVALID_DAT
 import static org.mule.extension.db.internal.domain.connection.DbConnectionProvider.DRIVER_FILE_NAME_PATTERN;
 import static org.mule.extension.db.internal.domain.connection.mysql.MySqlConnectionParameters.MYSQL_DRIVER_CLASS;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
-import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
 import org.mule.extension.db.api.exception.connection.DbError;
 import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Optional;
+
+import javax.sql.DataSource;
 
 /**
  * Creates connections to a MySQL database.
@@ -57,7 +56,7 @@ public class MySqlConnectionProvider extends DbConnectionProvider {
   }
 
   @Override
-  public Optional<DbError> getDbErrorType(SQLException e) {
+  public Optional<DbError> getDbVendorErrorType(SQLException e) {
     String message = e.getMessage();
     if (message.contains(ACCESS_DENIED)) {
       return of(INVALID_CREDENTIALS);
