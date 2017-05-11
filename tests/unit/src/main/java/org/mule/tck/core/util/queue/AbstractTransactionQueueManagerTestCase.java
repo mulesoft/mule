@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.queue;
+package org.mule.tck.core.util.queue;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -15,6 +15,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.util.queue.AbstractQueueManager;
+import org.mule.runtime.core.util.queue.DefaultQueueConfiguration;
+import org.mule.runtime.core.util.queue.Queue;
+import org.mule.runtime.core.util.queue.QueueManager;
+import org.mule.runtime.core.util.queue.QueueSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;

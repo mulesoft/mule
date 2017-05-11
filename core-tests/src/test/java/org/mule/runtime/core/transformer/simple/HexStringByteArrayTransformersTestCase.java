@@ -8,7 +8,7 @@ package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
+import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

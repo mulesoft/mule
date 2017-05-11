@@ -50,7 +50,6 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-metadata-model-xml</artifactId>
-            <version>${muleMetadataModelVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -62,13 +61,11 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-metadata-model-java</artifactId>
-            <version>${muleMetadataModelVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-metadata-model-json</artifactId>
-            <version>${muleMetadataModelVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -76,13 +73,6 @@
             <artifactId>mule-tests-functional</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core-tests</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -110,7 +100,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${mavenCompilerVersion}</version>
                 <configuration>
                     <encoding>ISO-8859-1</encoding>
                     <fork>true</fork>

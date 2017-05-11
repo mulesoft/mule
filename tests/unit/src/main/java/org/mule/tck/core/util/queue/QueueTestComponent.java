@@ -5,10 +5,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.util.queue;
+package org.mule.tck.core.util.queue;
 
 import static junit.framework.Assert.assertNotSame;
 import static org.junit.Assert.assertEquals;
+
+import org.mule.runtime.core.util.queue.Queue;
+import org.mule.runtime.core.util.queue.QueueManager;
+import org.mule.runtime.core.util.queue.QueueSession;
 
 public class QueueTestComponent {
 

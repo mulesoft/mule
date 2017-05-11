@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.transformer.simple;
 
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
+import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 
 import java.util.Map;
 import java.util.TreeMap;

@@ -8,7 +8,7 @@ package org.mule.plugin.scripting.transformer;
 
 import org.mule.plugin.scripting.component.Scriptable;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
+import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 
 import java.util.ArrayList;
 import java.util.List;

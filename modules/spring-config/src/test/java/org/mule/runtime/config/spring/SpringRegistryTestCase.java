@@ -23,8 +23,8 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
-import org.mule.runtime.core.registry.AbstractRegistryTestCase;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.core.registry.AbstractRegistryTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 

@@ -34,40 +34,6 @@
         <!--Test Dependencies-->
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-library</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -276,13 +242,6 @@
 
         <!-- Test dependencies -->
         <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core-tests</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
             <version>${project.version}</version>
@@ -293,11 +252,6 @@
                     <artifactId>mule-service-weave</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
         </dependency>
         <!--TODO: MULE-10837-->
         <dependency>
@@ -316,7 +270,6 @@
         <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-weave</artifactId>
-            <version>${weaveVersion}</version>
             <classifier>mule-service</classifier>
             <scope>provided</scope>
         </dependency>

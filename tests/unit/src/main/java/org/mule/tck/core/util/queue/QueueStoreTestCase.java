@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.queue;
+package org.mule.tck.core.util.queue;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -16,6 +16,7 @@ import static org.mule.runtime.core.util.queue.QueueConfiguration.MAXIMUM_CAPACI
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.core.util.queue.QueueStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;

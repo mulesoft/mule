@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.transformer;
+package org.mule.tck.core.transformer;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertNotNull;

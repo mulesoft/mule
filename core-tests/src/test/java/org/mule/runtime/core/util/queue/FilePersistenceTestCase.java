@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.tck.core.util.queue.AbstractTransactionQueueManagerTestCase;
 
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
