@@ -23,8 +23,7 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassL
 
 import java.io.File;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.StampedLock;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
@@ -44,9 +43,7 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
   private final MavenClientProvider mavenClientProvider;
   private MavenConfiguration mavenRuntimeConfig;
 
-  private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-  private Lock readLock = lock.readLock();
-  private Lock writeLock = lock.readLock();
+  private StampedLock lock = new StampedLock();
 
   public MavenClassLoaderModelLoader() {
     mavenClientProvider = discoverProvider(MavenClientProvider.class.getClassLoader());
@@ -72,9 +69,17 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
   @Override
   public ClassLoaderModel load(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
-    readLock.lock();
+    long stamp = lock.readLock();
     try {
-      updateMavenConfigurationIfNeeded();
+      MavenConfiguration updatedMavenConfiguration = getMavenConfig();
+      if (!mavenRuntimeConfig.equals(updatedMavenConfiguration)) {
+        stamp = lock.tryConvertToWriteLock(stamp);
+        if (stamp == 0L) {
+          stamp = lock.writeLock();
+        }
+        mavenRuntimeConfig = updatedMavenConfiguration;
+        createClassLoaderModelLoaders();
+      }
 
       if (deployableMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
         return deployableMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
@@ -84,24 +89,7 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
       }
       throw new IllegalStateException(format("Artifact type %s not supported", artifactType));
     } finally {
-      readLock.unlock();
-    }
-  }
-
-  private void updateMavenConfigurationIfNeeded() {
-    MavenConfiguration updatedMavenConfiguration = getMavenConfig();
-    if (!mavenRuntimeConfig.equals(updatedMavenConfiguration)) {
-      readLock.unlock();
-      writeLock.lock();
-      try {
-        if (!mavenRuntimeConfig.equals(updatedMavenConfiguration)) {
-          mavenRuntimeConfig = updatedMavenConfiguration;
-          createClassLoaderModelLoaders();
-        }
-        readLock.lock();
-      } finally {
-        writeLock.unlock();
-      }
+      lock.unlock(stamp);
     }
   }
 

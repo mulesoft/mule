@@ -23,9 +23,7 @@ import com.typesafe.config.ConfigResolveOptions;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.StampedLock;
 
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
@@ -45,9 +43,8 @@ public class GlobalConfigLoader {
   private static final String CONFIG_ROOT_ELEMENT_NAME = "muleRuntimeConfig";
   private static Logger LOGGER = LoggerFactory.getLogger(GlobalConfigLoader.class);
   private static MavenConfiguration mavenConfig;
-  private static ReadWriteLock lock = new ReentrantReadWriteLock();
-  private static Lock writeLock = lock.writeLock();
-  private static Lock readLock = lock.writeLock();
+
+  private static StampedLock lock = new StampedLock();
 
   private static final String MULE_SCHEMA_JSON_LOCATION = "mule-schema.json";
 
@@ -102,13 +99,13 @@ public class GlobalConfigLoader {
    * config.
    */
   public static void reset() {
-    writeLock.lock();
+    long stamp = lock.writeLock();
     try {
       mavenConfig = null;
       invalidateCaches();
       initialiseGlobalConfig();
     } finally {
-      writeLock.unlock();
+      lock.unlockWrite(stamp);
     }
   }
 
@@ -116,26 +113,18 @@ public class GlobalConfigLoader {
    * @return the maven configuration to use for the runtime.
    */
   public static MavenConfiguration getMavenConfig() {
-    readLock.lock();
+    long stamp = lock.readLock();
     try {
       if (mavenConfig == null) {
-        readLock.unlock();
-        writeLock.lock();
-        try {
-          if (mavenConfig == null) {
-            initialiseGlobalConfig();
-          }
-          readLock.lock();
-        } finally {
-          writeLock.unlock();
+        stamp = lock.tryConvertToWriteLock(stamp);
+        if (stamp == 0L) {
+          stamp = lock.writeLock();
         }
+        initialiseGlobalConfig();
       }
       return mavenConfig;
     } finally {
-      try {
-        readLock.unlock();
-      } catch (Exception e) {
-      }
+      lock.unlock(stamp);
     }
   }
 
