@@ -24,6 +24,8 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
  * <p/>
  * This implementation offers an optimization over {@link DirectProcessingStrategyFactory} by reusing a single stream instance for
  * each callee thread.
+ *
+ * @since 4.0
  */
 public class DirectStreamPerThreadProcessingStrategyFactory implements ProcessingStrategyFactory {
 

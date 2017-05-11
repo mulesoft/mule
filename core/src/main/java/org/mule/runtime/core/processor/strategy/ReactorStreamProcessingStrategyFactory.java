@@ -8,8 +8,8 @@ package org.mule.runtime.core.processor.strategy;
 
 import static java.lang.Math.min;
 import static java.lang.Runtime.getRuntime;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategy.WaitStrategy.LITE_BLOCKING;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -32,18 +32,20 @@ import java.util.function.Supplier;
  * process events from the ring-buffer.
  * <p/>
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
+ *
+ * @since 4.0
  */
 public class ReactorStreamProcessingStrategyFactory extends AbstractProcessingStrategyFactory {
 
   protected static String RING_BUFFER_SCHEDULER_NAME_SUFFIX = ".ring-buffer";
 
-  public static int DEFAULT_BUFFER_SIZE = SMALL_BUFFER_SIZE;
-  public static int DEFAULT_SUBSCRIBER_COUNT = 1;
-  public static String DEFAULT_WAIT_STRATEGY = LITE_BLOCKING.name();
+  public static final int DEFAULT_BUFFER_SIZE = SMALL_BUFFER_SIZE;
+  public static final int DEFAULT_SUBSCRIBER_COUNT = 1;
+  public static final String DEFAULT_WAIT_STRATEGY = LITE_BLOCKING.name();
 
   private int bufferSize = DEFAULT_BUFFER_SIZE;
   private int subscriberCount = DEFAULT_SUBSCRIBER_COUNT;
-  private String waitStrategy;
+  private String waitStrategy = DEFAULT_WAIT_STRATEGY;
 
   /**
    * Configure the size of the ring-buffer size used to buffer and de-multiplexes events from multiple source threads. This value
@@ -95,13 +97,12 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractProcessingSt
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new ReactorStreamProcessingStrategy(() -> muleContext.getSchedulerService()
-        .customScheduler(config()
+        .customScheduler(muleContext.getSchedulerBaseConfig()
             .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
-            .withMaxConcurrentTasks(getSubscriberCount() + 1)),
-                                               getBufferSize(),
-                                               getSubscriberCount(),
-                                               getWaitStrategy(), () -> muleContext.getSchedulerService()
-                                                   .cpuLightScheduler(config().withMaxConcurrentTasks(getMaxConcurrency())),
+            .withMaxConcurrentTasks(getSubscriberCount() + 1)), getBufferSize(), getSubscriberCount(), getWaitStrategy(),
+                                               () -> muleContext.getSchedulerService()
+                                                   .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
+                                                       .withName(schedulersNamePrefix + "." + CPU_LITE.name())),
                                                getMaxConcurrency());
   }
 

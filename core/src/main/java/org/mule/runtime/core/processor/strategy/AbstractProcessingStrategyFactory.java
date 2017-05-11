@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
  * <p/>
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
  *
+ * @since 4.0
  */
 public abstract class AbstractProcessingStrategyFactory implements ProcessingStrategyFactory {
 
@@ -42,4 +43,5 @@ public abstract class AbstractProcessingStrategyFactory implements ProcessingStr
   public int getMaxConcurrency() {
     return maxConcurrency;
   }
+
 }

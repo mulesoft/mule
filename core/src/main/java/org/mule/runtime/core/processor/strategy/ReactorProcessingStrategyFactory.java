@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static java.util.Objects.requireNonNull;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
@@ -37,16 +38,17 @@ public class ReactorProcessingStrategyFactory extends AbstractProcessingStrategy
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService()
-        .cpuLightScheduler(config().withMaxConcurrentTasks(getMaxConcurrency())));
+        .cpuLightScheduler(muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + CPU_LITE.name())
+            .withMaxConcurrentTasks(getMaxConcurrency())));
   }
 
   static class ReactorProcessingStrategy extends AbstractProcessingStrategy implements Startable, Stoppable {
 
-    private Supplier<Scheduler> cpuLightSchedulerSupplier;
+    private final Supplier<Scheduler> cpuLightSchedulerSupplier;
     private Scheduler cpuLightScheduler;
 
     public ReactorProcessingStrategy(Supplier<Scheduler> cpuLightSchedulerSupplier) {
-      this.cpuLightSchedulerSupplier = cpuLightSchedulerSupplier;
+      this.cpuLightSchedulerSupplier = requireNonNull(cpuLightSchedulerSupplier);
     }
 
     @Override

@@ -22,6 +22,8 @@ import reactor.core.publisher.DirectProcessor;
 
 /**
  * {@link Sink} implementation that dispatches incoming events directly to to the {@link Flow} serializing concurrent events.
+ *
+ * @since 4.0
  */
 public class DirectSink implements Sink, Disposable {
 

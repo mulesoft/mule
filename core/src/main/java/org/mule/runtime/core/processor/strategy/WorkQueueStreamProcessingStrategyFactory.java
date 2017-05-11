@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static java.util.Objects.requireNonNull;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategy.WaitStrategy.LITE_BLOCKING;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -26,8 +27,6 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 import java.util.function.Supplier;
 
-import reactor.core.publisher.Flux;
-
 /**
  * Creates {@link WorkQueueStreamProcessingStrategy} instances that de-multiplexes incoming messages using a ring-buffer but
  * instead of processing events using a constrained {@link SchedulerService#cpuLightScheduler()}, or by using the proactor
@@ -35,6 +34,8 @@ import reactor.core.publisher.Flux;
  * {@link SchedulerService#ioScheduler()}.
  * <p/>
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
+ *
+ * @since 4.0
  */
 public class WorkQueueStreamProcessingStrategyFactory extends AbstractProcessingStrategyFactory {
 
@@ -98,20 +99,22 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractProcessing
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new WorkQueueStreamProcessingStrategy(() -> muleContext.getSchedulerService()
-        .customScheduler(config()
+        .customScheduler(muleContext.getSchedulerBaseConfig()
             .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
             .withMaxConcurrentTasks(getSubscriberCount() + 1)),
                                                  getBufferSize(),
                                                  getSubscriberCount(),
-                                                 getWaitStrategy(), () -> muleContext.getSchedulerService()
-                                                     .cpuLightScheduler(config().withMaxConcurrentTasks(getMaxConcurrency())),
+                                                 getWaitStrategy(),
+                                                 () -> muleContext.getSchedulerService()
+                                                     .ioScheduler(muleContext.getSchedulerBaseConfig()
+                                                         .withName(schedulersNamePrefix + "." + BLOCKING.name())),
                                                  getMaxConcurrency());
   }
 
   static protected class WorkQueueStreamProcessingStrategy extends AbstractRingBufferProcessingStrategy
       implements Startable, Stoppable {
 
-    private Supplier<Scheduler> blockingSchedulerSupplier;
+    private final Supplier<Scheduler> blockingSchedulerSupplier;
     private Scheduler blockingScheduler;
 
     protected WorkQueueStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize,
@@ -119,7 +122,7 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractProcessing
                                                 String waitStrategy, Supplier<Scheduler> blockingSchedulerSupplier,
                                                 int maxConcurrency) {
       super(ringBufferSchedulerSupplier, bufferSize, subscribers, waitStrategy, maxConcurrency);
-      this.blockingSchedulerSupplier = blockingSchedulerSupplier;
+      this.blockingSchedulerSupplier = requireNonNull(blockingSchedulerSupplier);
     }
 
     @Override

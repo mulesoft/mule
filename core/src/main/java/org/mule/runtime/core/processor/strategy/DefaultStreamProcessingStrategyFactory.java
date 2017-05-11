@@ -9,7 +9,6 @@ package org.mule.runtime.core.processor.strategy;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 
@@ -30,6 +29,8 @@ import java.util.function.Supplier;
 /**
  * Creates default processing strategy with same behavior as {@link ProactorStreamProcessingStrategyFactory} apart from the fact
  * it will process synchronously without error when a transaction is active.
+ *
+ * @since 4.0
  */
 public class DefaultStreamProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory {
 
@@ -39,19 +40,19 @@ public class DefaultStreamProcessingStrategyFactory extends ReactorStreamProcess
       return new ReactorProcessingStrategyFactory().create(muleContext, schedulersNamePrefix);
     } else {
       return new RingBufferDefaultProcessingStrategy(() -> muleContext.getSchedulerService()
-          .customScheduler(config()
+          .customScheduler(muleContext.getSchedulerBaseConfig()
               .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
               .withMaxConcurrentTasks(getSubscriberCount() + 1)),
                                                      getBufferSize(),
                                                      getSubscriberCount(),
                                                      getWaitStrategy(), () -> muleContext.getSchedulerService()
-                                                         .cpuLightScheduler(config()
+                                                         .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
                                                              .withName(schedulersNamePrefix + "." + CPU_LITE.name())),
                                                      () -> muleContext.getSchedulerService()
-                                                         .ioScheduler(config()
+                                                         .ioScheduler(muleContext.getSchedulerBaseConfig()
                                                              .withName(schedulersNamePrefix + "." + BLOCKING.name())),
                                                      () -> muleContext.getSchedulerService()
-                                                         .cpuIntensiveScheduler(config()
+                                                         .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                              .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
                                                      getMaxConcurrency());
     }

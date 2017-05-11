@@ -9,7 +9,6 @@ package org.mule.runtime.core.processor.strategy;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
@@ -20,7 +19,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory.ReactorStreamProcessingStrategy;
 
 import java.util.function.Supplier;
 
@@ -46,19 +44,19 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
       return new ReactorProcessingStrategyFactory().create(muleContext, schedulersNamePrefix);
     } else {
       return new ProactorStreamProcessingStrategy(() -> muleContext.getSchedulerService()
-          .customScheduler(config()
+          .customScheduler(muleContext.getSchedulerBaseConfig()
               .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
               .withMaxConcurrentTasks(getSubscriberCount() + 1)),
                                                   getBufferSize(),
                                                   getSubscriberCount(),
                                                   getWaitStrategy(), () -> muleContext.getSchedulerService()
-                                                      .cpuLightScheduler(config()
+                                                      .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
                                                           .withName(schedulersNamePrefix + "." + CPU_LITE.name())),
                                                   () -> muleContext.getSchedulerService()
-                                                      .ioScheduler(config()
+                                                      .ioScheduler(muleContext.getSchedulerBaseConfig()
                                                           .withName(schedulersNamePrefix + "." + BLOCKING.name())),
                                                   () -> muleContext.getSchedulerService()
-                                                      .cpuIntensiveScheduler(config()
+                                                      .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
                                                           .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
                                                   getMaxConcurrency());
     }

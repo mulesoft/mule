@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static reactor.core.publisher.Flux.from;
@@ -17,7 +18,6 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -44,11 +44,11 @@ public class WorkQueueProcessingStrategyFactory extends AbstractProcessingStrate
 
   static class WorkQueueProcessingStrategy extends AbstractProcessingStrategy implements Startable, Stoppable {
 
-    private Supplier<Scheduler> ioSchedulerSupplier;
+    private final Supplier<Scheduler> ioSchedulerSupplier;
     private Scheduler ioScheduler;
 
     public WorkQueueProcessingStrategy(Supplier<Scheduler> ioSchedulerSupplier) {
-      this.ioSchedulerSupplier = ioSchedulerSupplier;
+      this.ioSchedulerSupplier = requireNonNull(ioSchedulerSupplier);
     }
 
     @Override

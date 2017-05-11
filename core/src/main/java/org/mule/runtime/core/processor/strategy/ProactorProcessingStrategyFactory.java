@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
@@ -53,8 +54,8 @@ public class ProactorProcessingStrategyFactory extends ReactorProcessingStrategy
 
   static class ProactorProcessingStrategy extends ReactorProcessingStrategy implements Startable, Stoppable {
 
-    private Supplier<Scheduler> blockingSchedulerSupplier;
-    private Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
+    private final Supplier<Scheduler> blockingSchedulerSupplier;
+    private final Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
     private Scheduler blockingScheduler;
     private Scheduler cpuIntensiveScheduler;
 
@@ -62,8 +63,8 @@ public class ProactorProcessingStrategyFactory extends ReactorProcessingStrategy
                                       Supplier<Scheduler> blockingSchedulerSupplier,
                                       Supplier<Scheduler> cpuIntensiveSchedulerSupplier) {
       super(cpuLightSchedulerSupplier);
-      this.blockingSchedulerSupplier = blockingSchedulerSupplier;
-      this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
+      this.blockingSchedulerSupplier = requireNonNull(blockingSchedulerSupplier);
+      this.cpuIntensiveSchedulerSupplier = requireNonNull(cpuIntensiveSchedulerSupplier);
     }
 
     @Override
