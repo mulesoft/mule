@@ -149,53 +149,6 @@
 
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-wsc</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-plugin</classifier>
-            <!--TODO(gfernandes): remove this, see validation's comment -->
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-rt-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-rt-ws-security</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-rt-ws-rm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-rt-frontend-simple</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.sf.saxon</groupId>
-                    <artifactId>Saxon-HE</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.java.dev.stax-utils</groupId>
-                    <artifactId>stax-utils</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-lang</groupId>
-                    <artifactId>commons-lang</artifactId>
-                </exclusion>
-                <!--TODO remove MULE-10783 -->
-                <exclusion>
-                    <groupId>com.squareup.okhttp</groupId>
-                    <artifactId>okhttp</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-jms</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
