@@ -8,6 +8,7 @@ package org.mule.test.runner;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.System.getProperty;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.test.runner.RunnerConfiguration.readConfiguration;
@@ -37,6 +38,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -214,9 +216,11 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     WorkspaceLocationResolver workspaceLocationResolver = new AutoDiscoverWorkspaceLocationResolver(classPath,
                                                                                                     rootArtifactClassesFolder);
     final DependencyResolver dependencyResolver = RepositorySystemFactory
-        .newOfflineDependencyResolver(classPath,
-                                      workspaceLocationResolver,
-                                      getMavenLocalRepository());
+        .newDependencyResolver(classPath,
+                               workspaceLocationResolver,
+                               getMavenLocalRepository(),
+                               //TODO (gfernandes) MULE-12449 (read settings to pass enable remote repositories in addition to the ones in pom that have public access)
+                               emptyList());
     builder.setClassPathClassifier(new AetherClassPathClassifier(dependencyResolver,
                                                                  new ArtifactClassificationTypeResolver(
                                                                                                         dependencyResolver)));
