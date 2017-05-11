@@ -437,7 +437,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerBeanDefinitionParser("message-chunk-aggregator", new AggregatorDefinitionParser(MessageChunkAggregator.class));
     registerBeanDefinitionParser("resequencer", new InboundRouterDefinitionParser(Resequencer.class));
     registerBeanDefinitionParser("splitter", new SplitterDefinitionParser(Splitter.class));
-    registerBeanDefinitionParser("collection-splitter", new SplitterDefinitionParser(Splitter.class));
     registerBeanDefinitionParser("message-chunk-splitter", new SplitterDefinitionParser(MessageChunkSplitter.class));
     registerBeanDefinitionParser("custom-splitter", new SplitterDefinitionParser());
     registerMuleBeanDefinitionParser("foreach", new ChildDefinitionParser("messageProcessor", Foreach.class))

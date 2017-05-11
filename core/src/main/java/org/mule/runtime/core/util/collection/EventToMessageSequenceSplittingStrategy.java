@@ -69,8 +69,7 @@ public class EventToMessageSequenceSplittingStrategy implements SplittingStrateg
         List<Object> list = new LinkedList<>();
         Set<Map.Entry<?, ?>> set = ((Map) payload).entrySet();
         for (Map.Entry<?, ?> entry : set) {
-          // TODO MULE-9502 Support "key" flowVar with MapSplitter in Mule 4
-          list.add(new ReadOnlyEntry<>(entry));
+          list.add(new ImmutableEntry<>(entry));
         }
         return new CollectionMessageSequence(list);
       }

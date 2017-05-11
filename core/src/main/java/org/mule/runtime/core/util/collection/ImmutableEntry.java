@@ -6,22 +6,19 @@
  */
 package org.mule.runtime.core.util.collection;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
-
 import java.util.Map;
 
 /**
- * Read only {@link Map.Entry} implementation.
+ * Immutable {@link Map.Entry} implementation.
  *
  * @param <K> the type of the key
  * @param <V> the type of the value
  */
-public class ReadOnlyEntry<K, V> implements Map.Entry<K, V> {
+public class ImmutableEntry<K, V> implements Map.Entry<K, V> {
 
   private final Map.Entry<K, V> entry;
 
-  public ReadOnlyEntry(Map.Entry<K, V> entry) {
+  public ImmutableEntry(Map.Entry<K, V> entry) {
     this.entry = entry;
   }
 
@@ -37,7 +34,6 @@ public class ReadOnlyEntry<K, V> implements Map.Entry<K, V> {
 
   @Override
   public V setValue(V value) {
-    throw new MuleRuntimeException(I18nMessageFactory
-        .createStaticMessage("It's not possible to update a map entry result of a map iteration"));
+    throw new UnsupportedOperationException("It's not possible to update a map entry result of a map iteration");
   }
 }

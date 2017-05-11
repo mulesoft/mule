@@ -568,9 +568,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
 
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("collection-splitter")
-        .withTypeDefinition(fromType(Splitter.class)).build());
-
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("splitter")
         .withTypeDefinition(fromType(Splitter.class))
         .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
