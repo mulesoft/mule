@@ -19,26 +19,26 @@ java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowNullProcessorB
 ##############################################
 echo "org.mule.FlowNullProcessorBenchmark (CPU Light Processor)"
 
-java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightlProcessorBenchmark -t 1
-java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightlProcessorBenchmark -t 2
-java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightlProcessorBenchmark -t 4
-java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightlProcessorBenchmark -t 8
-java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightlProcessorBenchmark -t 16
-java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightlProcessorBenchmark -t 32
-java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightlProcessorBenchmark -t 64
+java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightProcessorBenchmark -t 1
+java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightProcessorBenchmark -t 2
+java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightProcessorBenchmark -t 4
+java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightProcessorBenchmark -t 8
+java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightProcessorBenchmark -t 16
+java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightProcessorBenchmark -t 32
+java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightProcessorBenchmark -t 64
 
 ##############################################
 # CPU Intensive Processor
 ##############################################
 echo "org.mule.FlowNullProcessorBenchmark (CPU Light Processor)"
 
-java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightlProcessorBenchmark -t 1
-java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightlProcessorBenchmark -t 2
-java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightlProcessorBenchmark -t 4
-java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightlProcessorBenchmark -t 8
-java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightlProcessorBenchmark -t 16
-java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightlProcessorBenchmark -t 32
-java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightlProcessorBenchmark -t 64
+java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightProcessorBenchmark -t 1
+java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightProcessorBenchmark -t 2
+java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightProcessorBenchmark -t 4
+java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightProcessorBenchmark -t 8
+java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightProcessorBenchmark -t 16
+java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightProcessorBenchmark -t 32
+java -jar mule-runtime-benchmarks-4.0.0-SNAPSHOT.jar org.mule.FlowCPULightProcessorBenchmark -t 64
 
 ##############################################
 # Blocking Processor
