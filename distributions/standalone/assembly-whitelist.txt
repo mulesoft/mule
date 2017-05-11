@@ -163,10 +163,10 @@
 # /services
 #
 /mule-standalone-${productVersion}/services
-/mule-standalone-${productVersion}/services/mule-service-scheduler-${productVersion}.zip
-/mule-standalone-${productVersion}/services/mule-service-http-${productVersion}.zip
-/mule-standalone-${productVersion}/services/mule-service-oauth-${productVersion}.zip
-/mule-standalone-${productVersion}/services/mule-service-soap-${productVersion}.zip
+/mule-standalone-${productVersion}/services/mule-service-scheduler-1.0.0-+
+/mule-standalone-${productVersion}/services/mule-service-http-1.0.0-+
+/mule-standalone-${productVersion}/services/mule-service-oauth-1.0.0-+
+/mule-standalone-${productVersion}/services/mule-service-soap-1.0.0-+
 /mule-standalone-${productVersion}/services/mule-service-weave-4.0.0-+
 #
 # /lib/opt

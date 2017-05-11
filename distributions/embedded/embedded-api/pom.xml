@@ -1,0 +1,49 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>embedded</artifactId>
+        <groupId>org.mule.runtime</groupId>
+        <version>4.0.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-module-embedded-api</artifactId>
+    <packaging>jar</packaging>
+    <name>Mule Embedded API</name>
+    <version>${muleEmbeddedApiVersion}</version>
+
+    <properties>
+        <skipExportTests>false</skipExportTests>
+        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-maven-client-api</artifactId>
+            <version>${muleMavenClientApi}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-maven-client-impl</artifactId>
+            <version>${muleMavenClientImpl}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gsonVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guavaVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commonsIoVersion}</version>
+        </dependency>
+    </dependencies>
+</project>
+

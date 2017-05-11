@@ -24,6 +24,8 @@
     </build>
 
     <modules>
+        <module>services-all</module>
+        <module>bom</module>
         <module>embedded</module>
         <module>standalone</module>
     </modules>

@@ -34,7 +34,7 @@
         <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-scheduler</artifactId>
-            <version>${project.version}</version>
+            <version>${muleSchedulerServiceVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
