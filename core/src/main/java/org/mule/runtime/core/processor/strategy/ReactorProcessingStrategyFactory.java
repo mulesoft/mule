@@ -7,6 +7,7 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
@@ -15,56 +16,37 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 
-import java.util.concurrent.ExecutorService;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * Creates {@link RingBufferProcessingStrategy} instance that implements the reactor pattern by de-multiplexes incoming messages
- * onto a single event-loop using a ring-buffer.
- *
+ * Creates {@link ReactorProcessingStrategy} instance that use the {@link SchedulerService#cpuLightScheduler()} to process all
+ * incoming events.
+ * <p/>
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
  *
  * @since 4.0
  */
-public class ReactorProcessingStrategyFactory extends AbstractRingBufferProcessingStrategyFactory {
+public class ReactorProcessingStrategyFactory extends AbstractProcessingStrategyFactory {
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService().cpuLightScheduler(),
-                                         scheduler -> scheduler.stop(),
-                                         () -> muleContext.getSchedulerService()
-                                             .customScheduler(muleContext.getSchedulerBaseConfig()
-                                                 .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
-                                                 .withMaxConcurrentTasks(getSubscriberCount() + 1)),
-
-                                         getBufferSize(),
-                                         getSubscriberCount(),
-                                         getWaitStrategy(),
-                                         muleContext);
+    return new ReactorProcessingStrategy(() -> muleContext.getSchedulerService()
+        .cpuLightScheduler(config().withMaxConcurrentTasks(getMaxConcurrency())));
   }
 
-  static class ReactorProcessingStrategy extends RingBufferProcessingStrategy implements Startable, Stoppable {
+  static class ReactorProcessingStrategy extends AbstractProcessingStrategy implements Startable, Stoppable {
 
     private Supplier<Scheduler> cpuLightSchedulerSupplier;
-    private Consumer<Scheduler> schedulerStopper;
     private Scheduler cpuLightScheduler;
 
-    public ReactorProcessingStrategy(Supplier<Scheduler> cpuLightSchedulerSupplier,
-                                     Consumer<Scheduler> schedulerStopper,
-                                     Supplier<Scheduler> ringBufferSchedulerSupplier,
-                                     int bufferSize,
-                                     int subscriberCount,
-                                     String waitStrategy,
-                                     MuleContext muleContext) {
-      super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, muleContext);
+    public ReactorProcessingStrategy(Supplier<Scheduler> cpuLightSchedulerSupplier) {
       this.cpuLightSchedulerSupplier = cpuLightSchedulerSupplier;
-      this.schedulerStopper = schedulerStopper;
     }
 
     @Override
@@ -75,13 +57,18 @@ public class ReactorProcessingStrategyFactory extends AbstractRingBufferProcessi
     @Override
     public void stop() throws MuleException {
       if (cpuLightScheduler != null) {
-        schedulerStopper.accept(cpuLightScheduler);
+        cpuLightScheduler.stop();
       }
     }
 
     @Override
+    public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
+      return new StreamPerEventSink(pipeline, createOnEventConsumer());
+    }
+
+    @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-      return publisher -> from(publisher).publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)))
+      return publisher -> from(publisher).publishOn(fromExecutorService(decorateScheduler(cpuLightScheduler)))
           .transform(pipeline);
     }
 
@@ -89,28 +76,16 @@ public class ReactorProcessingStrategyFactory extends AbstractRingBufferProcessi
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
       if (processor.getProcessingType() == CPU_LITE_ASYNC) {
         return publisher -> from(publisher).transform(processor)
-            .publishOn(fromExecutorService(getExecutorService(cpuLightScheduler)));
+            .publishOn(fromExecutorService(decorateScheduler(cpuLightScheduler)));
       } else {
         return super.onProcessor(processor);
       }
     }
 
-    protected ExecutorService getExecutorService(Scheduler scheduler) {
-      return new ConditionalExecutorServiceDecorator(scheduler, scheduleOverridePredicate());
-    }
-
-    /**
-     * Provides a way override the scheduling of tasks based on a predicate.
-     *
-     * @return preficate that determines if task should be scheduled or processed in the current thread.
-     */
-    protected Predicate<Scheduler> scheduleOverridePredicate() {
-      return scheduler -> false;
-    }
-
     protected Scheduler getCpuLightScheduler() {
       return cpuLightScheduler;
     }
+
   }
 
 }

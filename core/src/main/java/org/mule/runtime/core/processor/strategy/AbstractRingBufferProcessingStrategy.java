@@ -1,0 +1,100 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.runtime.core.processor.strategy;
+
+import static org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
+import static reactor.util.concurrent.WaitStrategy.blocking;
+import static reactor.util.concurrent.WaitStrategy.busySpin;
+import static reactor.util.concurrent.WaitStrategy.liteBlocking;
+import static reactor.util.concurrent.WaitStrategy.parking;
+import static reactor.util.concurrent.WaitStrategy.phasedOffLiteLock;
+import static reactor.util.concurrent.WaitStrategy.sleeping;
+import static reactor.util.concurrent.WaitStrategy.yielding;
+
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.Sink;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
+import reactor.core.Disposable;
+import reactor.core.publisher.WorkQueueProcessor;
+
+/**
+ * Abstract {@link ProcessingStrategy} to be used by implementations that de-multiplex incoming messages using a ring-buffer which
+ * can then be subscribed to n times.
+ * <p/>
+ * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
+ */
+public abstract class AbstractRingBufferProcessingStrategy extends AbstractProcessingStrategy implements Startable, Stoppable {
+
+  protected Supplier<Scheduler> ringBufferSchedulerSupplier;
+  protected int bufferSize;
+  protected int subscribers;
+  protected WaitStrategy waitStrategy = WaitStrategy.valueOf(DEFAULT_WAIT_STRATEGY);
+  protected int maxConcurrency;
+
+  public AbstractRingBufferProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier, int bufferSize, int subscribers,
+                                              String waitStrategy,
+                                              int maxConcurrency) {
+    this.subscribers = subscribers;
+    if (waitStrategy != null) {
+      this.waitStrategy = WaitStrategy.valueOf(waitStrategy);
+    }
+    this.bufferSize = bufferSize;
+    this.ringBufferSchedulerSupplier = ringBufferSchedulerSupplier;
+    this.maxConcurrency = maxConcurrency;
+  }
+
+  @Override
+  public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
+    WorkQueueProcessor<Event> processor =
+        WorkQueueProcessor.share(ringBufferSchedulerSupplier.get(), bufferSize, waitStrategy.reactorWaitStrategy, false);
+    List<Disposable> disposables = new ArrayList<>();
+    for (int i = 0; i < (maxConcurrency < subscribers ? maxConcurrency : subscribers); i++) {
+      disposables.add(processor.transform(function).subscribe());
+    }
+    return new ReactorSink(processor.connectSink(), () -> disposables.forEach(disposable -> disposable.dispose()),
+                           createOnEventConsumer());
+  }
+
+  protected enum WaitStrategy {
+    BLOCKING(blocking()),
+
+    LITE_BLOCKING(liteBlocking()),
+
+    SLEEPING(sleeping()),
+
+    BUSY_SPIN(busySpin()),
+
+    YIELDING(yielding()),
+
+    PARKING(parking()),
+
+    PHASED(phasedOffLiteLock(200, 100, TimeUnit.MILLISECONDS));
+
+    private reactor.util.concurrent.WaitStrategy reactorWaitStrategy;
+
+    WaitStrategy(reactor.util.concurrent.WaitStrategy reactorWaitStrategy) {
+      this.reactorWaitStrategy = reactorWaitStrategy;
+    }
+
+    reactor.util.concurrent.WaitStrategy getReactorWaitStrategy() {
+      return reactorWaitStrategy;
+    }
+  }
+
+}

@@ -8,9 +8,9 @@ package org.mule.runtime.core.processor.strategy;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
-import static reactor.core.Exceptions.propagate;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -19,8 +19,10 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.exception.MessagingException;
 
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
+import reactor.core.publisher.BlockingSink;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.FluxProcessor;
 import reactor.core.publisher.FluxSink;
@@ -34,9 +36,7 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
 
   @Override
   public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
-    FluxProcessor<Event, Event> processor = EmitterProcessor.<Event>create(false).serialize();
-    return new ReactorSink(processor.sink(), processor.transform(pipeline).retry().subscribe(),
-                           createOnEventConsumer());
+    return new DirectSink(pipeline, createOnEventConsumer());
   }
 
   protected Consumer<Event> createOnEventConsumer() {
@@ -48,18 +48,22 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
     };
   }
 
+  protected ExecutorService decorateScheduler(Scheduler scheduler) {
+    return scheduler;
+  }
+
   /**
    * Implementation of {@link Sink} using Reactor's {@link FluxSink} to accept events.
    */
   static final class ReactorSink implements Sink, Disposable {
 
-    private final FluxSink<Event> fluxSink;
+    private final BlockingSink<Event> blockingSink;
     private final reactor.core.Disposable disposable;
     private final Consumer onEventConsumer;
 
-    ReactorSink(FluxSink<Event> fluxSink, reactor.core.Disposable disposable,
+    ReactorSink(BlockingSink<Event> blockingSink, reactor.core.Disposable disposable,
                 Consumer<Event> onEventConsumer) {
-      this.fluxSink = fluxSink;
+      this.blockingSink = blockingSink;
       this.disposable = disposable;
       this.onEventConsumer = onEventConsumer;
     }
@@ -68,12 +72,12 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
     public void accept(Event event) {
       onEventConsumer.accept(event);
       // TODO MULE-11449 Implement handling of back-pressure via OVERLOAD exception type.
-      fluxSink.next(event);
+      blockingSink.accept(event);
     }
 
     @Override
     public void dispose() {
-      fluxSink.complete();
+      blockingSink.complete();
       disposable.dispose();
     }
 

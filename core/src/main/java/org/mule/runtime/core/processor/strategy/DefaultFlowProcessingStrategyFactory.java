@@ -22,53 +22,39 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * Creates default processing strategy with same behaviuor as {@link ProactorProcessingStrategyFactory} apart from the fact it
- * will process syncronously without errror when a transaction is active.
+ * Creates default processing strategy with same behavior as {@link ProactorProcessingStrategyFactory} apart from the fact it will
+ * process synchronously without error when a transaction is active.
  */
 public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStrategyFactory {
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new DefaultFlowProcessingStrategy(() -> muleContext.getSchedulerService()
-        .cpuLightScheduler(muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + CPU_LITE.name())),
+        .cpuLightScheduler(muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + CPU_LITE.name())
+            .withMaxConcurrentTasks(getMaxConcurrency())),
                                              () -> muleContext.getSchedulerService()
                                                  .ioScheduler(muleContext.getSchedulerBaseConfig()
-                                                     .withName(schedulersNamePrefix + "." + BLOCKING.name())),
+                                                     .withName(schedulersNamePrefix + "." + BLOCKING.name())
+                                                     .withMaxConcurrentTasks(getMaxConcurrency())),
                                              () -> muleContext.getSchedulerService()
                                                  .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
-                                                     .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
-                                             scheduler -> scheduler.stop(),
-                                             getMaxConcurrency(),
-                                             () -> muleContext.getSchedulerService()
-                                                 .customScheduler(muleContext.getSchedulerBaseConfig()
-                                                     .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
-                                                     .withMaxConcurrentTasks(getSubscriberCount() + 1)),
-                                             getBufferSize(),
-                                             getSubscriberCount(),
-                                             getWaitStrategy(),
-                                             muleContext);
+                                                     .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())
+                                                     .withMaxConcurrentTasks(getMaxConcurrency())));
   }
 
   static class DefaultFlowProcessingStrategy extends ProactorProcessingStrategy {
 
     protected DefaultFlowProcessingStrategy(Supplier<Scheduler> cpuLightSchedulerSupplier,
                                             Supplier<Scheduler> blockingSchedulerSupplier,
-                                            Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                            Consumer<Scheduler> schedulerStopper,
-                                            int maxConcurrency,
-                                            Supplier<Scheduler> ringBufferSchedulerSupplier,
-                                            int bufferSize,
-                                            int subscriberCount,
-                                            String waitStrategy,
-                                            MuleContext muleContext) {
-      super(cpuLightSchedulerSupplier, blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier, schedulerStopper,
-            maxConcurrency, ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, muleContext);
+                                            Supplier<Scheduler> cpuIntensiveSchedulerSupplier) {
+      super(cpuLightSchedulerSupplier, blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier);
     }
 
     @Override
@@ -86,11 +72,11 @@ public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStra
     }
 
     @Override
-    protected Predicate<Scheduler> scheduleOverridePredicate() {
-      return scheduler -> isTransactionActive();
+    protected ExecutorService decorateScheduler(Scheduler scheduler) {
+      return new ConditionalExecutorServiceDecorator(scheduler, cuurentScheduler -> isTransactionActive());
     }
 
-    private final static class DelegateSink implements Sink, Disposable {
+    final static class DelegateSink implements Sink, Disposable {
 
       private final Sink syncSink;
       private final Sink proactorSink;
