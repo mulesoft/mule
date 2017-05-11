@@ -214,15 +214,10 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
     WorkspaceLocationResolver workspaceLocationResolver = new AutoDiscoverWorkspaceLocationResolver(classPath,
                                                                                                     rootArtifactClassesFolder);
-    //final DependencyResolver dependencyResolver = RepositorySystemFactory
-    //    .newOfflineDependencyResolver(classPath,
-    //                                  workspaceLocationResolver,
-    //                                  getMavenLocalRepository());
     final DependencyResolver dependencyResolver = RepositorySystemFactory
-        .newOnlineDependencyResolver(classPath,
-                                     workspaceLocationResolver,
-                                     getMavenLocalRepository(), Collections
-                                         .singletonList("https://repository.mulesoft.org/nexus/content/repositories/public/"));
+        .newOfflineDependencyResolver(classPath,
+                                      workspaceLocationResolver,
+                                      getMavenLocalRepository());
     builder.setClassPathClassifier(new AetherClassPathClassifier(dependencyResolver,
                                                                  new ArtifactClassificationTypeResolver(
                                                                                                         dependencyResolver)));
