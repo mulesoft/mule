@@ -108,6 +108,16 @@ public interface AllureConstants {
 
   }
 
+
+  interface FileFeature {
+
+    String FILE_EXTENSION = "File Extension";
+
+    interface FileStory {
+
+    }
+  }
+
   interface ComponentsFeature {
 
     interface FlowReferenceStory {
@@ -122,6 +132,16 @@ public interface AllureConstants {
 
     }
 
+  }
+
+
+  interface FtpFeature {
+
+    String FTP_EXTENSION = "FTP Extension";
+
+    interface FtpStory {
+
+    }
   }
 
   interface HttpFeature {
@@ -317,4 +337,3 @@ public interface AllureConstants {
   }
 
 }
-
