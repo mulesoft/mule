@@ -11,21 +11,43 @@ import org.junit.Test;
 import org.mule.config.spring.AbstractSchemaValidationTestCase;
 import org.xml.sax.SAXException;
 
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.hamcrest.CoreMatchers.containsString;
+
+
 public class InvalidReconnectionStrategyTestCase extends AbstractSchemaValidationTestCase
 {
+    private static final String ERROR_MESSAGE  = "Invalid content was found starting with element 'reconnect'";
 
-    @Test(expected = SAXException.class)
+    @Test
     public void testInvalidReconnectStrategyWithinInboundEndpoint() throws Exception
     {
         addSchema("http://www.mulesoft.org/schema/mule/ftp","META-INF/mule-ftp.xsd");
-        doTest("org/mule/test/reconnection/invalid-reconnection-within-inbound-endpoint-config.xml");
+        try
+        {
+            doTest("org/mule/test/reconnection/invalid-reconnection-within-inbound-endpoint-config.xml");
+            fail("SaxException must be triggered, because it's an invalid configuration.");
+        }
+        catch (SAXException e)
+        {
+            assertThat(e.getMessage(), containsString(ERROR_MESSAGE));
+        }
     }
 
-    @Test(expected = SAXException.class)
+    @Test
     public void testInvalidReconnectStrategyWithinOutboundEndpoint() throws Exception
     {
         addSchema("http://www.mulesoft.org/schema/mule/ftp","META-INF/mule-ftp.xsd");
-        doTest("org/mule/test/reconnection/invalid-reconnection-within-outbound-endpoint-config.xml");
+        try
+        {
+            doTest("org/mule/test/reconnection/invalid-reconnection-within-outbound-endpoint-config.xml");
+            fail("SaxException must be triggered, because it's an invalid configuration.");
+        }
+        catch (SAXException e)
+        {
+            assertThat(e.getMessage(), containsString(ERROR_MESSAGE));
+        }
     }
 
 }
