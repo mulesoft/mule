@@ -71,7 +71,7 @@ public class ListableObjectStoreProducer<T extends Serializable> implements Prod
   }
 
   @Override
-  public int size() {
+  public int getSize() {
     return this.size;
   }
 

@@ -8,7 +8,7 @@
 package org.mule.runtime.core.internal.streaming.object.iterator;
 
 
-import org.mule.runtime.api.streaming.Sized;
+import org.mule.runtime.api.streaming.HasSize;
 
 import java.io.Closeable;
 import java.util.NoSuchElementException;
@@ -20,7 +20,7 @@ import java.util.NoSuchElementException;
  * 
  * @since 3.5.0
  */
-public interface Consumer<T> extends Closeable, Sized {
+public interface Consumer<T> extends Closeable, HasSize {
 
   /**
    * Retrieves the next available item.

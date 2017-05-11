@@ -60,10 +60,10 @@ public class CompositeProducerTestCase {
     this.aggregatedList.addAll(this.list3);
 
     Mockito.when(this.producer1.produce()).thenReturn(this.list1).thenReturn(this.list2).thenReturn(null);
-    Mockito.when(this.producer1.size()).thenReturn(this.list1.size() + this.list2.size());
+    Mockito.when(this.producer1.getSize()).thenReturn(this.list1.size() + this.list2.size());
 
     Mockito.when(this.producer2.produce()).thenReturn(this.list3).thenReturn(null);
-    Mockito.when(this.producer2.size()).thenReturn(this.list3.size());
+    Mockito.when(this.producer2.getSize()).thenReturn(this.list3.size());
 
     this.producer = new CompositeProducer<List<String>>(this.producer1, this.producer2);
   }
@@ -98,6 +98,6 @@ public class CompositeProducerTestCase {
 
   @Test
   public void totalAvailable() {
-    Assert.assertEquals(this.aggregatedList.size(), this.producer.size());
+    Assert.assertEquals(this.aggregatedList.size(), this.producer.getSize());
   }
 }

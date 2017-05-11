@@ -64,7 +64,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * Returns the total amount of available results informed by delegate
    */
   @Override
-  public int size() {
+  public int getSize() {
     return performWithConnection(connection -> delegate.getTotalResults(connection)).orElse(-1);
   }
 

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.object;
 
-import org.mule.runtime.api.streaming.Sized;
+import org.mule.runtime.api.streaming.HasSize;
 
 import java.util.Optional;
 
@@ -29,7 +29,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public interface ObjectStreamBuffer<T> extends Sized {
+public interface ObjectStreamBuffer<T> extends HasSize {
 
   /**
    * Returns the {@link Bucket} for the given {@code position}

@@ -42,7 +42,7 @@ public class PagedOperationExecutionTestCase extends AbstractExtensionFunctional
   @Test
   public void basicPagedOperation() throws Exception {
     CursorIterator<PersonalInfo> streamingIterator = getCursor("getPersonalInfo");
-    assertThat(streamingIterator.size(), is(11));
+    assertThat(streamingIterator.getSize(), is(11));
     while (streamingIterator.hasNext()) {
       assertThat((streamingIterator.next()), isIn(INVOLVED_PEOPLE));
     }
@@ -52,7 +52,7 @@ public class PagedOperationExecutionTestCase extends AbstractExtensionFunctional
   public void emptyPagedOperation() throws Exception {
     CursorIterator iterator = getCursor("emptyPagedOperation");
     assertThat(iterator.hasNext(), is(false));
-    assertThat(iterator.size(), is(0));
+    assertThat(iterator.getSize(), is(0));
   }
 
   @Test
