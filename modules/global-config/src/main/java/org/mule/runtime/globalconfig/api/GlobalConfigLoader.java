@@ -132,7 +132,10 @@ public class GlobalConfigLoader {
       }
       return mavenConfig;
     } finally {
-      readLock.unlock();
+      try {
+        readLock.unlock();
+      } catch (Exception e) {
+      }
     }
   }
 
