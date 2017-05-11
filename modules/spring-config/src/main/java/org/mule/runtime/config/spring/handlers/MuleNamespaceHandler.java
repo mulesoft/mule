@@ -123,13 +123,11 @@ import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
 import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
 import org.mule.runtime.core.retry.policies.RetryForeverPolicyTemplate;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
-import org.mule.runtime.core.routing.CollectionSplitter;
-import org.mule.runtime.core.routing.ExpressionSplitter;
+import org.mule.runtime.core.routing.Splitter;
 import org.mule.runtime.core.routing.FirstSuccessful;
 import org.mule.runtime.core.routing.Foreach;
 import org.mule.runtime.core.routing.IdempotentMessageValidator;
 import org.mule.runtime.core.routing.IdempotentSecureHashMessageValidator;
-import org.mule.runtime.core.routing.MapSplitter;
 import org.mule.runtime.core.routing.MessageChunkAggregator;
 import org.mule.runtime.core.routing.MessageChunkSplitter;
 import org.mule.runtime.core.routing.Resequencer;
@@ -438,9 +436,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerBeanDefinitionParser("collection-aggregator", new AggregatorDefinitionParser(SimpleCollectionAggregator.class));
     registerBeanDefinitionParser("message-chunk-aggregator", new AggregatorDefinitionParser(MessageChunkAggregator.class));
     registerBeanDefinitionParser("resequencer", new InboundRouterDefinitionParser(Resequencer.class));
-    registerBeanDefinitionParser("splitter", new SplitterDefinitionParser(ExpressionSplitter.class));
-    registerBeanDefinitionParser("collection-splitter", new SplitterDefinitionParser(CollectionSplitter.class));
-    registerBeanDefinitionParser("map-splitter", new SplitterDefinitionParser(MapSplitter.class));
+    registerBeanDefinitionParser("splitter", new SplitterDefinitionParser(Splitter.class));
     registerBeanDefinitionParser("message-chunk-splitter", new SplitterDefinitionParser(MessageChunkSplitter.class));
     registerBeanDefinitionParser("custom-splitter", new SplitterDefinitionParser());
     registerMuleBeanDefinitionParser("foreach", new ChildDefinitionParser("messageProcessor", Foreach.class))

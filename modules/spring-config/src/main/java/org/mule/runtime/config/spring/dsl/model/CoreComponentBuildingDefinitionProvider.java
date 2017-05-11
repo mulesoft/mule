@@ -168,13 +168,11 @@ import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
 import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
 import org.mule.runtime.core.routing.AggregationStrategy;
 import org.mule.runtime.core.routing.ChoiceRouter;
-import org.mule.runtime.core.routing.CollectionSplitter;
-import org.mule.runtime.core.routing.ExpressionSplitter;
+import org.mule.runtime.core.routing.Splitter;
 import org.mule.runtime.core.routing.FirstSuccessful;
 import org.mule.runtime.core.routing.Foreach;
 import org.mule.runtime.core.routing.IdempotentMessageValidator;
 import org.mule.runtime.core.routing.IdempotentSecureHashMessageValidator;
-import org.mule.runtime.core.routing.MapSplitter;
 import org.mule.runtime.core.routing.MessageChunkAggregator;
 import org.mule.runtime.core.routing.MessageChunkSplitter;
 import org.mule.runtime.core.routing.MessageFilter;
@@ -570,16 +568,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
 
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("collection-splitter")
-        .withTypeDefinition(fromType(CollectionSplitter.class)).build());
-
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("splitter")
-        .withTypeDefinition(fromType(ExpressionSplitter.class))
+        .withTypeDefinition(fromType(Splitter.class))
         .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("map-splitter")
-        .withTypeDefinition(fromType(MapSplitter.class))
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-splitter")

@@ -4256,40 +4256,15 @@
     <xsd:element name="splitter" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                The simple splitter splits incoming message into parts using the configured expression passing on each part in turn to the next message processor
+                The splitter splits incoming message into parts using the configured expression passing on each part in turn to the next message processor. The expression
+                may return a collection, or map, or a
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="baseSplitterType">
-                <xsd:attributeGroup ref="expressionAttributes"/>
+                <xsd:attributeGroup ref="optionalExpressionAttributes"/>
             </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
-    <xsd:element name="collection-splitter" substitutionGroup="abstract-intercepting-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                The collection splitter accepts a collection of objects and splits the collection invoking the next message processor with each item in the collection in sequence.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="baseSplitterType"/>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
-    <xsd:element name="map-splitter" substitutionGroup="abstract-intercepting-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                The map splitter accepts a map of objects and splits the collection invoking the next message processor with each item in the collection in sequence.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="baseSplitterType"/>
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>

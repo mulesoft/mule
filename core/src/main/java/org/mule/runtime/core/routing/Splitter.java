@@ -9,19 +9,30 @@ package org.mule.runtime.core.routing;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.runtime.core.util.collection.EventToMessageSequenceSplittingStrategy;
 import org.mule.runtime.core.util.collection.SplittingStrategy;
 
 /**
- * Splits a message that has a Collection, Iterable, MessageSequence or Iterator payload invoking the next message processor one
- * for each item in it.
+ * Splits a message that has a Collection, Iterable, MessageSequence or Iterator payload or an expression that resolves to some of
+ * those types or data that is a collection of values in a non-java format. Then invokes the next message processor one for each
+ * item in it.
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http ://www.eaipatterns.com/Sequencer.html</a>
  */
-public class CollectionSplitter extends AbstractMessageSequenceSplitter implements Initialisable {
+public class Splitter extends AbstractMessageSequenceSplitter implements Initialisable {
 
+  private ExpressionConfig config = new ExpressionConfig("#[payload]");
   private SplittingStrategy<Event, MessageSequence<?>> strategy;
+
+  public Splitter() {
+    // Used by spring
+  }
+
+  public Splitter(ExpressionConfig config) {
+    this.config = config;
+  }
 
   protected MessageSequence<?> splitMessageIntoSequence(Event event) {
     return this.strategy.split(event);
@@ -29,6 +40,12 @@ public class CollectionSplitter extends AbstractMessageSequenceSplitter implemen
 
   @Override
   public void initialise() throws InitialisationException {
-    strategy = new EventToMessageSequenceSplittingStrategy(new ExpressionSplittingStrategy(muleContext.getExpressionManager()));
+    config.validate();
+    strategy = new EventToMessageSequenceSplittingStrategy(new ExpressionSplittingStrategy(muleContext.getExpressionManager(),
+                                                                                           config.getFullExpression()));
+  }
+
+  public void setExpression(String expression) {
+    this.config.setExpression(expression);
   }
 }

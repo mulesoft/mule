@@ -9,9 +9,8 @@ package org.mule.runtime.core.routing;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
-import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-
+import static org.mule.runtime.core.routing.ExpressionSplittingStrategy.DEFAULT_SPIT_EXPRESSION;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -26,13 +25,9 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
-import org.mule.runtime.core.routing.outbound.CollectionMessageSequence;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -61,7 +56,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   private List<Processor> messageProcessors;
   private MessageProcessorChain ownedMessageProcessor;
   private AbstractMessageSequenceSplitter splitter;
-  private String collectionExpression;
+  private String collectionExpression = DEFAULT_SPIT_EXPRESSION;
   private ExpressionConfig expressionConfig = new ExpressionConfig();
   private int batchSize;
   private String rootMessageVariableName;
@@ -148,29 +143,25 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   @Override
   public void initialise() throws InitialisationException {
-    if (collectionExpression != null) {
-      expressionConfig.setExpression(collectionExpression);
-      splitter = new ExpressionSplitter(expressionConfig) {
+    expressionConfig.setExpression(collectionExpression);
+    splitter = new Splitter(expressionConfig) {
 
-        @Override
-        protected void propagateFlowVars(Event previousResult, final Builder builder) {
-          for (String flowVarName : resolvePropagatedFlowVars(previousResult)) {
-            builder.addVariable(flowVarName, previousResult.getVariable(flowVarName).getValue(),
-                                previousResult.getVariable(flowVarName).getDataType());
-          }
+      @Override
+      protected void propagateFlowVars(Event previousResult, final Builder builder) {
+        for (String flowVarName : resolvePropagatedFlowVars(previousResult)) {
+          builder.addVariable(flowVarName, previousResult.getVariable(flowVarName).getValue(),
+                              previousResult.getVariable(flowVarName).getDataType());
         }
-
-        @Override
-        protected Set<String> resolvePropagatedFlowVars(Event previousResult) {
-          return previousResult != null ? previousResult.getVariableNames() : emptySet();
-        }
-
-      };
-      if (isXPathExpression(expressionConfig.getExpression())) {
-        xpathCollection = true;
       }
-    } else {
-      splitter = new CollectionMapSplitter();
+
+      @Override
+      protected Set<String> resolvePropagatedFlowVars(Event previousResult) {
+        return previousResult != null ? previousResult.getVariableNames() : emptySet();
+      }
+
+    };
+    if (isXPathExpression(expressionConfig.getExpression())) {
+      xpathCollection = true;
     }
     splitter.setBatchSize(batchSize);
     splitter.setCounterVariableName(counterVariableName);
@@ -203,35 +194,4 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     this.counterVariableName = counterVariableName;
   }
 
-  private static class CollectionMapSplitter extends CollectionSplitter {
-
-    @Override
-    protected MessageSequence<?> splitMessageIntoSequence(Event event) {
-      Object payload = event.getMessage().getPayload().getValue();
-      if (payload instanceof Map<?, ?>) {
-        List<Object> list = new LinkedList<>();
-        Set<Map.Entry<?, ?>> set = ((Map) payload).entrySet();
-        for (Entry<?, ?> entry : set) {
-          // TODO MULE-9502 Support "key" flowVar with MapSplitter in Mule 4
-          list.add(entry.getValue());
-        }
-        return new CollectionMessageSequence(list);
-      }
-      return super.splitMessageIntoSequence(event);
-    }
-
-    @Override
-    protected void propagateFlowVars(Event previousResult, final Builder builder) {
-      for (String flowVarName : resolvePropagatedFlowVars(previousResult)) {
-        builder.addVariable(flowVarName, previousResult.getVariable(flowVarName).getValue(),
-                            previousResult.getVariable(flowVarName).getDataType());
-      }
-    }
-
-    @Override
-    protected Set<String> resolvePropagatedFlowVars(Event previousResult) {
-      return previousResult != null ? previousResult.getVariableNames() : emptySet();
-    }
-
-  }
 }

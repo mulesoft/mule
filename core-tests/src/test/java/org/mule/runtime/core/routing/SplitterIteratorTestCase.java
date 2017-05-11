@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -32,31 +33,32 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class ExpressionSplitterIteratorTestCase extends AbstractMuleTestCase {
+public class SplitterIteratorTestCase extends AbstractMuleTestCase {
 
   private Event muleEvent = mock(Event.class);
   private MuleContext muleContext = mock(MuleContext.class);
   private ExtendedExpressionManager expressionManager = mock(ExtendedExpressionManager.class);
   private final List<TypedValue<?>> integers = createListOfIntegers();
   private final ExpressionConfig expressionConfig = mock(ExpressionConfig.class);
-  private final ExpressionSplitter expressionSplitter = new ExpressionSplitter(expressionConfig);
+  private final Splitter splitter = new Splitter(expressionConfig);
   private final FlowCallStack flowCallStack = mock(FlowCallStack.class);
 
   @Before
   public void setUp() throws Exception {
-    expressionSplitter.setMuleContext(muleContext);
+    splitter.setMuleContext(muleContext);
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
     when(expressionConfig.getFullExpression()).thenReturn("fullExpression");
     when(expressionManager.split(any(String.class), any(Integer.class), any(Event.class), any(BindingContext.class)))
         .thenReturn(integers.iterator());
     when(muleEvent.getFlowCallStack()).thenReturn(flowCallStack);
     when(muleEvent.getError()).thenReturn(Optional.empty());
-    expressionSplitter.initialise();
+    splitter.initialise();
   }
 
   @Test
   public void testExpressionSplitterWithIteratorInput() throws Exception {
-    List<?> values = expressionSplitter.splitMessage(muleEvent);
+    Event result = splitter.process(muleEvent);
+    List<?> values = (List<?>) result.getMessage().getPayload().getValue();
     assertThat(values.size(), is(integers.size()));
     assertListValues(values);
   }
@@ -72,9 +74,9 @@ public class ExpressionSplitterIteratorTestCase extends AbstractMuleTestCase {
   private void assertListValues(List<?> values) {
     final Integer[] i = {0};
     values.forEach(value -> {
-      TypedValue<?> typedValue = (TypedValue<?>) value;
-      assertThat(typedValue.getValue(), instanceOf(Integer.class));
-      assertThat(typedValue.getValue(), is(i[0]++));
+      Message message = (Message) value;
+      assertThat(message.getPayload().getValue(), instanceOf(Integer.class));
+      assertThat(message.getPayload().getValue(), is(i[0]++));
     });
   }
 

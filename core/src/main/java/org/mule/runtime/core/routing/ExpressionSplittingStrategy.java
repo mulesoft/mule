@@ -12,17 +12,17 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.util.collection.SplittingStrategy;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * {@link SplittingStrategy} implementation that splits based on an expression.
  * 
  * @since 4.0
  */
-public class ExpressionSplittingStrategy implements SplittingStrategy<Event, List<?>> {
+public class ExpressionSplittingStrategy implements SplittingStrategy<Event, Iterator<TypedValue<?>>> {
 
+  public static final String DEFAULT_SPIT_EXPRESSION = "#[payload]";
   private final String expression;
   private final ExpressionManager expressionManager;
 
@@ -43,20 +43,26 @@ public class ExpressionSplittingStrategy implements SplittingStrategy<Event, Lis
    * @param expressionManager expression manager to use to evaluate the expression
    */
   public ExpressionSplittingStrategy(ExpressionManager expressionManager) {
-    this(expressionManager, "#[payload]");
+    this(expressionManager, DEFAULT_SPIT_EXPRESSION);
   }
 
   @Override
-  public List<?> split(Event event) {
+  public Iterator<TypedValue<?>> split(Event event) {
     Iterator<TypedValue<?>> result = expressionManager.split(expression, 0, event, BindingContext.builder().build());
-    if (result != null) {
-      List<TypedValue> values = new ArrayList<>();
-      result.forEachRemaining(value -> {
-        values.add(value);
-      });
-      return values;
-    } else {
-      return new ArrayList<>();
-    }
+    return result != null ? result : Collections.<TypedValue<?>>emptyList().iterator();
+  }
+
+  /**
+   * @return true if the expression was not configured or the configured one is the default one.
+   */
+  public boolean hasDefaultExpression() {
+    return DEFAULT_SPIT_EXPRESSION.equals(expression);
+  }
+
+  /**
+   * @return the expression configured in the strategy
+   */
+  public String getExpression() {
+    return expression;
   }
 }
