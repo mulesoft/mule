@@ -12,7 +12,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.session.DefaultMuleSession;
-import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
+import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.io.IOException;

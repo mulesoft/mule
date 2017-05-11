@@ -109,18 +109,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core-tests</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
             <scope>test</scope>

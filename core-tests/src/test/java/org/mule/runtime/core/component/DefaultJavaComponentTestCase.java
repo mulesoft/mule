@@ -18,8 +18,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
+import org.mule.tck.core.lifecycle.LifecycleTrackerComponent;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.test.core.lifecycle.LifecycleTrackerComponent;
 
 import org.junit.Test;
 

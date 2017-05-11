@@ -7,8 +7,8 @@
 package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 
 import org.apache.commons.lang.SerializationUtils;
 

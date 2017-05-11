@@ -23,7 +23,6 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-soap-api</artifactId>
-            <version>${muleExtensionsSoapApiVersion}</version>
         </dependency>
 
         <!-- SOAP Service API -->

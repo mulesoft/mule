@@ -19,11 +19,11 @@ import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStra
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.internal.serialization.AbstractSerializerProtocolContractTestCase;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.tck.core.internal.serialization.AbstractSerializerProtocolContractTestCase;
 import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;

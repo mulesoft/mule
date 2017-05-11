@@ -36,7 +36,7 @@ import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.test.core.lifecycle.LifecycleTrackerProcessor;
+import org.mule.tck.core.lifecycle.LifecycleTrackerProcessor;
 
 import java.util.ArrayList;
 import java.util.Collection;
