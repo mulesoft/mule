@@ -24,7 +24,6 @@
     <modules>
         <module>all-extensions</module>
         <module>http</module>
-        <module>oauth</module>
         <module>sockets</module>
         <module>jms</module>
     </modules>
