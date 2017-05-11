@@ -14,13 +14,13 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
+import static org.mule.runtime.core.execution.ExceptionToMessagingExceptionExecutionInterceptor.findMessagingExceptionWrappedByAnotherException;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.util.ExceptionUtils.putContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -51,13 +51,13 @@ import org.mule.runtime.core.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -207,6 +207,11 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   private Function<MessagingException, MessagingException> updateMessagingException(Processor processor) {
     return exception -> {
+      Optional<MessagingException> causeMessagingExceptionWithErrorOptional =
+          findMessagingExceptionWrappedByAnotherException(exception);
+      if (causeMessagingExceptionWithErrorOptional.isPresent()) {
+        return causeMessagingExceptionWithErrorOptional.get();
+      }
       Processor failing = exception.getFailingMessageProcessor();
       if (failing == null) {
         failing = processor;

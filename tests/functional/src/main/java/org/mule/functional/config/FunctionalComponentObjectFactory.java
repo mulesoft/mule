@@ -8,13 +8,13 @@ package org.mule.functional.config;
 
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
-import org.mule.runtime.dsl.api.component.ObjectFactory;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.component.DefaultJavaComponent;
+import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 /**
  * {@link ObjectFactory} for functional test component
@@ -123,5 +123,9 @@ public class FunctionalComponentObjectFactory extends AbstractAnnotatedObjectFac
 
   public void setMuleContext(MuleContext muleContext) {
     component.setMuleContext(muleContext);
+  }
+
+  public void setRaiseErrorType(String raiseErrorType) {
+    component.setRaiseErrorType(raiseErrorType);
   }
 }

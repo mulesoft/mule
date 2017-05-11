@@ -66,6 +66,13 @@
                         </xsd:complexType>
                     </xsd:element>
                 </xsd:sequence>
+                <xsd:attribute name="raiseErrorType" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The error to be raised by the component. If the exceptionToThrow or exceptionText are configured, those will be used as part of the exception.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="throwException" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>

@@ -37,6 +37,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -213,10 +214,15 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
     WorkspaceLocationResolver workspaceLocationResolver = new AutoDiscoverWorkspaceLocationResolver(classPath,
                                                                                                     rootArtifactClassesFolder);
+    //final DependencyResolver dependencyResolver = RepositorySystemFactory
+    //    .newOfflineDependencyResolver(classPath,
+    //                                  workspaceLocationResolver,
+    //                                  getMavenLocalRepository());
     final DependencyResolver dependencyResolver = RepositorySystemFactory
-        .newOfflineDependencyResolver(classPath,
-                                      workspaceLocationResolver,
-                                      getMavenLocalRepository());
+        .newOnlineDependencyResolver(classPath,
+                                     workspaceLocationResolver,
+                                     getMavenLocalRepository(), Collections
+                                         .singletonList("https://repository.mulesoft.org/nexus/content/repositories/public/"));
     builder.setClassPathClassifier(new AetherClassPathClassifier(dependencyResolver,
                                                                  new ArtifactClassificationTypeResolver(
                                                                                                         dependencyResolver)));
