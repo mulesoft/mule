@@ -20,28 +20,6 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-file</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-plugin</classifier>
-            <exclusions>
-                <!--TODO(gfernandes): remove this, see validation's comment -->
-                <exclusion>
-                    <groupId>commons-io</groupId>
-                    <artifactId>commons-io</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-lang</groupId>
-                    <artifactId>commons-lang</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-sockets</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
