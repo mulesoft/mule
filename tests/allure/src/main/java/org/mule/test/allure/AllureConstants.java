@@ -108,6 +108,16 @@ public interface AllureConstants {
 
   }
 
+
+  interface FileFeature {
+
+    String FILE_EXTENSION = "File Extension";
+
+    interface FileStory {
+
+    }
+  }
+
   interface ComponentsFeature {
 
     interface FlowReferenceStory {
@@ -122,6 +132,16 @@ public interface AllureConstants {
 
     }
 
+  }
+
+
+  interface FtpFeature {
+
+    String FTP_EXTENSION = "FTP Extension";
+
+    interface FtpStory {
+
+    }
   }
 
   interface HttpFeature {
@@ -245,16 +265,6 @@ public interface AllureConstants {
 
   }
 
-  interface RoutersFeature {
-
-    String ROUTERS_FEATURE = "Routers";
-
-    interface ForeachStory {
-
-      String FOR_EACH = "Foreach";
-    }
-  }
-
   interface TransformMessageFeature {
 
     String TRANSFORM_MESSAGE = "Transform Message";
@@ -317,4 +327,3 @@ public interface AllureConstants {
   }
 
 }
-
