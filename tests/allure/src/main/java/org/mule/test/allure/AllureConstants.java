@@ -124,16 +124,6 @@ public interface AllureConstants {
 
   }
 
-
-  interface FtpFeature {
-
-    String FTP_EXTENSION = "FTP Extension";
-
-    interface FtpStory {
-
-    }
-  }
-
   interface HttpFeature {
 
     String HTTP_EXTENSION = "HTTP Extension";
