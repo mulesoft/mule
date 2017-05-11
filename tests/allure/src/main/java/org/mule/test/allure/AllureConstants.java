@@ -108,16 +108,6 @@ public interface AllureConstants {
 
   }
 
-
-  interface FileFeature {
-
-    String FILE_EXTENSION = "File Extension";
-
-    interface FileStory {
-
-    }
-  }
-
   interface ComponentsFeature {
 
     interface FlowReferenceStory {
