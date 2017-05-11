@@ -223,7 +223,6 @@
                 <exclude>org.mule.runtime:mule-module-extensions-spring-support</exclude>
                 <exclude>org.mule.runtime:mule-module-extensions-xml-support</exclude>
                 <exclude>org.mule.modules:mule-module-http-ext</exclude>
-                <exclude>org.mule.modules:mule-module-wsc</exclude>
                 <exclude>org.mule.runtime:mule-module-container</exclude>
                 <exclude>org.mule.runtime:mule-module-launcher</exclude>
                 <exclude>org.mule.runtime:mule-module-global-config</exclude>
