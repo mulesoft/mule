@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 /**
  * {@link Sink} implementation that creates and caches a single {@link DirectSink} for each callee thread.
  */
-public class PerThreadSink implements Sink, Disposable {
+class PerThreadSink implements Sink, Disposable {
 
   private Supplier<Sink> sinkSupplier;
   private Cache<Thread, Sink> sinkCache =

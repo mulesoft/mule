@@ -25,7 +25,7 @@ import reactor.core.publisher.DirectProcessor;
  *
  * @since 4.0
  */
-public class DirectSink implements Sink, Disposable {
+class DirectSink implements Sink, Disposable {
 
   private ReactorSink reactorSink;
 

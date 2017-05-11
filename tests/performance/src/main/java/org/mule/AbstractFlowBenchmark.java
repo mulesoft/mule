@@ -12,7 +12,6 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.openjdk.jmh.infra.Blackhole.consumeCPU;
-import static reactor.util.concurrent.QueueSupplier.SMALL_BUFFER_SIZE;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
@@ -36,7 +35,6 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 import reactor.core.publisher.Mono;
-import reactor.util.concurrent.QueueSupplier;
 
 @State(Scope.Benchmark)
 public abstract class AbstractFlowBenchmark extends AbstractBenchmark {

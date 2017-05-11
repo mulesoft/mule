@@ -9,7 +9,7 @@ package org.mule.runtime.core.processor.strategy;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
-import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategy.WaitStrategy.LITE_BLOCKING;
+import static org.mule.runtime.core.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy.WaitStrategy.LITE_BLOCKING;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -37,64 +37,7 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class WorkQueueStreamProcessingStrategyFactory extends AbstractProcessingStrategyFactory {
-
-  protected static String RING_BUFFER_SCHEDULER_NAME_SUFFIX = ".ring-buffer";
-
-  public static int DEFAULT_BUFFER_SIZE = SMALL_BUFFER_SIZE;
-  public static int DEFAULT_SUBSCRIBER_COUNT = 1;
-  public static String DEFAULT_WAIT_STRATEGY = LITE_BLOCKING.name();
-
-  private int bufferSize = DEFAULT_BUFFER_SIZE;
-  private int subscriberCount = DEFAULT_SUBSCRIBER_COUNT;
-  private String waitStrategy;
-
-  /**
-   * Configure the size of the ring-buffer size used to buffer and de-multiplexes events from multiple source threads. This value
-   * must be a power-of two.
-   * <p/>
-   * Ring buffers typically use a power of two because it means that the rollover at the end of the buffer can be achieved using a
-   * bit mask rather than having to explicitly compare the head/tail pointer with the end of the buffer.
-   *
-   * @param bufferSize buffer size to use.
-   */
-  public void setBufferSize(int bufferSize) {
-    if (!isPowerOfTwo(bufferSize)) {
-      throw new IllegalArgumentException("bufferSize must be a power of 2 : " + bufferSize);
-    }
-    this.bufferSize = bufferSize;
-  }
-
-  /**
-   * Configure the number of ring-buffer subscribers.
-   *
-   * @param subscriberCount
-   */
-  public void setSubscriberCount(int subscriberCount) {
-    this.subscriberCount = subscriberCount;
-  }
-
-  /**
-   * Configure the wait strategy used to wait for new events on ring-buffer.
-   *
-   * @param waitStrategy
-   */
-  public void setWaitStrategy(String waitStrategy) {
-    this.waitStrategy = waitStrategy;
-  }
-
-  protected int getBufferSize() {
-    return bufferSize;
-  }
-
-  protected int getSubscriberCount() {
-    return subscriberCount;
-  }
-
-  protected String getWaitStrategy() {
-    return waitStrategy;
-  }
-
+public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProcessingStrategyFactory {
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
@@ -111,7 +54,8 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractProcessing
                                                  getMaxConcurrency());
   }
 
-  static protected class WorkQueueStreamProcessingStrategy extends AbstractRingBufferProcessingStrategy
+  static class WorkQueueStreamProcessingStrategy
+      extends AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy
       implements Startable, Stoppable {
 
     private final Supplier<Scheduler> blockingSchedulerSupplier;
