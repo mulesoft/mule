@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
@@ -45,7 +46,7 @@ public class MapSplitterTestCase extends AbstractMuleContextTestCase {
 
     mapSplitter.process(eventBuilder().message(of(testMap)).build());
 
-    assertThat(3, is(splitPayloads.size()));
+    assertThat(splitPayloads, hasSize(3));
     assertThat(splitPayloads.get(0), instanceOf(Map.Entry.class));
     assertThat(splitPayloads.get(0).getKey(), is("1"));
     assertThat(splitPayloads.get(0).getValue(), is("one"));
