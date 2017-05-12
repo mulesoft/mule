@@ -12,6 +12,24 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.internal.util.generics.GenericsUtils.getCollectionType;
+import static org.mule.runtime.core.internal.util.generics.GenericsUtils.getMapKeyType;
+import static org.mule.runtime.core.internal.util.generics.GenericsUtils.getMapValueType;
+import org.mule.runtime.api.el.ExpressionFunction;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.CollectionDataType;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.DataTypeBuilder;
+import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
+import org.mule.runtime.api.metadata.FunctionDataType;
+import org.mule.runtime.api.metadata.FunctionParameter;
+import org.mule.runtime.api.metadata.MapDataType;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringUtils;
+
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -23,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,27 +49,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import org.mule.runtime.api.el.ExpressionFunction;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.CollectionDataType;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.DataTypeBuilder;
-import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
-import org.mule.runtime.api.metadata.FunctionParameter;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
-
 /**
  * Provides a way to build immutable {@link DataType} objects.
  *
  * @since 4.0
  */
 public class DefaultDataTypeBuilder
-    implements DataTypeBuilder, DataTypeBuilder.DataTypeCollectionTypeBuilder, DataTypeBuilder.DataTypeFunctionTypeBuilder {
+    implements DataTypeBuilder, DataTypeBuilder.DataTypeCollectionTypeBuilder, DataTypeBuilder.DataTypeFunctionTypeBuilder,
+    DataTypeBuilder.DataTypeMapTypeBuilder {
 
   private static ConcurrentHashMap<String, ProxyIndicator> proxyClassCache = new ConcurrentHashMap<>();
 
@@ -68,6 +74,8 @@ public class DefaultDataTypeBuilder
   private MediaType mediaType = MediaType.ANY;
   private DataType returnType;
   private List<FunctionParameter> parametersType;
+  private DataTypeBuilder keyTypeBuilder;
+  private DataTypeBuilder valueTypeBuilder;
 
   private boolean built = false;
 
@@ -79,6 +87,17 @@ public class DefaultDataTypeBuilder
     if (dataType instanceof CollectionDataType) {
       this.typeRef = new WeakReference<>(dataType.getType());
       this.itemTypeBuilder = DataType.builder(((CollectionDataType) dataType).getItemDataType());
+    } else if (dataType instanceof MapDataType) {
+      this.typeRef = new WeakReference<>(dataType.getType());
+      this.keyTypeBuilder = DataType.builder(((MapDataType) dataType).getKeyDataType());
+      this.valueTypeBuilder = DataType.builder(((MapDataType) dataType).getValueDataType());
+    } else if (dataType instanceof FunctionDataType) {
+      this.typeRef = new WeakReference<>(dataType.getType());
+      Optional<DataType> returnType = ((FunctionDataType) dataType).getReturnType();
+      if (returnType.isPresent()) {
+        this.returnType = returnType.get();
+      }
+      this.parametersType = ((FunctionDataType) dataType).getParameters();
     } else {
       this.typeRef = new WeakReference<>(dataType.getType());
     }
@@ -227,6 +246,40 @@ public class DefaultDataTypeBuilder
     return this;
   }
 
+  @Override
+  public DataTypeMapTypeBuilder mapType(Class<? extends Map> mapType) {
+    validateAlreadyBuilt();
+
+    checkNotNull(mapType, "'mapType' cannot be null.");
+    if (!Map.class.isAssignableFrom(mapType)) {
+      throw new IllegalArgumentException("mapType " + mapType.getName() + " is not a Map type");
+    }
+
+    this.typeRef = new WeakReference<>(handleProxy(mapType));
+
+    if (this.keyTypeBuilder == null) {
+      this.keyTypeBuilder = DataType.builder();
+    }
+    final Class<?> keyType = getMapKeyType((Class<? extends Map<?, ?>>) typeRef.get());
+    if (keyType != null) {
+      this.keyTypeBuilder.type(keyType);
+    }
+    if (this.valueTypeBuilder == null) {
+      this.valueTypeBuilder = DataType.builder();
+    }
+    final Class<?> valueType = getMapValueType((Class<? extends Map<?, ?>>) typeRef.get());
+    if (valueType != null) {
+      this.valueTypeBuilder.type(valueType);
+    }
+
+    return asMapTypeBuilder();
+  }
+
+  @Override
+  public DataTypeMapTypeBuilder asMapTypeBuilder() {
+    return this;
+  }
+
   /**
    * Sets the given types for the {@link DefaultCollectionDataType} to be built. See {@link DefaultCollectionDataType#getType()}
    * and {@link DefaultCollectionDataType#getItemDataType()}.
@@ -257,6 +310,32 @@ public class DefaultDataTypeBuilder
   @Override
   public DataTypeFunctionTypeBuilder parametersType(List<FunctionParameter> list) {
     this.parametersType = list;
+    return this;
+  }
+
+  @Override
+  public DataTypeMapTypeBuilder keyType(Class<?> keyType) {
+    validateAlreadyBuilt();
+
+    checkNotNull(keyType, "'keyType' cannot be null.");
+
+    if (this.keyTypeBuilder == null) {
+      this.keyTypeBuilder = DataType.builder();
+    }
+    this.keyTypeBuilder.type(handleProxy(keyType));
+    return this;
+  }
+
+  @Override
+  public DataTypeMapTypeBuilder valueType(Class<?> valueType) {
+    validateAlreadyBuilt();
+
+    checkNotNull(valueType, "'valueType' cannot be null.");
+
+    if (this.valueTypeBuilder == null) {
+      this.valueTypeBuilder = DataType.builder();
+    }
+    this.valueTypeBuilder.type(handleProxy(valueType));
     return this;
   }
 
@@ -301,6 +380,38 @@ public class DefaultDataTypeBuilder
     validateAlreadyBuilt();
 
     itemTypeBuilder.mediaType(itemMediaType);
+    return this;
+  }
+
+  @Override
+  public DataTypeMapTypeBuilder keyMediaType(String keyMediaType) {
+    validateAlreadyBuilt();
+
+    keyTypeBuilder.mediaType(keyMediaType);
+    return this;
+  }
+
+  @Override
+  public DataTypeMapTypeBuilder keyMediaType(MediaType keyMediaType) {
+    validateAlreadyBuilt();
+
+    keyTypeBuilder.mediaType(keyMediaType);
+    return this;
+  }
+
+  @Override
+  public DataTypeMapTypeBuilder valueMediaType(String valueMediaType) {
+    validateAlreadyBuilt();
+
+    valueTypeBuilder.mediaType(valueMediaType);
+    return this;
+  }
+
+  @Override
+  public DataTypeMapTypeBuilder valueMediaType(MediaType valueMediaType) {
+    validateAlreadyBuilt();
+
+    itemTypeBuilder.mediaType(valueMediaType);
     return this;
   }
 
@@ -382,6 +493,10 @@ public class DefaultDataTypeBuilder
     } else if (ExpressionFunction.class.isAssignableFrom(type)) {
       return new DefaultFunctionDataType(type, returnType, parametersType != null ? parametersType : newArrayList(), mediaType,
                                          isConsumable(type));
+    } else if (Map.class.isAssignableFrom(type)) {
+      return new DefaultMapDataType(type, keyTypeBuilder != null ? keyTypeBuilder.build() : DataType.OBJECT,
+                                    valueTypeBuilder != null ? valueTypeBuilder.build() : DataType.OBJECT, mediaType,
+                                    isConsumable(type));
     } else {
       return new SimpleDataType(type, mediaType, isConsumable(type));
     }
@@ -399,7 +514,7 @@ public class DefaultDataTypeBuilder
 
   @Override
   public int hashCode() {
-    return Objects.hash(typeRef.get(), itemTypeBuilder, mediaType);
+    return Objects.hash(typeRef.get(), itemTypeBuilder, keyTypeBuilder, valueTypeBuilder, returnType, parametersType, mediaType);
   }
 
   @Override
@@ -416,6 +531,8 @@ public class DefaultDataTypeBuilder
     DefaultDataTypeBuilder other = (DefaultDataTypeBuilder) obj;
 
     return Objects.equals(typeRef.get(), other.typeRef.get()) && Objects.equals(itemTypeBuilder, other.itemTypeBuilder)
+        && Objects.equals(keyTypeBuilder, other.keyTypeBuilder) && Objects.equals(valueTypeBuilder, other.valueTypeBuilder)
+        && Objects.equals(returnType, other.returnType) && Objects.equals(parametersType, other.parametersType)
         && Objects.equals(mediaType, other.mediaType);
   }
 
