@@ -315,9 +315,9 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
         return bundleDependency.getScope().equals(COMPILE) &&
             bundleDependency.getDescriptor().getClassifier().isPresent() &&
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
-            bundleDependency.getDescriptor().getArtifactId().equals("mule-module-sockets") &&
-            bundleDependency.getDescriptor().getGroupId().equals("org.mule.modules") &&
-            bundleDependency.getDescriptor().getVersion().equals("4.0.0-SNAPSHOT");
+            bundleDependency.getDescriptor().getArtifactId().equals("mule-sockets-connector") &&
+            bundleDependency.getDescriptor().getGroupId().equals("org.mule.connectors") &&
+            bundleDependency.getDescriptor().getVersion().equals("1.0.0-SNAPSHOT");
       }
     };
   }

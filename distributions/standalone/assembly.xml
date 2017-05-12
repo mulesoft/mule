@@ -160,7 +160,6 @@
                 <include>org.mule.runtime:mule-module-schedulers</include>
                 <include>org.mule.runtime:mule-module-spring-config</include>
                 <include>org.mule.runtime:mule-module-spring-security</include>
-                <include>org.mule.modules:mule-module-sockets</include>
                 <include>org.mule.runtime:mule-module-tls</include>
                 <include>org.mule.runtime:mule-module-tooling-support</include>
 
@@ -238,7 +237,6 @@
                 <exclude>org.mule.runtime:mule-module-schedulers</exclude>
                 <exclude>org.mule.runtime:mule-module-spring-config</exclude>
                 <exclude>org.mule.runtime:mule-module-spring-security</exclude>
-                <exclude>org.mule.modules:mule-module-sockets</exclude>
                 <exclude>org.mule.runtime:mule-module-tls</exclude>
                 <exclude>org.mule.runtime:mule-module-tooling-support</exclude>
 
