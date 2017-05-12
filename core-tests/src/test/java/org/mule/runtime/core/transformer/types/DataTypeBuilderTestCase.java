@@ -42,6 +42,7 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -100,6 +101,14 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void buildTypedCollection() {
+    final DataType dataType = DataType.builder().collectionType(List.class).itemType(String.class).build();
+    assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
+    assertThat(dataType.getType(), is(equalTo(List.class)));
+    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(STRING));
+  }
+
+  @Test
   public void buildTypedMap() {
     final DataType dataType = DataType.builder().mapType(HashMap.class).keyType(Number.class).valueType(String.class).build();
     assertThat(dataType, instanceOf(DefaultMapDataType.class));
@@ -109,20 +118,20 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void buildTypedCollectionFromImplementationClass() {
+    final DataType dataType = DataType.builder().collectionType(SpecificCollection.class).build();
+    assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
+    assertThat(dataType.getType(), is(equalTo(SpecificCollection.class)));
+    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(STRING));
+  }
+
+  @Test
   public void buildTypedMapFromImplementationClass() {
     final DataType dataType = DataType.builder().mapType(SpecificMap.class).build();
     assertThat(dataType, instanceOf(DefaultMapDataType.class));
     assertThat(dataType.getType(), is(equalTo(SpecificMap.class)));
     assertThat(((DefaultMapDataType) dataType).getKeyDataType(), is(STRING));
     assertThat(((DefaultMapDataType) dataType).getValueDataType(), is(NUMBER));
-  }
-
-  @Test
-  public void buildTypedCollection() {
-    final DataType dataType = DataType.builder().collectionType(List.class).itemType(String.class).build();
-    assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
-    assertThat(dataType.getType(), is(equalTo(List.class)));
-    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(STRING));
   }
 
   @Test
@@ -290,6 +299,10 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
   }
 
+  private class SpecificCollection extends LinkedList<String> {
+
+  }
+
   private class SomeFunction implements ExpressionFunction {
 
     @Override
@@ -311,5 +324,4 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
     }
 
   }
-
 }
