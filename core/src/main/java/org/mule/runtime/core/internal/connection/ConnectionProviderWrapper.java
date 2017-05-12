@@ -35,8 +35,7 @@ import org.slf4j.Logger;
  * @param <C> the generic type of the connections that the {@link #delegate} produces
  * @since 4.0
  */
-public abstract class ConnectionProviderWrapper<C>
-    implements ConnectionProvider<C>, HasPoolingProfile, Lifecycle {
+public abstract class ConnectionProviderWrapper<C> implements ConnectionProvider<C>, HasPoolingProfile, Lifecycle {
 
   private static final Logger LOGGER = getLogger(ConnectionProviderWrapper.class);
 
@@ -56,7 +55,13 @@ public abstract class ConnectionProviderWrapper<C>
 
   @Override
   public C connect() throws ConnectionException {
-    return delegate.connect();
+    try {
+      return delegate.connect();
+    } catch (ConnectionException ce) {
+      throw ce;
+    } catch (Exception e) {
+      throw new ConnectionException(e);
+    }
   }
 
   /**

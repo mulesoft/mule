@@ -6,16 +6,22 @@
  */
 package org.mule.runtime.core.connection;
 
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.internal.connection.LifecycleAwareConnectionProviderWrapper;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
@@ -24,6 +30,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class LifecycleAwareConnectionProviderWrapperTestCase extends AbstractMuleContextTestCase {
+
+  private static final String ERROR_MESSAGE = "BOOM ><";
+
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
 
   @Mock
   private ConnectionProvider<Lifecycle> connectionProvider;
@@ -60,5 +71,32 @@ public class LifecycleAwareConnectionProviderWrapperTestCase extends AbstractMul
     inOrder.verify(connection).start();
     inOrder.verify(connection).stop();
     inOrder.verify(connection).dispose();
+  }
+
+  @Test
+  public void alwaysThrowConnectionException() throws ConnectionException {
+    exception.expect(ConnectionException.class);
+    exception.expectCause(instanceOf(NullPointerException.class));
+    exception.expectMessage(ERROR_MESSAGE);
+    wrapper = new LifecycleAwareConnectionProviderWrapper(new TestProvider(), muleContext);
+    wrapper.connect();
+  }
+
+  private class TestProvider implements ConnectionProvider {
+
+    @Override
+    public Object connect() throws ConnectionException {
+      throw new NullPointerException(ERROR_MESSAGE);
+    }
+
+    @Override
+    public void disconnect(Object connection) {
+
+    }
+
+    @Override
+    public ConnectionValidationResult validate(Object connection) {
+      return success();
+    }
   }
 }
