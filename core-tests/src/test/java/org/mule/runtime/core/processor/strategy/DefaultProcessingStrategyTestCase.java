@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.lang.Integer.MAX_VALUE;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
@@ -14,15 +13,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
-import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
-import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -41,17 +36,9 @@ public class DefaultProcessingStrategyTestCase extends ProactorProcessingStrateg
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new DefaultFlowProcessingStrategy(() -> cpuLight,
-                                             () -> blocking,
-                                             () -> cpuIntensive,
-                                             scheduler -> {
-                                             },
-                                             MAX_VALUE,
-                                             () -> blocking,
-                                             DEFAULT_BUFFER_SIZE,
-                                             DEFAULT_SUBSCRIBER_COUNT,
-                                             DEFAULT_WAIT_STRATEGY,
-                                             muleContext);
+    return new DefaultFlowProcessingStrategyFactory.DefaultFlowProcessingStrategy(() -> cpuLight,
+                                                                                  () -> blocking,
+                                                                                  () -> cpuIntensive);
   }
 
   @Override

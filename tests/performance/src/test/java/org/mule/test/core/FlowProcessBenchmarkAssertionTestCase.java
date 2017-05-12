@@ -22,24 +22,8 @@ public class FlowProcessBenchmarkAssertionTestCase extends AbstractBenchmarkAsse
   private static final String PROCESSING_STRATEGY_PARAM = "processingStrategyFactory";
 
   @Test
-  public void processFlowDefault() {
-    runAndAssertBenchmark(FlowNullProcessorBenchmark.class, "processFlow", 1,
-                          singletonMap(PROCESSING_STRATEGY_PARAM,
-                                       new String[] {DefaultFlowProcessingStrategyFactory.class.getCanonicalName()}),
-                          50, MICROSECONDS, 8500);
-  }
-
-  @Test
-  public void processFlowBlocking() {
-    runAndAssertBenchmark(FlowNullProcessorBenchmark.class, "processFlow", 1,
-                          singletonMap(PROCESSING_STRATEGY_PARAM,
-                                       new String[] {BlockingProcessingStrategyFactory.class.getCanonicalName()}),
-                          8, MICROSECONDS, 8000);
-  }
-
-  @Test
   public void processStreamOf1000FlowDefault() {
-    runAndAssertBenchmark(FlowNullProcessorBenchmark.class, "processFlowStream", 1,
+    runAndAssertBenchmark(FlowNullProcessorBenchmark.class, "processSourceStream", 1,
                           singletonMap(PROCESSING_STRATEGY_PARAM,
                                        new String[] {DefaultFlowProcessingStrategyFactory.class.getCanonicalName()}),
                           9, MILLISECONDS, 7800000);
@@ -48,7 +32,7 @@ public class FlowProcessBenchmarkAssertionTestCase extends AbstractBenchmarkAsse
 
   @Test
   public void processStreamOf1000FlowSynchronous() {
-    runAndAssertBenchmark(FlowNullProcessorBenchmark.class, "processFlowStream", 1,
+    runAndAssertBenchmark(FlowNullProcessorBenchmark.class, "processSourceStream", 1,
                           singletonMap(PROCESSING_STRATEGY_PARAM,
                                        new String[] {BlockingProcessingStrategyFactory.class.getCanonicalName()}),
                           9, MILLISECONDS, 7800000);

@@ -16,9 +16,6 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
-import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
-import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
-import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 
@@ -46,15 +43,7 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
     return new ProactorProcessingStrategy(() -> cpuLight,
                                           () -> blocking,
-                                          () -> cpuIntensive,
-                                          scheduler -> {
-                                          },
-                                          Integer.MAX_VALUE,
-                                          () -> blocking,
-                                          DEFAULT_BUFFER_SIZE,
-                                          DEFAULT_SUBSCRIBER_COUNT,
-                                          DEFAULT_WAIT_STRATEGY,
-                                          muleContext);
+                                          () -> cpuIntensive);
   }
 
   @Override

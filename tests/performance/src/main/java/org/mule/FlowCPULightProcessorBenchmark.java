@@ -19,7 +19,7 @@ import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
-public class FlowCPULightlProcessorBenchmark extends AbstractFlowBenchmark {
+public class FlowCPULightProcessorBenchmark extends AbstractFlowBenchmark {
 
   @Override
   protected List<Processor> getMessageProcessors() {

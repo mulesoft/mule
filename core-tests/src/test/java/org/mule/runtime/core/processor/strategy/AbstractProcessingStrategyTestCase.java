@@ -331,6 +331,35 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
   }
 
   @Test
+  public void concurrentStream() throws Exception {
+    flow.setMessageProcessors(asList(cpuLightProcessor));
+    flow.initialise();
+    flow.start();
+
+    CountDownLatch latch = new CountDownLatch(STREAM_ITERATIONS);
+    for (int i = 0; i < 4; i++) {
+      asyncExecutor.submit(() -> {
+        for (int j = 0; j < STREAM_ITERATIONS / 4; j++) {
+          try {
+            switch (mode) {
+              case BLOCKING:
+                flow.process(newEvent());
+                latch.countDown();
+                break;
+              case NON_BLOCKING:
+                processNonBlocking(newEvent(), t -> latch.countDown(),
+                                   response -> bubble(new AssertionError("Unexpected error")));
+            }
+          } catch (MuleException e) {
+            throw new RuntimeException(e);
+          }
+        }
+      });
+    }
+    assertThat(latch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
+  }
+
+  @Test
   public void errorsStream() throws Exception {
     flow.setMessageProcessors(asList(failingProcessor));
     flow.initialise();

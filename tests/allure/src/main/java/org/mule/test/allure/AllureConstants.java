@@ -193,8 +193,8 @@ public interface AllureConstants {
       String BLOCKING = "Blocking";
       String DEFAULT = "Default (used when no processing strategy is configured)";
       String PROACTOR = "Proactor";
-      String MULTI_REACTOR = "MultiReactor";
-      String SYNCHRONOUS = "Synchronous";
+      String REACTOR = "Reactor";
+      String DIRECT = "Direct";
       String WORK_QUEUE = "Work Queue";
     }
 

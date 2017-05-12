@@ -16,10 +16,8 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
-import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
-import static org.mule.runtime.core.processor.strategy.AbstractRingBufferProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
-import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.MULTI_REACTOR;
+import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.REACTOR;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -34,7 +32,7 @@ import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features(PROCESSING_STRATEGIES)
-@Stories(MULTI_REACTOR)
+@Stories(REACTOR)
 public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   public ReactorProcessingStrategyTestCase(Mode mode) {
@@ -43,12 +41,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new ReactorProcessingStrategy(() -> cpuLight, scheduler -> scheduler.stop(),
-                                         () -> custom,
-                                         DEFAULT_BUFFER_SIZE,
-                                         1,
-                                         DEFAULT_WAIT_STRATEGY,
-                                         muleContext);
+    return new ReactorProcessingStrategy(() -> cpuLight);
   }
 
   @Override
