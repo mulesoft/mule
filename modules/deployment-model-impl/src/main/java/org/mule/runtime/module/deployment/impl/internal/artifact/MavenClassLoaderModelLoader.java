@@ -12,7 +12,7 @@ import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConst
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
-import org.mule.maven.client.api.MavenConfiguration;
+import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
@@ -23,6 +23,7 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassL
 
 import java.io.File;
 import java.util.Map;
+import java.util.concurrent.locks.StampedLock;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
@@ -37,12 +38,21 @@ import java.util.Map;
 // TODO MULE-11878 - consolidate with other aether usages in mule.
 public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
 
-  private final DeployableMavenClassLoaderModelLoader deployableMavenClassLoaderModelLoader;
-  private final PluginMavenClassLoaderModelLoader pluginMavenClassLoaderModelLoader;
+  private DeployableMavenClassLoaderModelLoader deployableMavenClassLoaderModelLoader;
+  private PluginMavenClassLoaderModelLoader pluginMavenClassLoaderModelLoader;
+  private final MavenClientProvider mavenClientProvider;
+  private MavenConfiguration mavenRuntimeConfig;
+
+  private StampedLock lock = new StampedLock();
 
   public MavenClassLoaderModelLoader() {
-    MavenConfiguration mavenRuntimeConfig = getMavenConfig();
-    MavenClientProvider mavenClientProvider = discoverProvider(MavenClientProvider.class.getClassLoader());
+    mavenClientProvider = discoverProvider(MavenClientProvider.class.getClassLoader());
+
+    mavenRuntimeConfig = getMavenConfig();
+    createClassLoaderModelLoaders();
+  }
+
+  private void createClassLoaderModelLoaders() {
     MavenClient mavenClient = mavenClientProvider.createMavenClient(mavenRuntimeConfig);
 
     deployableMavenClassLoaderModelLoader =
@@ -59,13 +69,28 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
   @Override
   public ClassLoaderModel load(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
-    if (deployableMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
-      return deployableMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
+    long stamp = lock.readLock();
+    try {
+      MavenConfiguration updatedMavenConfiguration = getMavenConfig();
+      if (!mavenRuntimeConfig.equals(updatedMavenConfiguration)) {
+        stamp = lock.tryConvertToWriteLock(stamp);
+        if (stamp == 0L) {
+          stamp = lock.writeLock();
+        }
+        mavenRuntimeConfig = updatedMavenConfiguration;
+        createClassLoaderModelLoaders();
+      }
+
+      if (deployableMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
+        return deployableMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
+      }
+      if (pluginMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
+        return pluginMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
+      }
+      throw new IllegalStateException(format("Artifact type %s not supported", artifactType));
+    } finally {
+      lock.unlock(stamp);
     }
-    if (pluginMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
-      return pluginMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
-    }
-    throw new IllegalStateException(format("Artifact type %s not supported", artifactType));
   }
 
   @Override
