@@ -19,6 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ *
+ */
 public class EnrichedNotificationInfo {
 
   private String id;
@@ -31,21 +34,6 @@ public class EnrichedNotificationInfo {
   private Map<String, TypedValue> variables;
   private String originatingFlowName;
   private FlowCallStack flowCallStack;
-
-  public EnrichedNotificationInfo(String uniqueId, String correlationId, GroupCorrelation groupCorrelation, Message message,
-                                  Optional<Error> error, Object component, Exception exception,
-                                  Map<String, TypedValue> variables, String originatingFlowName, FlowCallStack flowCallStack) {
-    this.id = uniqueId;
-    this.correlationId = correlationId;
-    this.groupCorrelation = groupCorrelation;
-    this.message = message;
-    this.error = error;
-    this.component = component;
-    this.exception = exception;
-    this.variables = variables;
-    this.originatingFlowName = originatingFlowName;
-    this.flowCallStack = flowCallStack;
-  }
 
   public static EnrichedNotificationInfo createInfo(Event event, Exception e, Object component) {
     if (event != null) {
@@ -91,6 +79,21 @@ public class EnrichedNotificationInfo {
       }
     }
     return null;
+  }
+
+  public EnrichedNotificationInfo(String uniqueId, String correlationId, GroupCorrelation groupCorrelation, Message message,
+                                  Optional<Error> error, Object component, Exception exception,
+                                  Map<String, TypedValue> variables, String originatingFlowName, FlowCallStack flowCallStack) {
+    this.id = uniqueId;
+    this.correlationId = correlationId;
+    this.groupCorrelation = groupCorrelation;
+    this.message = message;
+    this.error = error;
+    this.component = component;
+    this.exception = exception;
+    this.variables = variables;
+    this.originatingFlowName = originatingFlowName;
+    this.flowCallStack = flowCallStack;
   }
 
   public String getUniqueId() {

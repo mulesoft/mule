@@ -34,6 +34,30 @@ public abstract class EnrichedServerNotification extends ServerNotification {
     this.notificationInfo = notificationInfo;
   }
 
+  /**
+   * This function should not be used anymore, try getMessage, getError or getException depending
+   * on the situation.
+   *
+   * @return null
+   */
+  @Deprecated
+  @Override
+  public Object getSource() {
+    return null;
+  }
+
+  /**
+   * This function should not be used anymore, try getFlowConstruct().getName() or getComponent().getLocation() depending
+   * on the situation.
+   *
+   * @return the resource identifier used before
+   */
+  @Deprecated
+  @Override
+  public String getResourceIdentifier() {
+    return super.getResourceIdentifier();
+  }
+
   public String getUniqueId() {
     return notificationInfo.getUniqueId();
   }

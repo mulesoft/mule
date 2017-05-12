@@ -8,21 +8,21 @@ package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.context.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ErrorHandlerNotification.PROCESS_START;
 
-import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
-import org.mule.runtime.core.api.message.ExceptionPayload;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.context.notification.ErrorHandlerNotification;
-import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.message.ExceptionPayload;
+import org.mule.runtime.core.context.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
+import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 
 /**
  * Fire a notification, log exception, increment statistics, route the problematic message to a destination if one is configured
@@ -47,7 +47,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
     try {
 
       muleContext.getNotificationManager()
-          .fireNotification(new ErrorHandlerNotification(EnrichedNotificationInfo.createInfo(event, ex, null), flowConstruct,
+          .fireNotification(new ErrorHandlerNotification(createInfo(event, ex, null), flowConstruct,
                                                          PROCESS_START));
 
       // keep legacy notifications
@@ -71,7 +71,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
           .message(InternalMessage.builder(event.getMessage()).nullPayload().exceptionPayload(exceptionPayload).build()).build();
     } finally {
       muleContext.getNotificationManager()
-          .fireNotification(new ErrorHandlerNotification(EnrichedNotificationInfo.createInfo(event, ex, null), flowConstruct,
+          .fireNotification(new ErrorHandlerNotification(createInfo(event, ex, null), flowConstruct,
                                                          PROCESS_END));
     }
   }

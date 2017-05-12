@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.context.notification;
 
+import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -98,7 +100,7 @@ public class NotificationHelper {
     try {
       if (serverNotificationHandler.isNotificationEnabled(notificationClass)) {
         serverNotificationHandler
-            .fireNotification(new ConnectorMessageNotification(EnrichedNotificationInfo.createInfo(event, null, source),
+            .fireNotification(new ConnectorMessageNotification(createInfo(event, null, source),
                                                                flowConstruct,
                                                                action));
       }

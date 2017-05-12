@@ -9,7 +9,7 @@ package org.mule.functional.listener;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotificationListener;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class FlowExecutionListener {
 
-  private final List<Callback<Event>> callbacks = new ArrayList<Callback<Event>>();
+  private final List<Callback<EnrichedNotificationInfo>> callbacks = new ArrayList<>();
   private CountDownLatch flowExecutedLatch = new Latch();
   private String flowName;
   private int timeout = 10000;
@@ -55,8 +55,8 @@ public class FlowExecutionListener {
             return;
           }
           if (notification.getAction() == PipelineMessageNotification.PROCESS_COMPLETE) {
-            for (Callback<Event> callback : callbacks) {
-              callback.execute((Event) notification.getSource());
+            for (Callback<EnrichedNotificationInfo> callback : callbacks) {
+              callback.execute(notification.getInfo());
             }
             flowExecutedLatch.countDown();
           }
@@ -93,7 +93,7 @@ public class FlowExecutionListener {
   /**
    * @param callback callback to be executed once a notification is received
    */
-  public void addListener(Callback<Event> callback) {
+  public void addListener(Callback<EnrichedNotificationInfo> callback) {
     this.callbacks.add(callback);
   }
 }

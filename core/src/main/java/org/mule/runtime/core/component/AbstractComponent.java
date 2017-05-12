@@ -8,8 +8,10 @@ package org.mule.runtime.core.component;
 
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.util.StreamingUtils.withCursoredEvent;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -25,7 +27,6 @@ import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
@@ -258,7 +259,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
     if (notificationHandler != null
         && notificationHandler.isNotificationEnabled(ComponentMessageNotification.class)) {
       notificationHandler
-          .fireNotification(new ComponentMessageNotification(EnrichedNotificationInfo.createInfo(event, null, this),
+          .fireNotification(new ComponentMessageNotification(createInfo(event, null, this),
                                                              flowConstruct, action));
     }
   }
