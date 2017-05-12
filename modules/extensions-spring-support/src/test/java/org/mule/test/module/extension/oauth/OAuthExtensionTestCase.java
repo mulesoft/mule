@@ -42,6 +42,10 @@ public class OAuthExtensionTestCase extends BaseOAuthExtensionTestCase {
   public void authorizeAndStartDancingBaby() throws Exception {
     simulateDanceStart();
 
+    verifyAuthUrlRequest();
+  }
+
+  protected void verifyAuthUrlRequest() {
     wireMock.verify(getRequestedFor(urlPathEqualTo("/" + AUTHORIZE_PATH))
         .withQueryParam("redirect_uri", equalTo((toUrl(CALLBACK_PATH, callbackPort.getNumber()))))
         .withQueryParam("client_id", equalTo(CONSUMER_KEY))
@@ -113,11 +117,15 @@ public class OAuthExtensionTestCase extends BaseOAuthExtensionTestCase {
     assertThat(objectStore.contains(OWNER_ID), is(false));
   }
 
-  private void assertBeforeCallbackPayload(TestOAuthExtension config) {
+  protected void assertBeforeCallbackPayload(TestOAuthExtension config) {
     AuthCodeRequest request = config.getCapturedAuthCodeRequests().get(0);
     assertThat(request.getResourceOwnerId(), is(OWNER_ID));
-    assertThat(request.getScopes().get(), is(SCOPES));
+    assertScopes(request);
     assertThat(request.getState().get(), is(STATE));
+  }
+
+  protected void assertScopes(AuthCodeRequest request) {
+    assertThat(request.getScopes().get(), is(SCOPES));
   }
 
   private void assertAfterCallbackPayload(TestOAuthExtension config) {

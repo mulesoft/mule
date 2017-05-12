@@ -192,7 +192,13 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
         .responseExpiresInExpr(grantType.getExpirationRegex())
         .responseRefreshTokenExpr(grantType.getRefreshTokenExpr())
         .responseAccessTokenExpr(grantType.getAccessTokenExpr());
-    dancerBuilder.scopes(authCodeConfig.getScope().orElse(grantType.getDefaultScope()));
+
+    String scopes = authCodeConfig.getScope()
+        .orElseGet(() -> grantType.getDefaultScope().orElse(null));
+
+    if (scopes != null) {
+      dancerBuilder.scopes(scopes);
+    }
 
     final URL callbackUrl = url(callbackConfig.getHost(), callbackConfig.getPort(), callbackConfig.getCallbackPath());
     dancerBuilder
