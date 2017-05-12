@@ -102,11 +102,5 @@
             <version>${project.version}</version>
             <type>pom</type>
         </dependency>
-        <dependency>
-            <groupId>org.mule.extensions</groupId>
-            <artifactId>mule-extensions-all</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-        </dependency>
     </dependencies>
 </project>
