@@ -46,10 +46,10 @@
         <marvel:to-stream />
     </flow>
 
-    <flow name="toGreedyStream">
+    <flow name="bufferExceeded">
         <try>
             <marvel:to-stream config-ref="drStrange" >
-                <repeatable-in-memory-stream maxBufferSize="1" initialBufferSize="1" bufferSizeIncrement="0" bufferUnit="BYTE" />
+                <repeatable-in-memory-stream initialBufferSize="10" bufferSizeIncrement="5" maxBufferSize="50" bufferUnit="KB" />
             </marvel:to-stream>
             <flow-ref name="readStream" />
             <object-to-string-transformer />
@@ -74,6 +74,22 @@
         <flow-ref name="castSpell" />
     </flow>
 
+    <flow name="sourceWithExceededBuffer" initialState="stopped">
+        <marvel:bytes-caster config-ref="drStrange"
+                             castFrequencyInMillis="5000"
+                             spell="dormammu i've come to bargain" spellSize="65536">
+            <repeatable-in-memory-stream initialBufferSize="10" bufferSizeIncrement="5" maxBufferSize="50" bufferUnit="KB" />
+        </marvel:bytes-caster>
+        <logger message="#[payload]" level="ERROR"/>
+        <flow-ref name="castSpell" />
+        <error-handler>
+            <on-error-continue type="STREAM_MAXIMUM_SIZE_EXCEEDED">
+                <set-payload value="Too big!" />
+                <flow-ref name="castSpell" />
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
     <flow name="bytesCasterInTx" initialState="stopped">
         <marvel:bytes-caster config-ref="drStrange" castFrequencyInMillis="5000" spell="dormammu i've come to bargain" />
         <try transactionalAction="BEGIN_OR_JOIN">
@@ -82,8 +98,6 @@
             <flow-ref name="castSpell" />
         </try>
     </flow>
-
-    
 
     <flow name="bytesCasterWithoutStreaming" initialState="stopped">
         <marvel:bytes-caster config-ref="drStrange" castFrequencyInMillis="5000" spell="dormammu i've come to bargain">

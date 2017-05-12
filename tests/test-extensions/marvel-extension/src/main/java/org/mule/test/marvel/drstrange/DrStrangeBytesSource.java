@@ -15,6 +15,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -38,18 +39,27 @@ public class DrStrangeBytesSource extends Source<InputStream, NullAttributes> {
   @Parameter
   private String spell;
 
+  @Parameter
+  @Optional(defaultValue = "1")
+  private int spellSize;
+
   @Config
   private DrStrange config;
 
   @Override
   public void onStart(SourceCallback<InputStream, NullAttributes> sourceCallback) throws MuleException {
     scheduler = schedulerService.cpuLightScheduler();
-    scheduler.scheduleAtFixedRate(() -> {
-      sourceCallback.handle(Result.<InputStream, NullAttributes>builder()
-          .output(new ByteArrayInputStream(spell.getBytes()))
-          .attributes(NULL_ATTRIBUTES)
-          .build());
-    }, 0, castFrequencyInMillis, MILLISECONDS);
+    scheduler.scheduleAtFixedRate(() -> sourceCallback.handle(Result.<InputStream, NullAttributes>builder()
+        .output(new ByteArrayInputStream(getSpellBytes(spell)))
+        .attributes(NULL_ATTRIBUTES)
+        .build()), 0, castFrequencyInMillis, MILLISECONDS);
+  }
+
+  private byte[] getSpellBytes(String spell) {
+    while (spell.length() < spellSize) {
+      spell += spell;
+    }
+    return spell.getBytes();
   }
 
   @Override

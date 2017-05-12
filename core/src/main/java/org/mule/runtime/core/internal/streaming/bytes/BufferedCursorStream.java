@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import static java.lang.Math.toIntExact;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -32,14 +33,16 @@ public final class BufferedCursorStream extends AbstractCursorStream {
    * Intermediate buffer between this cursor and the {@code traversableBuffer}. This reduces contention
    * on the {@code traversableBuffer}
    */
-  private final ByteBuffer memoryBuffer;
+  private final ByteBuffer localBuffer;
   private final ByteBufferManager bufferManager;
+  private long rangeStart = 0;
+  private long rangeEnd = -1;
 
   /**
    * Creates a new instance
    *
-   * @param streamBuffer    the buffer which provides data
-   * @param bufferManager   the {@link ByteBufferManager} that will be used to allocate all buffers
+   * @param streamBuffer  the buffer which provides data
+   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    */
   public BufferedCursorStream(InputStreamBuffer streamBuffer,
                               CursorStreamProvider provider,
@@ -47,8 +50,8 @@ public final class BufferedCursorStream extends AbstractCursorStream {
     super(provider);
     this.streamBuffer = streamBuffer;
     this.bufferManager = bufferManager;
-    memoryBuffer = bufferManager.allocate(LOCAL_BUFFER_SIZE);
-    memoryBuffer.flip();
+    localBuffer = bufferManager.allocate(LOCAL_BUFFER_SIZE);
+    localBuffer.flip();
   }
 
   /**
@@ -57,8 +60,25 @@ public final class BufferedCursorStream extends AbstractCursorStream {
   @Override
   public void seek(long position) throws IOException {
     super.seek(position);
-    memoryBuffer.clear();
-    memoryBuffer.flip();
+
+    boolean reset = false;
+    if (position < rangeStart || position >= rangeEnd) {
+      reset = true;
+    } else {
+      int bufferPosition = toIntExact(position - rangeStart);
+      if (bufferPosition >= localBuffer.limit()) {
+        reset = true;
+      } else {
+        localBuffer.position(bufferPosition);
+      }
+    }
+
+    if (reset) {
+      localBuffer.clear();
+      localBuffer.flip();
+      rangeStart = position;
+      rangeEnd = -1;
+    }
   }
 
   /**
@@ -66,13 +86,13 @@ public final class BufferedCursorStream extends AbstractCursorStream {
    */
   @Override
   protected int doRead() throws IOException {
-    if (reloadLocalBufferIfEmpty(1) > 0) {
-      int read = unsigned((int) memoryBuffer.get());
-      position++;
-      return read;
+    if (assureDataInLocalBuffer(1) == -1) {
+      return -1;
     }
 
-    return -1;
+    int read = unsigned((int) localBuffer.get());
+    position++;
+    return read;
   }
 
   /**
@@ -83,17 +103,17 @@ public final class BufferedCursorStream extends AbstractCursorStream {
     int read = 0;
 
     while (true) {
-      int remaining = reloadLocalBufferIfEmpty(len);
+      int remaining = assureDataInLocalBuffer(len);
       if (remaining == -1) {
         return read == 0 ? -1 : read;
       }
 
       if (len <= remaining) {
-        memoryBuffer.get(b, off, len);
+        localBuffer.get(b, off, len);
         position += len;
         return read + len;
       } else {
-        memoryBuffer.get(b, off, remaining);
+        localBuffer.get(b, off, remaining);
         position += remaining;
         read += remaining;
         off += remaining;
@@ -102,20 +122,23 @@ public final class BufferedCursorStream extends AbstractCursorStream {
     }
   }
 
-  private int reloadLocalBufferIfEmpty(int len) {
-    if (!memoryBuffer.hasRemaining()) {
-      memoryBuffer.clear();
-      int read = streamBuffer.get(memoryBuffer, position, LOCAL_BUFFER_SIZE);
-      if (read > 0) {
-        memoryBuffer.flip();
-        return read;
-      } else {
-        memoryBuffer.limit(0);
-        return -1;
-      }
+  private int assureDataInLocalBuffer(int len) {
+    if (len <= localBuffer.remaining()) {
+      return toIntExact(len);
     }
 
-    return memoryBuffer.remaining();
+    localBuffer.clear();
+    int read = streamBuffer.get(localBuffer, position, LOCAL_BUFFER_SIZE);
+    if (read > 0) {
+      localBuffer.flip();
+      rangeStart = position;
+      rangeEnd = rangeStart + read;
+
+      return read;
+    } else {
+      localBuffer.limit(0);
+      return -1;
+    }
   }
 
   /**
@@ -123,6 +146,6 @@ public final class BufferedCursorStream extends AbstractCursorStream {
    */
   @Override
   protected void doRelease() {
-    bufferManager.deallocate(memoryBuffer);
+    bufferManager.deallocate(localBuffer);
   }
 }

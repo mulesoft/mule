@@ -72,7 +72,6 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
       if (consumeStreamIfNecessary) {
         releaseReadLock();
         return withWriteLock(() -> {
-          final long requiredUpperBound = position + length;
 
           Optional<Integer> refetch;
           refetch = getFromCurrentData(dest, position, length);
@@ -80,11 +79,12 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
             return refetch.get();
           }
 
+          final long requiredUpperBound = position + length;
           while (!isStreamFullyConsumed() && bufferTip < requiredUpperBound) {
             try {
               final int read = consumeForwardData();
               if (read > 0) {
-                refetch = getFromCurrentData(dest, position, length);
+                refetch = getFromCurrentData(dest, position, min(length, read));
                 if (refetch.isPresent()) {
                   return refetch.get();
                 }
