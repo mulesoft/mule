@@ -8,7 +8,9 @@ package org.mule.runtime.core.exception;
 
 import static java.text.MessageFormat.format;
 import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.context.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
@@ -142,12 +144,12 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     logger.info("Initialising exception listener: " + toString());
   }
 
-  protected void fireNotification(Exception ex) {
+  protected void fireNotification(Exception ex, Event event) {
     if (enableNotifications) {
       if (ex.getCause() != null && getCause(ex) instanceof SecurityException) {
         fireNotification(new SecurityNotification((SecurityException) getCause(ex), SECURITY_AUTHENTICATION_FAILED));
       } else {
-        fireNotification(new ExceptionNotification(ex));
+        fireNotification(new ExceptionNotification(createInfo(event, ex, null), flowConstruct));
       }
     }
   }

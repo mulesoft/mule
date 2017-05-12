@@ -6,11 +6,16 @@
  */
 package org.mule.runtime.core.context.notification;
 
+import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
+import org.mule.runtime.core.api.context.notification.EnrichedServerNotification;
 import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.transaction.Transaction;
 
-public class TransactionNotification extends ServerNotification implements SynchronousServerEvent {
+import java.util.HashMap;
+
+// TODO: Shouldn't really be an EnrichedServerNotification as it doesn't know event data,
+// but inherits to be compatible with how mule-agent tracking currently handles them
+public class TransactionNotification extends EnrichedServerNotification implements SynchronousServerEvent {
 
   /**
    * Serial version
@@ -42,7 +47,7 @@ public class TransactionNotification extends ServerNotification implements Synch
   }
 
   public TransactionNotification(Transaction transaction, int action, String applicationName) {
-    super(transaction.getId(), action, transaction.getId());
+    super(emptyInfo(), action, transaction.getId());
     this.transactionStringId = transaction.getId();
     this.applicationName = applicationName;
   }
@@ -59,5 +64,9 @@ public class TransactionNotification extends ServerNotification implements Synch
   public String toString() {
     return EVENT_NAME + "{" + "action=" + getActionName(action) + ", transactionStringId=" + transactionStringId + ", timestamp="
         + timestamp + "}";
+  }
+
+  private static EnrichedNotificationInfo emptyInfo() {
+    return new EnrichedNotificationInfo(null, null, null, null, null, null, null, new HashMap<>(), null, null);
   }
 }

@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.api.Event;
-
 /**
  * Provides callbacks for notifying when a flow call from another flow is started or completed.
  * 
@@ -18,16 +16,16 @@ public interface FlowTraceManager {
   /**
    * Handles the start of the passed flowName for the given event.
    * 
-   * @param event the event for which the flow is being started
+   * @param notificationInfo the notification information about the event for which the flow is being started
    * @param flowName the name of the flow that is about to start
    */
-  void onFlowStart(Event event, String flowName);
+  void onFlowStart(EnrichedNotificationInfo notificationInfo, String flowName);
 
   /**
    * Handles the completion of the current flow for the given event.
    * 
-   * @param event the event for which the flow is being completed
+   * @param notificationInfo the notification information about the event for which the flow is being completed
    */
-  void onFlowComplete(Event event);
+  void onFlowComplete(EnrichedNotificationInfo notificationInfo);
 
 }

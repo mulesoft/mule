@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
+import org.mule.runtime.core.api.context.notification.EnrichedServerNotification;
 import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
 
 import org.slf4j.Logger;
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Used to notify that a message was received or sent through a Connector
  */
-public class ConnectorMessageNotification extends ServerNotification implements SynchronousServerEvent {
+public class ConnectorMessageNotification extends EnrichedServerNotification implements SynchronousServerEvent {
 
   /**
    * Serial version
@@ -45,47 +45,21 @@ public class ConnectorMessageNotification extends ServerNotification implements 
     registerAction("end request", MESSAGE_REQUEST_END);
   }
 
-  private final Object component;
-  private String endpoint;
-  private FlowConstruct flowConstruct;
-
-  public ConnectorMessageNotification(Object component, Message resource, String endpoint, FlowConstruct flowConstruct,
+  public ConnectorMessageNotification(EnrichedNotificationInfo notificationInfo, FlowConstruct flowConstruct,
                                       int action) {
-    super(resource, action, flowConstruct != null ? flowConstruct.getName() : null);
-    this.component = component;
-    this.endpoint = endpoint;
+    super(notificationInfo, action, flowConstruct);
     this.flowConstruct = flowConstruct;
   }
 
-
   @Override
   public String toString() {
-    return EVENT_NAME + "{action=" + getActionName(action) + ", endpoint: " + endpoint + ", resourceId=" + resourceIdentifier
+    return EVENT_NAME + "{action=" + getActionName(action) + ", endpoint: " + getLocationUri() + ", resourceId="
+        + resourceIdentifier
         + ", timestamp=" + timestamp + ", serverId=" + serverId + ", message: " + source + "}";
-  }
-
-  public String getEndpoint() {
-    return endpoint;
-  }
-
-  public FlowConstruct getFlowConstruct() {
-    return flowConstruct;
   }
 
   @Override
   public String getType() {
     return TYPE_TRACE;
-  }
-
-  @Override
-  public Message getSource() {
-    return (Message) super.getSource();
-  }
-
-  /**
-   * @return the component that dispatched/received the message
-   */
-  public Object getComponent() {
-    return component;
   }
 }

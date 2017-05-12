@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationLis
 import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
 import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
-import org.mule.runtime.core.api.context.notification.ExceptionStrategyNotificationListener;
+import org.mule.runtime.core.api.context.notification.ErrorHandlerNotificationListener;
 import org.mule.runtime.core.api.context.notification.ManagementNotificationListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotificationListener;
@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.context.notification.TransactionNotificationLis
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.context.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.internal.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
@@ -42,7 +43,6 @@ import org.mule.runtime.core.context.notification.ClusterNodeNotification;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.context.notification.CustomNotification;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
-import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.runtime.core.context.notification.ManagementNotification;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
@@ -272,7 +272,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     manager.addInterfaceToType(ConnectionNotificationListener.class, ConnectionNotification.class);
     manager.addInterfaceToType(RegistryNotificationListener.class, RegistryNotification.class);
     manager.addInterfaceToType(ExceptionNotificationListener.class, ExceptionNotification.class);
-    manager.addInterfaceToType(ExceptionStrategyNotificationListener.class, ExceptionStrategyNotification.class);
+    manager.addInterfaceToType(ErrorHandlerNotificationListener.class, ErrorHandlerNotification.class);
     manager.addInterfaceToType(TransactionNotificationListener.class, TransactionNotification.class);
     manager.addInterfaceToType(PipelineMessageNotificationListener.class, PipelineMessageNotification.class);
     manager.addInterfaceToType(AsyncMessageNotificationListener.class, AsyncMessageNotification.class);

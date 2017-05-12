@@ -8,8 +8,10 @@ package org.mule.runtime.core.component;
 
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.util.StreamingUtils.withCursoredEvent;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -99,7 +101,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
 
     // Invoke component implementation and gather statistics
     try {
-      fireComponentNotification(event.getMessage(), ComponentMessageNotification.COMPONENT_PRE_INVOKE);
+      fireComponentNotification(event, ComponentMessageNotification.COMPONENT_PRE_INVOKE);
 
       long startTime = 0;
       if (statistics.isEnabled()) {
@@ -114,7 +116,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
       }
 
       Event resultEvent = createResultEvent(event, resultEventBuilder, result);
-      fireComponentNotification(resultEvent.getMessage(),
+      fireComponentNotification(resultEvent,
                                 ComponentMessageNotification.COMPONENT_POST_INVOKE);
 
       return resultEvent;
@@ -253,11 +255,12 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
     // Default implementation is no-op
   }
 
-  protected void fireComponentNotification(Message message, int action) {
+  protected void fireComponentNotification(Event event, int action) {
     if (notificationHandler != null
         && notificationHandler.isNotificationEnabled(ComponentMessageNotification.class)) {
-      notificationHandler.fireNotification(new ComponentMessageNotification(message, this,
-                                                                            flowConstruct, action));
+      notificationHandler
+          .fireNotification(new ComponentMessageNotification(createInfo(event, null, this),
+                                                             flowConstruct, action));
     }
   }
 

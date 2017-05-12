@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.context.notification;
 
+import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.slf4j.Logger;
@@ -86,33 +88,25 @@ public class NotificationHelper {
 
   /**
    * Fires a {@link ConnectorMessageNotification} for the given arguments using the {@link ServerNotificationHandler} associated
-   * to the given {@code event}
-   *
-   * @param source
-   * @param event a {@link org.mule.runtime.core.api.Event}
-   * @param uri the uri of the firing endpoint
-   * @param flowConstruct the {@link org.mule.runtime.core.api.construct.FlowConstruct} that generated the notification
-   * @param action the action code for the notification
-   */
-  public void fireNotification(Object source, Event event, String uri, FlowConstruct flowConstruct, int action) {
-    doFireNotification(getNotificationHandler(flowConstruct.getMuleContext()), source, event.getMessage(), uri, flowConstruct,
-                       action);
-  }
-
-  /**
-   * Fires a {@link ConnectorMessageNotification} for the given arguments using the {@link ServerNotificationHandler} associated
    * to the given {@code event} and based on a {@link ComponentLocation}.
    *
    * @param source
    * @param event a {@link org.mule.runtime.core.api.Event}
-   * @param location the location of the firing component
    * @param flowConstruct the {@link org.mule.runtime.core.api.construct.FlowConstruct} that generated the notification
    * @param action the action code for the notification
    */
-  public void fireNotification(Object source, Event event, ComponentLocation location, FlowConstruct flowConstruct, int action) {
-    doFireNotification(getNotificationHandler(flowConstruct.getMuleContext()), source, event.getMessage(), toUri(location),
-                       flowConstruct,
-                       action);
+  public void fireNotification(Object source, Event event, FlowConstruct flowConstruct, int action) {
+    ServerNotificationHandler serverNotificationHandler = getNotificationHandler(flowConstruct.getMuleContext());
+    try {
+      if (serverNotificationHandler.isNotificationEnabled(notificationClass)) {
+        serverNotificationHandler
+            .fireNotification(new ConnectorMessageNotification(createInfo(event, null, source),
+                                                               flowConstruct,
+                                                               action));
+      }
+    } catch (Exception e) {
+      logger.warn("Could not fire notification. Action: " + action, e);
+    }
   }
 
   /**
@@ -134,21 +128,6 @@ public class NotificationHelper {
    */
   public void fireNotification(ServerNotification notification, MuleContext muleContext) {
     getNotificationHandler(muleContext).fireNotification(notification);
-  }
-
-  private void doFireNotification(ServerNotificationHandler serverNotificationHandler, Object source, Message message,
-                                  String uri, FlowConstruct flowConstruct, int action) {
-    try {
-      if (serverNotificationHandler.isNotificationEnabled(notificationClass)) {
-        serverNotificationHandler.fireNotification(new ConnectorMessageNotification(source, message, uri, flowConstruct, action));
-      }
-    } catch (Exception e) {
-      logger.warn("Could not fire notification. Action: " + action, e);
-    }
-  }
-
-  private String toUri(ComponentLocation location) {
-    return location.getParts().get(0).getPartPath() + "/" + location.getComponentIdentifier().getIdentifier().toString();
   }
 
   private ServerNotificationHandler adaptNotificationHandler(ServerNotificationHandler serverNotificationHandler) {

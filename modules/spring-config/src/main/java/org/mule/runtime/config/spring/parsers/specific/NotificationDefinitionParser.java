@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.context.notification.ConnectionNotificationList
 import org.mule.runtime.core.api.context.notification.ConnectorMessageNotificationListener;
 import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
-import org.mule.runtime.core.api.context.notification.ExceptionStrategyNotificationListener;
+import org.mule.runtime.core.api.context.notification.ErrorHandlerNotificationListener;
 import org.mule.runtime.core.api.context.notification.ManagementNotificationListener;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
@@ -31,7 +31,7 @@ import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.context.notification.CustomNotification;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
-import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
+import org.mule.runtime.core.context.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.context.notification.ManagementNotification;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
@@ -72,7 +72,7 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser 
     EVENT_MAP.put("COMPONENT-MESSAGE", ComponentMessageNotification.class.getName());
     EVENT_MAP.put("MANAGEMENT", ManagementNotification.class.getName());
     EVENT_MAP.put("MESSAGE-PROCESSOR", MessageProcessorNotification.class.getName());
-    EVENT_MAP.put("EXCEPTION-STRATEGY", ExceptionStrategyNotification.class.getName());
+    EVENT_MAP.put("EXCEPTION-STRATEGY", ErrorHandlerNotification.class.getName());
     EVENT_MAP.put("CONNECTION", ConnectionNotification.class.getName());
     EVENT_MAP.put("REGISTRY", RegistryNotification.class.getName());
     EVENT_MAP.put("CUSTOM", CustomNotification.class.getName());
@@ -88,7 +88,7 @@ public class NotificationDefinitionParser extends ChildMapEntryDefinitionParser 
     INTERFACE_MAP.put("SECURITY", SecurityNotificationListener.class.getName());
     INTERFACE_MAP.put("MANAGEMENT", ManagementNotificationListener.class.getName());
     INTERFACE_MAP.put("MESSAGE-PROCESSOR", MessageProcessorNotificationListener.class.getName());
-    INTERFACE_MAP.put("EXCEPTION-STRATEGY", ExceptionStrategyNotificationListener.class.getName());
+    INTERFACE_MAP.put("EXCEPTION-STRATEGY", ErrorHandlerNotificationListener.class.getName());
     INTERFACE_MAP.put("CONNECTION", ConnectionNotificationListener.class.getName());
     INTERFACE_MAP.put("REGISTRY", RegistryNotificationListener.class.getName());
     INTERFACE_MAP.put("CUSTOM", CustomNotificationListener.class.getName());

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.processor;
 
 import static java.util.Collections.singletonList;
+import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
@@ -146,12 +147,14 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   private Consumer<Event> fireAsyncScheduledNotification(FlowConstruct flowConstruct) {
     return event -> muleContext.getNotificationManager()
-        .fireNotification(new AsyncMessageNotification(flowConstruct, event, null, PROCESS_ASYNC_SCHEDULED));
+        .fireNotification(new AsyncMessageNotification(createInfo(event, null, this), flowConstruct,
+                                                       PROCESS_ASYNC_SCHEDULED));
   }
 
   private void fireAsyncCompleteNotification(Event event, FlowConstruct flowConstruct, MessagingException exception) {
     muleContext.getNotificationManager()
-        .fireNotification(new AsyncMessageNotification(flowConstruct, event, null, PROCESS_ASYNC_COMPLETE, exception));
+        .fireNotification(new AsyncMessageNotification(createInfo(event, exception, this), flowConstruct,
+                                                       PROCESS_ASYNC_COMPLETE));
   }
 
   @Override

@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
+import org.mule.runtime.core.api.context.notification.EnrichedServerNotification;
 import org.mule.runtime.core.api.context.notification.SynchronousServerEvent;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.exception.MessagingException;
 
 /**
  * <code>AsyncMessageNotification</code> when async work is scheduled and completed for a given flow
  */
-public class AsyncMessageNotification extends ServerNotification implements SynchronousServerEvent {
+public class AsyncMessageNotification extends EnrichedServerNotification implements SynchronousServerEvent {
 
   private static final long serialVersionUID = 6065691696506216248L;
 
@@ -28,25 +28,15 @@ public class AsyncMessageNotification extends ServerNotification implements Sync
     registerAction("async process complete", PROCESS_ASYNC_COMPLETE);
   }
 
-  protected Processor messageProcessor;
-  protected MessagingException exception;
-
-  public AsyncMessageNotification(FlowConstruct flowConstruct, Event event, Processor messageProcessor, int action) {
-    super(event, action, flowConstruct.getName());
-    this.messageProcessor = messageProcessor;
-  }
-
-  public AsyncMessageNotification(FlowConstruct flowConstruct, Event event, Processor messageProcessor, int action,
-                                  MessagingException exception) {
-    this(flowConstruct, event, messageProcessor, action);
-    this.exception = exception;
+  public AsyncMessageNotification(EnrichedNotificationInfo notificationInfo, FlowConstruct flowConstruct, int action) {
+    super(notificationInfo, action, flowConstruct);
   }
 
   public Processor getMessageProcessor() {
-    return messageProcessor;
+    return (Processor) super.getComponent();
   }
 
   public MessagingException getException() {
-    return exception;
+    return (MessagingException) super.getException();
   }
 }

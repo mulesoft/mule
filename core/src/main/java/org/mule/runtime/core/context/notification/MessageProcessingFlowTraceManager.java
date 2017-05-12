@@ -9,10 +9,11 @@ package org.mule.runtime.core.context.notification;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
@@ -100,14 +101,16 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
    */
   public void onMessageProcessorNotificationPreInvoke(MessageProcessorNotification notification) {
     String resolveProcessorRepresentation =
-        resolveProcessorRepresentation(muleContext.getConfiguration().getId(), notification.getComponentLocation().getLocation(),
+        resolveProcessorRepresentation(muleContext.getConfiguration().getId(),
+                                       notification.getComponent().getLocation().getLocation(),
                                        notification.getProcessor());
-    if (notification.getSource().getContext().getProcessorsTrace() instanceof DefaultProcessorsTrace) {
-      ((DefaultProcessorsTrace) notification.getSource().getContext().getProcessorsTrace())
+    EventContext eventContext = notification.getEventContext();
+    if (eventContext != null) {
+      ((DefaultProcessorsTrace) eventContext.getProcessorsTrace())
           .addExecutedProcessors(resolveProcessorRepresentation);
     }
-    if (notification.getSource().getFlowCallStack() instanceof DefaultFlowCallStack) {
-      ((DefaultFlowCallStack) notification.getSource().getFlowCallStack())
+    if (notification.getFlowCallStack() != null) {
+      ((DefaultFlowCallStack) notification.getFlowCallStack())
           .setCurrentProcessorPath(resolveProcessorRepresentation);
     }
   }
@@ -118,7 +121,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
    * @param notification the notification that contains the event and the processor that is about to be invoked.
    */
   public void onPipelineNotificationComplete(PipelineMessageNotification notification) {
-    onFlowComplete((Event) notification.getSource());
+    onFlowComplete(notification.getInfo());
   }
 
   /**
@@ -127,27 +130,28 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
    * @param notification the notification that contains the event and the processor that is about to be invoked.
    */
   public void onPipelineNotificationStart(PipelineMessageNotification notification) {
-    onFlowStart((Event) notification.getSource(), notification.getResourceIdentifier());
+    onFlowStart(notification.getInfo(), notification.getFlowConstruct().getName());
   }
 
   @Override
-  public void onFlowStart(Event muleEvent, String flowName) {
-    if (muleEvent.getFlowCallStack() instanceof DefaultFlowCallStack) {
-      ((DefaultFlowCallStack) muleEvent.getFlowCallStack()).push(new FlowStackElement(flowName, null));
+  public void onFlowStart(EnrichedNotificationInfo notificationInfo, String flowName) {
+    if (notificationInfo.getFlowCallStack() instanceof DefaultFlowCallStack) {
+      ((DefaultFlowCallStack) notificationInfo.getFlowCallStack()).push(new FlowStackElement(flowName, null));
     }
   }
 
   @Override
-  public void onFlowComplete(Event muleEvent) {
-    if (muleEvent.getFlowCallStack() instanceof DefaultFlowCallStack) {
-      ((DefaultFlowCallStack) muleEvent.getFlowCallStack()).pop();
+  public void onFlowComplete(EnrichedNotificationInfo notificationInfo) {
+    if (notificationInfo.getFlowCallStack() instanceof DefaultFlowCallStack) {
+      ((DefaultFlowCallStack) notificationInfo.getFlowCallStack()).pop();
     }
   }
 
   @Override
-  public Map<String, Object> getContextInfo(Event muleEvent, Processor lastProcessed, FlowConstruct flowConstruct) {
+  public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Processor lastProcessed,
+                                            FlowConstruct flowConstruct) {
     if (DefaultMuleConfiguration.isFlowTrace()) {
-      return Collections.<String, Object>singletonMap(FLOW_STACK_INFO_KEY, muleEvent.getFlowCallStack().toString());
+      return Collections.<String, Object>singletonMap(FLOW_STACK_INFO_KEY, notificationInfo.getFlowCallStack().toString());
     } else {
       return Collections.<String, Object>emptyMap();
     }

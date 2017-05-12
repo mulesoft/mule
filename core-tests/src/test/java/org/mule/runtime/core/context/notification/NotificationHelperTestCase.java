@@ -92,13 +92,14 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
 
   @Test
   public void fireNotificationForEvent() {
-    final String uri = "uri";
+    final ComponentLocation location = mock(ComponentLocation.class);
+    when(messageSource.getLocation()).thenReturn(location);
     final FlowConstruct flowConstruct = mock(FlowConstruct.class);
     when(flowConstruct.getMuleContext()).thenReturn(muleContext);
     final int action = 100;
 
-    helper.fireNotification(messageSource, event, uri, flowConstruct, action);
-    assertConnectorMessageNotification(eventNotificationHandler, messageSource, uri, flowConstruct, action);
+    helper.fireNotification(messageSource, event, flowConstruct, action);
+    assertConnectorMessageNotification(eventNotificationHandler, messageSource, location, flowConstruct, action);
   }
 
   @Test
@@ -125,16 +126,17 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
         .withType(SOURCE)
         .withIdentifier(buildFromStringRepresentation("http:listener"))
         .build());
+    when(messageSource.getLocation()).thenReturn(location);
     final FlowConstruct flowConstruct = mock(FlowConstruct.class);
     when(flowConstruct.getMuleContext()).thenReturn(muleContext);
     final int action = 100;
 
-    helper.fireNotification(messageSource, event, location, flowConstruct, action);
-    assertConnectorMessageNotification(eventNotificationHandler, messageSource, "flowName/http:listener", flowConstruct, action);
+    helper.fireNotification(messageSource, event, flowConstruct, action);
+    assertConnectorMessageNotification(eventNotificationHandler, messageSource, location, flowConstruct, action);
   }
 
   private void assertConnectorMessageNotification(ServerNotificationHandler notificationHandler, MessageSource messageSource,
-                                                  String uri, FlowConstruct flowConstruct, int action) {
+                                                  ComponentLocation location, FlowConstruct flowConstruct, int action) {
     ArgumentCaptor<ConnectorMessageNotification> notificationCaptor = ArgumentCaptor.forClass(ConnectorMessageNotification.class);
     verify(notificationHandler).fireNotification(notificationCaptor.capture());
 
@@ -142,7 +144,7 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
     assertThat(notification.getComponent(), is(messageSource));
     assertThat(notification.getAction(), is(action));
     assertThat(notification.getFlowConstruct(), is(flowConstruct));
-    assertThat(notification.getEndpoint(), is(uri));
+    assertThat(notification.getComponent().getLocation(), is(location));
   }
 
   private class TestServerNotification extends ServerNotification {

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.construct;
 
+import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
@@ -333,7 +334,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     @Override
     public Event process(Event event) throws MuleException {
       muleContext.getNotificationManager()
-          .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event, PROCESS_END));
+          .fireNotification(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this), AbstractPipeline.this,
+                                                            PROCESS_END));
       return event;
     }
   }
@@ -343,7 +345,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     @Override
     public Event process(Event event) throws MuleException {
       muleContext.getNotificationManager()
-          .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event, PROCESS_START));
+          .fireNotification(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this), AbstractPipeline.this,
+                                                            PROCESS_START));
 
       // Fire COMPLETE notification on async response
       Mono.from(event.getContext().getBeforeResponsePublisher())
@@ -360,8 +363,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     private void fireCompleteNotification(Event event, MessagingException messagingException) {
       muleContext.getNotificationManager()
-          .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event, PROCESS_COMPLETE,
-                                                            messagingException));
+          .fireNotification(new PipelineMessageNotification(createInfo(event, messagingException, AbstractPipeline.this),
+                                                            AbstractPipeline.this, PROCESS_COMPLETE));
     }
 
   }
