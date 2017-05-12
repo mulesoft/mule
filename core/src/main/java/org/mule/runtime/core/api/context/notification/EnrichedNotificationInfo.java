@@ -103,7 +103,7 @@ public class EnrichedNotificationInfo {
     this.originatingFlowName = originatingFlowName;
     this.flowCallStack = flowCallStack;
   }
-  
+
   public String getUniqueId() {
     return id;
   }
