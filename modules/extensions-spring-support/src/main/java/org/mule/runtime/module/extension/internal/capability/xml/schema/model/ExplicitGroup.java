@@ -48,7 +48,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "explicitGroup")
-@XmlSeeAlso({All.class, SimpleExplicitGroup.class})
+@XmlSeeAlso({SimpleExplicitGroup.class})
 public class ExplicitGroup extends Group {
 
 
