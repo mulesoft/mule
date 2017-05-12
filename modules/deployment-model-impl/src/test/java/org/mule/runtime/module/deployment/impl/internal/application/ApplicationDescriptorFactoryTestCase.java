@@ -53,13 +53,6 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import org.mule.tck.util.CompilerUtils;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Set;
-
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -68,6 +61,13 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Set;
 
 public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
@@ -340,8 +340,8 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
         return bundleDependency.getScope().equals(COMPILE) &&
             bundleDependency.getDescriptor().getClassifier().isPresent() &&
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
-            bundleDependency.getDescriptor().getArtifactId().equals("mule-module-http-ext") &&
-            bundleDependency.getDescriptor().getGroupId().equals("org.mule.modules") &&
+            bundleDependency.getDescriptor().getArtifactId().equals("mule-http-connector") &&
+            bundleDependency.getDescriptor().getGroupId().equals("org.mule.connectors") &&
             bundleDependency.getDescriptor().getVersion().equals("4.0.0-SNAPSHOT");
       }
     };
