@@ -135,7 +135,9 @@ public class OAuthExtensionTestCase extends BaseOAuthExtensionTestCase {
     assertThat(state.getResourceOwnerId(), is(OWNER_ID));
     assertThat(state.getExpiresIn().get(), is(EXPIRES_IN));
     assertThat(state.getState().get(), is(STATE));
+    assertThat(state.getAuthorizationUrl(), is(authUrl));
+    assertThat(state.getAccessTokenUrl(), is(tokenUrl));
+    assertThat(state.getConsumerKey(), is(CONSUMER_KEY));
+    assertThat(state.getConsumerSecret(), is(CONSUMER_SECRET));
   }
-
-
 }

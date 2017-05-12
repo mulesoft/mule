@@ -302,7 +302,7 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
   private BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterCallback(OAuthConfig config,
                                                                                                      Flow flow) {
     return (callbackContext, oauthContext) -> {
-      AuthorizationCodeState state = toAuthorizationCodeState(oauthContext);
+      AuthorizationCodeState state = toAuthorizationCodeState(config.getAuthCodeConfig(), oauthContext);
       Event event = (Event) callbackContext.getParameter(DANCE_CALLBACK_EVENT_KEY)
           .orElseGet(() -> createEvent(state, config, flow));
 
