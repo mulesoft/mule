@@ -6,7 +6,7 @@
  */
 package org.mule.test.components;
 
-import org.mule.module.db.integration.config.AbstractConfigurationErrorTestCase;
+import org.mule.tck.AbstractConfigurationErrorTestCase;
 
 import org.junit.Test;
 

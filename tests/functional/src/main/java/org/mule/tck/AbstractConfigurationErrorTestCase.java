@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.db.integration.config;
+package org.mule.tck;
 
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
