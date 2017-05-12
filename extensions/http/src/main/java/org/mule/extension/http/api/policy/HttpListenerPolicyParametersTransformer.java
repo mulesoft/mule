@@ -8,7 +8,9 @@ package org.mule.extension.http.api.policy;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
+import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -62,12 +64,12 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
 
   @Override
   public Map<String, Object> fromMessageToSuccessResponseParameters(Message message) {
-    return messageToResponseParameters(new HttpListenerResponseBuilder(), "response", message);
+    return messageToResponseParameters(new HttpListenerSuccessResponseBuilder(), "response", message);
   }
 
   @Override
   public Map<String, Object> fromMessageToErrorResponseParameters(Message message) {
-    return messageToResponseParameters(new HttpListenerResponseBuilder(), "errorResponse", message);
+    return messageToResponseParameters(new HttpListenerErrorResponseBuilder(), "errorResponse", message);
   }
 
   private Map<String, Object> messageToResponseParameters(HttpListenerResponseBuilder httpListenerResponseBuilder,

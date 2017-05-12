@@ -33,7 +33,9 @@ import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.error.HttpMessageParsingException;
+import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
+import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
 import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.http.internal.HttpListenerMetadataResolver;
 import org.mule.extension.http.internal.HttpStreamingType;
@@ -161,7 +163,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnSuccess
   public void onSuccess(@Placement(tab = RESPONSE_SETTINGS) @ParameterGroup(name = "Response",
-      showInDsl = true) HttpListenerResponseBuilder response,
+      showInDsl = true) HttpListenerSuccessResponseBuilder response,
                         SourceCallbackContext callbackContext)
       throws Exception {
 
@@ -173,7 +175,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnError
   public void onError(@Placement(tab = ERROR_RESPONSE_SETTINGS) @ParameterGroup(name = "Error Response",
-      showInDsl = true) HttpListenerResponseBuilder errorResponse,
+      showInDsl = true) HttpListenerErrorResponseBuilder errorResponse,
                       SourceCallbackContext callbackContext,
                       Error error) {
     final HttpResponseBuilder failureResponseBuilder = createFailureResponseBuilder(error, errorResponse);
@@ -206,7 +208,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
           .setStatusCode(attributes.getStatusCode())
           .setReasonPhrase(attributes.getReasonPhrase());
       attributes.getHeaders().forEach(failureResponseBuilder::addHeader);
-      if (errorResponse.getBody().getValue() == null) {
+      if (errorResponse.getBody() == null || errorResponse.getBody().getValue() == null) {
         errorResponse.setBody(errorMessage.getPayload());
       }
     } else if (error != null) {

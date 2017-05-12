@@ -8,6 +8,7 @@ package org.mule.extension.http.api.request.builder;
 
 import static java.util.Collections.unmodifiableMap;
 import org.mule.extension.http.api.HttpMessageBuilder;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -22,6 +23,21 @@ import java.util.Map;
  * @since 4.0
  */
 public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
+
+  /**
+   * The body of the response message
+   */
+  @Parameter
+  @Content(primary = true)
+  private TypedValue<Object> body;
+
+  /**
+   * HTTP headers the message should include.
+   */
+  @Parameter
+  @Optional
+  @Content
+  protected Map<String, String> headers = new HashMap<>();
 
   /**
    * URI parameters that should be used to create the request.
@@ -40,6 +56,26 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Content
   @DisplayName("Query Parameters")
   private Map<String, String> queryParams = new HashMap<>();
+
+  @Override
+  public TypedValue<Object> getBody() {
+    return body;
+  }
+
+  @Override
+  public void setBody(TypedValue<Object> body) {
+    this.body = body;
+  }
+
+  @Override
+  public Map<String, String> getHeaders() {
+    return headers;
+  }
+
+  @Override
+  public void setHeaders(Map<String, String> headers) {
+    this.headers = headers;
+  }
 
   // For now, only handle single params
   public String replaceUriParams(String path) {
