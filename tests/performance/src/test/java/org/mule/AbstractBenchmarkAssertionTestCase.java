@@ -116,7 +116,7 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
   protected void runAndAssertBenchmark(Class clazz, String testName, int threads, Map<String, String[]> params, TimeUnit timeUnit,
                                        boolean profileGC, Consumer<RunResult> assertions) {
     try {
-      if (getProperty(ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY) != null) {
+      if (Boolean.getBoolean(getProperty(ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY))) {
         ChainedOptionsBuilder optionsBuilder = createCommonOptionsBuilder(clazz, testName, params, timeUnit, profileGC);
         optionsBuilder = optionsBuilder
             .forks(1)
