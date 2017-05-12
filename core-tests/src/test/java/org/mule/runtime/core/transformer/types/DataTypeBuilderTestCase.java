@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.transformer.types;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -162,12 +164,23 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void templateTypedCollection() {
     final DataType template =
-        DataType.builder().collectionType(List.class).itemType(String.class).mediaType("text/plain;charset=ASCII").build();
+        DataType.builder()
+            .collectionType(List.class)
+            .itemType(String.class)
+            .itemMediaType("application/json;charset=UTF-8")
+            .mediaType("text/plain;charset=ASCII")
+            .build();
     final DataType dataType = DataType.builder(template).build();
 
     assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
     assertThat(dataType.getType(), is(equalTo(List.class)));
     assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(STRING));
+    assertThat(((DefaultCollectionDataType) dataType).getItemDataType().getMediaType().getPrimaryType(), is("application"));
+    assertThat(((DefaultCollectionDataType) dataType).getItemDataType().getMediaType().getSubType(), is("json"));
+    assertThat(((DefaultCollectionDataType) dataType).getItemDataType().getMediaType().getCharset().get(), is(UTF_8));
+    assertThat(dataType.getMediaType().getPrimaryType(), is("text"));
+    assertThat(dataType.getMediaType().getSubType(), is("plain"));
+    assertThat(dataType.getMediaType().getCharset().get(), is(US_ASCII));
   }
 
   @Test
@@ -189,7 +202,9 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
     final DataType template = DataType.builder()
         .mapType(HashMap.class)
         .keyType(String.class)
+        .keyMediaType("text/plain;charset=UTF-8")
         .valueType(Number.class)
+        .valueMediaType("application/json;charset=ISO-8859-1")
         .mediaType("text/plain;charset=ASCII")
         .build();
     final DataType dataType = DataType.builder(template).build();
@@ -197,7 +212,13 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
     assertThat(dataType, instanceOf(DefaultMapDataType.class));
     assertThat(dataType.getType(), is(equalTo(HashMap.class)));
     assertThat(((DefaultMapDataType) dataType).getKeyDataType(), is(STRING));
+    assertThat(((DefaultMapDataType) dataType).getKeyDataType().getMediaType().getPrimaryType(), is("text"));
+    assertThat(((DefaultMapDataType) dataType).getKeyDataType().getMediaType().getSubType(), is("plain"));
+    assertThat(((DefaultMapDataType) dataType).getKeyDataType().getMediaType().getCharset().get(), is(UTF_8));
     assertThat(((DefaultMapDataType) dataType).getValueDataType(), is(NUMBER));
+    assertThat(((DefaultMapDataType) dataType).getValueDataType().getMediaType().getPrimaryType(), is("application"));
+    assertThat(((DefaultMapDataType) dataType).getValueDataType().getMediaType().getSubType(), is("json"));
+    assertThat(((DefaultMapDataType) dataType).getValueDataType().getMediaType().getCharset().get(), is(ISO_8859_1));
   }
 
   @Test
