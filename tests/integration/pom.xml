@@ -64,6 +64,8 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-db</artifactId>
             <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
         <!-- Include all Mule Transports -->
         <dependency>

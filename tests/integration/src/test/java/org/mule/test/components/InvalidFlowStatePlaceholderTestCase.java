@@ -6,53 +6,23 @@
  */
 package org.mule.test.components;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
-import org.mule.api.MuleContext;
-import org.mule.api.config.ConfigurationException;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.context.DefaultMuleContextFactory;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.module.db.integration.config.AbstractConfigurationErrorTestCase;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
-public class InvalidFlowStatePlaceholderTestCase extends AbstractMuleTestCase
+public class InvalidFlowStatePlaceholderTestCase extends AbstractConfigurationErrorTestCase
 {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
-    private MuleContext context;
-
-    @Before
-    public void before() throws InitialisationException, ConfigurationException
+    @Override
+    protected String getConfigFile()
     {
-        context = new DefaultMuleContextFactory().createMuleContext();
-    }
-
-    @After
-    public void after()
-    {
-        if (context != null)
-        {
-            context.dispose();
-        }
+        return "org/mule/test/components/invalid-flow-initial-state.xml";
     }
 
     @Test
-    public void emptyVariableNameValidatedBySchema() throws Exception
+    public void invalidInitialFlowStatePlaceholder() throws Exception
     {
-        thrown.expect(ConfigurationException.class);
-        thrown.expect(hasMessage(containsString("'${state}]' is not a valid value of union type '#AnonType_initialStateflowType'")));
-
-        SpringXmlConfigurationBuilder builder =
-                new SpringXmlConfigurationBuilder("org/mule/test/components/invalid-flow-initial-state.xml");
-        builder.configure(context);
+        assertConfigurationError("'${state}]' is not a valid value of union type '#AnonType_initialStateflowType'");
     }
 
 }
