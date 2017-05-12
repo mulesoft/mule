@@ -103,8 +103,8 @@ public class ManagedCursorIteratorProvider extends ManagedCursorProvider<CursorI
     }
 
     @Override
-    public int size() {
-      return delegate.size();
+    public int getSize() {
+      return delegate.getSize();
     }
   }
 }

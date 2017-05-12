@@ -38,7 +38,7 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
   @Override
   public final void initialise() {
     currentPosition = new Position(0, -1);
-    int size = size();
+    int size = getSize();
     if (size > 0) {
       setMaxPosition(toPosition(size - 1));
     }
@@ -66,8 +66,8 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
   }
 
   @Override
-  public int size() {
-    return stream.size();
+  public int getSize() {
+    return stream.getSize();
   }
 
   @Override

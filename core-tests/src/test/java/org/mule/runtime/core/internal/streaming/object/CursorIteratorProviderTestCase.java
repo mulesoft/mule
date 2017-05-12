@@ -171,7 +171,7 @@ public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestC
   @Test
   @Description("Get the size of a stream")
   public void size() throws Exception {
-    withCursor(cursor -> assertThat(cursor.size(), is(data.size())));
+    withCursor(cursor -> assertThat(cursor.getSize(), is(data.size())));
   }
 
   @Test(expected = StreamingBufferSizeExceededException.class)

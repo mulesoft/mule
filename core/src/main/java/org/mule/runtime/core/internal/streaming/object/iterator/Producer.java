@@ -8,7 +8,7 @@
 package org.mule.runtime.core.internal.streaming.object.iterator;
 
 
-import org.mule.runtime.api.streaming.Sized;
+import org.mule.runtime.api.streaming.HasSize;
 
 import java.io.Closeable;
 
@@ -18,7 +18,7 @@ import java.io.Closeable;
  * 
  * @since 3.5.0
  */
-public interface Producer<T> extends Closeable, Sized {
+public interface Producer<T> extends Closeable, HasSize {
 
   /**
    * Returns the next available item

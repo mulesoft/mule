@@ -99,7 +99,7 @@ public class ListableObjectStoreProducerTestCase {
 
   @Test
   public void size() throws Exception {
-    Assert.assertEquals(this.values.size(), this.producer.size());
+    Assert.assertEquals(this.values.size(), this.producer.getSize());
   }
 
   @Test

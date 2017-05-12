@@ -63,7 +63,7 @@ public class SimpleConsumerTestCase {
 
   @Test
   public void totalAvailable() {
-    assertEquals(this.consumer.size(), this.values.size());
+    assertEquals(this.consumer.getSize(), this.values.size());
   }
 
   @Test
@@ -100,7 +100,7 @@ public class SimpleConsumerTestCase {
     }
 
     @Override
-    public int size() {
+    public int getSize() {
       return values.size();
     }
 

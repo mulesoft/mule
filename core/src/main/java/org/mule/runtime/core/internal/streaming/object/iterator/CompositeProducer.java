@@ -77,11 +77,11 @@ public class CompositeProducer<T> implements Producer<T> {
    * it is not factored in
    */
   @Override
-  public int size() {
+  public int getSize() {
     if (this.totalAvailable == null) {
       int total = 0;
       for (Producer<T> producer : this.producers) {
-        int available = producer.size();
+        int available = producer.getSize();
         if (available > 0) {
           total += available;
         }

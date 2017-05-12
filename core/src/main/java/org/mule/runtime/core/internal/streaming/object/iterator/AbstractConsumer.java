@@ -100,8 +100,8 @@ public abstract class AbstractConsumer<T, P> implements Consumer<T> {
    * {@inheritDoc}
    */
   @Override
-  public int size() {
-    return this.producer.size();
+  public int getSize() {
+    return this.producer.getSize();
   }
 
   private void closeQuietly() {

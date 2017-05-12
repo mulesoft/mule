@@ -44,7 +44,7 @@ public abstract class AbstractObjectStreamingTestCase extends AbstractMuleTestCa
   }
 
   protected <T> void checkEquals(Collection<T> data, CursorIterator<T> cursor) {
-    assertThat(data.size(), is(cursor.size()));
+    assertThat(data.size(), is(cursor.getSize()));
     int i = 0;
     for (T collectionItem : data) {
       assertThat("Cursor exhausted at position " + i, cursor.hasNext(), is(true));
@@ -94,7 +94,7 @@ public abstract class AbstractObjectStreamingTestCase extends AbstractMuleTestCa
     }
 
     @Override
-    public int size() {
+    public int getSize() {
       return size;
     }
   }

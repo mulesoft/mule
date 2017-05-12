@@ -53,8 +53,8 @@ public class ConsumerStreamingIterator<T> implements StreamingIterator<T> {
   }
 
   @Override
-  public int size() {
-    return this.consumer.size();
+  public int getSize() {
+    return this.consumer.getSize();
   }
 
 }

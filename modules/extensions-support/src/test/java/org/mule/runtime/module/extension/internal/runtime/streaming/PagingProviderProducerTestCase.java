@@ -101,7 +101,7 @@ public class PagingProviderProducerTestCase {
   public void totalAvailable() {
     final int total = 10;
     when(delegate.getTotalResults(anyObject())).thenReturn(Optional.of(total));
-    assertThat(total, is(producer.size()));
+    assertThat(total, is(producer.getSize()));
   }
 
   @Test

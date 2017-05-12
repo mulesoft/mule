@@ -7,19 +7,19 @@
 
 package org.mule.runtime.core.internal.streaming.object.iterator;
 
-import org.mule.runtime.api.streaming.Sized;
+import org.mule.runtime.api.streaming.HasSize;
 
 import java.io.Closeable;
 import java.util.Iterator;
 
 /**
- * {@link Iterator} that also extends {@link Closeable} and {@link Sized}.
+ * {@link Iterator} that also extends {@link Closeable} and {@link HasSize}.
  *
  * The {@link Iterator#remove()} operation is not allowed for this iterator.
  * 
  * @param <T> the type of elements returned by this iterator
  */
-public interface StreamingIterator<T> extends Iterator<T>, Closeable, Sized {
+public interface StreamingIterator<T> extends Iterator<T>, Closeable, HasSize {
 
   /**
    * Not allowed on this implementations

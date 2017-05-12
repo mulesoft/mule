@@ -74,7 +74,7 @@ public class BufferedCursorIterator<T> extends AbstractCursorIterator<T> {
    * {@inheritDoc}
    */
   @Override
-  public int size() {
-    return buffer.size();
+  public int getSize() {
+    return buffer.getSize();
   }
 }

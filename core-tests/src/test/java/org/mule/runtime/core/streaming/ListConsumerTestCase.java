@@ -82,7 +82,7 @@ public class ListConsumerTestCase {
 
   @Test
   public void totalAvailable() {
-    assertEquals(this.consumer.size(), totalCount);
+    assertEquals(this.consumer.getSize(), totalCount);
   }
 
   @Test
@@ -128,7 +128,7 @@ public class ListConsumerTestCase {
       return ret;
     }
 
-    public int size() {
+    public int getSize() {
       return totalCount;
     }
   }

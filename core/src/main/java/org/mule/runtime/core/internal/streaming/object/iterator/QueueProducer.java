@@ -73,7 +73,7 @@ public class QueueProducer<T> implements Producer<T> {
   }
 
   @Override
-  public int size() {
+  public int getSize() {
     return this.size;
   }
 

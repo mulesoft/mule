@@ -50,7 +50,7 @@ public class StreamingIteratorTestCase {
   private Producer<List<String>> producer = new Producer<List<String>>() {
 
     @Override
-    public int size() {
+    public int getSize() {
       return delegate.getTotalResults(new Object()).get();
     }
 
@@ -101,7 +101,7 @@ public class StreamingIteratorTestCase {
   @Description("iterator has size")
   public void size() throws Exception {
     StreamingIterator<String> it = this.newIterator();
-    assertThat(it.size(), is(TOP));
+    assertThat(it.getSize(), is(TOP));
   }
 
   private StreamingIterator<String> newIterator() {
