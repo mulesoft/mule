@@ -56,7 +56,6 @@ import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
@@ -89,7 +88,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 
 import com.google.common.collect.ImmutableList;
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -235,43 +233,6 @@ public class MuleExtensionUtils {
     }
 
     return interceptorFactories.stream().map(InterceptorFactory::createInterceptor).collect(new ImmutableListCollector<>());
-  }
-
-  /**
-   * Returns the default value associated with the given annotation.
-   * <p>
-   * The reason for this method to be instead of simply using {@link Optional#defaultValue()} is a limitation on the Java language
-   * to have an annotation which defaults to a {@code null} value. For that reason, this method tests the default value for
-   * equality against the {@link Optional#NULL}. If such test is positive, then {@code null} is returned.
-   * <p>
-   * If a {@code null} {@code optional} is supplied, then this method returns {@code null}
-   *
-   * @param optional a nullable annotation
-   * @return the default value associated to the annotation or {@code null}
-   */
-  public static String getDefaultValue(Optional optional) {
-    if (optional == null) {
-      return null;
-    }
-
-    String defaultValue = optional.defaultValue();
-    return Optional.NULL.equals(defaultValue) ? null : defaultValue;
-  }
-
-  /**
-   * Tests the given {@code object} to be annotated with {@link Optional}.
-   * <p>
-   * If the annotation is present, then a default value is extracted by the rules of {@link #getDefaultValue(Optional)}.
-   * Otherwise, {@code null} is returned.
-   * <p>
-   * Notice that a {@code null} return value doesn't necessarily mean that the annotation is not present. It could well be that
-   * {@code null} happens to be the default value.
-   *
-   * @param object an object potentially annotated with {@link Optional}
-   * @return A default value or {@code null}
-   */
-  public static Object getDefaultValue(AccessibleObject object) {
-    return getDefaultValue(object.getAnnotation(Optional.class));
   }
 
   public static Event getInitialiserEvent() {
