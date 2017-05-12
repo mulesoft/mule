@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- *
+ * This class contains information about an event/exception, to be used in notifications without directly exposing it.
  */
 public class EnrichedNotificationInfo {
 
@@ -35,6 +35,14 @@ public class EnrichedNotificationInfo {
   private String originatingFlowName;
   private FlowCallStack flowCallStack;
 
+  /**
+   * Extract information from the event and exception to provide notification data.
+   *
+   * @param event the event to extract information from
+   * @param e the exception that occurred
+   * @param component the component (processor, source, etc) that triggered the notification
+   * @return
+   */
   public static EnrichedNotificationInfo createInfo(Event event, Exception e, Object component) {
     if (event != null) {
       if (component == null && e != null) {
@@ -59,7 +67,7 @@ public class EnrichedNotificationInfo {
     throw new RuntimeException("Neither event or exception present");
   }
 
-  public static Map<String, TypedValue> createVariablesMap(Event event) {
+  private static Map<String, TypedValue> createVariablesMap(Event event) {
     Map<String, TypedValue> variables = new HashMap<>();
 
     event.getVariableNames().forEach(name -> {
@@ -69,7 +77,7 @@ public class EnrichedNotificationInfo {
     return variables;
   }
 
-  public static AnnotatedObject componentFromException(Exception e) {
+  private static AnnotatedObject componentFromException(Exception e) {
     if (e instanceof MessagingException) {
       MessagingException messagingException = (MessagingException) e;
       Processor messageProcessor = messagingException.getFailingMessageProcessor();
@@ -95,7 +103,7 @@ public class EnrichedNotificationInfo {
     this.originatingFlowName = originatingFlowName;
     this.flowCallStack = flowCallStack;
   }
-
+  
   public String getUniqueId() {
     return id;
   }

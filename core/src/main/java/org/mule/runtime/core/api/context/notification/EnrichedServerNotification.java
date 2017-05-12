@@ -17,6 +17,9 @@ import org.mule.runtime.core.message.GroupCorrelation;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * This notification type includes information about the event, exception and flow where it occurred.
+ */
 public abstract class EnrichedServerNotification extends ServerNotification {
 
   protected EnrichedNotificationInfo notificationInfo;
@@ -38,12 +41,12 @@ public abstract class EnrichedServerNotification extends ServerNotification {
    * This function should not be used anymore, try getMessage, getError or getException depending
    * on the situation.
    *
-   * @return null
+   * @return the notification information instead of the event used before
    */
   @Deprecated
   @Override
   public Object getSource() {
-    return null;
+    return notificationInfo;
   }
 
   /**

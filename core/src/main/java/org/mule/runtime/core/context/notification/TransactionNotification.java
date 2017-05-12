@@ -13,7 +13,8 @@ import org.mule.runtime.core.api.transaction.Transaction;
 
 import java.util.HashMap;
 
-// Shouldn't really be an EnrichedServerNotification as it doesn't know event data, but inherits to be compatible with others
+// TODO: Shouldn't really be an EnrichedServerNotification as it doesn't know event data,
+// but inherits to be compatible with how mule-agent tracking currently handles them
 public class TransactionNotification extends EnrichedServerNotification implements SynchronousServerEvent {
 
   /**
