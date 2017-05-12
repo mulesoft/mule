@@ -7,11 +7,13 @@
 package org.mule.runtime.core.transformer.types;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -20,18 +22,6 @@ import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.util.IOUtils.toByteArray;
-
-import java.lang.ref.PhantomReference;
-import java.lang.ref.ReferenceQueue;
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.message.Message;
@@ -40,10 +30,25 @@ import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.api.metadata.FunctionDataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
+import org.mule.runtime.core.internal.metadata.DefaultFunctionDataType;
+import org.mule.runtime.core.internal.metadata.DefaultMapDataType;
 import org.mule.runtime.core.internal.metadata.SimpleDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
+
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
@@ -62,31 +67,12 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
     final DataType dataType = DataType.fromType(Set.class);
     assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
     assertThat(dataType.getType(), is(equalTo(Set.class)));
-    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.OBJECT));
+    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(OBJECT));
   }
 
   @Test
   public void buildFunction() {
-    FunctionDataType dataType = (FunctionDataType) DataType.fromFunction(new ExpressionFunction() {
-
-      @Override
-      public Object call(Object[] objects, BindingContext bindingContext) {
-        return null;
-      }
-
-      @Override
-      public Optional<DataType> returnType() {
-        return of(STRING);
-      }
-
-      @Override
-      public List<FunctionParameter> parameters() {
-        List<FunctionParameter> parameters = new ArrayList<>();
-        parameters.add(new FunctionParameter("fst", NUMBER));
-        parameters.add(new FunctionParameter("snd", OBJECT, ctx -> "wow"));
-        return parameters;
-      }
-    });
+    FunctionDataType dataType = (FunctionDataType) DataType.fromFunction(new SomeFunction());
 
     //Return type
     assertThat(dataType.getReturnType().isPresent(), is(true));
@@ -102,6 +88,33 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
     assertThat(second.getType(), equalTo(OBJECT));
     //Default
     assertThat(second.getDefaultValueResolver().getDefaultValue(builder().build()), is("wow"));
+  }
+
+  @Test
+  public void buildMap() {
+    final DataType dataType = DataType.fromType(HashMap.class);
+    assertThat(dataType, instanceOf(DefaultMapDataType.class));
+    assertThat(dataType.getType(), is(equalTo(HashMap.class)));
+    assertThat(((DefaultMapDataType) dataType).getKeyDataType(), is(OBJECT));
+    assertThat(((DefaultMapDataType) dataType).getValueDataType(), is(OBJECT));
+  }
+
+  @Test
+  public void buildTypedMap() {
+    final DataType dataType = DataType.builder().mapType(HashMap.class).keyType(Number.class).valueType(String.class).build();
+    assertThat(dataType, instanceOf(DefaultMapDataType.class));
+    assertThat(dataType.getType(), is(equalTo(HashMap.class)));
+    assertThat(((DefaultMapDataType) dataType).getKeyDataType(), is(NUMBER));
+    assertThat(((DefaultMapDataType) dataType).getValueDataType(), is(STRING));
+  }
+
+  @Test
+  public void buildTypedMapFromImplementationClass() {
+    final DataType dataType = DataType.builder().mapType(SpecificMap.class).build();
+    assertThat(dataType, instanceOf(DefaultMapDataType.class));
+    assertThat(dataType.getType(), is(equalTo(SpecificMap.class)));
+    assertThat(((DefaultMapDataType) dataType).getKeyDataType(), is(STRING));
+    assertThat(((DefaultMapDataType) dataType).getValueDataType(), is(NUMBER));
   }
 
   @Test
@@ -131,7 +144,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
     assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
     assertThat(dataType.getType(), is(equalTo(Set.class)));
-    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(DataType.OBJECT));
+    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(OBJECT));
     assertThat(dataType.getMediaType().getPrimaryType(), is("text"));
     assertThat(dataType.getMediaType().getSubType(), is("plain"));
     assertThat(dataType.getMediaType().getCharset().get(), is(US_ASCII));
@@ -146,6 +159,52 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
     assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
     assertThat(dataType.getType(), is(equalTo(List.class)));
     assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(STRING));
+  }
+
+  @Test
+  public void templateMap() {
+    final DataType template = DataType.builder().type(HashMap.class).mediaType("text/plain;charset=ASCII").build();
+    final DataType dataType = DataType.builder(template).build();
+
+    assertThat(dataType, instanceOf(DefaultMapDataType.class));
+    assertThat(dataType.getType(), is(equalTo(HashMap.class)));
+    assertThat(((DefaultMapDataType) dataType).getKeyDataType(), is(OBJECT));
+    assertThat(((DefaultMapDataType) dataType).getValueDataType(), is(OBJECT));
+    assertThat(dataType.getMediaType().getPrimaryType(), is("text"));
+    assertThat(dataType.getMediaType().getSubType(), is("plain"));
+    assertThat(dataType.getMediaType().getCharset().get(), is(US_ASCII));
+  }
+
+  @Test
+  public void templateTypedMap() {
+    final DataType template = DataType.builder()
+        .mapType(HashMap.class)
+        .keyType(String.class)
+        .valueType(Number.class)
+        .mediaType("text/plain;charset=ASCII")
+        .build();
+    final DataType dataType = DataType.builder(template).build();
+
+    assertThat(dataType, instanceOf(DefaultMapDataType.class));
+    assertThat(dataType.getType(), is(equalTo(HashMap.class)));
+    assertThat(((DefaultMapDataType) dataType).getKeyDataType(), is(STRING));
+    assertThat(((DefaultMapDataType) dataType).getValueDataType(), is(NUMBER));
+  }
+
+  @Test
+  public void templateFunction() {
+    FunctionParameter functionParameter = new FunctionParameter("fst", NUMBER);
+    final DataType template = DataType.builder()
+        .functionType(SomeFunction.class)
+        .returnType(STRING)
+        .parametersType(singletonList(functionParameter))
+        .build();
+    final DataType dataType = DataType.builder(template).build();
+
+    assertThat(dataType, instanceOf(DefaultFunctionDataType.class));
+    assertThat(dataType.getType(), is(equalTo(SomeFunction.class)));
+    assertThat(((DefaultFunctionDataType) dataType).getReturnType().get(), is(STRING));
+    assertThat(((DefaultFunctionDataType) dataType).getParameters(), hasItems(functionParameter));
   }
 
   @Test
@@ -226,4 +285,31 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
       return true;
     }, "A hard reference is being mantained to the type of the DataType."));
   }
+
+  private class SpecificMap extends HashMap<String, Number> {
+
+  }
+
+  private class SomeFunction implements ExpressionFunction {
+
+    @Override
+    public Object call(Object[] objects, BindingContext bindingContext) {
+      return null;
+    }
+
+    @Override
+    public Optional<DataType> returnType() {
+      return of(STRING);
+    }
+
+    @Override
+    public List<FunctionParameter> parameters() {
+      List<FunctionParameter> parameters = new ArrayList<>();
+      parameters.add(new FunctionParameter("fst", NUMBER));
+      parameters.add(new FunctionParameter("snd", OBJECT, ctx -> "wow"));
+      return parameters;
+    }
+
+  }
+
 }
