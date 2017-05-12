@@ -150,7 +150,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-policy-api-1.0.0-SNAPSHOT.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-repository-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-schedulers-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-sockets-${productVersion}-mule-plugin.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-config-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-spring-security-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-tls-${productVersion}.jar
