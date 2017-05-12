@@ -86,13 +86,15 @@ public abstract class BaseOAuthExtensionTestCase extends AbstractExtensionFuncti
   @Rule
   public WireMockRule wireMock = new WireMockRule(wireMockConfig().port(oauthServerPort.getNumber()));
 
-  @Rule
-  public SystemProperty authorizationUrl =
-      new SystemProperty("authorizationUrl", toUrl(AUTHORIZE_PATH, oauthServerPort.getNumber()));
+  protected String authUrl = toUrl(AUTHORIZE_PATH, oauthServerPort.getNumber());
 
   @Rule
-  public SystemProperty accessTokenUrl =
-      new SystemProperty("accessTokenUrl", toUrl(TOKEN_PATH, oauthServerPort.getNumber()));
+  public SystemProperty authorizationUrl = new SystemProperty("authorizationUrl", authUrl);
+
+
+  protected String tokenUrl = toUrl(TOKEN_PATH, oauthServerPort.getNumber());
+  @Rule
+  public SystemProperty accessTokenUrl = new SystemProperty("accessTokenUrl", tokenUrl);
 
 
   protected String toUrl(String path, int port) {

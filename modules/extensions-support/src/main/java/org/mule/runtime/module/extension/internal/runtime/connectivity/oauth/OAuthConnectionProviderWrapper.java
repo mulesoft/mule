@@ -68,7 +68,7 @@ public class OAuthConnectionProviderWrapper<C> extends ReconnectableConnectionPr
     ResourceOwnerOAuthContext context = getContext();
 
     final ConnectionProvider<C> delegate = getDelegate();
-    authCodeStateSetter.set(delegate, toAuthorizationCodeState(context));
+    authCodeStateSetter.set(delegate, toAuthorizationCodeState(oauthConfig.getAuthCodeConfig(), context));
 
     Map<String, Object> responseParameters = context.getTokenResponseParameters();
     callbackValues.keySet().forEach(field -> {

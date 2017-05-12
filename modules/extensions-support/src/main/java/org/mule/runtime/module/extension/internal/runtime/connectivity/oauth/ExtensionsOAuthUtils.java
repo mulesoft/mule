@@ -16,12 +16,16 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
  */
 public final class ExtensionsOAuthUtils {
 
-  static AuthorizationCodeState toAuthorizationCodeState(ResourceOwnerOAuthContext context) {
+  static AuthorizationCodeState toAuthorizationCodeState(AuthCodeConfig config, ResourceOwnerOAuthContext context) {
     return new ImmutableAuthorizationCodeState(context.getAccessToken(),
                                                context.getRefreshToken(),
                                                context.getResourceOwnerId(),
                                                context.getExpiresIn(),
-                                               context.getState());
+                                               context.getState(),
+                                               config.getAuthorizationUrl(),
+                                               config.getAccessTokenUrl(),
+                                               config.getConsumerKey(),
+                                               config.getConsumerSecret());
   }
 
   private ExtensionsOAuthUtils() {}

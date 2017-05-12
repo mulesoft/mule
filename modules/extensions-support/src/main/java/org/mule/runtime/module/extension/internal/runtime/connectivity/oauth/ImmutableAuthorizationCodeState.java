@@ -24,14 +24,29 @@ public class ImmutableAuthorizationCodeState implements AuthorizationCodeState {
   private final String resourceOwnerId;
   private final String expiresIn;
   private final String state;
+  private final String authorizationUrl;
+  private final String accessTokenUrl;
+  private final String consumerKey;
+  private final String consumerSecret;
 
-  public ImmutableAuthorizationCodeState(String accessToken, String refreshToken, String resourceOwnerId,
-                                         String expiresIn, String state) {
+  public ImmutableAuthorizationCodeState(String accessToken,
+                                         String refreshToken,
+                                         String resourceOwnerId,
+                                         String expiresIn,
+                                         String state,
+                                         String authorizationUrl,
+                                         String accessTokenUrl,
+                                         String consumerKey,
+                                         String consumerSecret) {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
     this.resourceOwnerId = resourceOwnerId;
     this.expiresIn = expiresIn;
     this.state = state;
+    this.authorizationUrl = authorizationUrl;
+    this.accessTokenUrl = accessTokenUrl;
+    this.consumerKey = consumerKey;
+    this.consumerSecret = consumerSecret;
   }
 
   @Override
@@ -57,5 +72,25 @@ public class ImmutableAuthorizationCodeState implements AuthorizationCodeState {
   @Override
   public Optional<String> getState() {
     return ofNullable(state);
+  }
+
+  @Override
+  public String getAuthorizationUrl() {
+    return authorizationUrl;
+  }
+
+  @Override
+  public String getAccessTokenUrl() {
+    return accessTokenUrl;
+  }
+
+  @Override
+  public String getConsumerKey() {
+    return consumerKey;
+  }
+
+  @Override
+  public String getConsumerSecret() {
+    return consumerSecret;
   }
 }
