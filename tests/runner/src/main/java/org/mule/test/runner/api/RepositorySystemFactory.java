@@ -7,10 +7,10 @@
 
 package org.mule.test.runner.api;
 
-import static java.util.Collections.emptyList;
 import static org.apache.maven.repository.internal.MavenRepositorySystemUtils.newSession;
 import static org.eclipse.aether.repository.RepositoryPolicy.CHECKSUM_POLICY_IGNORE;
 import static org.eclipse.aether.repository.RepositoryPolicy.UPDATE_POLICY_NEVER;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.test.runner.classification.DefaultWorkspaceReader;
 import org.mule.test.runner.classification.LoggerRepositoryListener;
 
@@ -31,8 +31,12 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RemoteRepository.Builder;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
+import org.eclipse.aether.transfer.TransferCancelledException;
+import org.eclipse.aether.transfer.TransferEvent;
+import org.eclipse.aether.transfer.TransferListener;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
+import org.slf4j.Logger;
 
 /**
  * Factory to create a {@link RepositorySystem} from Eclipse Aether to work in {@code offline} mode and resolve dependencies
@@ -52,23 +56,7 @@ import org.eclipse.aether.transport.http.HttpTransporterFactory;
 public class RepositorySystemFactory {
 
   private static final String DEFAULT_REPOSITORY_TYPE = "default";
-
-  /**
-   * Creates an instance of the {@link RepositorySystemFactory} to collect Maven dependencies.
-   *
-   * @param classPath {@link URL}'s from class path
-   * @param workspaceLocationResolver {@link WorkspaceLocationResolver} to resolve artifactId's {@link Path}s from workspace. Not
-   *        {@code null}.
-   */
-  public static DependencyResolver newOfflineDependencyResolver(List<URL> classPath,
-                                                                WorkspaceLocationResolver workspaceLocationResolver,
-                                                                File mavenLocalRepositoryLocation) {
-    DefaultRepositorySystemSession session = newDefaultRepositorySystemSession();
-    session.setOffline(true);
-    session.setIgnoreArtifactDescriptorRepositories(true);
-    RepositorySystem system = newRepositorySystem(classPath, workspaceLocationResolver, mavenLocalRepositoryLocation, session);
-    return new DependencyResolver(system, session, emptyList());
-  }
+  private static final Logger LOGGER = getLogger(RepositorySystemFactory.class);
 
   /**
    * Creates an instance of the {@link RepositorySystemFactory} to collect Maven dependencies.
@@ -79,12 +67,11 @@ public class RepositorySystemFactory {
    * @param mavenLocalRepositoryLocation file system location for the local Maven repository to resolve offline dependencies.
    * @param remoteRepositories list of {@link String} with URL of remote repositories to resolve online dependencies not present in local Maven repository.
    */
-  public static DependencyResolver newOnlineDependencyResolver(List<URL> classPath,
-                                                               WorkspaceLocationResolver workspaceLocationResolver,
-                                                               File mavenLocalRepositoryLocation,
-                                                               List<String> remoteRepositories) {
+  public static DependencyResolver newDependencyResolver(List<URL> classPath,
+                                                         WorkspaceLocationResolver workspaceLocationResolver,
+                                                         File mavenLocalRepositoryLocation,
+                                                         List<String> remoteRepositories) {
     DefaultRepositorySystemSession session = newDefaultRepositorySystemSession();
-    session.setIgnoreArtifactDescriptorRepositories(true);
     RepositorySystem system = newRepositorySystem(classPath, workspaceLocationResolver, mavenLocalRepositoryLocation, session);
     return new DependencyResolver(system, session, collectRemoteRepositories(remoteRepositories));
   }
@@ -103,6 +90,7 @@ public class RepositorySystemFactory {
 
     session.setUpdatePolicy(UPDATE_POLICY_NEVER);
     session.setChecksumPolicy(CHECKSUM_POLICY_IGNORE);
+    session.setTransferListener(new LoggingTransferListener());
     return session;
   }
 
@@ -147,5 +135,39 @@ public class RepositorySystemFactory {
 
     return locator.getService(RepositorySystem.class);
   }
+
+  private static final class LoggingTransferListener implements TransferListener {
+
+    @Override
+    public void transferSucceeded(TransferEvent event) {
+      LOGGER.debug("Transfer {} for '{}'", event.getType(), event.getResource().getResourceName());
+    }
+
+    @Override
+    public void transferStarted(TransferEvent event) throws TransferCancelledException {
+      LOGGER.debug("Transfer {} for '{}'", event.getType(), event.getResource().getResourceName());
+    }
+
+    @Override
+    public void transferProgressed(TransferEvent event) throws TransferCancelledException {
+      LOGGER.trace("Transfer {} for '{}'", event.getType(), event.getResource().getResourceName());
+    }
+
+    @Override
+    public void transferInitiated(TransferEvent event) throws TransferCancelledException {
+      LOGGER.debug("Transfer {} for '{}'", event.getType(), event.getResource().getResourceName());
+    }
+
+    @Override
+    public void transferFailed(TransferEvent event) {
+      LOGGER.warn("Transfer {} for '{}' ({})", event.getType(), event.getResource(), event.getException());
+    }
+
+    @Override
+    public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
+      LOGGER.warn("Transfer {} for '{}' ({})", event.getType(), event.getResource(), event.getException());
+    }
+  }
+
 
 }

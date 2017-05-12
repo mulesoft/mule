@@ -9,7 +9,6 @@ package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.io.File.separator;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
@@ -28,9 +27,7 @@ import java.util.Collections;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -57,32 +54,17 @@ public class RepositorySystemFactoryTestCase extends AbstractMuleTestCase {
 
     WorkspaceLocationResolver workspaceLocationResolver = mock(WorkspaceLocationResolver.class);
     File mavenLocalRepositoryLocation = root.newFolder("repository");
-    DependencyResolver dependencyResolver = RepositorySystemFactory.newOnlineDependencyResolver(
-                                                                                                Collections.<URL>emptyList(),
-                                                                                                workspaceLocationResolver,
-                                                                                                mavenLocalRepositoryLocation,
-                                                                                                newArrayList(MAVEN_CENTRAL));
+    DependencyResolver dependencyResolver = RepositorySystemFactory.newDependencyResolver(
+                                                                                          Collections.<URL>emptyList(),
+                                                                                          workspaceLocationResolver,
+                                                                                          mavenLocalRepositoryLocation,
+                                                                                          newArrayList(MAVEN_CENTRAL));
 
     final ArtifactResult artifactResult = dependencyResolver.resolveArtifact(commonsCollectionsArtifact);
     assertThat(artifactResult, not(nullValue()));
     assertThat(artifactResult.getArtifact().getFile().getParentFile(),
                equalTo(new File(mavenLocalRepositoryLocation,
                                 "commons-collections" + separator + "commons-collections" + separator + "3.2")));
-  }
-
-  @Test
-  public void offlineRepository() throws Exception {
-    WorkspaceLocationResolver workspaceLocationResolver = mock(WorkspaceLocationResolver.class);
-    File mavenLocalRepositoryLocation = root.newFolder("repository");
-    DependencyResolver dependencyResolver = RepositorySystemFactory.newOnlineDependencyResolver(
-                                                                                                Collections.<URL>emptyList(),
-                                                                                                workspaceLocationResolver,
-                                                                                                mavenLocalRepositoryLocation,
-                                                                                                Collections.<String>emptyList());
-
-    expectedException.expect(ArtifactResolutionException.class);
-    expectedException.expectCause(instanceOf(ArtifactNotFoundException.class));
-    dependencyResolver.resolveArtifact(commonsCollectionsArtifact);
   }
 
   private Matcher<String> isReachable() {
