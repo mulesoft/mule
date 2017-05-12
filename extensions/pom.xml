@@ -23,7 +23,6 @@
 
     <modules>
         <module>all-extensions</module>
-        <module>sockets</module>
         <module>jms</module>
     </modules>
 
