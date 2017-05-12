@@ -212,7 +212,6 @@
                 <!-- lib/mule -->
                 <exclude>org.mule.mvel:mule-mvel2</exclude>
                 <exclude>org.mule.runtime:mule-core</exclude>
-                <exclude>org.mule.extensions:mule-extensions-all</exclude>
                 <exclude>org.mule.services:mule-services-all</exclude>
                 <exclude>org.mule.runtime:mule-modules-all</exclude>
                 <exclude>org.mule.runtime:mule-module-artifact</exclude>
@@ -230,7 +229,6 @@
                 <exclude>org.mule.runtime:mule-module-dsl-api</exclude>
                 <exclude>org.mule.runtime:mule-module-http-policy-api</exclude>
                 <exclude>org.mule.runtime:mule-module-service</exclude>
-                <exclude>org.mule.modules:mule-module-oauth</exclude>
                 <exclude>org.mule.runtime:mule-module-policy-api</exclude>
                 <exclude>org.mule.runtime:mule-module-reboot</exclude>
                 <exclude>org.mule.runtime:mule-module-repository</exclude>

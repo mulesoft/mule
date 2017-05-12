@@ -123,9 +123,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-jms</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.mule.connectors</groupId>
+            <artifactId>mule-jms-connector</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
