@@ -14,10 +14,7 @@ import org.mule.runtime.extension.api.annotation.connectivity.oauth.Authorizatio
 
 @AuthorizationCode(accessTokenUrl = TestOAuthConnectionProvider.ACCESS_TOKEN_URL,
     authorizationUrl = TestOAuthConnectionProvider.AUTH_URL,
-    defaultScopes = TestOAuthConnectionProvider.DEFAULT_SCOPE,
-    accessTokenExpr = "#[payload.access_token]",
-    refreshTokenExpr = "#[payload.refresh_token]",
-    expirationExpr = "#[payload.expires_in]")
+    defaultScopes = TestOAuthConnectionProvider.DEFAULT_SCOPE)
 public class TestOAuthConnectionProvider extends TestOAuthConnectionState implements ConnectionProvider<TestOAuthConnection> {
 
   public static final String ACCESS_TOKEN_URL = "accessTokenUrl";

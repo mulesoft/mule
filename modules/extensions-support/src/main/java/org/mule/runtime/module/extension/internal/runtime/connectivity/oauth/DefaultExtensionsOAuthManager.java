@@ -11,6 +11,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.config.MuleProperties.DEFAULT_USER_OBJECT_STORE_NAME;
@@ -192,7 +193,13 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
         .responseExpiresInExpr(grantType.getExpirationRegex())
         .responseRefreshTokenExpr(grantType.getRefreshTokenExpr())
         .responseAccessTokenExpr(grantType.getAccessTokenExpr());
-    dancerBuilder.scopes(authCodeConfig.getScope().orElse(grantType.getDefaultScope()));
+
+    String scopes = authCodeConfig.getScope()
+        .orElseGet(() -> isBlank(grantType.getDefaultScope()) ? null : grantType.getDefaultScope());
+
+    if (scopes != null) {
+      dancerBuilder.scopes(scopes);
+    }
 
     final URL callbackUrl = url(callbackConfig.getHost(), callbackConfig.getPort(), callbackConfig.getCallbackPath());
     dancerBuilder
