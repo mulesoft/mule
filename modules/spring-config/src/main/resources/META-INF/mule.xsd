@@ -3670,7 +3670,6 @@
     <xsd:group name="defaultEndpointElements">
         <xsd:sequence>
             <xsd:group ref="commonDefaultEndpointElements"/>
-            <xsd:element ref="abstract-reconnection-strategy" minOccurs="0"/>
             <xsd:element ref="abstract-multi-transaction" minOccurs="0"/>
             <xsd:group ref="propertiesGroup"/>
         </xsd:sequence>

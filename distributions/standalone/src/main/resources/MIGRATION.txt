@@ -16,6 +16,7 @@ MULE-10686: XML entity expansion in Jersey is now disabled by default because it
 MULE-10979: The default response timeout and default transaction timeout can't be configured using system properties on the command line or in the wrapper.conf file anymore. In replacement, use the configuration element. For example: <configuration defaultResponseTimeout="20000"  defaultTransactionTimeout="40000"/>.
 MULE-11118: The HTTP listener now replies with status code 503 when the thread pool is exhausted (and poolExhaustedAction="ABORT") instead of closing the socket.
 MULE-11825: In a DB template query, to set a DB param with the null value, you can use the "NULL" literal value. For example: <db:in-param name="name" defaultValue="NULL"/>
+MULE-12385: Reconnection Strategies can only be defined in connector components or globally (using <configuration> element). In mule 3.x, defining reconnection strategies was being supported by the XSD, but ignored by Runtime. Now, the XSD was changed to not allow to use this invalid configuration.
 
 Migration changes from 3.7.x to 3.8.x
 MULE-9368: System property mule.sftp.knownHostsFile is now removed. Instead, the file with the known hosts must now be provided through the mule xml config file, in the knownHostsFile attribute of the connector or the endpoints.
