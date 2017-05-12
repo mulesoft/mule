@@ -28,7 +28,7 @@ import reactor.core.publisher.FluxSink;
 /**
  * Abstract base {@link ProcessingStrategy} that creates a basic {@link Sink} that serializes events.
  */
-abstract class AbstractProcessingStrategy implements ProcessingStrategy {
+public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
 
   public static final String TRANSACTIONAL_ERROR_MESSAGE = "Unable to process a transactional flow asynchronously";
 
