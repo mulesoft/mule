@@ -8,7 +8,6 @@
         <groupId>org.mule.runtime</groupId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
-    <groupId>org.mule.runtime</groupId>
     <artifactId>mule-module-extensions-xml-support</artifactId>
     <name>Mule Extensions XML Support</name>
     <packaging>jar</packaging>
@@ -101,6 +100,21 @@
             <scope>provided</scope>
         </dependency>
 
+		<!-- TODO Move to Integration tests repository the tests that need these conectors and services -->
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-http</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
+            <classifier>mule-service</classifier>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-scheduler</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
+            <classifier>mule-service</classifier>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-http-connector</artifactId>
@@ -130,6 +144,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-servlet_3.0_spec</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>
@@ -139,20 +158,6 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-service</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-scheduler</artifactId>
-            <version>${muleSchedulerServiceVersion}</version>
-            <classifier>mule-service</classifier>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-http</artifactId>
-            <version>${muleHttpServiceVersion}</version>
-            <classifier>mule-service</classifier>
             <scope>provided</scope>
         </dependency>
     </dependencies>

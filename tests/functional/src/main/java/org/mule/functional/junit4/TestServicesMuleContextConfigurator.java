@@ -8,9 +8,16 @@
 package org.mule.functional.junit4;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
+import org.mule.runtime.api.service.Service;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.module.service.ServiceRepository;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Register services implementations.
@@ -18,6 +25,7 @@ import org.mule.runtime.module.service.ServiceRepository;
 public class TestServicesMuleContextConfigurator implements ServiceConfigurator {
 
   private final ServiceRepository serviceRepository;
+  private Collection<Service> testServices;
 
   /**
    * Creates a new instance.
@@ -27,11 +35,21 @@ public class TestServicesMuleContextConfigurator implements ServiceConfigurator 
   public TestServicesMuleContextConfigurator(ServiceRepository serviceRepository) {
     checkArgument(serviceRepository != null, "serviceRepository cannot be null");
     this.serviceRepository = serviceRepository;
+
+    testServices =
+        new SpiServiceRegistry().lookupProviders(Service.class, TestServicesMuleContextConfigurator.class.getClassLoader());
   }
 
   @Override
   public void configure(CustomizationService customizationService) {
-    serviceRepository.getServices()
-        .forEach(service -> customizationService.registerCustomServiceImpl(service.getName(), service));
+    Map<String, Service> servicesByName = new HashMap<>();
+
+    // First, load any services from the classpath. This will be mock/test implementations
+    testServices.forEach(service -> servicesByName.put(service.getName(), service));
+
+    // Then, lookup any actual service implementations and replace any mocked with these ones.
+    serviceRepository.getServices().forEach(service -> servicesByName.put(service.getName(), service));
+
+    servicesByName.values().forEach(service -> customizationService.registerCustomServiceImpl(service.getName(), service));
   }
 }

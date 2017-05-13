@@ -98,13 +98,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-http</artifactId>
-            <version>${muleHttpServiceVersion}</version>
-            <type>test-jar</type>
-        </dependency>
-
-        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-runner</artifactId>
             <version>${project.version}</version>

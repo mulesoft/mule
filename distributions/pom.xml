@@ -23,6 +23,13 @@
         </plugins>
     </build>
 
+	<properties>
+        <muleSchedulerServiceVersion>1.0.0-SNAPSHOT</muleSchedulerServiceVersion>
+        <muleHttpServiceVersion>1.0.0-SNAPSHOT</muleHttpServiceVersion>
+        <muleOAuthServiceVersion>1.0.0-SNAPSHOT</muleOAuthServiceVersion>
+        <muleSoapServiceVersion>1.0.0-SNAPSHOT</muleSoapServiceVersion>
+	</properties>
+
     <modules>
         <module>services-all</module>
         <module>bom</module>
