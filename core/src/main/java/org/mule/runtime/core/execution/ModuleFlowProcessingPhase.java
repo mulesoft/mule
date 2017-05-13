@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
+import static java.lang.System.getProperty;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
@@ -63,6 +64,7 @@ public class ModuleFlowProcessingPhase
   public static final String ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY = "enableSourcePolicies";
 
   private static Logger LOGGER = LoggerFactory.getLogger(ModuleFlowProcessingPhase.class);
+  private static final boolean ENABLE_SOURCE_POLICIES = getProperty(ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY) != null;
 
   private final PolicyManager policyManager;
 
@@ -93,7 +95,7 @@ public class ModuleFlowProcessingPhase
       Event templateEvent = createEvent(template, messageProcessContext, sourceLocation, responseCompletion);
 
       // TODO MULE-11167 Policies should be non blocking
-      if (System.getProperty(ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY) == null) {
+      if (!ENABLE_SOURCE_POLICIES) {
         just(templateEvent)
             .doOnNext(request -> {
               fireNotification(messageProcessContext.getMessageSource(), request,
