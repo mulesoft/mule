@@ -120,21 +120,23 @@
             <artifactId>aspectjrt</artifactId>
         </dependency>
 
-		<!-- TODO Move to Integration tests repository the tests that need these conectors and services -->
+        <!-- TODO MULE-12471 Move to Integration tests repository the tests that need these conectors and services -->
         <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-http</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
             <classifier>mule-service</classifier>
             <scope>provided</scope>
         </dependency>
+        <!-- TODO MULE-12471 Move to Integration tests repository the tests that need these conectors and services -->
         <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-scheduler</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
             <classifier>mule-service</classifier>
             <scope>provided</scope>
         </dependency>
+        <!-- TODO MULE-12471 Move to Integration tests repository the tests that need these conectors and services -->
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-http-connector</artifactId>
@@ -142,6 +144,7 @@
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
+        <!-- TODO MULE-12471 Move to Integration tests repository the tests that need these conectors and services -->
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-sockets-connector</artifactId>
