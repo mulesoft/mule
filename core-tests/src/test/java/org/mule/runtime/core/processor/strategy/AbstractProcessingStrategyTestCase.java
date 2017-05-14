@@ -46,7 +46,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -128,7 +127,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
   protected Scheduler blocking;
   protected Scheduler cpuIntensive;
   protected Scheduler custom;
-  private ExecutorService asyncExecutor;
+  private Scheduler asyncExecutor;
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -173,7 +172,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     blocking.stop();
     cpuIntensive.stop();
     custom.stop();
-    asyncExecutor.shutdownNow();
+    asyncExecutor.stop();
   }
 
   @Test

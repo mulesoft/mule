@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.heisenberg.extension.DEARadioSource.MESSAGES_PER_POLL;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.lifecycle.Callable;
@@ -38,6 +39,7 @@ public class ListOfMessagesSourceTestCase extends AbstractExtensionFunctionalTes
   protected void doTearDown() throws Exception {
     capturedPayload = null;
     latch = null;
+    super.doTearDown();
   }
 
   @Override

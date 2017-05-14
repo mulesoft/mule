@@ -24,7 +24,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
@@ -37,6 +39,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
@@ -123,11 +126,13 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   }
 
   @After
-  public void after() {
-    final List<Scheduler> createdSchedulers = muleContext.getSchedulerService().getSchedulers();
+  public void after() throws MuleException {
+    SchedulerService schedulerService = muleContext.getSchedulerService();
+    final List<Scheduler> createdSchedulers = schedulerService.getSchedulers();
     for (Scheduler scheduler : new ArrayList<>(createdSchedulers)) {
-      scheduler.shutdown();
+      scheduler.stop();
     }
+    stopIfNeeded(schedulerService);
   }
 
   @Test(expected = InitialisationException.class)

@@ -23,6 +23,7 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EventContextStory.RESPONSE_AND_COMPLETION_PUBLISHERS;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -34,6 +35,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import reactor.core.publisher.MonoProcessor;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
@@ -287,7 +289,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
       awaitAndAssertResponse(parent, event);
       assertCompletionDone(child1);
     } finally {
-      testScheduler.shutdown();
+      testScheduler.stop();
     }
   }
 

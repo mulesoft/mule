@@ -17,6 +17,7 @@ public class SimpleUnitTestSupportCustomScheduler extends SimpleUnitTestSupportS
 
   @Override
   public void stop() {
+    super.stop();
     this.shutdownNow();
   }
 }
