@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.runtime.core.util;
 
 import org.junit.Test;
@@ -9,9 +15,6 @@ import org.mule.weave.v2.el.ByteArrayBasedCursorStreamProvider;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-/**
- * Created by matiasbargas on 5/15/17.
- */
 public class ExpressionEvaluatorTestCase extends AbstractMuleContextTestCase {
 
   @Test
