@@ -8,38 +8,23 @@ package org.mule.test.runner;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.System.getProperty;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
+import static java.util.Optional.of;
+import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
+import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.test.runner.RunnerConfiguration.readConfiguration;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_ARTIFACTS;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_FILE;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getExcludedProperties;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.test.runner.api.AetherClassPathClassifier;
-import org.mule.test.runner.api.ArtifactClassLoaderHolder;
-import org.mule.test.runner.api.ArtifactClassificationTypeResolver;
-import org.mule.test.runner.api.ArtifactIsolatedClassLoaderBuilder;
-import org.mule.test.runner.api.ClassPathClassifier;
-import org.mule.test.runner.api.ClassPathUrlProvider;
-import org.mule.test.runner.api.DependencyResolver;
-import org.mule.test.runner.api.RepositorySystemFactory;
-import org.mule.test.runner.api.WorkspaceLocationResolver;
-import org.mule.test.runner.maven.AutoDiscoverWorkspaceLocationResolver;
-import org.mule.test.runner.utils.AnnotationUtils;
-
-import com.google.common.base.Throwables;
-import com.google.common.collect.Sets;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
@@ -55,8 +40,26 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerBuilder;
 import org.junit.runners.model.TestClass;
+
+import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.test.runner.api.AetherClassPathClassifier;
+import org.mule.test.runner.api.ArtifactClassLoaderHolder;
+import org.mule.test.runner.api.ArtifactClassificationTypeResolver;
+import org.mule.test.runner.api.ArtifactIsolatedClassLoaderBuilder;
+import org.mule.test.runner.api.ClassPathClassifier;
+import org.mule.test.runner.api.ClassPathUrlProvider;
+import org.mule.test.runner.api.DependencyResolver;
+import org.mule.test.runner.api.WorkspaceLocationResolver;
+import org.mule.test.runner.classification.DefaultWorkspaceReader;
+import org.mule.test.runner.maven.AutoDiscoverWorkspaceLocationResolver;
+import org.mule.test.runner.utils.AnnotationUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Throwables;
+import com.google.common.collect.Sets;
 
 /**
  * A {@link org.junit.runner.Runner} that mimics the class loading model used in a Mule Standalone distribution. In order to
@@ -215,12 +218,25 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
     WorkspaceLocationResolver workspaceLocationResolver = new AutoDiscoverWorkspaceLocationResolver(classPath,
                                                                                                     rootArtifactClassesFolder);
-    final DependencyResolver dependencyResolver = RepositorySystemFactory
-        .newDependencyResolver(classPath,
-                               workspaceLocationResolver,
-                               getMavenLocalRepository(),
-                               //TODO (gfernandes) MULE-12449 (read settings to pass enable remote repositories in addition to the ones in pom that have public access)
-                               emptyList());
+
+    final File localMavenRepository =
+        discoverProvider(ArtifactClassLoaderRunner.class.getClassLoader()).getLocalRepositorySuppliers()
+            .environmentMavenRepositorySupplier().get();
+
+    final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder()
+        .withForcePolicyUpdateNever(true)
+        .withLocalMavenRepositoryLocation(localMavenRepository);
+
+    final File userSettings = new File(localMavenRepository.getParent(), "settings.xml");
+    if (userSettings.exists()) {
+      mavenConfigurationBuilder.withUserSettingsLocation(userSettings);
+    } else {
+      LOGGER.warn("Maven user settings not present in default folder: {}", userSettings.getAbsolutePath());
+    }
+    final MavenConfiguration mavenConfiguration = mavenConfigurationBuilder.build();
+    LOGGER.info("Using MavenConfiguration: {}", mavenConfiguration);
+
+    final DependencyResolver dependencyResolver = new DependencyResolver(mavenConfiguration, of(new DefaultWorkspaceReader(classPath, workspaceLocationResolver)));
     builder.setClassPathClassifier(new AetherClassPathClassifier(dependencyResolver,
                                                                  new ArtifactClassificationTypeResolver(
                                                                                                         dependencyResolver)));
@@ -266,21 +282,6 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
           + " found but there is no list of extra boot packages defined to be added to container, this could be the reason why the test may fail later due to JUnit classes are not found");
     }
     return newArrayList(packages);
-  }
-
-  /**
-   * Reads the attribute from the klass annotated and does a flatMap with the list of values.
-   *
-   * @param name attribute/method name of the annotation {@link ArtifactClassLoaderRunnerConfig} to be obtained
-   * @param klass {@link Class} from where the annotated attribute will be read
-   * @param <E> generic type
-   * @return {@link List} of values
-   */
-  private static <E> List<E> readAttribute(String name, Class<?> klass) {
-    List<E[]> valuesList =
-        AnnotationUtils.getAnnotationAttributeFromHierarchy(klass, ArtifactClassLoaderRunnerConfig.class,
-                                                            name);
-    return valuesList.stream().flatMap(Arrays::stream).distinct().collect(toList());
   }
 
   /**
