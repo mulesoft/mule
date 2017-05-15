@@ -42,7 +42,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   @Override
   public String getName() {
-    return this.getClass().getSimpleName();
+    return SchedulerService.class.getSimpleName();
   }
 
   @Override
@@ -110,12 +110,13 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   @Override
   public Scheduler customScheduler(SchedulerConfig config) {
-    final SimpleUnitTestSupportScheduler customScheduler = new SimpleUnitTestSupportScheduler(config.getMaxConcurrentTasks(),
-                                                                                              new NamedThreadFactory(config
-                                                                                                  .getSchedulerName() != null
-                                                                                                      ? config.getSchedulerName()
-                                                                                                      : "SimpleUnitTestSupportSchedulerService_custom"),
-                                                                                              new AbortPolicy());
+    final SimpleUnitTestSupportScheduler customScheduler =
+        new SimpleUnitTestSupportCustomScheduler(config.getMaxConcurrentTasks(),
+                                                 new NamedThreadFactory(config
+                                                     .getSchedulerName() != null
+                                                         ? config.getSchedulerName()
+                                                         : "SimpleUnitTestSupportSchedulerService_custom"),
+                                                 new AbortPolicy());
     customSchedulers.add(customScheduler);
     final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(customScheduler);
     decorators.add(decorator);
@@ -124,12 +125,13 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   @Override
   public Scheduler customScheduler(SchedulerConfig config, int queueSize) {
-    final SimpleUnitTestSupportScheduler customScheduler = new SimpleUnitTestSupportScheduler(config.getMaxConcurrentTasks(),
-                                                                                              new NamedThreadFactory(config
-                                                                                                  .getSchedulerName() != null
-                                                                                                      ? config.getSchedulerName()
-                                                                                                      : "SimpleUnitTestSupportSchedulerService_custom"),
-                                                                                              new AbortPolicy());
+    final SimpleUnitTestSupportScheduler customScheduler =
+        new SimpleUnitTestSupportCustomScheduler(config.getMaxConcurrentTasks(),
+                                                 new NamedThreadFactory(config
+                                                     .getSchedulerName() != null
+                                                         ? config.getSchedulerName()
+                                                         : "SimpleUnitTestSupportSchedulerService_custom"),
+                                                 new AbortPolicy());
     customSchedulers.add(customScheduler);
     final SimpleUnitTestSupportLifecycleSchedulerDecorator decorator = decorateScheduler(customScheduler);
     decorators.add(decorator);
@@ -153,8 +155,11 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
     while (skip(ste) && i < stackTrace.length) {
       ste = stackTrace[i++];
     }
+
     if (skip(ste)) {
       ste = stackTrace[3];
+    } else {
+      ste = stackTrace[i];
     }
 
     return ste.getClassName() + "." + ste.getMethodName() + ":" + ste.getLineNumber();
@@ -162,7 +167,8 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   private boolean skip(StackTraceElement ste) {
     return ste.getClassName().startsWith(SimpleUnitTestSupportSchedulerService.class.getName())
-        || ste.getClassName().startsWith("org.mockito");
+        || ste.getClassName().startsWith("org.mockito")
+        || !ste.getClassName().contains("$Proxy");
   }
 
   @Override

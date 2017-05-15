@@ -6,13 +6,17 @@
  */
 package org.mule.runtime.config.builders;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
-import org.mule.service.scheduler.internal.DefaultSchedulerService;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 
 /**
  * Provides the basic {@link Service}s infrastructure required by the Mule runtime to start in embedded mode.
@@ -26,9 +30,17 @@ public class BasicRuntimeServicesConfigurationBuilder extends AbstractConfigurat
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
     MuleRegistry registry = muleContext.getRegistry();
-    final DefaultSchedulerService schedulerService = new DefaultSchedulerService();
-    schedulerService.start();
-    registry.registerObject(schedulerService.getName(), schedulerService);
+
+    new SpiServiceRegistry().lookupProviders(Service.class, BasicRuntimeServicesConfigurationBuilder.class.getClassLoader())
+        .forEach(service -> {
+          try {
+            startIfNeeded(service);
+            registry.registerObject(service.getName(), service);
+          } catch (MuleException e) {
+            throw new MuleRuntimeException(e);
+          }
+        });
+
     DefaultExpressionLanguageFactoryService weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService();
     registry.registerObject(weaveExpressionExecutor.getName(), weaveExpressionExecutor);
   }

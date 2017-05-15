@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -83,8 +84,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   public static final String WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY = "workingDirectory";
   public static final String REACTOR_BLOCK_TIMEOUT_EXCEPTION_MESSAGE = "Timeout on Mono blocking read";
 
-  public TestServicesConfigurationBuilder testServicesConfigurationBuilder =
-      new TestServicesConfigurationBuilder(mockHttpService(), mockExprExecutorService());
+  public TestServicesConfigurationBuilder testServicesConfigurationBuilder;
+  public Supplier<TestServicesConfigurationBuilder> testServicesConfigurationBuilderSupplier =
+      () -> new TestServicesConfigurationBuilder(mockHttpService(), mockExprExecutorService());
 
   public TemporaryFolder workingDirectory = new TemporaryFolder();
 
@@ -266,6 +268,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   // This shouldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
   // creating the MuleContext.
   protected void addBuilders(List<ConfigurationBuilder> builders) {
+    testServicesConfigurationBuilder = testServicesConfigurationBuilderSupplier.get();
     builders.add(testServicesConfigurationBuilder);
   }
 
@@ -315,7 +318,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       }
 
       disposeContext();
-      testServicesConfigurationBuilder.stopServices();
+      if (testServicesConfigurationBuilder != null) {
+        testServicesConfigurationBuilder.stopServices();
+      }
       doTearDownAfterMuleContextDispose();
     }
 

@@ -262,13 +262,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-scheduler</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-service</classifier>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.services</groupId>
             <artifactId>mule-service-weave</artifactId>
             <classifier>mule-service</classifier>
             <scope>provided</scope>
@@ -277,13 +270,6 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-service-http-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-http</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-service</classifier>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -14,6 +14,7 @@ import static org.hamcrest.object.IsCompatibleType.typeCompatibleWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
@@ -62,8 +63,8 @@ import org.junit.runner.RunWith;
  * <p/>
  * For plugins it will scan the plugin set of {@link java.net.URL}s to search for classes annotated with
  * {@link org.mule.runtime.extension.api.annotation.Extension}, if a class is annotated it will generate the metadata for the
- * extension in runtime and it will also register it to the {@link org.mule.runtime.core.api.extension.ExtensionManager}. Non extension
- * plugins will set its filter based on {@code mule-module.properties} file.
+ * extension in runtime and it will also register it to the {@link org.mule.runtime.core.api.extension.ExtensionManager}. Non
+ * extension plugins will set its filter based on {@code mule-module.properties} file.
  * <p/>
  * By default this test runs internally with a {@link org.junit.runners.BlockJUnit4ClassRunner} runner. On those cases where the
  * test has to be run with another runner the {@link RunnerDelegateTo} should be used to define it.
@@ -83,8 +84,8 @@ import org.junit.runner.RunWith;
 public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
   /**
-   * As part of providing support for handling different artifacts without unzipping them, the factory for URL must be
-   * registered and then the current protocol for mule artifacts {@link MuleArtifactUrlStreamHandler#PROTOCOL}.
+   * As part of providing support for handling different artifacts without unzipping them, the factory for URL must be registered
+   * and then the current protocol for mule artifacts {@link MuleArtifactUrlStreamHandler#PROTOCOL}.
    */
   static {
     // register the custom UrlStreamHandlerFactory.
@@ -98,6 +99,8 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   private static MuleServiceManager serviceRepository;
   private static ClassLoaderRepository classLoaderRepository;
   private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder extensionsManagerConfigurationBuilder;
+
+  private static TestServicesMuleContextConfigurator serviceConfigurator;
 
   @BeforeClass
   public static void configureClassLoaderRepository() throws RegistrationException {
@@ -190,7 +193,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   }
 
   protected void configureSpringXmlConfigurationBuilder(SpringXmlConfigurationBuilder builder) {
-    builder.addServiceConfigurator(new TestServicesMuleContextConfigurator(serviceRepository));
+    builder.addServiceConfigurator(serviceConfigurator);
   }
 
   private static void createServiceManager() {
@@ -202,6 +205,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     } catch (MuleException e) {
       throw new IllegalStateException("Couldn't start service manager", e);
     }
+    serviceConfigurator = new TestServicesMuleContextConfigurator(serviceRepository);
   }
 
   /**
@@ -228,7 +232,8 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   }
 
   /**
-   * Defines a {@link ClassLoaderRepository} with all the class loaders configured in the {@link ArtifactFunctionalTestCase} class.
+   * Defines a {@link ClassLoaderRepository} with all the class loaders configured in the {@link ArtifactFunctionalTestCase}
+   * class.
    */
   protected static class TestClassLoaderRepository implements ClassLoaderRepository {
 

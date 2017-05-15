@@ -66,7 +66,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
   @Override
   protected void doTearDown() throws Exception {
-    scheduler.shutdownNow();
+    scheduler.stop();
     if (asyncReplyMP != null) {
       asyncReplyMP.stop();
       asyncReplyMP.dispose();

@@ -51,8 +51,9 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase {
     assertTrue(baseStore instanceof SimpleMemoryObjectStore);
     assertSame(baseStore, muleContext.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
     testObjectStore(store);
-    testObjectStoreExpiry(manager.<ObjectStore<String>>getObjectStore("inMemoryExpPart1", false, -1, 500, 200));
-    testObjectStoreMaxEntries(manager.<ListableObjectStore<String>>getObjectStore("inMemoryMaxPart1", false, 10, 10000, 200));
+    testObjectStoreExpiry(manager, manager.<ObjectStore<String>>getObjectStore("inMemoryExpPart1", false, -1, 500, 200));
+    testObjectStoreMaxEntries(manager,
+                              manager.<ListableObjectStore<String>>getObjectStore("inMemoryMaxPart1", false, 10, 10000, 200));
   }
 
   @Test
@@ -85,8 +86,9 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase {
     assertTrue(baseStore instanceof QueuePersistenceObjectStore);
     assertSame(baseStore, muleContext.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME));
     testObjectStore(store);
-    testObjectStoreExpiry(manager.<ObjectStore<String>>getObjectStore("persistenceExpPart1", true, -1, 500, 200));
-    testObjectStoreMaxEntries(manager.<ListableObjectStore<String>>getObjectStore("persistenceMaxPart1", true, 10, 10000, 200));
+    testObjectStoreExpiry(manager, manager.<ObjectStore<String>>getObjectStore("persistenceExpPart1", true, -1, 500, 200));
+    testObjectStoreMaxEntries(manager,
+                              manager.<ListableObjectStore<String>>getObjectStore("persistenceMaxPart1", true, 10, 10000, 200));
   }
 
   @Test
@@ -99,8 +101,9 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase {
     assertTrue(baseStore instanceof PartitionedInMemoryObjectStore);
     assertSame(baseStore, muleContext.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
     testObjectStore(store);
-    testObjectStoreExpiry(manager.<ObjectStore<String>>getObjectStore("inMemoryExpPart2", false, -1, 500, 200));
-    testObjectStoreMaxEntries(manager.<ListableObjectStore<String>>getObjectStore("inMemoryMaxPart2", false, 10, 10000, 200));
+    testObjectStoreExpiry(manager, manager.<ObjectStore<String>>getObjectStore("inMemoryExpPart2", false, -1, 500, 200));
+    testObjectStoreMaxEntries(manager,
+                              manager.<ListableObjectStore<String>>getObjectStore("inMemoryMaxPart2", false, 10, 10000, 200));
   }
 
   @Ignore("MULE-6926")
@@ -116,8 +119,9 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase {
     assertTrue(baseStore instanceof PartitionedPersistentObjectStore);
     assertSame(baseStore, muleContext.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME));
     testObjectStore(store);
-    testObjectStoreExpiry(manager.<ObjectStore<String>>getObjectStore("persistenceExpPart2", true, -1, 1000, 200));
-    testObjectStoreMaxEntries(manager.<ListableObjectStore<String>>getObjectStore("persistenceMaxPart2", true, 10, 10000, 200));
+    testObjectStoreExpiry(manager, manager.<ObjectStore<String>>getObjectStore("persistenceExpPart2", true, -1, 1000, 200));
+    testObjectStoreMaxEntries(manager,
+                              manager.<ListableObjectStore<String>>getObjectStore("persistenceMaxPart2", true, 10, 10000, 200));
   }
 
   private void testObjectStore(ListableObjectStore<String> store) throws ObjectStoreException {
@@ -159,40 +163,48 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase {
     e = null;
   }
 
-  private void testObjectStoreExpiry(ObjectStore<String> objectStore) throws ObjectStoreException, InterruptedException {
-    objectStore.store("key1", "value1");
-    assertEquals("value1", objectStore.retrieve("key1"));
+  private void testObjectStoreExpiry(ObjectStoreManager manager, ObjectStore<String> objectStore)
+      throws ObjectStoreException, InterruptedException {
+    try {
+      objectStore.store("key1", "value1");
+      assertEquals("value1", objectStore.retrieve("key1"));
 
-    new PollingProber(2000, 50).check(new JUnitLambdaProbe(() -> {
-      try {
-        assertFalse("Object with key1 still exists.", objectStore.contains("key1"));
-      } catch (Exception e) {
-        fail(e.getMessage());
-      }
-      return true;
-    }));
-
+      new PollingProber(2000, 50).check(new JUnitLambdaProbe(() -> {
+        try {
+          assertFalse("Object with key1 still exists.", objectStore.contains("key1"));
+        } catch (Exception e) {
+          fail(e.getMessage());
+        }
+        return true;
+      }));
+    } finally {
+      manager.disposeStore(objectStore);
+    }
   }
 
-  private void testObjectStoreMaxEntries(final ListableObjectStore<String> objectStore)
+  private void testObjectStoreMaxEntries(ObjectStoreManager manager, final ListableObjectStore<String> objectStore)
       throws ObjectStoreException, InterruptedException {
-    storeObjects(objectStore, 0, 90);
+    try {
+      storeObjects(objectStore, 0, 90);
 
-    ensureMillisecondChanged();
+      ensureMillisecondChanged();
 
-    storeObjects(objectStore, 90, 100);
+      storeObjects(objectStore, 90, 100);
 
-    new PollingProber(2000, 50).check(new JUnitLambdaProbe(() -> {
-      try {
-        assertEquals(10, objectStore.allKeys().size());
-        for (int i = 90; i < 100; i++) {
-          assertTrue("Checking that key" + i + " exists", objectStore.contains("key" + i));
+      new PollingProber(2000, 50).check(new JUnitLambdaProbe(() -> {
+        try {
+          assertEquals(10, objectStore.allKeys().size());
+          for (int i = 90; i < 100; i++) {
+            assertTrue("Checking that key" + i + " exists", objectStore.contains("key" + i));
+          }
+        } catch (Exception e) {
+          fail(e.getMessage());
         }
-      } catch (Exception e) {
-        fail(e.getMessage());
-      }
-      return true;
-    }));
+        return true;
+      }));
+    } finally {
+      manager.disposeStore(objectStore);
+    }
 
   }
 

@@ -16,10 +16,12 @@ import org.mule.runtime.api.service.ServiceProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Resolves {@link Service} instances given a set of {@link ServiceProvider} instances.
@@ -83,7 +85,12 @@ public class ReflectionServiceResolver implements ServiceResolver {
     }
 
     if (!unresolvedServiceProviders.isEmpty()) {
-      throw new ServiceResolutionError("Unable to resolve core service dependencies: " + unresolvedServiceProviders);
+      final Set<Class<? extends Service>> dependencies = new HashSet<>();
+      for (DependencyAwareServiceProvider dependencyAwareServiceProvider : unresolvedServiceProviders) {
+        dependencies.addAll(dependencyAwareServiceProvider.getDependencies());
+      }
+
+      throw new ServiceResolutionError("Unable to resolve core service dependencies. Missing some of: " + dependencies);
     }
 
     return registeredServices.values().stream().map(s -> s.getService()).collect(toList());

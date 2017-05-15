@@ -8,9 +8,11 @@ package org.mule.test.heisenberg.extension;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -33,6 +35,9 @@ public class DEARadioSource extends Source<List<Result<String, DEAOfficerAttribu
   @Inject
   private SchedulerService schedulerService;
 
+  @Inject
+  private SchedulerConfig baseConfig;
+
   private Scheduler executor;
 
   private Random random = new Random();
@@ -41,19 +46,14 @@ public class DEARadioSource extends Source<List<Result<String, DEAOfficerAttribu
   public void onStart(SourceCallback<List<Result<String, DEAOfficerAttributes>>, Attributes> sourceCallback)
       throws MuleException {
 
-    executor = schedulerService.cpuLightScheduler();
+    executor = schedulerService.cpuLightScheduler(baseConfig.withShutdownTimeout(500, MILLISECONDS));
     executor.scheduleAtFixedRate(() -> sourceCallback.handle(makeResult()), 0, 500, MILLISECONDS);
   }
 
   @Override
   public void onStop() {
     if (executor != null) {
-      executor.shutdown();
-      try {
-        executor.awaitTermination(500, MILLISECONDS);
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
+      executor.stop();
     }
   }
 

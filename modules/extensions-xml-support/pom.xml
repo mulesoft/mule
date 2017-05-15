@@ -8,7 +8,6 @@
         <groupId>org.mule.runtime</groupId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
-    <groupId>org.mule.runtime</groupId>
     <artifactId>mule-module-extensions-xml-support</artifactId>
     <name>Mule Extensions XML Support</name>
     <packaging>jar</packaging>
@@ -101,6 +100,23 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- TODO MULE-12471 Move to Integration tests repository the tests that need these conectors and services -->
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-http</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <classifier>mule-service</classifier>
+            <scope>provided</scope>
+        </dependency>
+        <!-- TODO MULE-12471 Move to Integration tests repository the tests that need these conectors and services -->
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-scheduler</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <classifier>mule-service</classifier>
+            <scope>provided</scope>
+        </dependency>
+        <!-- TODO MULE-12471 Move to Integration tests repository the tests that need these conectors and services -->
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-http-connector</artifactId>
@@ -108,6 +124,7 @@
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
+        <!-- TODO MULE-12471 Move to Integration tests repository the tests that need these conectors and services -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-file-extension-common</artifactId>
@@ -115,6 +132,7 @@
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
+        <!-- TODO MULE-12471 Move to Integration tests repository the tests that need these conectors and services -->
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-file-connector</artifactId>
@@ -122,11 +140,17 @@
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
+        <!-- TODO MULE-12471 Move to Integration tests repository the tests that need these conectors and services -->
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-jms-connector</artifactId>
             <version>1.0.0-SNAPSHOT</version>
             <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-servlet_3.0_spec</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -139,20 +163,6 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-service</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-scheduler</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-service</classifier>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-http</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-service</classifier>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -99,11 +99,8 @@
         <module>buildtools</module>
         <module>core</module>
         <module>core-tests</module>
-        <module>services</module>
         <module>modules</module>
         <module>tests</module>
-        <module>bom</module>
-        <module>embedded</module>
     </modules>
 
     <properties>

@@ -56,7 +56,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
 
   @Override
   protected void doTearDown() throws Exception {
-    scheduler.shutdownNow();
+    scheduler.stop();
     super.doTearDown();
   }
 

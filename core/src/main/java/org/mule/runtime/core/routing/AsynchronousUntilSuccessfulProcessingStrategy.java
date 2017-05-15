@@ -78,7 +78,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
 
   @Override
   public void stop() {
-    pool.shutdown();
+    pool.stop();
     pool = null;
   }
 

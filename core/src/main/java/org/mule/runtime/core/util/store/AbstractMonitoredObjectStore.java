@@ -88,7 +88,7 @@ public abstract class AbstractMonitoredObjectStore<T extends Serializable>
   public void dispose() {
     if (scheduledTask != null) {
       scheduledTask.cancel(true);
-      scheduler.shutdown();
+      scheduler.stop();
     }
   }
 

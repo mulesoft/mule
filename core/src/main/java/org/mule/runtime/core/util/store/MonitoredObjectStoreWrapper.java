@@ -183,7 +183,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
         }
       }
     } catch (Exception e) {
-      logger.warn("Running expirty on " + baseStore + " threw " + e + ":" + e.getMessage());
+      logger.warn("Running expiry on " + baseStore + " threw " + e + ":" + e.getMessage());
     }
   }
 
@@ -191,7 +191,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
   public void dispose() {
     if (scheduledTask != null) {
       scheduledTask.cancel(true);
-      scheduler.shutdown();
+      scheduler.stop();
     }
   }
 

@@ -8,16 +8,15 @@
         <version>4.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>mule-embedded</artifactId>
+    
+    <artifactId>mule-bom</artifactId>
     <packaging>pom</packaging>
-    <name>Mule Embedded</name>
+    <name>Mule Runtime BOM</name>
+    <description>Mule runtime modules for BOMs</description>
 
     <modules>
-        <module>embedded-api</module>
-        <module>embedded-impl</module>
-        <module>embedded-test</module>
-        <module>embedded-distribution</module>
+        <module>runtime-api</module>
+        <module>runtime-impl</module>
     </modules>
 
 </project>
