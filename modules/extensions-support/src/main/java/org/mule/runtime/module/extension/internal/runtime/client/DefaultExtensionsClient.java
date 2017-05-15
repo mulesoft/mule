@@ -11,7 +11,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -35,18 +34,18 @@ import org.mule.runtime.extension.internal.client.ComplexParameter;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessorBuilder;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+
+import reactor.core.Exceptions;
+import reactor.core.publisher.Mono;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
-
-import reactor.core.Exceptions;
-import reactor.core.publisher.Mono;
 
 
 /**
@@ -147,7 +146,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
         }
       } else {
         if (value instanceof String && parser.isContainsTemplate((String) value)) {
-          values.put(name, new TypeSafeExpressionValueResolver<>((String) value, Object.class));
+          values.put(name, new ExpressionValueResolver((String) value));
         } else {
           values.put(name, new StaticValueResolver<>(value));
         }

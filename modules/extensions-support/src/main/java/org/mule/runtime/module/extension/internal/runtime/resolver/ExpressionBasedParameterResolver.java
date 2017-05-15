@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -67,7 +66,7 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initi
 
   @Override
   public void initialise() throws InitialisationException {
-    valueResolver = new TypeSafeExpressionValueResolver<>(expression, getType(metadataType));
+    valueResolver = new TypeSafeExpressionValueResolver<>(expression, metadataType);
     valueResolver.setExtendedExpressionManager(extendedExpressionManager);
     valueResolver.setTransformationService(transformationService);
     valueResolver.initialise();

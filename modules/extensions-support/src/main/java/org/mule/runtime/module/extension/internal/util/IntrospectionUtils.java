@@ -36,6 +36,7 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
+import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.metadata.message.MessageMetadataTypeBuilder;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -53,7 +54,9 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
@@ -72,14 +75,15 @@ import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
-import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterResolverTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.TypedValueTypeModelProperty;
 
 import com.google.common.collect.ImmutableList;
+import org.springframework.core.ResolvableType;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -96,14 +100,14 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import org.springframework.core.ResolvableType;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -123,6 +127,59 @@ public final class IntrospectionUtils {
    */
   public static MetadataType getMetadataType(Class<?> type, ClassTypeLoader typeLoader) {
     return typeLoader.load(ResolvableType.forClass(type).getType());
+  }
+
+  /**
+   * Transforms a {@link MetadataType} and generates the correspondent {@link DataType}
+   *
+   * @param metadataType to introspect a create a {@link DataType} from it.
+   * @return a {@link DataType} based on the given {@link MetadataType}
+   */
+  public static DataType toDataType(MetadataType metadataType) {
+    Class<?> type = getType(metadataType);
+    Reference<DataType> dataType = new Reference<>();
+
+    metadataType.accept(new MetadataTypeVisitor() {
+
+      @Override
+      protected void defaultVisit(MetadataType metadataType) {
+        dataType.set(DataType.fromType(type));
+      }
+
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        Class itemClass = getType(arrayType.getType());
+        if (Collection.class.isAssignableFrom(type)) {
+          dataType.set(DataType.builder()
+              .collectionType((Class<? extends Collection>) type)
+              .itemType(itemClass)
+              .build());
+        } else if (Iterator.class.isAssignableFrom(type)) {
+          dataType.set(DataType.builder()
+              .streamType((Class<? extends Iterator>) type)
+              .itemType(itemClass)
+              .build());
+        } else {
+          defaultVisit(arrayType);
+        }
+      }
+
+      @Override
+      public void visitObject(ObjectType objectType) {
+        if (Map.class.isAssignableFrom(type)) {
+          dataType.set(DataType.builder().mapType((Class<? extends Map>) type)
+              .keyType(String.class)
+              .valueType(objectType.getOpenRestriction()
+                  .map(JavaTypeUtils::getType)
+                  .orElse(Object.class))
+              .build());
+        } else {
+          defaultVisit(objectType);
+        }
+      }
+    });
+
+    return dataType.get();
   }
 
   /**

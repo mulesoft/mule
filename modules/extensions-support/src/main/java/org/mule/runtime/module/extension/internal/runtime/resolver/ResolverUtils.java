@@ -83,14 +83,14 @@ public class ResolverUtils {
         valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
         return valueResolver;
       } else if (muleContext.getExpressionManager().isExpression(expression)) {
-        TypeSafeExpressionValueResolver<Object> valueResolver = new TypeSafeExpressionValueResolver<>(expression, getType(type));
+        TypeSafeExpressionValueResolver<Object> valueResolver = new TypeSafeExpressionValueResolver<>(expression, type);
         valueResolver.setTransformationService(muleContext.getTransformationService());
         valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
         valueResolver.initialise();
         return valueResolver;
       } else {
         TypeSafeValueResolverWrapper typeSafeValueResolverWrapper =
-            new TypeSafeValueResolverWrapper(new StaticValueResolver<>(expression), getType(type));
+            new TypeSafeValueResolverWrapper<>(new StaticValueResolver<>(expression), getType(type));
         typeSafeValueResolverWrapper.setTransformationService(muleContext.getTransformationService());
         typeSafeValueResolverWrapper.initialise();
         return typeSafeValueResolverWrapper;
