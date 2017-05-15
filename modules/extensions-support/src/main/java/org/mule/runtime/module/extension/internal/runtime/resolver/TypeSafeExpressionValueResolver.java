@@ -35,9 +35,9 @@ import javax.inject.Inject;
  */
 public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Initialisable {
 
-  private MetadataType expectedMetadataType;
-  private Class<T> expectedType;
-  private String expression;
+  private final MetadataType expectedMetadataType;
+  private final Class<T> expectedType;
+  private final String expression;
   private TypeSafeValueResolverWrapper<T> delegate;
 
   @Inject

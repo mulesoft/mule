@@ -166,7 +166,7 @@ public final class IntrospectionUtils {
 
       @Override
       public void visitObject(ObjectType objectType) {
-        if (objectType.isOpen() && Map.class.isAssignableFrom(type)) {
+        if (Map.class.isAssignableFrom(type)) {
           dataType.set(DataType.builder().mapType((Class<? extends Map>) type)
               .keyType(String.class)
               .valueType(objectType.getOpenRestriction()
