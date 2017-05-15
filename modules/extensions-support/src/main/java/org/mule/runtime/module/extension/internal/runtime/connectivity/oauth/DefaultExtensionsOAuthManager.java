@@ -179,7 +179,8 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
   private AuthorizationCodeOAuthDancer createDancer(OAuthConfig config) throws MuleException {
     OAuthAuthorizationCodeDancerBuilder dancerBuilder =
         oauthService.get().authorizationCodeGrantTypeDancerBuilder(lockId -> muleContext.getLockFactory().createLock(lockId),
-                                                                   new LazyObjectStoreToMapAdapter(getObjectStoreSupplier(config)),
+                                                                   new LazyObjectStoreToMapAdapter(
+                                                                                                   getObjectStoreSupplier(config)),
                                                                    muleContext.getExpressionManager());
     final AuthCodeConfig authCodeConfig = config.getAuthCodeConfig();
     final AuthorizationCodeGrantType grantType = config.getGrantType();
@@ -207,8 +208,8 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
         .externalCallbackUrl(callbackUrl.toExternalForm())
         .localAuthorizationUrlPath(callbackConfig.getLocalAuthorizePath())
         .localAuthorizationUrlResourceOwnerId(
-                                              "#[attributes.queryParams.resourceOwnerId when attributes.queryParams.resourceOwnerId != null otherwise '']")
-        .state("#[attributes.queryParams.state when attributes.queryParams.state != null otherwise '']")
+                                              "#[if (attributes.queryParams.resourceOwnerId != null) attributes.queryParams.resourceOwnerId else '']")
+        .state("#[if (attributes.queryParams.state != null) attributes.queryParams.state else '']")
         .customParameters(config.getCustomParameters())
         .customParametersExtractorsExprs(getParameterExtractors(config));
 
