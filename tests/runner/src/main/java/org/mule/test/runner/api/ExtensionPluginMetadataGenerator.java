@@ -136,7 +136,7 @@ class ExtensionPluginMetadataGenerator {
 
   /**
    * Scans for a {@link Class} annotated with {@link Extension} annotation and return the {@link Class} or {@code null} if there
-   * is no annotated {@link Class}.
+   * is no annotated {@link Class}. It would only look for classes when the URLs for the plugin have an artifact not packaged (target/classes/ or target-test/classes).
    *
    * @param plugin the {@link Artifact} to generate its extension manifest if it is an extension.
    * @param urls   {@link URL}s to use for discovering {@link Class}es annotated with {@link Extension}
@@ -147,7 +147,7 @@ class ExtensionPluginMetadataGenerator {
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
     scanner.addIncludeFilter(new AnnotationTypeFilter(Extension.class));
     try (URLClassLoader classLoader = new URLClassLoader(urls.stream()
-        .filter(url -> toFile(url).getName().endsWith("-mule-plugin.jar") || toFile(url).isDirectory())
+        .filter(url -> toFile(url).isDirectory())
         .collect(toList())
         .toArray(new URL[0]), null)) {
       scanner.setResourceLoader(new PathMatchingResourcePatternResolver(classLoader));

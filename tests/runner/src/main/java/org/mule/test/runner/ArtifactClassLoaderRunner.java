@@ -8,9 +8,10 @@ package org.mule.test.runner;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.io.File.separator;
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.lang.System.getenv;
-import static java.util.Arrays.stream;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
@@ -111,6 +112,8 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArtifactClassLoaderRunner.class);
   public static final String MAVEN_GLOBAL_SETTINGS_PATH = "conf" + separator + "settings.xml";
+  public static final String M2_HOME = "M2_HOME";
+  public static final String MAVEN_HOME = "MAVEN_HOME";
 
   private static String userHome = getProperty(USER_HOME);
   private static ArtifactClassLoaderHolder artifactClassLoaderHolder;
@@ -253,16 +256,20 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
   }
 
   private static Optional<File> getMavenGlobalSettings() {
-    final String mavenHome = getenv("MAVEN_HOME");
-    if (mavenHome != null) {
-      File globalSettings = new File(mavenHome, MAVEN_GLOBAL_SETTINGS_PATH);
-      if (globalSettings.exists()) {
-        return of(globalSettings);
-      }
+    String mavenHome = getenv(M2_HOME);
+    mavenHome = mavenHome != null ? mavenHome : getenv(MAVEN_HOME);
+    mavenHome = mavenHome != null ? mavenHome : getProperty("maven.home");
+    if (mavenHome == null) {
+      throw new IllegalStateException(format("Couldn't find Maven home directory, either %s or %s had to be set as environment variables",
+                                             M2_HOME, MAVEN_HOME));
     }
-    Optional<String> mavenPath =
-        stream(getenv("PATH").split(File.pathSeparator)).filter(path -> path.contains("maven")).findFirst();
-    return mavenPath.map(path -> new File(path, MAVEN_GLOBAL_SETTINGS_PATH));
+    File globalSettings = new File(mavenHome, MAVEN_GLOBAL_SETTINGS_PATH);
+    if (globalSettings.exists()) {
+      return of(globalSettings);
+    } else {
+      LOGGER.warn("Couldn't find a global settings for Maven on {}, tests may fail due to Maven resolution issues", mavenHome);
+    }
+    return empty();
   }
 
   /**
