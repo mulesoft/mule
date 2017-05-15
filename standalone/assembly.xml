@@ -72,15 +72,6 @@
             <outputDirectory>docs/api</outputDirectory>
             <fileMode>0644</fileMode>
         </fileSet>
-
-        <!-- Copy source bundle (the build must be run with -DperformRelease=true) -->
-        <fileSet>
-            <directory>target</directory>
-            <outputDirectory>src</outputDirectory>
-            <includes>
-                <include>mule-*-src.zip</include>
-            </includes>
-        </fileSet>
     </fileSets>
 
     <!--
