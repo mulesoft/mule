@@ -184,8 +184,6 @@
                                         <argument>-classpath</argument>
                                         <classpath/>
                                         <mainClass>org.openjdk.jmh.Main</mainClass>
-<!--TODO Delete calss argument, only for fast testing of the plugin-->
-                                        <argument>org.mule.el.mvel.MVELDeepInvokeBenchmark.mvelWarmStart</argument>
                                         <!--Create json report-->
                                         <argument>-rf</argument>
                                         <argument>json</argument>
