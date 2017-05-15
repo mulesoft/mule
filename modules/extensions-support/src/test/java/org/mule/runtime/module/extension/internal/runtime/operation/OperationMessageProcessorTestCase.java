@@ -71,7 +71,7 @@ import org.mule.runtime.module.extension.internal.runtime.ValueResolvingExceptio
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.tck.size.SmallTest;
 
-import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
+import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
 import java.util.Map;
 import java.util.Set;
