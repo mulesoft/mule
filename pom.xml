@@ -188,7 +188,6 @@
         <disruptorVersion>3.3.0</disruptorVersion>
         <mockitoVersion>1.10.19</mockitoVersion>
         <muleDslApiVersion>1.0.0-SNAPSHOT</muleDslApiVersion>
-        <muleEmbeddedApiVersion>1.0.0-SNAPSHOT</muleEmbeddedApiVersion>
         <muleExtensionsApiVersion>1.0.0-SNAPSHOT</muleExtensionsApiVersion>
         <muleExtensionsSoapApiVersion>1.0.0-SNAPSHOT</muleExtensionsSoapApiVersion>
         <muleHttpPolicyApiVersion>1.0.0-SNAPSHOT</muleHttpPolicyApiVersion>
