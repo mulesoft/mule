@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
+import org.mule.runtime.core.util.collection.ImmutableSetCollector;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -15,7 +14,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
 import java.lang.annotation.Annotation;
-import java.util.List;
+import java.util.Set;
 
 /**
  * A generic contract for any kind of component that is based in a {@link Class} and can define parameters
@@ -27,25 +26,34 @@ public interface ParameterizableTypeElement extends Type, WithParameters {
   /**
    * {@inheritDoc}
    */
-  default List<ExtensionParameter> getParameters() {
-    return unmodifiableList(getAnnotatedFields(Parameter.class,
-                                               OAuthParameter.class,
-                                               ParameterGroup.class,
-                                               Connection.class,
-                                               Config.class));
+  default Set<ExtensionParameter> getParameters() {
+    return getAnnotatedFields(Parameter.class,
+                              OAuthParameter.class,
+                              ParameterGroup.class,
+                              Connection.class,
+                              Config.class)
+                                  .stream()
+                                  .distinct()
+                                  .collect(new ImmutableSetCollector<>());
   }
 
   /**
    * {@inheritDoc}
    */
-  default List<ExtensionParameter> getParameterGroups() {
-    return unmodifiableList(getAnnotatedFields(ParameterGroup.class));
+  default Set<ExtensionParameter> getParameterGroups() {
+    return getAnnotatedFields(ParameterGroup.class)
+        .stream()
+        .distinct()
+        .collect(new ImmutableSetCollector<>());
   }
 
   /**
    * {@inheritDoc}
    */
-  default List<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass) {
-    return getParameters().stream().filter(field -> field.getAnnotation(annotationClass).isPresent()).collect(toList());
+  default Set<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass) {
+    return getParameters().stream()
+        .filter(field -> field.getAnnotation(annotationClass).isPresent())
+        .distinct()
+        .collect(new ImmutableSetCollector<>());
   }
 }

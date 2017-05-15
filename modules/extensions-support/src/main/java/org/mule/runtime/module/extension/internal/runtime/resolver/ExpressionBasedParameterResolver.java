@@ -11,7 +11,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
@@ -29,7 +28,7 @@ import javax.inject.Inject;
 class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initialisable {
 
   private final String expression;
-  private final Event event;
+  private final ValueResolvingContext context;
   private final MetadataType metadataType;
   private TypeSafeExpressionValueResolver<T> valueResolver;
 
@@ -38,9 +37,9 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initi
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
 
-  ExpressionBasedParameterResolver(String expression, MetadataType metadataType, Event event) {
+  ExpressionBasedParameterResolver(String expression, MetadataType metadataType, ValueResolvingContext context) {
     this.expression = expression;
-    this.event = event;
+    this.context = context;
     this.metadataType = metadataType;
   }
 
@@ -50,7 +49,7 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T>, Initi
   @Override
   public T resolve() {
     try {
-      return valueResolver.resolve(event);
+      return valueResolver.resolve(context);
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
     }

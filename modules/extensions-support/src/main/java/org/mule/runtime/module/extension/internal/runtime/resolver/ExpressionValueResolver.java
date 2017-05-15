@@ -11,15 +11,14 @@ import static org.mule.runtime.core.util.ClassUtils.isInstance;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.util.AttributeEvaluator;
-
-import org.apache.commons.lang.StringUtils;
 
 import java.util.function.BiConsumer;
 
 import javax.inject.Inject;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * A {@link ValueResolver} which evaluates a MEL expressions
@@ -65,14 +64,14 @@ public class ExpressionValueResolver<T> implements ValueResolver<T> {
   }
 
   @Override
-  public T resolve(Event event) throws MuleException {
+  public T resolve(ValueResolvingContext context) throws MuleException {
     initEvaluator();
-    TypedValue typedValue = evaluator.resolveTypedValue(event);
+    TypedValue typedValue = evaluator.resolveTypedValue(context.getEvent());
 
     Object value = typedValue.getValue();
 
     if (isInstance(ValueResolver.class, value)) {
-      value = ((ValueResolver) value).resolve(event);
+      value = ((ValueResolver) value).resolve(context);
     }
 
     return (T) value;

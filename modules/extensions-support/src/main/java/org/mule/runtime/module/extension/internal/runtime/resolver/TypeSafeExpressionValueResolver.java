@@ -13,7 +13,6 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -54,8 +53,8 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
   }
 
   @Override
-  public T resolve(Event event) throws MuleException {
-    return delegate.resolve(event);
+  public T resolve(ValueResolvingContext context) throws MuleException {
+    return delegate.resolve(context);
   }
 
   /**

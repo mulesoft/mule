@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
@@ -43,6 +46,9 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
   private Event event;
 
   @Mock
+  private ValueResolvingContext resolvingContext;
+
+  @Mock
   private MuleContext muleContext;
 
   private DefaultObjectBuilder<PersonalInfo> builder;
@@ -57,21 +63,24 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
 
     nameField = getField(PROTOTYPE_CLASS, "name").get();
     ageField = getField(PROTOTYPE_CLASS, "age").get();
+
+    when(resolvingContext.getEvent()).thenReturn(event);
+    when(resolvingContext.getConfig()).thenReturn(empty());
   }
 
   @Test
   public void build() throws Exception {
     populate(false);
-    PersonalInfo personalInfo = builder.build(event);
+    PersonalInfo personalInfo = builder.build(resolvingContext);
     verify(personalInfo);
   }
 
   @Test
   public void reusable() throws Exception {
     populate(false);
-    PersonalInfo info1 = builder.build(event);
-    PersonalInfo info2 = builder.build(event);
-    PersonalInfo info3 = builder.build(event);
+    PersonalInfo info1 = builder.build(resolvingContext);
+    PersonalInfo info2 = builder.build(resolvingContext);
+    PersonalInfo info3 = builder.build(resolvingContext);
 
     assertThat(info1, is(not(sameInstance(info2))));
     assertThat(info1, is(not(sameInstance(info3))));
@@ -102,25 +111,25 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
   @Test(expected = IllegalArgumentException.class)
   public void buildInterface() throws Exception {
     builder = new DefaultObjectBuilder(InternalMessage.class);
-    builder.build(event);
+    builder.build(resolvingContext);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void abstractClass() throws Exception {
     builder = new DefaultObjectBuilder(TestAbstract.class);
-    builder.build(event);
+    builder.build(resolvingContext);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void noDefaultConstructor() throws Exception {
     builder = new DefaultObjectBuilder(TestNoDefaultConstructor.class);
-    builder.build(event);
+    builder.build(resolvingContext);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void noPublicConstructor() throws Exception {
     builder = new DefaultObjectBuilder(NoPublicConstructor.class);
-    builder.build(event);
+    builder.build(resolvingContext);
   }
 
   private void populate(boolean dynamic) throws Exception {
@@ -129,7 +138,7 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
   }
 
   private ValueResolver getResolver(Object value, boolean dynamic) throws Exception {
-    ValueResolver resolver = ExtensionsTestUtils.getResolver(value, event, dynamic);
+    ValueResolver resolver = ExtensionsTestUtils.getResolver(value, resolvingContext, dynamic);
     resolvers.add(resolver);
 
     return resolver;

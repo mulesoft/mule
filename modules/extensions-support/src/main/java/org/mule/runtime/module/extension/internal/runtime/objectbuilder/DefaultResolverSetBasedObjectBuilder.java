@@ -7,7 +7,9 @@
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 /**
  * Default implementation of {@link ResolverSetBasedObjectBuilder} which uses reflection
@@ -29,4 +31,13 @@ public class DefaultResolverSetBasedObjectBuilder<T> extends ResolverSetBasedObj
   protected T instantiateObject() {
     return createInstance(prototypeClass);
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public T build(ValueResolvingContext context) throws MuleException {
+    return super.build(context);
+  }
+
 }

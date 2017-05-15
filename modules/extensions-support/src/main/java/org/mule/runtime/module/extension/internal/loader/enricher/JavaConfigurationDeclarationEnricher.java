@@ -11,8 +11,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
-import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -25,8 +25,8 @@ import org.mule.runtime.module.extension.internal.loader.java.type.WithParameter
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.MethodWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterizableTypeWrapper;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 /**
@@ -66,9 +66,9 @@ public class JavaConfigurationDeclarationEnricher extends AbstractAnnotatedDecla
   }
 
   private void enrich(BaseDeclaration declaration, WithParameters methodWrapper) {
-    final List<ExtensionParameter> configParameters = methodWrapper.getParametersAnnotatedWith(Config.class);
+    final Set<ExtensionParameter> configParameters = methodWrapper.getParametersAnnotatedWith(Config.class);
     if (!configParameters.isEmpty()) {
-      declaration.addModelProperty(new ConfigTypeModelProperty(configParameters.get(0).getType().getDeclaringClass()));
+      declaration.addModelProperty(new ConfigTypeModelProperty(configParameters.iterator().next().getType().getDeclaringClass()));
     }
   }
 }

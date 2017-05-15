@@ -50,6 +50,6 @@ public class MulePluginDescriptorGeneratorTestCase extends AbstractGeneratedReso
     assertThat(resource.isPresent(), is(true));
 
     String actualDescriptor = new String(resource.get().getContent());
-    JSONAssert.assertEquals(actualDescriptor, expectedDescriptor, true);
+    JSONAssert.assertEquals(expectedDescriptor, actualDescriptor, true);
   }
 }

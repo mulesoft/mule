@@ -82,6 +82,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.MetadataR
 import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -151,7 +152,8 @@ public final class ExtensionsTestUtils {
     return getResolver(value, null, true);
   }
 
-  public static ValueResolver getResolver(Object value, Event event, boolean dynamic, Class<?>... extraInterfaces)
+  public static ValueResolver getResolver(Object value, ValueResolvingContext context, boolean dynamic,
+                                          Class<?>... extraInterfaces)
       throws Exception {
     ValueResolver resolver;
     if (isEmpty(extraInterfaces)) {
@@ -160,7 +162,7 @@ public final class ExtensionsTestUtils {
       resolver = mock(ValueResolver.class, withSettings().extraInterfaces(extraInterfaces));
     }
 
-    when(resolver.resolve(event != null ? same(event) : any(Event.class))).thenReturn(value);
+    when(resolver.resolve(context != null ? same(context) : any(ValueResolvingContext.class))).thenReturn(value);
     when(resolver.isDynamic()).thenReturn(dynamic);
 
     return resolver;

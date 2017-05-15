@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
@@ -39,8 +38,8 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements ValueRe
    * {@inheritDoc}
    */
   @Override
-  public ParameterResolver<T> resolve(Event event) throws MuleException {
-    ExpressionBasedParameterResolver<T> resolver = new ExpressionBasedParameterResolver<>(exp, metadataType, event);
+  public ParameterResolver<T> resolve(ValueResolvingContext context) throws MuleException {
+    ExpressionBasedParameterResolver<T> resolver = new ExpressionBasedParameterResolver<>(exp, metadataType, context);
     resolver.setTransformationService(transformationService);
     resolver.setExtendedExpressionManager(extendedExpressionManager);
     resolver.initialise();

@@ -53,7 +53,7 @@ public class TypedInlineParameterGroupParser extends ParameterGroupParser {
   @Override
   protected void doParse(ComponentBuildingDefinition.Builder definitionBuilder) throws ConfigurationException {
     definitionBuilder.withIdentifier(name).withNamespace(namespace).asNamed().withTypeDefinition(fromType(ValueResolver.class))
-        .withObjectFactoryType(TopLevelParameterObjectFactory.class)
+        .withObjectFactoryType(InlineParameterGroupObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(metadataType).build())
         .withConstructorParameterDefinition(fromFixedValue(classLoader).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build());

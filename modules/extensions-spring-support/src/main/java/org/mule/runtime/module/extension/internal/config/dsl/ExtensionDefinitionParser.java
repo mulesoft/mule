@@ -1047,7 +1047,8 @@ public abstract class ExtensionDefinitionParser {
     }
   }
 
-  protected void parseInlineParameterGroup(ParameterGroupModel group) throws ConfigurationException {
+  protected void parseInlineParameterGroup(ParameterGroupModel group)
+      throws ConfigurationException {
     ParameterGroupDescriptor descriptor =
         group.getModelProperty(ParameterGroupModelProperty.class)
             .map(ParameterGroupModelProperty::getDescriptor)

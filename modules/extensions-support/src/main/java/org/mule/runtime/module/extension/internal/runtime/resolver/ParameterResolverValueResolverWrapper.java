@@ -32,13 +32,13 @@ public class ParameterResolverValueResolverWrapper<T> implements ValueResolver<P
    * Resolves the value of {@link this#resolver} using the given {@link Event} and wraps it into a
    * {@link StaticParameterResolver}
    *
-   * @param event a {@link Event} to resolve the {@link ValueResolver}
+   * @param context a {@link ValueResolvingContext} to resolve the {@link ValueResolver}
    * @return an {@link ParameterResolver} with the resolved value
    * @throws MuleException if it fails to resolve the value
    */
   @Override
-  public ParameterResolver<T> resolve(Event event) throws MuleException {
-    return new StaticParameterResolver<>((T) resolver.resolve(event));
+  public ParameterResolver<T> resolve(ValueResolvingContext context) throws MuleException {
+    return new StaticParameterResolver<>((T) resolver.resolve(context));
   }
 
   @Override

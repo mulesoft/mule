@@ -8,9 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-
-import java.util.Optional;
 
 /**
  * Provides a value which is dependant on a {@link Event}
@@ -22,17 +19,17 @@ public interface ValueResolver<T> {
   /**
    * Resolves a value from the given {@code event}
    *
-   * @param event a {@link Event}
+   * @param context the {@link ValueResolvingContext context} for the current resolution attempt
    * @return a resolved value
    * @throws MuleException if the resolution of the value fails
    */
-  T resolve(Event event) throws MuleException;
+  T resolve(ValueResolvingContext context) throws MuleException;
 
   /**
-   * returns {@code false} if subsequent invocations to {@link #resolve(Event)} will return the same value. Notice that if it
-   * returns {@code true}, then it might return different values per invocation but that's not guaranteed.
+   * Returns {@code false} if subsequent invocations to {@link #resolve(ValueResolvingContext)} will return the same value.
+   * Notice that if it returns {@code true}, then it might return different values per invocation but that's not guaranteed.
    *
-   * @return whether this resolve is dynamic
+   * @return whether the resolved value changes based or the resolution context or not
    */
   boolean isDynamic();
 }

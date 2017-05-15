@@ -39,7 +39,7 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
   public List<SourceElement> getSources() {
     final Optional<Sources> optionalSources = this.getAnnotation(Sources.class);
     if (optionalSources.isPresent()) {
-      return stream(optionalSources.get().value()).map(SourceTypeWrapper::new).collect(toList());
+      return stream(optionalSources.get().value()).map(s -> new SourceTypeWrapper(s)).collect(toList());
     }
     return emptyList();
   }
@@ -65,7 +65,7 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
 
     final Optional<ConnectionProviders> optionalProviders = this.getAnnotation(ConnectionProviders.class);
     if (optionalProviders.isPresent()) {
-      return stream(optionalProviders.get().value()).map(ConnectionProviderTypeWrapper::new).collect(toList());
+      return stream(optionalProviders.get().value()).map(c -> new ConnectionProviderTypeWrapper(c)).collect(toList());
     }
     return emptyList();
   }

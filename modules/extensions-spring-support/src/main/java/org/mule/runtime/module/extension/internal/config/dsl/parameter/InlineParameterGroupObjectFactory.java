@@ -8,8 +8,6 @@ package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.with;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -27,14 +25,14 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
  *
  * @since 4.0
  */
-public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFactory<Object> {
+public class InlineParameterGroupObjectFactory extends AbstractExtensionObjectFactory<Object> {
 
   private DefaultObjectBuilder builder;
   private Class<Object> objectClass;
   private final ObjectType objectType;
   private final ClassLoader classLoader;
 
-  public TopLevelParameterObjectFactory(ObjectType type, ClassLoader classLoader, MuleContext muleContext) {
+  public InlineParameterGroupObjectFactory(ObjectType type, ClassLoader classLoader, MuleContext muleContext) {
     super(muleContext);
     this.classLoader = classLoader;
     this.objectType = type;
@@ -53,8 +51,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
       resolveParameters(objectType, builder);
       resolveParameterGroups(objectType, builder);
 
-      ValueResolver<Object> resolver = new ObjectBuilderValueResolver<>(builder, muleContext);
-      return resolver.isDynamic() ? resolver : resolver.resolve(with(getInitialiserEvent(muleContext)));
+      return new ObjectBuilderValueResolver<>(builder, muleContext);
     }, Exception.class, exception -> {
       throw exception;
     });

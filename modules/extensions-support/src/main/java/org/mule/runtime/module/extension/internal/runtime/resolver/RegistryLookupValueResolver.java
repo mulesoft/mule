@@ -48,13 +48,13 @@ public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
   /**
    * Returns the registry value associated with {@link #key}
    *
-   * @param event a {@link Event}
+   * @param context a {@link ValueResolvingContext}
    * @return the registry value associated with {@link #key}
    * @throws MuleException if an error occurred fetching the value
    * @throws ConfigurationException if no object is registered under {@link #key}
    */
   @Override
-  public T resolve(Event event) throws MuleException {
+  public T resolve(ValueResolvingContext context) throws MuleException {
     T value = muleContext.getRegistry().get(key);
     if (value == null) {
       throw new ConfigurationException(createStaticMessage(format("Element '%s' is not defined in the Mule Registry", key)));

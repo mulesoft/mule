@@ -22,6 +22,7 @@ import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +44,9 @@ public class ResolverSetTestCase extends AbstractMuleTestCase {
   private Event event;
 
   @Mock
+  private ValueResolvingContext resolvingContext;
+
+  @Mock
   private MuleContext muleContext;
 
   @Before
@@ -51,12 +55,15 @@ public class ResolverSetTestCase extends AbstractMuleTestCase {
     mapping.put(getParameter("myName", String.class), getResolver(NAME));
     mapping.put(getParameter("age", Integer.class), getResolver(AGE));
 
+    when(resolvingContext.getEvent()).thenReturn(event);
+    when(resolvingContext.getConfig()).thenReturn(Optional.empty());
+
     set = buildSet(mapping);
   }
 
   @Test
   public void resolve() throws Exception {
-    ResolverSetResult result = set.resolve(event);
+    ResolverSetResult result = set.resolve(resolvingContext);
     assertResult(result, mapping);
   }
 
@@ -97,7 +104,7 @@ public class ResolverSetTestCase extends AbstractMuleTestCase {
     assertThat(result, is(notNullValue()));
     for (Map.Entry<ParameterModel, ValueResolver> entry : mapping.entrySet()) {
       Object value = result.get(entry.getKey().getName());
-      assertThat(value, is(entry.getValue().resolve(event)));
+      assertThat(value, is(entry.getValue().resolve(resolvingContext)));
     }
   }
 
@@ -109,6 +116,6 @@ public class ResolverSetTestCase extends AbstractMuleTestCase {
   }
 
   private ValueResolver getResolver(Object value) throws Exception {
-    return ExtensionsTestUtils.getResolver(value, event, false, MuleContextAware.class, Lifecycle.class);
+    return ExtensionsTestUtils.getResolver(value, resolvingContext, false, MuleContextAware.class, Lifecycle.class);
   }
 }

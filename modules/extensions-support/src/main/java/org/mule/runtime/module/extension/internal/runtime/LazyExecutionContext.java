@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import static java.util.Optional.empty;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -15,6 +14,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -35,15 +35,15 @@ public class LazyExecutionContext<M extends ComponentModel> implements EventedEx
   private final Map<String, ValueResolver> valueResolvers;
   private final M componentModel;
   private final ExtensionModel extensionModel;
-  private final Event event;
+  private final ValueResolvingContext resolvingContext;
 
   public LazyExecutionContext(ResolverSet resolverSet, M componentModel, ExtensionModel extensionModel,
-                              Event event) {
+                              ValueResolvingContext resolvingContext) {
 
     this.valueResolvers = resolverSet.getResolvers();
     this.componentModel = componentModel;
     this.extensionModel = extensionModel;
-    this.event = event;
+    this.resolvingContext = resolvingContext;
   }
 
   /**
@@ -61,7 +61,7 @@ public class LazyExecutionContext<M extends ComponentModel> implements EventedEx
   public <T> T getParameter(String parameterName) {
     if (hasParameter(parameterName)) {
       try {
-        return (T) valueResolvers.get(parameterName).resolve(event);
+        return (T) valueResolvers.get(parameterName).resolve(resolvingContext);
       } catch (MuleException e) {
         throw new RuntimeException(e);
       }
@@ -75,12 +75,12 @@ public class LazyExecutionContext<M extends ComponentModel> implements EventedEx
    */
   @Override
   public Optional<ConfigurationInstance> getConfiguration() {
-    return empty();
+    return resolvingContext.getConfig();
   }
 
   @Override
   public Event getEvent() {
-    return event;
+    return resolvingContext.getEvent();
   }
 
   /**

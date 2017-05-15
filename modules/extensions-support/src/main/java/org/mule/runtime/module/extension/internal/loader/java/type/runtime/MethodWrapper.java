@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.util.Optional.ofNullable;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
-
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
@@ -16,9 +15,9 @@ import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Wrapper for {@link Method} that provide utility methods to facilitate the introspection of a {@link Method}
@@ -53,8 +52,8 @@ public final class MethodWrapper implements MethodElement {
    * {@inheritDoc}
    */
   @Override
-  public List<ExtensionParameter> getParameters() {
-    List<ExtensionParameter> extensionParameters = new ArrayList<>();
+  public Set<ExtensionParameter> getParameters() {
+    Set<ExtensionParameter> extensionParameters = new LinkedHashSet<>();
     final Parameter[] parameters = method.getParameters();
     for (int i = 0; i < parameters.length; i++) {
       extensionParameters.add(new ParameterWrapper(method, i));
@@ -66,7 +65,7 @@ public final class MethodWrapper implements MethodElement {
    * {@inheritDoc}
    */
   @Override
-  public List<ExtensionParameter> getParameterGroups() {
+  public Set<ExtensionParameter> getParameterGroups() {
     return getParametersAnnotatedWith(ParameterGroup.class);
   }
 
@@ -74,8 +73,8 @@ public final class MethodWrapper implements MethodElement {
    * {@inheritDoc}
    */
   @Override
-  public List<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass) {
-    List<ExtensionParameter> extensionParameters = new ArrayList<>();
+  public Set<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass) {
+    Set<ExtensionParameter> extensionParameters = new LinkedHashSet<>();
     final Parameter[] parameters = method.getParameters();
     for (int i = 0; i < parameters.length; i++) {
       if (parameters[i].getAnnotation(annotationClass) != null) {

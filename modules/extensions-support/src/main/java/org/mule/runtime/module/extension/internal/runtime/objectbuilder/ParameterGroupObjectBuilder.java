@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.with;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.EventedExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -40,15 +41,17 @@ public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
   }
 
   public T build(EventedExecutionContext executionContext) throws MuleException {
-    return doBuild(executionContext::hasParameter, executionContext::getParameter, executionContext.getEvent());
+    return doBuild(executionContext::hasParameter, executionContext::getParameter,
+                   with(executionContext.getEvent(), executionContext.getConfiguration()));
   }
 
   public T build(ResolverSetResult result) throws MuleException {
     final Map<String, Object> resultMap = result.asMap();
-    return doBuild(resultMap::containsKey, resultMap::get, getInitialiserEvent());
+    return doBuild(resultMap::containsKey, resultMap::get, with(getInitialiserEvent()));
   }
 
-  private T doBuild(Predicate<String> hasParameter, Function<String, Object> parameters, Event event) throws MuleException {
+  private T doBuild(Predicate<String> hasParameter, Function<String, Object> parameters, ValueResolvingContext context)
+      throws MuleException {
     groupDescriptor.getType().getFields().forEach(field -> {
       String name = field.getName();
       if (hasParameter.test(name)) {
@@ -56,6 +59,6 @@ public class ParameterGroupObjectBuilder<T> extends DefaultObjectBuilder<T> {
       }
     });
 
-    return build(event);
+    return build(context);
   }
 }

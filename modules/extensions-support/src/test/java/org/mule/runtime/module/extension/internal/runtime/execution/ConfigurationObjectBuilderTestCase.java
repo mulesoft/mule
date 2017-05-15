@@ -12,10 +12,10 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.with;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getResolver;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
-import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.Event;
@@ -75,7 +75,7 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void build() throws Exception {
-    TestConfig testConfig = configurationObjectBuilder.build(event);
+    TestConfig testConfig = configurationObjectBuilder.build(with(event));
     assertThat(testConfig.getName(), is(NAME_VALUE));
     assertThat(testConfig.getDescription(), is(DESCRIPTION_VALUE));
   }

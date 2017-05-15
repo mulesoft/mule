@@ -11,7 +11,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.transformer.Transformer;
 
@@ -42,8 +41,8 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
   }
 
   @Override
-  public T resolve(Event event) throws MuleException {
-    return resolver.resolve(event);
+  public T resolve(ValueResolvingContext context) throws MuleException {
+    return resolver.resolve(context);
   }
 
   @Override
@@ -54,12 +53,12 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
   @Override
   public void initialise() throws InitialisationException {
     TypeSafeTransformer typeSafeTransformer = new TypeSafeTransformer(transformationService);
-    resolver = (event -> {
-      Object resolvedValue = valueResolverDelegate.resolve(event);
+    resolver = context -> {
+      Object resolvedValue = valueResolverDelegate.resolve(context);
       return isInstance(expectedType, resolvedValue)
           ? (T) resolvedValue
           : (T) typeSafeTransformer.transform(resolvedValue, DataType.fromObject(resolvedValue), DataType.fromType(expectedType));
-    });
+    };
 
     if (!valueResolverDelegate.isDynamic()) {
       resolver = new CachedResolver(resolver);
@@ -73,7 +72,7 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
   @FunctionalInterface
   private interface Resolver<T> {
 
-    T resolve(Event event) throws MuleException;
+    T resolve(ValueResolvingContext context) throws MuleException;
   }
 
   /**
@@ -85,16 +84,16 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
     private Resolver<T> resolver;
 
     private CachedResolver(Resolver<T> resolver) {
-      this.resolver = (event -> {
-        T resolvedValue = resolver.resolve(event);
-        this.resolver = (newEvent -> resolvedValue);
+      this.resolver = context -> {
+        T resolvedValue = resolver.resolve(context);
+        this.resolver = c -> resolvedValue;
         return resolvedValue;
-      });
+      };
     }
 
     @Override
-    public T resolve(Event event) throws MuleException {
-      return resolver.resolve(event);
+    public T resolve(ValueResolvingContext context) throws MuleException {
+      return resolver.resolve(context);
     }
   }
 }

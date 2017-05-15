@@ -16,15 +16,14 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.with;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 @SmallTest
@@ -42,10 +41,10 @@ public class TypeSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
     ExtendedExpressionManager expressionManager = spy(muleContext.getExpressionManager());
 
     when(staticValueResolver.isDynamic()).thenReturn(false);
-    when(staticValueResolver.resolve(any(Event.class))).thenReturn("123");
+    when(staticValueResolver.resolve(any(ValueResolvingContext.class))).thenReturn("123");
 
     when(dynamicValueResolver.isDynamic()).thenReturn(true);
-    when(dynamicValueResolver.resolve(any(Event.class))).thenReturn("123");
+    when(dynamicValueResolver.resolve(any(ValueResolvingContext.class))).thenReturn("123");
 
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
 
@@ -61,42 +60,42 @@ public class TypeSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
   @Test
   public void staticValueIsTransformed() throws MuleException {
-    Integer resolve = staticResolver.resolve(testEvent());
+    Integer resolve = staticResolver.resolve(with(testEvent()));
     assertThat(resolve, is(123));
   }
 
   @Test
   public void staticValueIsTransformedOnlyOnce() throws MuleException {
-    staticResolver.resolve(testEvent());
-    staticResolver.resolve(testEvent());
-    staticResolver.resolve(testEvent());
-    staticResolver.resolve(testEvent());
-    staticResolver.resolve(testEvent());
+    staticResolver.resolve(with(testEvent()));
+    staticResolver.resolve(with(testEvent()));
+    staticResolver.resolve(with(testEvent()));
+    staticResolver.resolve(with(testEvent()));
+    staticResolver.resolve(with(testEvent()));
 
-    verify(staticValueResolver, times(1)).resolve(any(Event.class));
+    verify(staticValueResolver, times(1)).resolve(any(ValueResolvingContext.class));
   }
 
   @Test
   public void dynamicValueIsTransformed() throws MuleException {
-    Integer resolve = dynamicResolver.resolve(testEvent());
+    Integer resolve = dynamicResolver.resolve(with(testEvent()));
     assertThat(resolve, is(123));
   }
 
   @Test
   public void dynamicValueIsTransformedOnlyOnce() throws MuleException {
-    dynamicResolver.resolve(testEvent());
-    dynamicResolver.resolve(testEvent());
-    dynamicResolver.resolve(testEvent());
-    dynamicResolver.resolve(testEvent());
-    dynamicResolver.resolve(testEvent());
+    dynamicResolver.resolve(with(testEvent()));
+    dynamicResolver.resolve(with(testEvent()));
+    dynamicResolver.resolve(with(testEvent()));
+    dynamicResolver.resolve(with(testEvent()));
+    dynamicResolver.resolve(with(testEvent()));
 
-    verify(dynamicValueResolver, times(5)).resolve(any(Event.class));
+    verify(dynamicValueResolver, times(5)).resolve(any(ValueResolvingContext.class));
   }
 
   @Test
   public void transformNullValue() throws MuleException {
-    when(staticValueResolver.resolve(any(Event.class))).thenReturn(null);
-    Integer value = staticResolver.resolve(testEvent());
+    when(staticValueResolver.resolve(any(ValueResolvingContext.class))).thenReturn(null);
+    Integer value = staticResolver.resolve(with(testEvent()));
 
     assertThat(value, is(nullValue()));
   }
