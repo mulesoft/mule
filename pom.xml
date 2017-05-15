@@ -241,7 +241,7 @@
         <release.plugin.version>2.5.3</release.plugin.version>
         <resources.plugin.version>3.0.1</resources.plugin.version>
         <site.plugin.version>3.5.1</site.plugin.version>
-        <source.plugin.version>3.0.0</source.plugin.version>
+        <source.plugin.version>3.0.1</source.plugin.version>
         <war.plugin.version>2.6</war.plugin.version>
         <shade.plugin.version>2.4.3</shade.plugin.version>
         <build.helper.maven.plugin.version>1.10</build.helper.maven.plugin.version>
@@ -2211,11 +2211,12 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
+                        <inherited>false</inherited>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
                                 <goals>
-                                    <goal>jar</goal>
+                                    <goal>aggregate</goal>
                                 </goals>
                             </execution>
                         </executions>

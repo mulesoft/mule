@@ -9,7 +9,6 @@
 /mule-standalone-${productVersion}/examples
 /mule-standalone-${productVersion}/lib
 /mule-standalone-${productVersion}/logs
-/mule-standalone-${productVersion}/src
 /mule-standalone-${productVersion}/LICENSE.txt
 /mule-standalone-${productVersion}/README.txt
 /mule-standalone-${productVersion}/MIGRATION.txt
@@ -263,10 +262,3 @@
 # /lib/logs
 #
 /mule-standalone-${productVersion}/logs/README.txt
-
-
-#
-# /lib/src
-#
-/mule-standalone-${productVersion}/src/mule-${productVersion}-src.zip
-/mule-standalone-${productVersion}/src/README.txt
