@@ -84,15 +84,6 @@
    http://jira.codehaus.org/browse/MASSEMBLY-220 -->
     <dependencySets>
 
-        <!-- Copy source bundle (the build must be run with -DperformRelease=true) -->
-        <dependencySet>
-            <outputDirectory>src</outputDirectory>
-            <includes>
-                <include>org.mule.runtime:mule:jar:sources</include>
-            </includes>
-            <outputFileNameMapping>${artifact.artifactId}-${artifact.version}-src.zip</outputFileNameMapping>
-        </dependencySet>
-
         <!-- Bootstrap -->
         <dependencySet>
             <outputDirectory>lib/boot</outputDirectory>
@@ -242,7 +233,6 @@
                 <!--//TODO(fernandezlautaro): MULE-11383 all artifacts must be .jar files , when done remove all the code to support zips-->
                 <exclude>*:zip:*</exclude>
                 <exclude>*:mule-plugin:*</exclude>
-                <exclude>*:sources:*</exclude>
 
                 <!-- lib/boot -->
                 <exclude>commons-cli:commons-cli</exclude>

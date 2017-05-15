@@ -188,14 +188,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Sources bundle -->
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule</artifactId>
-            <classifier>sources</classifier>
-            <version>${project.version}</version>
-        </dependency>
-        
         <!--
             We need to register the endorsed XML jars as dependencies of the
             distribution, so that they can be referenced in the assembly as in/excludes.
