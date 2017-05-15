@@ -5,7 +5,9 @@
 
     <flow name="main">
         <scheduler>
-            <fixed-frequency-scheduler frequency="1000"/>
+            <scheduling-strategy>
+                <fixed-frequency-scheduler frequency="1000"/>
+            </scheduling-strategy>
         </scheduler>
         <set-payload value="Hello!!"/>
         <component class="org.foo.EchoTest"/>

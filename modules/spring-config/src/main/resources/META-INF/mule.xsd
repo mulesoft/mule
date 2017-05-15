@@ -2471,14 +2471,31 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="abstract-scheduler" abstract="true" type="abstractSchedulerType">
+    <xsd:element name="scheduling-strategy" type="schedulingStrategyType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for shedulers
+                A placeholder for scheduling strategies
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractSchedulerType">
+    <xsd:complexType name="schedulingStrategyType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-scheduling-strategy" minOccurs="0" maxOccurs="1"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-scheduling-strategy" abstract="true" type="abstractSchedulingStrategyType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for scheduling strategies
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractSchedulingStrategyType">
         <xsd:complexContent>
             <xsd:extension base="annotatedType"/>
         </xsd:complexContent>
@@ -2486,7 +2503,7 @@
 
     <xsd:complexType name="fixedSchedulerType">
         <xsd:complexContent>
-            <xsd:extension base="abstractSchedulerType">
+            <xsd:extension base="abstractSchedulingStrategyType">
                 <xsd:attribute name="frequency" type="substitutableLong" default="1000">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -2512,7 +2529,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="fixed-frequency-scheduler" type="fixedSchedulerType" substitutionGroup="abstract-scheduler"/>
+    <xsd:element name="fixed-frequency-scheduler" type="fixedSchedulerType" substitutionGroup="abstract-scheduling-strategy"/>
 
     <xsd:element name="scheduler" type="schedulerMessageSourceType" substitutionGroup="abstract-message-source">
         <xsd:annotation>
@@ -2526,7 +2543,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractMessageSourceType">
                 <xsd:sequence>
-                    <xsd:element ref="abstract-scheduler" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element ref="scheduling-strategy" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>

@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class SchedulersComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider {
 
-  public static final String SCHEDULERS_NAMESPACE = "scheduler";
+  public static final String SCHEDULERS_NAMESPACE = "schedulers";
   private static final String CRON = "cron-scheduler";
 
   private static ComponentBuildingDefinition.Builder baseDefinition =

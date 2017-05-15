@@ -584,11 +584,14 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
         .withSetterParameterDefinition("storePrefix", fromSimpleParameter("storePrefix").build()).build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(SCHEDULER)
+    componentBuildingDefinitions.add(baseDefinition.copy()
+        .withIdentifier(SCHEDULER)
         .withTypeDefinition(fromType(DefaultSchedulerMessageSource.class))
         .withObjectFactoryType(SchedulingMessageSourceFactoryBean.class)
         .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
-        .withSetterParameterDefinition("scheduler", fromChildConfiguration(PeriodicScheduler.class).build()).build());
+        .withSetterParameterDefinition("scheduler", fromChildConfiguration(PeriodicScheduler.class)
+            .withWrapperIdentifier("scheduling-strategy").build())
+        .build());
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("fixed-frequency-scheduler")
         .withTypeDefinition(fromType(FixedFrequencyScheduler.class))

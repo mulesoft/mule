@@ -1,0 +1,134 @@
+{
+  "name": "Mule Schedulers",
+  "description": "Mule Runtime and Integration Platform: Scheduler components",
+  "version": "4.0.0-SNAPSHOT",
+  "vendor": "MuleSoft, Inc.",
+  "category": "COMMUNITY",
+  "minMuleVersion": "4.0.0-SNAPSHOT",
+  "xmlDsl": {
+    "prefix": "schedulers",
+    "namespace": "http://www.mulesoft.org/schema/mule/schedulers",
+    "schemaLocation": "http://www.mulesoft.org/schema/mule/schedulers/current/mule-schedulers.xsd",
+    "schemaVersion": "4.0.0-SNAPSHOT",
+    "xsdFileName": "mule-schedulers.xsd"
+  },
+  "resources": [],
+  "subTypes": [
+    {
+      "baseType": {
+        "format": "java",
+        "type": "@ref:org.mule.runtime.core.api.source.SchedulingStrategy"
+      },
+      "subTypes": [
+        {
+          "format": "java",
+          "type": "@ref:org.mule.runtime.module.scheduler.cron.CronScheduler"
+        }
+      ]
+    }
+  ],
+  "externalLibraries": [],
+  "importedTypes": [
+    {
+      "type": {
+        "format": "java",
+        "type": "@ref:org.mule.runtime.core.api.source.SchedulingStrategy"
+      },
+      "extension": "Mule Core"
+    }
+  ],
+  "configurations": [],
+  "operations": [],
+  "connectionProviders": [],
+  "messageSources": [],
+  "errors": [],
+  "modelProperties": {},
+  "types": [
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.runtime.core.api.source.SchedulingStrategy",
+        "classInformation": {
+          "hasDefaultConstructor": false,
+          "isInterface": true,
+          "isInstantiable": false,
+          "isAbstract": true,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "typeAlias": {
+          "value": "SchedulingStrategy"
+        }
+      },
+      "fields": []
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.runtime.module.scheduler.cron.CronScheduler",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "org.mule.runtime.core.api.source.SchedulingStrategy"
+          ],
+          "parent": "",
+          "genericTypes": []
+        },
+        "typeAlias": {
+          "value": "CronScheduler"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "expression",
+            "required": "true"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          },
+          "annotations": {
+            "visibility": "WRITE_ONLY",
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "timeZone"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          },
+          "annotations": {
+            "visibility": "WRITE_ONLY",
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

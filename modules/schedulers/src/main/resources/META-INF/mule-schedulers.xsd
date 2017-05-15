@@ -18,7 +18,7 @@
 
     <xsd:complexType name="cronSchedulerType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractSchedulerType">
+            <xsd:extension base="mule:abstractSchedulingStrategyType">
                 <xsd:attribute name="expression" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -37,6 +37,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="cron-scheduler" type="cronSchedulerType" substitutionGroup="mule:abstract-scheduler"/>
+    <xsd:element name="cron-scheduler" type="cronSchedulerType" substitutionGroup="mule:abstract-scheduling-strategy"/>
 
 </xsd:schema>

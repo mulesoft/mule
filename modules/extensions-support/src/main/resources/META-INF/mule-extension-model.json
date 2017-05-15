@@ -13,7 +13,20 @@
     "xsdFileName": "mule.xsd"
   },
   "resources": [],
-  "subTypes": [],
+  "subTypes": [
+    {
+      "baseType": {
+        "format": "java",
+        "type": "@ref:org.mule.runtime.core.api.source.SchedulingStrategy"
+      },
+      "subTypes": [
+        {
+          "format": "java",
+          "type": "@ref:org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler"
+        }
+      ]
+    }
+  ],
   "externalLibraries": [],
   "importedTypes": [],
   "configurations": [],
@@ -2934,81 +2947,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler",
-                  "classInformation": {
-                    "hasDefaultConstructor": true,
-                    "isInterface": false,
-                    "isInstantiable": true,
-                    "isAbstract": false,
-                    "isFinal": false,
-                    "implementedInterfaces": [],
-                    "parent": "org.mule.runtime.core.api.source.polling.PeriodicScheduler",
-                    "genericTypes": []
-                  },
-                  "typeAlias": {
-                    "value": "FixedFrequencyScheduler"
-                  }
-                },
-                "fields": [
-                  {
-                    "key": {
-                      "name": "frequency"
-                    },
-                    "model": {
-                      "type": "Number",
-                      "annotations": {
-                        "int": {},
-                        "typeId": "long"
-                      }
-                    },
-                    "annotations": {
-                      "visibility": "WRITE_ONLY"
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "startDelay"
-                    },
-                    "model": {
-                      "type": "Number",
-                      "annotations": {
-                        "int": {},
-                        "typeId": "long"
-                      }
-                    },
-                    "annotations": {
-                      "visibility": "WRITE_ONLY"
-                    }
-                  },
-                  {
-                    "key": {
-                      "name": "timeUnit"
-                    },
-                    "model": {
-                      "type": "String",
-                      "annotations": {
-                        "typeId": "java.util.concurrent.TimeUnit",
-                        "enum": {
-                          "type": "[Ljava.lang.String;",
-                          "values": [
-                            "NANOSECONDS",
-                            "MICROSECONDS",
-                            "MILLISECONDS",
-                            "SECONDS",
-                            "MINUTES",
-                            "HOURS",
-                            "DAYS"
-                          ]
-                        }
-                      }
-                    },
-                    "annotations": {
-                      "visibility": "WRITE_ONLY"
-                    }
-                  }
-                ]
+                "type": "@ref:org.mule.runtime.core.api.source.SchedulingStrategy"
               },
               "hasDynamicType": false,
               "required": false,
@@ -3026,7 +2965,7 @@
                 "query": false,
                 "order": 1
               },
-              "name": "fixedFrequencyScheduler",
+              "name": "schedulingStrategy",
               "description": "",
               "modelProperties": {}
             }
@@ -3041,8 +2980,8 @@
         // Manually removed the "Connection" model group
         // Didn't add the watermark parameters
       ],
-      "name": "poll",
-      "description": "Polls the nested message processor for new messages.",
+      "name": "scheduler",
+      "description": "Source that schedules periodic execution of a flow.",
       "modelProperties": {}
     }
   ],
@@ -3133,5 +3072,109 @@
     }
   ],
   "modelProperties": {},
-  "types": []
+  "types": [
+    {
+        "format": "java",
+        "type": "Object",
+        "annotations": {
+          "typeId": "org.mule.runtime.core.api.source.SchedulingStrategy",
+          "classInformation": {
+            "hasDefaultConstructor": false,
+            "isInterface": true,
+            "isInstantiable": false,
+            "isAbstract": true,
+            "isFinal": false,
+            "implementedInterfaces": [],
+            "parent": "",
+            "genericTypes": []
+          },
+          "typeAlias": {
+            "value": "SchedulingStrategy"
+          }
+        },
+        "fields": []
+    },
+    {
+        "format": "java",
+        "type": "Object",
+        "annotations": {
+          "typeId": "org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler",
+          "classInformation": {
+            "hasDefaultConstructor": true,
+            "isInterface": false,
+            "isInstantiable": true,
+            "isAbstract": false,
+            "isFinal": false,
+            "implementedInterfaces": [
+              "org.mule.runtime.core.api.source.SchedulingStrategy"
+            ],
+            "parent": "org.mule.runtime.core.api.source.polling.PeriodicScheduler",
+            "genericTypes": []
+          },
+          "typeAlias": {
+            "value": "FixedFrequencyScheduler"
+          }
+        },
+        "fields": [
+          {
+            "key": {
+              "name": "frequency"
+            },
+            "model": {
+              "type": "Number",
+              "annotations": {
+                "int": {},
+                "typeId": "long"
+              }
+            },
+            "annotations": {
+              "visibility": "WRITE_ONLY",
+              "default": "1000l"
+            }
+          },
+          {
+            "key": {
+              "name": "timeUnit"
+            },
+            "model": {
+              "type": "String",
+              "annotations": {
+                "typeId": "java.util.concurrent.TimeUnit",
+                "enum": {
+                  "type": "[Ljava.lang.String;",
+                  "values": [
+                    "NANOSECONDS",
+                    "MICROSECONDS",
+                    "MILLISECONDS",
+                    "SECONDS",
+                    "MINUTES",
+                    "HOURS",
+                    "DAYS"
+                  ]
+                }
+              }
+            },
+            "annotations": {
+              "visibility": "WRITE_ONLY"
+            }
+          },
+          {
+            "key": {
+              "name": "startDelay"
+            },
+            "model": {
+              "type": "Number",
+              "annotations": {
+                "int": {},
+                "typeId": "long"
+              }
+            },
+            "annotations": {
+              "visibility": "WRITE_ONLY",
+              "default": "0l"
+            }
+          }
+        ]
+      }
+  ]
 }

@@ -4,23 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.resources;
+package org.mule.runtime.module.scheduler.resources;
 
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExtensionTypeAnnotationsRegistry;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 
 /**
- * Utility class to access the {@link ExtensionModel} definition for Mule's Runtime
+ * Utility class to access the {@link ExtensionModel} definition for Mule's Schedulers
  *
  * @since 4.0
  */
-public class MuleExtensionModelProvider {
+public class SchedulersExtensionModelProvider {
 
-  private static final String MODEL_JSON = "META-INF/mule-extension-model.json";
-  private static final String JSON = IOUtils.toString(MuleExtensionModelProvider.class.getClassLoader()
+  private static final String MODEL_JSON = "META-INF/mule-schedulers-extension-model.json";
+  private static final String JSON = IOUtils.toString(SchedulersExtensionModelProvider.class.getClassLoader()
       .getResourceAsStream(MODEL_JSON));
   private static final ExtensionModel EXTENSION_MODEL =
       withContextClassLoader(ExtensionTypeAnnotationsRegistry.class.getClassLoader(),
@@ -28,7 +29,7 @@ public class MuleExtensionModelProvider {
 
 
   /**
-   * @return the {@link ExtensionModel} definition for Mule's Runtime
+   * @return the {@link ExtensionModel} definition for Mule's Schedulers
    */
   public static ExtensionModel getExtensionModel() {
     return EXTENSION_MODEL;
