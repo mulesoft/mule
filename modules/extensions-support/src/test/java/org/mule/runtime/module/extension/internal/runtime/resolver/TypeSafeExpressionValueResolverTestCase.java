@@ -18,6 +18,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -29,6 +31,8 @@ import org.mockito.verification.VerificationMode;
 public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContextTestCase {
 
   private static final String HELLO_WORLD = "Hello World!";
+  private static final MetadataType STRING =
+      new JavaTypeLoader(Thread.currentThread().getContextClassLoader()).load(String.class);
 
   private ExtendedExpressionManager expressionManager;
 
@@ -42,49 +46,48 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
 
   @Test
   public void expressionLanguageWithoutTransformation() throws Exception {
-    assertResolved(getResolver("#[mel:'Hello ' + payload]", String.class)
+    assertResolved(getResolver("#[mel:'Hello ' + payload]", STRING)
         .resolve(eventBuilder().message(of("World!")).build()), HELLO_WORLD, never());
   }
 
   @Test
   public void expressionTemplateWithoutTransformation() throws Exception {
-    assertResolved(getResolver("Hello #[mel:payload]", String.class)
+    assertResolved(getResolver("Hello #[mel:payload]", STRING)
         .resolve(eventBuilder().message(of("World!")).build()), HELLO_WORLD, times(1));
   }
 
   @Test
   public void constant() throws Exception {
-    assertResolved(getResolver("Hello World!", String.class)
+    assertResolved(getResolver("Hello World!", STRING)
         .resolve(eventBuilder().message(of(HELLO_WORLD)).build()), HELLO_WORLD, never());
   }
 
   @Test
   public void expressionWithTransformation() throws Exception {
-    assertResolved(getResolver("#[mel:true]", String.class)
+    assertResolved(getResolver("#[mel:true]", STRING)
         .resolve(eventBuilder().message(of(HELLO_WORLD)).build()), "true", never());
   }
 
   @Test
   public void templateWithTransformation() throws Exception {
-    assertResolved(getResolver("tru#[mel:'e']", String.class)
+    assertResolved(getResolver("tru#[mel:'e']", STRING)
         .resolve(eventBuilder().message(of(HELLO_WORLD)).build()), "true", times(1));
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void nullExpression() throws Exception {
-    getResolver(null, String.class);
+    getResolver(null, STRING);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void blankExpression() throws Exception {
-    getResolver(EMPTY, String.class);
+    getResolver(EMPTY, STRING);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void nullExpectedType() throws Exception {
     getResolver("#[mel:payload]", null);
   }
-
 
   private void assertResolved(Object resolvedValue, Object expected, VerificationMode expressionManagerVerificationMode) {
     assertThat(resolvedValue, instanceOf(String.class));
@@ -96,8 +99,8 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
     verify(expressionManager, mode).parse(anyString(), any(Event.class), any(FlowConstruct.class));
   }
 
-  private ValueResolver getResolver(String expression, Class<?> expectedType) throws Exception {
-    TypeSafeExpressionValueResolver valueResolver = new TypeSafeExpressionValueResolver(expression, expectedType);
+  private <T> ValueResolver<T> getResolver(String expression, MetadataType expectedType) throws Exception {
+    TypeSafeExpressionValueResolver<T> valueResolver = new TypeSafeExpressionValueResolver<>(expression, expectedType);
     valueResolver.setExtendedExpressionManager(expressionManager);
     valueResolver.setTransformationService(muleContext.getTransformationService());
     valueResolver.initialise();

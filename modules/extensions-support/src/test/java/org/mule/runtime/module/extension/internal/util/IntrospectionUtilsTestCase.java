@@ -14,9 +14,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExposedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldMetadataType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.unwrapGenericFromClass;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
@@ -24,6 +26,9 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.a
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.springframework.core.ResolvableType.forType;
+import org.mule.metadata.api.builder.ArrayTypeBuilder;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -31,6 +36,9 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.metadata.CollectionDataType;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
@@ -44,18 +52,19 @@ import org.mule.tck.testmodels.fruit.FruitBox;
 import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.test.petstore.extension.PhoneNumber;
 
+import org.junit.Test;
+import org.springframework.core.ResolvableType;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
-import org.junit.Test;
-import org.springframework.core.ResolvableType;
 
 @SmallTest
 public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
@@ -164,6 +173,68 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   public void unwrapPagingProviderGenericFromParentClass() {
     ResolvableType type = unwrapGenericFromClass(PagingProvider.class, forType(TestPagingProvider.class), 1);
     assertThat(type.getRawClass(), equalTo(Banana.class));
+  }
+
+  @Test
+  public void getDataTypeFromList() {
+    Class<List> listClass = List.class;
+    Class<Integer> integerClass = Integer.class;
+
+    ArrayTypeBuilder arrayTypeBuilder = BaseTypeBuilder.create(JAVA)
+        .arrayType()
+        .id(listClass.getName());
+    arrayTypeBuilder.of().numberType().id(Integer.class.getName());
+
+    CollectionDataType dataType = (CollectionDataType) toDataType(arrayTypeBuilder.build());
+
+    assertThat(dataType.getType(), is(equalTo(listClass)));
+    assertThat(dataType.getItemDataType().getType(), is(equalTo(integerClass)));
+  }
+
+  @Test
+  public void getDataTypeFromMap() {
+    Class<Date> dateClass = Date.class;
+    Class<Map> mapClass = Map.class;
+
+    ObjectTypeBuilder objectTypeBuilder = BaseTypeBuilder
+        .create(JAVA)
+        .objectType()
+        .id(mapClass.getName());
+    objectTypeBuilder.openWith().objectType().id(dateClass.getName());
+
+    MapDataType dataType = (MapDataType) toDataType(objectTypeBuilder.build());
+
+    assertThat(dataType.getType(), is(equalTo(mapClass)));
+    assertThat(dataType.getKeyDataType().getType(), is(equalTo(String.class)));
+    assertThat(dataType.getValueDataType().getType(), is(equalTo(dateClass)));
+  }
+
+  @Test
+  public void getDataTypeFromObject() {
+    Class<Object> objectClass = Object.class;
+
+    ObjectTypeBuilder objectTypeBuilder = BaseTypeBuilder
+        .create(JAVA)
+        .objectType()
+        .id(objectClass.getName());
+
+    DataType dataType = toDataType(objectTypeBuilder.build());
+
+    assertThat(dataType.getType(), is(equalTo(objectClass)));
+  }
+
+  @Test
+  public void getDataTypeFromString() {
+    Class<String> stringClass = String.class;
+
+    ObjectTypeBuilder objectTypeBuilder = BaseTypeBuilder
+        .create(JAVA)
+        .objectType()
+        .id(stringClass.getName());
+
+    DataType dataType = toDataType(objectTypeBuilder.build());
+
+    assertThat(dataType.getType(), is(equalTo(stringClass)));
   }
 
   private void assertField(String name, MetadataType metadataType, Collection<Field> fields) {

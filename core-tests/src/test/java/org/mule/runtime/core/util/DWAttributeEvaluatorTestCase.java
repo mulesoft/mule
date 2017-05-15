@@ -22,7 +22,6 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -36,15 +35,15 @@ import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -53,7 +52,9 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   private static final String HOST_PORT_JSON = "{\"host\":\"0.0.0.0\", \"port\" : 8081}";
   private static final String JSON_CAR = "{\n  \"color\": \"RED\",\n  \"price\": 1000\n}";
   private static final String DW_CAR = "#[{color : 'RED', price: 1000}]";
+  private static final String DW_CAR_LIST = "#[[{color : 'RED', price: 1000}]]";
   private static final DataType CAR_DATA_TYPE = DataType.fromType(Car.class);
+  private static final DataType CAR_LIST_DATA_TYPE = DataType.builder().collectionType(List.class).itemType(Car.class).build();
   private Event mockMuleEvent = mock(Event.class);
   private DefaultExpressionManager expressionManager;
 
@@ -131,7 +132,7 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void getMapFromJsonCar() throws MuleException {
     AttributeEvaluator attributeEvaluator = getAttributeEvaluator("#[payload]", DataType.fromType(Map.class));
-    Map<String, String> car = (Map<String, String>) attributeEvaluator.resolveValue(newEvent(JSON_CAR, APPLICATION_JSON));
+    Map<String, String> car = attributeEvaluator.resolveValue(newEvent(JSON_CAR, APPLICATION_JSON));
     assertThat(car, hasEntry(is("price"), is(1000)));
     assertThat(car, hasEntry(is("color"), is("RED")));
   }
@@ -139,9 +140,17 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void getListOfCarsFromJsonCar() throws MuleException {
     AttributeEvaluator attributeEvaluator =
-        getAttributeEvaluator("#[[payload as Object { class: \"org.mule.runtime.core.util.Car\"}]]",
-                              DataType.fromType(List.class));
-    List<Car> cars = (List<Car>) attributeEvaluator.resolveValue(newEvent(JSON_CAR, APPLICATION_JSON));
+        getAttributeEvaluator("#[[payload]]", CAR_LIST_DATA_TYPE);
+    List<Car> cars = attributeEvaluator.resolveValue(newEvent(JSON_CAR, APPLICATION_JSON));
+    Car car = cars.get(0);
+    assertThat(car, is(allOf(hasProperty("color", is("RED")), hasProperty("price", is(1000)))));
+  }
+
+  @Test
+  public void getListOfCarsFromExpression() throws MuleException {
+    AttributeEvaluator attributeEvaluator =
+        getAttributeEvaluator(DW_CAR_LIST, CAR_LIST_DATA_TYPE);
+    List<Car> cars = attributeEvaluator.resolveValue(newEvent(JSON_CAR, APPLICATION_JSON));
     Car car = cars.get(0);
     assertThat(car, is(allOf(hasProperty("color", is("RED")), hasProperty("price", is(1000)))));
   }
@@ -149,8 +158,7 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void getListOfMapsFromJsonCar() throws MuleException {
     AttributeEvaluator attributeEvaluator = getAttributeEvaluator("#[[payload as Object]]", DataType.fromType(List.class));
-    List<Map<String, String>> cars =
-        (List<Map<String, String>>) attributeEvaluator.resolveValue(newEvent(JSON_CAR, APPLICATION_JSON));
+    List<Map<String, String>> cars = attributeEvaluator.resolveValue(newEvent(JSON_CAR, APPLICATION_JSON));
     Map<String, String> car = cars.get(0);
     assertThat(car, hasEntry(is("price"), is(1000)));
     assertThat(car, hasEntry(is("color"), is("RED")));

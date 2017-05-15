@@ -48,10 +48,16 @@ public class ExpressionValueResolver<T> implements ValueResolver<T> {
         }
       };
 
-  ExpressionValueResolver(String expression, DataType dataType) {
+  ExpressionValueResolver(String expression, DataType expectedDataType) {
     checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
 
-    this.evaluator = new AttributeEvaluator(expression, dataType);
+    this.evaluator = new AttributeEvaluator(expression, expectedDataType);
+  }
+
+  public ExpressionValueResolver(String expression) {
+    checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
+
+    this.evaluator = new AttributeEvaluator(expression);
   }
 
   void setExtendedExpressionManager(ExtendedExpressionManager extendedExpressionManager) {

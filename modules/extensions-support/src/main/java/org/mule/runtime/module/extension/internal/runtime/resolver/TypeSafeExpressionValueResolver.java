@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -33,8 +35,9 @@ import javax.inject.Inject;
  */
 public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Initialisable {
 
-  private final Class<T> expectedType;
-  private final String expression;
+  private MetadataType expectedMetadataType;
+  private Class<T> expectedType;
+  private String expression;
   private TypeSafeValueResolverWrapper<T> delegate;
 
   @Inject
@@ -43,10 +46,11 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
 
-  public TypeSafeExpressionValueResolver(String expression, Class<T> expectedType) {
-    checkArgument(expectedType != null, "expected type cannot be null");
-    this.expectedType = expectedType;
+  public TypeSafeExpressionValueResolver(String expression, MetadataType expectedMetadataType) {
+    checkArgument(expectedMetadataType != null, "expected type cannot be null");
     this.expression = expression;
+    this.expectedType = getType(expectedMetadataType);
+    this.expectedMetadataType = expectedMetadataType;
   }
 
   @Override
@@ -64,7 +68,7 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
 
   @Override
   public void initialise() throws InitialisationException {
-    ExpressionValueResolver resolver = new ExpressionValueResolver(expression, fromType(expectedType));
+    ExpressionValueResolver resolver = new ExpressionValueResolver(expression, toDataType(expectedMetadataType));
     resolver.setExtendedExpressionManager(extendedExpressionManager);
     delegate = new TypeSafeValueResolverWrapper<>(resolver, expectedType);
     delegate.setTransformationService(transformationService);
