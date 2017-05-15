@@ -4,26 +4,25 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
-package org.mule.module.db.integration.template;
+package org.mule.test.components;
 
 import org.mule.tck.AbstractConfigurationErrorTestCase;
 
 import org.junit.Test;
 
-public class TemplateQueryFileAndTextTestCase extends AbstractConfigurationErrorTestCase
+public class InvalidFlowStatePlaceholderTestCase extends AbstractConfigurationErrorTestCase
 {
 
     @Override
     protected String getConfigFile()
     {
-        return "integration/template/template-query-file-and-text-config.xml";
+        return "org/mule/test/components/invalid-flow-initial-state.xml";
     }
 
     @Test
-    public void doesNotAllowSimultaneousQueryTextAndFile() throws Exception
+    public void invalidInitialFlowStatePlaceholder() throws Exception
     {
-        assertConfigurationError("Able to define a template query with text content and file simultaneously");
-
+        assertConfigurationError("'${state}]' is not a valid value of union type '#AnonType_initialStateflowType'");
     }
+
 }

@@ -7,7 +7,7 @@
 
 package org.mule.module.db.integration.select;
 
-import org.mule.module.db.integration.config.AbstractConfigurationErrorTestCase;
+import org.mule.tck.AbstractConfigurationErrorTestCase;
 
 import org.junit.Test;
 
