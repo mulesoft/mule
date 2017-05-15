@@ -30,7 +30,7 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
+import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
 /**
  * Registers services instances into the {@link MuleRegistry} of a {@link MuleContext}.

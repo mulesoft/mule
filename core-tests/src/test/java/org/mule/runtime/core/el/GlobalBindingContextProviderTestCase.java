@@ -30,7 +30,7 @@ import org.mule.runtime.core.api.el.GlobalBindingContextProvider;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
+import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
 import java.util.ArrayList;
 import java.util.List;

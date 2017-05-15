@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.builders;
 
-import com.mulesoft.weave.el.WeaveDefaultExpressionLanguageFactoryService;
+import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.MuleContext;
