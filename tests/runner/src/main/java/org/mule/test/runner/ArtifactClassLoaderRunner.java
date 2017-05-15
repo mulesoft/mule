@@ -7,7 +7,10 @@
 package org.mule.test.runner;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.io.File.separator;
 import static java.lang.System.getProperty;
+import static java.lang.System.getenv;
+import static java.util.Arrays.stream;
 import static java.util.Optional.of;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
@@ -107,6 +110,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
   private static final String M2_REPO = "/.m2/repository";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArtifactClassLoaderRunner.class);
+  public static final String MAVEN_GLOBAL_SETTINGS_PATH = "conf" + separator + "settings.xml";
 
   private static String userHome = getProperty(USER_HOME);
   private static ArtifactClassLoaderHolder artifactClassLoaderHolder;
@@ -233,15 +237,32 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     } else {
       LOGGER.warn("Maven user settings not present in default folder: {}", userSettings.getAbsolutePath());
     }
+
+    mavenConfigurationBuilder.withGlobalSettingsLocation(getMavenGlobalSettings()
+        .orElseThrow(() -> new IllegalStateException("Couldn't find maven directory")));
     final MavenConfiguration mavenConfiguration = mavenConfigurationBuilder.build();
     LOGGER.info("Using MavenConfiguration: {}", mavenConfiguration);
 
-    final DependencyResolver dependencyResolver = new DependencyResolver(mavenConfiguration, of(new DefaultWorkspaceReader(classPath, workspaceLocationResolver)));
+    final DependencyResolver dependencyResolver =
+        new DependencyResolver(mavenConfiguration, of(new DefaultWorkspaceReader(classPath, workspaceLocationResolver)));
     builder.setClassPathClassifier(new AetherClassPathClassifier(dependencyResolver,
                                                                  new ArtifactClassificationTypeResolver(
                                                                                                         dependencyResolver)));
 
     return builder.build();
+  }
+
+  private static Optional<File> getMavenGlobalSettings() {
+    final String mavenHome = getenv("MAVEN_HOME");
+    if (mavenHome != null) {
+      File globalSettings = new File(mavenHome, MAVEN_GLOBAL_SETTINGS_PATH);
+      if (globalSettings.exists()) {
+        return of(globalSettings);
+      }
+    }
+    Optional<String> mavenPath =
+        stream(getenv("PATH").split(File.pathSeparator)).filter(path -> path.contains("maven")).findFirst();
+    return mavenPath.map(path -> new File(path, MAVEN_GLOBAL_SETTINGS_PATH));
   }
 
   /**

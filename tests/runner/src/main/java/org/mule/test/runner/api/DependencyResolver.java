@@ -65,7 +65,8 @@ public class DependencyResolver {
     checkNotNull(mavenConfiguration, "mavenConfiguration cannot be null");
 
     this.resolutionContext = new AetherResolutionContext(mavenConfiguration);
-    this.repositoryState = new AetherRepositoryState(this.resolutionContext.getLocalRepositoryLocation(), workspaceReader);
+    this.repositoryState =
+        new AetherRepositoryState(this.resolutionContext.getLocalRepositoryLocation(), workspaceReader, false, false);
   }
 
   /**
