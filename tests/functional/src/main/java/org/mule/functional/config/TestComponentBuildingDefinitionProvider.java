@@ -77,6 +77,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("appendString", fromSimpleParameter("appendString").build())
         .withSetterParameterDefinition("waitTime", fromSimpleParameter("waitTime").build())
         .withSetterParameterDefinition("id", fromSimpleParameter("id").build())
+        .withSetterParameterDefinition("raiseErrorType", fromSimpleParameter("raiseErrorType").build())
         .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build());
 
     componentBuildingDefinitions.add(baseComponentDefinition.copy()

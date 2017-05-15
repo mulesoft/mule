@@ -192,7 +192,9 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
       for (Interceptor interceptor : interceptors) {
         chainBuilder.chain(interceptor);
       }
-      chainBuilder.chain(new AnnotatedProcessor(event -> invokeInternal(event)));
+      AnnotatedProcessor annotatedProcessor = new AnnotatedProcessor(event -> invokeInternal(event));
+      annotatedProcessor.setAnnotations(this.getAnnotations());
+      chainBuilder.chain(annotatedProcessor);
       interceptorChain = chainBuilder.build();
       applyLifecycleAndDependencyInjection(interceptorChain);
       doInitialise();

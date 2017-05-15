@@ -12,8 +12,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
@@ -101,7 +101,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
       cut.execute(mockMessageProcessor, mockMuleEvent);
       fail("Exception should be thrown");
     } catch (MessagingException e) {
-      assertThat((MuleException) e.getCause(), is(mockMuleException));
+      assertThat(e.getCause(), is(mockMuleException));
     }
   }
 
@@ -113,7 +113,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
       cut.execute(mockMessageProcessor, mockMuleEvent);
       fail("Exception should be thrown");
     } catch (MessagingException e) {
-      assertThat((RuntimeException) e.getCause(), is(runtimeException));
+      assertThat(e.getCause(), is(runtimeException));
     }
   }
 
@@ -126,6 +126,36 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
       fail("Exception should be thrown");
     } catch (MessagingException e) {
       assertThat((java.lang.Error) e.getCause(), is(error));
+    }
+  }
+
+  @Test
+  public void messagingExceptionWithErrorWrappedByAnotherMessagingException() throws Exception {
+    testExceptionWrappedByAnotherException(mockMessagingException);
+  }
+
+  @Test
+  public void messagingExceptionWithErrorWrappedByNonMessagingException() throws Exception {
+    testExceptionWrappedByAnotherException(mockMuleException);
+  }
+
+  private void testExceptionWrappedByAnotherException(MuleException wrapperException) throws MuleException {
+    ErrorType moreSpecificErrorType = mock(ErrorType.class);
+    Error moreSpecificError = mock(Error.class);
+    IllegalStateException causeOfMoreSpecificException = new IllegalStateException();
+    when(moreSpecificError.getCause()).thenReturn(causeOfMoreSpecificException);
+    when(moreSpecificError.getErrorType()).thenReturn(moreSpecificErrorType);
+    MessagingException moreSpecificException = mock(MessagingException.class, RETURNS_DEEP_STUBS.get());
+    when(moreSpecificException.getEvent().getError()).thenReturn(of(moreSpecificError));
+    when(moreSpecificException.getCause()).thenReturn(causeOfMoreSpecificException);
+
+    when(wrapperException.getCause()).thenReturn(moreSpecificException);
+    when(mockMessageProcessor.process(mockMuleEvent)).thenThrow(wrapperException);
+    try {
+      cut.execute(mockMessageProcessor, mockMuleEvent);
+      fail("Exception should be thrown");
+    } catch (MessagingException e) {
+      assertThat(e.getEvent().getError().get(), is(moreSpecificError));
     }
   }
 }

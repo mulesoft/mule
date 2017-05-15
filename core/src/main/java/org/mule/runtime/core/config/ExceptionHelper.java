@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.config;
 
+import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.legacy.exception.ExceptionReader;
 import org.mule.runtime.core.api.MuleContext;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -316,6 +318,24 @@ public final class ExceptionHelper extends org.mule.runtime.api.exception.Except
     StringBuilder msg = new StringBuilder();
     msg.append(er.getMessage(t)).append(". Type: ").append(t.getClass());
     return msg.toString();
+  }
+
+  /**
+   * Searches for the deepes cause with the given type.
+   * 
+   * @param exceptionType the exception type to search for
+   * @param exception the exception to search within
+   * @param <T> the type of the exception to search for
+   * @return the deepest cause with the given exception type or null if not found
+   */
+  public static <T> Optional<T> getDeepestExceptionType(Class<T> exceptionType, Exception exception) {
+    Throwable exceptionFound = traverseCauseHierarchy(exception, cause -> {
+      if (exceptionType.isAssignableFrom(cause.getClass())) {
+        return cause;
+      }
+      return null;
+    });
+    return ofNullable((T) exceptionFound);
   }
 
   public static interface ExceptionEvaluator<T> {

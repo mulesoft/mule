@@ -6,14 +6,19 @@
  */
 package org.mule.runtime.core.execution;
 
+import static java.util.Optional.empty;
+import static org.mule.runtime.core.config.ExceptionHelper.getDeepestExceptionType;
 import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.util.ExceptionUtils.getRootCauseException;
 import static org.mule.runtime.core.util.ExceptionUtils.putContext;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
+
+import java.util.Optional;
 
 /**
  * Replace any exception thrown with a MessagingException
@@ -28,15 +33,20 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
     try {
       return messageProcessor.process(event);
     } catch (Exception exception) {
+      Optional<MessagingException> messagingExceptionWrappedByAnotherException =
+          findMessagingExceptionWrappedByAnotherException(exception);
+      if (messagingExceptionWrappedByAnotherException.isPresent()) {
+        throw messagingExceptionWrappedByAnotherException.get();
+      }
       MessagingException messagingException;
       if (exception instanceof MessagingException) {
-        //Use same exception, but make sure whether a new error is needed
+        // Use same exception, but make sure whether a new error is needed
         messagingException = (MessagingException) exception;
         // TODO - MULE-10266 - Once we remove the usage of MessagingException from within the mule component we can get rid of the
         // messagingException.causedExactlyBy(..) condition.
         event = createErrorEvent(event, messageProcessor, messagingException, muleContext.getErrorTypeLocator());
       } else {
-        //Create a ME and an error, both using the exception
+        // Create a ME and an error, both using the exception
         messagingException = new MessagingException(event, getRootCauseException(exception), messageProcessor);
         messagingException
             .setProcessedEvent(createErrorEvent(event, messageProcessor, messagingException, muleContext.getErrorTypeLocator()));
@@ -50,6 +60,24 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
     } catch (Throwable ex) {
       throw putContext(new MessagingException(event, ex, messageProcessor), messageProcessor, event, flowConstruct, muleContext);
     }
+  }
+
+  /**
+   * Searches for a {@link MessagingException} with an {@link Error} inside the {@link Event} it contains from all the causes of
+   * the provided exception.
+   * <p>
+   * If such exception exists, then it's because the exception is wrapping an exception that already has an error.
+   * 
+   * @param exception the exception to search in all it's causes for a {@link MessagingException} with an {@link Error}
+   * @return the found exception or empty.
+   */
+  public static Optional<MessagingException> findMessagingExceptionWrappedByAnotherException(Exception exception) {
+    Optional<MessagingException> messagingExceptionOptional = getDeepestExceptionType(MessagingException.class, exception);
+    Optional<Error> error = messagingExceptionOptional.flatMap(messagingException -> messagingException.getEvent().getError());
+    if (error.isPresent()) {
+      return messagingExceptionOptional;
+    }
+    return empty();
   }
 
   @Override

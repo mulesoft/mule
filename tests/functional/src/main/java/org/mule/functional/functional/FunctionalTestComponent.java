@@ -6,8 +6,10 @@
  */
 package org.mule.functional.functional;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.functional.functional.FunctionalTestNotification.EVENT_RECEIVED;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.runtime.api.exception.MuleException;
@@ -25,6 +27,8 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.exception.ErrorTypeRepository;
+import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.NumberUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
@@ -32,6 +36,8 @@ import org.mule.runtime.core.util.StringMessageUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -54,10 +60,14 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
+  @Inject
+  private ErrorTypeRepository errorTypeRepository;
+
   public static final int STREAM_SAMPLE_SIZE = 4;
   public static final int STREAM_BUFFER_SIZE = 4096;
 
   private EventCallback eventCallback;
+  private String raiseErrorType;
   private Object returnData = null;
   private boolean throwException = false;
   private Class<? extends Throwable> exceptionToThrow;
@@ -127,8 +137,13 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
    */
   @Override
   public Object onCall(MuleEventContext context) throws Exception {
+    if (raiseErrorType != null) {
+      throw new TypedException(createExceptionToThrow(), muleContext.getErrorTypeRepository()
+          .getErrorType(buildFromStringRepresentation(raiseErrorType))
+          .orElseThrow(() -> new IllegalArgumentException(format("The error type %s does not exists", raiseErrorType))));
+    }
     if (isThrowException()) {
-      throwException();
+      throw createExceptionToThrow();
     }
     return process(getMessageFromContext(context), context);
   }
@@ -160,7 +175,7 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
     MuleEventContext context = new DefaultMuleEventContext(flowConstruct, getCurrentEvent());
 
     if (isThrowException()) {
-      throwException();
+      throw createExceptionToThrow();
     }
     return process(data, context);
   }
@@ -171,20 +186,20 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
    *
    * @throws FunctionalTestException or the exception specified in 'exceptionType
    */
-  protected void throwException() throws Exception {
+  protected Exception createExceptionToThrow() throws Exception {
     if (getExceptionToThrow() != null) {
       if (StringUtils.isNotBlank(exceptionText)) {
         Throwable exception = ClassUtils.instanciateClass(getExceptionToThrow(),
                                                           new Object[] {exceptionText});
-        throw (Exception) exception;
+        return (Exception) exception;
       } else {
-        throw (Exception) getExceptionToThrow().newInstance();
+        return (Exception) getExceptionToThrow().newInstance();
       }
     } else {
       if (StringUtils.isNotBlank(exceptionText)) {
-        throw new FunctionalTestException(exceptionText);
+        return new FunctionalTestException(exceptionText);
       } else {
-        throw new FunctionalTestException();
+        return new FunctionalTestException();
       }
     }
   }
@@ -267,6 +282,13 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
       }
     }
     return replyMessage;
+  }
+
+  /**
+   * @param raiseErrorType error type to raise when executed
+   */
+  public void setRaiseErrorType(String raiseErrorType) {
+    this.raiseErrorType = raiseErrorType;
   }
 
   /**
