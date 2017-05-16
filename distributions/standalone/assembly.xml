@@ -241,7 +241,6 @@
                 <!-- lib/plugins (these artifacts are zip type) -->
                 <!--//TODO(fernandezlautaro): MULE-11383 all artifacts must be .jar files , when done remove all the code to support zips-->
                 <exclude>*:zip:*</exclude>
-                <exclude>*:mule-plugin:*</exclude>
 
                 <!-- lib/boot -->
                 <exclude>commons-cli:commons-cli</exclude>
