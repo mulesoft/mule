@@ -21,7 +21,6 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.openjdk.jmh.annotations.*;
 
 @OutputTimeUnit(NANOSECONDS)
-@Warmup(iterations = 1)
 public class ExpressionBenchmark extends AbstractBenchmark {
 
 

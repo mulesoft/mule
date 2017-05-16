@@ -191,7 +191,6 @@
                                         <argument>-prof</argument>
                                         <argument>gc</argument>
                                     </arguments>
-                                    <!--<commandlineArgs>-rf json -prof gc</commandlineArgs>-->
                                 </configuration>
                             </execution>
                         </executions>
