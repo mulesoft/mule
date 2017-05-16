@@ -7,7 +7,7 @@
 package org.mule.runtime.core.util.queue.objectstore;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.util.queue.Queue;
 import org.mule.runtime.core.util.queue.QueueSession;
 import org.mule.runtime.core.util.queue.objectstore.xa.AbstractXAResourceManager;

@@ -9,10 +9,10 @@ package org.mule.runtime.core.util.store;
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
-import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
-import org.mule.runtime.core.api.store.ObjectStore;
-import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectAlreadyExistsException;
+import org.mule.runtime.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.io.Serializable;

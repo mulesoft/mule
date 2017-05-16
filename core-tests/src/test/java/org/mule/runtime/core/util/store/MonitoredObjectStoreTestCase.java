@@ -10,8 +10,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.store.ObjectStoreNotAvaliableException;
+import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
@@ -67,7 +67,7 @@ public class MonitoredObjectStoreTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
-    public boolean contains(Serializable id) throws ObjectStoreNotAvaliableException {
+    public boolean contains(Serializable id) throws ObjectStoreNotAvailableException {
       return false;
     }
 

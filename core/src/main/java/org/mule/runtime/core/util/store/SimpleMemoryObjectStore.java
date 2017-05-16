@@ -10,7 +10,7 @@ import static java.util.Collections.synchronizedMap;
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
 
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStoreException;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -10,7 +10,7 @@ package org.mule.runtime.core.streaming;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.core.internal.streaming.object.iterator.ListableObjectStoreProducer;
 import org.mule.tck.size.SmallTest;
 

@@ -8,7 +8,7 @@ package org.mule.runtime.core.util.store;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStoreException;
 
 import java.io.Serializable;
 import java.util.Collection;

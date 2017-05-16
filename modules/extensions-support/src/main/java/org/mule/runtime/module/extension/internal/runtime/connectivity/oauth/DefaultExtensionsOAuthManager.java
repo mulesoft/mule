@@ -32,7 +32,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.util.func.CheckedFunction;
 import org.mule.runtime.core.util.store.LazyObjectStoreToMapAdapter;

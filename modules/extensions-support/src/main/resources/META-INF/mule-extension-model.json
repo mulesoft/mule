@@ -168,7 +168,7 @@
                 "format": "java",
                 "type": "Object",
                 "annotations": {
-                  "typeId": "org.mule.runtime.core.api.store.ObjectStore",
+                  "typeId": "org.mule.runtime.api.store.ObjectStore",
                   "classInformation": {
                     "hasDefaultConstructor": false,
                     "isInterface": true,
@@ -210,7 +210,7 @@
                 "format": "java",
                 "type": "Object",
                 "annotations": {
-                  "typeId": "org.mule.runtime.core.api.store.ObjectStore",
+                  "typeId": "org.mule.runtime.api.store.ObjectStore",
                   "classInformation": {
                     "hasDefaultConstructor": false,
                     "isInterface": true,
@@ -1493,7 +1493,7 @@
                 "format": "java",
                 "type": "Object",
                 "annotations": {
-                  "typeId": "org.mule.runtime.core.api.store.ObjectStore",
+                  "typeId": "org.mule.runtime.api.store.ObjectStore",
                   "classInformation": {
                     "hasDefaultConstructor": false,
                     "isInterface": true,

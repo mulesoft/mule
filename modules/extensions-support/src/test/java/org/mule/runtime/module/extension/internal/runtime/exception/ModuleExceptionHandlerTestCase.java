@@ -62,7 +62,7 @@ public class ModuleExceptionHandlerTestCase {
         .thenReturn(singleton(newError(TRANSFORMATION_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
     ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     ModuleException moduleException =
-        new ModuleException(new RuntimeException(), CONNECTIVITY);
+        new ModuleException(CONNECTIVITY, new RuntimeException());
 
     assertThatThrownBy(() -> handler.processException(moduleException))
         .isInstanceOf(MuleRuntimeException.class)
@@ -76,7 +76,7 @@ public class ModuleExceptionHandlerTestCase {
     when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
     ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     ModuleException moduleException =
-        new ModuleException(new RuntimeException(), CONNECTIVITY);
+        new ModuleException(CONNECTIVITY, new RuntimeException());
 
     assertThatThrownBy(() -> handler.processException(moduleException))
         .isInstanceOf(MuleRuntimeException.class)
@@ -96,7 +96,7 @@ public class ModuleExceptionHandlerTestCase {
                                 typeRepository.getAnyErrorType());
 
     ModuleException moduleException =
-        new ModuleException(new RuntimeException(), CONNECTIVITY);
+        new ModuleException(CONNECTIVITY, new RuntimeException());
     Throwable exception = handler.processException(moduleException);
 
     assertThat(exception, is(instanceOf(TypedException.class)));

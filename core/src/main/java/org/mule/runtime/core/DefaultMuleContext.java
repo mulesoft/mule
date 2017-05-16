@@ -54,6 +54,7 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
@@ -86,7 +87,7 @@ import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.api.store.ObjectStoreManager;
+import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.config.ClusterConfiguration;
@@ -648,12 +649,12 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   /**
-   * When running in clustered mode, it returns a {@link org.mule.runtime.core.api.store.ObjectStoreManager} that creates
-   * {@link org.mule.runtime.core.api.store.ObjectStore} instances which are only local to the current node. This is just a
+   * When running in clustered mode, it returns a {@link ObjectStoreManager} that creates
+   * {@link ObjectStore} instances which are only local to the current node. This is just a
    * workaround until we introduce a solution for durable persistent stores in HA. This is not part of Mule's API and you should
    * not use this in your apps or extensions
    *
-   * @return a {@link org.mule.runtime.core.api.store.ObjectStoreManager}
+   * @return a {@link ObjectStoreManager}
    * @since 3.5.0
    */
   public ObjectStoreManager getLocalObjectStoreManager() {

@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.api.store;
 
+import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStoreException;
+
 import java.io.Serializable;
 
 public interface ExpirableObjectStore<T extends Serializable> extends ObjectStore<T> {

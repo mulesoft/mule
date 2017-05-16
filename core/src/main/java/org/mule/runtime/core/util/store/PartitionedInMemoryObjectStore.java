@@ -7,11 +7,11 @@
 package org.mule.runtime.core.util.store;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
-import static org.mule.runtime.core.api.store.ObjectStoreManager.UNBOUNDED;
+import static org.mule.runtime.api.store.ObjectStoreManager.UNBOUNDED;
 
-import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
-import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
-import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectAlreadyExistsException;
+import org.mule.runtime.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableExpirableObjectStore;
 
 import java.io.Serializable;

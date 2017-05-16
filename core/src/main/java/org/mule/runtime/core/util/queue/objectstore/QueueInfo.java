@@ -8,8 +8,8 @@ package org.mule.runtime.core.util.queue.objectstore;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.api.store.ObjectStore;
-import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStoreException;
 
 import java.io.Serializable;
 import java.util.HashMap;
