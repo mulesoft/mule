@@ -154,6 +154,11 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   private TypedValue handleStreaming(TypedValue value, Event event) {
+    //TODO required a better fix for MULE-12486
+    if (event == null) {
+      return value;
+    }
+
     Object payload = value.getValue();
     if (payload instanceof CursorProvider) {
       value = new TypedValue<>(streamingManager.manage((CursorProvider) payload, event), value.getDataType());
