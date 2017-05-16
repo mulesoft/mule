@@ -27,12 +27,12 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.routing.DuplicateMessageException;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.routing.ValidationException;
-import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 
 import java.io.IOException;
+import java.util.concurrent.RejectedExecutionException;
 
 /**
  * Factory for {@link ErrorTypeLocator}.
@@ -60,7 +60,7 @@ public class ErrorTypeLocatorFactory {
             .addExceptionMapping(RetryPolicyExhaustedException.class, errorTypeRepository.lookupErrorType(RETRY_EXHAUSTED).get())
             .addExceptionMapping(IOException.class, errorTypeRepository.lookupErrorType(CONNECTIVITY).get())
             .addExceptionMapping(SecurityException.class, errorTypeRepository.lookupErrorType(SECURITY).get())
-            .addExceptionMapping(SchedulerBusyException.class, errorTypeRepository.getErrorType(OVERLOAD).get())
+            .addExceptionMapping(RejectedExecutionException.class, errorTypeRepository.getErrorType(OVERLOAD).get())
             .addExceptionMapping(MessageRedeliveredException.class,
                                  errorTypeRepository.lookupErrorType(REDELIVERY_EXHAUSTED).get())
             .addExceptionMapping(Exception.class, errorTypeRepository.getErrorType(UNKNOWN).get())

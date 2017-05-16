@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
@@ -35,9 +36,11 @@ import org.mule.runtime.core.internal.construct.processor.FlowConstructStatistic
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
+import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.reactivestreams.Publisher;
 
@@ -217,7 +220,12 @@ public class DefaultFlowBuilder implements Builder {
             Event request = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
             // Use sink and potentially shared stream in Flow by dispatching incoming event via sink and then using
             // response publisher to operate of the result of flow processing before returning
-            sink.accept(request);
+            try {
+              sink.accept(request);
+            } catch (RejectedExecutionException ree) {
+              request.getContext()
+                  .error(ExceptionUtils.updateMessagingExceptionWithError(new MessagingException(event, ree, this), this, this));
+            }
             return Mono.from(request.getContext().getResponsePublisher())
                 .map(r -> {
                   Event result = createReturnEventForParentFlowConstruct(r, event);
@@ -229,7 +237,6 @@ public class DefaultFlowBuilder implements Builder {
                 });
           });
     }
-
 
     private Event createMuleEventForCurrentFlow(Event event, Object replyToDestination, ReplyToHandler replyToHandler) {
       // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any

@@ -9,7 +9,9 @@ package org.mule.runtime.core.processor.strategy;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.WAIT;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -39,7 +41,7 @@ public class WorkQueueProcessingStrategyFactory extends AbstractProcessingStrate
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new WorkQueueProcessingStrategy(() -> muleContext.getSchedulerService()
         .ioScheduler(muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + BLOCKING.name())
-            .withMaxConcurrentTasks(getMaxConcurrency())));
+            .withMaxConcurrentTasks(getMaxConcurrency()).withRejectionAction(WAIT)));
   }
 
   static class WorkQueueProcessingStrategy extends AbstractProcessingStrategy implements Startable, Stoppable {
@@ -64,7 +66,8 @@ public class WorkQueueProcessingStrategyFactory extends AbstractProcessingStrate
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
       if (processor.getProcessingType() == CPU_LITE_ASYNC) {
-        return publisher -> from(publisher).transform(processor).publishOn(fromExecutorService(ioScheduler));
+        return publisher -> from(publisher)
+            .flatMap(event -> just(event).transform(processor).publishOn(fromExecutorService(decorateScheduler(ioScheduler))));
       } else {
         return super.onProcessor(processor);
       }
