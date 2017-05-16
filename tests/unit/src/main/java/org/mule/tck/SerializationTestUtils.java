@@ -12,8 +12,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
-import org.mule.runtime.core.api.store.ObjectStore;
-import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 
 public abstract class SerializationTestUtils {

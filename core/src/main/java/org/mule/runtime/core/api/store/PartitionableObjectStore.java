@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.store;
 
+import org.mule.runtime.api.store.ObjectStoreException;
+
 import java.io.Serializable;
 import java.util.List;
 

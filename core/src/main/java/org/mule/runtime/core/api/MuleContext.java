@@ -33,7 +33,7 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.api.store.ObjectStoreManager;
+import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;

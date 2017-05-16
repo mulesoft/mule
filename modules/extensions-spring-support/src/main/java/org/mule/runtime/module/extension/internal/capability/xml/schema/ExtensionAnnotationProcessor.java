@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
 import static org.mule.runtime.core.util.ClassUtils.loadClass;
 import org.mule.runtime.api.util.Reference;
@@ -20,12 +22,12 @@ import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
-import org.apache.commons.lang.StringUtils;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Stream;
@@ -39,6 +41,8 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.util.ElementFilter;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Annotation processing class that uses the {@link Processor} API to introspect and extract information from the extension
@@ -64,12 +68,22 @@ public final class ExtensionAnnotationProcessor {
    * @param <T>                   the generic type of the returned {@link Class}
    * @return the {@link Class} represented by {@code typeElement}
    */
-  public <T> Class<T> classFor(TypeElement typeElement, ProcessingEnvironment processingEnvironment) {
+  public <T> Optional<Class<T>> classFor(TypeElement typeElement, ProcessingEnvironment processingEnvironment) {
     try {
-      return loadClass(processingEnvironment.getElementUtils().getBinaryName(typeElement).toString(), typeElement.getClass());
+      return of(loadClass(getClassName(typeElement, processingEnvironment), typeElement.getClass()));
     } catch (ClassNotFoundException e) {
-      throw new RuntimeException(e);
+      return empty();
     }
+  }
+
+  /**
+   * Returns the name of the class represented by the {@code typeElement}
+   * @param typeElement a {@link TypeElement}
+   * @param processingEnvironment the {@link ProcessingEnvironment}
+   * @return A class name
+   */
+  public String getClassName(TypeElement typeElement, ProcessingEnvironment processingEnvironment) {
+    return processingEnvironment.getElementUtils().getBinaryName(typeElement).toString();
   }
 
   /**
@@ -97,7 +111,7 @@ public final class ExtensionAnnotationProcessor {
 
   public <T> T getAnnotationFromType(ProcessingEnvironment processingEnvironment, TypeElement rootElement,
                                      Class<? extends Annotation> annotationClass) {
-    return (T) classFor(rootElement, processingEnvironment).getAnnotation(annotationClass);
+    return (T) classFor(rootElement, processingEnvironment).get().getAnnotation(annotationClass);
   }
 
   public Element getElementForClass(List<AnnotationValue> annotationValues, Class<?> clazz) {
@@ -167,8 +181,7 @@ public final class ExtensionAnnotationProcessor {
       for (Attribute.Compound compound : parameterSymbol.getAnnotationMirrors()) {
         DeclaredType annotationType = compound.getAnnotationType();
         if (annotationType != null) {
-          Class<? extends Annotation> annotationClass =
-              classFor((TypeElement) compound.getAnnotationType().asElement(), processingEnv);
+          Class annotationClass = classFor((TypeElement) compound.getAnnotationType().asElement(), processingEnv).get();
           if (ParameterGroup.class.isAssignableFrom(annotationClass)) {
             try {
               getOperationParameterGroupDocumentation((TypeElement) processingEnv.getTypeUtils()

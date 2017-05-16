@@ -75,7 +75,12 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
 
     try {
       getExtension(roundEnv).ifPresent(extensionElement -> {
-        final Class<?> extensionClass = processor.classFor(extensionElement, processingEnv);
+        Optional<Class<Object>> annotatedClass = processor.classFor(extensionElement, processingEnv);
+        if (!annotatedClass.isPresent()) {
+          log("Extension class " + processor.getClassName(extensionElement, processingEnv) + " could not be found. Skipping");
+          return;
+        }
+        final Class<?> extensionClass = annotatedClass.get();
         withContextClassLoader(extensionClass.getClassLoader(), () -> {
           ExtensionModel extensionModel = parseExtension(extensionElement, roundEnv);
           generator.generateFor(extensionModel);
@@ -90,7 +95,7 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
   }
 
   private ExtensionModel parseExtension(TypeElement extensionElement, RoundEnvironment roundEnvironment) {
-    Class<?> extensionClass = processor.classFor(extensionElement, processingEnv);
+    Class<?> extensionClass = processor.classFor(extensionElement, processingEnv).get();
 
     Map<String, Object> params = new HashMap<>();
     params.put(TYPE_PROPERTY_NAME, extensionClass.getName());

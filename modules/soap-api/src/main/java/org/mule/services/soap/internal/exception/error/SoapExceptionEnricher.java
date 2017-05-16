@@ -19,7 +19,6 @@ import org.mule.services.soap.api.exception.DispatchingException;
 import org.mule.services.soap.api.exception.EncodingException;
 import org.mule.services.soap.api.exception.InvalidWsdlException;
 import org.mule.services.soap.api.exception.SoapFaultException;
-import org.mule.services.soap.api.exception.SoapServiceException;
 
 /**
  * A util class that knows how to wrap an exception throwed by the Soap Service into a {@link ModuleException}.
@@ -38,22 +37,22 @@ public class SoapExceptionEnricher {
    */
   public Exception enrich(Exception e) {
     if (e instanceof SoapFaultException) {
-      return new ModuleException(e, SOAP_FAULT);
+      return new ModuleException(SOAP_FAULT, e);
     }
     if (e instanceof InvalidWsdlException) {
-      return new ModuleException(e, INVALID_WSDL);
+      return new ModuleException(INVALID_WSDL, e);
     }
     if (e instanceof BadResponseException) {
-      return new ModuleException(e, BAD_RESPONSE);
+      return new ModuleException(BAD_RESPONSE, e);
     }
     if (e instanceof BadRequestException) {
-      return new ModuleException(e, BAD_REQUEST);
+      return new ModuleException(BAD_REQUEST, e);
     }
     if (e instanceof DispatchingException) {
-      return new ModuleException(e, CANNOT_DISPATCH);
+      return new ModuleException(CANNOT_DISPATCH, e);
     }
     if (e instanceof EncodingException) {
-      return new ModuleException(e, ENCODING);
+      return new ModuleException(ENCODING, e);
     }
     return new Exception("Unexpected error while consuming web service: " + e.getMessage(), e);
   }

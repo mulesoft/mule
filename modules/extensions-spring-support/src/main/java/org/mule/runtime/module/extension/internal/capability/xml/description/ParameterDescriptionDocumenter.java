@@ -46,7 +46,7 @@ final class ParameterDescriptionDocumenter extends AbstractDescriptionDocumenter
     final Map<String, VariableElement> variableElements = processor.getFieldsAnnotatedWith(element, Parameter.class);
     TypeElement traversingElement = element;
     while (traversingElement != null && !Object.class.getName().equals(traversingElement.getQualifiedName().toString())) {
-      Class<?> declaringClass = processor.classFor(traversingElement, processingEnv);
+      Class<?> declaringClass = processor.classFor(traversingElement, processingEnv).get();
 
       parameterized.getAllParameters()
           .forEach(param -> getField(declaringClass, param)

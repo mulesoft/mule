@@ -13,9 +13,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
-import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
-import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectAlreadyExistsException;
+import org.mule.runtime.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.store.AbstractMonitoredObjectStore;
 

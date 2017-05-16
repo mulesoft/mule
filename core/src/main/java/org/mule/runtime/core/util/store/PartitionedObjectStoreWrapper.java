@@ -8,8 +8,8 @@ package org.mule.runtime.core.util.store;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
-import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectAlreadyExistsException;
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.util.queue.objectstore.QueueKey;
 
 import java.io.Serializable;

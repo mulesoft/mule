@@ -19,7 +19,7 @@ import static java.util.Calendar.WEEK_OF_YEAR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.text.SimpleDateFormat;

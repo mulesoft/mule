@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.util.queue.objectstore;
 
-import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStoreException;
 
 import java.io.Serializable;
 import java.util.Collection;

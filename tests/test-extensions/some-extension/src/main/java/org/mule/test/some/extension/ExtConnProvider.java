@@ -18,8 +18,8 @@ import org.mule.test.heisenberg.extension.HeisenbergErrors;
 
 public class ExtConnProvider implements CachedConnectionProvider<String> {
 
-  private static final ModuleException OAUTH_MODULE_EXCEPTION = new ModuleException(null, HeisenbergErrors.OAUTH2);
-  private static final ModuleException HEALTH_MODULE_EXCEPTION = new ModuleException(null, HeisenbergErrors.HEALTH);
+  private static final ModuleException OAUTH_MODULE_EXCEPTION = new ModuleException("", HeisenbergErrors.OAUTH2);
+  private static final ModuleException HEALTH_MODULE_EXCEPTION = new ModuleException("", HeisenbergErrors.HEALTH);
   private static final CustomConnectionException DOMAIN_HEALTH_CONNECTION_EXCEPTION =
       new CustomConnectionException(HEALTH_MODULE_EXCEPTION);
   private static final CustomConnectionException DOMAIN_OAUTH_CONNECTION_EXCEPTION =

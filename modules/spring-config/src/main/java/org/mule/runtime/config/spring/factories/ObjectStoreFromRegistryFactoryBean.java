@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStore;
 
 import java.io.Serializable;
 

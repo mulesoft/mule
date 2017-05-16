@@ -11,7 +11,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionJournal;
 import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionRecoverer;
 import org.mule.runtime.core.util.journal.queue.XaTxQueueTransactionJournal;

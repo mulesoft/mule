@@ -30,11 +30,11 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.DuplicateMessageException;
-import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
-import org.mule.runtime.core.api.store.ObjectStore;
-import org.mule.runtime.core.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.store.ObjectStoreManager;
-import org.mule.runtime.core.api.store.ObjectStoreNotAvaliableException;
+import org.mule.runtime.api.store.ObjectAlreadyExistsException;
+import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.core.exception.MessagingException;
 
 import org.slf4j.Logger;
@@ -130,7 +130,7 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
           return true;
         } catch (ObjectAlreadyExistsException ex) {
           return false;
-        } catch (ObjectStoreNotAvaliableException e) {
+        } catch (ObjectStoreNotAvailableException e) {
           LOGGER.error("ObjectStore not available: " + e.getMessage());
           return false;
         } catch (ObjectStoreException e) {

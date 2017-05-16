@@ -43,7 +43,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.core.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.runtime.core.el.DefaultExpressionManager;

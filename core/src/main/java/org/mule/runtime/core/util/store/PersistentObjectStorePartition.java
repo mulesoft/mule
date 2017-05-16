@@ -9,7 +9,7 @@ package org.mule.runtime.core.util.store;
 
 import static org.apache.commons.io.FileUtils.moveFileToDirectory;
 import static org.apache.commons.io.FileUtils.readFileToString;
-import static org.mule.runtime.core.api.store.ObjectStoreManager.UNBOUNDED;
+import static org.mule.runtime.api.store.ObjectStoreManager.UNBOUNDED;
 import static org.mule.runtime.core.util.FileUtils.cleanDirectory;
 import static org.mule.runtime.core.util.FileUtils.newFile;
 
@@ -20,10 +20,10 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.store.ExpirableObjectStore;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
-import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
-import org.mule.runtime.core.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.store.ObjectStoreNotAvaliableException;
+import org.mule.runtime.api.store.ObjectAlreadyExistsException;
+import org.mule.runtime.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.io.File;
@@ -69,19 +69,19 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     this.partitionDirectory = partitionDirectory;
   }
 
-  PersistentObjectStorePartition(MuleContext muleContext, File partitionDirectory) throws ObjectStoreNotAvaliableException {
+  PersistentObjectStorePartition(MuleContext muleContext, File partitionDirectory) throws ObjectStoreNotAvailableException {
     this.muleContext = muleContext;
     serializer = muleContext.getObjectSerializer();
     this.partitionDirectory = partitionDirectory;
     this.partitionName = readPartitionFileName(partitionDirectory);
   }
 
-  private String readPartitionFileName(File partitionDirectory) throws ObjectStoreNotAvaliableException {
+  private String readPartitionFileName(File partitionDirectory) throws ObjectStoreNotAvailableException {
     File partitionDescriptorFile = new File(partitionDirectory, PARTITION_DESCRIPTOR_FILE);
     try {
       return readFileToString(partitionDescriptorFile);
     } catch (IOException e) {
-      throw new ObjectStoreNotAvaliableException(e);
+      throw new ObjectStoreNotAvailableException(e);
     }
   }
 

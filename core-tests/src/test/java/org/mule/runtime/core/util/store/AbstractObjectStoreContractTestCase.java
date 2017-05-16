@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.util.store;
 
-import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
-import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
-import org.mule.runtime.core.api.store.ObjectStore;
-import org.mule.runtime.core.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectAlreadyExistsException;
+import org.mule.runtime.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
