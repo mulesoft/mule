@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.internal;
 
 import static org.mule.runtime.config.spring.MuleArtifactContext.INNER_BEAN_PREFIX;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -16,10 +17,10 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.config.spring.SpringRegistry;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -34,7 +35,6 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.api.util.queue.QueueManager;
-import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
 import org.mule.runtime.core.internal.lifecycle.NotificationLifecycleObject;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;
@@ -86,7 +86,6 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
       initOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
       initOrderedObjects.add(new NotificationLifecycleObject(Config.class));
       initOrderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
-      initOrderedObjects.add(new NotificationLifecycleObject(Agent.class));
       initOrderedObjects.add(new NotificationLifecycleObject(SecurityManager.class));
       initOrderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
       initOrderedObjects.add(new NotificationLifecycleObject(Initialisable.class));

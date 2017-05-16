@@ -7,7 +7,6 @@
 package org.mule.runtime.config.spring.processors;
 
 import org.mule.runtime.api.meta.NameableObject;
-import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.LegacyConnector;
 
@@ -23,7 +22,7 @@ public class MuleObjectNameProcessor implements BeanPostProcessor {
 
   private boolean overwrite = false;
   private final Class<? extends NameableObject> managedTypes[] =
-      new Class[] {LegacyConnector.class, Transformer.class, Agent.class};
+      new Class[] {LegacyConnector.class, Transformer.class};
 
   @Override
   public Object postProcessBeforeInitialization(Object object, String beanName) throws BeansException {
