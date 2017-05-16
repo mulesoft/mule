@@ -143,14 +143,6 @@
             </exclusions>
         </dependency>
 
-        <!-- Include all Mule Plugins -->
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-file-extension-common</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-plugin</classifier>
-        </dependency>
-
         <!-- Include all Mule Services -->
         <dependency>
             <groupId>org.mule.distributions</groupId>
