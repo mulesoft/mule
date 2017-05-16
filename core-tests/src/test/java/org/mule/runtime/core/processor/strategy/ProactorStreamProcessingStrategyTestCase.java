@@ -8,7 +8,6 @@ package org.mule.runtime.core.processor.strategy;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -24,10 +23,7 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.strategy.ProactorStreamProcessingStrategyFactory.ProactorStreamProcessingStrategy;
-
-import java.util.concurrent.RejectedExecutionException;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
@@ -69,9 +65,7 @@ public class ProactorStreamProcessingStrategyTestCase extends ProactorProcessing
     flow.setMessageProcessors(singletonList(blockingProcessor));
     flow.initialise();
     flow.start();
-    expectedException.expect(MessagingException.class);
-    expectedException.expect(overloadErrorTypeMatcher());
-    expectedException.expectCause(instanceOf(RejectedExecutionException.class));
+    expectRejected();
     process(flow, testEvent());
   }
 
@@ -90,9 +84,7 @@ public class ProactorStreamProcessingStrategyTestCase extends ProactorProcessing
     flow.setMessageProcessors(singletonList(cpuIntensiveProcessor));
     flow.initialise();
     flow.start();
-    expectedException.expect(MessagingException.class);
-    expectedException.expect(overloadErrorTypeMatcher());
-    expectedException.expectCause(instanceOf(RejectedExecutionException.class));
+    expectRejected();
     process(flow, testEvent());
   }
 

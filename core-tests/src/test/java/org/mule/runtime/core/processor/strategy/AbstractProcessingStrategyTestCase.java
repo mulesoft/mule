@@ -12,6 +12,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Collections.synchronizedSet;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
@@ -21,6 +22,7 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.mule.runtime.core.exception.Errors.Identifiers.OVERLOAD_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.Exceptions.bubble;
 import static reactor.core.publisher.Flux.from;
@@ -35,7 +37,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -77,6 +79,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
   protected static final String CUSTOM = "custom";
   protected static final String RING_BUFFER = "ringBuffer";
   private static final int STREAM_ITERATIONS = 2000;
+  private static final int CONCURRENT_TEST_CONCURRENCY = 8;
 
   protected Flow flow;
   protected Set<String> threads = synchronizedSet(new HashSet<>());
@@ -204,11 +207,20 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     internalConcurrent(false, BLOCKING, 1);
   }
 
-  protected void internalConcurrent(boolean blocks, ReactiveProcessor.ProcessingType processingType, int invocations)
+  protected void internalConcurrent(boolean blocks, ProcessingType processingType, int invocations)
+      throws MuleException, InterruptedException {
+    internalConcurrent(blocks, processingType, invocations, null);
+  }
+
+  protected void internalConcurrent(boolean blocks, ProcessingType processingType, int invocations, Processor processor)
       throws MuleException, InterruptedException {
     MultipleInvocationLatchedProcessor latchedProcessor = new MultipleInvocationLatchedProcessor(processingType, invocations);
 
-    flow.setMessageProcessors(singletonList(latchedProcessor));
+    if (processor != null) {
+      flow.setMessageProcessors(asList(processor, latchedProcessor));
+    } else {
+      flow.setMessageProcessors(asList(latchedProcessor));
+    }
     flow.initialise();
     flow.start();
 
@@ -229,7 +241,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     latchedProcessor.release();
 
     if (blocks) {
-      assertThat(latchedProcessor.getUnlatchedInvocationLatch().await(BLOCK_TIMEOUT, MILLISECONDS), is(true));
+      assertThat(latchedProcessor.getUnlatchedInvocationLatch().await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
     }
 
     threads = threadsBeforeUnlock;
@@ -310,28 +322,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void asyncCpuLightConcurrent() throws Exception {
-    internalAsyncCpuLightConcurrent(false);
-  }
-
-  protected void internalAsyncCpuLightConcurrent(boolean blocks) throws MuleException, InterruptedException {
-    MultipleInvocationLatchedProcessor latchedProcessor = new MultipleInvocationLatchedProcessor(CPU_LITE, 1);
-
-    flow.setMessageProcessors(asList(asyncProcessor, latchedProcessor));
-    flow.initialise();
-    flow.start();
-
-    asyncExecutor.submit(() -> process(flow, newEvent()));
-
-    latchedProcessor.getAllLatchedLatch().await();
-
-    asyncExecutor.submit(() -> process(flow, newEvent()));
-    assertThat(latchedProcessor.getUnlatchedInvocationLatch().await(BLOCK_TIMEOUT, MILLISECONDS), is(!blocks));
-
-    latchedProcessor.release();
-
-    if (blocks) {
-      assertThat(latchedProcessor.getUnlatchedInvocationLatch().await(BLOCK_TIMEOUT, MILLISECONDS), is(true));
-    }
+    internalConcurrent(false, CPU_LITE, 1, asyncProcessor);
   }
 
   @Test
@@ -357,19 +348,14 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void concurrentStream() throws Exception {
-    CountDownLatch latch = doConcurrentStream();
-    assertThat(latch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
-  }
-
-  protected CountDownLatch doConcurrentStream() throws MuleException {
     flow.setMessageProcessors(asList(cpuLightProcessor));
     flow.initialise();
     flow.start();
 
     CountDownLatch latch = new CountDownLatch(STREAM_ITERATIONS);
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < CONCURRENT_TEST_CONCURRENCY; i++) {
       asyncExecutor.submit(() -> {
-        for (int j = 0; j < STREAM_ITERATIONS / 8; j++) {
+        for (int j = 0; j < STREAM_ITERATIONS / CONCURRENT_TEST_CONCURRENCY; j++) {
           try {
             switch (mode) {
               case BLOCKING:
@@ -386,7 +372,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
         }
       });
     }
-    return latch;
+    assertThat(latch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
   }
 
   @Test
@@ -578,7 +564,13 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     return allOf(greaterThanOrEqualTo(min), lessThanOrEqualTo(max));
   }
 
-  protected TypeSafeMatcher<MessagingException> overloadErrorTypeMatcher() {
+  protected void expectRejected() {
+    expectedException.expect(MessagingException.class);
+    expectedException.expect(overloadErrorTypeMatcher());
+    expectedException.expectCause(instanceOf(RejectedExecutionException.class));
+  }
+
+  private TypeSafeMatcher<MessagingException> overloadErrorTypeMatcher() {
     return new TypeSafeMatcher<MessagingException>() {
 
       private String errorTypeId;
@@ -591,8 +583,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
       @Override
       protected boolean matchesSafely(MessagingException item) {
         errorTypeId = item.getEvent().getError().get().getErrorType().getIdentifier();
-        return "OVERLOAD".equals(errorTypeId);
+        return OVERLOAD_ERROR_IDENTIFIER.equals(errorTypeId);
       }
     };
   }
+
+
 }

@@ -30,8 +30,6 @@ import org.mule.runtime.core.processor.strategy.ProactorProcessingStrategyFactor
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import java.util.concurrent.RejectedExecutionException;
-
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
@@ -201,9 +199,7 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
     flow.setMessageProcessors(singletonList(blockingProcessor));
     flow.initialise();
     flow.start();
-    expectedException.expect(MessagingException.class);
-    expectedException.expect(overloadErrorTypeMatcher());
-    expectedException.expectCause(instanceOf(RejectedExecutionException.class));
+    expectRejected();
     process(flow, testEvent());
   }
 
@@ -216,9 +212,7 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
     flow.setMessageProcessors(singletonList(blockingProcessor));
     flow.initialise();
     flow.start();
-    expectedException.expect(MessagingException.class);
-    expectedException.expect(overloadErrorTypeMatcher());
-    expectedException.expectCause(instanceOf(RejectedExecutionException.class));
+    expectRejected();
     process(flow, testEvent());
   }
 
@@ -231,9 +225,7 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
     flow.setMessageProcessors(singletonList(cpuIntensiveProcessor));
     flow.initialise();
     flow.start();
-    expectedException.expect(MessagingException.class);
-    expectedException.expect(overloadErrorTypeMatcher());
-    expectedException.expectCause(instanceOf(RejectedExecutionException.class));
+    expectRejected();
     process(flow, testEvent());
   }
 

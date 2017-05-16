@@ -12,6 +12,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
+import static org.mule.runtime.core.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -27,7 +28,6 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
@@ -36,7 +36,6 @@ import org.mule.runtime.core.internal.construct.processor.FlowConstructStatistic
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
-import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -224,7 +223,7 @@ public class DefaultFlowBuilder implements Builder {
               sink.accept(request);
             } catch (RejectedExecutionException ree) {
               request.getContext()
-                  .error(ExceptionUtils.updateMessagingExceptionWithError(new MessagingException(event, ree, this), this, this));
+                  .error(updateMessagingExceptionWithError(new MessagingException(event, ree, this), this, this));
             }
             return Mono.from(request.getContext().getResponsePublisher())
                 .map(r -> {
