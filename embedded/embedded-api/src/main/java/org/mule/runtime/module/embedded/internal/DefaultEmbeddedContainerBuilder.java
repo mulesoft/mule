@@ -207,7 +207,7 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
                                                            String muleVersion)
       throws MalformedURLException {
 
-    BundleDescriptor embeddedControllerImplDescriptor = new BundleDescriptor.Builder().setGroupId("org.mule.runtime")
+    BundleDescriptor embeddedControllerImplDescriptor = new BundleDescriptor.Builder().setGroupId("org.mule.distributions")
         .setArtifactId("mule-module-embedded-impl").setVersion(muleVersion).setType("jar").build();
 
     BundleDependency embeddedBundleImplDependency = mavenClient.resolveBundleDescriptor(embeddedControllerImplDescriptor);

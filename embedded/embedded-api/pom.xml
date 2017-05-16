@@ -10,7 +10,7 @@
     <artifactId>mule-module-embedded-api</artifactId>
     <packaging>jar</packaging>
     <name>Mule Embedded API</name>
-    <version>${muleEmbeddedApiVersion}</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <properties>
         <skipExportTests>false</skipExportTests>
