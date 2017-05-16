@@ -11,13 +11,14 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
 import org.mule.extension.http.api.request.validator.ResponseValidatorException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 public class ModuleWithGlobalElementTestCase extends AbstractModuleWithHttpTestCase {
@@ -67,7 +68,7 @@ public class ModuleWithGlobalElementTestCase extends AbstractModuleWithHttpTestC
     } catch (MessagingException me) {
       Throwable cause = me.getEvent().getError().get().getCause();
       assertThat(cause, instanceOf(ResponseValidatorException.class));
-      assertThat(cause.getMessage(), is("Response code 401 mapped as failure"));
+      assertThat(cause.getMessage(), is("Response code 401 mapped as failure: unauthorized."));
     }
   }
 
