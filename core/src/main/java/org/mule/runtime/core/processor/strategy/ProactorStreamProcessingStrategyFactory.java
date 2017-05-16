@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -21,8 +22,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 import java.util.function.Supplier;
-
-import reactor.core.publisher.Flux;
 
 /**
  * Creates {@link ReactorProcessingStrategyFactory.ReactorProcessingStrategy} instance that implements the proactor pattern by
@@ -104,9 +103,9 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
 
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-      if (processor.getProcessingType() == BLOCKING) {
+      if (processor.getProcessingType() == BLOCKING && maxConcurrency > subscribers) {
         return proactor(processor, blockingScheduler);
-      } else if (processor.getProcessingType() == CPU_INTENSIVE) {
+      } else if (processor.getProcessingType() == CPU_INTENSIVE && maxConcurrency > subscribers) {
         return proactor(processor, cpuIntensiveScheduler);
       } else {
         return super.onProcessor(processor);
@@ -114,9 +113,10 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
     }
 
     private ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
-      return publisher -> from(publisher).flatMap(event -> Flux.just(event).transform(processor)
-          .publishOn(fromExecutorService(decorateScheduler(getCpuLightScheduler())))
-          .subscribeOn(fromExecutorService(decorateScheduler(scheduler))), maxConcurrency);
+      return publisher -> from(publisher)
+          .flatMap(event -> just(event).transform(processor)
+              .publishOn(fromExecutorService(decorateScheduler(getCpuLightScheduler())))
+              .subscribeOn(fromExecutorService(decorateScheduler(scheduler))), maxConcurrency);
     }
 
   }

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.processor.strategy;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -15,6 +16,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
@@ -27,6 +30,7 @@ import org.mule.runtime.core.processor.strategy.ProactorProcessingStrategyFactor
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -174,6 +178,85 @@ public class ProactorProcessingStrategyTestCase extends AbstractProcessingStrate
     assertThat(threads, hasSize(between(1, 2)));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), between(1l, 2l));
     assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Override
+  @Description("Concurrent stream with concurrency of 8 only uses two CPU_LIGHT threads.")
+  public void concurrentStream() throws Exception {
+    super.concurrentStream();
+    assertThat(threads, hasSize(2));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(2l));
+  }
+
+  @Test
+  @Description("If CPU LITE pool is busy OVERLOAD error is thrown")
+  public void cpuLightRejectedExecution() throws Exception {
+    flow.setProcessingStrategyFactory((context, prefix) -> new ProactorProcessingStrategy(() -> new RejectingScheduler(),
+                                                                                          () -> blocking,
+                                                                                          () -> cpuIntensive));
+    flow.setMessageProcessors(singletonList(blockingProcessor));
+    flow.initialise();
+    flow.start();
+    expectRejected();
+    process(flow, testEvent());
+  }
+
+  @Test
+  @Description("If IO pool is busy OVERLOAD error is thrown")
+  public void blockingRejectedExecution() throws Exception {
+    flow.setProcessingStrategyFactory((context, prefix) -> new ProactorProcessingStrategy(() -> cpuLight,
+                                                                                          () -> new RejectingScheduler(),
+                                                                                          () -> cpuIntensive));
+    flow.setMessageProcessors(singletonList(blockingProcessor));
+    flow.initialise();
+    flow.start();
+    expectRejected();
+    process(flow, testEvent());
+  }
+
+  @Test
+  @Description("If CPU INTENSIVE pool is busy OVERLOAD error is thrown")
+  public void cpuIntensiveRejectedExecution() throws Exception {
+    flow.setProcessingStrategyFactory((context, prefix) -> new ProactorProcessingStrategy(() -> cpuLight,
+                                                                                          () -> blocking,
+                                                                                          () -> new RejectingScheduler()));
+    flow.setMessageProcessors(singletonList(cpuIntensiveProcessor));
+    flow.initialise();
+    flow.start();
+    expectRejected();
+    process(flow, testEvent());
+  }
+
+  @Test
+  @Description("If CPU LIGHT pool has maximum size of 1 only 1 thread is used and further requests block.")
+  public void singleCpuLightConcurrentMaxConcurrency1() throws Exception {
+    flow.setProcessingStrategyFactory((context,
+                                       prefix) -> new ProactorProcessingStrategy(() -> new TestScheduler(1,
+                                                                                                         CPU_LIGHT),
+                                                                                 () -> blocking,
+                                                                                 () -> cpuIntensive));
+    internalConcurrent(true, CPU_LITE, 1);
+    assertThat(threads, hasSize(1));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Test
+  @Description("If IO pool has maximum size of 1 only 1 thread is used and further requests block.")
+  public void singleBlockingConcurrentMaxConcurrency1() throws Exception {
+    flow.setProcessingStrategyFactory((context,
+                                       prefix) -> new ProactorProcessingStrategy(() -> cpuLight,
+                                                                                 () -> new TestScheduler(1,
+                                                                                                         IO),
+                                                                                 () -> cpuIntensive));
+    internalConcurrent(true, BLOCKING, 1);
+    assertThat(threads, hasSize(1));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
     assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }

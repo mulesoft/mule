@@ -18,6 +18,7 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -36,9 +37,9 @@ public class DefaultProcessingStrategyTestCase extends ProactorProcessingStrateg
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new DefaultFlowProcessingStrategyFactory.DefaultFlowProcessingStrategy(() -> cpuLight,
-                                                                                  () -> blocking,
-                                                                                  () -> cpuIntensive);
+    return new DefaultFlowProcessingStrategy(() -> cpuLight,
+                                             () -> blocking,
+                                             () -> cpuIntensive);
   }
 
   @Override

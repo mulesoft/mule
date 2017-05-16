@@ -134,6 +134,7 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
       for (int i = 0; i < (maxConcurrency < subscribers ? maxConcurrency : subscribers); i++) {
         disposables.add(processor.transform(function).subscribe());
       }
+      disposables.add(() -> processor.shutdown());
       return new ReactorSink(processor.connectSink(), () -> disposables.forEach(disposable -> disposable.dispose()),
                              createOnEventConsumer());
     }

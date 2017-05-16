@@ -12,6 +12,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
+import static org.mule.runtime.core.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -38,6 +39,7 @@ import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestRep
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.reactivestreams.Publisher;
 
@@ -217,7 +219,12 @@ public class DefaultFlowBuilder implements Builder {
             Event request = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
             // Use sink and potentially shared stream in Flow by dispatching incoming event via sink and then using
             // response publisher to operate of the result of flow processing before returning
-            sink.accept(request);
+            try {
+              sink.accept(request);
+            } catch (RejectedExecutionException ree) {
+              request.getContext()
+                  .error(updateMessagingExceptionWithError(new MessagingException(event, ree, this), this, this));
+            }
             return Mono.from(request.getContext().getResponsePublisher())
                 .map(r -> {
                   Event result = createReturnEventForParentFlowConstruct(r, event);
@@ -229,7 +236,6 @@ public class DefaultFlowBuilder implements Builder {
                 });
           });
     }
-
 
     private Event createMuleEventForCurrentFlow(Event event, Object replyToDestination, ReplyToHandler replyToHandler) {
       // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any

@@ -10,6 +10,7 @@ import static java.lang.Math.min;
 import static java.lang.Runtime.getRuntime;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.WAIT;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
@@ -20,6 +21,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
 import java.util.function.Supplier;
@@ -42,7 +44,8 @@ public class ReactorStreamProcessingStrategyFactory extends AbstractStreamProces
     return new ReactorStreamProcessingStrategy(() -> muleContext.getSchedulerService()
         .customScheduler(muleContext.getSchedulerBaseConfig()
             .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
-            .withMaxConcurrentTasks(getSubscriberCount() + 1)), getBufferSize(), getSubscriberCount(), getWaitStrategy(),
+            .withMaxConcurrentTasks(getSubscriberCount() + 1).withRejectionAction(WAIT)), getBufferSize(), getSubscriberCount(),
+                                               getWaitStrategy(),
                                                () -> muleContext.getSchedulerService()
                                                    .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
                                                        .withName(schedulersNamePrefix + "." + CPU_LITE.name())),

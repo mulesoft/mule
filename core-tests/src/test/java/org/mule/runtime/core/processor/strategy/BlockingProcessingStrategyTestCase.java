@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.BLOCKING;
@@ -48,7 +49,7 @@ public class BlockingProcessingStrategyTestCase extends DirectProcessingStrategy
       + "synchronously in a caller thread and the pipeline will block caller thread until any async processors complete " +
       "before continuing in the caller thread.")
   public void asyncCpuLightConcurrent() throws Exception {
-    super.internalAsyncCpuLightConcurrent(false);
+    internalConcurrent(false, CPU_LITE, 1, asyncProcessor);
     assertSynchronous(2);
   }
 

@@ -6,7 +6,14 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
-import static java.lang.Integer.MAX_VALUE;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
 import static org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
@@ -17,6 +24,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.WorkQueueStreamProcessingStrategyFactory.WorkQueueStreamProcessingStrategy;
 
+import org.junit.Test;
+import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
@@ -35,7 +44,45 @@ public class WorkQueueStreamProcessingStrategyTestCase extends WorkQueueProcessi
                                                  DEFAULT_SUBSCRIBER_COUNT,
                                                  DEFAULT_WAIT_STRATEGY,
                                                  () -> blocking,
-                                                 MAX_VALUE);
+                                                 4);
+  }
+
+  @Test
+  @Override
+  @Description("If IO pool has maximum size of 1 only 1 thread is used for CPU_LIGHT processor and further requests block.")
+  public void singleCpuLightConcurrentMaxConcurrency1() throws Exception {
+    flow.setProcessingStrategyFactory((context,
+                                       prefix) -> new WorkQueueStreamProcessingStrategy(() -> blocking,
+                                                                                        DEFAULT_BUFFER_SIZE,
+                                                                                        DEFAULT_SUBSCRIBER_COUNT,
+                                                                                        DEFAULT_WAIT_STRATEGY,
+                                                                                        () -> blocking,
+                                                                                        1));
+    internalConcurrent(true, CPU_LITE, 1);
+    assertThat(threads, hasSize(1));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Test
+  @Override
+  @Description("If IO pool has maximum size of 1 only 1 thread is used for BLOCKING processor and further requests block.")
+  public void singleBlockingConcurrentMaxConcurrency1() throws Exception {
+    flow.setProcessingStrategyFactory((context,
+                                       prefix) -> new WorkQueueStreamProcessingStrategy(() -> blocking,
+                                                                                        DEFAULT_BUFFER_SIZE,
+                                                                                        DEFAULT_SUBSCRIBER_COUNT,
+                                                                                        DEFAULT_WAIT_STRATEGY,
+                                                                                        () -> blocking,
+                                                                                        1));
+    internalConcurrent(true, BLOCKING, 1);
+    assertThat(threads, hasSize(1));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
 

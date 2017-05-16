@@ -17,8 +17,10 @@ import static org.mule.runtime.core.context.notification.MessageProcessorNotific
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.util.ExceptionUtils.putContext;
+import static org.mule.runtime.core.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.empty;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -31,6 +33,7 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -51,6 +54,7 @@ import org.mule.runtime.core.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -197,9 +201,13 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
     // #6 Handle errors that occur during Processor execution. This is done outside to any scheduling to ensure errors in
     // scheduling such as RejectedExecutionException's can be handled cleanly
-    interceptors.add((processor, next) -> stream -> from(stream).flatMap(event -> Flux.just(event)
+    interceptors.add((processor, next) -> stream -> from(stream).concatMap(event -> just(event)
         .transform(next)
-        .onErrorResumeWith(MessagingException.class, handleError(event.getContext()))));
+        .onErrorResume(RejectedExecutionException.class,
+                       throwable -> handleError(event.getContext())
+                           .apply(updateMessagingExceptionWithError(new MessagingException(event, throwable, processor),
+                                                                    processor, flowConstruct)))
+        .onErrorResume(MessagingException.class, handleError(event.getContext()))));
 
     return interceptors;
   }
@@ -211,9 +219,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
         failing = processor;
         exception = new MessagingException(exception.getI18nMessage(), exception.getEvent(), exception.getCause(), processor);
       }
-      exception
-          .setProcessedEvent(createErrorEvent(exception.getEvent(), processor, exception, muleContext.getErrorTypeLocator()));
-      return putContext(exception, failing, exception.getEvent(), flowConstruct, muleContext);
+      return updateMessagingExceptionWithError(exception, failing, flowConstruct);
     };
   }
 
