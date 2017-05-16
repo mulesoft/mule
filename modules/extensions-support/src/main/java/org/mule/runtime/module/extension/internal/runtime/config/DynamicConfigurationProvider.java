@@ -14,7 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.with;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -108,10 +108,10 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   @Override
   public ConfigurationInstance get(Object event) {
     return withContextClassLoader(getExtensionClassLoader(), () -> {
-      ResolverSetResult result = resolverSet.resolve(with((Event) event));
+      ResolverSetResult result = resolverSet.resolve(from((Event) event));
       ResolverSetResult providerResult = null;
       if (connectionProviderResolver.getResolverSet().isPresent()) {
-        providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve(with((Event) event));
+        providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve(from((Event) event));
       }
       return getConfiguration(new Pair<>(result, providerResult), (Event) event);
     });
@@ -156,7 +156,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
 
   private ConfigurationInstance createConfiguration(ResolverSetResult result, Event event) throws MuleException {
     ConfigurationInstance configuration = configurationInstanceFactory
-        .createConfiguration(getName(), result, ofNullable(connectionProviderResolver.resolve(with(event))));
+        .createConfiguration(getName(), result, ofNullable(connectionProviderResolver.resolve(from(event))));
 
     registerConfiguration(configuration);
 

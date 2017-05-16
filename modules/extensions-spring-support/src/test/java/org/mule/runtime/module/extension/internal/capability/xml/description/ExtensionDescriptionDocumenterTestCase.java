@@ -94,8 +94,8 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
     assertThat(configurations, hasSize(2));
     ConfigurationModel first = configurations.get(1);
     assertDescription(first, "This is some Config documentation.");
-    assertDescription(first.getConnectionProviders().get(0), "Provider Documentation");
-    assertDescription(first.getConnectionProviders().get(1), "Another Provider Documentation");
+    assertDescription(first.getConnectionProviders().get(0), "Another Provider Documentation");
+    assertDescription(first.getConnectionProviders().get(1), "Provider Documentation");
 
     ConfigurationModel second = configurations.get(0);
     assertDescription(second, "This is some Another Config documentation.");

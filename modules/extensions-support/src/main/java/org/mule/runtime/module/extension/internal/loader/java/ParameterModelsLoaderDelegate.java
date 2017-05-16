@@ -60,8 +60,6 @@ import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotatio
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.FieldWrapper;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -80,13 +78,13 @@ public final class ParameterModelsLoaderDelegate {
   }
 
   public List<ParameterDeclarer> declare(ParameterizedDeclarer component,
-                                         Set<? extends ExtensionParameter> parameters,
+                                         List<? extends ExtensionParameter> parameters,
                                          ParameterDeclarationContext declarationContext) {
     return declare(component, parameters, declarationContext, null);
   }
 
   public List<ParameterDeclarer> declare(ParameterizedDeclarer component,
-                                         Set<? extends ExtensionParameter> parameters,
+                                         List<? extends ExtensionParameter> parameters,
                                          ParameterDeclarationContext declarationContext,
                                          ParameterGroupDeclarer parameterGroupDeclarer) {
     List<ParameterDeclarer> declarerList = new ArrayList<>();
@@ -178,7 +176,7 @@ public final class ParameterModelsLoaderDelegate {
                                                                     .collect(joining(","))));
     }
 
-    final Set<FieldElement> annotatedParameters = ImmutableSet.copyOf(type.getAnnotatedFields(Parameter.class));
+    final List<FieldElement> annotatedParameters = type.getAnnotatedFields(Parameter.class);
 
     if (groupParameter.isAnnotatedWith(org.mule.runtime.extension.api.annotation.param.Optional.class)) {
       throw new IllegalParameterModelDefinitionException(format(
@@ -222,7 +220,7 @@ public final class ParameterModelsLoaderDelegate {
       declare(component, annotatedParameters, declarationContext, declarer);
     } else {
       Class declaringClass = type.getDeclaringClass();
-      Set<FieldWrapper> fields = getFieldsWithGetters(declaringClass).stream().map(FieldWrapper::new).collect(toSet());
+      List<FieldWrapper> fields = getFieldsWithGetters(declaringClass).stream().map(FieldWrapper::new).collect(toList());
       declare(component, fields, declarationContext, declarer);
     }
 
@@ -340,7 +338,7 @@ public final class ParameterModelsLoaderDelegate {
                                                                    .build()));
   }
 
-  private void checkAnnotationsNotUsedMoreThanOnce(Set<? extends ExtensionParameter> parameters,
+  private void checkAnnotationsNotUsedMoreThanOnce(List<? extends ExtensionParameter> parameters,
                                                    Class<? extends Annotation>... annotations) {
     for (Class<? extends Annotation> annotation : annotations) {
       final long count = parameters.stream().filter(param -> param.isAnnotatedWith(annotation)).count();

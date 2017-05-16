@@ -15,9 +15,9 @@ import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Wrapper for {@link Method} that provide utility methods to facilitate the introspection of a {@link Method}
@@ -52,8 +52,8 @@ public final class MethodWrapper implements MethodElement {
    * {@inheritDoc}
    */
   @Override
-  public Set<ExtensionParameter> getParameters() {
-    Set<ExtensionParameter> extensionParameters = new LinkedHashSet<>();
+  public List<ExtensionParameter> getParameters() {
+    List<ExtensionParameter> extensionParameters = new LinkedList<>();
     final Parameter[] parameters = method.getParameters();
     for (int i = 0; i < parameters.length; i++) {
       extensionParameters.add(new ParameterWrapper(method, i));
@@ -65,7 +65,7 @@ public final class MethodWrapper implements MethodElement {
    * {@inheritDoc}
    */
   @Override
-  public Set<ExtensionParameter> getParameterGroups() {
+  public List<ExtensionParameter> getParameterGroups() {
     return getParametersAnnotatedWith(ParameterGroup.class);
   }
 
@@ -73,8 +73,8 @@ public final class MethodWrapper implements MethodElement {
    * {@inheritDoc}
    */
   @Override
-  public Set<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass) {
-    Set<ExtensionParameter> extensionParameters = new LinkedHashSet<>();
+  public List<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass) {
+    List<ExtensionParameter> extensionParameters = new LinkedList<>();
     final Parameter[] parameters = method.getParameters();
     for (int i = 0; i < parameters.length; i++) {
       if (parameters[i].getAnnotation(annotationClass) != null) {

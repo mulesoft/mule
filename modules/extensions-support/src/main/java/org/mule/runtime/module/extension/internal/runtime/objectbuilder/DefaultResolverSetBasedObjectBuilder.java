@@ -32,12 +32,4 @@ public class DefaultResolverSetBasedObjectBuilder<T> extends ResolverSetBasedObj
     return createInstance(prototypeClass);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public T build(ValueResolvingContext context) throws MuleException {
-    return super.build(context);
-  }
-
 }

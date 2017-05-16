@@ -116,14 +116,14 @@
     </flow>
 
     <flow name="sourceDeclareValueInlineWithCustom">
-        <vegan:harvest-apples config-ref="appleCustom" timeToPeel="30" shouldNotOverride="declared"
-                              flowName="sourceDeclareValueInlineWithCustom">
+        <vegan:harvest-apples config-ref="appleCustom" shouldNotOverride="declared" flowName="sourceDeclareValueInlineWithCustom">
             <vegan:main-producers>
                 <vegan:main-producer value="getProducersOne"/>
             </vegan:main-producers>
             <vegan:sample>
                 <vegan:taste-profile tasty="false"/>
             </vegan:sample>
+            <vegan:response timeToPeel="30"/>
         </vegan:harvest-apples>
         <logger level="DEBUG"/>
     </flow>

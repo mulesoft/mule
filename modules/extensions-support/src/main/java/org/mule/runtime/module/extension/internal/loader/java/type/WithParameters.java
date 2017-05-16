@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
 import java.lang.annotation.Annotation;
-import java.util.Set;
+import java.util.List;
 
 /**
  * A generic contract for any kind of component from which, a list of parameters can be derived
@@ -19,17 +19,17 @@ public interface WithParameters {
   /**
    * @return A list of {@link ExtensionParameter} that represents the parameters of the component
    */
-  Set<ExtensionParameter> getParameters();
+  List<ExtensionParameter> getParameters();
 
   /**
    * @return A list of {@link ExtensionParameter} that represents the parameters of the component that are considered as parameter
    *         groups
    */
-  Set<ExtensionParameter> getParameterGroups();
+  List<ExtensionParameter> getParameterGroups();
 
   /**
    * @param annotationClass {@link Annotation} to look for parameters annotated with this class
    * @return A list of {@link ExtensionParameter} that are annotated with the given Annotation Class
    */
-  Set<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass);
+  List<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass);
 }

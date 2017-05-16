@@ -1,0 +1,2446 @@
+{
+  "name": "Basic",
+  "description": "Basic Test connector",
+  "version": "4.0",
+  "vendor": "Mulesoft",
+  "category": "COMMUNITY",
+  "minMuleVersion": "4.0.0",
+  "xmlDsl": {
+    "prefix": "basic",
+    "namespace": "http://www.mulesoft.org/schema/mule/basic",
+    "schemaLocation": "http://www.mulesoft.org/schema/mule/basic/current/mule-basic.xsd",
+    "schemaVersion": "4.0",
+    "xsdFileName": "mule-basic.xsd"
+  },
+  "resources": [],
+  "subTypes": [],
+  "externalLibraries": [],
+  "importedTypes": [],
+  "configurations": [
+    {
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner",
+                  "classInformation": {
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  },
+                  "typeAlias": {
+                    "value": "Owner"
+                  }
+                },
+                "fields": [
+                  {
+                    "key": {
+                      "name": "requiredFieldDefault",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionRequired",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionNotSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldDefault"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionRequired"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionNotSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "requiredPojoDefault",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner",
+                  "classInformation": {
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  },
+                  "typeAlias": {
+                    "value": "Owner"
+                  }
+                },
+                "fields": [
+                  {
+                    "key": {
+                      "name": "requiredFieldDefault",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionRequired",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionNotSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldDefault"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionRequired"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionNotSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "name": "requiredPojoNoExpression",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner",
+                  "classInformation": {
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  },
+                  "typeAlias": {
+                    "value": "Owner"
+                  }
+                },
+                "fields": [
+                  {
+                    "key": {
+                      "name": "requiredFieldDefault",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionRequired",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionNotSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldDefault"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionRequired"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionNotSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "name": "requiredPojoExpressionRequired",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner",
+                  "classInformation": {
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  },
+                  "typeAlias": {
+                    "value": "Owner"
+                  }
+                },
+                "fields": [
+                  {
+                    "key": {
+                      "name": "requiredFieldDefault",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionRequired",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionNotSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldDefault"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionRequired"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionNotSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "name": "requiredPojoExpressionSupported",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner",
+                  "classInformation": {
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  },
+                  "typeAlias": {
+                    "value": "Owner"
+                  }
+                },
+                "fields": [
+                  {
+                    "key": {
+                      "name": "requiredFieldDefault",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionRequired",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionNotSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldDefault"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionRequired"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionNotSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5
+              },
+              "name": "optionalPojoDefault",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner",
+                  "classInformation": {
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  },
+                  "typeAlias": {
+                    "value": "Owner"
+                  }
+                },
+                "fields": [
+                  {
+                    "key": {
+                      "name": "requiredFieldDefault",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionRequired",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionNotSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldDefault"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionRequired"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionNotSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 6
+              },
+              "name": "optionalPojoNoExpression",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner",
+                  "classInformation": {
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  },
+                  "typeAlias": {
+                    "value": "Owner"
+                  }
+                },
+                "fields": [
+                  {
+                    "key": {
+                      "name": "requiredFieldDefault",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionRequired",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionNotSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldDefault"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionRequired"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionNotSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 7
+              },
+              "name": "optionalPojoExpressionRequired",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner",
+                  "classInformation": {
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  },
+                  "typeAlias": {
+                    "value": "Owner"
+                  }
+                },
+                "fields": [
+                  {
+                    "key": {
+                      "name": "requiredFieldDefault",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionRequired",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "requiredFieldExpressionNotSupported",
+                      "required": "true"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldDefault"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "SUPPORTED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionRequired"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "REQUIRED"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "optionalFieldExpressionNotSupported"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "parameterPurpose": {
+                        "role": "BEHAVIOUR"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
+                    }
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 8
+              },
+              "name": "optionalPojoExpressionSupported",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "externalLibraryModels": [],
+      "operations": [],
+      "connectionProviders": [
+        {
+          "connectionManagementType": "NONE",
+          "externalLibraryModels": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "name": "connectionProviderRequiredFieldDefault",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "name": "connectionProviderRequiredFieldExpressionSupported",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "REQUIRED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 3
+                  },
+                  "name": "connectionProviderRequiredFieldExpressionRequired",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 4
+                  },
+                  "name": "connectionProviderRequiredFieldExpressionNotSupported",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 5
+                  },
+                  "name": "connectionProviderOptionalFieldDefault",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 6
+                  },
+                  "name": "connectionProviderOptionalFieldExpressionSupported",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "REQUIRED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 7
+                  },
+                  "name": "connectionProviderOptionalFieldExpressionRequired",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 8
+                  },
+                  "name": "connectionProviderOptionalFieldExpressionNotSupported",
+                  "description": "",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "ReconnectionStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "typeId": "java.lang.Boolean",
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect-forever"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "connection",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "messageSources": [],
+      "name": "config",
+      "description": "Default configuration",
+      "modelProperties": {}
+    }
+  ],
+  "operations": [
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "errors": [],
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotypes": [],
+      "parameterGroupModels": [],
+      "name": "foo",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    }
+  ],
+  "connectionProviders": [
+    {
+      "connectionManagementType": "NONE",
+      "externalLibraryModels": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "connectionProviderRequiredFieldDefault",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "name": "connectionProviderRequiredFieldExpressionSupported",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "name": "connectionProviderRequiredFieldExpressionRequired",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "name": "connectionProviderRequiredFieldExpressionNotSupported",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5
+              },
+              "name": "connectionProviderOptionalFieldDefault",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 6
+              },
+              "name": "connectionProviderOptionalFieldExpressionSupported",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 7
+              },
+              "name": "connectionProviderOptionalFieldExpressionRequired",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 8
+              },
+              "name": "connectionProviderOptionalFieldExpressionNotSupported",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Union",
+                "annotations": {
+                  "typeId": "java.lang.Object",
+                  "typeAlias": {
+                    "value": "ReconnectionStrategy"
+                  }
+                },
+                "of": [
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "reconnect"
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "frequency"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Long",
+                            "default": "2000"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "How often (in ms) to reconnect"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "count"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Integer",
+                            "default": "2"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "How many reconnection attempts to make"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "blocking"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "typeId": "java.lang.Boolean",
+                            "default": "true"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "reconnect-forever"
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "frequency"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Long",
+                            "default": "2000"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "How often (in ms) to reconnect"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "name": "reconnectionStrategy",
+              "description": "A retry strategy in case of connectivity errors",
+              "modelProperties": {
+                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "abstract-reconnection-strategy",
+                    "prefix": "mule"
+                  }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Connection",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "connection",
+      "description": "",
+      "modelProperties": {}
+    }
+  ],
+  "messageSources": [],
+  "errors": [],
+  "modelProperties": {},
+  "types": []
+}

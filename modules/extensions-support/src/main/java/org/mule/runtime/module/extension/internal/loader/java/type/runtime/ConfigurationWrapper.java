@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
-import org.mule.runtime.core.util.collection.ImmutableSetCollector;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.ParameterizableTypeElement;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -23,21 +23,21 @@ import java.util.stream.Stream;
  */
 class ConfigurationWrapper extends ComponentWrapper implements ConfigurationElement, ParameterizableTypeElement {
 
-  private final Set<ExtensionParameter> parameters;
+  private final List<ExtensionParameter> parameters;
 
   ConfigurationWrapper(Class aClass) {
     super(aClass);
     this.parameters = Stream.concat(getAnnotatedFields(Parameter.class).stream(),
                                     getAnnotatedFields(ParameterGroup.class).stream())
         .distinct()
-        .collect(new ImmutableSetCollector<>());
+        .collect(new ImmutableListCollector<>());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Set<ExtensionParameter> getParameters() {
+  public List<ExtensionParameter> getParameters() {
     return parameters;
   }
 }

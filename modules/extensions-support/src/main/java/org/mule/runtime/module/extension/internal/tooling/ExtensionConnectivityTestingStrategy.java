@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.tooling;
 import static java.lang.String.format;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.with;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -59,7 +59,7 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
     try {
       if (connectivityTestingObject instanceof ConnectionProviderResolver) {
         ConnectionProvider connectionProvider =
-            ((ConnectionProviderResolver) connectivityTestingObject).resolve(with(getInitialiserEvent(muleContext)));
+            ((ConnectionProviderResolver) connectivityTestingObject).resolve(from(getInitialiserEvent(muleContext)));
         return connectionManager.testConnectivity(connectionProvider);
       } else if (connectivityTestingObject instanceof ConfigurationProvider) {
         ConfigurationProvider configurationProvider = (ConfigurationProvider) connectivityTestingObject;

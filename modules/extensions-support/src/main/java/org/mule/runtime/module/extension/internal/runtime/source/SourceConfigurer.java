@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.with;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -74,7 +74,7 @@ public final class SourceConfigurer {
         };
 
     try {
-      return builder.build(with(getInitialiserEvent(muleContext), config));
+      return builder.build(from(getInitialiserEvent(muleContext), config));
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Exception was found trying to configure source of type "
           + source.getClass().getName()), e);

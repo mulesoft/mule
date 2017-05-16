@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.with;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
@@ -99,7 +99,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     when(configurationModel.getOperationModels()).thenReturn(asList(operationModel));
     when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
 
-    when(resolverSet.resolve(with(event))).thenReturn(resolverSetResult);
+    when(resolverSet.resolve(from(event))).thenReturn(resolverSetResult);
     visitableMock(operationModel);
 
 
@@ -129,14 +129,14 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
       assertThat(provider.get(event).getValue(), is(sameInstance(config)));
     }
 
-    verify(resolverSet, times(count)).resolve(with(event));
+    verify(resolverSet, times(count)).resolve(from(event));
   }
 
   @Test
   public void resolveCachedWithProviderParams() throws Exception {
     ResolverSet providerResolverSet = mock(ResolverSet.class);
     when(connectionProviderResolver.getResolverSet()).thenReturn(Optional.of(providerResolverSet));
-    when(providerResolverSet.resolve(with(event))).thenReturn(mock(ResolverSetResult.class));
+    when(providerResolverSet.resolve(from(event))).thenReturn(mock(ResolverSetResult.class));
 
     final int count = 10;
     HeisenbergExtension config = (HeisenbergExtension) provider.get(event).getValue();
@@ -144,8 +144,8 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
       assertThat(provider.get(event).getValue(), is(sameInstance(config)));
     }
 
-    verify(providerResolverSet, times(count)).resolve(with(event));
-    verify(resolverSet, times(count)).resolve(with(event));
+    verify(providerResolverSet, times(count)).resolve(from(event));
+    verify(resolverSet, times(count)).resolve(from(event));
   }
 
   @Test
@@ -155,12 +155,12 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
     ResolverSet providerResolverSet = mock(ResolverSet.class);
     when(connectionProviderResolver.getResolverSet()).thenReturn(Optional.of(providerResolverSet));
-    when(providerResolverSet.resolve(with(event))).thenReturn(mock(ResolverSetResult.class));
+    when(providerResolverSet.resolve(from(event))).thenReturn(mock(ResolverSetResult.class));
     assertThat(provider.get(event).getValue(), is(not(sameInstance(config))));
 
-    verify(resolverSet, times(2)).resolve(with(event));
-    verify(providerResolverSet, times(1)).resolve(with(event));
-    verify(connectionProviderResolver, times(2)).resolve(with(event));
+    verify(resolverSet, times(2)).resolve(from(event));
+    verify(providerResolverSet, times(1)).resolve(from(event));
+    verify(connectionProviderResolver, times(2)).resolve(from(event));
   }
 
   @Test
@@ -194,7 +194,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   private HeisenbergExtension makeAlternateInstance() throws Exception {
     ResolverSetResult alternateResult = mock(ResolverSetResult.class, Mockito.RETURNS_DEEP_STUBS);
     mockConfigurationInstance(configurationModel, MODULE_CLASS.newInstance());
-    when(resolverSet.resolve(with(event))).thenReturn(alternateResult);
+    when(resolverSet.resolve(from(event))).thenReturn(alternateResult);
 
     return (HeisenbergExtension) provider.get(event).getValue();
   }
@@ -208,7 +208,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   public void resolveDynamicConfigWithDifferentEvent() throws Exception {
     Object config1 = provider.get(event);
 
-    when(resolverSet.resolve(with(event))).thenReturn(mock(ResolverSetResult.class));
+    when(resolverSet.resolve(from(event))).thenReturn(mock(ResolverSetResult.class));
     Object config2 = provider.get(event);
 
     assertThat(config1, is(not(sameInstance(config2))));

@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.client;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.with;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -141,7 +141,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
           }
         });
         try {
-          values.put(name, new StaticValueResolver<>(builder.build(with(event))));
+          values.put(name, new StaticValueResolver<>(builder.build(from(event))));
         } catch (MuleException e) {
           throw new MuleRuntimeException(createStaticMessage(format("Could not construct parameter [%s]", name)), e);
         }

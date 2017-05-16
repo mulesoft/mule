@@ -12,7 +12,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.with;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSourceName;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.reflections.ReflectionUtils.getAllFields;
@@ -180,7 +180,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
 
     public Map<String, Object> createResponseParameters(Event event) {
       try {
-        ResolverSetResult parameters = SourceAdapter.this.successCallbackParameters.resolve(with(event, configurationInstance));
+        ResolverSetResult parameters = SourceAdapter.this.successCallbackParameters.resolve(from(event, configurationInstance));
         return parameters.asMap();
       } catch (MuleException e) {
         throw new MuleRuntimeException(e);
@@ -189,7 +189,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
 
     public Map<String, Object> createFailureResponseParameters(Event event) {
       try {
-        ResolverSetResult parameters = SourceAdapter.this.errorCallbackParameters.resolve(with(event, configurationInstance));
+        ResolverSetResult parameters = SourceAdapter.this.errorCallbackParameters.resolve(from(event, configurationInstance));
         return parameters.asMap();
       } catch (MuleException e) {
         throw new MuleRuntimeException(e);
@@ -293,7 +293,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
     Object transactionalAction;
 
     try {
-      transactionalAction = valueResolver.resolve(with(getInitialiserEvent(muleContext)));
+      transactionalAction = valueResolver.resolve(from(getInitialiserEvent(muleContext)));
     } catch (MuleException e) {
       throw new MuleRuntimeException(createStaticMessage("Unable to get the Transactional Action value for Message Source"), e);
     }

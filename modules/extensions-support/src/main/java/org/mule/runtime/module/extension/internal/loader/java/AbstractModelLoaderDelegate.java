@@ -18,7 +18,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionPara
 import org.mule.runtime.module.extension.internal.loader.java.type.WithAlias;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithParameters;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Base class for sub delegates of {@link DefaultJavaModelLoaderDelegate}
@@ -62,7 +62,7 @@ abstract class AbstractModelLoaderDelegate {
   }
 
   void processComponentConnectivity(ComponentDeclarer componentDeclarer, WithParameters component, WithAlias alias) {
-    final Set<ExtensionParameter> connectionParameters = component.getParametersAnnotatedWith(Connection.class);
+    final List<ExtensionParameter> connectionParameters = component.getParametersAnnotatedWith(Connection.class);
     if (connectionParameters.isEmpty()) {
       componentDeclarer.requiresConnection(false).transactional(false);
     } else if (connectionParameters.size() == 1) {

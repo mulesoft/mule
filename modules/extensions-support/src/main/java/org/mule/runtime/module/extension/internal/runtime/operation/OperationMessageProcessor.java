@@ -24,7 +24,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.with;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
@@ -302,7 +302,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   protected ParameterValueResolver getParameterValueResolver() {
     final Event event = getInitialiserEvent(muleContext);
     return new OperationParameterValueResolver(new LazyExecutionContext<>(resolverSet, operationModel, extensionModel,
-                                                                          with(event)));
+                                                                          from(event)));
   }
 
   @Override
@@ -342,6 +342,6 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
 
   private Map<String, Object> getResolutionResult(Event event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
-    return resolverSet.resolve(with(event, configuration)).asMap();
+    return resolverSet.resolve(from(event, configuration)).asMap();
   }
 }

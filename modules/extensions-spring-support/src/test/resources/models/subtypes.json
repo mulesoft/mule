@@ -1,0 +1,3949 @@
+{
+  "name": "SubtypesConnector",
+  "description": "Test connector for pojo subtype mapping",
+  "version": "4.0",
+  "vendor": "Mulesoft",
+  "category": "COMMUNITY",
+  "minMuleVersion": "4.0.0",
+  "xmlDsl": {
+    "prefix": "subtypes",
+    "namespace": "http://www.mulesoft.org/schema/mule/subtypes",
+    "schemaLocation": "http://www.mulesoft.org/schema/mule/subtypes/current/mule-subtypes.xsd",
+    "schemaVersion": "4.0",
+    "xsdFileName": "mule-subtypes.xsd"
+  },
+  "resources": [],
+  "subTypes": [
+    {
+      "baseType": {
+        "format": "java",
+        "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+      },
+      "subTypes": [
+        {
+          "format": "java",
+          "type": "@ref:org.mule.test.subtypes.extension.Square"
+        },
+        {
+          "format": "java",
+          "type": "@ref:org.mule.test.subtypes.extension.Triangle"
+        }
+      ]
+    },
+    {
+      "baseType": {
+        "format": "java",
+        "type": "@ref:org.mule.test.subtypes.extension.Door"
+      },
+      "subTypes": [
+        {
+          "format": "java",
+          "type": "@ref:org.mule.test.subtypes.extension.HouseDoor"
+        },
+        {
+          "format": "java",
+          "type": "@ref:org.mule.test.subtypes.extension.CarDoor"
+        }
+      ]
+    },
+    {
+      "baseType": {
+        "format": "java",
+        "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
+      },
+      "subTypes": [
+        {
+          "format": "java",
+          "type": "@ref:org.mule.test.subtypes.extension.Revolver"
+        }
+      ]
+    }
+  ],
+  "externalLibraries": [],
+  "importedTypes": [
+    {
+      "type": {
+        "format": "java",
+        "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
+      },
+      "extension": "Heisenberg"
+    },
+    {
+      "type": {
+        "format": "java",
+        "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
+      },
+      "extension": "Heisenberg"
+    },
+    {
+      "type": {
+        "format": "java",
+        "type": "@ref:org.mule.test.vegan.extension.VeganCookBook"
+      },
+      "extension": "vegan"
+    }
+  ],
+  "configurations": [
+    {
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "abstractShape",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.Door"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "name": "doorInterface",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.Square"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "name": "explicitSquare",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.FinalPojo"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "name": "finalPojo",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5
+              },
+              "name": "ricin",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 6
+              },
+              "name": "extensibleWeapon",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 7
+              },
+              "name": "triangle",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.ExtensiblePojo"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 8
+              },
+              "name": "pojoWithExtension",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "typeId": "java.util.List"
+                },
+                "item": {
+                  "type": "@ref:org.mule.test.subtypes.extension.PojoForList"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 9
+              },
+              "name": "onePojos",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "typeId": "java.util.List"
+                },
+                "item": {
+                  "type": "@ref:org.mule.test.subtypes.extension.PojoForList"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 10
+              },
+              "name": "twoPojos",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "typeId": "java.util.List"
+                },
+                "item": {
+                  "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 11
+              },
+              "name": "weapons",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "java.util.Map",
+                  "classInformation": {
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [
+                      "java.lang.String",
+                      "org.mule.test.heisenberg.extension.model.Weapon"
+                    ]
+                  }
+                },
+                "open": {
+                  "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
+                },
+                "fields": []
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 12
+              },
+              "name": "weaponMap",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "externalLibraryModels": [],
+      "operations": [
+        {
+          "blocking": true,
+          "executionType": "CPU_LITE",
+          "errors": [],
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "@ref:org.mule.test.subtypes.extension.SubTypesMappingConnector"
+            },
+            "hasDynamicType": true,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": false,
+          "supportsStreaming": false,
+          "stereotypes": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "name": "target",
+                  "displayModel": {
+                    "displayName": "Target Variable"
+                  },
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Output",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "configRetriever",
+          "description": "",
+          "modelProperties": {},
+          "kind": "operation"
+        },
+        {
+          "blocking": true,
+          "executionType": "BLOCKING",
+          "errors": [],
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "@ref:org.mule.test.subtypes.extension.SubTypesConnectorConnection"
+            },
+            "hasDynamicType": true,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": true,
+          "supportsStreaming": false,
+          "stereotypes": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "name": "target",
+                  "displayModel": {
+                    "displayName": "Target Variable"
+                  },
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Output",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "connectionRetriever",
+          "description": "",
+          "modelProperties": {},
+          "kind": "operation"
+        }
+      ],
+      "connectionProviders": [
+        {
+          "connectionManagementType": "NONE",
+          "externalLibraryModels": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "name": "abstractShape",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.subtypes.extension.Door"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "name": "doorInterface",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Array",
+                    "annotations": {
+                      "typeId": "java.util.List"
+                    },
+                    "item": {
+                      "type": "@ref:org.mule.test.subtypes.extension.Door"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 3
+                  },
+                  "name": "doors",
+                  "description": "",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "ReconnectionStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "typeId": "java.lang.Boolean",
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect-forever"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "connection",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "messageSources": [],
+      "name": "config",
+      "description": "Default configuration",
+      "modelProperties": {}
+    }
+  ],
+  "operations": [
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "errors": [],
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "@ref:org.mule.test.subtypes.extension.Door"
+        },
+        "hasDynamicType": true,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotypes": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.Door"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "door",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "doorRetriever",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "errors": [],
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "@ref:org.mule.test.subtypes.extension.NoGlobalPojo"
+        },
+        "hasDynamicType": true,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotypes": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.NoGlobalPojo"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "noGlobalPojo",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "noGlobalPojo",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "errors": [],
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Object",
+          "annotations": {
+            "typeId": "java.util.Map",
+            "classInformation": {
+              "hasDefaultConstructor": false,
+              "isInterface": true,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": false,
+              "implementedInterfaces": [],
+              "parent": "",
+              "genericTypes": [
+                "org.mule.test.subtypes.extension.Door",
+                "java.util.Map"
+              ]
+            }
+          },
+          "open": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "java.util.Map",
+              "classInformation": {
+                "hasDefaultConstructor": false,
+                "isInterface": true,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": [
+                  "java.lang.String",
+                  "org.mule.test.subtypes.extension.Door"
+                ]
+              }
+            },
+            "open": {
+              "type": "@ref:org.mule.test.subtypes.extension.Door"
+            },
+            "fields": []
+          },
+          "fields": []
+        },
+        "hasDynamicType": true,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotypes": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.Door"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "door",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "java.util.Map",
+                  "classInformation": {
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [
+                      "java.lang.String",
+                      "org.mule.test.subtypes.extension.Door"
+                    ]
+                  }
+                },
+                "open": {
+                  "type": "@ref:org.mule.test.subtypes.extension.Door"
+                },
+                "fields": []
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "name": "doorRegistry",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "processDoor",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "errors": [],
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+        },
+        "hasDynamicType": true,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotypes": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "shape",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "shapeRetriever",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "errors": [],
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Array",
+          "annotations": {
+            "typeId": "java.util.List"
+          },
+          "item": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "java.lang.Object",
+              "classInformation": {
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "typeAlias": {
+                "value": "Object"
+              }
+            },
+            "fields": []
+          }
+        },
+        "hasDynamicType": true,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotypes": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "baseShape",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.Door"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "name": "door",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.FinalPojo"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "name": "finalPojo",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.vegan.extension.VeganCookBook"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "name": "cookBook",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5
+              },
+              "name": "squareShape",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 6
+              },
+              "name": "triangle",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.NoReferencePojo"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 7
+              },
+              "name": "noRef",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "subtypedAndConcreteParameters",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    }
+  ],
+  "connectionProviders": [
+    {
+      "connectionManagementType": "NONE",
+      "externalLibraryModels": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.ParentShape"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "abstractShape",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.Door"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "name": "doorInterface",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "typeId": "java.util.List"
+                },
+                "item": {
+                  "type": "@ref:org.mule.test.subtypes.extension.Door"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "name": "doors",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Union",
+                "annotations": {
+                  "typeId": "java.lang.Object",
+                  "typeAlias": {
+                    "value": "ReconnectionStrategy"
+                  }
+                },
+                "of": [
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "reconnect"
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "frequency"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Long",
+                            "default": "2000"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "How often (in ms) to reconnect"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "count"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Integer",
+                            "default": "2"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "How many reconnection attempts to make"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "blocking"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "typeId": "java.lang.Boolean",
+                            "default": "true"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "reconnect-forever"
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "frequency"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Long",
+                            "default": "2000"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "How often (in ms) to reconnect"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "name": "reconnectionStrategy",
+              "description": "A retry strategy in case of connectivity errors",
+              "modelProperties": {
+                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "abstract-reconnection-strategy",
+                    "prefix": "mule"
+                  }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Connection",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "connection",
+      "description": "",
+      "modelProperties": {}
+    }
+  ],
+  "messageSources": [
+    {
+      "hasResponse": false,
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "String",
+          "annotations": {
+            "typeId": "java.lang.String"
+          }
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "@ref:org.mule.tck.message.StringAttributes"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotypes": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.subtypes.extension.Door"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "doorParam",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "java.lang.Object",
+                  "typeAlias": {
+                    "value": "RedeliveryPolicy"
+                  }
+                },
+                "fields": [
+                  {
+                    "key": {
+                      "name": "maxRedeliveryCount"
+                    },
+                    "model": {
+                      "type": "Number",
+                      "annotations": {
+                        "int": {},
+                        "typeId": "java.lang.Integer",
+                        "default": "5"
+                      }
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "useSecureHash"
+                    },
+                    "model": {
+                      "type": "Boolean",
+                      "annotations": {
+                        "typeId": "java.lang.Boolean",
+                        "default": "true"
+                      }
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "Whether to use a secure hash algorithm to identify a redelivered message"
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "messageDigestAlgorithm"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "The secure hashing algorithm to use. If not set, the default is SHA-256."
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "idExpression"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false."
+                      }
+                    }
+                  },
+                  {
+                    "key": {
+                      "name": "object-store-ref"
+                    },
+                    "model": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "annotations": {
+                      "description": {
+                        "value": "The object store where the redelivery counter for each message is going to be stored."
+                      }
+                    }
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "name": "redeliveryPolicy",
+              "description": "Defines a policy for processing the redelivery of the same message",
+              "modelProperties": {
+                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "abstract-redelivery-policy",
+                    "prefix": "mule"
+                  }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Union",
+                "annotations": {
+                  "typeId": "java.lang.Object",
+                  "typeAlias": {
+                    "value": "ReconnectionStrategy"
+                  }
+                },
+                "of": [
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "reconnect"
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "frequency"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Long",
+                            "default": "2000"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "How often (in ms) to reconnect"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "count"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Integer",
+                            "default": "2"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "How many reconnection attempts to make"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "blocking"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "typeId": "java.lang.Boolean",
+                            "default": "true"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "reconnect-forever"
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "frequency"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Long",
+                            "default": "2000"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "How often (in ms) to reconnect"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "name": "reconnectionStrategy",
+              "description": "A retry strategy in case of connectivity errors",
+              "modelProperties": {
+                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "abstract-reconnection-strategy",
+                    "prefix": "mule"
+                  }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Connection",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "SubtypesSource",
+      "description": "",
+      "modelProperties": {}
+    }
+  ],
+  "errors": [],
+  "modelProperties": {},
+  "types": [
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.tck.message.StringAttributes",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "org.mule.runtime.api.message.Attributes"
+          ],
+          "parent": "",
+          "genericTypes": []
+        },
+        "typeAlias": {
+          "value": "StringAttributes"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "value"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.heisenberg.extension.model.Ricin",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "org.mule.test.heisenberg.extension.model.Weapon"
+          ],
+          "parent": "",
+          "genericTypes": []
+        },
+        "xmlHints": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true,
+          "allowReferences": true
+        },
+        "typeAlias": {
+          "value": "Ricin"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "microgramsPerKilo",
+            "required": "true"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "typeId": "java.lang.Long"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "destination",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
+              "classInformation": {
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "xmlHints": {
+                "allowInlineDefinition": true,
+                "allowTopLevelDefinition": true,
+                "allowReferences": true
+              },
+              "typeAlias": {
+                "value": "door"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "victim",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String",
+                  "annotations": {
+                    "typeId": "java.lang.String"
+                  }
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "address",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String",
+                  "annotations": {
+                    "typeId": "java.lang.String"
+                  }
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "previous"
+                },
+                "model": "#..",
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.heisenberg.extension.model.Weapon",
+        "classInformation": {
+          "hasDefaultConstructor": false,
+          "isInterface": true,
+          "isInstantiable": false,
+          "isAbstract": true,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "extensibleType": {},
+        "typeAlias": {
+          "value": "Weapon"
+        }
+      },
+      "fields": []
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.CarDoor",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "org.mule.test.subtypes.extension.Door"
+          ],
+          "parent": "",
+          "genericTypes": []
+        },
+        "xmlHints": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true,
+          "allowReferences": true
+        },
+        "typeAlias": {
+          "value": "CarDoor"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "color",
+            "required": "true"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "handle"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "default": "button",
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.Door",
+        "classInformation": {
+          "hasDefaultConstructor": false,
+          "isInterface": true,
+          "isInstantiable": false,
+          "isAbstract": true,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "typeAlias": {
+          "value": "Door"
+        }
+      },
+      "fields": []
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.ExtensiblePojo",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "extensibleType": {},
+        "typeAlias": {
+          "value": "ExtensiblePojo"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "myString",
+            "required": "true"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "numbers",
+            "required": "true"
+          },
+          "model": {
+            "type": "Array",
+            "annotations": {
+              "typeId": "java.util.List"
+            },
+            "item": {
+              "type": "Number",
+              "annotations": {
+                "typeId": "java.lang.Integer"
+              }
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.FinalPojo",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": true,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "typeAlias": {
+          "value": "FinalPojo"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "someString"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.HouseDoor",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "org.mule.test.subtypes.extension.Door"
+          ],
+          "parent": "",
+          "genericTypes": []
+        },
+        "xmlHints": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true,
+          "allowReferences": true
+        },
+        "typeAlias": {
+          "value": "HouseDoor"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "isLocked",
+            "required": "true"
+          },
+          "model": {
+            "type": "Boolean",
+            "annotations": {
+              "typeId": "boolean"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "handle"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "default": "pivotal",
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.NoGlobalPojo",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "typeAlias": {
+          "value": "NoGlobalPojo"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "name",
+            "required": "true"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "number",
+            "required": "true"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "int": {},
+              "typeId": "int"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "string",
+            "required": "true"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.NoReferencePojo",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "typeAlias": {
+          "value": "NoReferencePojo"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "number",
+            "required": "true"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "int": {},
+              "typeId": "int"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "string",
+            "required": "true"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.ParentShape",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "typeAlias": {
+          "value": "ParentShape"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "area"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "typeId": "java.lang.Integer"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.PojoForList",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "extensibleType": {},
+        "typeAlias": {
+          "value": "PojoForList"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "id"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.Revolver",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": true,
+          "implementedInterfaces": [
+            "org.mule.test.heisenberg.extension.model.Weapon"
+          ],
+          "parent": "",
+          "genericTypes": []
+        },
+        "xmlHints": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true,
+          "allowReferences": true
+        },
+        "typeAlias": {
+          "value": "Revolver"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "bullets"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "int": {},
+              "typeId": "int"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "default": "6",
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.Square",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "org.mule.test.subtypes.extension.ParentShape",
+          "genericTypes": []
+        },
+        "xmlHints": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true,
+          "allowReferences": true
+        },
+        "typeAlias": {
+          "value": "Square"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "area"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "typeId": "java.lang.Integer"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "side"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "typeId": "java.lang.Integer"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.SubTypesConnectorConnection",
+        "classInformation": {
+          "hasDefaultConstructor": false,
+          "isInterface": false,
+          "isInstantiable": false,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "typeAlias": {
+          "value": "SubTypesConnectorConnection"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "door"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.subtypes.extension.Door",
+              "classInformation": {
+                "hasDefaultConstructor": false,
+                "isInterface": true,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "typeAlias": {
+                "value": "Door"
+              }
+            },
+            "fields": []
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        },
+        {
+          "key": {
+            "name": "shape"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.subtypes.extension.ParentShape",
+              "classInformation": {
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "typeAlias": {
+                "value": "ParentShape"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "area"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "typeId": "java.lang.Integer"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.SubTypesMappingConnector",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "typeAlias": {
+          "value": "SubTypesMappingConnector"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "abstractShape",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.subtypes.extension.ParentShape",
+              "classInformation": {
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "typeAlias": {
+                "value": "ParentShape"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "area"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "typeId": "java.lang.Integer"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "doorInterface",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.subtypes.extension.Door",
+              "classInformation": {
+                "hasDefaultConstructor": false,
+                "isInterface": true,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "typeAlias": {
+                "value": "Door"
+              }
+            },
+            "fields": []
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "explicitSquare",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.subtypes.extension.Square",
+              "classInformation": {
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "org.mule.test.subtypes.extension.ParentShape",
+                "genericTypes": []
+              },
+              "xmlHints": {
+                "allowInlineDefinition": true,
+                "allowTopLevelDefinition": true,
+                "allowReferences": true
+              },
+              "typeAlias": {
+                "value": "Square"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "area"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "typeId": "java.lang.Integer"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "side"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "typeId": "java.lang.Integer"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "finalPojo",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.subtypes.extension.FinalPojo",
+              "classInformation": {
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "typeAlias": {
+                "value": "FinalPojo"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "someString"
+                },
+                "model": {
+                  "type": "String",
+                  "annotations": {
+                    "typeId": "java.lang.String"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "ricin",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.heisenberg.extension.model.Ricin",
+              "classInformation": {
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [
+                  "org.mule.test.heisenberg.extension.model.Weapon"
+                ],
+                "parent": "",
+                "genericTypes": []
+              },
+              "xmlHints": {
+                "allowInlineDefinition": true,
+                "allowTopLevelDefinition": true,
+                "allowReferences": true
+              },
+              "typeAlias": {
+                "value": "Ricin"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "microgramsPerKilo",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "typeId": "java.lang.Long"
+                  }
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "destination",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "org.mule.test.heisenberg.extension.model.KnockeableDoor",
+                    "classInformation": {
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": []
+                    },
+                    "xmlHints": {
+                      "allowInlineDefinition": true,
+                      "allowTopLevelDefinition": true,
+                      "allowReferences": true
+                    },
+                    "typeAlias": {
+                      "value": "door"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "victim",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "java.lang.String"
+                        }
+                      },
+                      "annotations": {
+                        "parameterPurpose": {
+                          "role": "BEHAVIOUR"
+                        },
+                        "expressionSupport": {
+                          "value": "SUPPORTED"
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "address",
+                        "required": "true"
+                      },
+                      "model": {
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "java.lang.String"
+                        }
+                      },
+                      "annotations": {
+                        "parameterPurpose": {
+                          "role": "BEHAVIOUR"
+                        },
+                        "expressionSupport": {
+                          "value": "SUPPORTED"
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "previous"
+                      },
+                      "model": "#..",
+                      "annotations": {
+                        "parameterPurpose": {
+                          "role": "BEHAVIOUR"
+                        },
+                        "expressionSupport": {
+                          "value": "SUPPORTED"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "extensibleWeapon",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.heisenberg.extension.model.Weapon",
+              "classInformation": {
+                "hasDefaultConstructor": false,
+                "isInterface": true,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "extensibleType": {},
+              "typeAlias": {
+                "value": "Weapon"
+              }
+            },
+            "fields": []
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "triangle",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.subtypes.extension.ParentShape",
+              "classInformation": {
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "typeAlias": {
+                "value": "ParentShape"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "area"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "typeId": "java.lang.Integer"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "pojoWithExtension",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.subtypes.extension.ExtensiblePojo",
+              "classInformation": {
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "extensibleType": {},
+              "typeAlias": {
+                "value": "ExtensiblePojo"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "myString",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String",
+                  "annotations": {
+                    "typeId": "java.lang.String"
+                  }
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "numbers",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Array",
+                  "annotations": {
+                    "typeId": "java.util.List"
+                  },
+                  "item": {
+                    "type": "Number",
+                    "annotations": {
+                      "typeId": "java.lang.Integer"
+                    }
+                  }
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "onePojos",
+            "required": "true"
+          },
+          "model": {
+            "type": "Array",
+            "annotations": {
+              "typeId": "java.util.List"
+            },
+            "item": {
+              "type": "Object",
+              "annotations": {
+                "typeId": "org.mule.test.subtypes.extension.PojoForList",
+                "classInformation": {
+                  "hasDefaultConstructor": true,
+                  "isInterface": false,
+                  "isInstantiable": true,
+                  "isAbstract": false,
+                  "isFinal": false,
+                  "implementedInterfaces": [],
+                  "parent": "",
+                  "genericTypes": []
+                },
+                "extensibleType": {},
+                "typeAlias": {
+                  "value": "PojoForList"
+                }
+              },
+              "fields": [
+                {
+                  "key": {
+                    "name": "id"
+                  },
+                  "model": {
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "twoPojos",
+            "required": "true"
+          },
+          "model": {
+            "type": "Array",
+            "annotations": {
+              "typeId": "java.util.List"
+            },
+            "item": {
+              "type": "Object",
+              "annotations": {
+                "typeId": "org.mule.test.subtypes.extension.PojoForList",
+                "classInformation": {
+                  "hasDefaultConstructor": true,
+                  "isInterface": false,
+                  "isInstantiable": true,
+                  "isAbstract": false,
+                  "isFinal": false,
+                  "implementedInterfaces": [],
+                  "parent": "",
+                  "genericTypes": []
+                },
+                "extensibleType": {},
+                "typeAlias": {
+                  "value": "PojoForList"
+                }
+              },
+              "fields": [
+                {
+                  "key": {
+                    "name": "id"
+                  },
+                  "model": {
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "weapons",
+            "required": "true"
+          },
+          "model": {
+            "type": "Array",
+            "annotations": {
+              "typeId": "java.util.List"
+            },
+            "item": {
+              "type": "Object",
+              "annotations": {
+                "typeId": "org.mule.test.heisenberg.extension.model.Weapon",
+                "classInformation": {
+                  "hasDefaultConstructor": false,
+                  "isInterface": true,
+                  "isInstantiable": false,
+                  "isAbstract": true,
+                  "isFinal": false,
+                  "implementedInterfaces": [],
+                  "parent": "",
+                  "genericTypes": []
+                },
+                "extensibleType": {},
+                "typeAlias": {
+                  "value": "Weapon"
+                }
+              },
+              "fields": []
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "weaponMap",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "java.util.Map",
+              "classInformation": {
+                "hasDefaultConstructor": false,
+                "isInterface": true,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": [
+                  "java.lang.String",
+                  "org.mule.test.heisenberg.extension.model.Weapon"
+                ]
+              }
+            },
+            "open": {
+              "type": "Object",
+              "annotations": {
+                "typeId": "org.mule.test.heisenberg.extension.model.Weapon",
+                "classInformation": {
+                  "hasDefaultConstructor": false,
+                  "isInterface": true,
+                  "isInstantiable": false,
+                  "isAbstract": true,
+                  "isFinal": false,
+                  "implementedInterfaces": [],
+                  "parent": "",
+                  "genericTypes": []
+                },
+                "extensibleType": {},
+                "typeAlias": {
+                  "value": "Weapon"
+                }
+              },
+              "fields": []
+            },
+            "fields": []
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.Triangle",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "org.mule.test.subtypes.extension.ParentShape",
+          "genericTypes": []
+        },
+        "xmlHints": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true,
+          "allowReferences": true
+        },
+        "typeAlias": {
+          "value": "triangleAlias"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "area"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "typeId": "java.lang.Integer"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "height"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "typeId": "java.lang.Integer"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.vegan.extension.VeganCookBook",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "extensibleType": {},
+        "typeAlias": {
+          "value": "VeganCookBook"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "recipes"
+          },
+          "model": {
+            "type": "Array",
+            "annotations": {
+              "typeId": "java.util.List"
+            },
+            "item": {
+              "type": "String",
+              "annotations": {
+                "typeId": "java.lang.String"
+              }
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "numberOfPages"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "typeId": "java.lang.Integer"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "editorial"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "default": "Enemies of Bondiola",
+            "expressionSupport": {
+              "value": "NOT_SUPPORTED"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

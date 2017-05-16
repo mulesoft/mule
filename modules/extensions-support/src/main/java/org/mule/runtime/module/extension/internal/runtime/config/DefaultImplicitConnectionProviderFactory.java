@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getFirstImplicit;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.with;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAllConnectionProviders;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -75,7 +75,7 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
                                                      extensionModel, muleContext);
     builder.setOwnerConfigName(configName);
     try {
-      return builder.build(with(event));
+      return builder.build(from(event));
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
     }

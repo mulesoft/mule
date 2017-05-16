@@ -11,11 +11,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.with;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.HELLO_WORLD;
-
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -51,7 +49,7 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase {
 
   @Test
   public void cache() throws Exception {
-    Object value = resolver.resolve(with(event));
+    Object value = resolver.resolve(ValueResolvingContext.from(event));
     assertThat(value, is(HELLO_WORLD));
     verify(muleContext.getRegistry()).get(KEY);
   }
@@ -75,6 +73,6 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase {
   public void nonExistingKey() throws Exception {
     RegistryLookupValueResolver<Object> valueResolver = new RegistryLookupValueResolver<>(FAKE_KEY);
     valueResolver.setMuleContext(muleContext);
-    valueResolver.resolve(with(event));
+    valueResolver.resolve(ValueResolvingContext.from(event));
   }
 }

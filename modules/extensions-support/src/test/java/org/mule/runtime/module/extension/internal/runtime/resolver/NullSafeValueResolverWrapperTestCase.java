@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.with;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.api.Event;
@@ -76,7 +76,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
       throws Exception {
     ValueResolver resolver = NullSafeValueResolverWrapper.of(valueResolver, type, muleContext, objectTypeParametersResolver);
     assertThat(resolver.isDynamic(), is(isDynamic));
-    assertThat(resolver.resolve(with(event)), is(expected));
+    assertThat(resolver.resolve(ValueResolvingContext.from(event)), is(expected));
   }
 
   public static class DynamicPojo {
