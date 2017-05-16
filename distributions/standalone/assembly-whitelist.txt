@@ -213,6 +213,7 @@
 /mule-standalone-${productVersion}/lib/opt/jaxen-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/jgrapht-jdk1.5-0.7.3.jar
 /mule-standalone-${productVersion}/lib/opt/joda-time-2.9.1.jar
+/mule-standalone-${productVersion}/lib/opt/jopt-simple-5.0.3.jar
 /mule-standalone-${productVersion}/lib/opt/mail-1.4.3.jar
 /mule-standalone-${productVersion}/lib/opt/maven-aether-provider-3.3.9.jar
 /mule-standalone-${productVersion}/lib/opt/maven-artifact-3.3.9.jar
