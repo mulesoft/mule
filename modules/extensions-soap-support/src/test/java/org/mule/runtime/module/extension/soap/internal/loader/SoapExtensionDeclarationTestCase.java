@@ -78,12 +78,13 @@ public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDecla
     assertConnectionProvider(providers.get(0), "base-connection", "",
                              new ParameterProber("leaguesAddress", "http://some-url.com", StringType.class, false));
 
-    assertConnectionProvider(providers.get(1), "la-liga-connection", "",
+    assertConnectionProvider(providers.get(1), CALCIO_ID + "-connection", CALCIO_DESC);
+
+    assertConnectionProvider(providers.get(2), "la-liga-connection", "",
                              new ParameterProber("firstDivision", StringType.class),
                              new ParameterProber("secondDivision", StringType.class),
                              new ParameterProber("wsdlLocation", StringType.class));
 
-    assertConnectionProvider(providers.get(2), CALCIO_ID + "-connection", CALCIO_DESC);
   }
 
   private void assertErrorModels(Set<ErrorModel> errors) {
