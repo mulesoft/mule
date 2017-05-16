@@ -47,7 +47,9 @@ import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.CountDownLatch;
@@ -207,20 +209,14 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     internalConcurrent(false, BLOCKING, 1);
   }
 
-  protected void internalConcurrent(boolean blocks, ProcessingType processingType, int invocations)
-      throws MuleException, InterruptedException {
-    internalConcurrent(blocks, processingType, invocations, null);
-  }
-
-  protected void internalConcurrent(boolean blocks, ProcessingType processingType, int invocations, Processor processor)
+  protected void internalConcurrent(boolean blocks, ProcessingType processingType, int invocations,
+                                    Processor... processorsBeforeLatch)
       throws MuleException, InterruptedException {
     MultipleInvocationLatchedProcessor latchedProcessor = new MultipleInvocationLatchedProcessor(processingType, invocations);
 
-    if (processor != null) {
-      flow.setMessageProcessors(asList(processor, latchedProcessor));
-    } else {
-      flow.setMessageProcessors(asList(latchedProcessor));
-    }
+    List<Processor> processors = new ArrayList<>(asList(processorsBeforeLatch));
+    processors.add(latchedProcessor);
+    flow.setMessageProcessors(processors);
     flow.initialise();
     flow.start();
 
