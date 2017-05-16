@@ -18,8 +18,8 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
-import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -28,7 +28,6 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.internal.loader.validator.ParameterModelValidator;
 import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.internal.property.QNameModelProperty;
@@ -112,7 +111,7 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
     validate(extensionModel, validator);
   }
 
-  @Test(expected = IllegalParameterModelDefinitionException.class)
+  @Test(expected = IllegalModelDefinitionException.class)
   public void invalidParameterDueToReservedName() {
     when(invalidParameterModel.getType()).thenReturn(toMetadataType(InvalidPojo.class));
     when(invalidParameterModel.getName()).thenReturn("pojo");

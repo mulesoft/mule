@@ -42,8 +42,8 @@ public final class ImplicitConnectionProviderValueResolver implements Connection
   }
 
   @Override
-  public ConnectionProvider resolve(Event event) throws MuleException {
-    return implicitConnectionProviderFactory.createImplicitConnectionProvider(configName, event);
+  public ConnectionProvider resolve(ValueResolvingContext context) throws MuleException {
+    return implicitConnectionProviderFactory.createImplicitConnectionProvider(configName, context.getEvent());
   }
 
   /**

@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -42,7 +41,7 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
   public void yieldsNestedProcessor() throws Exception {
     NestedProcessorValueResolver resolver = new NestedProcessorValueResolver(messageProcessor);
     resolver.setMuleContext(muleContext);
-    NestedProcessor nestedProcessor = resolver.resolve(testEvent());
+    NestedProcessor nestedProcessor = resolver.resolve(ValueResolvingContext.from(testEvent()));
     Object response = nestedProcessor.process();
     assertThat((String) response, is(TEST_PAYLOAD));
 
@@ -57,8 +56,8 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
   public void alwaysGivesDifferentInstances() throws Exception {
     NestedProcessorValueResolver resolver = new NestedProcessorValueResolver(messageProcessor);
     resolver.setMuleContext(muleContext);
-    NestedProcessor resolved1 = resolver.resolve(testEvent());
-    NestedProcessor resolved2 = resolver.resolve(testEvent());
+    NestedProcessor resolved1 = resolver.resolve(ValueResolvingContext.from(testEvent()));
+    NestedProcessor resolved2 = resolver.resolve(ValueResolvingContext.from(testEvent()));
 
     assertThat(resolved1, is(not(sameInstance(resolved2))));
   }

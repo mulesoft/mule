@@ -24,6 +24,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
@@ -146,7 +147,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     if (operationModel.isBlocking()) {
       return from(publisher).map(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
         Optional<ConfigurationInstance> configuration = getConfiguration(event);
-        Map<String, Object> operationParameters = resolverSet.resolve(event).asMap();
+        Map<String, Object> operationParameters = getResolutionResult(event, configuration);
 
         OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent) -> {
           ExecutionContextAdapter<OperationModel> operationContext =
@@ -300,7 +301,8 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   @Override
   protected ParameterValueResolver getParameterValueResolver() {
     final Event event = getInitialiserEvent(muleContext);
-    return new OperationParameterValueResolver(new LazyExecutionContext<>(resolverSet, operationModel, extensionModel, event));
+    return new OperationParameterValueResolver(new LazyExecutionContext<>(resolverSet, operationModel, extensionModel,
+                                                                          from(event)));
   }
 
   @Override
@@ -331,6 +333,15 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   }
 
   private ExecutionContextAdapter<OperationModel> createExecutionContext(Event event) throws MuleException {
-    return createExecutionContext(getConfiguration(event), resolverSet.resolve(event).asMap(), event);
+    Optional<ConfigurationInstance> configuration = getConfiguration(event);
+
+
+
+    return createExecutionContext(configuration, getResolutionResult(event, configuration), event);
+  }
+
+  private Map<String, Object> getResolutionResult(Event event, Optional<ConfigurationInstance> configuration)
+      throws MuleException {
+    return resolverSet.resolve(from(event, configuration)).asMap();
   }
 }

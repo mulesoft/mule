@@ -1,0 +1,2940 @@
+{
+  "name": "Test OAuth Extension",
+  "description": "",
+  "version": "4.0",
+  "vendor": "Mulesoft",
+  "category": "COMMUNITY",
+  "minMuleVersion": "4.0.0",
+  "xmlDsl": {
+    "prefix": "test-oauth",
+    "namespace": "http://www.mulesoft.org/schema/mule/test-oauth",
+    "schemaLocation": "http://www.mulesoft.org/schema/mule/test-oauth/current/mule-test-oauth.xsd",
+    "schemaVersion": "4.0",
+    "xsdFileName": "mule-test-oauth.xsd"
+  },
+  "resources": [],
+  "subTypes": [],
+  "externalLibraries": [],
+  "importedTypes": [],
+  "configurations": [
+    {
+      "parameterGroupModels": [],
+      "externalLibraryModels": [],
+      "operations": [
+        {
+          "blocking": true,
+          "executionType": "CPU_LITE",
+          "errors": [],
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": false,
+          "supportsStreaming": false,
+          "stereotypes": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.connectivity.oauth.AuthCodeRequest",
+                      "classInformation": {
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": []
+                      },
+                      "typeAlias": {
+                        "value": "AuthCodeRequest"
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "name": "request",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState",
+                      "classInformation": {
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": []
+                      },
+                      "typeAlias": {
+                        "value": "AuthorizationCodeState"
+                      }
+                    },
+                    "fields": []
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "name": "state",
+                  "description": "",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "captureCallbackPayloads",
+          "description": "",
+          "modelProperties": {},
+          "kind": "operation"
+        },
+        {
+          "blocking": true,
+          "executionType": "BLOCKING",
+          "errors": [],
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "@ref:org.mule.test.oauth.TestOAuthConnection"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": true,
+          "supportsStreaming": false,
+          "stereotypes": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "name": "target",
+                  "displayModel": {
+                    "displayName": "Target Variable"
+                  },
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Output",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "getConnection",
+          "description": "",
+          "modelProperties": {},
+          "kind": "operation"
+        },
+        {
+          "blocking": true,
+          "executionType": "BLOCKING",
+          "errors": [],
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": true,
+          "supportsStreaming": false,
+          "stereotypes": [],
+          "parameterGroupModels": [],
+          "name": "tokenExpired",
+          "description": "",
+          "modelProperties": {},
+          "kind": "operation"
+        },
+        {
+          "blocking": true,
+          "executionType": "BLOCKING",
+          "errors": [],
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Object",
+              "annotations": {
+                "typeId": "org.mule.runtime.api.message.NullAttributes",
+                "classInformation": {
+                  "hasDefaultConstructor": false,
+                  "isInterface": false,
+                  "isInstantiable": false,
+                  "isAbstract": false,
+                  "isFinal": true,
+                  "implementedInterfaces": [
+                    "org.mule.runtime.api.message.Attributes"
+                  ],
+                  "parent": "",
+                  "genericTypes": []
+                },
+                "typeAlias": {
+                  "value": "NullAttributes"
+                }
+              },
+              "fields": []
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": false,
+          "supportsStreaming": false,
+          "stereotypes": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "name": "resourceOwnerId",
+                  "description": "The id of the resource owner which access should be invalidated",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "unauthorize",
+          "description": "Deletes all the access token information of a given resource owner id so that it\u0027s impossible to execute any operation for that user without doing the authorization dance again",
+          "modelProperties": {},
+          "kind": "operation"
+        }
+      ],
+      "connectionProviders": [
+        {
+          "connectionManagementType": "NONE",
+          "externalLibraryModels": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Number",
+                    "annotations": {
+                      "typeId": "java.lang.Double"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "defaultValue": "34.0",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "name": "apiVersion",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "name": "display",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "false",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 3
+                  },
+                  "name": "immediate",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "true",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 4
+                  },
+                  "name": "prompt",
+                  "description": "",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "ReconnectionStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "typeId": "java.lang.Boolean",
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect-forever"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "consumerKey",
+                  "description": "The OAuth consumerKey as registered with the service provider",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "consumerSecret",
+                  "description": "The OAuth consumerSecret as registered with the service provider",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "authUrl",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "authorizationUrl",
+                  "description": "The service provider\u0027s authorization endpoint URL",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "accessTokenUrl",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "accessTokenUrl",
+                  "description": "The service provider\u0027s accessToken endpoint URL",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "defaultScope",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "scopes",
+                  "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "resourceOwnerId",
+                  "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "before",
+                  "description": "The name of a flow to be executed right before starting the OAuth dance",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "after",
+                  "description": "The name of a flow to be executed right after an accessToken has been received",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": true,
+              "name": "oauthAuthorizationCode",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "listenerConfig",
+                  "description": "A reference to an \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint. This is mutually exclusive with callbackHost and callbackPort",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "callbackHost",
+                  "description": "The host in which to create a http listener for the access token callback endpoint. This is mutually exclusive with listenerConfig",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Number",
+                    "annotations": {
+                      "typeId": "java.lang.Integer"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "callbackPort",
+                  "description": "The port in which to create a http listener for triggering the authorization dance. This is mutually exclusive with listenerConfig",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "callbackPath",
+                  "description": "The path of the access token callback endpoint",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "authorizePath",
+                  "description": "The path of the local http endpoint which triggers the OAuth dance",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": true,
+              "name": "oauthCallbackConfig",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "objectStore",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": true,
+              "name": "oauthStoreConfig",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "connection",
+          "description": "",
+          "modelProperties": {
+            "OAuth": {
+              "grantTypes": [
+                {
+                  "accessTokenUrl": "accessTokenUrl",
+                  "authorizationUrl": "authUrl",
+                  "accessTokenExpr": "#[payload.access_token]",
+                  "expirationRegex": "#[payload.expires_in]",
+                  "refreshTokenExpr": "#[payload.refresh_token]",
+                  "defaultScope": "defaultScope"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "connectionManagementType": "NONE",
+          "externalLibraryModels": [],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Number",
+                    "annotations": {
+                      "typeId": "java.lang.Double"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "defaultValue": "34.0",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "name": "apiVersion",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "name": "display",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "false",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 3
+                  },
+                  "name": "immediate",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "true",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 4
+                  },
+                  "name": "prompt",
+                  "description": "",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "ReconnectionStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "blocking"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "typeId": "java.lang.Boolean",
+                                "default": "true"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect-forever"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "consumerKey",
+                  "description": "The OAuth consumerKey as registered with the service provider",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "consumerSecret",
+                  "description": "The OAuth consumerSecret as registered with the service provider",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "authUrl",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "authorizationUrl",
+                  "description": "The service provider\u0027s authorization endpoint URL",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": "accessTokenUrl",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "accessTokenUrl",
+                  "description": "The service provider\u0027s accessToken endpoint URL",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "scopes",
+                  "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "resourceOwnerId",
+                  "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "before",
+                  "description": "The name of a flow to be executed right before starting the OAuth dance",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "after",
+                  "description": "The name of a flow to be executed right after an accessToken has been received",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": true,
+              "name": "oauthAuthorizationCode",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "listenerConfig",
+                  "description": "A reference to an \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint. This is mutually exclusive with callbackHost and callbackPort",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "callbackHost",
+                  "description": "The host in which to create a http listener for the access token callback endpoint. This is mutually exclusive with listenerConfig",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Number",
+                    "annotations": {
+                      "typeId": "java.lang.Integer"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "callbackPort",
+                  "description": "The port in which to create a http listener for triggering the authorization dance. This is mutually exclusive with listenerConfig",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "callbackPath",
+                  "description": "The path of the access token callback endpoint",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "authorizePath",
+                  "description": "The path of the local http endpoint which triggers the OAuth dance",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": true,
+              "name": "oauthCallbackConfig",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "objectStore",
+                  "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": true,
+              "name": "oauthStoreConfig",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "scopeless-connection",
+          "description": "",
+          "modelProperties": {
+            "OAuth": {
+              "grantTypes": [
+                {
+                  "accessTokenUrl": "accessTokenUrl",
+                  "authorizationUrl": "authUrl",
+                  "accessTokenExpr": "#[payload.access_token]",
+                  "expirationRegex": "#[payload.expires_in]",
+                  "refreshTokenExpr": "#[payload.refresh_token]"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "messageSources": [],
+      "name": "config",
+      "description": "Default configuration",
+      "modelProperties": {}
+    }
+  ],
+  "operations": [],
+  "connectionProviders": [
+    {
+      "connectionManagementType": "NONE",
+      "externalLibraryModels": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "typeId": "java.lang.Double"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "34.0",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "apiVersion",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "name": "display",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Boolean",
+                "annotations": {
+                  "typeId": "boolean"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "false",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "name": "immediate",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Boolean",
+                "annotations": {
+                  "typeId": "boolean"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "true",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "name": "prompt",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Union",
+                "annotations": {
+                  "typeId": "java.lang.Object",
+                  "typeAlias": {
+                    "value": "ReconnectionStrategy"
+                  }
+                },
+                "of": [
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "reconnect"
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "frequency"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Long",
+                            "default": "2000"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "How often (in ms) to reconnect"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "count"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Integer",
+                            "default": "2"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "How many reconnection attempts to make"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "blocking"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "typeId": "java.lang.Boolean",
+                            "default": "true"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "reconnect-forever"
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "frequency"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Long",
+                            "default": "2000"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "How often (in ms) to reconnect"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "name": "reconnectionStrategy",
+              "description": "A retry strategy in case of connectivity errors",
+              "modelProperties": {
+                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "abstract-reconnection-strategy",
+                    "prefix": "mule"
+                  }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Connection",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "consumerKey",
+              "description": "The OAuth consumerKey as registered with the service provider",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "consumerSecret",
+              "description": "The OAuth consumerSecret as registered with the service provider",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "authUrl",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "authorizationUrl",
+              "description": "The service provider\u0027s authorization endpoint URL",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "accessTokenUrl",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "accessTokenUrl",
+              "description": "The service provider\u0027s accessToken endpoint URL",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "defaultScope",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "scopes",
+              "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "resourceOwnerId",
+              "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "before",
+              "description": "The name of a flow to be executed right before starting the OAuth dance",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "after",
+              "description": "The name of a flow to be executed right after an accessToken has been received",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": true,
+          "name": "oauthAuthorizationCode",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "listenerConfig",
+              "description": "A reference to an \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint. This is mutually exclusive with callbackHost and callbackPort",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "callbackHost",
+              "description": "The host in which to create a http listener for the access token callback endpoint. This is mutually exclusive with listenerConfig",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "typeId": "java.lang.Integer"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "callbackPort",
+              "description": "The port in which to create a http listener for triggering the authorization dance. This is mutually exclusive with listenerConfig",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "callbackPath",
+              "description": "The path of the access token callback endpoint",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "authorizePath",
+              "description": "The path of the local http endpoint which triggers the OAuth dance",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": true,
+          "name": "oauthCallbackConfig",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "objectStore",
+              "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": true,
+          "name": "oauthStoreConfig",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "connection",
+      "description": "",
+      "modelProperties": {
+        "OAuth": {
+          "grantTypes": [
+            {
+              "accessTokenUrl": "accessTokenUrl",
+              "authorizationUrl": "authUrl",
+              "accessTokenExpr": "#[payload.access_token]",
+              "expirationRegex": "#[payload.expires_in]",
+              "refreshTokenExpr": "#[payload.refresh_token]",
+              "defaultScope": "defaultScope"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "connectionManagementType": "NONE",
+      "externalLibraryModels": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "typeId": "java.lang.Double"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "34.0",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "apiVersion",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "name": "display",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Boolean",
+                "annotations": {
+                  "typeId": "boolean"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "false",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "name": "immediate",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Boolean",
+                "annotations": {
+                  "typeId": "boolean"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "true",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "name": "prompt",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Union",
+                "annotations": {
+                  "typeId": "java.lang.Object",
+                  "typeAlias": {
+                    "value": "ReconnectionStrategy"
+                  }
+                },
+                "of": [
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "reconnect"
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "frequency"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Long",
+                            "default": "2000"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "How often (in ms) to reconnect"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "count"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Integer",
+                            "default": "2"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "How many reconnection attempts to make"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "blocking"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "typeId": "java.lang.Boolean",
+                            "default": "true"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "reconnect-forever"
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "frequency"
+                        },
+                        "model": {
+                          "type": "Number",
+                          "annotations": {
+                            "int": {},
+                            "typeId": "java.lang.Long",
+                            "default": "2000"
+                          }
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "How often (in ms) to reconnect"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "name": "reconnectionStrategy",
+              "description": "A retry strategy in case of connectivity errors",
+              "modelProperties": {
+                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "abstract-reconnection-strategy",
+                    "prefix": "mule"
+                  }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {}
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Connection",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "consumerKey",
+              "description": "The OAuth consumerKey as registered with the service provider",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "consumerSecret",
+              "description": "The OAuth consumerSecret as registered with the service provider",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "authUrl",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "authorizationUrl",
+              "description": "The service provider\u0027s authorization endpoint URL",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "accessTokenUrl",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "accessTokenUrl",
+              "description": "The service provider\u0027s accessToken endpoint URL",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "scopes",
+              "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "resourceOwnerId",
+              "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "before",
+              "description": "The name of a flow to be executed right before starting the OAuth dance",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "after",
+              "description": "The name of a flow to be executed right after an accessToken has been received",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": true,
+          "name": "oauthAuthorizationCode",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "listenerConfig",
+              "description": "A reference to an \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint. This is mutually exclusive with callbackHost and callbackPort",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "callbackHost",
+              "description": "The host in which to create a http listener for the access token callback endpoint. This is mutually exclusive with listenerConfig",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "typeId": "java.lang.Integer"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "callbackPort",
+              "description": "The port in which to create a http listener for triggering the authorization dance. This is mutually exclusive with listenerConfig",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "callbackPath",
+              "description": "The path of the access token callback endpoint",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "authorizePath",
+              "description": "The path of the local http endpoint which triggers the OAuth dance",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": true,
+          "name": "oauthCallbackConfig",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "objectStore",
+              "description": "A reference to the object store that should be used to store each resource owner id\u0027s data. If not specified, runtime will automatically provision the default one.",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": true,
+          "name": "oauthStoreConfig",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "scopeless-connection",
+      "description": "",
+      "modelProperties": {
+        "OAuth": {
+          "grantTypes": [
+            {
+              "accessTokenUrl": "accessTokenUrl",
+              "authorizationUrl": "authUrl",
+              "accessTokenExpr": "#[payload.access_token]",
+              "expirationRegex": "#[payload.expires_in]",
+              "refreshTokenExpr": "#[payload.refresh_token]"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "messageSources": [],
+  "errors": [],
+  "modelProperties": {},
+  "types": [
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.oauth.TestOAuthConnection",
+        "classInformation": {
+          "hasDefaultConstructor": false,
+          "isInterface": false,
+          "isInstantiable": false,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "typeAlias": {
+          "value": "TestOAuthConnection"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "state"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.oauth.TestOAuthConnectionState",
+              "classInformation": {
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "typeAlias": {
+                "value": "TestOAuthConnectionState"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "apiVersion"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "typeId": "java.lang.Double"
+                  }
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "default": "34.0",
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        }
+      ]
+    }
+  ]
+}

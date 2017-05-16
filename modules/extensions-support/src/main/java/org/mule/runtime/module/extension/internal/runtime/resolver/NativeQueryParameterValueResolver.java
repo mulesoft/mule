@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.lang.String.format;
 import static org.mule.runtime.extension.api.dsql.DsqlParser.isDsqlQuery;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.dsql.DsqlParser;
 import org.mule.runtime.extension.api.dsql.DsqlQuery;
@@ -38,7 +37,7 @@ public final class NativeQueryParameterValueResolver implements ValueResolver<St
    * {@inheritDoc}
    */
   @Override
-  public String resolve(Event event) throws MuleException {
+  public String resolve(ValueResolvingContext context) throws MuleException {
 
     if (!isDsqlQuery(query)) {
       return query;

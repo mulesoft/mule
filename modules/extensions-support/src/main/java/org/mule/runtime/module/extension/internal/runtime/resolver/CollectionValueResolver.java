@@ -14,7 +14,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 
 import com.google.common.collect.ImmutableList;
@@ -28,8 +27,9 @@ import java.util.Set;
 import javax.inject.Inject;
 
 /**
- * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation of {@link #resolve(Event)} it return a
- * {@link Collection} of values with the outcome of each original resolver.
+ * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation
+ * of {@link #resolve(ValueResolvingContext)} it return a {@link Collection} of values with the outcome
+ * of each original resolver.
  * <p/>
  * This class implements {@link Lifecycle} and propagates those events to each of the {@code resolvers}
  *
@@ -71,15 +71,15 @@ public final class CollectionValueResolver<T> implements ValueResolver<Collectio
   /**
    * Passes the given {@code event} to each resolvers and outputs a collection of type {@code collectionType} with each result
    *
-   * @param event a {@link Event} the event to evaluate
+   * @param context a {@link ValueResolvingContext} the context used for evaluation
    * @return a {@link Collection} of type {@code collectionType}
    * @throws MuleException
    */
   @Override
-  public Collection<T> resolve(Event event) throws MuleException {
+  public Collection<T> resolve(ValueResolvingContext context) throws MuleException {
     Collection<T> collection = instantiateCollection();
     for (ValueResolver<T> resolver : resolvers) {
-      collection.add(resolver.resolve(event));
+      collection.add(resolver.resolve(context));
     }
 
     return collection;

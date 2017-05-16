@@ -6,24 +6,27 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * A {@link ValueResolver} wrapper which defaults to obtaining the value from the current {@link ConfigurationInstance}
@@ -32,13 +35,12 @@ import java.util.function.Supplier;
  * @param <T> the generic type of the produced values.
  * @since 4.0
  */
-public class ConfigOverrideValueResolverWrapper<T> implements ValueResolver<T>, Initialisable {
+public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolver<T>, Initialisable {
 
   private final ValueResolver<T> delegate;
   private final String parameterName;
   private final MuleContext muleContext;
-  private final Function<Event, Optional<ConfigurationInstance>> configProvider;
-  private Field field;
+  private Function<Object, Object> defaultValueResolver;
 
   /**
    * Creates a new instance
@@ -49,35 +51,33 @@ public class ConfigOverrideValueResolverWrapper<T> implements ValueResolver<T>, 
    * @param <T>      the generic type of the produced values.
    * @return a new instance of {@link ConfigOverrideValueResolverWrapper}
    */
-  public static <T> ValueResolver<T> of(ValueResolver<T> delegate, String parameterName, MuleContext muleContext,
-                                        Function<Event, Optional<ConfigurationInstance>> configProvider) {
-    checkArgument(delegate != null,
-                  "A ValueResolver is required in order to delegate the value resolution.");
-    return new ConfigOverrideValueResolverWrapper(delegate, parameterName, muleContext, configProvider);
+  public static <T> ValueResolver<T> of(ValueResolver<T> delegate, String parameterName, MuleContext muleContext) {
+    checkArgument(delegate != null, "A ValueResolver is required in order to delegate the value resolution.");
+    checkArgument(!isBlank(parameterName), "A parameter name is required in order to use the config as a fallback.");
+    return new ConfigOverrideValueResolverWrapper<>(delegate, parameterName, muleContext);
   }
 
   private ConfigOverrideValueResolverWrapper(ValueResolver<T> delegate, String parameterName,
-                                             MuleContext muleContext,
-                                             Function<Event, Optional<ConfigurationInstance>> configProvider) {
+                                             MuleContext muleContext) {
     this.muleContext = muleContext;
-    this.configProvider = configProvider;
     checkArgument(delegate != null, "A ConfigOverride value resolver requires a non-null delegate");
     this.delegate = delegate;
     this.parameterName = parameterName;
   }
 
   @Override
-  public T resolve(Event event) throws MuleException {
+  public T resolve(ValueResolvingContext context) throws MuleException {
+    T value = delegate.resolve(context);
+    if (value != null) {
+      return value;
+    }
 
-    final Supplier supplier = () -> {
-      try {
-        return delegate.resolve(event);
-      } catch (MuleException e) {
-        throw new MuleRuntimeException(createStaticMessage("An error occurred while resolving the value for parameter "
-            + parameterName), e);
-      }
-    };
-    return (T) resolveConfigOverrideParameter(supplier, configProvider.apply(event), parameterName);
+    if (!context.getConfig().isPresent()) {
+      throw new ResolverException(createStaticMessage("Failed to obtain the config-provided value for parameter [" + parameterName
+          + "]. No configuration was available in the current resolution context."));
+    }
+
+    return resolveConfigOverrideParameter(context.getConfig().get());
   }
 
   @Override
@@ -102,58 +102,119 @@ public class ConfigOverrideValueResolverWrapper<T> implements ValueResolver<T>, 
    * from {@link ConfigurationInstance#getValue() config instance} if the {@code delegate} produces a
    * {@code null} value.
    *
-   * @param config        the {@link ConfigurationInstance config} from where the parameter value will be obtained
-   * @param parameterName the name parameter to resolve
+   * @param instance        the {@link ConfigurationInstance config} from where the parameter value will be obtained
    * @return the value of the parameter with name {@code parameterName} obtained from the {@code delegate} or
    * from {@link ConfigurationInstance#getValue() config instance} if the {@code delegate} produces a {@code null} value.
    */
-  private Object resolveConfigOverrideParameter(Supplier delegate, Optional<ConfigurationInstance> config,
-                                                String parameterName) {
-    Object value = delegate.get();
-    if (value == null) {
-      checkState(config.isPresent(),
-                 "Failed to obtain the config-provided value for parameter [" + parameterName + "]."
-                     + " No configuration available in the current execution context.");
-
-      ConfigurationInstance instance = config.get();
-      try {
-        value = getConfigField(instance).get(instance.getValue());
-      } catch (Exception e) {
-        throw new IllegalArgumentException("Failed to obtain the value for parameter [" + parameterName
-            + "] from the associated configuration [" + instance.getName() + "]: "
-            + e.getMessage(), e);
-      }
+  private T resolveConfigOverrideParameter(ConfigurationInstance instance) {
+    try {
+      return (T) getParameterValueResolverFromConfig(instance).apply(instance.getValue());
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Failed to obtain the value for parameter [" + parameterName
+          + "] from the associated configuration [" + instance.getName() + "]: "
+          + e.getMessage(), e);
     }
-    return value;
   }
 
-  private Field getConfigField(ConfigurationInstance config) throws NoSuchFieldException {
-    if (field == null) {
-      synchronized (this) {
-        if (field == null) {
-          final String configFieldName = config.getModel().getAllParameterModels().stream()
-              .filter(p -> p.getName().equals(parameterName)
-                  && p.getModelProperty(DeclaringMemberModelProperty.class).isPresent())
-              .findFirst()
-              .map(p -> p.getModelProperty(DeclaringMemberModelProperty.class).get().getDeclaringField().getName())
-              .orElseThrow(() -> new IllegalArgumentException("Failed to obtain the declaring field for parameter ["
-                  + parameterName
-                  + "] from the associated configuration [" + config.getName()
-                  + "]"));
+  private Function<Object, Object> getParameterValueResolverFromConfig(final ConfigurationInstance config) {
+    if (defaultValueResolver != null) {
+      return defaultValueResolver;
+    }
 
-          final Optional<Field> fieldOptional = getField(config.getValue().getClass(), configFieldName);
-          if (fieldOptional.isPresent()) {
-            field = fieldOptional.get();
-            field.setAccessible(true);
-          } else {
-            throw new NoSuchFieldException("Missing field with name [" + configFieldName
-                + "] in class ["
-                + config.getValue().getClass().getName() + "]");
+    synchronized (this) {
+      if (defaultValueResolver == null) {
+        for (ParameterGroupModel group : config.getModel().getParameterGroupModels()) {
+          Optional<String> fieldName = group.getParameterModels().stream()
+              .filter(p -> p.getName().equals(parameterName))
+              .findFirst()
+              .map(p -> p.getModelProperty(DeclaringMemberModelProperty.class).get().getDeclaringField().getName());
+
+          if (!fieldName.isPresent()) {
+            continue;
           }
+
+          if (group.getName().equals(DEFAULT_GROUP_NAME)) {
+            defaultValueResolver = getParameterValueFromConfigField(config, fieldName.get());
+          } else {
+            defaultValueResolver = getParameterValueFromFieldInGroup(config, group, fieldName.get());
+          }
+          break;
         }
       }
     }
 
-    return field;
+    if (defaultValueResolver == null) {
+      throw new IllegalArgumentException("Missing parameter with name [" + parameterName
+          + "] in config [" + config.getName() + "]");
+    }
+
+    return defaultValueResolver;
+  }
+
+  private Function<Object, Object> getParameterValueFromConfigField(ConfigurationInstance config, String fieldName) {
+    Field parameterField = getField(config.getValue().getClass(), fieldName)
+        .orElseThrow(() -> new IllegalArgumentException("Missing field with name [" + fieldName
+            + "] in config [" + config.getName() + "]"));
+    parameterField.setAccessible(true);
+
+    return (target) -> {
+      try {
+        return parameterField.get(target);
+      } catch (IllegalAccessException e) {
+        throw new IllegalArgumentException("Failed to read field with name [" + parameterField.getName()
+            + " in config [" + config.getName() + "]: " + e.getMessage());
+      }
+    };
+  }
+
+  private Function<Object, Object> getParameterValueFromFieldInGroup(ConfigurationInstance config, ParameterGroupModel group,
+                                                                     String fieldName) {
+    ParameterGroupDescriptor descriptor = group.getModelProperty(ParameterGroupModelProperty.class)
+        .map(ParameterGroupModelProperty::getDescriptor)
+        .orElseThrow(() -> new IllegalArgumentException(
+                                                        format("The group [%s] in config [%s] doesn't provide a group descriptor. "
+                                                            + "Is not possible to retrieve the config parameter to override",
+                                                               group.getName(), config.getName())));
+
+    Field groupField = (Field) descriptor.getContainer();
+    Field parameterField = getField(descriptor.getType().getDeclaringClass(), fieldName)
+        .orElseThrow(() -> new IllegalArgumentException("Missing field with name [" + fieldName
+            + "] in group [" + descriptor.getName() + "] of config ["
+            + config.getName() + "]"));
+
+    return new ParameterValueRetrieverFromConfigGroup(groupField, parameterField);
+  }
+
+  private static final class ParameterValueRetrieverFromConfigGroup implements Function {
+
+    private final Field groupField;
+    private final Field parameterField;
+
+    public ParameterValueRetrieverFromConfigGroup(Field groupField, Field parameterField) {
+      this.groupField = groupField;
+      this.parameterField = parameterField;
+
+      this.groupField.setAccessible(true);
+      this.parameterField.setAccessible(true);
+    }
+
+    @Override
+    public Object apply(Object configInstance) {
+      Object groupInstance;
+      try {
+        groupInstance = groupField.get(configInstance);
+      } catch (IllegalAccessException e) {
+        throw new IllegalArgumentException("Missing field with name [" + groupField.getName() + "] of config ["
+            + groupField.getDeclaringClass().getName() + "]: " + e.getMessage());
+      }
+
+      try {
+        return parameterField.get(groupInstance);
+      } catch (IllegalAccessException e) {
+        throw new IllegalArgumentException("Missing field with name [" + parameterField.getName()
+            + "] in group [" + parameterField.getDeclaringClass().getName() + "] of config ["
+            + groupField.getDeclaringClass().getName() + "]: " + e.getMessage());
+      }
+    }
   }
 }

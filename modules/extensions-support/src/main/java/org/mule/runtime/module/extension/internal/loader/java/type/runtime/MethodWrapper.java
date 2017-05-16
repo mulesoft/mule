@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.util.Optional.ofNullable;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
-
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
@@ -16,7 +15,7 @@ import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,7 +53,7 @@ public final class MethodWrapper implements MethodElement {
    */
   @Override
   public List<ExtensionParameter> getParameters() {
-    List<ExtensionParameter> extensionParameters = new ArrayList<>();
+    List<ExtensionParameter> extensionParameters = new LinkedList<>();
     final Parameter[] parameters = method.getParameters();
     for (int i = 0; i < parameters.length; i++) {
       extensionParameters.add(new ParameterWrapper(method, i));
@@ -75,7 +74,7 @@ public final class MethodWrapper implements MethodElement {
    */
   @Override
   public List<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass) {
-    List<ExtensionParameter> extensionParameters = new ArrayList<>();
+    List<ExtensionParameter> extensionParameters = new LinkedList<>();
     final Parameter[] parameters = method.getParameters();
     for (int i = 0; i < parameters.length; i++) {
       if (parameters[i].getAnnotation(annotationClass) != null) {

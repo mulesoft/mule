@@ -1,0 +1,576 @@
+{
+  "name": "Map",
+  "description": "Map Test connector",
+  "version": "4.0",
+  "vendor": "Mulesoft",
+  "category": "COMMUNITY",
+  "minMuleVersion": "4.0.0",
+  "xmlDsl": {
+    "prefix": "map",
+    "namespace": "http://www.mulesoft.org/schema/mule/map",
+    "schemaLocation": "http://www.mulesoft.org/schema/mule/map/current/mule-map.xsd",
+    "schemaVersion": "4.0",
+    "xsdFileName": "mule-map.xsd"
+  },
+  "resources": [],
+  "subTypes": [],
+  "externalLibraries": [],
+  "importedTypes": [],
+  "configurations": [
+    {
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "java.util.Map",
+                  "classInformation": {
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [
+                      "java.lang.String",
+                      "java.lang.Object"
+                    ]
+                  }
+                },
+                "open": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "java.lang.Object",
+                    "classInformation": {
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": []
+                    },
+                    "typeAlias": {
+                      "value": "Object"
+                    }
+                  },
+                  "fields": []
+                },
+                "fields": []
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "requiredMapDefaults",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "java.util.Map",
+                  "classInformation": {
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [
+                      "java.lang.String",
+                      "java.lang.Object"
+                    ]
+                  }
+                },
+                "open": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "java.lang.Object",
+                    "classInformation": {
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": []
+                    },
+                    "typeAlias": {
+                      "value": "Object"
+                    }
+                  },
+                  "fields": []
+                },
+                "fields": []
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "name": "requiredMapNoExpressions",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "java.util.Map",
+                  "classInformation": {
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [
+                      "java.lang.String",
+                      "java.lang.Object"
+                    ]
+                  }
+                },
+                "open": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "java.lang.Object",
+                    "classInformation": {
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": []
+                    },
+                    "typeAlias": {
+                      "value": "Object"
+                    }
+                  },
+                  "fields": []
+                },
+                "fields": []
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3
+              },
+              "name": "requiredMapExpressionRequireds",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "java.util.Map",
+                  "classInformation": {
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [
+                      "java.lang.String",
+                      "java.lang.Object"
+                    ]
+                  }
+                },
+                "open": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "java.lang.Object",
+                    "classInformation": {
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": []
+                    },
+                    "typeAlias": {
+                      "value": "Object"
+                    }
+                  },
+                  "fields": []
+                },
+                "fields": []
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4
+              },
+              "name": "requiredMapExpressionSupporteds",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "java.util.Map",
+                  "classInformation": {
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [
+                      "java.lang.String",
+                      "java.lang.Object"
+                    ]
+                  }
+                },
+                "open": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "java.lang.Object",
+                    "classInformation": {
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": []
+                    },
+                    "typeAlias": {
+                      "value": "Object"
+                    }
+                  },
+                  "fields": []
+                },
+                "fields": []
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5
+              },
+              "name": "optionalMapDefaults",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "java.util.Map",
+                  "classInformation": {
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [
+                      "java.lang.String",
+                      "java.lang.Object"
+                    ]
+                  }
+                },
+                "open": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "java.lang.Object",
+                    "classInformation": {
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": []
+                    },
+                    "typeAlias": {
+                      "value": "Object"
+                    }
+                  },
+                  "fields": []
+                },
+                "fields": []
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 6
+              },
+              "name": "optionalMapNoExpressions",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "java.util.Map",
+                  "classInformation": {
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [
+                      "java.lang.String",
+                      "java.lang.Object"
+                    ]
+                  }
+                },
+                "open": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "java.lang.Object",
+                    "classInformation": {
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": []
+                    },
+                    "typeAlias": {
+                      "value": "Object"
+                    }
+                  },
+                  "fields": []
+                },
+                "fields": []
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 7
+              },
+              "name": "optionalMapExpressionRequireds",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "java.util.Map",
+                  "classInformation": {
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [
+                      "java.lang.String",
+                      "java.lang.Object"
+                    ]
+                  }
+                },
+                "open": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "java.lang.Object",
+                    "classInformation": {
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": []
+                    },
+                    "typeAlias": {
+                      "value": "Object"
+                    }
+                  },
+                  "fields": []
+                },
+                "fields": []
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 8
+              },
+              "name": "optionalMapExpressionSupporteds",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "externalLibraryModels": [],
+      "operations": [],
+      "connectionProviders": [],
+      "messageSources": [],
+      "name": "config",
+      "description": "Default configuration",
+      "modelProperties": {}
+    }
+  ],
+  "operations": [
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "errors": [],
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotypes": [],
+      "parameterGroupModels": [],
+      "name": "foo",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    }
+  ],
+  "connectionProviders": [],
+  "messageSources": [],
+  "errors": [],
+  "modelProperties": {},
+  "types": []
+}

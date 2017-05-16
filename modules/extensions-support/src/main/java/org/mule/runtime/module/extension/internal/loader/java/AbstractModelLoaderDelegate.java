@@ -66,7 +66,7 @@ abstract class AbstractModelLoaderDelegate {
     if (connectionParameters.isEmpty()) {
       componentDeclarer.requiresConnection(false).transactional(false);
     } else if (connectionParameters.size() == 1) {
-      ExtensionParameter connectionParameter = connectionParameters.get(0);
+      ExtensionParameter connectionParameter = connectionParameters.iterator().next();
       componentDeclarer.requiresConnection(true)
           .transactional(TransactionalConnection.class.isAssignableFrom(connectionParameter.getType().getDeclaringClass()))
           .withModelProperty(new ConnectivityModelProperty(connectionParameter.getType().getDeclaringClass()));

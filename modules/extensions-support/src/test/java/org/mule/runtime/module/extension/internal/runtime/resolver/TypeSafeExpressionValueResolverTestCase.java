@@ -47,31 +47,31 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
   @Test
   public void expressionLanguageWithoutTransformation() throws Exception {
     assertResolved(getResolver("#[mel:'Hello ' + payload]", STRING)
-        .resolve(eventBuilder().message(of("World!")).build()), HELLO_WORLD, never());
+        .resolve(ValueResolvingContext.from(eventBuilder().message(of("World!")).build())), HELLO_WORLD, never());
   }
 
   @Test
   public void expressionTemplateWithoutTransformation() throws Exception {
     assertResolved(getResolver("Hello #[mel:payload]", STRING)
-        .resolve(eventBuilder().message(of("World!")).build()), HELLO_WORLD, times(1));
+        .resolve(ValueResolvingContext.from(eventBuilder().message(of("World!")).build())), HELLO_WORLD, times(1));
   }
 
   @Test
   public void constant() throws Exception {
     assertResolved(getResolver("Hello World!", STRING)
-        .resolve(eventBuilder().message(of(HELLO_WORLD)).build()), HELLO_WORLD, never());
+        .resolve(ValueResolvingContext.from(eventBuilder().message(of(HELLO_WORLD)).build())), HELLO_WORLD, never());
   }
 
   @Test
   public void expressionWithTransformation() throws Exception {
     assertResolved(getResolver("#[mel:true]", STRING)
-        .resolve(eventBuilder().message(of(HELLO_WORLD)).build()), "true", never());
+        .resolve(ValueResolvingContext.from(eventBuilder().message(of(HELLO_WORLD)).build())), "true", never());
   }
 
   @Test
   public void templateWithTransformation() throws Exception {
     assertResolved(getResolver("tru#[mel:'e']", STRING)
-        .resolve(eventBuilder().message(of(HELLO_WORLD)).build()), "true", times(1));
+        .resolve(ValueResolvingContext.from(eventBuilder().message(of(HELLO_WORLD)).build())), "true", times(1));
   }
 
   @Test(expected = IllegalArgumentException.class)

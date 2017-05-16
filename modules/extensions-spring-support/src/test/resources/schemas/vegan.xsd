@@ -194,6 +194,16 @@
                             </xs:complexContent>
                         </xs:complexType>
                     </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="response">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                  <xs:sequence></xs:sequence>
+                  <xs:attribute type="mule:expressionInt" use="optional" name="timeToPeel"></xs:attribute>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
@@ -202,10 +212,9 @@
                 </xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="key"></xs:attribute>
                 <xs:attribute type="mule:substitutableName" use="optional" name="mainProducers"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="shouldNotOverride"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="flowName"></xs:attribute>
-                <xs:attribute type="mule:expressionInt" use="optional" name="timeToPeel"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

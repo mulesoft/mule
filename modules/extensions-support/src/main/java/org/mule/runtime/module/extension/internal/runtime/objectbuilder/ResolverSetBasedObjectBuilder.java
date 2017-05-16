@@ -13,12 +13,12 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.GroupValueSetter;
 import org.mule.runtime.module.extension.internal.util.SingleValueSetter;
 import org.mule.runtime.module.extension.internal.util.ValueSetter;
@@ -68,8 +68,8 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
    * {@inheritDoc}
    */
   @Override
-  public T build(Event event) throws MuleException {
-    return build(resolverSet.resolve(event));
+  public T build(ValueResolvingContext context) throws MuleException {
+    return build(resolverSet.resolve(context));
   }
 
   public T build(ResolverSetResult result) throws MuleException {

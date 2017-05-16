@@ -149,6 +149,76 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-recursive-chain-a"></xs:element>
+    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-recursive-chain-a" name="recursive-chain-a">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.RecursiveChainA">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.heisenberg.extension.model.RecursiveChainB">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="chain-a">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.RecursiveChainA"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="a-chains">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-recursive-chain-a"></xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionString" use="required" name="fieldB"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="chainA"></xs:attribute>
+                <xs:attribute type="mule:expressionList" use="optional" name="aChains"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-recursive-chain-b"></xs:element>
+    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-recursive-chain-b" name="recursive-chain-b">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.RecursiveChainB">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.heisenberg.extension.model.RecursiveChainA">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="chain-b">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.RecursiveChainB"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="b-chains">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-recursive-chain-b"></xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionString" use="required" name="fieldA"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="chainB"></xs:attribute>
+                <xs:attribute type="mule:expressionList" use="optional" name="bChains"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-recursive-pojo"></xs:element>
     <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-recursive-pojo" name="recursive-pojo">
         <xs:complexType>
@@ -196,76 +266,6 @@
                 <xs:attribute type="xs:string" use="optional" name="next"></xs:attribute>
                 <xs:attribute type="mule:expressionList" use="optional" name="childs"></xs:attribute>
                 <xs:attribute type="mule:expressionMap" use="optional" name="mappedChilds"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-recursive-chain-b"></xs:element>
-    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-recursive-chain-b" name="recursive-chain-b">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.RecursiveChainB">
-                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:complexType name="org.mule.test.heisenberg.extension.model.RecursiveChainA">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="chain-b">
-                        <xs:complexType>
-                            <xs:complexContent>
-                                <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.RecursiveChainB"></xs:extension>
-                            </xs:complexContent>
-                        </xs:complexType>
-                    </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" name="b-chains">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-recursive-chain-b"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:expressionString" use="required" name="fieldA"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="chainB"></xs:attribute>
-                <xs:attribute type="mule:expressionList" use="optional" name="bChains"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-recursive-chain-a"></xs:element>
-    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-recursive-chain-a" name="recursive-chain-a">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.RecursiveChainA">
-                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:complexType name="org.mule.test.heisenberg.extension.model.RecursiveChainB">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" name="chain-a">
-                        <xs:complexType>
-                            <xs:complexContent>
-                                <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.RecursiveChainA"></xs:extension>
-                            </xs:complexContent>
-                        </xs:complexType>
-                    </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" name="a-chains">
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-recursive-chain-a"></xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:sequence>
-                <xs:attribute type="mule:expressionString" use="required" name="fieldB"></xs:attribute>
-                <xs:attribute type="xs:string" use="optional" name="chainA"></xs:attribute>
-                <xs:attribute type="mule:expressionList" use="optional" name="aChains"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

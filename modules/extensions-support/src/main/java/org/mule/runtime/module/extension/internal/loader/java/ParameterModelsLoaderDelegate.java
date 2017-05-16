@@ -346,7 +346,8 @@ public final class ParameterModelsLoaderDelegate {
         throw new IllegalModelDefinitionException(
                                                   format("The defined parameters %s from %s, uses the annotation @%s more than once",
                                                          parameters.stream().map(p -> p.getName()).collect(toList()),
-                                                         parameters.get(0).getOwnerDescription(), annotation.getSimpleName()));
+                                                         parameters.iterator().next().getOwnerDescription(),
+                                                         annotation.getSimpleName()));
       }
     }
   }

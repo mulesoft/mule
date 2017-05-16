@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -28,24 +27,33 @@ public interface ParameterizableTypeElement extends Type, WithParameters {
    * {@inheritDoc}
    */
   default List<ExtensionParameter> getParameters() {
-    return unmodifiableList(getAnnotatedFields(Parameter.class,
-                                               OAuthParameter.class,
-                                               ParameterGroup.class,
-                                               Connection.class,
-                                               Config.class));
+    return getAnnotatedFields(Parameter.class,
+                              OAuthParameter.class,
+                              ParameterGroup.class,
+                              Connection.class,
+                              Config.class)
+                                  .stream()
+                                  .distinct()
+                                  .collect(new ImmutableListCollector<>());
   }
 
   /**
    * {@inheritDoc}
    */
   default List<ExtensionParameter> getParameterGroups() {
-    return unmodifiableList(getAnnotatedFields(ParameterGroup.class));
+    return getAnnotatedFields(ParameterGroup.class)
+        .stream()
+        .distinct()
+        .collect(new ImmutableListCollector<>());
   }
 
   /**
    * {@inheritDoc}
    */
   default List<ExtensionParameter> getParametersAnnotatedWith(Class<? extends Annotation> annotationClass) {
-    return getParameters().stream().filter(field -> field.getAnnotation(annotationClass).isPresent()).collect(toList());
+    return getParameters().stream()
+        .filter(field -> field.getAnnotation(annotationClass).isPresent())
+        .distinct()
+        .collect(new ImmutableListCollector<>());
   }
 }

@@ -25,6 +25,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
@@ -249,7 +250,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(operationExecutorFactory.createExecutor(operationModel)).thenReturn(operationExecutor);
     when(operationExecutor.execute(any())).thenReturn(just(""));
 
-    when(resolverSet.resolve(event)).thenReturn(parameters);
+    when(resolverSet.resolve(from(event))).thenReturn(parameters);
 
     when(configurationInstance.getName()).thenReturn(CONFIG_NAME);
     when(configurationInstance.getModel()).thenReturn(configurationModel);

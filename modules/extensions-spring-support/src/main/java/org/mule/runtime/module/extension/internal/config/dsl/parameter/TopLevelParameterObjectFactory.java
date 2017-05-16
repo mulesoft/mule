@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.core.api.Event;
@@ -53,7 +54,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
       resolveParameterGroups(objectType, builder);
 
       ValueResolver<Object> resolver = new ObjectBuilderValueResolver<>(builder, muleContext);
-      return resolver.isDynamic() ? resolver : resolver.resolve(getInitialiserEvent(muleContext));
+      return resolver.isDynamic() ? resolver : resolver.resolve(from(getInitialiserEvent(muleContext)));
     }, Exception.class, exception -> {
       throw exception;
     });

@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.ParameterizableTypeElement;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * {@link TypeWrapper} specification for classes that are considered as Configurations
@@ -23,8 +23,14 @@ import java.util.List;
  */
 class ConfigurationWrapper extends ComponentWrapper implements ConfigurationElement, ParameterizableTypeElement {
 
+  private final List<ExtensionParameter> parameters;
+
   ConfigurationWrapper(Class aClass) {
     super(aClass);
+    this.parameters = Stream.concat(getAnnotatedFields(Parameter.class).stream(),
+                                    getAnnotatedFields(ParameterGroup.class).stream())
+        .distinct()
+        .collect(new ImmutableListCollector<>());
   }
 
   /**
@@ -32,7 +38,6 @@ class ConfigurationWrapper extends ComponentWrapper implements ConfigurationElem
    */
   @Override
   public List<ExtensionParameter> getParameters() {
-    return ImmutableList.<ExtensionParameter>builder().addAll(getAnnotatedFields(Parameter.class))
-        .addAll(getAnnotatedFields(ParameterGroup.class)).build();
+    return parameters;
   }
 }

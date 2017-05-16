@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectConfigName;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -110,7 +111,7 @@ public final class ConfigurationInstanceFactory<T> {
       connectionProviderResolver = NULL_CONNECTION_PROVIDER;
     }
 
-    Optional<ConnectionProvider> connectionProvider = Optional.ofNullable(connectionProviderResolver.resolve(event));
+    Optional<ConnectionProvider> connectionProvider = Optional.ofNullable(connectionProviderResolver.resolve(from(event)));
     T configValue = createConfigurationInstance(name, event);
 
     return new LifecycleAwareConfigurationInstance(name, configurationModel, configValue,
@@ -146,7 +147,7 @@ public final class ConfigurationInstanceFactory<T> {
   }
 
   private T createConfigurationInstance(String name, Event event) throws MuleException {
-    T config = configurationObjectBuilder.build(event);
+    T config = configurationObjectBuilder.build(from(event));
     injectConfigName(configurationModel, config, name);
 
     return config;

@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.config.dsl.source;
 
 import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -18,14 +17,11 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
@@ -41,7 +37,6 @@ import com.google.common.base.Joiner;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -69,18 +64,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   }
 
   protected ParametersResolver getParametersResolver(MuleContext muleContext) {
-    final ExtensionManager extensionManager = muleContext.getExtensionManager();
-    final Function<Event, Optional<ConfigurationInstance>> configurationInstanceProvider = event -> {
-      if (configurationProvider != null) {
-        return ofNullable(configurationProvider.get(event));
-      }
-
-      return extensionManager.getConfigurationProvider(extensionModel, sourceModel)
-          .map(provider -> ofNullable(provider.get(event)))
-          .orElseGet(() -> extensionManager.getConfiguration(extensionModel, sourceModel, event));
-    };
-
-    return ParametersResolver.fromValues(parameters, muleContext, configurationInstanceProvider);
+    return ParametersResolver.fromValues(parameters, muleContext);
   }
 
   @Override

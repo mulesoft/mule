@@ -14,7 +14,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.util.HashMap;
@@ -25,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation of {@link #resolve(Event)} it return a
+ * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation of {@link #resolve(ValueResolvingContext)} it return a
  * {@link Map} of values with the outcome of each original resolver.
  * <p/>
  * This class implements {@link Lifecycle} and propagates those events to each of the {@code resolvers}
@@ -73,21 +72,21 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>, I
   }
 
   /**
-   * Passes the given {@code event} to each resolvers and outputs a map of type {@code mapType} with each result
+   * Passes the given {@code context} to each resolvers and outputs a map of type {@code mapType} with each result
    *
-   * @param event a {@link Event} the event to evaluate
+   * @param context a {@link ValueResolvingContext} the context to evaluate
    * @return a {@link Map} of type {@code mapType}
    * @throws MuleException
    */
   @Override
-  public Map<K, V> resolve(Event event) throws MuleException {
+  public Map<K, V> resolve(ValueResolvingContext context) throws MuleException {
     Map<K, V> map = instantiateMap();
 
     Iterator<ValueResolver<K>> keyIt = keyResolvers.iterator();
     Iterator<ValueResolver<V>> valueIt = valueResolvers.iterator();
     while (keyIt.hasNext() && valueIt.hasNext()) {
       try {
-        map.put(keyIt.next().resolve(event), valueIt.next().resolve(event));
+        map.put(keyIt.next().resolve(context), valueIt.next().resolve(context));
 
       } catch (Exception e) {
         throw new RuntimeException(e);

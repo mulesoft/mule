@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
@@ -12,13 +13,12 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
 /**
- * A {@link ValueResolver} which wraps an {@link ObjectBuilder} and calls {@link ObjectBuilder#build(Event)} on each
- * {@link #resolve(Event)}.
+ * A {@link ValueResolver} which wraps an {@link ObjectBuilder} and calls {@link ObjectBuilder#build(ValueResolvingContext)} on each
+ * {@link #resolve(ValueResolvingContext)}.
  * <p/>
  * It implements {@link Lifecycle} and propagates all lifecycle events to the underlying {@code builder}
  *
@@ -39,14 +39,13 @@ public class ObjectBuilderValueResolver<T> implements ValueResolver<T>, Initiali
   /**
    * Delegates to {@code builder}
    *
-   * @param event a {@link Event}
+   * @param context a {@link ValueResolvingContext}
    * @return the {@code builder}'s output object
    * @throws MuleException
    */
   @Override
-  public T resolve(Event event) throws MuleException {
-    T object = builder.build(event);
-    return object;
+  public T resolve(ValueResolvingContext context) throws MuleException {
+    return builder.build(context);
   }
 
   /**
@@ -61,4 +60,5 @@ public class ObjectBuilderValueResolver<T> implements ValueResolver<T>, Initiali
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(builder, true, muleContext);
   }
+
 }

@@ -33,14 +33,14 @@ public final class TypedValueValueResolverWrapper<T> implements ValueResolver<Ty
    * Resolves the value of {@link this#resolver} using the given {@link Event} and returns the correspondent
    * {@link TypedValue}
    *
-   * @param event a {@link Event} to resolve the {@link ValueResolver}
+   * @param context a {@link ValueResolvingContext} to resolve the {@link ValueResolver}
    * @return The {@link TypedValue} of the resolved value
    * @throws MuleException if it fails to resolve the value
    */
   @Override
-  public TypedValue<T> resolve(Event event) throws MuleException {
-    Object resolve = resolver.resolve(event);
-    return new TypedValue<>((T) resolver.resolve(event), DataType.fromObject(resolve));
+  public TypedValue<T> resolve(ValueResolvingContext context) throws MuleException {
+    Object resolve = resolver.resolve(context);
+    return new TypedValue<>((T) resolver.resolve(context), DataType.fromObject(resolve));
   }
 
   /**

@@ -15,8 +15,8 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -72,24 +72,22 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
     return hasAnyDynamic(resolvers.values());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public T build(Event event) throws MuleException {
+  public T build(ValueResolvingContext context) throws MuleException {
     T object = createInstance(prototypeClass);
 
     for (Map.Entry<Field, ValueResolver<Object>> entry : resolvers.entrySet()) {
-      setField(entry.getKey(), object, resolve(entry.getValue(), event));
+      setField(entry.getKey(), object, resolve(entry.getValue(), context));
     }
 
     return object;
   }
 
-  private Object resolve(ValueResolver resolver, Event event) throws MuleException {
-    Object value = resolver.resolve(event);
+  protected Object resolve(ValueResolver resolver, ValueResolvingContext context) throws MuleException {
+    Object value = resolver.resolve(context);
+
     if (value instanceof ValueResolver) {
-      value = resolve((ValueResolver) value, event);
+      value = resolve((ValueResolver) value, context);
     }
 
     if (value instanceof CursorStreamProvider) {
@@ -98,4 +96,5 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
 
     return value;
   }
+
 }

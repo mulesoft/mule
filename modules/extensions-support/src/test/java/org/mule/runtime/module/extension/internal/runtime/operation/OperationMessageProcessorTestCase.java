@@ -69,6 +69,7 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.tck.size.SmallTest;
 
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
@@ -367,6 +368,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     final ValueResolver valueResolver = mock(ValueResolver.class);
     when(valueResolvers.get(eq(SOME_PARAM_NAME))).thenReturn(valueResolver);
     when(valueResolvers.containsKey(eq(SOME_PARAM_NAME))).thenReturn(true);
-    when(valueResolver.resolve(any(Event.class))).thenReturn("person");
+    when(valueResolver.resolve(any(ValueResolvingContext.class))).thenReturn("person");
   }
 }

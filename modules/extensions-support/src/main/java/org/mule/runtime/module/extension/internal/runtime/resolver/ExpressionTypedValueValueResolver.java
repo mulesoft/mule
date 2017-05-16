@@ -12,7 +12,6 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.TransformationService;
 
 import javax.inject.Inject;
@@ -40,10 +39,10 @@ public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolve
   }
 
   @Override
-  public TypedValue<T> resolve(Event event) throws MuleException {
+  public TypedValue<T> resolve(ValueResolvingContext context) throws MuleException {
     initEvaluator();
 
-    TypedValue typedValue = evaluator.resolveTypedValue(event);
+    TypedValue typedValue = evaluator.resolveTypedValue(context.getEvent());
     if (!isInstance(expectedClass, typedValue.getValue())) {
       DataType expectedDataType =
           DataType.builder()

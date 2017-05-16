@@ -35,13 +35,13 @@ public final class NestedProcessorValueResolver extends AbstractNestedProcessorV
   /**
    * Returns a {@link NestedProcessor} that wraps the {@code event}
    *
-   * @param event a {@link Event}
+   * @param context a {@link ValueResolvingContext}
    * @return a {@link NestedProcessor}
    * @throws MuleException
    */
   @Override
-  public NestedProcessor resolve(Event event) throws MuleException {
-    return toNestedProcessor(messageProcessor, event, muleContext);
+  public NestedProcessor resolve(ValueResolvingContext context) throws MuleException {
+    return toNestedProcessor(messageProcessor, context.getEvent(), muleContext);
   }
 
   public void setMuleContext(MuleContext muleContext) {

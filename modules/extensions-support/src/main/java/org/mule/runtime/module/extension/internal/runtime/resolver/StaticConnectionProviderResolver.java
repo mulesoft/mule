@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
 
 import java.util.Optional;
 
@@ -26,8 +25,8 @@ public class StaticConnectionProviderResolver<C> implements ConnectionProviderVa
   }
 
   @Override
-  public ConnectionProvider<C> resolve(Event event) throws MuleException {
-    return valueResolver.resolve(event);
+  public ConnectionProvider<C> resolve(ValueResolvingContext context) throws MuleException {
+    return valueResolver.resolve(context);
   }
 
   @Override

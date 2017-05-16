@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 
 /**
@@ -34,7 +33,7 @@ public class StaticLiteralValueResolver<T> implements ValueResolver<Literal<T>> 
    * {@inheritDoc}
    */
   @Override
-  public Literal<T> resolve(Event event) throws MuleException {
+  public Literal<T> resolve(ValueResolvingContext context) throws MuleException {
     return literal;
   }
 

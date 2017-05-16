@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static com.google.common.collect.ImmutableList.copyOf;
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
-import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.intersection;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
@@ -40,15 +39,14 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.annotation.ConfigOverrideTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.DefaultEncodingAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.NullSafeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
@@ -66,7 +64,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -78,22 +75,14 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
 
   private final MuleContext muleContext;
   private final Map<String, ?> parameters;
-  private final Function<Event, Optional<ConfigurationInstance>> configProvider;
 
-  private ParametersResolver(MuleContext muleContext, Map<String, ?> parameters,
-                             Function<Event, Optional<ConfigurationInstance>> configProvider) {
+  private ParametersResolver(MuleContext muleContext, Map<String, ?> parameters) {
     this.muleContext = muleContext;
     this.parameters = parameters;
-    this.configProvider = configProvider;
   }
 
   public static ParametersResolver fromValues(Map<String, ?> parameters, MuleContext muleContext) {
-    return new ParametersResolver(muleContext, parameters, e -> empty());
-  }
-
-  public static ParametersResolver fromValues(Map<String, ?> parameters, MuleContext muleContext,
-                                              Function<Event, Optional<ConfigurationInstance>> configProvider) {
-    return new ParametersResolver(muleContext, parameters, configProvider);
+    return new ParametersResolver(muleContext, parameters);
   }
 
   public static ParametersResolver fromDefaultValues(ParameterizedModel parameterizedModel,
@@ -103,7 +92,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       parameterValues.put(model.getName(), model.getDefaultValue());
     }
 
-    return new ParametersResolver(muleContext, parameterValues, e -> empty());
+    return new ParametersResolver(muleContext, parameterValues);
   }
 
   /**
@@ -200,7 +189,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
 
       if (p.isOverrideFromConfig()) {
         resolver = ConfigOverrideValueResolverWrapper.of(resolver != null ? resolver : new StaticValueResolver<>(null),
-                                                         parameterName, muleContext, configProvider);
+                                                         parameterName, muleContext);
       }
 
       if (resolver != null) {
@@ -241,6 +230,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
         .forEach(groupField -> {
           if (!(groupField.getValue() instanceof ObjectType)) {
             return;
+
           }
 
           final ObjectType groupType = (ObjectType) groupField.getValue();
@@ -280,6 +270,12 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
         MetadataType type =
             getMetadataType(nullSafe.get().getType(), ExtensionsTypeLoaderFactory.getDefault().createTypeLoader());
         valueResolver = NullSafeValueResolverWrapper.of(delegate, type, muleContext, this);
+      }
+
+      if (field.getAnnotation(ConfigOverrideTypeAnnotation.class).isPresent()) {
+        valueResolver =
+            ConfigOverrideValueResolverWrapper.of(valueResolver != null ? valueResolver : new StaticValueResolver<>(null),
+                                                  key, muleContext);
       }
 
       if (valueResolver != null) {

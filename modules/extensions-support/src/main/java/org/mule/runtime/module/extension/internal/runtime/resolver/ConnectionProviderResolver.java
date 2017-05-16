@@ -14,7 +14,6 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 
@@ -49,8 +48,8 @@ public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject
    * {@inheritDoc}
    */
   @Override
-  public ConnectionProvider<C> resolve(Event event) throws MuleException {
-    return valueResolver.resolve(event);
+  public ConnectionProvider<C> resolve(ValueResolvingContext context) throws MuleException {
+    return valueResolver.resolve(context);
   }
 
   /**

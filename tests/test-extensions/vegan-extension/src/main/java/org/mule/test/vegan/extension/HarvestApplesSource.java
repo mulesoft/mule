@@ -15,6 +15,7 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -40,9 +41,8 @@ public class HarvestApplesSource extends Source<Apple, HarvestApplesAttributes> 
   @ConfigOverride
   private List<String> mainProducers;
 
-  @Parameter
-  @ConfigOverride
-  private HealthyFood sample;
+  @ParameterGroup(name = "Sample Input Group")
+  private HarvestInputGroup sampleInput;
 
   @Parameter
   @Optional
@@ -59,8 +59,9 @@ public class HarvestApplesSource extends Source<Apple, HarvestApplesAttributes> 
   }
 
   @OnSuccess
-  public void onSuccess(@ConfigOverride @Optional Integer timeToPeel) {
-    appleConfig.getResults().put(flowName, Arrays.asList(mainProducers, sample, shouldNotOverride, timeToPeel));
+  public void onSuccess(@ParameterGroup(name = "Response", showInDsl = true) SuccessResponse response) {
+    appleConfig.getResults()
+        .put(flowName, Arrays.asList(mainProducers, sampleInput.getSample(), shouldNotOverride, response.getTimeToPeel()));
   }
 
   @Override

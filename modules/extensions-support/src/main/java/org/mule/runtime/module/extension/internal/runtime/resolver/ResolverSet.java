@@ -15,12 +15,15 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
 import com.google.common.collect.ImmutableMap;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * A {@link ValueResolver} which is based on associating a set of keys -&gt; {@link ValueResolver} pairs. The result of evaluating
@@ -40,6 +43,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
   private Map<String, ValueResolver> resolvers = new LinkedHashMap<>();
   private boolean dynamic = false;
   private final MuleContext muleContext;
+  private Function<Event, Optional<ConfigurationInstance>> configProvider;
 
   public ResolverSet(MuleContext muleContext) {
     this.muleContext = muleContext;
@@ -81,26 +85,27 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
   /**
    * Evaluates all the added {@link ValueResolver}s and returns the results into a {@link ResolverSetResult}
    *
-   * @param event a not {@code null} {@link Event}
+   * @param context a not {@code null} {@link ValueResolvingContext}
    * @return a {@link ResolverSetResult}
    * @throws MuleException if an error occurs creating the {@link ResolverSetResult}
    */
   @Override
-  public ResolverSetResult resolve(Event event) throws MuleException {
+  public ResolverSetResult resolve(ValueResolvingContext context) throws MuleException {
     ResolverSetResult.Builder builder = getResolverSetBuilder();
 
     for (Map.Entry<String, ValueResolver> entry : resolvers.entrySet()) {
-      builder.add(entry.getKey(), resolveValue(entry.getValue(), event));
+      builder.add(entry.getKey(), resolveValue(entry.getValue(), context));
     }
 
     return builder.build();
   }
 
-  private Object resolveValue(ValueResolver<?> resolver, Event event)
+  private Object resolveValue(ValueResolver<?> resolver, ValueResolvingContext context)
       throws MuleException {
-    Object value = resolver.resolve(event);
+    Object value = resolver.resolve(context);
+
     if (value instanceof ValueResolver) {
-      return resolveValue((ValueResolver<?>) value, event);
+      return resolveValue((ValueResolver<?>) value, context);
     }
 
     if (value instanceof CursorProvider) {
@@ -129,4 +134,5 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
   ResolverSetResult.Builder getResolverSetBuilder() {
     return ResolverSetResult.newBuilder();
   }
+
 }
