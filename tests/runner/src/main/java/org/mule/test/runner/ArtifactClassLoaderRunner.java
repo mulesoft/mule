@@ -7,11 +7,6 @@
 package org.mule.test.runner;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.io.File.separator;
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
-import static java.lang.System.getenv;
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
@@ -28,11 +23,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Supplier;
 
-import org.eclipse.aether.repository.LocalRepository;
 import org.junit.internal.builders.AnnotatedBuilder;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
@@ -45,6 +39,8 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerBuilder;
 import org.junit.runners.model.TestClass;
 
+import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.test.runner.api.AetherClassPathClassifier;
@@ -107,15 +103,9 @@ import com.google.common.collect.Sets;
  */
 public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
-  private static final String USER_HOME = "user.home";
-  private static final String M2_REPO = "/.m2/repository";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArtifactClassLoaderRunner.class);
-  public static final String MAVEN_GLOBAL_SETTINGS_PATH = "conf" + separator + "settings.xml";
-  public static final String M2_HOME = "M2_HOME";
-  public static final String MAVEN_HOME = "MAVEN_HOME";
 
-  private static String userHome = getProperty(USER_HOME);
   private static ArtifactClassLoaderHolder artifactClassLoaderHolder;
   private static RunnerConfiguration runnerConfiguration;
 
@@ -226,24 +216,19 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     WorkspaceLocationResolver workspaceLocationResolver = new AutoDiscoverWorkspaceLocationResolver(classPath,
                                                                                                     rootArtifactClassesFolder);
 
-    final File localMavenRepository =
-        discoverProvider(ArtifactClassLoaderRunner.class.getClassLoader()).getLocalRepositorySuppliers()
-            .environmentMavenRepositorySupplier().get();
+    final MavenClientProvider mavenClientProvider = discoverProvider(ArtifactClassLoaderRunner.class.getClassLoader());
+    final Supplier<File> localMavenRepository =
+        mavenClientProvider.getLocalRepositorySuppliers().environmentMavenRepositorySupplier();
 
-    final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder()
+    final SettingsSupplierFactory settingsSupplierFactory = mavenClientProvider.getSettingsSupplierFactory();
+
+    final MavenConfiguration mavenConfiguration = newMavenConfigurationBuilder()
         .withForcePolicyUpdateNever(true)
-        .withLocalMavenRepositoryLocation(localMavenRepository);
+        .withLocalMavenRepositoryLocation(localMavenRepository.get())
+        .withUserSettingsLocation(settingsSupplierFactory.environmentUserSettingsSupplier(localMavenRepository).get())
+        .withGlobalSettingsLocation(settingsSupplierFactory.environmentGlobalSettingsSupplier().get())
+        .build();
 
-    final File userSettings = new File(localMavenRepository.getParent(), "settings.xml");
-    if (userSettings.exists()) {
-      mavenConfigurationBuilder.withUserSettingsLocation(userSettings);
-    } else {
-      LOGGER.warn("Maven user settings not present in default folder: {}", userSettings.getAbsolutePath());
-    }
-
-    mavenConfigurationBuilder.withGlobalSettingsLocation(getMavenGlobalSettings()
-        .orElseThrow(() -> new IllegalStateException("Couldn't find maven directory")));
-    final MavenConfiguration mavenConfiguration = mavenConfigurationBuilder.build();
     LOGGER.info("Using MavenConfiguration: {}", mavenConfiguration);
 
     final DependencyResolver dependencyResolver =
@@ -253,23 +238,6 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
                                                                                                         dependencyResolver)));
 
     return builder.build();
-  }
-
-  private static Optional<File> getMavenGlobalSettings() {
-    String mavenHome = getenv(M2_HOME);
-    mavenHome = mavenHome != null ? mavenHome : getenv(MAVEN_HOME);
-    mavenHome = mavenHome != null ? mavenHome : getProperty("maven.home");
-    if (mavenHome == null) {
-      throw new IllegalStateException(format("Couldn't find Maven home directory, either %s or %s had to be set as environment variables",
-                                             M2_HOME, MAVEN_HOME));
-    }
-    File globalSettings = new File(mavenHome, MAVEN_GLOBAL_SETTINGS_PATH);
-    if (globalSettings.exists()) {
-      return of(globalSettings);
-    } else {
-      LOGGER.warn("Couldn't find a global settings for Maven on {}, tests may fail due to Maven resolution issues", mavenHome);
-    }
-    return empty();
   }
 
   /**
@@ -310,27 +278,6 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
           + " found but there is no list of extra boot packages defined to be added to container, this could be the reason why the test may fail later due to JUnit classes are not found");
     }
     return newArrayList(packages);
-  }
-
-  /**
-   * Creates Maven local repository using the {@link System#getProperty(String)} {@code localRepository} or following the default
-   * location: {@code $USER_HOME/.m2/repository} if no property set.
-   *
-   * @return a {@link LocalRepository} that points to the local m2 repository folder
-   */
-  private static File getMavenLocalRepository() {
-    String localRepositoryProperty = getProperty("localRepository");
-    if (localRepositoryProperty == null) {
-      localRepositoryProperty = userHome + M2_REPO;
-      LOGGER.debug("System property 'localRepository' not set, using Maven default location: $USER_HOME{}", M2_REPO);
-    }
-
-    LOGGER.debug("Using Maven localRepository: '{}'", localRepositoryProperty);
-    File mavenLocalRepositoryLocation = new File(localRepositoryProperty);
-    if (!mavenLocalRepositoryLocation.exists()) {
-      throw new IllegalArgumentException("Maven repository location couldn't be found, please check your configuration");
-    }
-    return mavenLocalRepositoryLocation;
   }
 
   /**
