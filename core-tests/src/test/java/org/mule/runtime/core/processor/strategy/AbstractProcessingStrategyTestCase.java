@@ -235,7 +235,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     assertThat(latchedProcessor.getUnlatchedInvocationLatch().await(BLOCK_TIMEOUT, MILLISECONDS), is(!blocks));
 
     // We need to assert the threads logged at this point. But good idea to ensure once unlocked the pending invocation completes.
-    // Do do this need to copy threads locally.
+    // To do this need to copy threads locally.
     Set<String> threadsBeforeUnlock = new HashSet<>(threads);
 
     latchedProcessor.release();
