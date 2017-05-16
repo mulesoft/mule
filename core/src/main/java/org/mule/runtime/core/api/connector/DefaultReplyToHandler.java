@@ -12,6 +12,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
@@ -41,11 +42,15 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
    */
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-  protected transient MuleContext muleContext;
+  protected transient FlowConstruct flowConstruct;
   protected transient Map<String, Object> serializedData = null;
+  private String flowName;
 
-  public DefaultReplyToHandler(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  public DefaultReplyToHandler(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+    if (flowConstruct != null) {
+      this.flowName = flowConstruct.getName();
+    }
   }
 
   @Override
@@ -72,7 +77,9 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
     if (serializedData == null) {
       return;
     }
-    this.muleContext = context;
+    if (flowName != null) {
+      flowConstruct = context.getRegistry().lookupFlowConstruct(flowName);
+    }
 
     logger = LoggerFactory.getLogger(getClass());
     serializedData = null;
