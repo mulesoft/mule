@@ -7,8 +7,8 @@
 package org.mule.test.functional;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.extension.http.api.request.validator.ResponseValidatorException;
@@ -68,7 +68,7 @@ public class ModuleWithGlobalElementTestCase extends AbstractModuleWithHttpTestC
     } catch (MessagingException me) {
       Throwable cause = me.getEvent().getError().get().getCause();
       assertThat(cause, instanceOf(ResponseValidatorException.class));
-      assertThat(cause.getMessage(), startsWith("Response code 401 mapped as failure"));
+      assertThat(cause.getMessage(), containsString("failed: unauthorized (401)"));
     }
   }
 
