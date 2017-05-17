@@ -147,7 +147,10 @@ class ExtensionPluginMetadataGenerator {
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
     scanner.addIncludeFilter(new AnnotationTypeFilter(Extension.class));
     try (URLClassLoader classLoader = new URLClassLoader(urls.stream()
-        .filter(url -> toFile(url).isDirectory())
+        .filter(url -> {
+          File urlFile = toFile(url);
+          return urlFile.isDirectory() || urlFile.getName().endsWith("-mule-plugin.jar");
+        })
         .collect(toList())
         .toArray(new URL[0]), null)) {
       scanner.setResourceLoader(new PathMatchingResourcePatternResolver(classLoader));
