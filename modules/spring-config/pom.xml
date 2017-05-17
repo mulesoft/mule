@@ -69,6 +69,10 @@
             <artifactId>spring-context</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-dsl-api</artifactId>
         </dependency>
@@ -86,6 +90,12 @@
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
             <version>${springCglibVersion}</version>
+        </dependency>
+        <!--// TODO(pablo.kraan): MULE-12496: explicitly adding ant dependency to workaround the issue -->
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>${antVersion}</version>
         </dependency>
 
         <!-- Unit tests -->
