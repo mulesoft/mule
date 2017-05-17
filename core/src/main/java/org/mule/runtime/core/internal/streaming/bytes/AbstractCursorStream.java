@@ -87,7 +87,6 @@ abstract class AbstractCursorStream extends CursorStream {
   @Override
   public final void close() throws IOException {
     if (!released) {
-      released = true;
       release();
     }
   }

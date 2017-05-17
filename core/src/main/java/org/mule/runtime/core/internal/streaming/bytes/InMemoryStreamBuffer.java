@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.streaming.bytes;
 
 import static java.lang.Math.min;
 import static java.lang.Math.toIntExact;
-import static java.nio.ByteBuffer.allocate;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -137,19 +136,29 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
   public int consumeForwardData() throws IOException {
     ByteBuffer readBuffer = buffer.hasRemaining()
         ? buffer
-        : allocate(bufferSizeIncrement > 0 ? bufferSizeIncrement : STREAM_FINISHED_PROBE);
+        : bufferManager.allocate(bufferSizeIncrement > 0 ? bufferSizeIncrement : STREAM_FINISHED_PROBE);
 
-    int read = consumeStream(readBuffer);
+    final boolean auxBuffer = readBuffer != buffer;
+    final int read;
 
-    if (read > 0) {
-      if (readBuffer != buffer) {
-        buffer = expandBuffer();
-        readBuffer.flip();
-        buffer.put(readBuffer);
+    try {
+      read = consumeStream(readBuffer);
+
+      if (read > 0) {
+        if (auxBuffer) {
+          buffer = expandBuffer();
+          readBuffer.flip();
+          buffer.put(readBuffer);
+        }
+
+        bufferTip += read;
       }
-
-      bufferTip += read;
+    } finally {
+      if (auxBuffer) {
+        bufferManager.deallocate(readBuffer);
+      }
     }
+
 
     return read;
   }

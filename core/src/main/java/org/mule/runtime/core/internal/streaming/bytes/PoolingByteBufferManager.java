@@ -6,10 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static org.apache.commons.pool.impl.GenericObjectPool.DEFAULT_MAX_IDLE;
-import static org.apache.commons.pool.impl.GenericObjectPool.DEFAULT_MAX_WAIT;
-import static org.apache.commons.pool.impl.GenericObjectPool.WHEN_EXHAUSTED_GROW;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -22,9 +19,13 @@ import com.google.common.cache.RemovalListener;
 
 import java.nio.ByteBuffer;
 
-import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.PoolableObjectFactory;
-import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.pool2.BasePooledObjectFactory;
+import org.apache.commons.pool2.KeyedObjectPool;
+import org.apache.commons.pool2.ObjectPool;
+import org.apache.commons.pool2.PooledObject;
+import org.apache.commons.pool2.impl.DefaultPooledObject;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 
 /**
@@ -39,10 +40,16 @@ import org.slf4j.Logger;
 public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
 
   private static final Logger LOGGER = getLogger(PoolingByteBufferManager.class);
-  private static final long ONE_MINUTE = MINUTES.toMillis(1);
+  private static final int MAX_IDLE = Runtime.getRuntime().availableProcessors();
 
+  /**
+   * Using a cache of pools instead of a {@link KeyedObjectPool} because performance tests indicates that this
+   * option is slightly faster, plus it gives us the ability to expire unfrequent capacity buffers without the use
+   * of a reaper thread (those performance test did not include such a reaper, so it's very possible that this is more
+   * than just slightly faster)
+   */
   private final LoadingCache<Integer, ObjectPool<ByteBuffer>> pools = CacheBuilder.newBuilder()
-      .expireAfterAccess(1, MINUTES)
+      .expireAfterAccess(10, SECONDS)
       .removalListener((RemovalListener<Integer, ObjectPool<ByteBuffer>>) notification -> {
         try {
           notification.getValue().close();
@@ -80,7 +87,11 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
     ObjectPool<ByteBuffer> pool = pools.getIfPresent(capacity);
     if (pool != null) {
       try {
-        pool.returnObject(byteBuffer);
+        if (pool.getNumIdle() > MAX_IDLE) {
+          pool.invalidateObject(byteBuffer);
+        } else {
+          pool.returnObject(byteBuffer);
+        }
       } catch (Exception e) {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Could not deallocate buffer of capacity " + capacity, e);
@@ -91,56 +102,43 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
 
   @Override
   public void dispose() {
-    pools.invalidateAll();
+    try {
+      pools.invalidateAll();
+    } catch (Exception e) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn("Error disposing pool of byte buffers", e);
+      }
+    }
   }
 
   private ObjectPool<ByteBuffer> createPool(int capacity) {
-    GenericObjectPool.Config config = new GenericObjectPool.Config();
-    config.maxIdle = DEFAULT_MAX_IDLE;
-    config.maxActive = -1;
-    config.maxWait = DEFAULT_MAX_WAIT;
-    config.whenExhaustedAction = WHEN_EXHAUSTED_GROW;
-    config.minEvictableIdleTimeMillis = ONE_MINUTE;
-    config.timeBetweenEvictionRunsMillis = ONE_MINUTE;
-    config.testOnBorrow = false;
-    config.testOnReturn = false;
-    config.testWhileIdle = false;
-    GenericObjectPool genericPool = new GenericObjectPool(new ByteBufferObjectFactory(capacity), config);
+    GenericObjectPoolConfig config = new GenericObjectPoolConfig();
+    config.setMaxIdle(MAX_IDLE);
+    config.setMaxTotal(-1);
+    config.setBlockWhenExhausted(false);
+    config.setBlockWhenExhausted(false);
+    config.setTestOnBorrow(false);
+    config.setTestOnReturn(false);
+    config.setTestWhileIdle(false);
+    config.setTestOnCreate(false);
+    config.setJmxEnabled(false);
 
-    return genericPool;
-  }
+    return new GenericObjectPool<>(new BasePooledObjectFactory<ByteBuffer>() {
 
-  private class ByteBufferObjectFactory implements PoolableObjectFactory<ByteBuffer> {
+      @Override
+      public ByteBuffer create() throws Exception {
+        return ByteBuffer.allocate(capacity);
+      }
 
-    private final int capacity;
+      @Override
+      public PooledObject<ByteBuffer> wrap(ByteBuffer obj) {
+        return new DefaultPooledObject<>(obj);
+      }
 
-    private ByteBufferObjectFactory(int capacity) {
-      this.capacity = capacity;
-    }
-
-    @Override
-    public ByteBuffer makeObject() throws Exception {
-      return ByteBuffer.allocate(capacity);
-    }
-
-    @Override
-    public void destroyObject(ByteBuffer obj) throws Exception {
-      obj.clear();
-    }
-
-    @Override
-    public boolean validateObject(ByteBuffer obj) {
-      return false;
-    }
-
-    @Override
-    public void activateObject(ByteBuffer obj) throws Exception {
-      obj.clear();
-    }
-
-    @Override
-    public void passivateObject(ByteBuffer obj) throws Exception {
-
-    }
+      @Override
+      public void activateObject(PooledObject<ByteBuffer> p) throws Exception {
+        p.getObject().clear();
+      }
+    }, config);
   }
 }
