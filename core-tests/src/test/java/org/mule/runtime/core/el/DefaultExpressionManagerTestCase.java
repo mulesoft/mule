@@ -16,10 +16,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.el.BindingContext.builder;
@@ -48,6 +46,10 @@ import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,10 +60,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Features(EXPRESSION_LANGUAGE)
 @Stories(SUPPORT_MVEL_DW)
@@ -262,10 +260,6 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
 
     expressionManager.evaluate("someExpression", event);
     verify(streamingManager).manage(cursorProvider, event);
-
-    reset(streamingManager);
-    expressionManager.evaluate("someExpression", STRING, mock(BindingContext.class));
-    verify(streamingManager).manage(same(cursorProvider), any());
   }
 
 }
