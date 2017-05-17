@@ -9,7 +9,6 @@ package org.mule.runtime.core.processor.strategy;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.WAIT;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -41,7 +40,7 @@ public class WorkQueueProcessingStrategyFactory extends AbstractProcessingStrate
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     return new WorkQueueProcessingStrategy(() -> muleContext.getSchedulerService()
         .ioScheduler(muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + BLOCKING.name())
-            .withMaxConcurrentTasks(getMaxConcurrency()).withRejectionAction(WAIT)));
+            .withMaxConcurrentTasks(getMaxConcurrency())));
   }
 
   static class WorkQueueProcessingStrategy extends AbstractProcessingStrategy implements Startable, Stoppable {
