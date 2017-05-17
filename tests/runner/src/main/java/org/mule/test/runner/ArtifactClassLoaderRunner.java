@@ -23,6 +23,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -222,13 +223,27 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
     final SettingsSupplierFactory settingsSupplierFactory = mavenClientProvider.getSettingsSupplierFactory();
 
-    final MavenConfiguration mavenConfiguration = newMavenConfigurationBuilder()
-        .withForcePolicyUpdateNever(true)
-        .withLocalMavenRepositoryLocation(localMavenRepository.get())
-        .withUserSettingsLocation(settingsSupplierFactory.environmentUserSettingsSupplier(localMavenRepository).get())
-        .withGlobalSettingsLocation(settingsSupplierFactory.environmentGlobalSettingsSupplier().get())
-        .build();
+    final Optional<File> globalSettings = settingsSupplierFactory.environmentGlobalSettingsSupplier();
+    final Optional<File> userSettings = settingsSupplierFactory.environmentUserSettingsSupplier(localMavenRepository);
 
+    final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder()
+        .withForcePolicyUpdateNever(true)
+        .withLocalMavenRepositoryLocation(localMavenRepository.get());
+
+    if (globalSettings.isPresent()) {
+      mavenConfigurationBuilder.withGlobalSettingsLocation(globalSettings.get());
+    } else {
+      LOGGER
+          .info("Maven global settings couldn't be found, M2_HOME environment variable has to be set. This could cause a wrong resolution for dependencies");
+    }
+
+    if (userSettings.isPresent()) {
+      mavenConfigurationBuilder.withUserSettingsLocation(userSettings.get());
+    } else {
+      LOGGER.info("Maven user settings couldn't be found, this could cause a wrong resolution for dependencies");
+    }
+
+    final MavenConfiguration mavenConfiguration = mavenConfigurationBuilder.build();
     LOGGER.info("Using MavenConfiguration: {}", mavenConfiguration);
 
     final DependencyResolver dependencyResolver =
