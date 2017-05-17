@@ -7,7 +7,6 @@
 
 package org.mule.test.infrastructure.process;
 
-import static org.mule.runtime.core.util.FileUtils.newFile;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -17,6 +16,7 @@ import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
 import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.listFiles;
+import static org.mule.runtime.core.util.FileUtils.newFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,68 +24,51 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.ExecuteWatchdog;
-import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.commons.exec.util.StringUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public abstract class Controller {
+public class Controller {
 
-  private static Logger logger = LoggerFactory.getLogger(Controller.class);
   protected static final String ANCHOR_SUFFIX = "-anchor.txt";
   private static final IOFileFilter ANCHOR_FILTER = FileFilterUtils.suffixFileFilter(ANCHOR_SUFFIX);
-  protected static final String STATUS = "Mule Enterprise Edition is running \\(([0-9]+)\\)\\.";
-  protected static final Pattern STATUS_PATTERN = Pattern.compile(STATUS);
-  private static final int DEFAULT_TIMEOUT = 30000;
-  private static final String MULE_HOME_VARIABLE = "MULE_HOME";
   private static final String DOMAIN_DEPLOY_ERROR = "Error deploying domain %s.";
   private static final String ANCHOR_DELETE_ERROR = "Could not delete anchor file [%s] when stopping Mule Runtime.";
   private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
   private static final int IS_RUNNING_STATUS_CODE = 0;
   private static final Pattern pattern = Pattern.compile("wrapper\\.java\\.additional\\.(\\d*)=");
-  protected String muleHome;
-  protected String muleBin;
+
+  private final AbstractOSController osSpecificController;
+
+  protected File serverPluginsDir;
   protected File domainsDir;
   protected File appsDir;
   protected File libsDir;
   protected File internalRepository;
   protected Path wrapperConf;
-  protected int timeout;
 
-  public Controller(String muleHome, int timeout) {
-    this.muleHome = muleHome;
-    this.muleBin = getMuleBin();
+  public Controller(AbstractOSController osSpecificController, String muleHome) {
+    this.osSpecificController = osSpecificController;
+    this.serverPluginsDir = new File(muleHome + "/server-plugins");
     this.domainsDir = new File(muleHome + "/domains");
     this.appsDir = new File(muleHome + "/apps/");
     this.libsDir = new File(muleHome + "/lib/user");
     this.internalRepository = new File(muleHome, "repository");
     this.wrapperConf = Paths.get(muleHome + "/conf/wrapper.conf");
-    this.timeout = timeout != 0 ? timeout : DEFAULT_TIMEOUT;
   }
 
-  public abstract String getMuleBin();
+  public String getMuleBin() {
+    return osSpecificController.getMuleBin();
+  }
 
-  public void start(String[] args) {
+  public void start(String... args) {
     checkRepositoryLocationAndUpdateInternalRepoPropertyIfPresent(args);
-    int error = runSync("start", args);
-    if (error != 0) {
-      throw new MuleControllerException("The mule instance couldn't be started");
-    }
+    osSpecificController.start(args);
   }
 
   protected void checkRepositoryLocationAndUpdateInternalRepoPropertyIfPresent(String... args) {
@@ -94,65 +77,26 @@ public abstract class Controller {
     if (repoVar.isPresent()) {
       this.internalRepository = new File(repoVar.get().split("=")[1]);
     }
-
   }
 
-  public void stop(String[] args) {
-    int error = runSync("stop", args);
+  public int stop(String... args) {
+    int error = osSpecificController.stop(args);
     verify(error == 0, "The mule instance couldn't be stopped");
     deleteAnchors();
+    return error;
   }
 
-  public abstract int status(String... args);
-
-  public abstract int getProcessId();
-
-  public void restart(String[] args) {
-    int error = runSync("restart", args);
-    if (error != 0) {
-      throw new MuleControllerException("The mule instance couldn't be restarted");
-    }
+  public int status(String... args) {
+    return osSpecificController.status(args);
   }
 
-  protected int runSync(String command, String... args) {
-    Map<Object, Object> newEnv = copyEnvironmentVariables();
-    return executeSyncCommand(command, args, newEnv, timeout);
+  public int getProcessId() {
+    return osSpecificController.getProcessId();
   }
 
-  private int executeSyncCommand(String command, String[] args, Map<Object, Object> newEnv, int timeout)
-      throws MuleControllerException {
-    CommandLine commandLine = new CommandLine(muleBin);
-    commandLine.addArgument(command);
-    commandLine.addArguments(args);
-    DefaultExecutor executor = new DefaultExecutor();
-    ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
-    executor.setWatchdog(watchdog);
-    executor.setStreamHandler(new PumpStreamHandler());
-    return doExecution(executor, commandLine, newEnv);
+  public void restart(String... args) {
+    osSpecificController.restart(args);
   }
-
-  protected int doExecution(DefaultExecutor executor, CommandLine commandLine, Map<Object, Object> env) {
-    try {
-      logger.info("Executing: " + StringUtils.toString(commandLine.toStrings(), " "));
-      return executor.execute(commandLine, env);
-    } catch (ExecuteException e) {
-      return e.getExitValue();
-    } catch (Exception e) {
-      throw new MuleControllerException("Error executing [" + commandLine.getExecutable() + " " + commandLine.getArguments()
-          + "]", e);
-    }
-  }
-
-  protected Map<Object, Object> copyEnvironmentVariables() {
-    Map<String, String> env = System.getenv();
-    Map<Object, Object> newEnv = new HashMap<Object, Object>();
-    for (Map.Entry<String, String> it : env.entrySet()) {
-      newEnv.put(it.getKey(), it.getValue());
-    }
-    newEnv.put(MULE_HOME_VARIABLE, muleHome);
-    return newEnv;
-  }
-
 
   protected void verify(boolean condition, String message, Object... args) {
     if (!condition) {
@@ -197,7 +141,6 @@ public abstract class Controller {
       }
     }
   }
-
 
   public void deploy(String path) {
     File app = new File(path);
@@ -248,11 +191,11 @@ public abstract class Controller {
   }
 
   public void installLicense(String path) {
-    this.runSync(null, "--installLicense", path);
+    osSpecificController.runSync(null, "--installLicense", path);
   }
 
   public void uninstallLicense() {
-    this.runSync(null, "-unInstallLicense");
+    osSpecificController.runSync(null, "-unInstallLicense");
   }
 
   protected boolean isDeployed(String appName) {
@@ -279,23 +222,25 @@ public abstract class Controller {
   }
 
   public File getLog() {
-    File logEE = newFile(muleHome + "/logs/mule_ee.log");
-    File logCE = newFile(muleHome + "/logs/mule.log");
+    File logEE = newFile(osSpecificController.getMuleHome() + "/logs/mule_ee.log");
+    File logCE = newFile(osSpecificController.getMuleHome() + "/logs/mule.log");
     if (logCE.exists() && logCE.isFile()) {
       return logCE;
     }
     if (logEE.exists() && logEE.isFile()) {
       return logEE;
     }
-    throw new MuleControllerException(String.format("There is no mule log available at %s/logs/", muleHome));
+    throw new MuleControllerException(String.format("There is no mule log available at %s/logs/",
+                                                    osSpecificController.getMuleHome()));
   }
 
   public File getLog(String appName) {
-    File log = newFile(String.format("%s/logs/mule-app-%s.log", muleHome, appName));
+    File log = newFile(String.format("%s/logs/mule-app-%s.log", osSpecificController.getMuleHome(), appName));
     if (log.exists() && log.isFile()) {
       return log;
     }
-    throw new MuleControllerException(String.format("There is no mule log available at %s/logs/", muleHome));
+    throw new MuleControllerException(String.format("There is no mule log available at %s/logs/",
+                                                    osSpecificController.getMuleHome()));
   }
 
   public void addConfProperty(String value) {

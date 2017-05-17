@@ -19,7 +19,7 @@ import org.apache.commons.exec.PumpStreamHandler;
 /**
  *
  */
-public class UnixController extends Controller {
+public class UnixController extends AbstractOSController {
 
   public UnixController(String muleHome, int timeout) {
     super(muleHome, timeout);
@@ -52,7 +52,7 @@ public class UnixController extends Controller {
   }
 
   @Override
-  public int status(String[] args) {
+  public int status(String... args) {
     return runSync("status", args);
   }
 }

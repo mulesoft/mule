@@ -7,106 +7,115 @@
 
 package org.mule.test.infrastructure.process;
 
-import java.io.File;
+import static org.apache.commons.lang.SystemUtils.IS_OS_WINDOWS;
 
-import org.apache.commons.lang.SystemUtils;
+import java.io.File;
 
 public class MuleProcessController {
 
   private static final int DEFAULT_TIMEOUT = 60000;
-  private Controller controller;
+
+  private final Controller controller;
 
   public MuleProcessController(String muleHome) {
     this(muleHome, DEFAULT_TIMEOUT);
   }
 
   public MuleProcessController(String muleHome, int timeout) {
-    controller = SystemUtils.IS_OS_WINDOWS ? new WindowsController(muleHome, timeout) : new UnixController(muleHome, timeout);
+    AbstractOSController osSpecificController =
+        IS_OS_WINDOWS ? new WindowsController(muleHome, timeout) : new UnixController(muleHome, timeout);
+    controller = buildController(muleHome, osSpecificController);
+  }
+
+  protected Controller buildController(String muleHome, AbstractOSController osSpecificController) {
+    return new Controller(osSpecificController, muleHome);
   }
 
   public boolean isRunning() {
-    return controller.isRunning();
+    return getController().isRunning();
   }
 
   public void start(String... args) {
-    controller.start(args);
+    getController().start(args);
   }
 
   public void stop(String... args) {
-    controller.stop(args);
+    getController().stop(args);
   }
 
   public int status(String... args) {
-    return controller.status(args);
+    return getController().status(args);
   }
 
   public int getProcessId() {
-    return controller.getProcessId();
+    return getController().getProcessId();
   }
 
   public void restart(String... args) {
-    controller.restart(args);
+    getController().restart(args);
   }
 
-
-
   public void deploy(String path) {
-    controller.deploy(path);
+    getController().deploy(path);
   }
 
   public boolean isDeployed(String appName) {
-    return controller.isDeployed(appName);
+    return getController().isDeployed(appName);
   }
 
   public File getArtifactInternalRepository(String artifactName) {
-    return controller.getArtifactInternalRepository(artifactName);
+    return getController().getArtifactInternalRepository(artifactName);
   }
 
   public File getRuntimeInternalRepository() {
-    return controller.getRuntimeInternalRepository();
+    return getController().getRuntimeInternalRepository();
   }
 
   public boolean isDomainDeployed(String domainName) {
-    return controller.isDomainDeployed(domainName);
+    return getController().isDomainDeployed(domainName);
   }
 
   public void undeploy(String application) {
-    controller.undeploy(application);
+    getController().undeploy(application);
   }
 
   public void undeployDomain(String domain) {
-    controller.undeployDomain(domain);
+    getController().undeployDomain(domain);
   }
 
   public void undeployAll() {
-    controller.undeployAll();
+    getController().undeployAll();
   }
 
   public void installLicense(String path) {
-    controller.installLicense(path);
+    getController().installLicense(path);
   }
 
   public void uninstallLicense() {
-    controller.uninstallLicense();
+    getController().uninstallLicense();
   }
 
   public void addLibrary(File jar) {
-    controller.addLibrary(jar);
+    getController().addLibrary(jar);
   }
 
   public void deployDomain(String domain) {
-    controller.deployDomain(domain);
+    getController().deployDomain(domain);
   }
 
   public File getLog() {
-    return controller.getLog();
+    return getController().getLog();
   }
 
   public File getLog(String appName) {
-    return controller.getLog(appName);
+    return getController().getLog(appName);
   }
 
   public void addConfProperty(String value) {
-    controller.addConfProperty(value);
+    getController().addConfProperty(value);
+  }
+
+  protected Controller getController() {
+    return controller;
   }
 }
