@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.security.tls;
 
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.security.TlsDirectKeyStore;
 import org.mule.runtime.core.api.security.TlsDirectTrustStore;
@@ -36,7 +35,6 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,9 +114,6 @@ public final class TlsConfiguration implements TlsDirectTrustStore, TlsDirectKey
   public static final String DEFAULT_SECURITY_MODEL = "default";
   public static final String FIPS_SECURITY_MODEL = "fips140-2";
 
-  public static final String DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY =
-      SYSTEM_PROPERTY_PREFIX + "tls.disableSystemPropertiesMapping";
-
   private Logger logger = LoggerFactory.getLogger(getClass());
 
   private String sslType = DEFAULT_SSL_TYPE;
@@ -153,7 +148,6 @@ public final class TlsConfiguration implements TlsDirectTrustStore, TlsDirectKey
   private boolean requireClientAuthentication = false;
 
   private TlsProperties tlsProperties = new TlsProperties();
-  private boolean disableSystemPropertiesMapping = true;
 
   /**
    * Support for TLS connections with a given initial value for the key store
@@ -162,12 +156,6 @@ public final class TlsConfiguration implements TlsDirectTrustStore, TlsDirectKey
    */
   public TlsConfiguration(String keyStore) {
     this.keyStoreName = keyStore;
-
-    String disableSystemPropertiesMappingValue = System.getProperty(DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY);
-
-    if (disableSystemPropertiesMappingValue != null) {
-      disableSystemPropertiesMapping = BooleanUtils.toBoolean(disableSystemPropertiesMappingValue);
-    }
   }
 
   // note - in what follows i'm using "raw" variables rather than accessors because
@@ -190,14 +178,6 @@ public final class TlsConfiguration implements TlsDirectTrustStore, TlsDirectKey
       initKeyManagerFactory();
     }
     initTrustManagerFactory();
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("TLS system properties mapping is " + (disableSystemPropertiesMapping ? "disabled" : "enabled"));
-    }
-
-    if (null != namespace && !disableSystemPropertiesMapping) {
-      new TlsPropertiesMapper(namespace).writeToProperties(System.getProperties(), this);
-    }
 
     tlsProperties.load(String.format(PROPERTIES_FILE_PATTERN, SecurityUtils.getSecurityModel()));
   }
