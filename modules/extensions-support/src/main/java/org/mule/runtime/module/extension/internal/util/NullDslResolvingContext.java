@@ -77,7 +77,7 @@ public class NullDslResolvingContext implements DslResolvingContext {
       }
 
       @Override
-      public Optional<String> getExtension(String typeId) {
+      public Optional<String> getDeclaringExtension(String typeId) {
         return Optional.empty();
       }
     };

@@ -626,7 +626,7 @@ class DeclarationBasedElementModelFactory {
       nestedElementType = (ObjectType) parameterModel.getType();
     } else {
       nestedElementType = lookupType(objectValue);
-      context.getTypeCatalog().getExtension(objectValue.getTypeId()).ifPresent(owner -> context.getExtension(owner)
+      context.getTypeCatalog().getDeclaringExtension(objectValue.getTypeId()).ifPresent(owner -> context.getExtension(owner)
           .ifPresent(extensionModel -> customDsl.set(resolvers.get(extensionModel))));
     }
 
