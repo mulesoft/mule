@@ -1,7 +1,7 @@
 {
   "name": "petstore",
   "description": "PetStore Test connector",
-  "version": "4.0",
+  "version": "4.0.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "minMuleVersion": "4.0.0",
@@ -9,7 +9,7 @@
     "prefix": "petstore",
     "namespace": "http://www.mulesoft.org/schema/mule/petstore",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd",
-    "schemaVersion": "4.0",
+    "schemaVersion": "4.0.0-SNAPSHOT",
     "xsdFileName": "mule-petstore.xsd"
   },
   "resources": [],

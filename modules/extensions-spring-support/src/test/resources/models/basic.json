@@ -1,7 +1,7 @@
 {
   "name": "Basic",
   "description": "Basic Test connector",
-  "version": "4.0",
+  "version": "4.0.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "minMuleVersion": "4.0.0",
@@ -9,7 +9,7 @@
     "prefix": "basic",
     "namespace": "http://www.mulesoft.org/schema/mule/basic",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/basic/current/mule-basic.xsd",
-    "schemaVersion": "4.0",
+    "schemaVersion": "4.0.0-SNAPSHOT",
     "xsdFileName": "mule-basic.xsd"
   },
   "resources": [],

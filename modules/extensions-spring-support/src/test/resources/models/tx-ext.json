@@ -1,7 +1,7 @@
 {
   "name": "transactional",
   "description": "",
-  "version": "4.0",
+  "version": "4.0.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "category": "COMMUNITY",
   "minMuleVersion": "4.0.0",
@@ -9,7 +9,7 @@
     "prefix": "tx",
     "namespace": "http://www.mulesoft.org/schema/mule/tx",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/tx/current/mule-tx.xsd",
-    "schemaVersion": "4.0",
+    "schemaVersion": "4.0.0-SNAPSHOT",
     "xsdFileName": "mule-tx.xsd"
   },
   "resources": [],

@@ -16,7 +16,6 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
@@ -164,13 +163,13 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     if (!json.equals(expectedJson)) {
       System.out.println(json);
     }
-    assertThat(expectedJson, is(equalTo(json)));
+    assertThat(json, is(equalTo(expectedJson)));
   }
 
   public static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader) {
     Map<String, Object> params = new HashMap<>();
     params.put(TYPE_PROPERTY_NAME, clazz.getName());
-    params.put(VERSION, getProductVersion());
+    params.put(VERSION, "4.0.0-SNAPSHOT");
     //TODO MULE-11797: as this utils is consumed from org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel), this util should get dropped once the ticket gets implemented.
     final DslResolvingContext dslResolvingContext = getDefault(emptySet());
     return loader.loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
