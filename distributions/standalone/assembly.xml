@@ -171,6 +171,17 @@
                 <include>org.mule.services:mule-service-soap</include>
             </includes>
         </dependencySet>
+
+        <!-- Launcher libraries -->
+        <dependencySet>
+            <outputDirectory>lib/launcher</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
+            <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
+            <scope>runtime</scope>
+            <includes>
+                <include>org.codehaus.groovy:groovy-all</include>
+            </includes>
+        </dependencySet>
         
         <!-- 3rd-party libraries -->
         <dependencySet>
@@ -253,6 +264,8 @@
                 <exclude>xalan:serializer</exclude>
                 <exclude>xalan:xalan</exclude>
 
+                <!-- Excludes libraries on lib/launcher-->
+                <exclude>org.codehaus.groovy:groovy-all</exclude>
             </excludes>
         </dependencySet>
 

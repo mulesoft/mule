@@ -1,6 +1,4 @@
 /*
- * $Id: additional.groovy 298 2008-01-31 00:42:47Z andrew $
- * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
