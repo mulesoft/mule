@@ -7,43 +7,27 @@
 package org.mule.test.runner;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.lang.System.getProperty;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
+import static java.util.Optional.of;
+import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
+import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.test.runner.RunnerConfiguration.readConfiguration;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_ARTIFACTS;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_FILE;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getExcludedProperties;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.test.runner.api.AetherClassPathClassifier;
-import org.mule.test.runner.api.ArtifactClassLoaderHolder;
-import org.mule.test.runner.api.ArtifactClassificationTypeResolver;
-import org.mule.test.runner.api.ArtifactIsolatedClassLoaderBuilder;
-import org.mule.test.runner.api.ClassPathClassifier;
-import org.mule.test.runner.api.ClassPathUrlProvider;
-import org.mule.test.runner.api.DependencyResolver;
-import org.mule.test.runner.api.RepositorySystemFactory;
-import org.mule.test.runner.api.WorkspaceLocationResolver;
-import org.mule.test.runner.maven.AutoDiscoverWorkspaceLocationResolver;
-import org.mule.test.runner.utils.AnnotationUtils;
-
-import com.google.common.base.Throwables;
-import com.google.common.collect.Sets;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Supplier;
 
-import org.eclipse.aether.repository.LocalRepository;
 import org.junit.internal.builders.AnnotatedBuilder;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
@@ -55,8 +39,28 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerBuilder;
 import org.junit.runners.model.TestClass;
+
+import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.maven.client.api.SettingsSupplierFactory;
+import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.test.runner.api.AetherClassPathClassifier;
+import org.mule.test.runner.api.ArtifactClassLoaderHolder;
+import org.mule.test.runner.api.ArtifactClassificationTypeResolver;
+import org.mule.test.runner.api.ArtifactIsolatedClassLoaderBuilder;
+import org.mule.test.runner.api.ClassPathClassifier;
+import org.mule.test.runner.api.ClassPathUrlProvider;
+import org.mule.test.runner.api.DependencyResolver;
+import org.mule.test.runner.api.WorkspaceLocationResolver;
+import org.mule.test.runner.classification.DefaultWorkspaceReader;
+import org.mule.test.runner.maven.AutoDiscoverWorkspaceLocationResolver;
+import org.mule.test.runner.utils.AnnotationUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Throwables;
+import com.google.common.collect.Sets;
 
 /**
  * A {@link org.junit.runner.Runner} that mimics the class loading model used in a Mule Standalone distribution. In order to
@@ -100,12 +104,9 @@ import org.slf4j.LoggerFactory;
  */
 public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
-  private static final String USER_HOME = "user.home";
-  private static final String M2_REPO = "/.m2/repository";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArtifactClassLoaderRunner.class);
 
-  private static String userHome = getProperty(USER_HOME);
   private static ArtifactClassLoaderHolder artifactClassLoaderHolder;
   private static RunnerConfiguration runnerConfiguration;
 
@@ -215,12 +216,38 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
     WorkspaceLocationResolver workspaceLocationResolver = new AutoDiscoverWorkspaceLocationResolver(classPath,
                                                                                                     rootArtifactClassesFolder);
-    final DependencyResolver dependencyResolver = RepositorySystemFactory
-        .newDependencyResolver(classPath,
-                               workspaceLocationResolver,
-                               getMavenLocalRepository(),
-                               //TODO (gfernandes) MULE-12449 (read settings to pass enable remote repositories in addition to the ones in pom that have public access)
-                               emptyList());
+
+    final MavenClientProvider mavenClientProvider = discoverProvider(ArtifactClassLoaderRunner.class.getClassLoader());
+    final Supplier<File> localMavenRepository =
+        mavenClientProvider.getLocalRepositorySuppliers().environmentMavenRepositorySupplier();
+
+    final SettingsSupplierFactory settingsSupplierFactory = mavenClientProvider.getSettingsSupplierFactory();
+
+    final Optional<File> globalSettings = settingsSupplierFactory.environmentGlobalSettingsSupplier();
+    final Optional<File> userSettings = settingsSupplierFactory.environmentUserSettingsSupplier(localMavenRepository);
+
+    final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder()
+        .withForcePolicyUpdateNever(true)
+        .withLocalMavenRepositoryLocation(localMavenRepository.get());
+
+    if (globalSettings.isPresent()) {
+      mavenConfigurationBuilder.withGlobalSettingsLocation(globalSettings.get());
+    } else {
+      LOGGER
+          .info("Maven global settings couldn't be found, M2_HOME environment variable has to be set. This could cause a wrong resolution for dependencies");
+    }
+
+    if (userSettings.isPresent()) {
+      mavenConfigurationBuilder.withUserSettingsLocation(userSettings.get());
+    } else {
+      LOGGER.info("Maven user settings couldn't be found, this could cause a wrong resolution for dependencies");
+    }
+
+    final MavenConfiguration mavenConfiguration = mavenConfigurationBuilder.build();
+    LOGGER.info("Using MavenConfiguration: {}", mavenConfiguration);
+
+    final DependencyResolver dependencyResolver =
+        new DependencyResolver(mavenConfiguration, of(new DefaultWorkspaceReader(classPath, workspaceLocationResolver)));
     builder.setClassPathClassifier(new AetherClassPathClassifier(dependencyResolver,
                                                                  new ArtifactClassificationTypeResolver(
                                                                                                         dependencyResolver)));
@@ -266,42 +293,6 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
           + " found but there is no list of extra boot packages defined to be added to container, this could be the reason why the test may fail later due to JUnit classes are not found");
     }
     return newArrayList(packages);
-  }
-
-  /**
-   * Reads the attribute from the klass annotated and does a flatMap with the list of values.
-   *
-   * @param name attribute/method name of the annotation {@link ArtifactClassLoaderRunnerConfig} to be obtained
-   * @param klass {@link Class} from where the annotated attribute will be read
-   * @param <E> generic type
-   * @return {@link List} of values
-   */
-  private static <E> List<E> readAttribute(String name, Class<?> klass) {
-    List<E[]> valuesList =
-        AnnotationUtils.getAnnotationAttributeFromHierarchy(klass, ArtifactClassLoaderRunnerConfig.class,
-                                                            name);
-    return valuesList.stream().flatMap(Arrays::stream).distinct().collect(toList());
-  }
-
-  /**
-   * Creates Maven local repository using the {@link System#getProperty(String)} {@code localRepository} or following the default
-   * location: {@code $USER_HOME/.m2/repository} if no property set.
-   *
-   * @return a {@link LocalRepository} that points to the local m2 repository folder
-   */
-  private static File getMavenLocalRepository() {
-    String localRepositoryProperty = getProperty("localRepository");
-    if (localRepositoryProperty == null) {
-      localRepositoryProperty = userHome + M2_REPO;
-      LOGGER.debug("System property 'localRepository' not set, using Maven default location: $USER_HOME{}", M2_REPO);
-    }
-
-    LOGGER.debug("Using Maven localRepository: '{}'", localRepositoryProperty);
-    File mavenLocalRepositoryLocation = new File(localRepositoryProperty);
-    if (!mavenLocalRepositoryLocation.exists()) {
-      throw new IllegalArgumentException("Maven repository location couldn't be found, please check your configuration");
-    }
-    return mavenLocalRepositoryLocation;
   }
 
   /**

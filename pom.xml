@@ -1379,6 +1379,19 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <dependency>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-maven-client-api</artifactId>
+                <version>${muleMavenClientApi}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-maven-client-impl</artifactId>
+                <version>${muleMavenClientImpl}</version>
+            </dependency>
+
             <!-- Eclipse Aether -->
             <dependency>
                 <groupId>org.eclipse.aether</groupId>

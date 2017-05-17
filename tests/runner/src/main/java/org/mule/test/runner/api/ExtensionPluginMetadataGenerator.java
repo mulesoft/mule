@@ -9,6 +9,8 @@ package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.io.File.separator;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.test.runner.api.MulePluginBasedLoaderFinder.META_INF_MULE_PLUGIN;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -134,7 +136,7 @@ class ExtensionPluginMetadataGenerator {
 
   /**
    * Scans for a {@link Class} annotated with {@link Extension} annotation and return the {@link Class} or {@code null} if there
-   * is no annotated {@link Class}.
+   * is no annotated {@link Class}. It would only look for classes when the URLs for the plugin have an artifact not packaged (target/classes/ or target-test/classes).
    *
    * @param plugin the {@link Artifact} to generate its extension manifest if it is an extension.
    * @param urls   {@link URL}s to use for discovering {@link Class}es annotated with {@link Extension}
@@ -144,7 +146,13 @@ class ExtensionPluginMetadataGenerator {
     logger.debug("Scanning plugin '{}' for annotated Extension class", plugin);
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
     scanner.addIncludeFilter(new AnnotationTypeFilter(Extension.class));
-    try (URLClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), null)) {
+    try (URLClassLoader classLoader = new URLClassLoader(urls.stream()
+        .filter(url -> {
+          File urlFile = toFile(url);
+          return urlFile.isDirectory() || urlFile.getName().endsWith("-mule-plugin.jar");
+        })
+        .collect(toList())
+        .toArray(new URL[0]), null)) {
       scanner.setResourceLoader(new PathMatchingResourcePatternResolver(classLoader));
       Set<BeanDefinition> extensionsAnnotatedClasses = scanner.findCandidateComponents("");
       if (!extensionsAnnotatedClasses.isEmpty()) {

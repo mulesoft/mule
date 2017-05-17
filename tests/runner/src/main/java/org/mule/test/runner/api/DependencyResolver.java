@@ -11,9 +11,13 @@ import static com.google.common.base.Joiner.on;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.maven.client.internal.AetherRepositoryState;
+import org.mule.maven.client.internal.AetherResolutionContext;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -23,7 +27,7 @@ import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
-import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
@@ -48,23 +52,21 @@ public class DependencyResolver {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  private RepositorySystem system;
-  private RepositorySystemSession session;
-  private List<RemoteRepository> remoteRepositories;
+  private AetherResolutionContext resolutionContext;
+  private AetherRepositoryState repositoryState;
 
   /**
    * Creates an instance of the resolver.
-   *  @param system {@link RepositorySystem} where {@link Dependency}s will be resolved.
-   * @param session {@link RepositorySystemSession} used to resolve and {@link Dependency}s.
-   * @param remoteRepositories {@link RemoteRepository} to be used for resolving dependencies.
+   *
+   * @param mavenConfiguration {@link MavenConfiguration} that defines the configuration to be used by Aether.
+   * @param workspaceReader {@link WorkspaceReader} used to resolve {@link Dependency dependencies} within  the workspace.
    */
-  public DependencyResolver(RepositorySystem system, RepositorySystemSession session, List<RemoteRepository> remoteRepositories) {
-    checkNotNull(system, "system cannot be null");
-    checkNotNull(session, "session cannot be null");
+  public DependencyResolver(MavenConfiguration mavenConfiguration, Optional<WorkspaceReader> workspaceReader) {
+    checkNotNull(mavenConfiguration, "mavenConfiguration cannot be null");
 
-    this.system = system;
-    this.session = session;
-    this.remoteRepositories = remoteRepositories;
+    this.resolutionContext = new AetherResolutionContext(mavenConfiguration);
+    this.repositoryState =
+        new AetherRepositoryState(this.resolutionContext.getLocalRepositoryLocation(), workspaceReader, false, false);
   }
 
   /**
@@ -78,8 +80,8 @@ public class DependencyResolver {
     checkNotNull(artifact, "artifact cannot be null");
 
     final ArtifactDescriptorRequest request =
-        new ArtifactDescriptorRequest(artifact, remoteRepositories, null);
-    return system.readArtifactDescriptor(session, request);
+        new ArtifactDescriptorRequest(artifact, resolutionContext.getRemoteRepositories(), null);
+    return repositoryState.getSystem().readArtifactDescriptor(repositoryState.getSession(), request);
   }
 
   /**
@@ -92,8 +94,8 @@ public class DependencyResolver {
   public ArtifactResult resolveArtifact(Artifact artifact) throws ArtifactResolutionException {
     checkNotNull(artifact, "artifact cannot be null");
 
-    final ArtifactRequest request = new ArtifactRequest(artifact, remoteRepositories, null);
-    return system.resolveArtifact(session, request);
+    final ArtifactRequest request = new ArtifactRequest(artifact, resolutionContext.getRemoteRepositories(), null);
+    return repositoryState.getSystem().resolveArtifact(repositoryState.getSession(), request);
   }
 
   /**
@@ -135,11 +137,11 @@ public class DependencyResolver {
     collectRequest.setRoot(root);
     collectRequest.setDependencies(directDependencies);
     collectRequest.setManagedDependencies(managedDependencies);
-    collectRequest.setRepositories(remoteRepositories);
+    collectRequest.setRepositories(resolutionContext.getRemoteRepositories());
 
     DependencyNode node;
     try {
-      node = system.collectDependencies(session, collectRequest).getRoot();
+      node = repositoryState.getSystem().collectDependencies(repositoryState.getSession(), collectRequest).getRoot();
       logDependencyGraph(node, collectRequest);
       DependencyRequest dependencyRequest = new DependencyRequest();
       dependencyRequest.setRoot(node);
@@ -148,7 +150,7 @@ public class DependencyResolver {
         dependencyRequest.setFilter(dependencyFilter);
       }
 
-      node = system.resolveDependencies(session, dependencyRequest).getRoot();
+      node = repositoryState.getSystem().resolveDependencies(repositoryState.getSession(), dependencyRequest).getRoot();
     } catch (DependencyResolutionException e) {
       logger.warn("Dependencies couldn't be resolved for request '{}', {}", collectRequest, e.getMessage());
       node = e.getResult().getRoot();
