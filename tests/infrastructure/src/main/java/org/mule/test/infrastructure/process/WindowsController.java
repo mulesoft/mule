@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class WindowsController extends Controller {
+public class WindowsController extends AbstractOSController {
 
   protected static final String PID_WINDOWS = "(\\s)*PID (\\s)+ :(\\s)*([0-9])+";
   protected static final Pattern PID_PATTERN_WINDOWS = Pattern.compile(PID_WINDOWS);
@@ -27,18 +27,19 @@ public class WindowsController extends Controller {
   }
 
   @Override
-  public void start(String[] args) {
+  public void start(String... args) {
     install(args);
     super.start(args);
   }
 
   @Override
-  public void stop(String[] args) {
-    super.stop(args);
+  public int stop(String... args) {
+    final int returnCode = super.stop(args);
     int errorRemove = runSync("remove");
     if (errorRemove != 0 && errorRemove != 0x424) {
       throw new MuleControllerException("The mule instance couldn't be removed as a service");
     }
+    return returnCode;
   }
 
   @Override
@@ -67,7 +68,7 @@ public class WindowsController extends Controller {
   }
 
   @Override
-  public int status(String[] args) {
+  public int status(String... args) {
     String muleResult = executeCmd("sc queryex \"mule\" ");
     String muleEEResult = executeCmd("sc queryex \"mule_ee\" ");
     Boolean result = muleResult.contains("RUNNING") || muleEEResult.contains("RUNNING");
@@ -90,7 +91,8 @@ public class WindowsController extends Controller {
     return output.toString();
   }
 
-  public void restart(String[] args) {
+  @Override
+  public void restart(String... args) {
     install(args);
     super.restart(args);
   }
