@@ -6,8 +6,11 @@
  */
 package org.mule.util;
 
-import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.xml.util.XMLUtils.createSaxonTransformerFactory;
+import static org.mule.module.xml.util.XMLUtils.createWstxXmlInputFactory;
+import static org.mule.util.xmlsecurity.XMLSecureFactories.createDefault;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -20,9 +23,10 @@ import javax.xml.validation.SchemaFactory;
 import org.junit.Test;
 
 /**
- * These tests require the system property as configured in surefire in this module.
- * <p>
  * The asserted classes were obtained from getting the factories in a java component in a standalone mule.
+ *
+ * We can't override the default factories because Woodstox and Saxon register service providers with
+ * their own implementations (in META-INF/services).
  */
 public class XmlLibrariesVerificationTestCase extends AbstractMuleTestCase
 {
@@ -30,40 +34,49 @@ public class XmlLibrariesVerificationTestCase extends AbstractMuleTestCase
     @Test
     public void documentBuilder()
     {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        assertThat(factory, instanceOf(org.apache.xerces.jaxp.DocumentBuilderFactoryImpl.class));
+        DocumentBuilderFactory factory = createDefault().getDocumentBuilderFactory();
+        assertThat(factory.getClass().getName(), equalTo("com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl"));
     }
 
     @Test
     public void saxParser()
     {
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        assertThat(factory, instanceOf(org.apache.xerces.jaxp.SAXParserFactoryImpl.class));
+        SAXParserFactory factory = createDefault().getSAXParserFactory();
+        assertThat(factory.getClass().getName(), equalTo("com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl"));
     }
     
     @Test
     public void xmlInput()
     {
-        XMLInputFactory factory = XMLInputFactory.newInstance();
-        assertThat(factory, instanceOf(com.ctc.wstx.stax.WstxInputFactory.class));
+        XMLInputFactory factory = createDefault().getXMLInputFactory();
+        assertThat(factory.getClass().getName(), equalTo("com.sun.xml.internal.stream.XMLInputFactoryImpl"));
     }
-    
-    /**
-     * Saxon is used explicitly.
-     * <p>
-     * When using TransformerFactory, a Xalan transformer must be returned since Xalan is in lib/endorsed in standalone. 
-     */
+
     @Test
     public void transformer()
     {
-        TransformerFactory factory = TransformerFactory.newInstance();
-        assertThat(factory, instanceOf(org.apache.xalan.processor.TransformerFactoryImpl.class));
+        TransformerFactory factory = createDefault().getTransformerFactory();
+        assertThat(factory.getClass().getName(), equalTo("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"));
     }
 
     @Test
     public void schema()
     {
-        SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-        assertThat(factory, instanceOf(org.apache.xerces.jaxp.validation.XMLSchemaFactory.class));
+        SchemaFactory factory = createDefault().getSchemaFactory("http://www.w3.org/2001/XMLSchema");
+        assertThat(factory.getClass().getName(), equalTo("com.sun.org.apache.xerces.internal.jaxp.validation.XMLSchemaFactory"));
+    }
+
+    @Test
+    public void saxonTransformer()
+    {
+        TransformerFactory factory = createSaxonTransformerFactory();
+        assertThat(factory.getClass().getName(), equalTo("net.sf.saxon.TransformerFactoryImpl"));
+    }
+
+    @Test
+    public void woodstoxXmlInput()
+    {
+        XMLInputFactory factory = createWstxXmlInputFactory();
+        assertThat(factory.getClass().getName(), equalTo("com.ctc.wstx.stax.WstxInputFactory"));
     }
 }

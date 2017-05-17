@@ -11,21 +11,24 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
+import org.mule.util.xmlsecurity.XMLSecureFactories;
 
-import de.odysseus.staxon.json.JsonXMLInputFactory;
-import de.odysseus.staxon.json.JsonXMLOutputFactory;
+import java.io.File;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.net.URL;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stax.StAXResult;
 import javax.xml.transform.stax.StAXSource;
-import java.io.File;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.net.URL;
+
+import de.odysseus.staxon.json.JsonXMLInputFactory;
+import de.odysseus.staxon.json.JsonXMLOutputFactory;
 
 /**
  * Convert Json to Json using XSLT
@@ -41,8 +44,6 @@ public class JsonXsltTransformer extends XsltTransformer
         this.registerSourceType(DataTypeFactory.create(URL.class));
         this.registerSourceType(DataTypeFactory.create(File.class));
         setReturnDataType(DataTypeFactory.XML_STRING);
-
-        setXslTransformerFactory(TransformerInputs.getPreferredTransactionFactoryClassname());
     }
 
     /**
@@ -87,4 +88,9 @@ public class JsonXsltTransformer extends XsltTransformer
         }
     }
 
+    @Override
+    public TransformerFactory getTransformerFactory()
+    {
+        return XMLSecureFactories.createDefault().getTransformerFactory();
+    }
 }

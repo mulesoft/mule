@@ -57,6 +57,10 @@
                     <artifactId>wstx-asl</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.0.2_spec</artifactId>
                 </exclusion>

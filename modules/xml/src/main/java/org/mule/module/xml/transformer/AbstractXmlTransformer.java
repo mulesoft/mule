@@ -6,6 +6,8 @@
  */
 package org.mule.module.xml.transformer;
 
+import static org.mule.module.xml.util.XMLUtils.createWstxXmlInputFactory;
+
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -70,7 +72,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
     @Override
     public final void initialise() throws InitialisationException
     {
-        xmlInputFactory = XMLSecureFactories.createWithConfig(acceptExternalEntities, expandInternalEntities).getXMLInputFactory();
+        xmlInputFactory = createWstxXmlInputFactory(acceptExternalEntities, expandInternalEntities);
         useStaxSource = !acceptExternalEntities || !expandInternalEntities;
         xmlOutputFactory = XMLOutputFactory.newInstance();
 

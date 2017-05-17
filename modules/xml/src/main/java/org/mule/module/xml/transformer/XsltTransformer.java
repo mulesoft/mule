@@ -6,6 +6,9 @@
  */
 package org.mule.module.xml.transformer;
 
+import static org.mule.module.xml.util.XMLUtils.createInstance;
+import static org.mule.module.xml.util.XMLUtils.createSaxonTransformerFactory;
+
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
@@ -15,10 +18,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.util.LocalURIResolver;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
-import org.mule.util.StringUtils;
-import org.mule.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -30,7 +30,6 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
@@ -96,15 +95,9 @@ public class XsltTransformer extends AbstractXmlTransformer
     // MAX_IDLE is also the total limit
     private static final int MAX_ACTIVE_TRANSFORMERS = MAX_IDLE_TRANSFORMERS;
 
-    //Saxon shipped with Mule
-    public static final String PREFERRED_TRANSFORMER_FACTORY = "net.sf.saxon.TransformerFactoryImpl";
-
     protected final GenericObjectPool transformerPool;
 
-    /**
-     * Default to Saxon
-     */
-    private volatile String xslTransformerFactoryClassName = PREFERRED_TRANSFORMER_FACTORY;
+    private volatile String xslTransformerFactoryClassName;
     private volatile String xslFile;
     private volatile String xslt;
     private volatile Map<String, Object> contextProperties;
@@ -261,26 +254,9 @@ public class XsltTransformer extends AbstractXmlTransformer
         }
     }
 
-    /**
-     * Returns the name of the currently configured javax.xml.transform.Transformer
-     * factory class used to create XSLT Transformers.
-     *
-     * @return a TransformerFactory class name or <code>null</code> if none has been
-     *         configured
-     */
-    public String getXslTransformerFactory()
+    public TransformerFactory getTransformerFactory()
     {
-        return xslTransformerFactoryClassName;
-    }
-
-    /**
-     * Configures the javax.xml.transform.Transformer factory class
-     *
-     * @param xslTransformerFactory the name of the TransformerFactory class to use
-     */
-    public void setXslTransformerFactory(String xslTransformerFactory)
-    {
-        this.xslTransformerFactoryClassName = xslTransformerFactory;
+        return createSaxonTransformerFactory();
     }
 
     public String getXslFile()
@@ -314,6 +290,32 @@ public class XsltTransformer extends AbstractXmlTransformer
     }
 
     /**
+     * Returns the name of the currently configured javax.xml.transform.Transformer
+     * factory class used to create XSLT Transformers.
+     *
+     * This is provided only to override through configuration beans, in the code just override getTransformerFactory.
+     *
+     * @return a TransformerFactory class name or <code>null</code> if none has been
+     *         configured
+     */
+    public String getXslTransformerFactory()
+    {
+        return xslTransformerFactoryClassName;
+    }
+
+    /**
+     * Configures the javax.xml.transform.Transformer factory class
+     *
+     * This is provided only to override through configuration beans, in the code just override getTransformerFactory.
+     *
+     * @param xslTransformerFactory the name of the TransformerFactory class to use
+     */
+    public void setXslTransformerFactory(String xslTransformerFactory)
+    {
+        this.xslTransformerFactoryClassName = xslTransformerFactory;
+    }
+
+    /**
      * Returns the StreamSource corresponding to xslt (which should have been loaded
      * in {@link #initialise()}).
      *
@@ -337,26 +339,15 @@ public class XsltTransformer extends AbstractXmlTransformer
         public Object makeObject() throws Exception
         {
             StreamSource source = XsltTransformer.this.getStreamSource();
-            String factoryClassName = XsltTransformer.this.getXslTransformerFactory();
             TransformerFactory factory;
 
-            if (PREFERRED_TRANSFORMER_FACTORY.equals(factoryClassName) && !ClassUtils.isClassOnPath(factoryClassName, getClass()))
+            if (getXslTransformerFactory() != null)
             {
-                logger.warn("Preferred Transfomer Factory " + PREFERRED_TRANSFORMER_FACTORY + " not on classpath and no default is set, defaulting to JDK");
-                factoryClassName = null;
-            }
-
-            if (StringUtils.isNotEmpty(factoryClassName))
-            {
-
-                factory = (TransformerFactory) ClassUtils.instanciateClass(factoryClassName,
-                        ClassUtils.NO_ARGS, this.getClass());
-                XMLSecureFactories.createDefault().configureTransformerFactory(factory);
+                factory = (TransformerFactory) createInstance(getXslTransformerFactory());
             }
             else
             {
-                // fall back to JDK default
-                factory = XMLSecureFactories.createDefault().getTransformerFactory();
+                factory = XsltTransformer.this.getTransformerFactory();
             }
 
             factory.setURIResolver(getUriResolver());

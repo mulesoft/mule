@@ -27,15 +27,11 @@ public class XMLSecureFactories
 
     private Boolean externalEntities;
     private Boolean expandEntities;
+    private DefaultXMLSecureFactories secureFactories;
 
     public static XMLSecureFactories createWithConfig(Boolean externalEntities, Boolean expandEntities)
     {
-        XMLSecureFactories factory = new XMLSecureFactories();
-
-        factory.externalEntities = externalEntities;
-        factory.expandEntities = expandEntities;
-
-        return factory;
+        return new XMLSecureFactories(externalEntities, expandEntities);
     }
 
     public static XMLSecureFactories createDefault()
@@ -51,40 +47,53 @@ public class XMLSecureFactories
 
         String expandEntitiesValue = System.getProperty(EXPAND_ENTITIES_PROPERTY, "false");
         expandEntities = Boolean.parseBoolean(expandEntitiesValue);
+
+        secureFactories = new DefaultXMLSecureFactories(externalEntities, expandEntities);
+    }
+
+    private XMLSecureFactories(Boolean externalEntities, Boolean expandEntities)
+    {
+        this.externalEntities = externalEntities;
+        this.expandEntities = expandEntities;
+        this.secureFactories = new DefaultXMLSecureFactories(externalEntities, expandEntities);
     }
 
     public DocumentBuilderFactory getDocumentBuilderFactory()
     {
-        return XMLSecureFactoriesCache.getInstance().getDocumentBuilderFactory(externalEntities, expandEntities);
+        return XMLSecureFactoriesCache.getInstance().getDocumentBuilderFactory(secureFactories);
     }
 
     public SAXParserFactory getSAXParserFactory()
     {
-        return XMLSecureFactoriesCache.getInstance().getSAXParserFactory(externalEntities, expandEntities);
+        return XMLSecureFactoriesCache.getInstance().getSAXParserFactory(secureFactories);
     }
 
     public XMLInputFactory getXMLInputFactory()
     {
-        return XMLSecureFactoriesCache.getInstance().getXMLInputFactory(externalEntities, expandEntities);
+        return XMLSecureFactoriesCache.getInstance().getXMLInputFactory(secureFactories);
     }
 
     public TransformerFactory getTransformerFactory()
     {
-        return XMLSecureFactoriesCache.getInstance().getTransformerFactory(externalEntities, expandEntities);
+        return XMLSecureFactoriesCache.getInstance().getTransformerFactory(secureFactories);
+    }
+
+    public SchemaFactory getSchemaFactory(String schemaLocation) {
+        return XMLSecureFactoriesCache.getInstance().getSchemaFactory(secureFactories, schemaLocation);
+    }
+
+    public void configureXMLInputFactory(XMLInputFactory factory)
+    {
+        secureFactories.configureXMLInputFactory(factory);
     }
 
     public void configureTransformerFactory(TransformerFactory factory)
     {
-        DefaultXMLSecureFactories.configureTransformerFactory(externalEntities, expandEntities, factory);
-    }
-
-    public void configureSchemaFactory(SchemaFactory factory)
-    {
-        DefaultXMLSecureFactories.configureSchemaFactory(externalEntities, expandEntities, factory);
+        secureFactories.configureTransformerFactory(factory);
     }
 
     public void configureValidator(Validator validator)
     {
-        DefaultXMLSecureFactories.configureValidator(externalEntities, expandEntities, validator);
+        secureFactories.configureValidator(validator);
     }
 }

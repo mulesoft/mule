@@ -207,37 +207,6 @@
             </exclusions>
         </dependency>
 
-        <!--
-            We need to register the endorsed XML jars as dependencies of the
-            distribution, so that they can be referenced in the assembly as in/excludes.
-        -->
-        <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-            <version>${xmlApisVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>${xercesVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xml-serializer</artifactId>
-            <version>2.7.1</version>
-        </dependency>
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-            <version>${xalanVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>xalan</groupId>
-                    <artifactId>serializer</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!-- make sure we package the test frameworks, too -->
         <dependency>
             <groupId>org.mule</groupId>

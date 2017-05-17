@@ -23,12 +23,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <!-- TODO: We should be able to remove the PermGen config 
-                        after we fix MULE-10010 -->
+                    <!-- TODO: We should be able to remove the PermGen config after we fix MULE-10010 -->
                     <argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>
-                    <systemPropertyVariables>
-                        <javax.xml.transform.TransformerFactory>org.apache.xalan.processor.TransformerFactoryImpl</javax.xml.transform.TransformerFactory>
-                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>
@@ -270,24 +266,6 @@
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-            <version>${xalanVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>${xercesVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-            <version>${xmlApisVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

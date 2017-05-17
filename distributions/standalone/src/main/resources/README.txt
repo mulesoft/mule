@@ -40,7 +40,6 @@ The Mule distribution contains the following directories and files:
 /conf           Configuration files
 /docs           API documentation (Javadoc) for Mule and its sub-projects
 /lib/boot       Libraries used by the Java Service Wrapper to boot the server
-/lib/endorsed   Endorsed Java libraries used by Mule
 /lib/mule       Mule libraries
 /lib/opt        Third-party libraries
 /lib/user       Your custom classes and libraries. This directory comes before
