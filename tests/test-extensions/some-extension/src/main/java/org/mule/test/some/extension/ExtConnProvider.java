@@ -8,18 +8,19 @@
 package org.mule.test.some.extension;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
+import static org.mule.test.heisenberg.extension.HeisenbergErrors.OAUTH2;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.test.heisenberg.extension.HeisenbergErrors;
 
 public class ExtConnProvider implements CachedConnectionProvider<String> {
 
-  private static final ModuleException OAUTH_MODULE_EXCEPTION = new ModuleException("", HeisenbergErrors.OAUTH2);
-  private static final ModuleException HEALTH_MODULE_EXCEPTION = new ModuleException("", HeisenbergErrors.HEALTH);
+  private static final ModuleException OAUTH_MODULE_EXCEPTION = new ModuleException(OAUTH2, new RuntimeException());
+  private static final ModuleException HEALTH_MODULE_EXCEPTION = new ModuleException(HEALTH, new RuntimeException());
   private static final CustomConnectionException DOMAIN_HEALTH_CONNECTION_EXCEPTION =
       new CustomConnectionException(HEALTH_MODULE_EXCEPTION);
   private static final CustomConnectionException DOMAIN_OAUTH_CONNECTION_EXCEPTION =

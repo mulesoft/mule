@@ -264,9 +264,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
                                                     ErrorTypeLocator errorTypeLocator) {
     ErrorType errorType = getErrorTypeFromFailingProcessor(annotatedObject, causeException, errorTypeLocator);
     if (causeException instanceof TypedException) {
-      if (causeException.getCause() != null) {
-        causeException = causeException.getCause();
-      }
+      causeException = causeException.getCause();
     }
     return ErrorBuilder.builder(causeException).errorType(errorType).build();
   }
