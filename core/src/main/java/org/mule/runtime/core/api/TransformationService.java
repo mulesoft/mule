@@ -70,8 +70,7 @@ public class TransformationService {
       } catch (TransformerException e) {
         throw new TransformerException(createStaticMessage(String
             .format("The value '%s' of type %s could not be transformed to the desired type %s",
-                    value.toString(), expectedDataType.getType().getName(),
-                    value.getClass().getName())), e);
+                    value.toString(), value.getClass().getName(), expectedDataType.getType().getName()), e));
       }
 
       return transformer.transform(value);
