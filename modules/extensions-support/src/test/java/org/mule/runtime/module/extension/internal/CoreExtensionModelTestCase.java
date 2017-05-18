@@ -109,6 +109,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(subTypesModel.getBaseType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
                is(SchedulingStrategy.class.getName()));
 
+    assertThat(subTypesModel.getSubTypes(), hasSize(2));
     Iterator<ObjectType> iterator = subTypesModel.getSubTypes().iterator();
     final DefaultObjectType ffSchedulerType = (DefaultObjectType) iterator.next();
     assertThat(ffSchedulerType.getFields(), hasSize(3));
@@ -121,7 +122,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
     final DefaultObjectType cronSchedulerType = (DefaultObjectType) iterator.next();
     assertThat(cronSchedulerType.getFields(), hasSize(2));
-    assertThat(cronSchedulerType.getFieldByName("expression").get().isRequired(), is(false));
+    assertThat(cronSchedulerType.getFieldByName("expression").get().isRequired(), is(true));
     assertThat(cronSchedulerType.getFieldByName("expression").get().getValue(), instanceOf(DefaultStringType.class));
     assertThat(cronSchedulerType.getFieldByName("timeZone").get().isRequired(), is(false));
     assertThat(cronSchedulerType.getFieldByName("timeZone").get().getValue(), instanceOf(DefaultStringType.class));
