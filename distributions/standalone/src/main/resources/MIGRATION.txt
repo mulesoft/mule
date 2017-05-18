@@ -6,7 +6,6 @@ Please check https://developer.mulesoft.com/docs/display/current/Mule+ESB for mo
 
 Migration changes from 3.8.x to 3.9.x
 MULE-12245: Old Xalan and Xerces implementations were removed in favor of the newer versions included in Java. Only minor incompatibilities could result such as ordering changes of some XML attributes.
-    License Manager was updated to 1.17, which requires changing key="java.util.prefs:/com/mulesource/licm//license" in licenses to key="java.util.prefs:/com/mulesoft/licm//license".
 MULE-12017: log4j was updated from 2.5 to 2.8.1 and slf4j from 1.7.7 to 1.7.24. There is a minor incompatibility with code using logger.error(null, "message", e), in which case the first null argument should be omitted.
 MULE-11948: Saxon was upgraded from 9.6.0-7 to 9.6.0-10
 MULE-10720: xml-to-dom-transformer now transforms to org.w3c.dom.Document instead of byte[] by default.
