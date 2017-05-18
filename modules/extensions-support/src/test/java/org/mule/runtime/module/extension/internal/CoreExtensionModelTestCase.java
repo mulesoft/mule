@@ -68,6 +68,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.routing.AggregationStrategy;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -108,7 +109,8 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(subTypesModel.getBaseType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
                is(SchedulingStrategy.class.getName()));
 
-    final DefaultObjectType ffSchedulerType = (DefaultObjectType) subTypesModel.getSubTypes().iterator().next();
+    Iterator<ObjectType> iterator = subTypesModel.getSubTypes().iterator();
+    final DefaultObjectType ffSchedulerType = (DefaultObjectType) iterator.next();
     assertThat(ffSchedulerType.getFields(), hasSize(3));
     assertThat(ffSchedulerType.getFieldByName("frequency").get().isRequired(), is(false));
     assertThat(ffSchedulerType.getFieldByName("frequency").get().getValue(), instanceOf(DefaultNumberType.class));
@@ -116,6 +118,13 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(ffSchedulerType.getFieldByName("startDelay").get().getValue(), instanceOf(DefaultNumberType.class));
     assertThat(ffSchedulerType.getFieldByName("timeUnit").get().isRequired(), is(false));
     assertThat(ffSchedulerType.getFieldByName("timeUnit").get().getValue(), instanceOf(DefaultStringType.class));
+
+    final DefaultObjectType cronSchedulerType = (DefaultObjectType) iterator.next();
+    assertThat(cronSchedulerType.getFields(), hasSize(2));
+    assertThat(cronSchedulerType.getFieldByName("expression").get().isRequired(), is(false));
+    assertThat(cronSchedulerType.getFieldByName("expression").get().getValue(), instanceOf(DefaultStringType.class));
+    assertThat(cronSchedulerType.getFieldByName("timeZone").get().isRequired(), is(false));
+    assertThat(cronSchedulerType.getFieldByName("timeZone").get().getValue(), instanceOf(DefaultStringType.class));
 
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
@@ -133,7 +142,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
     assertThat(coreExtensionModel.getModelProperties(), empty());
-    assertThat(coreExtensionModel.getTypes(), hasSize(2));
+    assertThat(coreExtensionModel.getTypes(), hasSize(3));
   }
 
   @Test

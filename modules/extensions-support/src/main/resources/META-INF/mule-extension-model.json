@@ -23,6 +23,10 @@
         {
           "format": "java",
           "type": "@ref:org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler"
+        },
+        {
+          "format": "java",
+          "type": "@ref:org.mule.runtime.core.source.scheduler.schedule.CronScheduler"
         }
       ]
     }
@@ -3175,6 +3179,71 @@
             }
           }
         ]
-      }
+      },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.runtime.core.source.scheduler.schedule.CronScheduler",
+        "classInformation": {
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "org.mule.runtime.core.api.source.SchedulingStrategy"
+          ],
+          "parent": "",
+          "genericTypes": []
+        },
+        "typeAlias": {
+          "value": "CronScheduler"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "expression",
+            "required": "true"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          },
+          "annotations": {
+            "visibility": "WRITE_ONLY",
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "timeZone"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.lang.String"
+            }
+          },
+          "annotations": {
+            "visibility": "WRITE_ONLY",
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    }
   ]
 }

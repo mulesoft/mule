@@ -168,7 +168,6 @@ import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
 import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
 import org.mule.runtime.core.routing.AggregationStrategy;
 import org.mule.runtime.core.routing.ChoiceRouter;
-import org.mule.runtime.core.routing.Splitter;
 import org.mule.runtime.core.routing.FirstSuccessful;
 import org.mule.runtime.core.routing.Foreach;
 import org.mule.runtime.core.routing.IdempotentMessageValidator;
@@ -181,6 +180,7 @@ import org.mule.runtime.core.routing.Resequencer;
 import org.mule.runtime.core.routing.RoundRobin;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.runtime.core.routing.SimpleCollectionAggregator;
+import org.mule.runtime.core.routing.Splitter;
 import org.mule.runtime.core.routing.UntilSuccessful;
 import org.mule.runtime.core.routing.WireTap;
 import org.mule.runtime.core.routing.filters.EqualsFilter;
@@ -198,6 +198,7 @@ import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 import org.mule.runtime.core.routing.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.runtime.core.source.StartableCompositeMessageSource;
 import org.mule.runtime.core.source.scheduler.DefaultSchedulerMessageSource;
+import org.mule.runtime.core.source.scheduler.schedule.CronScheduler;
 import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.streaming.object.CursorIteratorProviderFactory;
@@ -598,6 +599,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
         .withSetterParameterDefinition("startDelay", fromSimpleParameter("startDelay").build())
         .withSetterParameterDefinition("timeUnit", fromSimpleParameter("timeUnit").build()).build());
+
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("cron-scheduler")
+        .withTypeDefinition(fromType(CronScheduler.class))
+        .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
+        .withSetterParameterDefinition("timeZone", fromSimpleParameter("timeZone").build()).build());
+
 
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier(REDELIVERY_POLICY_ELEMENT_IDENTIFIER)
         .withTypeDefinition(fromType(IdempotentRedeliveryPolicy.class))
