@@ -8,14 +8,12 @@ package org.mule.runtime.core.api.interception;
 
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.message.ErrorBuilder;
 
 import java.util.Map;
 import java.util.Optional;
@@ -90,18 +88,6 @@ public class DefaultInterceptionEvent implements InterceptionEvent {
   @Override
   public DefaultInterceptionEvent removeVariable(String key) {
     interceptedOutput = interceptedOutput.removeVariable(key);
-    return this;
-  }
-
-  public DefaultInterceptionEvent setError(ErrorType errorType, Throwable cause) {
-    ErrorBuilder errorBuilder = ErrorBuilder.builder();
-    errorBuilder
-        .errorType(errorType)
-        .description(cause.getMessage())
-        .detailedDescription(cause.getMessage())
-        .exception(cause);
-
-    interceptedOutput = interceptedOutput.error(errorBuilder.build());
     return this;
   }
 
