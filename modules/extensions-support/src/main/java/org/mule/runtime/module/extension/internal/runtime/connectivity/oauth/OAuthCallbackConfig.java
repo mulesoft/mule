@@ -19,29 +19,19 @@ import java.util.Optional;
 public final class OAuthCallbackConfig {
 
   private final String listenerConfig;
-  private final String host;
-  private final int port;
   private final String callbackPath;
   private final String localAuthorizePath;
+  private final String externalCallbackUrl;
 
-  public OAuthCallbackConfig(String listenerConfig, String host, int port, String callbackPath, String localAuthorizePath) {
+  public OAuthCallbackConfig(String listenerConfig, String callbackPath, String localAuthorizePath, String externalCallbackUrl) {
     this.listenerConfig = listenerConfig;
-    this.host = host;
-    this.port = port;
     this.callbackPath = callbackPath;
     this.localAuthorizePath = localAuthorizePath;
+    this.externalCallbackUrl = externalCallbackUrl;
   }
 
-  public Optional<String> getListenerConfig() {
-    return ofNullable(listenerConfig);
-  }
-
-  public String getHost() {
-    return host;
-  }
-
-  public int getPort() {
-    return port;
+  public String getListenerConfig() {
+    return listenerConfig;
   }
 
   public String getCallbackPath() {
@@ -50,5 +40,9 @@ public final class OAuthCallbackConfig {
 
   public String getLocalAuthorizePath() {
     return localAuthorizePath;
+  }
+
+  public Optional<String> getExternalCallbackUrl() {
+    return ofNullable(externalCallbackUrl);
   }
 }
