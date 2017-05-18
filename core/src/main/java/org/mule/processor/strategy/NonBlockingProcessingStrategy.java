@@ -6,7 +6,9 @@
  */
 package org.mule.processor.strategy;
 
+import static org.mule.api.config.ThreadingProfile.WHEN_EXHAUSTED_WAIT;
 import org.mule.api.MuleContext;
+import org.mule.api.config.ThreadingProfile;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.WorkManager;
 import org.mule.api.processor.MessageProcessor;
@@ -44,7 +46,12 @@ public class NonBlockingProcessingStrategy extends AbstractThreadingProfileProce
     public WorkManager createWorkManager(FlowConstruct flowConstruct)
     {
         MuleContext muleContext = flowConstruct.getMuleContext();
-        MuleWorkManager workManager = (MuleWorkManager) createThreadingProfile(muleContext).createWorkManager
+        ThreadingProfile threadingProfile = createThreadingProfile(muleContext);
+        if (poolExhaustedAction == null)
+        {
+            threadingProfile.setPoolExhaustedAction(WHEN_EXHAUSTED_WAIT);
+        }
+        MuleWorkManager workManager = (MuleWorkManager) threadingProfile.createWorkManager
                 (getThreadPoolName(flowConstruct.getName(), muleContext), muleContext.getConfiguration()
                         .getShutdownTimeout());
         return workManager;
