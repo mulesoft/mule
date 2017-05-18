@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.config.dsl.connection;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -25,6 +27,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.SoapConnectionProviderObjectBuilder;
+
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
@@ -59,7 +63,8 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
 
   @Override
   public ConnectionProviderResolver doGetObject() throws Exception {
-    ResolverSet resolverSet = parametersResolver.getParametersAsHashedResolverSet(providerModel, muleContext);
+    Callable<ResolverSet> callable = () -> parametersResolver.getParametersAsHashedResolverSet(providerModel, muleContext);
+    ResolverSet resolverSet = withContextClassLoader(getClassLoader(extensionModel), callable);
 
     ConnectionManagerAdapter connectionManager = getConnectionManager();
     ConnectionProviderObjectBuilder builder;

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.utils;
 
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getExpressionBasedValueResolver;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -44,7 +45,6 @@ public final class ImplicitObjectUtils {
     for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
       Object defaultValue = parameterModel.getDefaultValue();
       ValueResolver resolver;
-
       if (defaultValue instanceof String) {
         resolver = getExpressionBasedValueResolver((String) defaultValue, parameterModel.getType(), muleContext);
       } else {
@@ -52,9 +52,8 @@ public final class ImplicitObjectUtils {
       }
 
       if (parameterModel.getModelProperty(NullSafeModelProperty.class).isPresent()) {
-        resolver = NullSafeValueResolverWrapper
-            .of(resolver, parameterModel.getModelProperty(NullSafeModelProperty.class).get().defaultType(), muleContext,
-                parametersResolver);
+        MetadataType metadataType = parameterModel.getModelProperty(NullSafeModelProperty.class).get().defaultType();
+        resolver = NullSafeValueResolverWrapper.of(resolver, metadataType, muleContext, parametersResolver);
       }
 
       resolverSet.add(parameterModel.getName(), resolver);

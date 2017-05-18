@@ -100,10 +100,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import com.google.common.collect.ImmutableList;
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -124,6 +120,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 
 /**
  * Base class for parsers delegates which generate {@link ComponentBuildingDefinition} instances for the specific components types
@@ -449,7 +450,9 @@ public abstract class ExtensionDefinitionParser {
 
       @Override
       protected void defaultVisit(MetadataType metadataType) {
-        parseAttributeParameter(fieldName, fieldName, metadataType, defaultValue, expressionSupport, false, emptySet());
+        if (!parseAsContent(isContent, metadataType)) {
+          parseAttributeParameter(fieldName, fieldName, metadataType, defaultValue, expressionSupport, false, emptySet());
+        }
       }
 
       @Override
