@@ -12,6 +12,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -90,6 +91,35 @@ public class MultiConsumerJmsMessageReceiverTest extends AbstractMuleTestCase
         reset(mockMessageConsumer);
         messageReceiver.startSubReceivers();
         verify(mockMessageConsumer, never()).setMessageListener(any(MessageListener.class));
+    }
+
+
+    //The test does not actually check anything, is just to show that the exception is logged
+    @Test
+    public void stoppedSubReceiverShouldLogExceptionIfAny() throws Exception
+    {
+        when(mockJmsConnector.getTopicResolver().isTopic(mockInboundEndpoint, true)).thenReturn(false);
+        when(mockJmsConnector.getNumberOfConsumers()).thenReturn(1);
+
+        MessageConsumer mockMessageConsumer = mock(TestMessageConsumer.class, CALLS_REAL_METHODS);
+        doThrow(new JMSException("Message")).when(mockMessageConsumer).setMessageListener(null);
+        when(mockJmsConnector.getJmsSupport()
+                     .createConsumer(any(Session.class), any(Destination.class), anyString(), anyBoolean(), anyString(), anyBoolean(), any(InboundEndpoint.class)))
+                .thenReturn(mockMessageConsumer);
+        when(mockInboundEndpoint.getConnector()).thenReturn(mockJmsConnector);
+        when(mockInboundEndpoint.getMuleContext().getRegistry().get(MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)).thenReturn(mock(MessageProcessingManager.class));
+        SimpleRetryPolicyTemplate retryPolicyTemplate = new SimpleRetryPolicyTemplate();
+        retryPolicyTemplate.setMuleContext(mockJmsConnector.getMuleContext());
+        when(mockInboundEndpoint.getRetryPolicyTemplate()).thenReturn(retryPolicyTemplate);
+        when(mockInboundEndpoint.getProperties().get(JmsConstants.DURABLE_PROPERTY)).thenReturn("false");
+        when(mockInboundEndpoint.getProperties().get(JmsConstants.DURABLE_NAME_PROPERTY)).thenReturn(null);
+
+        MultiConsumerJmsMessageReceiver messageReceiver = new MultiConsumerJmsMessageReceiver(mockJmsConnector, mockFlowConstruct, mockInboundEndpoint);
+        messageReceiver.initialise();
+        messageReceiver.doStart();
+        messageReceiver.startSubReceivers();
+        messageReceiver.doStop();g
+
     }
 
     private abstract class TestMessageConsumer implements MessageConsumer
