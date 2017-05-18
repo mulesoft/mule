@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+
+    <flow name="nonBlockingFlow" processingStrategy="defaultNonBlockingStrategy">
+        <echo-component />
+    </flow>
+
+    <flow name="customNonBlockingFlow" processingStrategy="runNonBlockingStrategy">
+        <echo-component />
+    </flow>
+
+    <non-blocking-processing-strategy name="runNonBlockingStrategy" maxThreads="1" minThreads="1" poolExhaustedAction="RUN" />
+
+    <non-blocking-processing-strategy name="defaultNonBlockingStrategy" maxThreads="1" minThreads="1"/>
+
+</mule>
