@@ -8,6 +8,7 @@
 package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Collections.emptyList;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
 import static org.eclipse.aether.util.artifact.JavaScopes.COMPILE;
 import static org.eclipse.aether.util.artifact.JavaScopes.PROVIDED;
@@ -40,7 +41,6 @@ import org.mule.tck.size.SmallTest;
 import java.io.File;
 import java.io.FileWriter;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -150,7 +150,8 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                                                 (List<Dependency>) argThat(hasItems(equalTo(compileMuleCoreDep),
                                                                                     equalTo(compileMuleArtifactDep))),
                                                 (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
-                                                argThat(instanceOf(DependencyFilter.class))))
+                                                argThat(instanceOf(DependencyFilter.class)),
+                                                argThat(equalTo(emptyList()))))
                                                     .thenReturn(newArrayList(fooCoreArtifactFile, fooToolsArtifactFile));
 
     ArtifactsUrlClassification classification = classifier.classify(context);
@@ -170,7 +171,8 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                                                                               hasItems(equalTo(compileMuleCoreDep),
                                                                                        equalTo(compileMuleArtifactDep))),
                                                    (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
-                                                   argThat(instanceOf(DependencyFilter.class)));
+                                                   argThat(instanceOf(DependencyFilter.class)),
+                                                   argThat(equalTo(emptyList())));
     verify(artifactClassificationTypeResolver).resolveArtifactClassificationType(rootArtifact);
     verify(rootArtifactResult).getArtifact();
   }
@@ -204,10 +206,11 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                                                 (List<Dependency>) argThat(hasItems(equalTo(compileMuleCoreDep),
                                                                                     equalTo(compileMuleArtifactDep))),
                                                 (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
-                                                argThat(instanceOf(DependencyFilter.class))))
+                                                argThat(instanceOf(DependencyFilter.class)),
+                                                argThat(equalTo(emptyList()))))
                                                     .thenReturn(newArrayList(fooCoreArtifactFile, fooToolsArtifactFile));
 
-    URL url = mock(URL.class);
+    URL url = temporaryFolder.newFile().toURI().toURL();
     List<URL> appUrls = newArrayList(url);
     when(context.getApplicationUrls()).thenReturn(appUrls);
 
@@ -228,7 +231,8 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                                                                               hasItems(equalTo(compileMuleCoreDep),
                                                                                        equalTo(compileMuleArtifactDep))),
                                                    (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
-                                                   argThat(instanceOf(DependencyFilter.class)));
+                                                   argThat(instanceOf(DependencyFilter.class)),
+                                                   argThat(equalTo(emptyList())));
     verify(artifactClassificationTypeResolver).resolveArtifactClassificationType(rootArtifact);
     verify(context, atLeastOnce()).getApplicationUrls();
     verify(rootArtifactResult).getArtifact();
@@ -317,9 +321,11 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
     List<File> fooServiceUrls = newArrayList(fooServiceArtifactFile, metaInfFolder);
     when(dependencyResolver.resolveDependencies(argThat(equalTo(new Dependency(fooServiceDep.getArtifact(), COMPILE))),
-                                                argThat(equalTo(Collections.<Dependency>emptyList())),
-                                                argThat(equalTo(Collections.<Dependency>emptyList())),
-                                                argThat(instanceOf(DependencyFilter.class)))).thenReturn(fooServiceUrls);
+                                                argThat(equalTo(emptyList())),
+                                                argThat(equalTo(emptyList())),
+                                                argThat(instanceOf(DependencyFilter.class)),
+                                                argThat(equalTo(emptyList()))))
+                                                    .thenReturn(fooServiceUrls);
 
     File rootArtifactFile = temporaryFolder.newFile();
 
@@ -351,8 +357,9 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                                                 (List<Dependency>) and((argThat(hasItems(equalTo(compileMuleCoreDep),
                                                                                          equalTo(compileMuleArtifactDep)))),
                                                                        argThat(hasSize(2))),
-                                                argThat(equalTo(Collections.<Dependency>emptyList())),
-                                                argThat(instanceOf(DependencyFilter.class))))
+                                                argThat(equalTo(emptyList())),
+                                                argThat(instanceOf(DependencyFilter.class)),
+                                                argThat(equalTo(emptyList()))))
                                                     .thenReturn(newArrayList(fooCoreArtifactFile, fooToolsArtifactFile));
 
     ArtifactsUrlClassification classification = classifier.classify(context);
@@ -369,21 +376,23 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     verify(dependencyResolver, atLeastOnce()).readArtifactDescriptor(any(Artifact.class));
     verify(dependencyResolver, atLeastOnce())
         .resolveDependencies(argThat(equalTo(new Dependency(fooServiceDep.getArtifact(), COMPILE))),
-                             argThat(equalTo(Collections.<Dependency>emptyList())),
-                             argThat(equalTo(Collections.<Dependency>emptyList())),
-                             argThat(instanceOf(DependencyFilter.class)));
+                             argThat(equalTo(emptyList())),
+                             argThat(equalTo(emptyList())),
+                             argThat(instanceOf(DependencyFilter.class)),
+                             argThat(equalTo(emptyList())));
     verify(artifactClassificationTypeResolver).resolveArtifactClassificationType(rootArtifact);
     verify(dependencyResolver, atLeastOnce()).resolveDependencies(argThat(nullValue(Dependency.class)),
                                                                   (List<Dependency>) and((argThat(hasItems(equalTo(compileMuleCoreDep),
                                                                                                            equalTo(compileMuleArtifactDep)))),
                                                                                          argThat(hasSize(2))),
-                                                                  argThat(equalTo(Collections.<Dependency>emptyList())),
-                                                                  argThat(instanceOf(DependencyFilter.class)));
+                                                                  argThat(equalTo(emptyList())),
+                                                                  argThat(instanceOf(DependencyFilter.class)),
+                                                                  argThat(equalTo(emptyList())));
   }
 
   private ArtifactDescriptorResult noManagedDependencies() throws ArtifactDescriptorException {
     ArtifactDescriptorResult artifactDescriptorResult = mock(ArtifactDescriptorResult.class);
-    List<Dependency> managedDependencies = Collections.<Dependency>emptyList();
+    List<Dependency> managedDependencies = emptyList();
     when(artifactDescriptorResult.getManagedDependencies()).thenReturn(managedDependencies);
     when(dependencyResolver.readArtifactDescriptor(any(Artifact.class))).thenReturn(artifactDescriptorResult);
     return artifactDescriptorResult;
