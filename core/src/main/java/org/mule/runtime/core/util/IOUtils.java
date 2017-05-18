@@ -276,7 +276,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils {
     } else if (object instanceof InputStream && contentType != null) {
       dh = new DataHandler(new InputStreamDataSource((InputStream) object, contentType, name));
     } else {
-      dh = new DataHandler(object, contentType.toString());
+      dh = new DataHandler(object, contentType != null ? contentType.toString() : null);
     }
     return dh;
   }
