@@ -27,6 +27,7 @@ import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
@@ -66,7 +67,8 @@ public class DependencyResolver {
 
     this.resolutionContext = new AetherResolutionContext(mavenConfiguration);
     this.repositoryState =
-        new AetherRepositoryState(this.resolutionContext.getLocalRepositoryLocation(), workspaceReader, false, false);
+        new AetherRepositoryState(this.resolutionContext.getLocalRepositoryLocation(), workspaceReader, false,
+                                  false, resolutionContext.getAuthenticatorSelector());
   }
 
   /**
@@ -124,6 +126,7 @@ public class DependencyResolver {
    *        {@code null}
    * @param dependencyFilter {@link DependencyFilter} to include/exclude dependency nodes during collection and resolve operation.
    *        May be {@code null} to no filter
+   * @param remoteRepositories {@link RemoteRepository} to be used when resolving dependencies in addition to the ones already defined in the context.
    * @return a {@link List} of {@link File}s for each dependency resolved
    * @throws {@link DependencyCollectionException} if the dependency tree could not be built
    * @thwows {@link DependencyResolutionException} if the dependency tree could not be built or any dependency artifact could not
@@ -131,13 +134,14 @@ public class DependencyResolver {
    */
   public List<File> resolveDependencies(Dependency root, List<Dependency> directDependencies,
                                         List<Dependency> managedDependencies,
-                                        DependencyFilter dependencyFilter)
+                                        DependencyFilter dependencyFilter, List<RemoteRepository> remoteRepositories)
       throws DependencyCollectionException, DependencyResolutionException {
     CollectRequest collectRequest = new CollectRequest();
     collectRequest.setRoot(root);
     collectRequest.setDependencies(directDependencies);
     collectRequest.setManagedDependencies(managedDependencies);
     collectRequest.setRepositories(resolutionContext.getRemoteRepositories());
+    remoteRepositories.forEach(remoteRepository -> collectRequest.addRepository(remoteRepository));
 
     DependencyNode node;
     try {

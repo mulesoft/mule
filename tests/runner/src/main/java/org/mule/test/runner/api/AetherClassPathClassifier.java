@@ -11,6 +11,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FileUtils.toFile;
@@ -41,7 +42,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -218,6 +218,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         })
         .forEach(pluginSharedLibUrls::add);
 
+    resolveSnapshotVersionsToTimestampedFromClassPath(pluginSharedLibUrls, context.getClassPathURLs());
+
     logger.debug("Classified URLs as plugin runtime shared libraries: '{}", pluginSharedLibUrls);
     return pluginSharedLibUrls;
   }
@@ -283,7 +285,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     List<URL> containerUrls;
     try {
       containerUrls = toUrl(dependencyResolver.resolveDependencies(null, directDependencies, newArrayList(managedDependencies),
-                                                                   dependencyFilter));
+                                                                   dependencyFilter,
+                                                                   dependencyResolver
+                                                                       .readArtifactDescriptor(context.getRootArtifact())
+                                                                       .getRepositories()));
     } catch (Exception e) {
       throw new IllegalStateException("Couldn't resolve dependencies for Container", e);
     }
@@ -509,8 +514,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                                               + MULE_PLUGIN_CLASSIFIER + ":*"),
                                                                    new PatternInclusionsDependencyFilter(toId(artifactToClassify))));
       urls = toUrl(dependencyResolver.resolveDependencies(new Dependency(artifactToClassify, COMPILE),
-                                                          Collections.<Dependency>emptyList(), managedDependencies,
-                                                          dependencyFilter));
+                                                          emptyList(), managedDependencies,
+                                                          dependencyFilter, emptyList()));
     } catch (Exception e) {
       throw new IllegalStateException("Couldn't resolve dependencies for artifact: '" + artifactToClassify + "' classification",
                                       e);
@@ -537,6 +542,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         .forEach(artifactDependencies::add);
 
     final List<Class> exportClasses = getArtifactExportedClasses(artifactToClassify, context);
+
+    resolveSnapshotVersionsToTimestampedFromClassPath(urls, context.getClassPathURLs());
 
     ArtifactClassificationNode artifactUrlClassification = new ArtifactClassificationNode(artifactToClassify,
                                                                                           urls,
@@ -799,7 +806,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       List<File> urls = dependencyResolver
           .resolveDependencies(rootTestDependency, directDependencies, managedDependencies,
                                orFilter(dependencyFilter,
-                                        new PatternExclusionsDependencyFilter(exclusionsPatterns)));
+                                        new PatternExclusionsDependencyFilter(exclusionsPatterns)),
+                               emptyList());
       appFiles
           .addAll(urls);
     } catch (Exception e) {
@@ -810,6 +818,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     List<URL> appUrls = newArrayList(toUrl(appFiles));
     logger.debug("Appending URLs to application: {}", context.getApplicationUrls());
     appUrls.addAll(context.getApplicationUrls());
+
+    resolveSnapshotVersionsToTimestampedFromClassPath(appUrls, context.getClassPathURLs());
+
     return appUrls;
   }
 
@@ -884,13 +895,11 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         }
 
         if (urlFromClassPath != null) {
-          logger.debug("Replacing resolved URL '{}' from class path URL '{}'", urlResolved, urlFromClassPath);
+          logger.info("Replacing resolved URL '{}' from class path URL '{}'", urlResolved, urlFromClassPath);
           listIterator.set(urlFromClassPath);
         } else {
-          logger.error("'{}' resolved SNAPSHOT version couldn't be matched to a class path URL: '{}'", artifactResolvedFile,
-                       classpathURLs);
-          throw new IllegalStateException(artifactResolvedFile
-              + " resolved SNAPSHOT version couldn't be matched to a class path URL");
+          logger.warn("'{}' resolved SNAPSHOT version couldn't be matched to a class path URL: '{}'", artifactResolvedFile,
+                      classpathURLs);
         }
       }
     }
