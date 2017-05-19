@@ -10,6 +10,7 @@ import static java.lang.String.valueOf;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromFuture;
 
@@ -36,6 +37,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import reactor.core.Exceptions;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
@@ -71,7 +74,12 @@ public class ReactiveInterceptorAdapter
       return publisher -> from(publisher)
           .map(doBefore(interceptor, component, dslParameters))
           .flatMap(event -> fromFuture(doAround(event, interceptor, component, dslParameters, next))
-              .onErrorMap(CompletionException.class, completionException -> completionException.getCause()))
+              .onErrorMap(CompletionException.class, completionException -> completionException.getCause())
+              .doOnNext(resultEvent -> {
+                if (resultEvent.getError().isPresent()) {
+                  propagate(new MessagingException(resultEvent, resultEvent.getError().get().getCause(), component));
+                }
+              }))
           .doOnError(MessagingException.class, error -> {
             interceptor.after(new DefaultInterceptionEvent(error.getEvent()), of(error.getCause()));
           })

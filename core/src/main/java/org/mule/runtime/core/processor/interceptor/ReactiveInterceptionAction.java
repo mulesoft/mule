@@ -50,27 +50,10 @@ class ReactiveInterceptionAction implements InterceptionAction {
     interceptionEvent.resolve();
     return completedFuture(interceptionEvent);
   }
-
+  
   @Override
-  public CompletableFuture<InterceptionEvent> fail(Throwable cause) {
-    return just(interceptionEvent.resolve())
-        .transform(next)
-        .map(event -> {
-          throw new MessagingException(CoreMessages.createStaticMessage(""), interceptionEvent.resolve(), cause);
-        })
-        .cast(InterceptionEvent.class)
-        .toFuture();
-  }
-
-  @Override
-  public CompletableFuture<InterceptionEvent> fail(ErrorType errorType) {
-    return just(interceptionEvent.resolve())
-        .transform(next)
-        .map(event -> {
-          interceptionEvent.setError(errorType, new RuntimeException());
-          throw new MessagingException(CoreMessages.createStaticMessage(""), interceptionEvent.resolve());
-        })
-        .cast(InterceptionEvent.class)
-        .toFuture();
+  public CompletableFuture<InterceptionEvent> fail(ErrorType errorType, Throwable cause) {
+    interceptionEvent.setError(errorType, cause);
+    return completedFuture(interceptionEvent);
   }
 }
