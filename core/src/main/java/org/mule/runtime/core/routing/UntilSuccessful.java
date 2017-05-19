@@ -9,7 +9,6 @@ package org.mule.runtime.core.routing;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
 import org.mule.runtime.api.exception.MuleException;
@@ -90,8 +89,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     }
     this.untilSuccessfulStrategy.setUntilSuccessfulConfiguration(this);
 
-    initialiseIfNeeded(untilSuccessfulStrategy );
-    setMuleContextIfNeeded(untilSuccessfulStrategy, muleContext);
+    initialiseIfNeeded(untilSuccessfulStrategy, muleContext);
     String flowName = flowConstruct.getName();
     String clusterId = muleContext.getClusterId();
     eventKeyPrefix = flowName + "-" + clusterId + "-";
