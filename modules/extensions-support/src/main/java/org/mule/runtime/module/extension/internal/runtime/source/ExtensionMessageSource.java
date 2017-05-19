@@ -16,6 +16,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
@@ -52,6 +53,7 @@ import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourc
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
@@ -82,6 +84,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private SourceAdapter sourceAdapter;
   private Scheduler retryScheduler;
   private Scheduler flowTriggerScheduler;
+
+  private AtomicBoolean started = new AtomicBoolean(false);
 
   public ExtensionMessageSource(ExtensionModel extensionModel,
                                 SourceModel sourceModel,
@@ -179,9 +183,16 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void restart() throws MuleException {
-    stopSource();
-    disposeSource();
-    startSource();
+    synchronized (started) {
+      if (started.get()) {
+        stopSource();
+        disposeSource();
+        startSource();
+      } else {
+        LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", sourceAdapter.getName(),
+                           flowConstruct.getName()));
+      }
+    }
   }
 
   @Override
@@ -193,15 +204,21 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       flowTriggerScheduler = schedulerService.cpuLightScheduler();
     }
 
-    startSource();
+    synchronized (started) {
+      startSource();
+      started.set(true);
+    }
   }
 
   @Override
   public void doStop() throws MuleException {
-    try {
-      stopSource();
-    } finally {
-      stopSchedulers();
+    synchronized (started) {
+      started.set(false);
+      try {
+        stopSource();
+      } finally {
+        stopSchedulers();
+      }
     }
   }
 
