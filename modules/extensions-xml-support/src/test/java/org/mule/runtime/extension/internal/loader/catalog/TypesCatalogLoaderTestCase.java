@@ -23,11 +23,33 @@ public class TypesCatalogLoaderTestCase extends AbstractMuleTestCase {
   private static final File TESTS_FOLDER = new File("src/test/resources/catalog");
 
   @Test
-  public void typesCatalogCanBeLoadedFromXmlFile() throws Exception {
-    final File appTypesFile = new File(TESTS_FOLDER, "catalog.xml");
+  public void typesJsonCatalogCanBeLoadedFromXmlFile() throws Exception {
+    final File appTypesFile = new File(TESTS_FOLDER, "json-catalog.xml");
     TypesCatalogXmlLoader typesCatalogXmlLoader = new TypesCatalogXmlLoader();
     final TypesCatalog typesCatalog = typesCatalogXmlLoader.load(appTypesFile.toURI().toURL());
-    Assert.assertTrue(typesCatalog.resolveType("Type1").isPresent());
-    Assert.assertTrue(typesCatalog.resolveType("Type2").isPresent());
+    Assert.assertTrue(typesCatalog.resolveType("JsonType1").isPresent());
+    Assert.assertTrue(typesCatalog.resolveType("JsonType2").isPresent());
   }
+
+  @Test
+  public void typesXsdCatalogCanBeLoadedFromXmlFile() throws Exception {
+    final File appTypesFile = new File(TESTS_FOLDER, "xsd-catalog.xml");
+    TypesCatalogXmlLoader typesCatalogXmlLoader = new TypesCatalogXmlLoader();
+    final TypesCatalog typesCatalog = typesCatalogXmlLoader.load(appTypesFile.toURI().toURL());
+    Assert.assertTrue(typesCatalog.resolveType("XsdType1").isPresent());
+    Assert.assertTrue(typesCatalog.resolveType("XsdType2").isPresent());
+    Assert.assertTrue(typesCatalog.resolveType("XsdType3").isPresent());
+  }
+
+  @Test
+  public void typesJsonAndXsdCatalogCanBeLoadedFromXmlFile() throws Exception {
+    final File appTypesFile = new File(TESTS_FOLDER, "json-and-xsd-catalog.xml");
+    TypesCatalogXmlLoader typesCatalogXmlLoader = new TypesCatalogXmlLoader();
+    final TypesCatalog typesCatalog = typesCatalogXmlLoader.load(appTypesFile.toURI().toURL());
+    Assert.assertTrue(typesCatalog.resolveType("XsdType1").isPresent());
+    Assert.assertTrue(typesCatalog.resolveType("XsdType2").isPresent());
+    Assert.assertTrue(typesCatalog.resolveType("JsonType1").isPresent());
+    Assert.assertTrue(typesCatalog.resolveType("JsonType2").isPresent());
+  }
+
 }

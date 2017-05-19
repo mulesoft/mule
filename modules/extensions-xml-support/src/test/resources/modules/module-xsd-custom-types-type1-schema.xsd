@@ -1,0 +1,40 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://validationnamespace.raml.org" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://validationnamespace.raml.org">
+<element name="User">
+    <complexType>
+        <sequence>
+            <element name="name">
+                <simpleType>
+                    <restriction base="string"/>
+                </simpleType>
+            </element>
+            <element name="kind">
+                <simpleType>
+                    <restriction base="string"/>
+                </simpleType>
+            </element>
+            <element name="weight">
+                <simpleType>
+                    <restriction base="double">
+                        <minInclusive value="3"/>
+                        <maxInclusive value="5"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="email">
+                <simpleType>
+                    <restriction base="string">
+                        <minLength value="2"/>
+                        <maxLength value="6"/>
+                        <pattern value="^note\d+$"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="userId">
+                <simpleType>
+                    <restriction base="string"/>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+</element>
+</schema>

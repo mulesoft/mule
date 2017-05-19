@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module name="module-custom-types"
+<module name="module-xsd-custom-types"
         minMuleVersion="4.0.0"
         xmlns="http://www.mulesoft.org/schema/mule/module"
         xmlns:mule="http://www.mulesoft.org/schema/mule/core"
@@ -10,12 +10,14 @@
 
     <operation name="operation-with-custom-types">
         <parameters>
-            <parameter name="value" type="Type1"/>
+            <parameter name="value" type="XsdType1"/>
+            <!--extra parameter without targetNamespace in the schema under XsdType3-->
+            <parameter name="value2" type="XsdType3"/>
         </parameters>
         <body>
             <mule:set-payload value="#[parameters.value]"/>
         </body>
-        <output type="Type2"/>
+        <output type="XsdType2"/>
     </operation>
 
 </module>
