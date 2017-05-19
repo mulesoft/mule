@@ -8,17 +8,16 @@ package org.mule.runtime.core.routing;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
-
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
@@ -91,13 +90,8 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     }
     this.untilSuccessfulStrategy.setUntilSuccessfulConfiguration(this);
 
-    if (untilSuccessfulStrategy instanceof MuleContextAware) {
-      ((MuleContextAware) untilSuccessfulStrategy).setMuleContext(muleContext);
-    }
-
-    if (untilSuccessfulStrategy instanceof Initialisable) {
-      ((Initialisable) untilSuccessfulStrategy).initialise();
-    }
+    initialiseIfNeeded(untilSuccessfulStrategy );
+    setMuleContextIfNeeded(untilSuccessfulStrategy, muleContext);
     String flowName = flowConstruct.getName();
     String clusterId = muleContext.getClusterId();
     eventKeyPrefix = flowName + "-" + clusterId + "-";
