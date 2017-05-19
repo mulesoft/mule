@@ -118,7 +118,7 @@ public class MultiConsumerJmsMessageReceiverTest extends AbstractMuleTestCase
         messageReceiver.initialise();
         messageReceiver.doStart();
         messageReceiver.startSubReceivers();
-        messageReceiver.doStop();g
+        messageReceiver.doStop();
 
     }
 
