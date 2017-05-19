@@ -91,7 +91,7 @@ public class MultiConsumerJmsMessageReceiverTest extends AbstractMuleTestCase
         messageReceiver.startSubReceivers();
         verify(mockMessageConsumer, never()).setMessageListener(any(MessageListener.class));
     }
-
+    
     private abstract class TestMessageConsumer implements MessageConsumer
     {
 
