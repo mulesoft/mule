@@ -73,7 +73,7 @@ set JAVA=%JAVA_HOME%\bin\java.exe
 :HAS_JAVA
 
 rem dynamically evaluate the name of the groovy jar
-for /F %%v in ('dir /b "%MULE_BASE%"\lib\opt^| findstr groovy') do set GROOVY_JAR=%%v
+for /F %%v in ('dir /b "%MULE_BASE%"\lib\launcher^| findstr groovy') do set GROOVY_JAR=%%v
 set GROOVY_PATH=%MULE_BASE%\lib\launcher\%GROOVY_JAR%
 
 rem dynamically evaluate the name of the commons-cli jar
