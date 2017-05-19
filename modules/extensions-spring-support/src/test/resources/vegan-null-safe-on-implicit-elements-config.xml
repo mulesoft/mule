@@ -6,7 +6,7 @@
                http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd">
 
 
-    <vegan:grape name="config"/>
+    <vegan:grape-config name="config"/>
 
     <flow name="grape-operation">
         <vegan:grape-operation />

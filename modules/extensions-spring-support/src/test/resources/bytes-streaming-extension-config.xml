@@ -7,7 +7,7 @@
       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd">
 
-    <marvel:dr-strange name="drStrange" />
+    <marvel:dr-strange-config name="drStrange" />
 
     <flow name="readStream">
         <marvel:read-stream config-ref="drStrange"/>

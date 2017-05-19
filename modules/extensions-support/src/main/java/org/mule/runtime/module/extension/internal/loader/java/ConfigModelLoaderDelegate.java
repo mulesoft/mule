@@ -31,6 +31,7 @@ import java.util.Optional;
 final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private static final String CONFIGURATION = "Configuration";
+  private static final String CUSTOM_CONFIG_SUFFIX = "-" + DEFAULT_CONFIG_NAME;
 
   ConfigModelLoaderDelegate(DefaultJavaModelLoaderDelegate delegate) {
     super(delegate);
@@ -54,7 +55,11 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
     Optional<Configuration> configurationAnnotation = configType.getAnnotation(Configuration.class);
     if (configurationAnnotation.isPresent()) {
       final Configuration configuration = configurationAnnotation.get();
-      configurationDeclarer = declarer.withConfig(configuration.name()).describedAs(configuration.description());
+      String name = configuration.name();
+      if (!configuration.name().toLowerCase().endsWith(DEFAULT_CONFIG_NAME)) {
+        name = name.concat(CUSTOM_CONFIG_SUFFIX);
+      }
+      configurationDeclarer = declarer.withConfig(name).describedAs(configuration.description());
     } else {
       configurationDeclarer =
           declarer.withConfig(DEFAULT_CONFIG_NAME).describedAs(DEFAULT_CONFIG_DESCRIPTION);

@@ -1744,7 +1744,7 @@
           "modelProperties": {}
         }
       ],
-      "name": "dr-strange",
+      "name": "dr-strange-config",
       "description": "",
       "modelProperties": {}
     },
@@ -2242,7 +2242,7 @@
         }
       ],
       "messageSources": [],
-      "name": "iron-man",
+      "name": "iron-man-config",
       "description": "",
       "modelProperties": {}
     }

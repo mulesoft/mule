@@ -11,9 +11,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.loadExtension;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -42,6 +39,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
 @RunWith(Parameterized.class)
 @SmallTest
 public class ParameterLayoutOrderDeclarationEnricherTestCase {
@@ -60,10 +61,10 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     objects.add(new Object[] {extensionModel.getOperationModel("implicitOrder").get(), "Operation - Implicit Order"});
     objects.add(new Object[] {extensionModel.getOperationModel("explicitOrder").get(), "Operation - Explicit Order"});
     objects.add(new Object[] {extensionModel.getOperationModel("mixedOrder").get(), "Operation - Mixed Order"});
-    objects.add(new Object[] {extensionModel.getConfigurationModel("ImplicitConfigOrder").get(), "Config - Implicit Order"});
-    objects.add(new Object[] {extensionModel.getConfigurationModel("ExplicitConfigOrder").get(), "Config - Explicit Order"});
-    objects.add(new Object[] {extensionModel.getConfigurationModel("MixedConfigOrder").get(), "Config - Mixed Order"});
-    objects.add(new Object[] {extensionModel.getConfigurationModel("InheritsConfigOrder").get(), "Config - Inherited Order"});
+    objects.add(new Object[] {extensionModel.getConfigurationModel("ImplicitOrderConfig").get(), "Config - Implicit Order"});
+    objects.add(new Object[] {extensionModel.getConfigurationModel("ExplicitOrderConfig").get(), "Config - Explicit Order"});
+    objects.add(new Object[] {extensionModel.getConfigurationModel("MixedOrderConfig").get(), "Config - Mixed Order"});
+    objects.add(new Object[] {extensionModel.getConfigurationModel("InheritsOrderConfig").get(), "Config - Inherited Order"});
     objects.add(new Object[] {extensionModel.getConnectionProviderModel("implicit-connection").get(),
         "Conn Provider - Implicit Order"});
     objects.add(new Object[] {extensionModel.getConnectionProviderModel("explicit-connection").get(),
@@ -98,7 +99,7 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
 
   @Operations(OrderedOperations.class)
   @Extension(name = "OrderedExtension")
-  @Configurations({ImplicitConfigOrder.class, ExplicitConfigOrder.class, MixedConfigOrder.class, InheritsConfigOrder.class})
+  @Configurations({ImplicitOrderConfig.class, ExplicitOrderConfig.class, MixedOrderConfig.class, InheritsOrderConfig.class})
   @ConnectionProviders({ImplicitConnProvider.class, ExplicitConnProvider.class, MixedConnProvider.class})
   @Sources({ImplicitSourceOrder.class, ExplicitSourceOrder.class, MixedSourceOrder.class, ExplicitSourceOrderWithCallbacks.class,
       MixedSourceOrderWithCallbacks.class})
@@ -122,8 +123,8 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     }
   }
 
-  @Configuration(name = "ImplicitConfigOrder")
-  public static class ImplicitConfigOrder {
+  @Configuration(name = "ImplicitOrderConfig")
+  public static class ImplicitOrderConfig {
 
     @Parameter
     String paramOne;
@@ -136,8 +137,8 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
 
   }
 
-  @Configuration(name = "ExplicitConfigOrder")
-  public static class ExplicitConfigOrder {
+  @Configuration(name = "ExplicitOrderConfig")
+  public static class ExplicitOrderConfig {
 
     @Parameter
     @Placement(order = 1)
@@ -153,8 +154,8 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
 
   }
 
-  @Configuration(name = "MixedConfigOrder")
-  public static class MixedConfigOrder {
+  @Configuration(name = "MixedOrderConfig")
+  public static class MixedOrderConfig {
 
     @Parameter
     @Placement(order = 2)
@@ -167,8 +168,8 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     String paramThree;
   }
 
-  @Configuration(name = "InheritsConfigOrder")
-  public static class InheritsConfigOrder extends AbstractConfig {
+  @Configuration(name = "InheritsOrderConfig")
+  public static class InheritsOrderConfig extends AbstractConfig {
 
     @Parameter
     String paramOne;
