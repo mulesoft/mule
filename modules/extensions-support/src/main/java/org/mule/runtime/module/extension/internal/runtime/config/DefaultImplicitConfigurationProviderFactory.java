@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.canBeUsedImplicitly;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
 import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -25,6 +27,8 @@ import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.module.extension.internal.runtime.ImmutableExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
@@ -58,8 +62,8 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
     }
 
     final String providerName = getImplicitConfigurationProviderName(extensionModel, implicitConfigurationModel);
-    final ResolverSet resolverSet =
-        buildImplicitResolverSet(implicitConfigurationModel, muleContext);
+    Callable<ResolverSet> resolverSetCallable = () -> buildImplicitResolverSet(implicitConfigurationModel, muleContext);
+    final ResolverSet resolverSet = withContextClassLoader(getClassLoader(extensionModel), resolverSetCallable);
     try {
       ImplicitConnectionProviderValueResolver implicitConnectionProviderValueResolver =
           new ImplicitConnectionProviderValueResolver(implicitConfigurationModel.getName(), extensionModel,

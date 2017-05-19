@@ -14,6 +14,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.OnException;
@@ -21,16 +22,16 @@ import org.mule.runtime.extension.api.annotation.RestrictedTo;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
@@ -264,6 +265,11 @@ public class HeisenbergOperations implements Disposable {
   @Ignore
   public void ignoredOperation() {
 
+  }
+
+  public String operationWithInputStreamContentParam(@ParameterGroup(name = "Test",
+      showInDsl = true) InputStreamParameterGroup isGroup) {
+    return IOUtils.toString(isGroup.getContent());
   }
 
   public void throwError() {

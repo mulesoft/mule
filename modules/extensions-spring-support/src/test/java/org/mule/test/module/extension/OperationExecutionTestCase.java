@@ -49,11 +49,7 @@ import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
-import org.hamcrest.Matchers;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
+import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,6 +57,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.hamcrest.Matchers;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -477,6 +478,18 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
     List<Map<String, String>> result = (List<Map<String, String>>) event.getMessage().getPayload().getValue();
     assertThat(result, hasSize(1));
     assertThat(result.get(0).get(Apple.class.getSimpleName()), is(expectedMessage));
+  }
+
+  @Test
+  public void operationWithInputStreamContentParameterInParameterGroup() throws Exception {
+    String theMessage = "This is an important message";
+    Object result = flowRunner("operationWithInputStreamContentParam")
+        .withVariable("msg", new ByteArrayInputStream(theMessage.getBytes()))
+        .run()
+        .getMessage()
+        .getPayload()
+        .getValue();
+    assertThat(result, is(theMessage));
   }
 
   private void assertDynamicDoor(String flowName) throws Exception {
