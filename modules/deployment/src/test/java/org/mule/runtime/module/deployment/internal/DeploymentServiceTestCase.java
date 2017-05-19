@@ -86,15 +86,6 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
@@ -174,6 +165,16 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
+
 @RunWith(Parameterized.class)
 public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
@@ -202,7 +203,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private static final String MIN_MULE_VERSION = "4.0.0";
   private static final String POLICY_PROPERTY_VALUE = "policyPropertyValue";
   private static final String POLICY_PROPERTY_KEY = "policyPropertyKey";
-  public static final String PRIVILEGED_EXTENSION_PLUGIN_NAME = "privilegedExtensionPlugin";
+  public static final String PRIVILEGED_EXTENSION_ARTIFACT_ID = "privilegedExtensionPlugin";
 
   private DefaultClassLoaderManager artifactClassLoaderManager;
   private ModuleRepository moduleRepository;
@@ -316,7 +317,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                           "/,  META-INF/mule-simple.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
 
   private final ArtifactPluginFileBuilder privilegedExtensionPlugin =
-      new ArtifactPluginFileBuilder(PRIVILEGED_EXTENSION_PLUGIN_NAME)
+      new ArtifactPluginFileBuilder(PRIVILEGED_EXTENSION_ARTIFACT_ID)
           .dependingOn(new JarFileBuilder("privilegedExtensionV1", privilegedExtensionV1JarFile))
           .configuredWith(EXPORTED_RESOURCE_PROPERTY,
                           "/,  META-INF/mule-privileged.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
@@ -474,7 +475,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     applicationDeploymentListener = mock(DeploymentListener.class);
     domainDeploymentListener = mock(DeploymentListener.class);
-    moduleDiscoverer = new TestContainerModuleDiscoverer(singletonList(PRIVILEGED_EXTENSION_PLUGIN_NAME));
+    moduleDiscoverer = new TestContainerModuleDiscoverer(singletonList(PRIVILEGED_EXTENSION_ARTIFACT_ID));
     moduleRepository = new DefaultModuleRepository(moduleDiscoverer);
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
         new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();

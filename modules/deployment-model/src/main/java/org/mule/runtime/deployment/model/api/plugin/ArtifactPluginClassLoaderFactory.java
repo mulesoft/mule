@@ -64,7 +64,7 @@ public class ArtifactPluginClassLoaderFactory implements ArtifactClassLoaderFact
     ContainerOnlyLookupStrategy containerOnlyLookupStrategy = new ContainerOnlyLookupStrategy(this.getClass().getClassLoader());
 
     for (MuleModule module : moduleRepository.getModules()) {
-      if (module.getPrivilegedArtifacts().contains(descriptor.getName())) {
+      if (module.getPrivilegedArtifacts().contains(descriptor.getBundleDescriptor().getArtifactId())) {
         for (String packageName : module.getPrivilegedExportedPackages()) {
           pluginsLookupPolicies.put(packageName, containerOnlyLookupStrategy);
         }
