@@ -15,13 +15,13 @@ public abstract class HttpConstants {
     POST, GET, PUT, PATCH, OPTIONS, HEAD, DELETE;
   }
 
-  public static enum Protocols {
+  public enum Protocol {
     HTTP("http", 80), HTTPS("https", 443);
 
     private final String scheme;
     private final int defaultPort;
 
-    Protocols(String scheme, int defaultPort) {
+    Protocol(String scheme, int defaultPort) {
       this.scheme = scheme;
       this.defaultPort = defaultPort;
     }

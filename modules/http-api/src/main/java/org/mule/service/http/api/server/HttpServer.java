@@ -6,6 +6,8 @@
  */
 package org.mule.service.http.api.server;
 
+import org.mule.service.http.api.HttpConstants.Protocol;
+
 import java.io.IOException;
 import java.util.Collection;
 
@@ -37,6 +39,11 @@ public interface HttpServer {
    * @return the server address this server is listening on.
    */
   ServerAddress getServerAddress();
+
+  /**
+   * @return the protocol (HTTP or HTTPS) this server is expecting.
+   */
+  Protocol getProtocol();
 
   /**
    * @return true if the server is currently stopping, false if it's stopped already or if it's not doing stop.
