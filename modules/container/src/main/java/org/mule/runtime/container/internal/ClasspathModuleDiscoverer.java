@@ -33,7 +33,7 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   public static final String MODULE_PROPERTIES = "META-INF/mule-module.properties";
   public static final String EXPORTED_CLASS_PACKAGES_PROPERTY = "artifact.export.classPackages";
   public static final String PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY = "artifact.privileged.classPackages";
-  public static final String PRIVILEGED_ARTIFACTS_PROPERTY = "artifact.privileged.artifacts";
+  public static final String PRIVILEGED_ARTIFACTS_PROPERTY = "artifact.privileged.artifactIds";
   public static final String EXPORTED_RESOURCE_PROPERTY = "artifact.export.resources";
   public static final String EXPORTED_SERVICES_PROPERTY = "artifact.export.services";
 
