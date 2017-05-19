@@ -187,6 +187,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.setMuleContext(muleContext);
     untilSuccessful.initialise();
     untilSuccessful.start();
+    muleContext.start();
     ponderUntilEventProcessed(testEvent());
   }
 

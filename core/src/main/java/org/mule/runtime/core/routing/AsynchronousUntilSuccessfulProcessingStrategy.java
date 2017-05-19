@@ -9,26 +9,30 @@ package org.mule.runtime.core.routing;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
+import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STARTED;
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 import static org.mule.runtime.core.util.StringUtils.DASH;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.context.notification.MuleContextNotification;
+import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -51,12 +55,13 @@ import org.slf4j.LoggerFactory;
  * dead letter queue route then it will be handled by the flow exception strategy.
  */
 public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilSuccessfulProcessingStrategy
-    implements Initialisable, Startable, Stoppable, MessagingExceptionHandlerAware {
+    implements Initialisable, Disposable, Startable, Stoppable, MessagingExceptionHandlerAware {
 
   private static final String UNTIL_SUCCESSFUL_MSG_PREFIX = "until-successful retries exhausted. Last exception message was: %s";
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
   private MessagingExceptionHandler messagingExceptionHandler;
   private Scheduler pool;
+  private MuleContextNotificationListener<MuleContextNotification> contextStartListener;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -66,14 +71,31 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
                                             .createStaticMessage("A ListableObjectStore must be configured on UntilSuccessful."),
                                         this);
     }
+
+    contextStartListener = new MuleContextNotificationListener<MuleContextNotification>() {
+
+      @Override
+      public void onNotification(MuleContextNotification notification) {
+        if (notification.getAction() == CONTEXT_STARTED) {
+          muleContext.unregisterListener(this);
+          contextStartListener = null;
+
+          scheduleAllPendingEventsForProcessing();
+        }
+      }
+    };
+
+    try {
+      muleContext.registerListener(contextStartListener);
+    } catch (NotificationException e) {
+      throw new InitialisationException(e, this);
+    }
   }
 
   @Override
   public void start() {
     pool = muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig()
         .withName(format("%s.%s", getUntilSuccessfulConfiguration().getFlowConstruct().getName(), "until-successful")));
-
-    scheduleAllPendingEventsForProcessing();
   }
 
   @Override
@@ -263,4 +285,10 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     this.messagingExceptionHandler = messagingExceptionHandler;
   }
 
+  @Override
+  public void dispose() {
+    if (contextStartListener != null) {
+      muleContext.unregisterListener(contextStartListener);
+    }
+  }
 }
