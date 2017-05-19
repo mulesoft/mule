@@ -132,11 +132,11 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testModuleCustomTypes() throws IOException {
-    String modulePath = "modules/module-custom-types.xml";
+  public void testModuleJsonCustomTypes() throws IOException {
+    String modulePath = "modules/module-json-custom-types.xml";
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
-    assertThat(extensionModel.getName(), is("module-custom-types"));
+    assertThat(extensionModel.getName(), is("module-json-custom-types"));
     assertThat(extensionModel.getMinMuleVersion(), is(DEFAULT_MIN_MULE_VERSION));
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
@@ -156,6 +156,51 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(operation.getOutput().getType().getMetadataFormat(), is(MetadataFormat.JSON));
     assertThat(operation.getOutput().getType(), instanceOf(ObjectType.class));
     assertThat(((ObjectType) operation.getOutput().getType()).getFields().size(), is(3));
+
+    Optional<OperationComponentModelModelProperty> modelProperty =
+        operation.getModelProperty(OperationComponentModelModelProperty.class);
+    assertThat(modelProperty.isPresent(), is(true));
+    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(1));
+  }
+
+  @Test
+  public void testModuleXsdCustomTypes() throws IOException {
+    String modulePath = "modules/module-xsd-custom-types.xml";
+    ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
+
+    assertThat(extensionModel.getName(), is("module-xsd-custom-types"));
+    assertThat(extensionModel.getMinMuleVersion(), is(DEFAULT_MIN_MULE_VERSION));
+    assertThat(extensionModel.getConfigurationModels().size(), is(0));
+    assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
+    assertThat(extensionModel.getOperationModels().size(), is(1));
+
+    Optional<OperationModel> operationModel = extensionModel.getOperationModel("operation-with-custom-types");
+    assertThat(operationModel.isPresent(), is(true));
+    final OperationModel operation = operationModel.get();
+    assertThat(operation.getAllParameterModels().size(), is(3));
+    assertThat(operation.getAllParameterModels().get(2).getName(), is(TARGET_PARAMETER_NAME));
+
+    final ParameterModel firstParameterValueModel = operation.getAllParameterModels().get(0);
+    assertThat(firstParameterValueModel.getName(), is("value"));
+    assertThat(firstParameterValueModel.getType().getMetadataFormat(), is(MetadataFormat.XML));
+    assertThat(firstParameterValueModel.getType(), instanceOf(ObjectType.class));
+    final ObjectType firstInputParameterObjectType = (ObjectType) firstParameterValueModel.getType();
+    assertThat(firstInputParameterObjectType.getFields().size(), is(1));
+    assertThat(firstInputParameterObjectType.getFieldByName("User").isPresent(), is(true));
+
+    final ParameterModel secondParameterValueModel = operation.getAllParameterModels().get(1);
+    assertThat(secondParameterValueModel.getName(), is("value2"));
+    assertThat(secondParameterValueModel.getType().getMetadataFormat(), is(MetadataFormat.XML));
+    assertThat(secondParameterValueModel.getType(), instanceOf(ObjectType.class));
+    final ObjectType secondInputParameterObjectType = (ObjectType) secondParameterValueModel.getType();
+    assertThat(secondInputParameterObjectType.getFields().size(), is(1));
+    assertThat(secondInputParameterObjectType.getFieldByName("Root").isPresent(), is(true));
+
+    assertThat(operation.getOutput().getType().getMetadataFormat(), is(MetadataFormat.XML));
+    assertThat(operation.getOutput().getType(), instanceOf(ObjectType.class));
+    final ObjectType outputObjectType = (ObjectType) operation.getOutput().getType();
+    assertThat(outputObjectType.getFields().size(), is(1));
+    assertThat(outputObjectType.getFieldByName("Root0").isPresent(), is(true));
 
     Optional<OperationComponentModelModelProperty> modelProperty =
         operation.getModelProperty(OperationComponentModelModelProperty.class);

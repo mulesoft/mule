@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<types:mule xmlns="http://www.mulesoft.org/schema/mule/core"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:types="http://www.mulesoft.org/schema/mule/types">
+
+    <types:catalog>
+        <types:type name="XsdType1" location="./type1-schema.xsd" element="Root"/>
+        <types:type name="XsdType2" location="./type2-schema.xsd" element="{http://uri}Root0"/>
+        <types:type name="XsdType3" location="./type3-schema-from-raml-type.xsd" element="{http://validationnamespace.raml.org}objectName"/>
+    </types:catalog>
+
+</types:mule>

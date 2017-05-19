@@ -15,6 +15,8 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.impl.BaseMetadataType;
 import org.mule.metadata.json.JsonTypeLoader;
+import org.mule.metadata.xml.SchemaCollector;
+import org.mule.metadata.xml.XmlTypeLoader;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
@@ -31,14 +33,35 @@ import java.util.Optional;
  */
 public class SingleTypeResolver implements TypeResolver {
 
+  private static final String JSON_SUFFIX = "json";
+  private static final String XSD_SUFFIX = "xsd";
   private String typeIdentifier;
   private final TypeLoader typeLoader;
+  private final String element;
 
-  public SingleTypeResolver(String typeIdentifier, URL schemaUrl) {
+  public SingleTypeResolver(String typeIdentifier, URL schemaUrl, String element) {
     Preconditions.checkNotNull(typeIdentifier);
     Preconditions.checkNotNull(schemaUrl);
-    typeLoader = new JsonTypeLoader(getSchemaData(schemaUrl));
+    this.element = element;
+    typeLoader = getTypeLoader(schemaUrl);
     this.typeIdentifier = typeIdentifier;
+  }
+
+  private TypeLoader getTypeLoader(URL schemaUrl) {
+    final TypeLoader loader;
+    if (schemaUrl.toString().endsWith(JSON_SUFFIX)) {
+      loader = new JsonTypeLoader(getSchemaData(schemaUrl));
+    } else if (schemaUrl.toString().endsWith(XSD_SUFFIX)) {
+      final SchemaCollector instance = SchemaCollector.getInstance();
+      instance.addSchema(schemaUrl);
+      loader = new XmlTypeLoader(instance);
+    } else {
+      throw new RuntimeException(format("The schema trying to be read [%s] is of a unknown type. Currently JSON or XML schemas are supported, and the must end with the suffix [%s] or [%s], respectively",
+                                        schemaUrl.toString(),
+                                        JSON_SUFFIX,
+                                        XSD_SUFFIX));
+    }
+    return loader;
   }
 
   private String getSchemaData(URL schemaUrl) {
@@ -61,7 +84,7 @@ public class SingleTypeResolver implements TypeResolver {
    * @return
    */
   private Optional<MetadataType> getTypeWhileAddingIDToMakeItSerializable(String typeIdentifier) {
-    final Optional<MetadataType> load = typeLoader.load(typeIdentifier);
+    final Optional<MetadataType> load = loadMetadataTypeWithoutNPE();
     load.ifPresent(metadataType -> {
       if (metadataType instanceof ObjectType) {
         try {
@@ -77,5 +100,22 @@ public class SingleTypeResolver implements TypeResolver {
       }
     });
     return load;
+  }
+
+  private Optional<MetadataType> loadMetadataTypeWithoutNPE() {
+    try {
+      return typeLoader.load(element);
+    } catch (RuntimeException e) {
+      if (e.getCause() instanceof NullPointerException) {
+        throw new RuntimeException(format(
+                                          "the Smart Connector catalog's is missing the 'element' attribute due to MDM-42, which throws an NPE.\n"
+                                              + "To workaround this issue, add an 'element' attribute with the proper QName for the type [%s] with the convention \"{<targetNamespace>}<rootElement>\"\n"
+                                              + "e.g: if targetNamespace=\"http://validationnamespace.raml.org\" and element name is \"User\", then the following value should be used"
+                                              + "element=\"{http://validationnamespace.raml.org}User\"",
+                                          typeIdentifier),
+                                   e.getCause());
+      }
+      throw e;
+    }
   }
 }

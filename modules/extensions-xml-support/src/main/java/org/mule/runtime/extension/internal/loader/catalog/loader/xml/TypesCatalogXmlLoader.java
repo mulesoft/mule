@@ -37,6 +37,7 @@ public class TypesCatalogXmlLoader {
   private static final QName ELEM_TYPE = new QName(NS_TYPES, "type");
   private static final String ELEM_TYPE_ATTR_NAME = "name";
   private static final String ELEM_TYPE_ATTR_LOCATION = "location";
+  private static final String ELEM_TYPE_ATTR_ELEMENT = "element";
 
   public TypesCatalog load(URL resourceType) throws Exception {
     TypesCatalogBuilder typesCatalogBuilder = new TypesCatalogBuilder(resourceType.toURI());
@@ -56,6 +57,7 @@ public class TypesCatalogXmlLoader {
             typesCatalogBuilder.addTypesResolver(typesResolverBuilder -> {
               type.matchAttribute(ELEM_TYPE_ATTR_NAME).ifPresent(typesResolverBuilder::name);
               type.matchAttribute(ELEM_TYPE_ATTR_LOCATION).ifPresent(typesResolverBuilder::location);
+              type.matchAttribute(ELEM_TYPE_ATTR_ELEMENT).ifPresent(typesResolverBuilder::element);
             });
           });
         });

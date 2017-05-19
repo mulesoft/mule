@@ -27,6 +27,7 @@ public class TypesResolverBuilder {
   private final URI baseUri;
   private String name;
   private String location;
+  private String element;
 
   public TypesResolverBuilder(URI baseUri) {
     this.baseUri = baseUri;
@@ -40,9 +41,13 @@ public class TypesResolverBuilder {
     this.location = location;
   }
 
+  public void element(String element) {
+    this.element = element;
+  }
+
   public TypeResolver build() throws Exception {
     URI schemaURI = baseUri != null ? customResolve() : new URI(location);
-    return new SingleTypeResolver(name, schemaURI.toURL());
+    return new SingleTypeResolver(name, schemaURI.toURL(), element);
   }
 
   /**
