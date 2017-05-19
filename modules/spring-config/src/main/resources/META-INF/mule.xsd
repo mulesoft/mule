@@ -2482,7 +2482,7 @@
         <xsd:complexContent>
             <xsd:extension base="annotatedType">
                 <xsd:sequence>
-                    <xsd:element ref="abstract-scheduling-strategy" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element ref="abstract-scheduling-strategy" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -2543,7 +2543,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractMessageSourceType">
                 <xsd:sequence>
-                    <xsd:element ref="scheduling-strategy" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element ref="scheduling-strategy" minOccurs="1" maxOccurs="1"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
