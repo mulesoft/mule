@@ -8,10 +8,12 @@ package org.mule.util;
 
 import static java.util.Collections.synchronizedSet;
 
+import org.mule.api.processor.DefaultMessageProcessorPathElement;
 import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
+import org.mule.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.processor.chain.DynamicMessageProcessorContainer;
 import org.mule.processor.chain.InterceptingChainLifecycleWrapperPathSkip;
 
@@ -94,13 +96,16 @@ public class NotificationUtils
                 MessageProcessorPathElement messageProcessorPathElement;
 
                 // To avoid adding a level in some path elements:
-                if (!(mp instanceof InterceptingChainLifecycleWrapperPathSkip))
+                if (mp instanceof InterceptingChainLifecycleWrapperPathSkip || mp instanceof TransactionalInterceptingMessageProcessor)
                 {
-                    messageProcessorPathElement = parentElement.addChild(mp);
+                    //This messageProcessorPathElement is fictional and is never added to the path but is needed to continue adding children recursively
+                    messageProcessorPathElement = new DefaultMessageProcessorPathElement(mp,String.valueOf(0)); //The name could be any since it's never added to any path
+                    messageProcessorPathElement.setParent(parentElement);
                 }
                 else
                 {
-                    messageProcessorPathElement = parentElement;
+                    messageProcessorPathElement = parentElement.addChild(mp);
+
                 }
                 if (messageProcessorPathElement != null && mp instanceof MessageProcessorContainer)
                 {
