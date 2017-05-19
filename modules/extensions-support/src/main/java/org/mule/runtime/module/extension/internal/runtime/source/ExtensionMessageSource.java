@@ -183,15 +183,15 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void restart() throws MuleException {
-    if (started.get()) {
-      synchronized (started) {
+    synchronized (started) {
+      if (started.get()) {
         stopSource();
         disposeSource();
         startSource();
+      } else {
+        LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", sourceAdapter.getName(),
+                           flowConstruct.getName()));
       }
-    } else {
-      LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", sourceAdapter.getName(),
-                         flowConstruct.getName()));
     }
   }
 
