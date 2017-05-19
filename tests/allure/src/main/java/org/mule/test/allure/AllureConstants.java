@@ -298,6 +298,11 @@ public interface AllureConstants {
       String LIFECYCLE_PHASE_FAILURE_STORY = "Lifecycle Phase Failure";
     }
 
+    interface MuleContextStartOrderStory {
+
+      String MULE_CONTEXT_START_ORDER_STORY = "MuleContext start order";
+    }
+
   }
 
   interface MuleDsl {
