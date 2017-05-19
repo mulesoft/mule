@@ -30,7 +30,6 @@
         <module>oauth-api</module>
         <module>policy-api</module>
         <module>reboot</module>
-        <module>schedulers</module>
         <module>spring-config</module>
         <module>service</module>
 
