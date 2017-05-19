@@ -286,4 +286,12 @@
             </heisenberg:sales>
         </heisenberg:process-sale>
     </flow>
+
+    <flow name="operationWithInputStreamContentParam">
+        <heisenberg:operation-with-input-stream-content-param>
+            <heisenberg:test>
+                <heisenberg:content>#[msg]</heisenberg:content>
+            </heisenberg:test>
+        </heisenberg:operation-with-input-stream-content-param>
+    </flow>
 </mule>

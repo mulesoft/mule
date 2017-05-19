@@ -87,53 +87,58 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     when(serviceRegistry.lookupProviders(DeclarationEnricher.class, classLoader))
         .thenReturn(asList(new JavaXmlDeclarationEnricher()));
 
-    final List<SchemaGeneratorTestUnit> extensions = Arrays.asList(
-                                                                   new SchemaGeneratorTestUnit(javaLoader, MapConnector.class,
-                                                                                               "map.json"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader, ListConnector.class,
-                                                                                               "list.json"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader, TestConnector.class,
-                                                                                               "basic.json"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               StringListConnector.class,
-                                                                                               "string-list.json"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               GlobalPojoConnector.class,
-                                                                                               "global-pojo.json"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               GlobalInnerPojoConnector.class,
-                                                                                               "global-inner-pojo.json"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader, VeganExtension.class,
-                                                                                               "vegan.json"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               PetStoreConnector.class,
-                                                                                               "petstore.json"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               MetadataExtension.class,
-                                                                                               "metadata.json"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               HeisenbergExtension.class,
-                                                                                               "heisenberg.json"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               TransactionalExtension.class,
-                                                                                               "tx-ext.json"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               SubTypesMappingConnector.class,
-                                                                                               "subtypes.json"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader, MarvelExtension.class,
-                                                                                               "marvel.json"),
-                                                                   new SchemaGeneratorTestUnit(soapLoader,
-                                                                                               FootballSoapExtension.class,
-                                                                                               "soap.json"),
-                                                                   new SchemaGeneratorTestUnit(soapLoader,
-                                                                                               RickAndMortyExtension.class,
-                                                                                               "ram.json"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               TypedValueExtension.class,
-                                                                                               "typed-value.json"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               TestOAuthExtension.class,
-                                                                                               "test-oauth.json"));
+    final List<ExtensionJsonGeneratorTestUnit> extensions = Arrays.asList(
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             MapConnector.class,
+                                                                                                             "map.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             ListConnector.class,
+                                                                                                             "list.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             TestConnector.class,
+                                                                                                             "basic.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             StringListConnector.class,
+                                                                                                             "string-list.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             GlobalPojoConnector.class,
+                                                                                                             "global-pojo.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             GlobalInnerPojoConnector.class,
+                                                                                                             "global-inner-pojo.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             VeganExtension.class,
+                                                                                                             "vegan.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             PetStoreConnector.class,
+                                                                                                             "petstore.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             MetadataExtension.class,
+                                                                                                             "metadata.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             HeisenbergExtension.class,
+                                                                                                             "heisenberg.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             TransactionalExtension.class,
+                                                                                                             "tx-ext.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             SubTypesMappingConnector.class,
+                                                                                                             "subtypes.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             MarvelExtension.class,
+                                                                                                             "marvel.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(soapLoader,
+                                                                                                             FootballSoapExtension.class,
+                                                                                                             "soap.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(soapLoader,
+                                                                                                             RickAndMortyExtension.class,
+                                                                                                             "ram.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             TypedValueExtension.class,
+                                                                                                             "typed-value.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             TestOAuthExtension.class,
+                                                                                                             "test-oauth.json"));
 
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
       ExtensionModel model = loadExtension(extension, loader);
@@ -175,13 +180,13 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     return loader.loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
   }
 
-  static class SchemaGeneratorTestUnit {
+  static class ExtensionJsonGeneratorTestUnit {
 
     final ExtensionModelLoader loader;
     final Class<?> extensionClass;
     final String fileName;
 
-    SchemaGeneratorTestUnit(ExtensionModelLoader loader, Class<?> extensionClass, String fileName) {
+    ExtensionJsonGeneratorTestUnit(ExtensionModelLoader loader, Class<?> extensionClass, String fileName) {
       this.loader = loader;
       this.extensionClass = extensionClass;
       this.fileName = fileName;
