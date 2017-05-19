@@ -7,8 +7,11 @@
 package org.mule.test.module.extension.connector;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.connectionException;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.executor;
+
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -55,7 +58,10 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
       startFlow("source-fail-on-start");
     } catch (Exception e) {
       new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
-          .check(new JUnitLambdaProbe(() -> PetStoreConnector.timesStarted == 2));
+          .check(new JUnitLambdaProbe(() -> {
+            assertThat(PetStoreConnector.timesStarted, is(2));
+            return true;
+          }));
       throw e;
     }
   }
@@ -64,7 +70,10 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
   public void retryPolicySourceFailOnException() throws Exception {
     startFlow("source-fail-on-exception");
     new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS)
-        .check(new JUnitLambdaProbe(() -> PetStoreConnector.timesStarted == 3));
+        .check(new JUnitLambdaProbe(() -> {
+          assertThat(PetStoreConnector.timesStarted, is(3));
+          return true;
+        }));
   }
 
   private void startFlow(String flowName) throws Exception {
