@@ -6,14 +6,6 @@
  */
 package org.mule.runtime.core.processor.interceptor;
 
-import static java.lang.String.valueOf;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
-import static reactor.core.Exceptions.propagate;
-import static reactor.core.publisher.Mono.from;
-import static reactor.core.publisher.Mono.fromFuture;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.interception.InterceptionAction;
@@ -38,7 +30,12 @@ import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import reactor.core.Exceptions;
+import static java.lang.String.valueOf;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.fromFuture;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
@@ -111,7 +108,8 @@ public class ReactiveInterceptorAdapter
                                             Map<String, String> dslParameters,
                                             ReactiveProcessor next) {
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
-    final ReactiveInterceptionAction reactiveInterceptionAction = new ReactiveInterceptionAction(interceptionEvent, next);
+    final ReactiveInterceptionAction reactiveInterceptionAction =
+        new ReactiveInterceptionAction(interceptionEvent, next, component, flowConstruct.getMuleContext());
     return interceptor.around(resolveParameters(event, component, dslParameters), interceptionEvent,
                               reactiveInterceptionAction)
         .exceptionally(t -> {

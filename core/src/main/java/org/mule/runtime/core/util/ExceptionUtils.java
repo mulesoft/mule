@@ -6,14 +6,6 @@
  */
 package org.mule.runtime.core.util;
 
-import static java.util.Arrays.stream;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
-import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
-import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
@@ -26,11 +18,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.ErrorMapping;
-import org.mule.runtime.core.exception.ErrorTypeLocator;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.exception.TypedException;
-import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
+import org.mule.runtime.core.exception.*;
 import org.mule.runtime.core.message.ErrorBuilder;
 
 import java.util.List;
@@ -38,6 +26,14 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+
+import static java.util.Arrays.stream;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
+import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
+import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 
 /**
  * Mule exception utilities.
@@ -260,8 +256,8 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
     return !error.get().getCause().equals(throwable);
   }
 
-  private static Error getErrorFromFailingProcessor(Object annotatedObject, Throwable causeException,
-                                                    ErrorTypeLocator errorTypeLocator) {
+  public static Error getErrorFromFailingProcessor(Object annotatedObject, Throwable causeException,
+                                                   ErrorTypeLocator errorTypeLocator) {
     ErrorType errorType = getErrorTypeFromFailingProcessor(annotatedObject, causeException, errorTypeLocator);
     if (causeException instanceof TypedException) {
       causeException = causeException.getCause();

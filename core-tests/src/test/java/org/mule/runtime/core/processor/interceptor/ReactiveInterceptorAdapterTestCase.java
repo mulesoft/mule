@@ -6,51 +6,7 @@
  */
 package org.mule.runtime.core.processor.interceptor;
 
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.hamcrest.collection.IsMapContaining.hasEntry;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.PROCESSOR;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
-import static org.mule.runtime.core.api.construct.Flow.builder;
-import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
-import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.interception.InterceptionAction;
-import org.mule.runtime.api.interception.InterceptionEvent;
-import org.mule.runtime.api.interception.ProcessorInterceptor;
-import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
-import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
 import com.google.common.collect.ImmutableMap;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
-import javax.xml.namespace.QName;
-
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -60,6 +16,44 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
+import org.mockito.Mockito;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.interception.*;
+import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import javax.xml.namespace.QName;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.PROCESSOR;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
+import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 
 /*
  * The test methods with 'noMock' suffix exercise the optimized interception path when 'around' is not implemented.
@@ -278,6 +272,69 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     Event result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
+
+    InOrder inOrder = inOrder(processor, interceptor);
+
+    inOrder.verify(interceptor).before(mapArgWithEntry("param", ""), any());
+    inOrder.verify(interceptor).around(mapArgWithEntry("param", ""), any(), any());
+    inOrder.verify(processor, never()).process(any());
+    inOrder.verify(interceptor).after(argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
+  }
+
+  @Test
+  public void interceptorMutatesEventAroundAfterFailWithErrorType() throws Exception {
+    ErrorType errorTypeMock = Mockito.mock(ErrorType.class);
+    ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(Map<String, Object> parameters, InterceptionEvent event,
+                                                         InterceptionAction action) {
+        action.fail(errorTypeMock);
+        return supplyAsync(() -> {
+          event.message(Message.of(TEST_PAYLOAD));
+          return event;
+        });
+      }
+    });
+    startFlowWithInterceptors(interceptor);
+
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
+    assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
+    assertThat(result.getError().isPresent(), is(true));
+    assertThat(result.getError().get().getCause(), is(instanceOf(InterceptionException.class)));
+    assertThat(result.getError().get().getErrorType(), is(equalTo(errorTypeMock)));
+
+    InOrder inOrder = inOrder(processor, interceptor);
+
+    inOrder.verify(interceptor).before(mapArgWithEntry("param", ""), any());
+    inOrder.verify(interceptor).around(mapArgWithEntry("param", ""), any(), any());
+    inOrder.verify(processor, never()).process(any());
+    inOrder.verify(interceptor).after(argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
+  }
+
+  @Test
+  public void interceptorMutatesEventAroundAfterFailWithCause() throws Exception {
+    Throwable cause = new RuntimeException("");
+    ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(Map<String, Object> parameters, InterceptionEvent event,
+                                                         InterceptionAction action) {
+        action.fail(cause);
+        return supplyAsync(() -> {
+          event.message(Message.of(TEST_PAYLOAD));
+          return event;
+        });
+      }
+    });
+    startFlowWithInterceptors(interceptor);
+
+    Event result = process(flow, eventBuilder().message(Message.of("")).build());
+    assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
+    assertThat(result.getError().isPresent(), is(true));
+    assertThat(result.getError().get().getCause(), is(instanceOf(RuntimeException.class)));
+    assertThat(result.getError().get().getErrorType().getNamespace(), is(equalTo("MULE")));
+    assertThat(result.getError().get().getErrorType().getIdentifier(), is(equalTo("UNKNOWN")));
 
     InOrder inOrder = inOrder(processor, interceptor);
 
