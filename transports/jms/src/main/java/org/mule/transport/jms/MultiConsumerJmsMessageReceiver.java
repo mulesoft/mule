@@ -340,7 +340,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 {
                     if (force)
                     {
-                        logger.warn("Unable to cleanly stop subreceiver: " + e.getMessage());
+                        logger.warn("Unable to cleanly stop subreceiver", e);
                         started = false;
                     }
                     else
