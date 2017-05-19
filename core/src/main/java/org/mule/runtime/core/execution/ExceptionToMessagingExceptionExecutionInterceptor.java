@@ -6,20 +6,23 @@
  */
 package org.mule.runtime.core.execution;
 
-import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
-import static org.mule.runtime.core.util.ExceptionUtils.getRootCauseException;
 import static org.mule.runtime.core.util.ExceptionUtils.putContext;
+import static org.mule.runtime.core.util.ExceptionUtils.updateMessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Replace any exception thrown with a MessagingException
  */
 public class ExceptionToMessagingExceptionExecutionInterceptor implements MessageProcessorExecutionInterceptor {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionToMessagingExceptionExecutionInterceptor.class);
   private MuleContext muleContext;
   private FlowConstruct flowConstruct;
 
@@ -30,23 +33,12 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
     } catch (Exception exception) {
       MessagingException messagingException;
       if (exception instanceof MessagingException) {
-        //Use same exception, but make sure whether a new error is needed
         messagingException = (MessagingException) exception;
-        // TODO - MULE-10266 - Once we remove the usage of MessagingException from within the mule component we can get rid of the
-        // messagingException.causedExactlyBy(..) condition.
-        event = createErrorEvent(event, messageProcessor, messagingException, muleContext.getErrorTypeLocator());
       } else {
-        //Create a ME and an error, both using the exception
-        messagingException = new MessagingException(event, getRootCauseException(exception), messageProcessor);
-        messagingException
-            .setProcessedEvent(createErrorEvent(event, messageProcessor, messagingException, muleContext.getErrorTypeLocator()));
+        messagingException = new MessagingException(event, exception, messageProcessor);
       }
-
-      if (messagingException.getFailingMessageProcessor() == null) {
-        throw putContext(messagingException, messageProcessor, event, flowConstruct, muleContext);
-      } else {
-        throw putContext(messagingException, messagingException.getFailingMessageProcessor(), event, flowConstruct, muleContext);
-      }
+      throw updateMessagingException(LOGGER, messageProcessor, messagingException, muleContext.getErrorTypeLocator(),
+                                     muleContext.getErrorTypeRepository(), flowConstruct, muleContext);
     } catch (Throwable ex) {
       throw putContext(new MessagingException(event, ex, messageProcessor), messageProcessor, event, flowConstruct, muleContext);
     }
