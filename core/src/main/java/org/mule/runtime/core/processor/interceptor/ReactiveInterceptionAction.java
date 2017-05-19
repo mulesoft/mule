@@ -16,6 +16,7 @@ import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.interception.DefaultInterceptionEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
@@ -29,11 +30,13 @@ class ReactiveInterceptionAction implements InterceptionAction {
 
   private DefaultInterceptionEvent interceptionEvent;
   private ReactiveProcessor next;
+  private Processor processor;
 
   public ReactiveInterceptionAction(DefaultInterceptionEvent interceptionEvent,
-                                    ReactiveProcessor next) {
+                                    ReactiveProcessor next, Processor processor) {
     this.interceptionEvent = interceptionEvent;
     this.next = next;
+    this.processor = processor;
   }
 
   @Override
@@ -50,10 +53,12 @@ class ReactiveInterceptionAction implements InterceptionAction {
     interceptionEvent.resolve();
     return completedFuture(interceptionEvent);
   }
-  
+
   @Override
   public CompletableFuture<InterceptionEvent> fail(ErrorType errorType, Throwable cause) {
     interceptionEvent.setError(errorType, cause);
-    return completedFuture(interceptionEvent);
+    CompletableFuture<InterceptionEvent> completableFuture = new CompletableFuture<>();
+    completableFuture.completeExceptionally(new MessagingException(interceptionEvent.resolve(), cause, processor));
+    return completableFuture;
   }
 }
