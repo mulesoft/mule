@@ -133,6 +133,7 @@
                 <!-- Modules -->
                 <include>org.mule.runtime:mule-module-artifact</include>
                 <include>org.mule.runtime:mule-module-launcher</include>
+                <include>org.mule.runtime:mule-module-logging</include>
                 <include>org.mule.runtime:mule-module-global-config</include>
                 <include>org.mule.runtime:mule-module-deployment</include>
                 <include>org.mule.runtime:mule-module-deployment-model</include>
@@ -224,6 +225,7 @@
                 <exclude>org.mule.runtime:mule-module-extensions-xml-support</exclude>
                 <exclude>org.mule.runtime:mule-module-container</exclude>
                 <exclude>org.mule.runtime:mule-module-launcher</exclude>
+                <exclude>org.mule.runtime:mule-module-logging</exclude>
                 <exclude>org.mule.runtime:mule-module-global-config</exclude>
                 <exclude>org.mule.runtime:mule-module-deployment</exclude>
                 <exclude>org.mule.runtime:mule-module-deployment-model</exclude>
