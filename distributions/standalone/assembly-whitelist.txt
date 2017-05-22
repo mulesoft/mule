@@ -80,12 +80,12 @@
 /mule-standalone-${productVersion}/lib/boot/wrapper-windows-x86-32.dll
 /mule-standalone-${productVersion}/lib/boot/disruptor-3.3.0.jar
 /mule-standalone-${productVersion}/lib/boot/jcl-over-slf4j-1.7.25.jar
-/mule-standalone-${productVersion}/lib/boot/log4j-1.2-api-2.8.1.jar
-/mule-standalone-${productVersion}/lib/boot/log4j-api-2.8.1.jar
-/mule-standalone-${productVersion}/lib/boot/log4j-core-2.8.1.jar
-/mule-standalone-${productVersion}/lib/boot/log4j-jcl-2.8.1.jar
-/mule-standalone-${productVersion}/lib/boot/log4j-slf4j-impl-2.8.1.jar
-/mule-standalone-${productVersion}/lib/boot/log4j-jul-2.8.1.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-1.2-api-2.8.2.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-api-2.8.2.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-core-2.8.2.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-jcl-2.8.2.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-slf4j-impl-2.8.2.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-jul-2.8.2.jar
 /mule-standalone-${productVersion}/lib/boot/slf4j-api-1.7.25.jar
 
 #
