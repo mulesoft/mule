@@ -2220,20 +2220,13 @@
                             <additionalparam>${xDocLint}</additionalparam>
                         </configuration>
                     </plugin>
-                    <!-- TODO MULE-12539 -->
-                    <!--<plugin>-->
-                        <!--<groupId>org.apache.maven.plugins</groupId>-->
-                        <!--<artifactId>maven-source-plugin</artifactId>-->
-                        <!--<inherited>false</inherited>-->
-                        <!--<executions>-->
-                            <!--<execution>-->
-                                <!--<id>attach-sources</id>-->
-                                <!--<goals>-->
-                                    <!--<goal>aggregate</goal>-->
-                                <!--</goals>-->
-                            <!--</execution>-->
-                        <!--</executions>-->
-                    <!--</plugin>-->
+                    <plugin>
+                        <!-- Aggregate sources artifact must be explicitely required from the maven command -->
+                        <!-- Attempting to generate it automatically by configuring the execution here will cause issues when adding new modules -->
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <inherited>false</inherited>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
