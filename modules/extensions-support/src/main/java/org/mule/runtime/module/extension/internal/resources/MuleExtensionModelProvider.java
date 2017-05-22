@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
  */
 public class MuleExtensionModelProvider {
 
+  public static final String MULE_EXTENSION_NAME = "Mule Core";
   private static final String MODEL_JSON = "META-INF/mule-extension-model.json";
   private static final String JSON = IOUtils.toString(MuleExtensionModelProvider.class.getClassLoader()
       .getResourceAsStream(MODEL_JSON));

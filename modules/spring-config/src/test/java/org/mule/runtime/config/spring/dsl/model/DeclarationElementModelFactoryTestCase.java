@@ -23,7 +23,9 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newObjectValue;
+import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
@@ -52,11 +54,13 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -158,9 +162,10 @@ public class DeclarationElementModelFactoryTestCase {
     type.addField().key("field").value(TYPE_LOADER.load(String.class)).build();
     when(contentParameter.getType()).thenReturn(type.build());
 
-    when(parameterGroupModel.getName()).thenReturn("GENERAL");
+    List<ParameterModel> parameterModels = asList(contentParameter, behaviourParameter, listParameter);
+    when(parameterGroupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
     when(parameterGroupModel.isShowInDsl()).thenReturn(false);
-    when(parameterGroupModel.getParameterModels()).thenReturn(asList(contentParameter));
+    when(parameterGroupModel.getParameterModels()).thenReturn(parameterModels);
 
     when(source.getName()).thenReturn(SOURCE_NAME);
     when(source.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
@@ -188,8 +193,7 @@ public class DeclarationElementModelFactoryTestCase {
     when(dslContext.getTypeCatalog()).thenReturn(typeCatalog);
 
     Stream.of(configuration, operation, connectionProvider, source)
-        .forEach(model -> when(model.getAllParameterModels())
-            .thenReturn(asList(contentParameter, behaviourParameter, listParameter)));
+        .forEach(model -> when(model.getAllParameterModels()).thenReturn(parameterModels));
   }
 
   private void initializeExtensionMock(ExtensionModel extension) {
@@ -233,15 +237,19 @@ public class DeclarationElementModelFactoryTestCase {
     ConfigurationElementDeclaration declaration = ext.newConfiguration(CONFIGURATION_NAME)
         .withRefName("sample")
         .withConnection(ext.newConnection(CONNECTION_PROVIDER_NAME)
-            .withParameter(CONTENT_NAME, "#[{field: value}]")
+            .withParameterGroup(newParameterGroup()
+                .withParameter(CONTENT_NAME, "#[{field: value}]")
+                .withParameter(BEHAVIOUR_NAME, "additional")
+                .withParameter(LIST_NAME, newListValue().withValue("additional").build())
+                .getDeclaration())
             .getDeclaration())
-        .withParameter(BEHAVIOUR_NAME, "additional")
-        .withParameter(LIST_NAME, newListValue().withValue("additional").build())
         .getDeclaration();
 
     DslElementModel<ConfigurationModel> element = create(declaration);
     assertThat(element.getModel(), is(configuration));
-    assertThat(element.getContainedElements().size(), is(3));
+    assertThat(element.getContainedElements().size(), is(1));
+    DslElementModel connectionElement = element.getContainedElements().get(0);
+    assertThat(connectionElement.getContainedElements().size(), is(3));
     assertThat(element.findElement(LIST_NAME).isPresent(), is(true));
 
     DslElementModel<Object> listModel = element.findElement(LIST_NAME).get();
@@ -253,7 +261,8 @@ public class DeclarationElementModelFactoryTestCase {
 
     assertThat(element.findElement(CONNECTION_PROVIDER_NAME).isPresent(), is(true));
     assertThat(element.findElement(CONTENT_NAME).get().getConfiguration().get().getValue().get(), is("#[{field: value}]"));
-    assertThat(element.getConfiguration().get().getParameters().get(BEHAVIOUR_NAME), is("additional"));
+    assertThat(((ComponentConfiguration) connectionElement.getConfiguration().get())
+        .getParameters().get(BEHAVIOUR_NAME), is("additional"));
 
   }
 
@@ -263,8 +272,10 @@ public class DeclarationElementModelFactoryTestCase {
     ElementDeclarer ext = ElementDeclarer.forExtension(EXTENSION_NAME);
     OperationElementDeclaration declaration = ext.newOperation(OPERATION_NAME)
         .withConfig(CONFIGURATION_NAME)
-        .withParameter(BEHAVIOUR_NAME, "additional")
-        .withParameter(CONTENT_NAME, "#[{field: value}]")
+        .withParameterGroup(newParameterGroup()
+            .withParameter(CONTENT_NAME, "#[{field: value}]")
+            .withParameter(BEHAVIOUR_NAME, "additional")
+            .getDeclaration())
         .getDeclaration();
 
     DslElementModel<OperationModel> element = create(declaration);
@@ -281,8 +292,10 @@ public class DeclarationElementModelFactoryTestCase {
     ElementDeclarer ext = ElementDeclarer.forExtension(EXTENSION_NAME);
     SourceElementDeclaration declaration = ext.newSource(SOURCE_NAME)
         .withConfig(CONFIGURATION_NAME)
-        .withParameter(BEHAVIOUR_NAME, "additional")
-        .withParameter(CONTENT_NAME, "#[{field: value}]")
+        .withParameterGroup(newParameterGroup()
+            .withParameter(BEHAVIOUR_NAME, "additional")
+            .withParameter(CONTENT_NAME, "#[{field: value}]")
+            .getDeclaration())
         .getDeclaration();
 
     DslElementModel<SourceModel> element = create(declaration);
