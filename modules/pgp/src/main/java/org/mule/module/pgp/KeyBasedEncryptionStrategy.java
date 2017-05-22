@@ -109,7 +109,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
             MuleEvent event = RequestContext.getEvent();
             String principalId = (String) this.getCredentialsAccessor().getCredentials(event);
             PGPPublicKey publicKey = keyManager.getPublicKey(principalId);
-            validateNotNull(publicKey, PGPMessages.noPublicKeyForPrincipal(principalId, this.keyManager.getAvailablePrincipals()));
+            validateNotNull(publicKey, PGPMessages.noPublicKeyForPrincipal(principalId));
             this.checkKeyExpirity(publicKey);
             return new PGPCryptInfo(publicKey, false);
         }
