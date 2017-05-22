@@ -2222,7 +2222,7 @@
                     </plugin>
                     <plugin>
                         <!-- Aggregate sources artifact must be explicitely required from the maven command -->
-                        <!-- Attempting to generate it automatically by configuring the execution here will cause issues hwen adding new modules -->
+                        <!-- Attempting to generate it automatically by configuring the execution here will cause issues when adding new modules -->
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
                         <inherited>false</inherited>
