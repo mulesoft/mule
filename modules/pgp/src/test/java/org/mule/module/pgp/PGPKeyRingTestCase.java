@@ -13,9 +13,6 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.pgp.i18n.PGPMessages.ambiguousPGPPrincipalExceptionMessage;
-
-import org.mule.api.lifecycle.InitialisationException;
 
 import java.net.URL;
 
@@ -36,19 +33,14 @@ public class PGPKeyRingTestCase extends AbstractEncryptionStrategyTestCase
     }
 
     @Test
-    public void testDuplicatePrincipal() throws Exception
+    public void testSubKeyIsToken() throws Exception
     {
+        String publicSubKey = "3879972755627455806"; // This is the value of the subkey in decimal.
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        URL url = loader.getResource("./duplicatePrincipal.gpg");
-        ((PGPKeyRingImpl) keyManager).setPublicKeyRingFileName(url.getFile());
-        try
-        {
-            ((PGPKeyRingImpl) keyManager).initialise();
-        }
-        catch(InitialisationException initialisationException)
-        {
-            String expectedMessage = ambiguousPGPPrincipalExceptionMessage("Mule duplicate (duplicate userId) <mule_duplicate@mule.com>", "B6FD90CC2F993364", "DF34CC5CDB3360F3").getMessage();
-            assertThat(initialisationException.getMessage(), is(expectedMessage));
-        }
+        URL urlPublicKey = loader.getResource("./mule.gpg");
+        ((PGPKeyRingImpl) keyManager).setPublicKeyRingFileName(urlPublicKey.getFile());
+        ((PGPKeyRingImpl) keyManager).initialise();
+        Long resultKeyId = keyManager.getPublicKey("fernando.federico (Testing pgp) <fernando.federico@mulesoft.com>").getKeyID();
+        assertThat(publicSubKey, is(resultKeyId.toString()));
     }
 }

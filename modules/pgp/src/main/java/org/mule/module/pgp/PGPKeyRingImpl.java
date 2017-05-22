@@ -6,8 +6,6 @@
  */
 package org.mule.module.pgp;
 
-import static java.lang.String.format;
-import static org.mule.module.pgp.i18n.PGPMessages.ambiguousPGPPrincipalExceptionMessage;
 import static org.mule.module.pgp.i18n.PGPMessages.noFileKeyFound;
 import static org.mule.module.pgp.i18n.PGPMessages.noSecretKeyDefined;
 import static org.mule.module.pgp.i18n.PGPMessages.noSecretKeyFoundButAvailable;
@@ -17,7 +15,6 @@ import static org.mule.module.pgp.util.ValidatorUtil.validateNotNull;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.module.pgp.exception.AmbiguousPGPPrincipalException;
 import org.mule.module.pgp.exception.MissingPGPKeyException;
 import org.mule.util.IOUtils;
 import org.mule.util.SecurityUtils;
@@ -54,8 +51,6 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 
     private String secretPassPhrase;
 
-    private StringBuilder availablePrincipals;
-
     public void initialise() throws InitialisationException
     {
         try
@@ -69,7 +64,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 
             readPublicKeyRing();
         }
-        catch (MissingPGPKeyException | AmbiguousPGPPrincipalException exception)
+        catch (MissingPGPKeyException exception)
         {
             throw new InitialisationException(exception, this);
         }
@@ -87,7 +82,6 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(inputStream, KEY_FINGERPRINT_CALCULATOR);
         inputStream.close();
 
-        availablePrincipals = new StringBuilder();
         Iterator keyRingsIterator = collection.getKeyRings();
         while (keyRingsIterator.hasNext())
         {
@@ -100,34 +94,11 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
                 Iterator userIDs = publicKey.getUserIDs();
                 if (userIDs.hasNext())
                 {
-                    availablePrincipals.append("\nFor key: " + decimalToHexadecimal(publicKey.getKeyID()));
-                }
-                while (userIDs.hasNext())
-                {
                     userID = (String) userIDs.next();
-                    availablePrincipals.append("\n\t" + userID);
-                    if (! principalsKeyBundleMap.containsKey(userID))
-                    {
-                        principalsKeyBundleMap.put(userID, publicKey);
-                    }
-                    else
-                    {
-                        throw new AmbiguousPGPPrincipalException(ambiguousPGPPrincipalExceptionMessage(userID, decimalToHexadecimal(publicKey.getKeyID()), decimalToHexadecimal(principalsKeyBundleMap.get(userID).getKeyID())));
-                    }
                 }
+                principalsKeyBundleMap.put(userID, publicKey);
             }
-            availablePrincipals.append("\n");
         }
-    }
-
-    private String decimalToHexadecimal(long decimal)
-    {
-        return format("%X", decimal);
-    }
-
-    public String getAvailablePrincipals ()
-    {
-        return availablePrincipals.toString();
     }
 
     private void readPrivateKeyBundle() throws Exception

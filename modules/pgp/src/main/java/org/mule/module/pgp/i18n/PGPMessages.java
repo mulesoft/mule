@@ -20,11 +20,6 @@ public class PGPMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 1, userId);
     }
 
-    public static Message noSignedMessageFound()
-    {
-        return factory.createMessage(BUNDLE_PATH, 2);
-    }
-
     public static Message invalidSignature()
     {
         return factory.createMessage(BUNDLE_PATH, 3);
@@ -50,9 +45,9 @@ public class PGPMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 7, availableKeys);
     }
 
-    public static Message noPublicKeyForPrincipal(String principalId, String availablePrincipals)
+    public static Message noPublicKeyForPrincipal(String principalId)
     {
-        return factory.createMessage(BUNDLE_PATH, 8, principalId, availablePrincipals);
+        return factory.createMessage(BUNDLE_PATH, 8, principalId);
     }
 
     public static Message noFileKeyFound(String path)
@@ -68,11 +63,6 @@ public class PGPMessages extends MessageFactory
     public static Message noSecretPassPhrase()
     {
         return factory.createMessage(BUNDLE_PATH, 11);
-    }
-
-    public static Message ambiguousPGPPrincipalExceptionMessage(String principalId, String publicKey1, String publicKey2)
-    {
-        return factory.createMessage(BUNDLE_PATH, 12, principalId, publicKey1, publicKey2);
     }
 
 }
