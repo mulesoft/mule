@@ -2228,7 +2228,7 @@
                             <execution>
                                 <id>attach-sources</id>
                                 <goals>
-                                    <goal>aggregate</goal>
+                                    <goal>jar</goal>
                                 </goals>
                             </execution>
                         </executions>
