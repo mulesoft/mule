@@ -26,6 +26,7 @@ public class ImmutableAuthorizationCodeState implements AuthorizationCodeState {
   private final String state;
   private final String authorizationUrl;
   private final String accessTokenUrl;
+  private final Optional<String> externalCallbackUrl;
   private final String consumerKey;
   private final String consumerSecret;
 
@@ -36,6 +37,7 @@ public class ImmutableAuthorizationCodeState implements AuthorizationCodeState {
                                          String state,
                                          String authorizationUrl,
                                          String accessTokenUrl,
+                                         Optional<String> externalCallbackUrl,
                                          String consumerKey,
                                          String consumerSecret) {
     this.accessToken = accessToken;
@@ -45,6 +47,7 @@ public class ImmutableAuthorizationCodeState implements AuthorizationCodeState {
     this.state = state;
     this.authorizationUrl = authorizationUrl;
     this.accessTokenUrl = accessTokenUrl;
+    this.externalCallbackUrl = externalCallbackUrl;
     this.consumerKey = consumerKey;
     this.consumerSecret = consumerSecret;
   }
@@ -92,5 +95,10 @@ public class ImmutableAuthorizationCodeState implements AuthorizationCodeState {
   @Override
   public String getConsumerSecret() {
     return consumerSecret;
+  }
+
+  @Override
+  public Optional<String> getExternalCallbackUrl() {
+    return externalCallbackUrl;
   }
 }

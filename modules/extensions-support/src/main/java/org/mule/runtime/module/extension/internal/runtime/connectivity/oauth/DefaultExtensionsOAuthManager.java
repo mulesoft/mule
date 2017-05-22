@@ -26,13 +26,13 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.util.func.CheckedFunction;
 import org.mule.runtime.core.util.store.LazyObjectStoreToMapAdapter;
@@ -45,6 +45,9 @@ import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
+import org.mule.service.http.api.HttpService;
+import org.mule.service.http.api.server.HttpServer;
+import org.mule.service.http.api.server.ServerNotFoundException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -72,6 +75,9 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private HttpService httpService;
 
   // TODO: MULE-10837 this should be a plain old @Inject
   private LazyValue<OAuthService> oauthService = new LazyValue<>(() -> {
@@ -201,11 +207,21 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
       dancerBuilder.scopes(scopes);
     }
 
-    final URL callbackUrl = url(callbackConfig.getHost(), callbackConfig.getPort(), callbackConfig.getCallbackPath());
+    HttpServer httpServer;
+    try {
+      httpServer = httpService.getServerFactory().lookup(callbackConfig.getListenerConfig());
+    } catch (ServerNotFoundException e) {
+      throw new MuleRuntimeException(createStaticMessage(format(
+                                                                "Connector '%s' defines '%s' as the http:listener-config to use for provisioning callbacks, but no such definition "
+                                                                    + "exists in the application configuration",
+                                                                config.getOwnerConfigName(), callbackConfig.getListenerConfig())),
+                                     e);
+    }
+
     dancerBuilder
-        .localCallback(callbackUrl)
+        .localCallback(httpServer, callbackConfig.getCallbackPath())
+        .externalCallbackUrl(getExternalCallback(httpServer, callbackConfig))
         .authorizationUrl(authCodeConfig.getAuthorizationUrl())
-        .externalCallbackUrl(callbackUrl.toExternalForm())
         .localAuthorizationUrlPath(callbackConfig.getLocalAuthorizePath())
         .localAuthorizationUrlResourceOwnerId(
                                               "#[if (attributes.queryParams.resourceOwnerId != null) attributes.queryParams.resourceOwnerId else '']")
@@ -224,6 +240,23 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
     }
 
     return dancer;
+  }
+
+  private String getExternalCallback(HttpServer httpServer, OAuthCallbackConfig callbackConfig) {
+    return callbackConfig.getExternalCallbackUrl().orElseGet(() -> {
+      try {
+        return new URL(httpServer.getProtocol().getScheme(),
+                       httpServer.getServerAddress().getIp(),
+                       httpServer.getServerAddress().getPort(),
+                       callbackConfig.getCallbackPath())
+                           .toExternalForm();
+      } catch (MalformedURLException e) {
+        throw new MuleRuntimeException(createStaticMessage(format(
+                                                                  "Could not derive a external callback url from <http:listener-config> '%s'",
+                                                                  callbackConfig.getListenerConfig())),
+                                       e);
+      }
+    });
   }
 
   private void start(AuthorizationCodeOAuthDancer dancer) throws MuleException {
@@ -293,7 +326,8 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
     return (AuthorizationCodeRequest danceRequest) -> {
       final AuthCodeRequest request = new ImmutableAuthCodeRequest(danceRequest.getResourceOwnerId(),
                                                                    danceRequest.getScopes(),
-                                                                   danceRequest.getState().orElse(null));
+                                                                   danceRequest.getState().orElse(null),
+                                                                   config.getCallbackConfig().getExternalCallbackUrl());
 
       Event event = runFlow(flow, createEvent(request, config, flow), config, "before");
       return paramKey -> DANCE_CALLBACK_EVENT_KEY.equals(paramKey) ? of(event) : empty();
@@ -303,7 +337,7 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
   private BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterCallback(OAuthConfig config,
                                                                                                      Flow flow) {
     return (callbackContext, oauthContext) -> {
-      AuthorizationCodeState state = toAuthorizationCodeState(config.getAuthCodeConfig(), oauthContext);
+      AuthorizationCodeState state = toAuthorizationCodeState(config, oauthContext);
       Event event = (Event) callbackContext.getParameter(DANCE_CALLBACK_EVENT_KEY)
           .orElseGet(() -> createEvent(state, config, flow));
 

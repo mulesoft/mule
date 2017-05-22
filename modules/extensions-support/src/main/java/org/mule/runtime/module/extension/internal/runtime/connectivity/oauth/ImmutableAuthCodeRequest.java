@@ -22,11 +22,13 @@ public class ImmutableAuthCodeRequest implements AuthCodeRequest {
   private final String resourceOwnerId;
   private final String scopes;
   private final String state;
+  private final Optional<String> externalCallbackUrl;
 
-  public ImmutableAuthCodeRequest(String resourceOwnerId, String scopes, String state) {
+  public ImmutableAuthCodeRequest(String resourceOwnerId, String scopes, String state, Optional<String> externalCallbackUrl) {
     this.resourceOwnerId = resourceOwnerId;
     this.scopes = scopes;
     this.state = state;
+    this.externalCallbackUrl = externalCallbackUrl;
   }
 
   @Override
@@ -42,5 +44,10 @@ public class ImmutableAuthCodeRequest implements AuthCodeRequest {
   @Override
   public Optional<String> getState() {
     return ofNullable(state);
+  }
+
+  @Override
+  public Optional<String> getExternalCallbackUrl() {
+    return externalCallbackUrl;
   }
 }
