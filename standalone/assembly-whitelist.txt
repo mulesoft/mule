@@ -188,7 +188,7 @@
 /mule-standalone-${productVersion}/lib/opt/asm-tree-3.1.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjrt-1.8.5.jar
 /mule-standalone-${productVersion}/lib/opt/aspectjweaver-1.8.5.jar
-/mule-standalone-${productVersion}/lib/opt/commons-beanutils-1.9.2.jar
+/mule-standalone-${productVersion}/lib/opt/commons-beanutils-1.9.3.jar
 /mule-standalone-${productVersion}/lib/opt/commons-codec-1.9.jar
 /mule-standalone-${productVersion}/lib/opt/commons-collections-3.2.2.jar
 /mule-standalone-${productVersion}/lib/opt/commons-io-2.4.jar
