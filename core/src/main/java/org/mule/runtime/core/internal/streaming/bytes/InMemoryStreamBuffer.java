@@ -8,8 +8,6 @@ package org.mule.runtime.core.internal.streaming.bytes;
 
 import static java.lang.Math.min;
 import static java.lang.Math.toIntExact;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
@@ -18,7 +16,6 @@ import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.Optional;
 
 /**
  * An implementation of {@link AbstractInputStreamBuffer} which holds the buffered
@@ -56,26 +53,26 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
   }
 
   @Override
-  protected int doGet(ByteBuffer destination, long position, int length) {
-    return doGet(destination, position, length, true);
+  protected ByteBuffer doGet(long position, int length) {
+    return doGet(position, length, true);
   }
 
-  private int doGet(ByteBuffer dest, long position, int length, boolean consumeStreamIfNecessary) {
+  private ByteBuffer doGet(long position, int length, boolean consumeStreamIfNecessary) {
     return withReadLock(() -> {
 
-      Optional<Integer> presentRead = getFromCurrentData(dest, position, length);
-      if (presentRead.isPresent()) {
-        return presentRead.get();
+      ByteBuffer presentRead = getFromCurrentData(position, length);
+      if (presentRead != null) {
+        return presentRead;
       }
 
       if (consumeStreamIfNecessary) {
         releaseReadLock();
         return withWriteLock(() -> {
 
-          Optional<Integer> refetch;
-          refetch = getFromCurrentData(dest, position, length);
-          if (refetch.isPresent()) {
-            return refetch.get();
+          ByteBuffer refetch;
+          refetch = getFromCurrentData(position, length);
+          if (refetch != null) {
+            return refetch;
           }
 
           final long requiredUpperBound = position + length;
@@ -83,9 +80,9 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
             try {
               final int read = consumeForwardData();
               if (read > 0) {
-                refetch = getFromCurrentData(dest, position, min(length, read));
-                if (refetch.isPresent()) {
-                  return refetch.get();
+                refetch = getFromCurrentData(position, min(length, read));
+                if (refetch != null) {
+                  return refetch;
                 }
               } else {
                 streamFullyConsumed();
@@ -96,25 +93,25 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
             }
           }
 
-          return doGet(dest, position, length, false);
+          return doGet(position, length, false);
         });
       } else {
-        return getFromCurrentData(dest, position, length).orElse(-1);
+        return getFromCurrentData(position, length);
       }
     });
   }
 
-  private Optional<Integer> getFromCurrentData(ByteBuffer dest, long position, int length) {
+  private ByteBuffer getFromCurrentData(long position, int length) {
     if (isStreamFullyConsumed() && position > bufferTip) {
-      return of(-1);
+      return null;
     }
 
     if (position < bufferTip) {
       length = min(length, toIntExact(bufferTip - position));
-      return of(copy(dest, position, length));
+      return copy(position, length);
     }
 
-    return empty();
+    return null;
   }
 
   /**

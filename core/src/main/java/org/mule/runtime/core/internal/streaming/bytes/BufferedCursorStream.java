@@ -26,6 +26,7 @@ import java.nio.ByteBuffer;
 public final class BufferedCursorStream extends AbstractCursorStream {
 
   private static final int LOCAL_BUFFER_SIZE = KB.toBytes(32);
+  private static final ByteBuffer NULL_BUFFER = ByteBuffer.allocate(0);
 
   private final InputStreamBuffer streamBuffer;
 
@@ -33,8 +34,7 @@ public final class BufferedCursorStream extends AbstractCursorStream {
    * Intermediate buffer between this cursor and the {@code traversableBuffer}. This reduces contention
    * on the {@code traversableBuffer}
    */
-  private final ByteBuffer localBuffer;
-  private final ByteBufferManager bufferManager;
+  private ByteBuffer localBuffer = NULL_BUFFER;
   private long rangeStart = 0;
   private long rangeEnd = -1;
 
@@ -42,16 +42,11 @@ public final class BufferedCursorStream extends AbstractCursorStream {
    * Creates a new instance
    *
    * @param streamBuffer  the buffer which provides data
-   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
+   * @param provider the {@link CursorStreamProvider} for the {@link CursorStream cursors} that will consume this buffer
    */
-  public BufferedCursorStream(InputStreamBuffer streamBuffer,
-                              CursorStreamProvider provider,
-                              ByteBufferManager bufferManager) {
+  public BufferedCursorStream(InputStreamBuffer streamBuffer, CursorStreamProvider provider) {
     super(provider);
     this.streamBuffer = streamBuffer;
-    this.bufferManager = bufferManager;
-    localBuffer = bufferManager.allocate(LOCAL_BUFFER_SIZE);
-    localBuffer.flip();
   }
 
   /**
@@ -128,24 +123,16 @@ public final class BufferedCursorStream extends AbstractCursorStream {
     }
 
     localBuffer.clear();
-    int read = streamBuffer.get(localBuffer, position, LOCAL_BUFFER_SIZE);
-    if (read > 0) {
-      localBuffer.flip();
+    ByteBuffer read = streamBuffer.get(position, LOCAL_BUFFER_SIZE);
+    if (read != null) {
+      localBuffer = read;
       rangeStart = position;
-      rangeEnd = rangeStart + read;
+      rangeEnd = rangeStart + read.remaining();
 
-      return read;
+      return read.remaining();
     } else {
       localBuffer.limit(0);
       return -1;
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void doRelease() {
-    bufferManager.deallocate(localBuffer);
   }
 }

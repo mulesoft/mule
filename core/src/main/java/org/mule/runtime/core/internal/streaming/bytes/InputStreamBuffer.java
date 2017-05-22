@@ -23,15 +23,17 @@ import java.nio.ByteBuffer;
 public interface InputStreamBuffer {
 
   /**
-   * Loads information into the given {@code destination}
+   * Returns a ByteBuffer with up to {@code length} amount of bytes starting from the given
+   * {@code position}. The returned buffer may contain less information than requested.
    *
-   * @param destination the buffer in which the data is to be loaded. The buffer has to be in the correct position
-   *                    and have at least {@code length} bytes remaining
+   * If no information is available at all, then it returns {@code null}
+   *
    * @param position    the stream position from which the data should be read
    * @param length      how many bytes to read
-   * @return how many bytes were actually read, or {@code -1} if no data is available for the given {@code position}
+   * @return A {@link ByteBuffer} with up to {@code length} bytes of information or {@code null} if no information
+   * available at all
    */
-  int get(ByteBuffer destination, long position, int length);
+  ByteBuffer get(long position, int length);
 
   /**
    * Releases all the resources held by this buffer
