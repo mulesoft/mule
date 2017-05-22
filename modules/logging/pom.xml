@@ -10,7 +10,7 @@
     </parent>
     <artifactId>mule-module-logging</artifactId>
     <packaging>jar</packaging>
-    <name>Mule Core</name>
+    <name>Mule Logging</name>
     <description>Mule Logging Module</description>
 
     <properties>
