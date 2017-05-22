@@ -112,7 +112,7 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
         }
         catch (CryptoFailureException cryptoFailureException)
         {
-            assertThat(cryptoFailureException.getMessage(), containsString(noPublicKeyForPrincipal(credentialAccessor.getCredentials(), keyManager.getAvailablePrincipals()).getMessage()));
+            assertThat(cryptoFailureException.getMessage(), containsString(noPublicKeyForPrincipal(credentialAccessor.getCredentials()).getMessage()));
         }
     }
 
