@@ -16,6 +16,7 @@ import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 import org.mule.runtime.extension.api.soap.annotation.Soap;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Alias("base")
@@ -33,12 +34,23 @@ public class FootballSoapExtension implements SoapServiceProvider {
   @Optional(defaultValue = TEST_SERVICE_URL)
   private String leaguesAddress;
 
+  @Parameter
+  private String laLigaAddress;
+
   @Override
   public List<WebServiceDefinition> getWebServiceDefinitions() {
-    return singletonList(WebServiceDefinition.builder().withId(LEAGUES_ID).withFriendlyName(LEAGUES_FRIENDLY_NAME)
+    return Arrays.asList(getLeaguesService(), getLaLigaService());
+  }
+
+  private WebServiceDefinition getLaLigaService() {
+    return new LaLigaServiceProvider(laLigaAddress).getFirstDivisionService();
+  }
+
+  private WebServiceDefinition getLeaguesService() {
+    return WebServiceDefinition.builder().withId(LEAGUES_ID).withFriendlyName(LEAGUES_FRIENDLY_NAME)
         .withWsdlUrl(leaguesAddress + "?wsdl").withAddress(leaguesAddress)
         .withService(LEAGUES_SERVICE).withPort(LEAGUES_PORT).withExcludedOperations(emptyList())
-        .build());
+        .build();
   }
 
 }

@@ -8,17 +8,23 @@ package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.runtime.soap.api.SoapService;
 import org.mule.runtime.soap.api.client.SoapClient;
+import org.mule.runtime.soap.api.client.SoapClientConfiguration;
 import org.mule.runtime.soap.api.client.SoapClientFactory;
 import org.mule.runtime.soap.api.client.metadata.SoapMetadataResolver;
 import org.mule.runtime.soap.api.message.SoapRequest;
@@ -41,40 +47,55 @@ public class ForwardingSoapClientTestCase {
   public ExpectedException expectedException = ExpectedException.none();
 
   private SoapService service;
+  private ForwardingSoapClient client;
+  private MessageDispatcherProvider<MessageDispatcher> dispatcherProvider = new TestDispatcherProvider();
 
   @Before
   public void setup() throws ConnectionException {
-    SoapClientFactory factory = mock(SoapClientFactory.class);
     service = mock(SoapService.class);
-    when(service.getClientFactory()).thenReturn(factory);
-    when(factory.create(anyObject())).thenReturn(new TestSoapClient());
-
+    when(service.getClientFactory()).thenReturn(new TestClientFactory());
+    client = new ForwardingSoapClient(service, new TestServiceProvider(), dispatcherProvider);
   }
 
   @Test
   public void loadClient() throws Exception {
-    ForwardingSoapClient client = new ForwardingSoapClient(service, new TestServiceProvider(), mock(MessageDispatcher.class));
     SoapClient sc = client.getSoapClient("uno");
     SoapResponse response = sc.consume(SoapRequest.empty("no-op"));
     assertThat(IOUtils.toString(response.getContent()), is("Content"));
   }
 
   @Test
-  public void invalidService() throws MuleException, ConnectionException {
+  public void invalidService() throws MuleException {
     expectedException.expectMessage("Could not find a soap client id [invalid]");
     expectedException.expect(IllegalArgumentException.class);
-    ForwardingSoapClient client = new ForwardingSoapClient(service, new TestServiceProvider(), mock(MessageDispatcher.class));
     client.getSoapClient("invalid");
   }
 
   @Test
   public void disconnect() throws Exception {
-    ForwardingSoapClient client = new ForwardingSoapClient(service, new TestServiceProvider(), mock(MessageDispatcher.class));
     TestSoapClient sc1 = (TestSoapClient) client.getSoapClient("uno");
     TestSoapClient sc2 = (TestSoapClient) client.getSoapClient("dos");
     client.disconnect();
-    assertThat(sc1.disconnected, is(true));
-    assertThat(sc2.disconnected, is(true));
+    assertThat(sc1.isDisconnected(), is(true));
+    assertThat(sc2.isDisconnected(), is(true));
+  }
+
+  @Test
+  public void differentDispatcherInstances() {
+    TestSoapClient sc1 = (TestSoapClient) client.getSoapClient("uno");
+    TestSoapClient sc2 = (TestSoapClient) client.getSoapClient("dos");
+    assertThat(sc1.getDispatcher(), is(not(sameInstance(sc2.getDispatcher()))));
+  }
+
+  @Test
+  public void connectAndDisconnectDispatcher() throws ConnectionException {
+    MessageDispatcherProvider<MessageDispatcher> spyProvider = spy(dispatcherProvider);
+    client = new ForwardingSoapClient(service, new TestServiceProvider(), spyProvider);
+    TestSoapClient sc1 = (TestSoapClient) client.getSoapClient("uno");
+    TestSoapClient sc2 = (TestSoapClient) client.getSoapClient("dos");
+    verify(spyProvider, times(2)).connect();
+    assertThat(((TestDispatcherProvider.TestMessageDispatcher) sc1.getDispatcher()).isDisconnected(), is(true));
+    assertThat(((TestDispatcherProvider.TestMessageDispatcher) sc2.getDispatcher()).isDisconnected(), is(true));
   }
 
   private class TestServiceProvider implements SoapServiceProvider {
@@ -93,32 +114,12 @@ public class ForwardingSoapClientTestCase {
     }
   }
 
-  private class TestSoapClient implements SoapClient {
-
-    private boolean disconnected = false;
+  public class TestClientFactory implements SoapClientFactory {
 
     @Override
-    public void stop() throws MuleException {
-      disconnected = true;
-    }
-
-    @Override
-    public void start() throws MuleException {
-
-    }
-
-    @Override
-    public SoapResponse consume(SoapRequest request) {
-      SoapResponse response = mock(SoapResponse.class);
-      when(response.getContent()).thenReturn(new ByteArrayInputStream("Content".getBytes()));
-      return response;
-    }
-
-    @Override
-    public SoapMetadataResolver getMetadataResolver() {
-      return null;
+    public SoapClient create(SoapClientConfiguration configuration) throws ConnectionException {
+      return new TestSoapClient(configuration);
     }
   }
-
 }
 
