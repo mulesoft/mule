@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -181,11 +182,14 @@ class ExtensionPluginMetadataGenerator {
    * @param plugin             the extension {@link Artifact} plugin
    * @param extensionClass     the {@link Class} annotated with {@link Extension}
    * @param dependencyResolver the dependency resolver used to introspect the artifact pom.xml
+   * @param rootArtifactRemoteRepositories
    * @return {@link ExtensionModel} for the extensionClass
    */
-  private ExtensionModel getExtensionModel(Artifact plugin, Class extensionClass, DependencyResolver dependencyResolver) {
-    ExtensionModelLoader loader = extensionModelLoaderFinder.findLoaderByProperty(plugin, dependencyResolver)
-        .orElse(extensionModelLoaderFinder.findLoaderFromMulePlugin(extensionMulePluginJson));
+  private ExtensionModel getExtensionModel(Artifact plugin, Class extensionClass, DependencyResolver dependencyResolver,
+                                           List<RemoteRepository> rootArtifactRemoteRepositories) {
+    ExtensionModelLoader loader =
+        extensionModelLoaderFinder.findLoaderByProperty(plugin, dependencyResolver, rootArtifactRemoteRepositories)
+            .orElse(extensionModelLoaderFinder.findLoaderFromMulePlugin(extensionMulePluginJson));
     return extensionsInfrastructure.discoverExtension(extensionClass, loader);
   }
 
@@ -195,11 +199,14 @@ class ExtensionPluginMetadataGenerator {
    * @param plugin             the {@link Artifact} to generate its extension manifest if it is an extension.
    * @param extensionClass     {@link Class} annotated with {@link Extension}
    * @param dependencyResolver the dependency resolver used to discover test extensions poms to find which loader to use
+   * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
    * @return {@link File} folder where extension manifest resources were generated
    */
-  File generateExtensionResources(Artifact plugin, Class extensionClass, DependencyResolver dependencyResolver) {
+  File generateExtensionResources(Artifact plugin, Class extensionClass, DependencyResolver dependencyResolver,
+                                  List<RemoteRepository> rootArtifactRemoteRepositories) {
     logger.debug("Generating Extension metadata for extension class: '{}'", extensionClass);
-    final ExtensionModel extensionModel = getExtensionModel(plugin, extensionClass, dependencyResolver);
+    final ExtensionModel extensionModel =
+        getExtensionModel(plugin, extensionClass, dependencyResolver, rootArtifactRemoteRepositories);
     File generatedResourcesDirectory = new File(generatedResourcesBase, plugin.getArtifactId() + separator + "META-INF");
     generatedResourcesDirectory.mkdirs();
     extensionsInfrastructure.generateLoaderResources(extensionModel, generatedResourcesDirectory);

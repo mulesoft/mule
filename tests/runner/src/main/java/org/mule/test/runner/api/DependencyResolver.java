@@ -87,6 +87,31 @@ public class DependencyResolver {
   }
 
   /**
+   * Gets information about an artifact like its direct dependencies and potential relocations.
+   *
+   * @param artifact the {@link Artifact} requested, must not be {@code null}
+   * @param remoteRepositories to be used for resolving the artifact in addition to the ones already defined in context.
+   * @return {@link ArtifactDescriptorResult} descriptor result, never {@code null}
+   * @throws {@link ArtifactDescriptorException} if the artifact descriptor could not be read
+   */
+  public ArtifactDescriptorResult readArtifactDescriptor(Artifact artifact, List<RemoteRepository> remoteRepositories)
+      throws ArtifactDescriptorException {
+    checkNotNull(artifact, "artifact cannot be null");
+
+    final ArtifactDescriptorRequest request =
+        new ArtifactDescriptorRequest(artifact, resolutionContext.getRemoteRepositories(), null);
+    // Has to set authentication to these remote repositories as they may come from a pom descriptor
+    remoteRepositories.forEach(remoteRepository -> {
+      RemoteRepository authenticatedRemoteRepository = setAuthentication(remoteRepository);
+      if (!request.getRepositories().contains(authenticatedRemoteRepository)) {
+        request.addRepository(authenticatedRemoteRepository);
+      }
+    });
+
+    return repositoryState.getSystem().readArtifactDescriptor(repositoryState.getSession(), request);
+  }
+
+  /**
    * Resolves the path for an artifact.
    *
    * @param artifact the {@link Artifact} requested, must not be {@code null}
@@ -97,6 +122,29 @@ public class DependencyResolver {
     checkNotNull(artifact, "artifact cannot be null");
 
     final ArtifactRequest request = new ArtifactRequest(artifact, resolutionContext.getRemoteRepositories(), null);
+    return repositoryState.getSystem().resolveArtifact(repositoryState.getSession(), request);
+  }
+
+  /**
+   * Resolves the path for an artifact.
+   *
+   * @param artifact the {@link Artifact} requested, must not be {@code null}
+   * @param remoteRepositories remote repositories to be used in addition to the one in context
+   * @return The resolution result, never {@code null}.
+   * @throws {@link ArtifactResolutionException} if the artifact could not be resolved.
+   */
+  public ArtifactResult resolveArtifact(Artifact artifact, List<RemoteRepository> remoteRepositories)
+      throws ArtifactResolutionException {
+    checkNotNull(artifact, "artifact cannot be null");
+
+    final ArtifactRequest request = new ArtifactRequest(artifact, resolutionContext.getRemoteRepositories(), null);
+    // Has to set authentication to these remote repositories as they may come from a pom descriptor
+    remoteRepositories.forEach(remoteRepository -> {
+      RemoteRepository authenticatedRemoteRepository = setAuthentication(remoteRepository);
+      if (!request.getRepositories().contains(authenticatedRemoteRepository)) {
+        request.addRepository(authenticatedRemoteRepository);
+      }
+    });
     return repositoryState.getSystem().resolveArtifact(repositoryState.getSession(), request);
   }
 
@@ -141,7 +189,13 @@ public class DependencyResolver {
     collectRequest.setDependencies(directDependencies);
     collectRequest.setManagedDependencies(managedDependencies);
     collectRequest.setRepositories(resolutionContext.getRemoteRepositories());
-    remoteRepositories.forEach(remoteRepository -> collectRequest.addRepository(remoteRepository));
+    // Has to set authentication to these remote repositories as they may come from a pom descriptor
+    remoteRepositories.forEach(remoteRepository -> {
+      RemoteRepository authenticatedRemoteRepository = setAuthentication(remoteRepository);
+      if (!collectRequest.getRepositories().contains(authenticatedRemoteRepository)) {
+        collectRequest.addRepository(setAuthentication(remoteRepository));
+      }
+    });
 
     DependencyNode node;
     try {
@@ -164,6 +218,14 @@ public class DependencyResolver {
 
     List<File> files = getFiles(node);
     return files;
+  }
+
+  private RemoteRepository setAuthentication(RemoteRepository remoteRepository) {
+    return new RemoteRepository.Builder(remoteRepository)
+        .setAuthentication(this.resolutionContext
+            .getAuthenticatorSelector()
+            .getAuthentication(remoteRepository))
+        .build();
   }
 
   private void logDependencyGraph(DependencyNode node, Object request) {

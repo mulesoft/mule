@@ -8,6 +8,7 @@
 package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Collections.emptyList;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -50,7 +51,8 @@ public class ExtensionPluginMetadataGeneratorTestCase {
   public void before() throws Exception {
     depResolver = mock(DependencyResolver.class);
     ExtensionModelLoaderFinder finder = mock(ExtensionModelLoaderFinder.class);
-    when(finder.findLoaderByProperty(anyObject(), anyObject())).thenReturn(Optional.of(new DefaultJavaExtensionModelLoader()));
+    when(finder.findLoaderByProperty(anyObject(), anyObject(), anyObject()))
+        .thenReturn(Optional.of(new DefaultJavaExtensionModelLoader()));
     generator = new ExtensionPluginMetadataGenerator(temporaryFolder.newFolder(), finder);
   }
 
@@ -66,15 +68,19 @@ public class ExtensionPluginMetadataGeneratorTestCase {
 
   @Test
   public void generateExtensionManifestForTwoExtensionsInDifferentFolders() {
-    File heisenbergPluginFolder = generator.generateExtensionResources(heisenbergPlugin, HeisenbergExtension.class, depResolver);
-    File petStorePluginFolder = generator.generateExtensionResources(petStorePlugin, PetStoreConnector.class, depResolver);
+    File heisenbergPluginFolder =
+        generator.generateExtensionResources(heisenbergPlugin, HeisenbergExtension.class, depResolver, emptyList());
+    File petStorePluginFolder =
+        generator.generateExtensionResources(petStorePlugin, PetStoreConnector.class, depResolver, emptyList());
     assertThat(heisenbergPluginFolder, not(equalTo(petStorePluginFolder)));
   }
 
   @Test
   public void generateExtensionMetadataForTwoExtensionsInDifferentFolders() throws Exception {
-    File heisenbergPluginFolder = generator.generateExtensionResources(heisenbergPlugin, HeisenbergExtension.class, depResolver);
-    File petStorePluginFolder = generator.generateExtensionResources(petStorePlugin, PetStoreConnector.class, depResolver);
+    File heisenbergPluginFolder =
+        generator.generateExtensionResources(heisenbergPlugin, HeisenbergExtension.class, depResolver, emptyList());
+    File petStorePluginFolder =
+        generator.generateExtensionResources(petStorePlugin, PetStoreConnector.class, depResolver, emptyList());
     generator.generateDslResources();
 
     assertThat(listFiles(heisenbergPluginFolder, "heisenberg.xsd"), arrayWithSize(1));

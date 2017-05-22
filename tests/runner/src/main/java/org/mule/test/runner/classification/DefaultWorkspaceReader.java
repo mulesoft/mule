@@ -8,6 +8,7 @@
 package org.mule.test.runner.classification;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.test.runner.api.WorkspaceLocationResolver;
@@ -148,7 +149,7 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
    */
   @Override
   public List<String> findVersions(Artifact artifact) {
-    return emptyList();
+    return findArtifact(artifact) == null ? emptyList() : singletonList(artifact.getVersion());
   }
 
   /**

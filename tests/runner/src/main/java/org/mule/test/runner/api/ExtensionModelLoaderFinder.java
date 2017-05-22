@@ -14,11 +14,13 @@ import org.mule.test.runner.maven.MavenModelFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 
@@ -43,10 +45,11 @@ class ExtensionModelLoaderFinder {
    * Searches in the plugin pom.xml for the {@code testExtensionModelLoaderId} property which specifies with which loader the
    * extension must be loaded. The main use of this is for Test Extensions that don't generate a mule-plugin.json.
    */
-  public Optional<ExtensionModelLoader> findLoaderByProperty(Artifact plugin, DependencyResolver dependencyResolver) {
+  public Optional<ExtensionModelLoader> findLoaderByProperty(Artifact plugin, DependencyResolver dependencyResolver,
+                                                             List<RemoteRepository> rootArtifactRemoteRepositories) {
     DefaultArtifact artifact = new DefaultArtifact(plugin.getGroupId(), plugin.getArtifactId(), "pom", plugin.getVersion());
     try {
-      ArtifactResult artifactResult = dependencyResolver.resolveArtifact(artifact);
+      ArtifactResult artifactResult = dependencyResolver.resolveArtifact(artifact, rootArtifactRemoteRepositories);
       File pomFile = artifactResult.getArtifact().getFile();
       Model mavenProject = MavenModelFactory.createMavenProject(pomFile);
       String id = mavenProject.getProperties().getProperty("testExtensionModelLoaderId");
