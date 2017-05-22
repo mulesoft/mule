@@ -67,5 +67,18 @@
             <singleton-object class="org.mule.module.cxf.employee.EmployeeDirectoryImpl"/>
           </component>
         </service>
+
+        <service name="employeeDirectoryService12">
+          <inbound>
+            <inbound-endpoint 
+                address="http://localhost:${port1}/services/employeeDirectory12"
+                exchange-pattern="request-response">
+                <cxf:jaxws-service soapVersion="1.2" mtomEnabled="true"/>
+            </inbound-endpoint>
+          </inbound>
+          <component>
+            <singleton-object class="org.mule.module.cxf.employee.EmployeeDirectoryImpl"/>
+          </component>
+        </service>
     </model>
 </mule>
