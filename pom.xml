@@ -184,7 +184,7 @@
         <jschVersion>0.1.53</jschVersion>
         <jsonVersion>20140107</jsonVersion>
         <junitVersion>4.12</junitVersion>
-        <log4jVersion>2.8.1</log4jVersion>
+        <log4jVersion>2.8.2</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
         <mockitoVersion>1.10.19</mockitoVersion>
         <muleDslApiVersion>1.0.0-SNAPSHOT</muleDslApiVersion>
