@@ -15,7 +15,7 @@ MULE-10979: The default response timeout and default transaction timeout can't b
 MULE-11118: The HTTP listener now replies with status code 503 when the thread pool is exhausted (and poolExhaustedAction="ABORT") instead of closing the socket.
 MULE-11825: In a DB template query, to set a DB param with the null value, you can use the "NULL" literal value. For example: <db:in-param name="name" defaultValue="NULL"/>
 MULE-11948: Saxon was upgraded from 9.6.0-7 to 9.6.0-10
-MULE-12017: log4j was updated from 2.5 to 2.8.1 and slf4j from 1.7.7 to 1.7.24. There is a minor incompatibility with code using logger.error(null, "message", e), in which case the first null argument should be omitted.
+MULE-12017: log4j was updated from 2.5 to 2.8.2 and slf4j from 1.7.7 to 1.7.24. There is a minor incompatibility with code using logger.error(null, "message", e), in which case the first null argument should be omitted.
 MULE-12147: added proxy support to the SFTP connector through system properties: "mule.sftp.proxy.host", "mule.sftp.proxy.port", "mule.sftp.proxy.protocol" (can be "HTTP", "SOCKS4" or "SOCKS5"), "mule.sftp.proxy.username" (if required), "mule.sftp.proxy.password" (if required).
 
 Migration changes from 3.7.x to 3.8.x
@@ -27,12 +27,12 @@ MULE-9324: When using a File inbound endpoint to poll a directory, an exception 
 MULE-9204: The default authentication method for a token request when using the oauth client credentials grant type will now be basic auth (using client id as user and client secret as password).
     If the previous authentication method is desired instead, then the "encodeCredentialsInBody" attribute of the token-request element should be set to "true".
 MULE-9183: Status code for successful one-way operations handled through CXF will be 202 instead of 200
-MULE-9041: The HTTP Connector will leave the inbound property http.remote.address with the actual remote address. If an X-Forwarded-For header is present, it will be available as an inbound property. 
+MULE-9041: The HTTP Connector will leave the inbound property http.remote.address with the actual remote address. If an X-Forwarded-For header is present, it will be available as an inbound property.
 MULE-9020: BouncyCastle was upgraded to version 1.50.
     Note: DESede algorithm now requires keys of 16 or 24 bytes unlike the prior version which required 16 or 22 bytes.
     Note 2: the bcmail (Bouncy Castle S/MIME API) dependency was removed. If you need any of its functionalities, you must add the library by yourself.
 MULE-8963: Exceptions that extend org.mule.api.MessagingException now receive the org.mule.api.processor.MessageProcessor that was executing in the constructor.
-MULE-8927: The attributes that end in an endpoint URI (for instance: smtp user and passwords) had to be encoded as a workaround for this issue. That workaround now has to be removed. 
+MULE-8927: The attributes that end in an endpoint URI (for instance: smtp user and passwords) had to be encoded as a workaround for this issue. That workaround now has to be removed.
 	This also affects the result of MEL expressions (for instance, if an expression evaluated to a username with an @ char, it had to be encoded before using it), so a check has to be done to remove all the additional encoding that was placed for working this around.
 MULE-8626: The HTTP Connector will now ignore a "Connection" outbound property when responding to a request (listener) or making one (request), instead of transforming it to a header. This means that: if such property is desired, it should be explicitly added as a header using a response/request builder.
 MULE-8678: The HTTP Connector will now ignore a "Host" outbound property when making a request, instead of transforming it to a header. This means that: if such property is desired, it should be explicitly added as a header using a request builder.
