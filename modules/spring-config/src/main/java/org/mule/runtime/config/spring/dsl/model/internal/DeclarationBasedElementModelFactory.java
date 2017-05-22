@@ -36,6 +36,7 @@ import org.mule.runtime.api.app.declaration.ConnectionElementDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.app.declaration.OperationElementDeclaration;
 import org.mule.runtime.api.app.declaration.ParameterElementDeclaration;
+import org.mule.runtime.api.app.declaration.ParameterGroupElementDeclaration;
 import org.mule.runtime.api.app.declaration.ParameterValue;
 import org.mule.runtime.api.app.declaration.ParameterValueVisitor;
 import org.mule.runtime.api.app.declaration.ParameterizedElementDeclaration;
@@ -75,9 +76,6 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.internal.dsl.syntax.DslElementSyntaxBuilder;
 
-import com.google.common.collect.ImmutableList;
-
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -336,40 +334,18 @@ class DeclarationBasedElementModelFactory {
         .withModel(model)
         .withDsl(elementDsl);
 
-
-    ImmutableList.Builder<ParameterModel> builder = ImmutableList.builder();
-    builder.addAll(model.getParameterGroupModels().stream()
-        .filter(ParameterGroupModel::isShowInDsl)
-        .peek(group -> addInlineGroupElement(group, elementDsl, parentConfig, parentElement, declaration))
-        .flatMap(g -> g.getParameterModels().stream())
-        .collect(toList()));
+    addAllDeclaredParameters(model.getParameterGroupModels(), declaration, elementDsl, parentConfig, parentElement);
 
     if (model instanceof SourceModel) {
       ((SourceModel) model).getSuccessCallback()
-          .ifPresent(cb -> builder.addAll(cb.getParameterGroupModels().stream()
-              .filter(ParameterGroupModel::isShowInDsl)
-              .peek(group -> addInlineGroupElement(group, elementDsl, parentConfig, parentElement,
-                                                   declaration))
-              .flatMap(g -> g.getParameterModels().stream())
-              .collect(toList())));
-
+          .ifPresent(
+                     cb -> addAllDeclaredParameters(cb.getParameterGroupModels(), declaration, elementDsl, parentConfig,
+                                                    parentElement));
       ((SourceModel) model).getErrorCallback()
-          .ifPresent(cb -> builder.addAll(cb.getParameterGroupModels().stream()
-              .filter(ParameterGroupModel::isShowInDsl)
-              .peek(group -> addInlineGroupElement(group, elementDsl, parentConfig, parentElement,
-                                                   declaration))
-              .flatMap(g -> g.getParameterModels().stream())
-              .collect(toList())));
+          .ifPresent(
+                     cb -> addAllDeclaredParameters(cb.getParameterGroupModels(), declaration, elementDsl, parentConfig,
+                                                    parentElement));
     }
-
-    List<ParameterModel> inlineGroupedParameters = builder.build();
-
-
-    List<ParameterModel> nonGroupedParameters = model.getAllParameterModels().stream()
-        .filter(p -> !inlineGroupedParameters.contains(p))
-        .collect(toList());
-
-    addAllDeclaredParameters(nonGroupedParameters, declaration.getParameters(), elementDsl, parentConfig, parentElement);
 
     addCustomParameters(declaration, parentConfig, parentElement);
 
@@ -393,37 +369,43 @@ class DeclarationBasedElementModelFactory {
         });
   }
 
-  private void addAllDeclaredParameters(List<ParameterModel> parameterModels,
-                                        List<ParameterElementDeclaration> parameterDeclarations,
+  private void addAllDeclaredParameters(List<ParameterGroupModel> groups,
+                                        ParameterizedElementDeclaration parameterizedDeclaration,
                                         DslElementSyntax parentDsl,
                                         ComponentConfiguration.Builder parentConfig,
                                         DslElementModel.Builder parentElement) {
 
-    List<String> configuredParameters = new LinkedList<>();
-    parameterModels
-        .forEach(paramModel -> parentDsl.getContainedElement(paramModel.getName())
-            .ifPresent(paramDsl -> {
-              Optional<ParameterElementDeclaration> declared = parameterDeclarations.stream()
-                  .filter(d -> d.getName().equals(paramModel.getName()))
-                  .findFirst();
+    groups.forEach(group -> parameterizedDeclaration
+        .getParameterGroup(group.getName())
+        .ifPresent(groupDeclaration -> {
+          if (group.isShowInDsl()) {
+            addInlineGroupElement(group, parentDsl, parentConfig, parentElement, groupDeclaration);
+          } else {
+            group.getParameterModels()
+                .forEach(paramModel -> parentDsl.getContainedElement(paramModel.getName())
+                    .ifPresent(paramDsl -> {
+                      Optional<ParameterElementDeclaration> declared = groupDeclaration.getParameters().stream()
+                          .filter(d -> d.getName().equals(paramModel.getName()))
+                          .findFirst();
 
-              if (declared.isPresent()) {
-                addParameter(declared.get().getName(), declared.get().getValue(), paramModel, paramDsl, parentConfig,
-                             parentElement);
-                configuredParameters.add(declared.get().getName());
-              } else {
-                getDefaultValue(paramModel)
-                    .ifPresent(value -> createSimpleParameter((ParameterSimpleValue) ParameterSimpleValue.of(value),
-                                                              paramDsl, parentConfig, parentElement, paramModel, false));
-              }
-            }));
+                      if (declared.isPresent()) {
+                        addParameter(declared.get().getName(), declared.get().getValue(), paramModel, paramDsl, parentConfig,
+                                     parentElement);
+                      } else {
+                        getDefaultValue(paramModel)
+                            .ifPresent(value -> createSimpleParameter((ParameterSimpleValue) ParameterSimpleValue.of(value),
+                                                                      paramDsl, parentConfig, parentElement, paramModel, false));
+                      }
+                    }));
+          }
+        }));
   }
 
   private <T extends ParameterizedModel> void addInlineGroupElement(ParameterGroupModel group,
                                                                     DslElementSyntax elementDsl,
                                                                     ComponentConfiguration.Builder parentConfig,
                                                                     DslElementModel.Builder<T> parentElement,
-                                                                    ParameterizedElementDeclaration declaration) {
+                                                                    ParameterGroupElementDeclaration declaration) {
     elementDsl.getChild(group.getName())
         .ifPresent(groupDsl -> {
           DslElementModel.Builder<ParameterGroupModel> groupElementBuilder = DslElementModel.<ParameterGroupModel>builder()
@@ -432,37 +414,17 @@ class DeclarationBasedElementModelFactory {
 
           ComponentConfiguration.Builder groupBuilder = ComponentConfiguration.builder().withIdentifier(asIdentifier(groupDsl));
 
+          group.getParameterModels()
+              .forEach(paramModel -> declaration.getParameter(paramModel.getName())
+                  .ifPresent(paramDeclaration -> groupDsl.getContainedElement(paramModel.getName())
+                      .ifPresent(paramDsl -> addParameter(paramModel.getName(), paramDeclaration.getValue(),
+                                                          paramModel, paramDsl, groupBuilder, groupElementBuilder))));
 
-          Optional<ParameterElementDeclaration> groupDeclaration = declaration.getParameters().stream()
-              .filter(p -> p.getName().equals(group.getName())).findFirst();
+          ComponentConfiguration groupConfig = groupBuilder.build();
+          groupElementBuilder.withConfig(groupConfig);
 
-          groupDeclaration.ifPresent(g -> {
-            g.getValue().accept(new ParameterValueVisitor() {
-
-              @Override
-              public void visitObjectValue(ParameterObjectValue objectValue) {
-                Map<String, ParameterValue> parameters = objectValue.getParameters();
-
-                group.getParameterModels().forEach(p -> {
-                  ParameterValue parameterValue = parameters.get(p.getName());
-
-                  if (parameterValue != null) {
-                    groupDsl.getContainedElement(p.getName())
-                        .ifPresent(paramDsl -> {
-                          addParameter(p.getName(), parameterValue, p, paramDsl, groupBuilder, groupElementBuilder);
-                        });
-                  }
-
-                });
-              }
-            });
-
-            ComponentConfiguration groupConfig = groupBuilder.build();
-            groupElementBuilder.withConfig(groupConfig);
-
-            parentConfig.withNestedComponent(groupConfig);
-            parentElement.containing(groupElementBuilder.build());
-          });
+          parentConfig.withNestedComponent(groupConfig);
+          parentElement.containing(groupElementBuilder.build());
         });
   }
 

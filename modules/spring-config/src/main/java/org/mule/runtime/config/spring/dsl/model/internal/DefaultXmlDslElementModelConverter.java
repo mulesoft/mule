@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.spring.dsl.declaration.DefaultXmlArtifactDeclarationLoader.TRANSFORM_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.DECLARED_PREFIX;
@@ -33,7 +34,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -241,22 +241,31 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
   private Element populateEETransform(DslElementModel<?> elementModel) {
     Element transform = doc.createElementNS(EE_NAMESPACE, EE_PREFIX + ":" + TRANSFORM_IDENTIFIER);
     // write set-payload and set-attributes
-    elementModel.getContainedElements().stream()
-        .filter(e -> !((ComponentIdentifier) e.getIdentifier().get()).getName().equals("general")).forEach(e -> {
+    elementModel.findElement(buildFromStringRepresentation("mule:set-payload"))
+        .ifPresent(e -> {
           if (e.getContainedElements().isEmpty() && e.getValue().isPresent()) {
-            transform.setAttribute(e.getDsl().getAttributeName(), (String) e.getValue().get());
+            transform.setAttribute(e.getDsl().getAttributeName(), e.getValue().get());
           } else {
-            e.getConfiguration().ifPresent(c -> transform.appendChild(createTransformTextElement((ComponentConfiguration) c)));
+            e.getConfiguration()
+                .ifPresent(c -> transform.appendChild(createTransformTextElement((ComponentConfiguration) c)));
+          }
+        });
+    elementModel.findElement(buildFromStringRepresentation("mule:set-attributes"))
+        .ifPresent(e -> {
+          if (e.getContainedElements().isEmpty() && e.getValue().isPresent()) {
+            transform.setAttribute(e.getDsl().getAttributeName(), e.getValue().get());
+          } else {
+            e.getConfiguration()
+                .ifPresent(c -> transform.appendChild(createTransformTextElement((ComponentConfiguration) c)));
           }
         });
 
     // write set-variable
-    elementModel.getContainedElements().stream()
-        .filter(e -> ((ComponentIdentifier) e.getIdentifier().get()).getName().equals("general"))
-        .forEach(e -> e.getContainedElements().stream().findFirst()
-            .ifPresent(setVariablesElement -> ((DslElementModel) setVariablesElement).getContainedElements().stream()
-                .forEach(setVariable -> ((DslElementModel) setVariable).getConfiguration()
-                    .ifPresent(c -> transform.appendChild(createTransformTextElement((ComponentConfiguration) c))))));
+    elementModel.findElement(buildFromStringRepresentation("mule:set-variables"))
+        .ifPresent(e -> e.getContainedElements()
+            .forEach(setVariable -> setVariable.getConfiguration()
+                .ifPresent(c -> transform.appendChild(createTransformTextElement((ComponentConfiguration) c)))));
+
     return transform;
   }
 

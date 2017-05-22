@@ -1088,7 +1088,7 @@
             }
           ],
           "exclusiveParametersModels": [],
-          "showInDsl": true,
+          "showInDsl": false,
           "name": "General",
           "description": "",
           "modelProperties": {}
@@ -2031,7 +2031,12 @@
                   "description": "The expression to evaluate.",
                   "modelProperties": {}
                 }
-              ]
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
             }
           ],
           "name": "when",
@@ -2249,7 +2254,12 @@
               "description": "Allows customizing the logic used for aggregation the events back together.",
               "modelProperties": {}
             }
-          ]
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
         }
       ],
       "description": "Sends the same message to multiple message processors in parallel.",
@@ -2283,7 +2293,12 @@
       "requiresConnection": false,
       "parameterGroupModels": [
         {
-          "parameters": []
+          "parameters": [],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
         }
       ],
       "description": "Processes the nested list of message processors asynchronously using a thread pool",

@@ -36,7 +36,7 @@ import org.springframework.beans.factory.config.BeanReference;
  * configuration element this object represents is identified by a {@link ComponentIdentifier} that can be retrieved using
  * {@code #getName}.
  * <p/>
- * It may have simple configuration parameters which are retrieve by using {@code #getParameters} or complex parameters which are
+ * It may have simple configuration parameters which are retrieve by using {@code #getParameterGroups} or complex parameters which are
  * retrieved using {@code #getInnerComponents}.
  * <p/>
  * There's a set of configuration attributes or custom attributes that may not be mapped directly to the object that runs on
