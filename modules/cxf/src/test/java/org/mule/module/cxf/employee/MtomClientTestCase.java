@@ -12,6 +12,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+import static org.mule.transport.http.HttpConnector.HTTP_STATUS_PROPERTY;
+import static org.mule.transport.http.HttpConstants.SC_OK;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -22,6 +24,8 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Prober;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -120,7 +124,7 @@ public class MtomClientTestCase extends AbstractServiceAndFlowTestCase
 
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/employeeDirectory12", message, HTTP_REQUEST_OPTIONS);
 
-        assertThat((Integer) result.getInboundProperty("http.status"), is(200));
+        assertThat((Integer) result.getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
         // ensure that an attachment was actually sent.
         assertTrue(AttachmentVerifyInterceptor.HasAttachments);
     }
