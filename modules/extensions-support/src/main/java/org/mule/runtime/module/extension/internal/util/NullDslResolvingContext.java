@@ -70,6 +70,16 @@ public class NullDslResolvingContext implements DslResolvingContext {
       public boolean containsBaseType(ObjectType type) {
         return false;
       }
+
+      @Override
+      public Collection<ObjectType> getExtensionTypes(String extensionName) {
+        return emptySet();
+      }
+
+      @Override
+      public Optional<String> getDeclaringExtension(String typeId) {
+        return Optional.empty();
+      }
     };
   }
 }

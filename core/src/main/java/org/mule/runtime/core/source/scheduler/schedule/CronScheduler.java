@@ -4,17 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.scheduler.cron;
+package org.mule.runtime.core.source.scheduler.schedule;
 
 import static java.lang.String.format;
 import static java.util.TimeZone.getDefault;
 import static java.util.TimeZone.getTimeZone;
 
-import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
-
 import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
+
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

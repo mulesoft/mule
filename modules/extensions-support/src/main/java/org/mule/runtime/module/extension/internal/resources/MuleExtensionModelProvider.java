@@ -30,7 +30,7 @@ public class MuleExtensionModelProvider {
   /**
    * @return the {@link ExtensionModel} definition for Mule's Runtime
    */
-  public static ExtensionModel getMuleExtensionModel() {
+  public static ExtensionModel getExtensionModel() {
     return EXTENSION_MODEL;
   }
 

@@ -29,7 +29,9 @@
 
     <flow name="pollingUMO_authenticated">
         <scheduler>
-            <fixed-frequency-scheduler frequency="2000"/>
+            <scheduling-strategy>
+                <fixed-frequency-scheduler frequency="2000"/>
+            </scheduling-strategy>
         </scheduler>
         <http:request path="/" config-ref="secureRequestConfig">
             <http:response-validator>
@@ -42,7 +44,9 @@
 
     <flow name="pollingUMO_not_authenticated">
         <scheduler>
-            <fixed-frequency-scheduler frequency="2000"/>
+            <scheduling-strategy>
+                <fixed-frequency-scheduler frequency="2000"/>
+            </scheduling-strategy>
         </scheduler>
         <http:request path="/" config-ref="requestConfig">
             <http:response-validator>

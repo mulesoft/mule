@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.source.polling;
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
 
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.source.SchedulingStrategy;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -17,16 +18,12 @@ import java.util.concurrent.ScheduledFuture;
  *
  * @since 3.5.0, moved from {@link org.mule.runtime.core.api.schedule.SchedulerFactory}.
  */
-public abstract class PeriodicScheduler {
+public abstract class PeriodicScheduler implements SchedulingStrategy {
 
   /**
-   * Schedules a job.
-   *
-   * @param executor the corresponding {@link Scheduler} instance.
-   * @param job The {@link Runnable} job that has to be executed.
-   * @return the newly scheduled job.
-   * @throws NullPointerException In case the scheduled job handler is null.
+   * {@inheritDoc}
    */
+  @Override
   public final ScheduledFuture<?> schedule(Scheduler executor, Runnable job) {
     ScheduledFuture<?> scheduler = doSchedule(executor, job);
     checkNull(scheduler);

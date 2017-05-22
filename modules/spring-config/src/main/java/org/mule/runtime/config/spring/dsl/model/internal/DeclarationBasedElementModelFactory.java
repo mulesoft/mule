@@ -616,6 +616,8 @@ class DeclarationBasedElementModelFactory {
     ComponentConfiguration.Builder wrapperConfig = ComponentConfiguration.builder()
         .withIdentifier(asIdentifier(paramDsl));
 
+    Reference<DslSyntaxResolver> customDsl = new Reference<>(dsl);
+
     // TODO MULE-12002: Revisit DslSyntaxUtils as part of the API
     ObjectType nestedElementType;
     if (objectValue.getTypeId() == null || objectValue.getTypeId().trim().isEmpty() ||
@@ -624,9 +626,11 @@ class DeclarationBasedElementModelFactory {
       nestedElementType = (ObjectType) parameterModel.getType();
     } else {
       nestedElementType = lookupType(objectValue);
+      context.getTypeCatalog().getDeclaringExtension(objectValue.getTypeId()).ifPresent(owner -> context.getExtension(owner)
+          .ifPresent(extensionModel -> customDsl.set(resolvers.get(extensionModel))));
     }
 
-    dsl.resolve(nestedElementType)
+    customDsl.get().resolve(nestedElementType)
         .ifPresent(typeDsl -> createObject(objectValue, typeDsl, nestedElementType, nestedElementType, wrapperConfig,
                                            wrapperElement));
 

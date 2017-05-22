@@ -30,8 +30,7 @@ import static org.mule.runtime.core.config.MuleManifest.getProductName;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.config.MuleManifest.getVendorName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.getMuleExtensionModel;
-
+import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.getExtensionModel;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -52,6 +51,7 @@ import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.operation.RouteModel;
@@ -60,14 +60,15 @@ import org.mule.runtime.api.meta.model.operation.ScopeModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.LoggerMessageProcessor.LogLevel;
-import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.core.api.source.SchedulingStrategy;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.routing.AggregationStrategy;
-import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,7 +78,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
   private static final ErrorModel errorMuleAny = newError("ANY", "MULE").build();
 
-  private static ExtensionModel coreExtensionModel = getMuleExtensionModel();
+  private static ExtensionModel coreExtensionModel = getExtensionModel();
 
   @Test
   public void consistentWithManifest() {
@@ -102,7 +103,30 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   @Test
   public void otherModels() {
     assertThat(coreExtensionModel.getResources(), empty());
-    assertThat(coreExtensionModel.getSubTypes(), empty());
+    assertThat(coreExtensionModel.getSubTypes(), hasSize(1));
+
+    SubTypesModel subTypesModel = coreExtensionModel.getSubTypes().iterator().next();
+    assertThat(subTypesModel.getBaseType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
+               is(SchedulingStrategy.class.getName()));
+
+    assertThat(subTypesModel.getSubTypes(), hasSize(2));
+    Iterator<ObjectType> iterator = subTypesModel.getSubTypes().iterator();
+    final DefaultObjectType ffSchedulerType = (DefaultObjectType) iterator.next();
+    assertThat(ffSchedulerType.getFields(), hasSize(3));
+    assertThat(ffSchedulerType.getFieldByName("frequency").get().isRequired(), is(false));
+    assertThat(ffSchedulerType.getFieldByName("frequency").get().getValue(), instanceOf(DefaultNumberType.class));
+    assertThat(ffSchedulerType.getFieldByName("startDelay").get().isRequired(), is(false));
+    assertThat(ffSchedulerType.getFieldByName("startDelay").get().getValue(), instanceOf(DefaultNumberType.class));
+    assertThat(ffSchedulerType.getFieldByName("timeUnit").get().isRequired(), is(false));
+    assertThat(ffSchedulerType.getFieldByName("timeUnit").get().getValue(), instanceOf(DefaultStringType.class));
+
+    final DefaultObjectType cronSchedulerType = (DefaultObjectType) iterator.next();
+    assertThat(cronSchedulerType.getFields(), hasSize(2));
+    assertThat(cronSchedulerType.getFieldByName("expression").get().isRequired(), is(true));
+    assertThat(cronSchedulerType.getFieldByName("expression").get().getValue(), instanceOf(DefaultStringType.class));
+    assertThat(cronSchedulerType.getFieldByName("timeZone").get().isRequired(), is(false));
+    assertThat(cronSchedulerType.getFieldByName("timeZone").get().getValue(), instanceOf(DefaultStringType.class));
+
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
@@ -119,39 +143,23 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
     assertThat(coreExtensionModel.getModelProperties(), empty());
-    assertThat(coreExtensionModel.getTypes(), empty());
+    assertThat(coreExtensionModel.getTypes(), hasSize(3));
   }
 
-  // TODO MULE-9139 update this source model
   @Test
-  public void poll() {
-    final SourceModel pollModel = coreExtensionModel.getSourceModel("poll").get();
+  public void scheduler() {
+    final SourceModel schedulerModel = coreExtensionModel.getSourceModel("scheduler").get();
 
-    assertThat(pollModel.getErrorModels(), empty());
-    assertThat(pollModel.hasResponse(), is(false));
-    assertThat(pollModel.getOutput().getType(), instanceOf(DefaultObjectType.class));
-    assertThat(pollModel.getOutput().hasDynamicType(), is(true));
-    assertThat(pollModel.getOutputAttributes().getType(), instanceOf(DefaultObjectType.class));
-    assertThat(pollModel.getOutputAttributes().hasDynamicType(), is(false));
+    assertThat(schedulerModel.getErrorModels(), empty());
+    assertThat(schedulerModel.hasResponse(), is(false));
+    assertThat(schedulerModel.getOutput().getType(), instanceOf(DefaultObjectType.class));
+    assertThat(schedulerModel.getOutput().hasDynamicType(), is(true));
+    assertThat(schedulerModel.getOutputAttributes().getType(), instanceOf(DefaultObjectType.class));
+    assertThat(schedulerModel.getOutputAttributes().hasDynamicType(), is(false));
 
-    final List<ParameterModel> paramModels = pollModel.getAllParameterModels();
+    final List<ParameterModel> paramModels = schedulerModel.getAllParameterModels();
     assertThat(paramModels, hasSize(1));
-
-    assertThat(paramModels.get(0).getName(), is("fixedFrequencyScheduler"));
-    assertThat(paramModels.get(0).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(paramModels.get(0).getType(), instanceOf(DefaultObjectType.class));
-    assertThat(paramModels.get(0).isRequired(), is(false));
-    assertThat(paramModels.get(0).getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
-               is(FixedFrequencyScheduler.class.getName()));
-    final DefaultObjectType ffSchedulerType = (DefaultObjectType) paramModels.get(0).getType();
-    assertThat(ffSchedulerType.getFields(), hasSize(3));
-    assertThat(ffSchedulerType.getFieldByName("frequency").get().isRequired(), is(false));
-    assertThat(ffSchedulerType.getFieldByName("frequency").get().getValue(), instanceOf(DefaultNumberType.class));
-    assertThat(ffSchedulerType.getFieldByName("startDelay").get().isRequired(), is(false));
-    assertThat(ffSchedulerType.getFieldByName("startDelay").get().getValue(), instanceOf(DefaultNumberType.class));
-    assertThat(ffSchedulerType.getFieldByName("timeUnit").get().isRequired(), is(false));
-    assertThat(ffSchedulerType.getFieldByName("timeUnit").get().getValue(), instanceOf(DefaultStringType.class));
-
+    assertSchedulingStrategy(paramModels.get(0));
     // TODO add the route
   }
 
@@ -671,5 +679,14 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(targetParameterModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
                is(String.class.getName()));
     assertThat(targetParameterModel.isRequired(), is(false));
+  }
+
+  private void assertSchedulingStrategy(ParameterModel paramModel) {
+    assertThat(paramModel.getName(), is("schedulingStrategy"));
+    assertThat(paramModel.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(paramModel.getType(), instanceOf(DefaultObjectType.class));
+    assertThat(paramModel.isRequired(), is(false));
+    assertThat(paramModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
+               is(SchedulingStrategy.class.getName()));
   }
 }
