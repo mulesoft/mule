@@ -30,10 +30,12 @@ import java.util.Map;
 
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+@Ignore("MULE-12547: Flaky")
 public class MavenClassLoaderModelLoaderTestCase {
 
   public static final String MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION = "muleRuntimeConfig.maven.repositoryLocation";

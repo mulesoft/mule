@@ -11,8 +11,10 @@ import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import org.mule.runtime.api.message.Message;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("MULE-12547: Flaky")
 public class ModuleUsingJmsTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override
