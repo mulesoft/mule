@@ -7,6 +7,7 @@
 package org.mule;
 
 import static java.lang.System.getProperty;
+import static java.lang.Boolean.getBoolean;
 import static java.util.Collections.EMPTY_MAP;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
@@ -116,7 +117,7 @@ public abstract class AbstractBenchmarkAssertionTestCase extends AbstractMuleTes
   protected void runAndAssertBenchmark(Class clazz, String testName, int threads, Map<String, String[]> params, TimeUnit timeUnit,
                                        boolean profileGC, Consumer<RunResult> assertions) {
     try {
-      if (getProperty(ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY) != null) {
+      if (getBoolean(getProperty(ENABLE_PERFORMANCE_TESTS_SYSTEM_PROPERTY))) {
         ChainedOptionsBuilder optionsBuilder = createCommonOptionsBuilder(clazz, testName, params, timeUnit, profileGC);
         optionsBuilder = optionsBuilder
             .forks(1)
