@@ -530,9 +530,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     List<URL> urls;
     try {
-      //List<Dependency> managedDependencies =
-      //    dependencyResolver.readArtifactDescriptor(artifactToClassify).getManagedDependencies();
-
       final DependencyFilter dependencyFilter = andFilter(classpathFilter(COMPILE),
                                                           new PatternExclusionsDependencyFilter(context.getExcludedArtifacts()),
                                                           orFilter(new PatternExclusionsDependencyFilter("*:*:*:"
@@ -549,7 +546,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     List<Dependency> directDependencies;
     List<ArtifactClassificationNode> artifactDependencies = newArrayList();
     try {
-      directDependencies = dependencyResolver.getDirectDependencies(artifactToClassify);
+      directDependencies = dependencyResolver.getDirectDependencies(artifactToClassify, rootArtifactRemoteRepositories);
     } catch (ArtifactDescriptorException e) {
       throw new IllegalStateException("Couldn't get direct dependencies for artifact: '" + artifactToClassify + "'", e);
     }
@@ -925,7 +922,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         }
 
         if (urlFromClassPath != null) {
-          logger.info("Replacing resolved URL '{}' from class path URL '{}'", urlResolved, urlFromClassPath);
+          logger.debug("Replacing resolved URL '{}' from class path URL '{}'", urlResolved, urlFromClassPath);
           listIterator.set(urlFromClassPath);
         } else {
           logger.warn("'{}' resolved SNAPSHOT version couldn't be matched to a class path URL: '{}'", artifactResolvedFile,
