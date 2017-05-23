@@ -19,8 +19,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
@@ -46,6 +46,7 @@ import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.After;
@@ -90,6 +91,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
                                                                       any(Throwable.class)))
                                                                           .thenReturn(errorType);
     when(muleContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
+    when(muleContext.getErrorTypeRepository().getErrorType(UNKNOWN)).thenReturn(Optional.of(mock(ErrorType.class)));
     pipeline = new TestPipeline(pipelineName, muleContext);
     when(muleContext.getTransformationService()).thenReturn(new TransformationService(muleContext));
     context = DefaultEventContext.create(pipeline, TEST_CONNECTOR_LOCATION);

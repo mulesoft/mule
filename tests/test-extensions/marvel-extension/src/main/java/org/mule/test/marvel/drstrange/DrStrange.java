@@ -10,6 +10,7 @@ import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 
 /**
  * Default extension to test cursor streams and lists. Given Dr. Strange's ability to use the eye of Agamotto
