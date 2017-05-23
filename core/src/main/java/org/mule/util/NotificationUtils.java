@@ -12,9 +12,11 @@ import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.processor.chain.InterceptingChainLifecycleWrapperPathSkip;
 
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * Contains useful methods for the generation of message processor identifiers used by the notification system
@@ -39,20 +41,19 @@ public class NotificationUtils
                 MessageProcessorPathElement messageProcessorPathElement;
 
                 // To avoid adding a level in some path elements:
-                if (!(mp instanceof InterceptingChainLifecycleWrapperPathSkip))
+                if (mp instanceof InterceptingChainLifecycleWrapperPathSkip)
                 {
-                    messageProcessorPathElement = parentElement.addChild(mp);
+                    messageProcessorPathElement = parentElement;
                 }
                 else
                 {
-                    messageProcessorPathElement = parentElement;
+                    messageProcessorPathElement = parentElement.addChild(mp);
                 }
                 if (messageProcessorPathElement != null && mp instanceof MessageProcessorContainer)
                 {
                     ((MessageProcessorContainer) mp).addMessageProcessorPathElements(messageProcessorPathElement);
                 }
             }
-
         }
 
     }

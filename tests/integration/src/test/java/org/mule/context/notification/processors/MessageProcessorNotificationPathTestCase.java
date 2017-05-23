@@ -68,6 +68,8 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
         testFlowPaths("until-successful-with-processor-chain", "/0", "/0/0", "/0/0/0", "/0/0/1", "/1");
         testFlowPaths("until-successful-with-enricher", "/0", "/0/0", "/0/0/0", "/1");
         testFlowPaths("async", "/0", "/0/0", "/0/1");
+        testFlowPaths("single-transaction","/0","/0/0","/0/1");
+        testFlowPaths("single-transaction-not-first-element","/0","/1","/1/0","/1/1");
     }
 
     @Test
@@ -124,8 +126,7 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     {
         testFlowPaths("wire-tap", "/0", "/0/0", "/1");
     }
-
-
+    
     private void testFlowPaths(String flowName, String... nodes) throws Exception
     {
         String[] expectedPaths = generatePaths(flowName, nodes);
