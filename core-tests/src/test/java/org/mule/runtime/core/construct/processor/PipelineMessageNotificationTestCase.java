@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.construct.processor;
 
-import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
@@ -15,6 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
