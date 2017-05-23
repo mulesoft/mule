@@ -9,15 +9,16 @@ package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 import static com.google.common.collect.ImmutableList.copyOf;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.services.soap.api.client.SoapClientConfiguration.builder;
+import static org.mule.runtime.soap.api.client.SoapClientConfiguration.builder;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
-import org.mule.services.soap.api.SoapService;
-import org.mule.services.soap.api.client.SoapClient;
-import org.mule.services.soap.api.client.SoapClientConfigurationBuilder;
-import org.mule.services.soap.api.client.SoapClientFactory;
+import org.mule.runtime.soap.api.SoapService;
+import org.mule.runtime.soap.api.client.SoapClient;
+import org.mule.runtime.soap.api.client.SoapClientConfigurationBuilder;
+import org.mule.runtime.soap.api.client.SoapClientFactory;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

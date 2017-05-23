@@ -29,7 +29,7 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultR
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpMessageDispatcherProvider;
-import org.mule.services.soap.api.client.SoapClient;
+import org.mule.runtime.soap.api.client.SoapClient;
 
 /**
  * Implementation of {@link ConnectionProviderObjectBuilder} which produces instances of {@link ForwardingSoapClientConnectionProvider}.

@@ -17,12 +17,12 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
-import org.mule.services.soap.api.SoapService;
-import org.mule.services.soap.api.client.SoapClient;
-import org.mule.services.soap.api.client.SoapClientFactory;
-import org.mule.services.soap.api.client.metadata.SoapMetadataResolver;
-import org.mule.services.soap.api.message.SoapRequest;
-import org.mule.services.soap.api.message.SoapResponse;
+import org.mule.runtime.soap.api.SoapService;
+import org.mule.runtime.soap.api.client.SoapClient;
+import org.mule.runtime.soap.api.client.SoapClientFactory;
+import org.mule.runtime.soap.api.client.metadata.SoapMetadataResolver;
+import org.mule.runtime.soap.api.message.SoapRequest;
+import org.mule.runtime.soap.api.message.SoapResponse;
 
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;

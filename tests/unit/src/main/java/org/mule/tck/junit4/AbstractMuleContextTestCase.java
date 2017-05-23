@@ -56,7 +56,7 @@ import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.service.http.api.HttpService;
+import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;

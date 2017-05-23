@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.oauth.api;
 
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
-import org.mule.service.http.api.domain.message.request.HttpRequest;
-import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 
 import java.util.concurrent.CompletableFuture;
 

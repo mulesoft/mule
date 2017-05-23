@@ -31,7 +31,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.MessageDispatcherProviderTypeWrapper;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapExtensionTypeWrapper;
-import org.mule.services.soap.api.exception.error.SoapErrors;
+import org.mule.runtime.soap.api.exception.error.SoapErrors;
 
 import java.util.List;
 import java.util.Set;

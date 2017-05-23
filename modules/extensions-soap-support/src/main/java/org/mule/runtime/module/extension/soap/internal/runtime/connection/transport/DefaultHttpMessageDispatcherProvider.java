@@ -15,9 +15,9 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.soap.HttpMessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
-import org.mule.service.http.api.HttpService;
-import org.mule.services.soap.api.message.dispatcher.DefaultHttpMessageDispatcher;
-import org.mule.services.soap.api.message.dispatcher.HttpConfigBasedMessageDispatcher;
+import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.soap.api.message.dispatcher.DefaultHttpMessageDispatcher;
+import org.mule.runtime.soap.api.message.dispatcher.HttpConfigBasedMessageDispatcher;
 
 import javax.inject.Inject;
 

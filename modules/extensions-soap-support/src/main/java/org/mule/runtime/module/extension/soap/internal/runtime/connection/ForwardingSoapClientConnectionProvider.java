@@ -15,8 +15,8 @@ import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
-import org.mule.service.http.api.HttpService;
-import org.mule.services.soap.api.SoapService;
+import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.soap.api.SoapService;
 
 import java.util.List;
 

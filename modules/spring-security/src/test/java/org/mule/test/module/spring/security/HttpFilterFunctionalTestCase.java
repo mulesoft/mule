@@ -10,7 +10,8 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 

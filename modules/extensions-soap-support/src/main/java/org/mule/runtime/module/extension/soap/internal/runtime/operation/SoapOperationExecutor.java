@@ -27,11 +27,11 @@ import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.soap.SoapAttachment;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
-import org.mule.services.soap.api.client.SoapClient;
-import org.mule.services.soap.api.message.SoapRequest;
-import org.mule.services.soap.api.message.SoapRequestBuilder;
-import org.mule.services.soap.api.message.SoapResponse;
-import org.mule.services.soap.internal.exception.error.SoapExceptionEnricher;
+import org.mule.runtime.soap.api.client.SoapClient;
+import org.mule.runtime.soap.api.message.SoapRequest;
+import org.mule.runtime.soap.api.message.SoapRequestBuilder;
+import org.mule.runtime.soap.api.message.SoapResponse;
+import org.mule.runtime.soap.internal.exception.error.SoapExceptionEnricher;
 
 import java.io.InputStream;
 import java.util.Map;
