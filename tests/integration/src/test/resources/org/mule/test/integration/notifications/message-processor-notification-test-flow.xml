@@ -233,6 +233,24 @@
         </async>
     </flow>
 
+    <flow name="single-transaction">
+        <vm:inbound-endpoint path="single-transaction" exchange-pattern="request-response"/>
+        <transactional action="ALWAYS_BEGIN">
+            <logger message="check1"/>
+            <logger message="check2"/>
+        </transactional>
+    </flow>
+
+    <flow name="single-transaction-not-first-element">
+        <vm:inbound-endpoint path="single-transaction-not-first-element" exchange-pattern="request-response"/>
+        <logger message="check0"/>
+        <transactional action="ALWAYS_BEGIN">
+            <logger message="check1"/>
+            <logger message="check2"/>
+        </transactional>
+    </flow>
+
+
     <flow name="filters">
         <vm:inbound-endpoint path="in-filter" exchange-pattern="request-response"/>
         <payload-type-filter expectedType="java.lang.String"/>

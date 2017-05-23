@@ -6,22 +6,16 @@
  */
 package org.mule.util;
 
-import static java.util.Collections.synchronizedSet;
-
 import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.processor.chain.DynamicMessageProcessorContainer;
 import org.mule.processor.chain.InterceptingChainLifecycleWrapperPathSkip;
-
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -94,20 +88,19 @@ public class NotificationUtils
                 MessageProcessorPathElement messageProcessorPathElement;
 
                 // To avoid adding a level in some path elements:
-                if (!(mp instanceof InterceptingChainLifecycleWrapperPathSkip))
+                if (mp instanceof InterceptingChainLifecycleWrapperPathSkip)
                 {
-                    messageProcessorPathElement = parentElement.addChild(mp);
+                    messageProcessorPathElement = parentElement;
                 }
                 else
                 {
-                    messageProcessorPathElement = parentElement;
+                    messageProcessorPathElement = parentElement.addChild(mp);
                 }
                 if (messageProcessorPathElement != null && mp instanceof MessageProcessorContainer)
                 {
                     ((MessageProcessorContainer) mp).addMessageProcessorPathElements(messageProcessorPathElement);
                 }
             }
-
         }
 
     }
