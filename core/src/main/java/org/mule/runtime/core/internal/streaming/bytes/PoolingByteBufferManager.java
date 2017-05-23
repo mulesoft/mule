@@ -139,6 +139,7 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
       public void activateObject(PooledObject<ByteBuffer> p) throws Exception {
         p.getObject().clear();
       }
+
     }, config);
   }
 }
