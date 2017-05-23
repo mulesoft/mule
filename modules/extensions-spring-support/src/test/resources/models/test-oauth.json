@@ -814,7 +814,7 @@
                     }
                   },
                   "hasDynamicType": false,
-                  "required": false,
+                  "required": true,
                   "isConfigOverride": false,
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -824,7 +824,7 @@
                     "allowTopLevelDefinition": false
                   },
                   "name": "listenerConfig",
-                  "description": "A reference to an \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint. This is mutually exclusive with callbackHost and callbackPort",
+                  "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
                   "modelProperties": {}
                 },
                 {
@@ -836,51 +836,7 @@
                     }
                   },
                   "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "name": "callbackHost",
-                  "description": "The host in which to create a http listener for the access token callback endpoint. This is mutually exclusive with listenerConfig",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Number",
-                    "annotations": {
-                      "typeId": "java.lang.Integer"
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "name": "callbackPort",
-                  "description": "The port in which to create a http listener for triggering the authorization dance. This is mutually exclusive with listenerConfig",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "java.lang.String"
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
+                  "required": true,
                   "isConfigOverride": false,
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -913,6 +869,28 @@
                   },
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "externalCallbackUrl",
+                  "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
                 }
               ],
@@ -1441,7 +1419,7 @@
                     }
                   },
                   "hasDynamicType": false,
-                  "required": false,
+                  "required": true,
                   "isConfigOverride": false,
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -1451,7 +1429,7 @@
                     "allowTopLevelDefinition": false
                   },
                   "name": "listenerConfig",
-                  "description": "A reference to an \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint. This is mutually exclusive with callbackHost and callbackPort",
+                  "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
                   "modelProperties": {}
                 },
                 {
@@ -1463,51 +1441,7 @@
                     }
                   },
                   "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "name": "callbackHost",
-                  "description": "The host in which to create a http listener for the access token callback endpoint. This is mutually exclusive with listenerConfig",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Number",
-                    "annotations": {
-                      "typeId": "java.lang.Integer"
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "name": "callbackPort",
-                  "description": "The port in which to create a http listener for triggering the authorization dance. This is mutually exclusive with listenerConfig",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "java.lang.String"
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
+                  "required": true,
                   "isConfigOverride": false,
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -1540,6 +1474,28 @@
                   },
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "name": "externalCallbackUrl",
+                  "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
                 }
               ],
@@ -2077,7 +2033,7 @@
                 }
               },
               "hasDynamicType": false,
-              "required": false,
+              "required": true,
               "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
@@ -2087,7 +2043,7 @@
                 "allowTopLevelDefinition": false
               },
               "name": "listenerConfig",
-              "description": "A reference to an \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint. This is mutually exclusive with callbackHost and callbackPort",
+              "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
               "modelProperties": {}
             },
             {
@@ -2099,51 +2055,7 @@
                 }
               },
               "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "name": "callbackHost",
-              "description": "The host in which to create a http listener for the access token callback endpoint. This is mutually exclusive with listenerConfig",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "typeId": "java.lang.Integer"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "name": "callbackPort",
-              "description": "The port in which to create a http listener for triggering the authorization dance. This is mutually exclusive with listenerConfig",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
+              "required": true,
               "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
@@ -2176,6 +2088,28 @@
               },
               "name": "authorizePath",
               "description": "The path of the local http endpoint which triggers the OAuth dance",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "externalCallbackUrl",
+              "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
               "modelProperties": {}
             }
           ],
@@ -2704,7 +2638,7 @@
                 }
               },
               "hasDynamicType": false,
-              "required": false,
+              "required": true,
               "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
@@ -2714,7 +2648,7 @@
                 "allowTopLevelDefinition": false
               },
               "name": "listenerConfig",
-              "description": "A reference to an \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint. This is mutually exclusive with callbackHost and callbackPort",
+              "description": "A reference to a \u003chttp:listener-config /\u003e to be used in order to create the listener that will catch the access token callback endpoint.",
               "modelProperties": {}
             },
             {
@@ -2726,51 +2660,7 @@
                 }
               },
               "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "name": "callbackHost",
-              "description": "The host in which to create a http listener for the access token callback endpoint. This is mutually exclusive with listenerConfig",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "typeId": "java.lang.Integer"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "name": "callbackPort",
-              "description": "The port in which to create a http listener for triggering the authorization dance. This is mutually exclusive with listenerConfig",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String"
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
+              "required": true,
               "isConfigOverride": false,
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
@@ -2803,6 +2693,28 @@
               },
               "name": "authorizePath",
               "description": "The path of the local http endpoint which triggers the OAuth dance",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "typeId": "java.lang.String"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "name": "externalCallbackUrl",
+              "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
               "modelProperties": {}
             }
           ],
