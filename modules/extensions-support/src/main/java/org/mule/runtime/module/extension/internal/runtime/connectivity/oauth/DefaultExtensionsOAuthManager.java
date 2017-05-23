@@ -31,9 +31,9 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.core.util.LazyLookup;
 import org.mule.runtime.core.util.func.CheckedFunction;
 import org.mule.runtime.core.util.store.LazyObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthCodeRequest;
@@ -76,17 +76,11 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
   @Inject
   private MuleContext muleContext;
 
-  @Inject
-  private HttpService httpService;
+  // TODO: MULE-10837 this should be a plain old @Inject
+  private LazyValue<HttpService> httpService = new LazyLookup<>(HttpService.class, muleContext);
 
   // TODO: MULE-10837 this should be a plain old @Inject
-  private LazyValue<OAuthService> oauthService = new LazyValue<>(() -> {
-    try {
-      return muleContext.getRegistry().lookupObject(OAuthService.class);
-    } catch (RegistrationException e) {
-      throw new MuleRuntimeException(e);
-    }
-  });
+  private LazyValue<OAuthService> oauthService = new LazyLookup<>(OAuthService.class, muleContext);
 
 
   private final Map<String, AuthorizationCodeOAuthDancer> dancers = new ConcurrentHashMap<>();
@@ -209,7 +203,7 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
 
     HttpServer httpServer;
     try {
-      httpServer = httpService.getServerFactory().lookup(callbackConfig.getListenerConfig());
+      httpServer = httpService.get().getServerFactory().lookup(callbackConfig.getListenerConfig());
     } catch (ServerNotFoundException e) {
       throw new MuleRuntimeException(createStaticMessage(format(
                                                                 "Connector '%s' defines '%s' as the http:listener-config to use for provisioning callbacks, but no such definition "
