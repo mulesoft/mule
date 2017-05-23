@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -70,6 +71,8 @@ public class DependencyResolver {
     this.repositoryState =
         new AetherRepositoryState(this.resolutionContext.getLocalRepositoryLocation(), workspaceReader, false,
                                   false, resolutionContext.getAuthenticatorSelector());
+
+    logger.info(ReflectionToStringBuilder.toString(resolutionContext.getAuthenticatorSelector()));
   }
 
   /**
