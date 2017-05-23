@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -34,7 +35,8 @@ public class AttributeEvaluator {
 
   private static final Pattern SINGLE_EXPRESSION_REGEX_PATTERN = compile("^#\\[(?:(?!#\\[).)*]$", DOTALL);
   private static final BindingContext NULL_BINDING_CONTEXT = BindingContext.builder().build();
-  private static final List<Class<?>> BLACK_LIST_TYPES = asList(Object.class, InputStream.class, Serializable.class);
+  private static final List<Class<?>> BLACK_LIST_TYPES =
+      asList(Object.class, InputStream.class, Iterator.class, Serializable.class);
 
   private String attributeValue;
   private ExtendedExpressionManager expressionManager;
