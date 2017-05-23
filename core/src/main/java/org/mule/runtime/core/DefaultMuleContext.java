@@ -40,6 +40,7 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPING;
 import static org.mule.runtime.core.util.ExceptionUtils.getRootCauseException;
+import static org.mule.runtime.core.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.unwrap;
@@ -55,6 +56,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
@@ -87,7 +89,6 @@ import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.config.ClusterConfiguration;
@@ -327,10 +328,10 @@ public class DefaultMuleContext implements MuleContext {
 
       getNotificationManager().initialise();
     } catch (InitialisationException e) {
-      disposeManagers();
+      dispose();
       throw e;
     } catch (Exception e) {
-      disposeManagers();
+      dispose();
       throw new InitialisationException(e, this);
     }
   }
@@ -429,7 +430,9 @@ public class DefaultMuleContext implements MuleContext {
 
       // THis is a little odd. I find the relationship between the MuleRegistry Helper and the registry broker, too much
       // abstraction?
-      muleRegistryHelper.dispose();
+      if (muleRegistryHelper != null) {
+        safely(() -> muleRegistryHelper.dispose());
+      }
     } catch (Exception e) {
       logger.debug("Failed to cleanly dispose Mule: " + e.getMessage(), e);
     }
@@ -449,7 +452,7 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   private void disposeManagers() {
-    notificationManager.dispose();
+    safely(() -> notificationManager.dispose());
   }
 
   /**
@@ -650,10 +653,9 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   /**
-   * When running in clustered mode, it returns a {@link ObjectStoreManager} that creates
-   * {@link ObjectStore} instances which are only local to the current node. This is just a
-   * workaround until we introduce a solution for durable persistent stores in HA. This is not part of Mule's API and you should
-   * not use this in your apps or extensions
+   * When running in clustered mode, it returns a {@link ObjectStoreManager} that creates {@link ObjectStore} instances which are
+   * only local to the current node. This is just a workaround until we introduce a solution for durable persistent stores in HA.
+   * This is not part of Mule's API and you should not use this in your apps or extensions
    *
    * @return a {@link ObjectStoreManager}
    * @since 3.5.0
