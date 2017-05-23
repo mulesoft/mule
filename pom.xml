@@ -129,7 +129,7 @@
         <javadocPluginVersion>2.9.1</javadocPluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
         <mavenCompilerVersion>3.1</mavenCompilerVersion>
-        
+
         <!--
             The above project.url will not be picked up in the manifest,
             instead a module artifact id is erroneously substituted.
@@ -143,7 +143,7 @@
         <jdk7Name>JavaSE-1.7</jdk7Name>
 
         <activemqVersion>5.11.1</activemqVersion>
-        <antVersion>1.7.0</antVersion>
+        <antVersion>1.9.6</antVersion>
         <antlrVersion>3.5</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.8.5</aspectjVersion>
