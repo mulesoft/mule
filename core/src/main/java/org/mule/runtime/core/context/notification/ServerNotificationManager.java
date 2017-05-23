@@ -231,4 +231,7 @@ public class ServerNotificationManager implements Initialisable, Disposable, Ser
     return unmodifiableSet(configuration.getListeners());
   }
 
+  public boolean isDisposed() {
+    return disposed.get();
+  }
 }

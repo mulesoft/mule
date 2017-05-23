@@ -76,17 +76,21 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
   }
 
   protected void handleNotificationListeners() {
-    if (DefaultMuleConfiguration.isFlowTrace()) {
-      muleContext.getNotificationManager().addListener(messageProcessorTextDebugger);
-      muleContext.getNotificationManager().addListener(pipelineProcessorDebugger);
-    } else {
-      removeNotificationListeners();
+    if (!muleContext.getNotificationManager().isDisposed()) {
+      if (DefaultMuleConfiguration.isFlowTrace()) {
+        muleContext.getNotificationManager().addListener(messageProcessorTextDebugger);
+        muleContext.getNotificationManager().addListener(pipelineProcessorDebugger);
+      } else {
+        removeNotificationListeners();
+      }
     }
   }
 
   protected void removeNotificationListeners() {
-    muleContext.getNotificationManager().removeListener(messageProcessorTextDebugger);
-    muleContext.getNotificationManager().removeListener(pipelineProcessorDebugger);
+    if (!muleContext.getNotificationManager().isDisposed()) {
+      muleContext.getNotificationManager().removeListener(messageProcessorTextDebugger);
+      muleContext.getNotificationManager().removeListener(pipelineProcessorDebugger);
+    }
   }
 
   /**
