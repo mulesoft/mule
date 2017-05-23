@@ -6,24 +6,16 @@
  */
 package org.mule.util;
 
-import static java.util.Collections.synchronizedSet;
-
-import org.mule.api.processor.DefaultMessageProcessorPathElement;
 import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
-import org.mule.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.processor.chain.DynamicMessageProcessorContainer;
 import org.mule.processor.chain.InterceptingChainLifecycleWrapperPathSkip;
-
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

@@ -129,9 +129,7 @@ public class MessageProcessorNotificationPathTestCase extends FunctionalTestCase
     {
         testFlowPaths("wire-tap", "/0", "/0/0", "/1");
     }
-
-
-
+    
     private void testFlowPaths(String flowName, String... nodes) throws Exception
     {
         String[] expectedPaths = generatePaths(flowName, nodes);
