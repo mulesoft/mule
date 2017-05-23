@@ -16,6 +16,7 @@ import org.mule.maven.client.internal.AetherRepositoryState;
 import org.mule.maven.client.internal.AetherResolutionContext;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -162,6 +163,21 @@ public class DependencyResolver {
   }
 
   /**
+   * Resolves direct dependencies for an {@link Artifact}.
+   *
+   * @param artifact {@link Artifact} to collect its direct dependencies
+   * @param remoteRepositories remote repositories to be used in addition to the one in context
+   * @return a {@link List} of {@link Dependency} for each direct dependency resolved
+   * @throws {@link ArtifactDescriptorException} if the artifact descriptor could not be read
+   */
+  public List<Dependency> getDirectDependencies(Artifact artifact, List<RemoteRepository> remoteRepositories)
+      throws ArtifactDescriptorException {
+    checkNotNull(artifact, "artifact cannot be null");
+
+    return readArtifactDescriptor(artifact, remoteRepositories).getDependencies();
+  }
+
+  /**
    * Resolves and filters transitive dependencies for the root and direct dependencies.
    * <p/>
    * If both a root dependency and direct dependencies are given, the direct dependencies will be merged with the direct
@@ -193,12 +209,13 @@ public class DependencyResolver {
     remoteRepositories.forEach(remoteRepository -> {
       RemoteRepository authenticatedRemoteRepository = setAuthentication(remoteRepository);
       if (!collectRequest.getRepositories().contains(authenticatedRemoteRepository)) {
-        collectRequest.addRepository(setAuthentication(remoteRepository));
+        collectRequest.addRepository(authenticatedRemoteRepository);
       }
     });
 
     DependencyNode node;
     try {
+      logger.info("Collecting dependencies for '{}'", printCollectRequest(collectRequest));
       node = repositoryState.getSystem().collectDependencies(repositoryState.getSession(), collectRequest).getRoot();
       logDependencyGraph(node, collectRequest);
       DependencyRequest dependencyRequest = new DependencyRequest();
@@ -218,6 +235,26 @@ public class DependencyResolver {
 
     List<File> files = getFiles(node);
     return files;
+  }
+
+  private String printCollectRequest(CollectRequest collectRequest) {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("[");
+    Iterator<RemoteRepository> iterator = collectRequest.getRepositories().iterator();
+    while (iterator.hasNext()) {
+      RemoteRepository remoteRepository = iterator.next();
+      stringBuilder.append(remoteRepository);
+      stringBuilder.append("->authentication[");
+      if (remoteRepository.getAuthentication() != null) {
+        stringBuilder.append(remoteRepository.getAuthentication());
+      }
+      stringBuilder.append("]");
+      if (iterator.hasNext()) {
+        stringBuilder.append(", ");
+      }
+    }
+    stringBuilder.append("]");
+    return collectRequest.getRoot() + " -> " + collectRequest.getDependencies() + " < " + stringBuilder.toString();
   }
 
   private RemoteRepository setAuthentication(RemoteRepository remoteRepository) {
