@@ -179,8 +179,8 @@
 /mule-standalone-${productVersion}/lib/opt/aether-transport-file-1.0.2.v20150114.jar
 /mule-standalone-${productVersion}/lib/opt/aether-transport-http-1.0.2.v20150114.jar
 /mule-standalone-${productVersion}/lib/opt/aether-util-1.0.2.v20150114.jar
-/mule-standalone-${productVersion}/lib/opt/ant-1.7.0.jar
-/mule-standalone-${productVersion}/lib/opt/ant-launcher-1.7.0.jar
+/mule-standalone-${productVersion}/lib/opt/ant-1.9.6.jar
+/mule-standalone-${productVersion}/lib/opt/ant-launcher-1.9.6.jar
 /mule-standalone-${productVersion}/lib/opt/antlr-runtime-3.5.jar
 /mule-standalone-${productVersion}/lib/opt/aopalliance-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/asm-3.3.1.jar

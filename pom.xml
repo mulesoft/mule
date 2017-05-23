@@ -133,7 +133,7 @@
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
         <activemqVersion>5.11.1</activemqVersion>
-        <antVersion>1.7.0</antVersion>
+        <antVersion>1.9.6</antVersion>
         <assertJVersion>3.5.2</assertJVersion>
         <asmVersion>3.3.1</asmVersion>
         <asmCommonsVersion>3.1</asmCommonsVersion>
