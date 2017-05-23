@@ -30,6 +30,8 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -81,6 +83,12 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
   @Mock
   private ExtensionManager extensionManager;
 
+  @Mock
+  private CursorProviderFactory cursorProviderFactory;
+
+  @Mock
+  private StreamingManager streamingManager;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MuleContext muleContext;
 
@@ -100,7 +108,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
     when(muleEvent.getMessage().getPayload()).thenReturn(new TypedValue<>(null, DATA_TYPE));
     when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
     operationContext = new DefaultExecutionContext(extensionModel, of(configurationInstance), parameters.asMap(), operationModel,
-                                                   muleEvent, muleContext);
+                                                   muleEvent, cursorProviderFactory, streamingManager, muleContext);
     operationContext = spy(operationContext);
   }
 

@@ -14,6 +14,8 @@ import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
+import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.util.func.CheckedFunction;
 
 /**
@@ -78,6 +80,23 @@ public final class StreamingUtils {
       if (cursor != null) {
         cursor.release();
       }
+    }
+  }
+
+  /**
+   * If the {@code cursorProviderFactory} accepts the given {@code value}, then the result of invoking
+   * {@link CursorProviderFactory#of(Event, Object)} is returned. Otherwise, the original {@code value} is.
+   *
+   * @param value a value which may be a repeatable streaming resource
+   * @param cursorProviderFactory a nullable {@link CursorStreamProviderFactory}
+   * @param event the event on which the {@code value} was generated
+   * @return the {@code value} or a {@link CursorProvider}
+   */
+  public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, Event event) {
+    if (cursorProviderFactory != null && cursorProviderFactory.accepts(value)) {
+      return cursorProviderFactory.of(event, value);
+    } else {
+      return value;
     }
   }
 

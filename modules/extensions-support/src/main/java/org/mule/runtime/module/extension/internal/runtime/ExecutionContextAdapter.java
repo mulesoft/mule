@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
@@ -64,4 +66,14 @@ public interface ExecutionContextAdapter<M extends ComponentModel> extends Event
    * @return The {@link MuleContext} on which the operation is being executed
    */
   MuleContext getMuleContext();
+
+  /**
+   * @return The {@link CursorProviderFactory} configured on the executing component
+   */
+  CursorProviderFactory getCursorProviderFactory();
+
+  /**
+   * @return The application's {@link StreamingManager}
+   */
+  StreamingManager getStreamingManager();
 }

@@ -19,6 +19,8 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.config.LifecycleAwareConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -65,9 +67,15 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
   @Mock
   private ExtensionManager extensionManager;
 
+  @Mock
+  private CursorProviderFactory<Object> cursorProviderFactory;
+
+  @Mock
+  private StreamingManager streamingManager;
+
   private Object configurationInstance = new Object();
   private ConfigurationInstance configuration;
-  private DefaultExecutionContext operationContext;
+  private DefaultExecutionContext<OperationModel> operationContext;
 
 
   @Before
@@ -79,8 +87,8 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
     when(resolverSetResult.asMap()).thenReturn(parametersMap);
 
     operationContext =
-        new DefaultExecutionContext(extensionModel, of(configuration), resolverSetResult.asMap(), operationModel, event,
-                                    muleContext);
+        new DefaultExecutionContext<>(extensionModel, of(configuration), resolverSetResult.asMap(), operationModel,
+                                      event, cursorProviderFactory, streamingManager, muleContext);
   }
 
   @Test

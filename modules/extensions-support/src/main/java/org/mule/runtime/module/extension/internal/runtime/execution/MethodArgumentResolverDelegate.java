@@ -42,7 +42,9 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGrou
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SecurityContextHandlerArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SourceCallbackContextArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelperArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueArgumentResolver;
+import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -70,6 +72,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private static final ArgumentResolver<AuthenticationHandler> SECURITY_CONTEXT_HANDLER =
       new SecurityContextHandlerArgumentResolver();
   private static final ArgumentResolver<FlowListener> FLOW_LISTENER_ARGUMENT_RESOLVER = new FlowListenerArgumentResolver();
+  private static final ArgumentResolver<StreamingHelper> STREAMING_HELPER_ARGUMENT_RESOLVER =
+      new StreamingHelperArgumentResolver();
 
 
   private final Method method;
@@ -133,6 +137,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = SECURITY_CONTEXT_HANDLER;
       } else if (FlowListener.class.equals(parameterType)) {
         argumentResolver = FLOW_LISTENER_ARGUMENT_RESOLVER;
+      } else if (StreamingHelper.class.equals(parameterType)) {
+        argumentResolver = STREAMING_HELPER_ARGUMENT_RESOLVER;
       } else {
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
       }

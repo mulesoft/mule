@@ -122,6 +122,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                  sourceModel,
                                  source,
                                  configurationInstance,
+                                 cursorProviderFactory,
                                  sourceCallbackFactory,
                                  nonCallbackParameters,
                                  successCallbackParameters,

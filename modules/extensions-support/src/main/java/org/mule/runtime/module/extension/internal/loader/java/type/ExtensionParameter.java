@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
 import com.google.common.collect.ImmutableSet;
@@ -42,6 +43,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
       .add(MediaType.class)
       .add(AuthenticationHandler.class)
       .add(FlowListener.class)
+      .add(StreamingHelper.class)
       .build();
 
   /**

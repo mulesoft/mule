@@ -14,9 +14,12 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
@@ -27,7 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * Default implementation of {@link ExecutionContextAdapter} which adds additional information which is relevant to this
@@ -45,23 +47,29 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private final Map<String, Object> variables = new HashMap<>();
   private final M componentModel;
   private final MuleContext muleContext;
-  private Event event;
-  private Optional<TransactionConfig> transactionConfig = null;
-  private Supplier<Optional<TransactionConfig>> transactionConfigSupplier;
+  private final Event event;
+  private final CursorProviderFactory cursorProviderFactory;
+  private final StreamingManager streamingManager;
+  private final LazyValue<Optional<TransactionConfig>> transactionConfig;
 
   /**
    * Creates a new instance with the given state
    *
-   * @param configuration the {@link ConfigurationInstance} that the operation will use
-   * @param parameters the parameters that the operation will use
-   * @param componentModel the {@link ComponentModel} for the component being executed
-   * @param event the current {@link Event}
+   * @param configuration         the {@link ConfigurationInstance} that the operation will use
+   * @param parameters            the parameters that the operation will use
+   * @param componentModel        the {@link ComponentModel} for the component being executed
+   * @param event                 the current {@link Event}
+   * @param cursorProviderFactory the {@link CursorProviderFactory} that was configured on the executed component
+   * @param streamingManager      the application's {@link StreamingManager}
+   * @param muleContext           the current {@link MuleContext}
    */
   public DefaultExecutionContext(ExtensionModel extensionModel,
                                  Optional<ConfigurationInstance> configuration,
                                  Map<String, Object> parameters,
                                  M componentModel,
                                  Event event,
+                                 CursorProviderFactory cursorProviderFactory,
+                                 StreamingManager streamingManager,
                                  MuleContext muleContext) {
 
     this.extensionModel = extensionModel;
@@ -69,16 +77,10 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     this.event = event;
     this.componentModel = componentModel;
     this.parameters = parameters;
+    this.cursorProviderFactory = cursorProviderFactory;
+    this.streamingManager = streamingManager;
     this.muleContext = muleContext;
-    transactionConfigSupplier = () -> {
-      synchronized (this) {
-        if (transactionConfig == null) {
-          transactionConfig = componentModel.isTransactional() ? of(buildTransactionConfig()) : empty();
-          transactionConfigSupplier = () -> transactionConfig;
-        }
-        return transactionConfig;
-      }
-    };
+    transactionConfig = new LazyValue<>(() -> componentModel.isTransactional() ? of(buildTransactionConfig()) : empty());
   }
 
   /**
@@ -172,8 +174,24 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   /**
    * {@inheritDoc}
    */
+  @Override
+  public CursorProviderFactory getCursorProviderFactory() {
+    return cursorProviderFactory;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   public Optional<TransactionConfig> getTransactionConfig() {
-    return transactionConfigSupplier.get();
+    return transactionConfig.get();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public StreamingManager getStreamingManager() {
+    return streamingManager;
   }
 
   private TransactionConfig buildTransactionConfig() {
@@ -194,7 +212,8 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
         throw new NoSuchElementException();
       }
     } catch (NoSuchElementException e) {
-      throw new IllegalArgumentException(format("Operation '%s' from extension '%s' is transactional but no transactional action defined",
+      throw new IllegalArgumentException(
+                                         format("Operation '%s' from extension '%s' is transactional but no transactional action defined",
                                                 componentModel.getName(),
                                                 extensionModel.getName()));
     }

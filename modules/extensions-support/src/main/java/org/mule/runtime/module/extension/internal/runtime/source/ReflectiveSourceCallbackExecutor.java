@@ -7,12 +7,13 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOURCE_CALLBACK_CONTEXT_PARAM;
-
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -39,31 +40,39 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
   private final ExtensionModel extensionModel;
   private final Optional<ConfigurationInstance> configurationInstance;
   private final SourceModel sourceModel;
+  private final CursorProviderFactory cursorProviderFactory;
+  private final StreamingManager streamingManager;
   private final MuleContext muleContext;
   private final ReflectiveMethodComponentExecutor<SourceModel> executor;
 
   /**
    * Creates a new instance
-   * 
-   * @param extensionModel the {@link ExtensionModel} of the owning component
+   *
+   * @param extensionModel        the {@link ExtensionModel} of the owning component
    * @param configurationInstance an {@link Optional} {@link ConfigurationInstance} in case the component requires a config
-   * @param sourceModel the model of the {@code source}
-   * @param source a {@link Source} instance
-   * @param method the method to be executed
-   * @param muleContext the current {@link MuleContext}
-   * @param sourceCallbackModel
+   * @param sourceModel           the model of the {@code source}
+   * @param source                a {@link Source} instance
+   * @param method                the method to be executed
+   * @param cursorProviderFactory the {@link CursorProviderFactory} that was configured on the owning source
+   * @param streamingManager      the application's {@link StreamingManager}
+   * @param muleContext           the current {@link MuleContext}
+   * @param sourceCallbackModel   the callback's model
    */
   public ReflectiveSourceCallbackExecutor(ExtensionModel extensionModel,
                                           Optional<ConfigurationInstance> configurationInstance,
                                           SourceModel sourceModel,
                                           Object source,
                                           Method method,
+                                          CursorProviderFactory cursorProviderFactory,
+                                          StreamingManager streamingManager,
                                           MuleContext muleContext,
                                           SourceCallbackModelProperty sourceCallbackModel) {
 
     this.extensionModel = extensionModel;
     this.configurationInstance = configurationInstance;
     this.sourceModel = sourceModel;
+    this.cursorProviderFactory = cursorProviderFactory;
+    this.streamingManager = streamingManager;
     this.muleContext = muleContext;
 
     executor = new ReflectiveMethodComponentExecutor<>(getAllGroups(sourceModel, method, sourceCallbackModel), method, source);
@@ -84,6 +93,8 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
                                                                                           parameters,
                                                                                           sourceModel,
                                                                                           event,
+                                                                                          cursorProviderFactory,
+                                                                                          streamingManager,
                                                                                           muleContext);
 
     executionContext.setVariable(SOURCE_CALLBACK_CONTEXT_PARAM, callbackContext);
