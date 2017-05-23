@@ -23,6 +23,8 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Message;
@@ -68,7 +70,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class DefaultExtensionsOAuthManager implements Startable, Stoppable, ExtensionsOAuthManager {
+public class DefaultExtensionsOAuthManager implements Initialisable, Startable, Stoppable, ExtensionsOAuthManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionsOAuthManager.class);
   private static final String DANCE_CALLBACK_EVENT_KEY = "event";
@@ -77,14 +79,19 @@ public class DefaultExtensionsOAuthManager implements Startable, Stoppable, Exte
   private MuleContext muleContext;
 
   // TODO: MULE-10837 this should be a plain old @Inject
-  private LazyValue<HttpService> httpService = new LazyLookup<>(HttpService.class, muleContext);
+  private LazyValue<HttpService> httpService;
 
   // TODO: MULE-10837 this should be a plain old @Inject
-  private LazyValue<OAuthService> oauthService = new LazyLookup<>(OAuthService.class, muleContext);
-
+  private LazyValue<OAuthService> oauthService;
 
   private final Map<String, AuthorizationCodeOAuthDancer> dancers = new ConcurrentHashMap<>();
   private boolean started = false;
+
+  @Override
+  public void initialise() throws InitialisationException {
+    httpService = new LazyLookup<>(HttpService.class, muleContext);
+    oauthService = new LazyLookup<>(OAuthService.class, muleContext);
+  }
 
   @Override
   public void start() throws MuleException {

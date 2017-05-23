@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -66,29 +65,6 @@ public class PoolingByteBufferManagerTestCase extends AbstractMuleTestCase {
     bufferManager.deallocate(buffer2);
     ByteBuffer buffer2Reborn = bufferManager.allocate(OTHER_CAPACITY);
     assertThat(buffer2, is(sameInstance(buffer2Reborn)));
-  }
-
-  @Test
-  public void dispose() throws Exception {
-    byte[] bytes = randomAlphabetic(50).getBytes();
-    ByteBuffer buffer = bufferManager.allocate(CAPACITY);
-    ByteBuffer otherBuffer = bufferManager.allocate(OTHER_CAPACITY);
-
-    buffer.put(bytes);
-    assertThat(buffer.position(), is(bytes.length));
-
-    otherBuffer.put(bytes);
-    assertThat(otherBuffer.position(), is(bytes.length));
-
-    // return to pool to force the object to be destroyed. Not really necessary but need the clear() method
-    // invoked in order to perform the assertion
-    bufferManager.deallocate(buffer);
-    bufferManager.deallocate(otherBuffer);
-
-    bufferManager.dispose();
-
-    assertThat(buffer.position(), is(0));
-    assertThat(otherBuffer.position(), is(0));
   }
 
   @Test
