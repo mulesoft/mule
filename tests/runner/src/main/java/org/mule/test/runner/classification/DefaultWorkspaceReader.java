@@ -124,6 +124,7 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
   public File findArtifact(Artifact artifact) {
     File workspaceArtifactPath = workspaceLocationResolver.resolvePath(artifact.getArtifactId());
     if (workspaceArtifactPath == null) {
+      logger.debug("Couldn't resolve '{}' from workspace, it would be resolved against local repository or downloaded", artifact);
       // Cannot be resolved in workspace so delegate its resolution to the Maven local repository
       return null;
     }
@@ -136,6 +137,7 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
     }
 
     if (artifactFile != null && artifactFile.exists()) {
+      logger.debug("Artifact '{}' resolved from workspace {}", artifact, artifactFile.getAbsolutePath());
       return artifactFile.getAbsoluteFile();
     }
     return null;
