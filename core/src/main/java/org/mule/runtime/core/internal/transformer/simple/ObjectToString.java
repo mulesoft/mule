@@ -7,14 +7,15 @@
 package org.mule.runtime.core.internal.transformer.simple;
 
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
+import static org.mule.runtime.core.config.i18n.CoreMessages.errorReadingStream;
+import static org.mule.runtime.core.util.IOUtils.copyLarge;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -42,7 +43,7 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
 
   @Override
   public Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
-    String output = "";
+    String output;
 
     if (src instanceof CursorStreamProvider) {
       output = createStringFromInputStream(((CursorStreamProvider) src).openCursor(), outputEncoding);
@@ -62,9 +63,11 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
   protected String createStringFromInputStream(InputStream input, Charset outputEncoding)
       throws TransformerException {
     try {
-      return IOUtils.toString(input, outputEncoding);
+      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      copyLarge(input, outputStream);
+      return outputStream.toString(outputEncoding.name());
     } catch (IOException e) {
-      throw new TransformerException(CoreMessages.errorReadingStream(), e);
+      throw new TransformerException(errorReadingStream(), e);
     } finally {
       try {
         input.close();
