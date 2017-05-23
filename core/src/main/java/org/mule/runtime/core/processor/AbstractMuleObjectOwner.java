@@ -113,11 +113,6 @@ public abstract class AbstractMuleObjectOwner<T> extends AbstractAnnotatedObject
     }
   }
 
-  protected MessagingExceptionHandler getMessagingExceptionHandler() {
-    return messagingExceptionHandler;
-  }
-
   protected abstract List<T> getOwnedObjects();
-
 
 }

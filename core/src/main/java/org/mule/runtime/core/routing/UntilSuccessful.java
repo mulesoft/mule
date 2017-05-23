@@ -11,6 +11,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -21,6 +22,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.exception.MessagingExceptionHandlerToSystemAdapter;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
 
@@ -67,6 +69,10 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     }
 
     setWaitTime();
+
+    if (messagingExceptionHandler == null) {
+      messagingExceptionHandler = new MessagingExceptionHandlerToSystemAdapter(muleContext);
+    }
 
     super.initialise();
 

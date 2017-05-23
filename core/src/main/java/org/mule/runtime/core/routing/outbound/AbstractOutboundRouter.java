@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createNotificationExecutionTemplate;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -39,7 +40,6 @@ import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
 import org.mule.runtime.core.util.StringMessageUtils;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -247,7 +247,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   public void dispose() {
     synchronized (routes) {
       super.dispose();
-      routes = Collections.<Processor>emptyList();
+      routes = emptyList();
       initialised.set(false);
     }
   }

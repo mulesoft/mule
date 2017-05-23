@@ -73,11 +73,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     this.globalName = globalName;
   }
 
-  public AbstractExceptionListener() {
-    super.setMessagingExceptionHandler(new MessagingExceptionHandlerToSystemAdapter(muleContext));
-  }
-
-
   protected boolean isRollback(Throwable t) {
     // Work with the root exception, not anything thaat wraps it
     t = ExceptionHelper.getRootException(t);
@@ -142,6 +137,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   protected void doInitialise(MuleContext context) throws InitialisationException {
     logger.info("Initialising exception listener: " + toString());
+    super.setMessagingExceptionHandler(new MessagingExceptionHandlerToSystemAdapter(muleContext));
   }
 
   protected void fireNotification(Exception ex, Event event) {
