@@ -80,22 +80,12 @@
                                 <xs:complexContent>
                                     <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                                         <xs:sequence></xs:sequence>
-                                        <xs:attribute type="xs:string" use="optional" name="listenerConfig">
+                                        <xs:attribute type="xs:string" use="required" name="listenerConfig">
                                             <xs:annotation>
-                                                <xs:documentation>A reference to an &lt;http:listener-config /&gt; to be used in order to create the listener that will catch the access token callback endpoint. This is mutually exclusive with callbackHost and callbackPort</xs:documentation>
+                                                <xs:documentation>A reference to a &lt;http:listener-config /&gt; to be used in order to create the listener that will catch the access token callback endpoint.</xs:documentation>
                                             </xs:annotation>
                                         </xs:attribute>
-                                        <xs:attribute type="xs:string" use="optional" name="callbackHost">
-                                            <xs:annotation>
-                                                <xs:documentation>The host in which to create a http listener for the access token callback endpoint. This is mutually exclusive with listenerConfig</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:attribute>
-                                        <xs:attribute type="mule:substitutableInt" use="optional" name="callbackPort">
-                                            <xs:annotation>
-                                                <xs:documentation>The port in which to create a http listener for triggering the authorization dance. This is mutually exclusive with listenerConfig</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:attribute>
-                                        <xs:attribute type="xs:string" use="optional" name="callbackPath">
+                                        <xs:attribute type="xs:string" use="required" name="callbackPath">
                                             <xs:annotation>
                                                 <xs:documentation>The path of the access token callback endpoint</xs:documentation>
                                             </xs:annotation>
@@ -103,6 +93,11 @@
                                         <xs:attribute type="xs:string" use="required" name="authorizePath">
                                             <xs:annotation>
                                                 <xs:documentation>The path of the local http endpoint which triggers the OAuth dance</xs:documentation>
+                                            </xs:annotation>
+                                        </xs:attribute>
+                                        <xs:attribute type="xs:string" use="optional" name="externalCallbackUrl">
+                                            <xs:annotation>
+                                                <xs:documentation>If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback</xs:documentation>
                                             </xs:annotation>
                                         </xs:attribute>
                                     </xs:extension>
@@ -192,22 +187,12 @@
                                 <xs:complexContent>
                                     <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                                         <xs:sequence></xs:sequence>
-                                        <xs:attribute type="xs:string" use="optional" name="listenerConfig">
+                                        <xs:attribute type="xs:string" use="required" name="listenerConfig">
                                             <xs:annotation>
-                                                <xs:documentation>A reference to an &lt;http:listener-config /&gt; to be used in order to create the listener that will catch the access token callback endpoint. This is mutually exclusive with callbackHost and callbackPort</xs:documentation>
+                                                <xs:documentation>A reference to a &lt;http:listener-config /&gt; to be used in order to create the listener that will catch the access token callback endpoint.</xs:documentation>
                                             </xs:annotation>
                                         </xs:attribute>
-                                        <xs:attribute type="xs:string" use="optional" name="callbackHost">
-                                            <xs:annotation>
-                                                <xs:documentation>The host in which to create a http listener for the access token callback endpoint. This is mutually exclusive with listenerConfig</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:attribute>
-                                        <xs:attribute type="mule:substitutableInt" use="optional" name="callbackPort">
-                                            <xs:annotation>
-                                                <xs:documentation>The port in which to create a http listener for triggering the authorization dance. This is mutually exclusive with listenerConfig</xs:documentation>
-                                            </xs:annotation>
-                                        </xs:attribute>
-                                        <xs:attribute type="xs:string" use="optional" name="callbackPath">
+                                        <xs:attribute type="xs:string" use="required" name="callbackPath">
                                             <xs:annotation>
                                                 <xs:documentation>The path of the access token callback endpoint</xs:documentation>
                                             </xs:annotation>
@@ -215,6 +200,11 @@
                                         <xs:attribute type="xs:string" use="required" name="authorizePath">
                                             <xs:annotation>
                                                 <xs:documentation>The path of the local http endpoint which triggers the OAuth dance</xs:documentation>
+                                            </xs:annotation>
+                                        </xs:attribute>
+                                        <xs:attribute type="xs:string" use="optional" name="externalCallbackUrl">
+                                            <xs:annotation>
+                                                <xs:documentation>If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback</xs:documentation>
                                             </xs:annotation>
                                         </xs:attribute>
                                     </xs:extension>
