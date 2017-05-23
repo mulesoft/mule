@@ -19,9 +19,13 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.processor.InternalMessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
 import org.mule.transaction.MuleTransactionConfig;
+import org.mule.util.NotificationUtils;
 
 /**
  * Wraps the invocation of the next {@link org.mule.api.processor.MessageProcessor} with a transaction. If
@@ -114,5 +118,11 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
         {
             ((Stoppable)this.exceptionListener).stop();
         }
+    }
+
+    @Override
+    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
+    {
+        NotificationUtils.addMessageProcessorPathElements(((MessageProcessorChain) next).getMessageProcessors(), pathElement);
     }
 }

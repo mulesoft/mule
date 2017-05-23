@@ -96,23 +96,19 @@ public class NotificationUtils
                 MessageProcessorPathElement messageProcessorPathElement;
 
                 // To avoid adding a level in some path elements:
-                if (mp instanceof InterceptingChainLifecycleWrapperPathSkip || mp instanceof TransactionalInterceptingMessageProcessor)
+                if (mp instanceof InterceptingChainLifecycleWrapperPathSkip)
                 {
-                    //This messageProcessorPathElement is fictional and is never added to the path but is needed to continue adding children recursively
-                    messageProcessorPathElement = new DefaultMessageProcessorPathElement(mp,String.valueOf(0)); //The name could be any since it's never added to any path
-                    messageProcessorPathElement.setParent(parentElement);
+                    messageProcessorPathElement = parentElement;
                 }
                 else
                 {
                     messageProcessorPathElement = parentElement.addChild(mp);
-
                 }
                 if (messageProcessorPathElement != null && mp instanceof MessageProcessorContainer)
                 {
                     ((MessageProcessorContainer) mp).addMessageProcessorPathElements(messageProcessorPathElement);
                 }
             }
-
         }
 
     }
