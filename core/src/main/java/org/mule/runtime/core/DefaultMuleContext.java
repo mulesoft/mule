@@ -44,6 +44,7 @@ import static org.mule.runtime.core.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.unwrap;
+
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
@@ -135,6 +136,7 @@ import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContext {
@@ -452,7 +454,10 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   private void disposeManagers() {
-    safely(() -> notificationManager.dispose());
+    safely(() -> {
+      disposeIfNeeded(getFlowTraceManager(), logger);
+      notificationManager.dispose();
+    });
   }
 
   /**

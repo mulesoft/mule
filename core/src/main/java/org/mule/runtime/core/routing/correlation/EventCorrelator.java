@@ -22,6 +22,10 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.store.ObjectAlreadyExistsException;
+import org.mule.runtime.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -29,10 +33,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.api.store.ObjectAlreadyExistsException;
-import org.mule.runtime.api.store.ObjectDoesNotExistException;
-import org.mule.runtime.api.store.ObjectStore;
-import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.RoutingNotification;
@@ -51,7 +51,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EventCorrelator implements Startable, Stoppable, Disposable {
+public class EventCorrelator implements Startable, Stoppable {
 
   /**
    * logger used by this class
@@ -355,6 +355,10 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
     if (scheduler != null) {
       scheduler.stop();
     }
+    if (expiringGroupRunnable != null) {
+      expiringGroupRunnable.dispose();
+      expiringGroupRunnable = null;
+    }
   }
 
   private final class ExpiringGroupMonitoringRunnable implements Runnable, Expirable, Disposable {
@@ -436,10 +440,5 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
 
   protected String getEventGroupsPartitionKey() {
     return storePrefix + ".eventGroups";
-  }
-
-  @Override
-  public void dispose() {
-    expiringGroupRunnable.dispose();
   }
 }

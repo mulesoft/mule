@@ -18,14 +18,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.routing.EventGroup;
@@ -167,7 +167,6 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
       });
     } finally {
       eventCorrelator.stop();
-      eventCorrelator.dispose();
     }
   }
 
