@@ -10,7 +10,7 @@ import static java.util.Collections.singletonList;
 
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.service.http.api.HttpService;
+import org.mule.runtime.http.api.HttpService;
 
 import java.util.List;
 

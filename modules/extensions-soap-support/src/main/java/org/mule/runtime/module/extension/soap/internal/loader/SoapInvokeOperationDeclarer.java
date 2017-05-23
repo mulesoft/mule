@@ -43,7 +43,7 @@ import org.mule.runtime.module.extension.soap.internal.metadata.InvokeRequestTyp
 import org.mule.runtime.module.extension.soap.internal.metadata.WebServiceTypeKey;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
 import org.mule.runtime.module.extension.soap.internal.runtime.operation.SoapOperationExecutorFactory;
-import org.mule.services.soap.api.message.SoapMultipartPayload;
+import org.mule.runtime.soap.api.message.SoapMultipartPayload;
 
 import com.google.common.collect.ImmutableMap;
 

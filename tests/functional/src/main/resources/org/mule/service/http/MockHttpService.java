@@ -9,11 +9,11 @@ package org.mule.service.http;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
 
-import org.mule.service.http.api.HttpService;
-import org.mule.service.http.api.client.HttpClient;
-import org.mule.service.http.api.client.HttpClientFactory;
-import org.mule.service.http.api.server.HttpServer;
-import org.mule.service.http.api.server.HttpServerFactory;
+import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.http.api.client.HttpClient;
+import org.mule.runtime.http.api.client.HttpClientFactory;
+import org.mule.runtime.http.api.server.HttpServer;
+import org.mule.runtime.http.api.server.HttpServerFactory;
 
 public class MockHttpService implements HttpService {
 

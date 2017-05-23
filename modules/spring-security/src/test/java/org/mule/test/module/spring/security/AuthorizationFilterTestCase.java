@@ -12,10 +12,11 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mule.service.http.api.HttpConstants.HttpStatus.FORBIDDEN;
-import static org.mule.service.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
-import static org.mule.service.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.FORBIDDEN;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+import static org.mule.runtime.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 

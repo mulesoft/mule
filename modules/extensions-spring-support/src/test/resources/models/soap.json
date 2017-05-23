@@ -174,7 +174,7 @@
                   "type": "String"
                 },
                 {
-                  "type": "@ref:org.mule.services.soap.api.message.SoapMultipartPayload"
+                  "type": "@ref:org.mule.runtime.soap.api.message.SoapMultipartPayload"
                 }
               ]
             },
@@ -2069,7 +2069,7 @@
               "type": "String"
             },
             {
-              "type": "@ref:org.mule.services.soap.api.message.SoapMultipartPayload"
+              "type": "@ref:org.mule.runtime.soap.api.message.SoapMultipartPayload"
             }
           ]
         },
@@ -2671,7 +2671,7 @@
       "format": "java",
       "type": "Object",
       "annotations": {
-        "typeId": "org.mule.services.soap.api.message.SoapMultipartPayload",
+        "typeId": "org.mule.runtime.soap.api.message.SoapMultipartPayload",
         "classInformation": {
           "hasDefaultConstructor": false,
           "isInterface": false,

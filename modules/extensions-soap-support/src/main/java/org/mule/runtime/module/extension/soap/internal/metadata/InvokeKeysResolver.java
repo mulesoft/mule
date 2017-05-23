@@ -15,7 +15,7 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
-import org.mule.services.soap.api.client.metadata.SoapMetadataResolver;
+import org.mule.runtime.soap.api.client.metadata.SoapMetadataResolver;
 
 import com.google.common.collect.ImmutableSet;
 

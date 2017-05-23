@@ -7,10 +7,10 @@
 package org.mule.runtime.oauth.api.builder;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
-import org.mule.service.http.api.server.HttpServer;
 
 import java.net.URL;
 import java.util.Map;

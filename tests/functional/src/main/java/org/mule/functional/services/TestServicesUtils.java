@@ -12,8 +12,8 @@ import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_P
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
-import org.mule.service.http.api.HttpService;
 import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;

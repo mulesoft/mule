@@ -11,8 +11,8 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
-import org.mule.services.soap.api.client.SoapClient;
-import org.mule.services.soap.api.client.metadata.SoapOperationMetadata;
+import org.mule.runtime.soap.api.client.SoapClient;
+import org.mule.runtime.soap.api.client.metadata.SoapOperationMetadata;
 
 /**
  * Resolves the metadata for the input attachments for the soap connect invoke operation

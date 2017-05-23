@@ -7,7 +7,7 @@
 package org.mule.runtime.oauth.api.builder;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.service.http.api.client.HttpClient;
+import org.mule.runtime.http.api.client.HttpClient;
 
 import java.nio.charset.Charset;
 import java.util.Map;
