@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
+import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -55,7 +56,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
   @Mock
   private ErrorTypeLocator mockErrorTypeLocator;
   @Mock
-  private org.mule.runtime.core.exception.ErrorTypeRepository mockErrorTypeRepository;
+  private ErrorTypeRepository mockErrorTypeRepository;
   @Mock(answer = RETURNS_DEEP_STUBS)
   private Error mockError;
   @Mock
