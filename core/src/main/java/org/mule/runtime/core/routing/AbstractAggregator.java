@@ -23,14 +23,14 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.Aggregator;
-import org.mule.runtime.api.store.ObjectStore;
-import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.routing.correlation.EventCorrelator;
@@ -136,7 +136,9 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
   @Override
   public void stop() throws MuleException {
-    eventCorrelator.stop();
+    if (timeout != 0) {
+      eventCorrelator.stop();
+    }
   }
 
   @Override
@@ -213,6 +215,5 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   public void dispose() {
     disposeIfNeeded(processedGroupsObjectStore, LOGGER);
     disposeIfNeeded(eventGroupsObjectStore, LOGGER);
-    eventCorrelator.dispose();
   }
 }
