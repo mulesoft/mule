@@ -8,14 +8,16 @@ package org.mule.runtime.core.routing;
 
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STARTED;
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 import static org.mule.runtime.core.util.StringUtils.DASH;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -29,8 +31,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.core.config.ExceptionHelper;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.exception.MessagingException;
@@ -66,9 +66,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   @Override
   public void initialise() throws InitialisationException {
     if (getUntilSuccessfulConfiguration().getObjectStore() == null) {
-      throw new InitialisationException(
-                                        I18nMessageFactory
-                                            .createStaticMessage("A ListableObjectStore must be configured on UntilSuccessful."),
+      throw new InitialisationException(createStaticMessage("A ListableObjectStore must be configured on UntilSuccessful."),
                                         this);
     }
 
@@ -114,10 +112,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
       }
       return processResponseThroughAckResponseExpression(event);
     } catch (final Exception e) {
-      throw new MessagingException(
-                                   I18nMessageFactory.createStaticMessage("Failed to schedule the event for processing"), event,
-                                   e,
-                                   getUntilSuccessfulConfiguration().getRouter());
+      throw new MessagingException(createStaticMessage("Failed to schedule the event for processing"), event,
+                                   e, getUntilSuccessfulConfiguration().getRouter());
     }
   }
 
@@ -127,8 +123,9 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         try {
           scheduleForProcessing(eventStoreKey, true);
         } catch (final Exception e) {
-          logger.error(I18nMessageFactory
-              .createStaticMessage("Failed to schedule for processing event stored with key: " + eventStoreKey).toString(), e);
+          logger
+              .error(createStaticMessage("Failed to schedule for processing event stored with key: " + eventStoreKey).toString(),
+                     e);
         }
       }
     } catch (Exception e) {
@@ -242,24 +239,24 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   }
 
   protected RetryPolicyExhaustedException buildRetryPolicyExhaustedException(final Exception e) {
-    MuleException muleException = ExceptionHelper.getRootMuleException(e);
+    MuleException muleException = getRootMuleException(e);
 
     if (muleException == null) {
-      return new RetryPolicyExhaustedException(CoreMessages.createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, e.getMessage()),
+      return new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, e.getMessage()),
                                                e, this);
     } else {
       // the logger processes only the inner-most MuleException, which should be a MessagingException. In order to not lose
       // information, we have to re-wrap its cause with this new exception.
       if (muleException.getCause() != null) {
-        RetryPolicyExhaustedException retryPolicyExhaustedException = new RetryPolicyExhaustedException(CoreMessages
-            .createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, muleException.getMessage()),
-                                                                                                        muleException.getCause());
+        RetryPolicyExhaustedException retryPolicyExhaustedException =
+            new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, muleException.getMessage()),
+                                              muleException.getCause());
         retryPolicyExhaustedException.getInfo().putAll(muleException.getInfo());
         return retryPolicyExhaustedException;
       } else {
-        RetryPolicyExhaustedException retryPolicyExhaustedException = new RetryPolicyExhaustedException(CoreMessages
-            .createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, muleException.getMessage()),
-                                                                                                        muleException);
+        RetryPolicyExhaustedException retryPolicyExhaustedException =
+            new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, muleException.getMessage()),
+                                              muleException);
         retryPolicyExhaustedException.getInfo().putAll(muleException.getInfo());
         return retryPolicyExhaustedException;
       }
