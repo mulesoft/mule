@@ -15,14 +15,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
-import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
-import static org.mule.runtime.core.util.ExceptionUtils.putContext;
 import static org.mule.runtime.core.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.empty;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -33,7 +30,6 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -49,6 +45,7 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.streaming.StreamingManager;
+import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;
@@ -213,14 +210,8 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   }
 
   private Function<MessagingException, MessagingException> updateMessagingException(Processor processor) {
-    return exception -> {
-      Processor failing = exception.getFailingMessageProcessor();
-      if (failing == null) {
-        failing = processor;
-        exception = new MessagingException(exception.getI18nMessage(), exception.getEvent(), exception.getCause(), processor);
-      }
-      return updateMessagingExceptionWithError(exception, failing, flowConstruct);
-    };
+    return exception -> ExceptionUtils.updateMessagingException(LOGGER, processor, exception, muleContext.getErrorTypeLocator(),
+                                                                muleContext.getErrorTypeRepository(), flowConstruct, muleContext);
   }
 
   private Function<MessagingException, Publisher<Event>> handleError(EventContext eventContext) {

@@ -10,12 +10,14 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM_ERROR;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.extension.api.annotation.error.Throws;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
 import java.io.ByteArrayInputStream;
@@ -38,8 +40,13 @@ public class DrStrangeOperations {
     return readStream(dr, cursor);
   }
 
+  @Throws(CustomErrorProvider.class)
   public String readStream(@Config DrStrange dr, @Optional(defaultValue = PAYLOAD) InputStream stream) throws IOException {
-    return IOUtils.toString(stream);
+    try {
+      return IOUtils.toString(stream);
+    } catch (Exception e) {
+      throw new CustomErrorException(e, CUSTOM_ERROR);
+    }
   }
 
   public InputStream toStream(@Config DrStrange dr, @Optional(defaultValue = PAYLOAD) String data) {

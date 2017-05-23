@@ -8,15 +8,20 @@ package org.mule.runtime.core.util;
 
 import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
-
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -28,6 +33,7 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.ErrorMapping;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
+import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
@@ -38,6 +44,8 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+
+import org.slf4j.Logger;
 
 /**
  * Mule exception utilities.
@@ -253,6 +261,90 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
     } else {
       return currentEvent;
     }
+  }
+
+  /**
+   * Updates the {@link MessagingException} to be thrown based on the content of the {@code exception} parameter and the chain of
+   * causes inside it.
+   * 
+   * @param logger instance to use for logging
+   * @param processor the failing processor
+   * @param exception the exception to update based on it's content
+   * @param errorTypeLocator the error type locator
+   * @param errorTypeRepository the error type repository
+   * @param flowConstruct the flow associated with the exception
+   * @param muleContext the context of the artifact
+   * @return a {@link MessagingException} with the proper {@link Error} associated to it's {@link Event}
+   */
+  public static MessagingException updateMessagingException(Logger logger, Processor processor, MessagingException exception,
+                                                            ErrorTypeLocator errorTypeLocator,
+                                                            ErrorTypeRepository errorTypeRepository, FlowConstruct flowConstruct,
+                                                            MuleContext muleContext) {
+    Optional<Exception> rootExceptionOptional =
+        findRootExceptionForErrorHandling(exception, errorTypeLocator, errorTypeRepository);
+
+    Exception rootException;
+    if (rootExceptionOptional.isPresent()) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("discarding exception that is wrapping the original error", exception);
+      }
+      if (rootExceptionOptional.get() instanceof MessagingException
+          && ((MessagingException) rootExceptionOptional.get()).getEvent().getError().isPresent()) {
+        return (MessagingException) rootExceptionOptional.get();
+      }
+      rootException = rootExceptionOptional.get();
+    } else {
+      rootException = exception;
+    }
+
+    Processor failing = exception.getFailingMessageProcessor();
+    if (failing == null && rootException instanceof MessagingException) {
+      failing = ((MessagingException) rootException).getFailingMessageProcessor();
+    }
+
+    if (failing == null) {
+      failing = processor;
+      exception = new MessagingException(createStaticMessage(rootException.getMessage()), exception.getEvent(),
+                                         rootException instanceof MessagingException ? rootException.getCause() : rootException,
+                                         processor);
+    }
+    exception
+        .setProcessedEvent(createErrorEvent(exception.getEvent(), processor, exception, errorTypeLocator));
+    return putContext(exception, failing, exception.getEvent(), flowConstruct, muleContext);
+  }
+
+  /**
+   * Searches for the root {@link Exception} to use to generate the {@link Error} inside the {@link Event}.
+   * <p>
+   * If such exception exists, then it's because the exception is wrapping an exception that already has an error. For instance, a
+   * streaming error.
+   * <p>
+   * If there's already a {@link MessagingException} with an {@link Event} that contains a non empty {@link Error} then that
+   * exception will be returned since it means that the whole process of creating the error was already executed.
+   *
+   * @param exception the exception to search in all it's causes for a {@link MessagingException} with an {@link Error}
+   * @return the found exception or empty.
+   */
+  private static Optional<Exception> findRootExceptionForErrorHandling(Exception exception, ErrorTypeLocator errorTypeLocator,
+                                                                       ErrorTypeRepository errorTypeRepository) {
+    List<Throwable> causesAsList = getExceptionsAsList(exception);
+    for (Throwable cause : causesAsList) {
+      if (cause instanceof MessagingException && ((MessagingException) cause).getEvent().getError().isPresent()) {
+        return of((Exception) cause);
+      }
+    }
+    for (Throwable cause : causesAsList) {
+      if (cause instanceof TypedException) {
+        return of((Exception) cause);
+      }
+      if (cause instanceof MuleException || cause instanceof MuleRuntimeException) {
+        ErrorType errorType = errorTypeLocator.lookupErrorType(cause);
+        if (!errorType.equals(errorTypeRepository.getErrorType(UNKNOWN).get())) {
+          return of((Exception) cause);
+        }
+      }
+    }
+    return empty();
   }
 
   static boolean errorCauseMatchesException(Throwable causeException, Optional<Error> error) {
