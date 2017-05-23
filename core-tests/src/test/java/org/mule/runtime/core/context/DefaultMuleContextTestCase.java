@@ -12,6 +12,8 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -25,8 +27,8 @@ import static org.mule.runtime.core.api.registry.ServiceType.EXCEPTION;
 import static org.mule.runtime.core.config.ExceptionHelper.RESOURCE_ROOT;
 import static org.mule.runtime.core.config.ExceptionHelper.getErrorMapping;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.SchedulerController;
@@ -36,8 +38,10 @@ import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.config.ClusterConfiguration;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
+import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
@@ -82,6 +86,24 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
         context.stop();
       }
       context.dispose();
+    }
+  }
+
+  @Test
+  public void callDisposeIfInitFails() throws Exception {
+    ServerNotificationManager mockNotificationManager = mock(ServerNotificationManager.class);
+    doThrow(MuleRuntimeException.class).when(mockNotificationManager).initialise();
+
+    DefaultMuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder();
+    muleContextBuilder.setLifecycleManager(new MuleContextLifecycleManager());
+    muleContextBuilder.setNotificationManager(mockNotificationManager);
+    DefaultMuleContext defaultMuleContext = (DefaultMuleContext) muleContextBuilder.buildMuleContext();
+
+    try {
+      defaultMuleContext.initialise();
+      fail("exception expected");
+    } catch (Exception e) {
+      verify(mockNotificationManager).dispose();
     }
   }
 

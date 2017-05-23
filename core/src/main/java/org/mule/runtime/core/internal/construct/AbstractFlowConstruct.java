@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-
+import static org.mule.runtime.core.util.FunctionalUtils.safely;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -87,10 +87,11 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
         validateConstruct();
         doInitialise();
       });
-
     } catch (InitialisationException e) {
+      safely(() -> dispose());
       throw e;
     } catch (MuleException e) {
+      safely(() -> dispose());
       throw new InitialisationException(e, this);
     }
   }
