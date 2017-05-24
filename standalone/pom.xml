@@ -207,11 +207,6 @@
             <artifactId>aspectjweaver</artifactId>
         </dependency>
 
-        <!-- TODO: MULE-11982 This will not longer be required once boot packages are removed -->
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
