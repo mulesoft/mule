@@ -18,6 +18,7 @@ import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NA
 import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.api.exception.MuleException;
@@ -35,6 +36,7 @@ import org.mule.runtime.core.exception.ErrorMapping;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.message.ErrorBuilder;
@@ -281,7 +283,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
                                                             ErrorTypeRepository errorTypeRepository, FlowConstruct flowConstruct,
                                                             MuleContext muleContext) {
     Optional<Exception> rootExceptionOptional =
-        findRootExceptionForErrorHandling(exception, errorTypeLocator, errorTypeRepository);
+        findRootExceptionForErrorHandling(exception, processor, errorTypeLocator, errorTypeRepository);
 
     Exception rootException;
     if (rootExceptionOptional.isPresent()) {
@@ -317,15 +319,19 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
    * Searches for the root {@link Exception} to use to generate the {@link Error} inside the {@link Event}.
    * <p>
    * If such exception exists, then it's because the exception is wrapping an exception that already has an error. For instance, a
-   * streaming error.
+   * streaming error. Or it may also be that there's a wrapper but just for throwing a more specific for details exception.
    * <p>
    * If there's already a {@link MessagingException} with an {@link Event} that contains a non empty {@link Error} then that
    * exception will be returned since it means that the whole process of creating the error was already executed.
    *
    * @param exception the exception to search in all it's causes for a {@link MessagingException} with an {@link Error}
+   * @param processor the processor that thrown the exception
+   * @param errorTypeLocator the locator to discover {@link ErrorType}s
+   * @param errorTypeRepository the error type repository
    * @return the found exception or empty.
    */
-  private static Optional<Exception> findRootExceptionForErrorHandling(Exception exception, ErrorTypeLocator errorTypeLocator,
+  private static Optional<Exception> findRootExceptionForErrorHandling(Exception exception, Processor processor,
+                                                                       ErrorTypeLocator errorTypeLocator,
                                                                        ErrorTypeRepository errorTypeRepository) {
     List<Throwable> causesAsList = getExceptionsAsList(exception);
     for (Throwable cause : causesAsList) {
@@ -333,6 +339,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
         return of((Exception) cause);
       }
     }
+    int causeIndex = 0;
     for (Throwable cause : causesAsList) {
       if (cause instanceof TypedException) {
         return of((Exception) cause);
@@ -340,9 +347,22 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
       if (cause instanceof MuleException || cause instanceof MuleRuntimeException) {
         ErrorType errorType = errorTypeLocator.lookupErrorType(cause);
         if (!errorType.equals(errorTypeRepository.getErrorType(UNKNOWN).get())) {
+          // search for a more specific wrapper first
+          int nextCauseIndex = causeIndex + 1;
+          ComponentLocation componentLocation =
+              processor instanceof AnnotatedObject ? ((AnnotatedObject) processor).getLocation() : null;
+          if (causesAsList.size() > nextCauseIndex && componentLocation != null) {
+            Throwable causeOwnerException = causesAsList.get(nextCauseIndex);
+            ErrorType causeOwnerErrorType = errorTypeLocator
+                .lookupComponentErrorType(componentLocation.getComponentIdentifier().getIdentifier(), causeOwnerException);
+            if (new SingleErrorTypeMatcher(causeOwnerErrorType).match(causeOwnerErrorType)) {
+              return of((Exception) causeOwnerException);
+            }
+          }
           return of((Exception) cause);
         }
       }
+      causeIndex++;
     }
     return empty();
   }

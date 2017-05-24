@@ -56,7 +56,20 @@
         {
           "blocking": true,
           "executionType": "CPU_LITE",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CUSTOM_ERROR",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MARVEL",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
