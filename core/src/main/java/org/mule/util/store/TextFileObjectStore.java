@@ -6,10 +6,11 @@
  */
 package org.mule.util.store;
 
+import static org.mule.util.IOUtils.closeQuietly;
+
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.util.FileUtils;
-import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
 import java.io.File;
@@ -96,9 +97,7 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
                 output = new FileOutputStream(fileStore, true);
             }
 
-            StringBuilder buf = new StringBuilder();
-            buf.append(id).append("=").append(item).append(IOUtils.LINE_SEPARATOR);
-            output.write(buf.toString().getBytes());
+            updateTextFile();
         }
         catch (IOException iox)
         {
@@ -128,6 +127,10 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
 
         try
         {
+            if (output != null)
+            {
+                closeQuietly(output);
+            }
             output = new FileOutputStream(fileStore, false);
             props.store(output, StringUtils.EMPTY);
         }
@@ -174,7 +177,7 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
             {
                 output = new FileOutputStream(fileStore, false);
                 props.store(output, StringUtils.EMPTY);
-                IOUtils.closeQuietly(output);
+                closeQuietly(output);
             }
             catch (IOException e)
             {
@@ -183,7 +186,7 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
         }
         else
         {
-            IOUtils.closeQuietly(output);
+            closeQuietly(output);
         }
 
         super.dispose();

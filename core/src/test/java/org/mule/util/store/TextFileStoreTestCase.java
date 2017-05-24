@@ -52,6 +52,33 @@ public class TextFileStoreTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void testTimedExpiryWhenLessThanMaxEntries() throws Exception
+    {
+        // entryTTL=3 and expiryInterval=1 will cause background expiry
+        createObjectStore("timed", TTL, EXPIRY_INTERVAL);
+
+        // stores only one entry so that when
+        // expiration is prompted there are less entries than
+        // the max entries set for the text object store.
+        storeObjects("1");
+
+        // the entry should still be alive at this point
+        assertObjectsInStore("timed.dat", "1");
+
+        // wait until the entry TTL has been exceeded
+        new PollingProber(POLL_TIMEOUT, 500).check(new JUnitProbe()
+        {
+            
+            @Override
+            protected boolean test() throws Exception
+            {
+                assertObjectsExpired("timed.dat", "1");
+                return true;
+            }
+        });
+    }
+    
+    @Test
     public void testTimedExpiry() throws Exception
     {
         // entryTTL=3 and expiryInterval=1 will cause background expiry
