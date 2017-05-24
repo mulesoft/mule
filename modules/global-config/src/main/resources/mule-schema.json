@@ -27,8 +27,12 @@
             "required" : ["url"]
           }
         },
-        "mavenSettingsLocation" : {
-          "description" : "Location of the maven settings.xml file. It can be a classpath reference in which case the file can be placed in the MULE_HOME/conf folder or an absolute path to the file. If defined, the repositories and proxies configured on it will be used by the runtime",
+        "globalSettingsLocation" : {
+          "description" : "Location of the maven global settings.xml file. It can be a classpath reference in which case the file can be placed in the MULE_HOME/conf folder or an absolute path to the file. If defined, the repositories and proxies configured on it will be used by the runtime",
+          "type" : "string"
+        },
+        "userSettingsLocation" : {
+          "description" : "Location of the maven user settings.xml file. It can be a classpath reference in which case the file can be placed in the MULE_HOME/conf folder or an absolute path to the file. If defined, the repositories and proxies configured on it will be used by the runtime. If a global settings is configured, it will be merged with the user settings",
           "type" : "string"
         },
         "repositoryLocation" : {

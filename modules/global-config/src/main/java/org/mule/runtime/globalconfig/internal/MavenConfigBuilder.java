@@ -39,23 +39,16 @@ public class MavenConfigBuilder {
    */
   public static MavenConfiguration buildMavenConfig(Config mavenConfig) {
     try {
-
-      String mavenSettingsLocation =
-          mavenConfig.hasPath("mavenSettingsLocation") ? mavenConfig.getString("mavenSettingsLocation") : null;
+      String globalSettingsLocation =
+          mavenConfig.hasPath("globalSettingsLocation") ? mavenConfig.getString("globalSettingsLocation") : null;
+      String userSettingsLocation =
+          mavenConfig.hasPath("userSettingsLocation") ? mavenConfig.getString("userSettingsLocation") : null;
       String repositoryLocation =
           mavenConfig.hasPath("repositoryLocation") ? mavenConfig.getString("repositoryLocation") : null;
-      File mavenSettingsFile = null;
-      if (mavenSettingsLocation != null) {
-        URL resource = MavenConfigBuilder.class.getResource(mavenSettingsLocation);
-        if (resource == null) {
-          mavenSettingsFile = new File(mavenSettingsLocation);
-          if (!mavenSettingsFile.exists()) {
-            throw new RuntimeGlobalConfigException(I18nMessageFactory.createStaticMessage(
-                                                                                          format("Couldn't find file %s nor in the classpath or as absolute path",
-                                                                                                 mavenSettingsLocation)));
-          }
-        }
-      }
+
+      File globalSettingsFile = findResource(globalSettingsLocation);
+      File userSettingsFile = findResource(userSettingsLocation);
+
       File repositoryFolder = getRuntimeRepositoryFolder();
       if (repositoryLocation != null) {
         repositoryFolder = new File(repositoryLocation);
@@ -67,8 +60,11 @@ public class MavenConfigBuilder {
       }
       MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder =
           MavenConfiguration.newMavenConfigurationBuilder().withLocalMavenRepositoryLocation(repositoryFolder);
-      if (mavenSettingsFile != null) {
-        mavenConfigurationBuilder.withGlobalSettingsLocation(mavenSettingsFile);
+      if (globalSettingsFile != null) {
+        mavenConfigurationBuilder.withGlobalSettingsLocation(globalSettingsFile);
+      }
+      if (userSettingsFile != null) {
+        mavenConfigurationBuilder.withUserSettingsLocation(userSettingsFile);
       }
 
       ConfigObject repositories =
@@ -107,6 +103,22 @@ public class MavenConfigBuilder {
       }
       throw new RuntimeGlobalConfigException(e);
     }
+  }
+
+  private static File findResource(String resourceLocation) {
+    File resourceFile = null;
+    if (resourceLocation != null) {
+      URL resource = MavenConfigBuilder.class.getResource(resourceLocation);
+      if (resource == null) {
+        resourceFile = new File(resourceLocation);
+        if (!resourceFile.exists()) {
+          throw new RuntimeGlobalConfigException(I18nMessageFactory.createStaticMessage(
+                                                                                        format("Couldn't find file %s nor in the classpath or as absolute path",
+                                                                                               resourceLocation)));
+        }
+      }
+    }
+    return resourceFile;
   }
 
   private static Comparator<Map.Entry<String, Object>> remoteRepositoriesComparator() {
