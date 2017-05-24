@@ -10,18 +10,19 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.stream.Collectors.toList;
 import static org.codehaus.plexus.util.FileUtils.fileWrite;
 import static org.codehaus.plexus.util.FileUtils.toFile;
-import static org.mule.maven.client.api.model.BundleScope.PROVIDED;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
+import static org.mule.maven.client.api.model.BundleScope.PROVIDED;
 import static org.mule.runtime.module.embedded.internal.Serializer.serialize;
-import org.mule.maven.client.api.model.BundleDependency;
-import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.maven.client.api.model.BundleDependency;
+import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
 import org.mule.runtime.module.embedded.api.ContainerInfo;
 import org.mule.runtime.module.embedded.api.EmbeddedContainer;
-import org.mule.runtime.module.embedded.internal.classloading.JdkOnlyClassLoader;
+import org.mule.runtime.module.embedded.internal.classloading.FilteringClassLoader;
+import org.mule.runtime.module.embedded.internal.classloading.JdkOnlyClassLoaderFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -84,7 +85,7 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
     checkState(applicationConfigruation != null, "application cannot be null");
     checkState(mavenConfiguration != null, "mavenConfiguration cannot be null");
     try {
-      JdkOnlyClassLoader jdkOnlyClassLoader = new JdkOnlyClassLoader();
+      FilteringClassLoader jdkOnlyClassLoader = JdkOnlyClassLoaderFactory.create();
 
       if (log4jConfigurationFile != null) {
         configureLogging(jdkOnlyClassLoader);
@@ -162,7 +163,7 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
     }
   }
 
-  private void configureLogging(JdkOnlyClassLoader jdkOnlyClassLoader)
+  private void configureLogging(FilteringClassLoader jdkOnlyClassLoader)
       throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
     final Class<?> log4jLogManagerClass = jdkOnlyClassLoader.loadClass("org.apache.logging.log4j.LogManager");
     final Object logContext = log4jLogManagerClass.getMethod("getContext", boolean.class).invoke(null, false);

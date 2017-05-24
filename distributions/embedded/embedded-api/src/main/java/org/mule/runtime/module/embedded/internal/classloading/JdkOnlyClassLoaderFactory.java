@@ -6,12 +6,17 @@
  */
 package org.mule.runtime.module.embedded.internal.classloading;
 
+import static org.mule.runtime.module.embedded.internal.classloading.JreExplorer.exploreJdk;
+
 import com.google.common.collect.ImmutableSet;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 // TODO MULE-11882 - Consolidate classloading isolation
-public class JdkOnlyClassLoader extends FilteringClassLoader {
+public class JdkOnlyClassLoaderFactory {
 
   public static final Set<String> BOOT_PACKAGES =
       ImmutableSet.of("java", "javax.smartcardio",
@@ -24,11 +29,15 @@ public class JdkOnlyClassLoader extends FilteringClassLoader {
                       "com.yourkit",
                       "jdk.nashorn.api.scripting");
 
-  /**
-   * Creates a new filtering classLoader that only loads jdk specific classes
-   */
-  public JdkOnlyClassLoader() {
-    super(new ClassLoaderFilter(ImmutableSet.<String>builder().addAll(BOOT_PACKAGES)
-        .addAll(new JreUrlsDiscoverer().loadJrePackages()).build()));
+  public static FilteringClassLoader create() {
+    Set<String> packages = new HashSet<>(1024);
+    Set<String> resources = new HashSet<>(1024);
+    List<ExportedService> services = new ArrayList<>(128);
+    exploreJdk(packages, resources, services);
+
+    ClassLoaderFilter classLoaderFilter =
+        new ClassLoaderFilter(ImmutableSet.<String>builder().addAll(BOOT_PACKAGES).addAll(packages).build());
+
+    return new FilteringClassLoader(classLoaderFilter, services);
   }
 }
