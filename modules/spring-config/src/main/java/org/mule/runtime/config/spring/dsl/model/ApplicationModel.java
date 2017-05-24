@@ -508,7 +508,6 @@ public class ApplicationModel {
     // TODO MULE-9692 all this validations will be moved to an entity that does the validation and allows to aggregate all
     // validations instead of failing fast.
     validateNameIsNotRepeated();
-    validateNameIsOnlyOnTopLevelElements();
     validateErrorMappings();
     validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice();
     validateErrorHandlerStructure();
@@ -641,26 +640,6 @@ public class ApplicationModel {
         }
       }
     });
-  }
-
-  private void validateNameIsOnlyOnTopLevelElements() throws ConfigurationException {
-    try {
-      List<ComponentModel> topLevelComponents = muleComponentModels.get(0).getInnerComponents();
-      topLevelComponents.stream().filter(this::isMuleComponent).forEach(topLevelComponent -> {
-        topLevelComponent.getInnerComponents().stream().filter(this::isMuleComponent).forEach((topLevelComponentChild -> {
-          executeOnComponentTree(topLevelComponentChild, (component) -> {
-            if (component.getNameAttribute() != null && !ignoredNameValidationComponentList.contains(component.getIdentifier())) {
-              throw new MuleRuntimeException(createStaticMessage(
-                                                                 "Only top level elements can have a name attribute. Component %s has attribute name with value %s",
-                                                                 component.getIdentifier(), component.getNameAttribute()));
-            }
-          }, true);
-        }));
-
-      });
-    } catch (Exception e) {
-      throw new ConfigurationException(e);
-    }
   }
 
   private void validateNamedTopLevelElementsHaveName(ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry)
