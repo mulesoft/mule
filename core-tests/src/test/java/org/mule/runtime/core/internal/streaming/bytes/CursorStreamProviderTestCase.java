@@ -61,7 +61,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   private CursorStreamProvider streamProvider;
   private CountDownLatch controlLatch;
   private CountDownLatch mainThreadLatch;
-  protected ByteBufferManager bufferManager = new PoolingByteBufferManager();
+  protected PoolingByteBufferManager bufferManager = new PoolingByteBufferManager();
 
   public CursorStreamProviderTestCase(String name, int dataSize, int bufferSize, int maxBufferSize) {
     super(dataSize);
@@ -89,6 +89,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   public void after() {
     streamProvider.close();
     executorService.shutdownNow();
+    bufferManager.dispose();
   }
 
   @Test

@@ -60,7 +60,6 @@ abstract class AbstractCursorStream extends CursorStream {
   @Override
   public synchronized final void release() {
     if (!released) {
-      doRelease();
       released = true;
     }
   }
@@ -72,8 +71,6 @@ abstract class AbstractCursorStream extends CursorStream {
   public CursorStreamProvider getProvider() {
     return provider;
   }
-
-  protected abstract void doRelease();
 
   protected void assertNotDisposed() throws IOException {
     if (released) {

@@ -31,7 +31,7 @@ public class InMemoryCursorStreamProvider extends AbstractCursorStreamProvider {
   public InMemoryCursorStreamProvider(InputStream wrappedStream,
                                       InMemoryCursorStreamConfig config,
                                       ByteBufferManager bufferManager) {
-    super(wrappedStream, bufferManager);
+    super(wrappedStream);
     buffer = new InMemoryStreamBuffer(wrappedStream, config, bufferManager);
   }
 
@@ -40,7 +40,7 @@ public class InMemoryCursorStreamProvider extends AbstractCursorStreamProvider {
    */
   @Override
   protected CursorStream doOpenCursor() {
-    return new BufferedCursorStream(buffer, this, getBufferManager());
+    return new BufferedCursorStream(buffer, this);
   }
 
 

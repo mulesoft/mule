@@ -126,12 +126,12 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
    * @throws IllegalStateException if the buffer is closed
    */
   @Override
-  public final int get(ByteBuffer destination, long position, int length) {
+  public final ByteBuffer get(long position, int length) {
     checkState(!closed.get(), "Buffer is closed");
-    return doGet(destination, position, length);
+    return doGet(position, length);
   }
 
-  protected abstract int doGet(ByteBuffer destination, long position, int length);
+  protected abstract ByteBuffer doGet(long position, int length);
 
   protected void consume(ByteBuffer data) {
     int read = data.remaining();
@@ -157,8 +157,6 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     return result;
   }
 
-
-
   protected void deallocate(ByteBuffer byteBuffer) {
     if (byteBuffer != null) {
       closeSafely(() -> bufferManager.deallocate(byteBuffer));
@@ -174,19 +172,14 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   }
 
 
-  protected int copy(ByteBuffer dest, long position, int length) {
-    ByteBuffer src = buffer.duplicate();
+  protected ByteBuffer copy(long position, int length) {
+    ByteBuffer copy = buffer.duplicate();
 
     final int newPosition = toIntExact(position);
 
-    src.position(newPosition);
-    src.limit(newPosition + min(dest.remaining(), min(length, src.remaining())));
-    if (src.hasRemaining()) {
-      int remaining = src.remaining();
-      dest.put(src);
-      return remaining;
-    } else {
-      return -1;
-    }
+    copy.position(newPosition);
+    copy.limit(newPosition + min(copy.capacity(), min(length, copy.remaining())));
+
+    return copy;
   }
 }

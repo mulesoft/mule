@@ -23,17 +23,14 @@ public abstract class AbstractCursorStreamProvider implements CursorStreamProvid
   protected final InputStream wrappedStream;
 
   private final AtomicBoolean closed = new AtomicBoolean(false);
-  private final ByteBufferManager bufferManager;
 
   /**
    * Creates a new instance
    *
    * @param wrappedStream the original stream to be decorated
-   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    */
-  public AbstractCursorStreamProvider(InputStream wrappedStream, ByteBufferManager bufferManager) {
+  public AbstractCursorStreamProvider(InputStream wrappedStream) {
     this.wrappedStream = wrappedStream;
-    this.bufferManager = bufferManager;
   }
 
   /**
@@ -59,13 +56,6 @@ public abstract class AbstractCursorStreamProvider implements CursorStreamProvid
   @Override
   public boolean isClosed() {
     return closed.get();
-  }
-
-  /**
-   * @return the {@link ByteBufferManager} that <b>MUST</b> to be used to allocate byte buffers
-   */
-  protected ByteBufferManager getBufferManager() {
-    return bufferManager;
   }
 
   protected abstract CursorStream doOpenCursor();
