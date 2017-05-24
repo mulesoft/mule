@@ -95,6 +95,8 @@ public class IsolatedClassLoaderFactory {
   public ArtifactClassLoaderHolder createArtifactClassLoader(List<String> extraBootPackages,
                                                              ArtifactsUrlClassification artifactsUrlClassification) {
     JarInfo testJarInfo = getTestJarInfo(artifactsUrlClassification);
+    Map<String, LookupStrategy> appExportedLookupStrategies = new HashMap<>();
+    testJarInfo.getPackages().stream().forEach(p -> appExportedLookupStrategies.put(p, PARENT_FIRST));
 
     ArtifactClassLoader containerClassLoader;
     ClassLoaderLookupPolicy childClassLoaderLookupPolicy;
@@ -124,8 +126,6 @@ public class IsolatedClassLoaderFactory {
           new RegionClassLoader("Region", new ArtifactDescriptor("Region"), containerClassLoader.getClassLoader(),
                                 childClassLoaderLookupPolicy);
 
-
-
       if (!artifactsUrlClassification.getPluginUrlClassifications().isEmpty()) {
         for (PluginUrlClassification pluginUrlClassification : artifactsUrlClassification.getPluginUrlClassifications()) {
           logClassLoaderUrls("PLUGIN (" + pluginUrlClassification.getName() + ")", pluginUrlClassification.getUrls());
@@ -136,6 +136,7 @@ public class IsolatedClassLoaderFactory {
               extendLookupPolicyForPrivilegedAccess(childClassLoaderLookupPolicy, moduleRepository,
                                                     testContainerClassLoaderFactory,
                                                     pluginUrlClassification);
+          pluginLookupPolicy = pluginLookupPolicy.extend(appExportedLookupStrategies);
 
           MuleArtifactClassLoader pluginCL =
               new MuleArtifactClassLoader(artifactId,

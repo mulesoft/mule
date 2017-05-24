@@ -76,7 +76,7 @@ public class ContainerClassLoaderFactory {
    */
   public static final Set<String> BOOT_PACKAGES =
       ImmutableSet.of(// Java EE
-                      "javax.servlet", "javax.mail", "javax.inject", "org.apache.xerces",
+                      "org.apache.xerces",
                       // MULE-10194 Mechanism to add custom boot packages to be exported by the container
                       "com.yourkit");
 

@@ -696,7 +696,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private Dependency findPluginSharedLibArtifact(String pluginSharedLibCoords, Artifact rootArtifact,
                                                  List<Dependency> directDependencies) {
     Optional<Dependency> pluginSharedLibDependency = discoverDependency(pluginSharedLibCoords, rootArtifact, directDependencies);
-    if (!pluginSharedLibDependency.isPresent() || !pluginSharedLibDependency.get().getScope().equals(TEST)) {
+    if (!pluginSharedLibDependency.isPresent()) {
       throw new IllegalStateException("Plugin shared lib artifact '" + pluginSharedLibCoords +
           "' in order to be resolved has to be declared as " + TEST + " dependency of your Maven project (" + rootArtifact + ")");
     }
