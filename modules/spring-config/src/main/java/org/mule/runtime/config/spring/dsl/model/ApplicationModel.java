@@ -729,13 +729,14 @@ public class ApplicationModel {
    * @param name the expected value for the name attribute configuration.
    * @return the component if present, if not, an empty {@link Optional}
    */
-  public Optional<ComponentModel> findNamedComponent(String name) {
+  public Optional<ComponentModel> findTopLevelNamedComponent(String name) {
     Optional<ComponentModel> requestedComponentModelOptional = empty();
     for (ComponentModel muleComponentModel : muleComponentModels) {
       requestedComponentModelOptional = muleComponentModel.getInnerComponents().stream()
           .filter(componentModel -> name.equals(componentModel.getNameAttribute()))
           .findAny();
-      if (requestedComponentModelOptional.isPresent()) {
+      if (requestedComponentModelOptional.isPresent())
+      {
         break;
       }
     }
@@ -749,7 +750,7 @@ public class ApplicationModel {
    * @return the component if present, if not, an empty {@link Optional}
    */
   // TODO MULE-11355: Make the ComponentModel haven an ComponentConfiguration internally
-  public Optional<ComponentConfiguration> findNamedElement(String name) {
+  public Optional<ComponentConfiguration> findTopLevelNamedElement(String name) {
     Optional<ComponentConfiguration> requestedElement = empty();
     for (ComponentModel muleComponentModel : muleComponentModels) {
       requestedElement = muleComponentModel.getInnerComponents().stream()
