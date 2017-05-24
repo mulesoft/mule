@@ -145,7 +145,7 @@
     <flow name="typedValueForObject">
         <typed-value:typed-value-for-object>
             <typed-value:object-typed-value>
-                #[%output application/json
+                #[output application/json
                 ---
                 {
                 a : "json value"
@@ -157,7 +157,7 @@
     <flow name="typedValueForInputStream">
         <typed-value:typed-value-for-input-stream>
             <typed-value:input-stream>
-                #[%output application/json
+                #[output application/json
                 ---
                 {
                 a : "json value"

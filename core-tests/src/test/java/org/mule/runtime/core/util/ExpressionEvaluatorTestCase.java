@@ -19,7 +19,7 @@ public class ExpressionEvaluatorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void handleNullEvent() throws MuleException {
-    TypedValue evaluate = muleContext.getExpressionManager().evaluate("%dw 2.0\n%output application/json\n---\n{a: 1}");
+    TypedValue evaluate = muleContext.getExpressionManager().evaluate("%dw 2.0\noutput application/json\n---\n{a: 1}");
     ByteArrayBasedCursorStreamProvider value = (ByteArrayBasedCursorStreamProvider) evaluate.getValue();
     String expected = "{\n" +
         "  \"a\": 1\n" +

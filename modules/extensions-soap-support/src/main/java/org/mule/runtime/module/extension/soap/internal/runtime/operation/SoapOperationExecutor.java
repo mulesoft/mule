@@ -105,7 +105,7 @@ public final class SoapOperationExecutor implements OperationExecutor {
     String hs = IOUtils.toString(headers);
     BindingContext context = BindingContext.builder().addBinding("payload", new TypedValue<>(hs, DataType.XML_STRING)).build();
     return expressionExecutor.evaluate("%dw 2.0 \n"
-        + "%output application/java \n"
+        + "output application/java \n"
         + "---\n"
         + "payload.headers mapObject (value, key) -> {\n"
         + "    '$key' : write((key): value, \"application/xml\")\n"
