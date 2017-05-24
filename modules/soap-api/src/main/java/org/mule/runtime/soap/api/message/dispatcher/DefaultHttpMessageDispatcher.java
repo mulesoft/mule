@@ -50,12 +50,12 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
     this.client = service.getClientFactory().create(new HttpClientConfiguration.Builder()
         .setName("wsc-dispatcher")
         .build());
-    LOGGER.info("Creating http client [" + client + "]");
+    log("Creating http client [" + client + "]");
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    LOGGER.info("Starting client [" + client + "]");
+    log("Starting client [" + client + "]");
     client.start();
   }
 
@@ -103,7 +103,13 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
    */
   @Override
   public void dispose() {
-    LOGGER.info("Stopping http client [" + client + "]");
+    log("Stopping http client [" + client + "]");
     client.stop();
+  }
+
+  private void log(String message) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.info(message);
+    }
   }
 }
