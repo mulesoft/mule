@@ -117,12 +117,6 @@
             <groupId>com.github.stephenc.eaio-uuid</groupId>
             <artifactId>uuid</artifactId>
             <version>3.4.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.github.stephenc.eaio-grabbag</groupId>
-                    <artifactId>grabbag</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
