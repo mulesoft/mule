@@ -122,6 +122,9 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
     @Override
     public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement)
     {
-        NotificationUtils.addMessageProcessorPathElements(((MessageProcessorChain) next).getMessageProcessors(), pathElement);
+        if(next instanceof MessageProcessorChain) //If this is no checked, the cast raises exception
+        {
+            NotificationUtils.addMessageProcessorPathElements(((MessageProcessorChain) next).getMessageProcessors(), pathElement);
+        }
     }
 }
