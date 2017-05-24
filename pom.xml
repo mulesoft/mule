@@ -129,7 +129,7 @@
         <javadocPluginVersion>2.9.1</javadocPluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
         <mavenCompilerVersion>3.1</mavenCompilerVersion>
-        
+
         <!--
             The above project.url will not be picked up in the manifest,
             instead a module artifact id is erroneously substituted.
@@ -143,17 +143,17 @@
         <jdk7Name>JavaSE-1.7</jdk7Name>
 
         <activemqVersion>5.11.1</activemqVersion>
-        <antVersion>1.7.0</antVersion>
+        <antVersion>1.9.6</antVersion>
         <antlrVersion>3.5</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.8.5</aspectjVersion>
         <asyncHttpClientVersion>1.9.39</asyncHttpClientVersion>
         <bshVersion>2.0b4</bshVersion>
-        <bouncycastleVersion>1.54</bouncycastleVersion>
+        <bouncycastleVersion>1.56</bouncycastleVersion>
         <c3p0Version>0.9.5.2</c3p0Version>
         <cglibVersion>2.2</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
-        <commonsBeanUtilsVersion>1.9.2</commonsBeanUtilsVersion>
+        <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
         <commonsExecVersion>1.2</commonsExecVersion>
         <commonsCliVersion>1.2</commonsCliVersion>
         <commonsCodecVersion>1.9</commonsCodecVersion>
@@ -179,7 +179,7 @@
         <hamcrestVersion>1.3</hamcrestVersion>
         <hk2Version>2.3.0-b05</hk2Version>
         <jacksonVersion>1.9.11</jacksonVersion>
-        <jackson2Version>2.4.3</jackson2Version>
+        <jackson2Version>2.6.6</jackson2Version>
         <javax.inject.version>1</javax.inject.version>
         <javax.transaction.version>1.2</javax.transaction.version>
         <jerseyVersion>2.11</jerseyVersion>
@@ -195,7 +195,7 @@
         <jodaTimeVersion>2.9.1</jodaTimeVersion>
         <jschVersion>0.1.54</jschVersion>
         <junitVersion>4.12</junitVersion>
-        <log4jVersion>2.8.1</log4jVersion>
+        <log4jVersion>2.8.2</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
         <maven.buildnumber.plugin.version>1.1</maven.buildnumber.plugin.version>
         <maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>
@@ -1943,7 +1943,7 @@
                                 <links>
                                     <link>http://docs.oracle.com/javase/7/docs/api/</link>
                                     <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
-                                    <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.9.2/docs/api/</link>
+                                    <link>http://jakarta.apache.org/commons/beanutils/commons-beanutils-1.9.3/docs/api/</link>
                                     <link>http://jakarta.apache.org/commons/collections/api-3.2/</link>
                                     <link>http://jakarta.apache.org/httpcomponents/httpclient-3.x/apidocs/</link>
                                     <link>http://jakarta.apache.org/commons/io/api-1.2/</link>

@@ -82,14 +82,13 @@
 /mule-standalone-${productVersion}/lib/boot/wrapper-windows-x86-32.dll
 /mule-standalone-${productVersion}/lib/boot/disruptor-3.3.0.jar
 /mule-standalone-${productVersion}/lib/boot/jcl-over-slf4j-1.7.24.jar
-/mule-standalone-${productVersion}/lib/boot/log4j-1.2-api-2.8.1.jar
-/mule-standalone-${productVersion}/lib/boot/log4j-api-2.8.1.jar
-/mule-standalone-${productVersion}/lib/boot/log4j-core-2.8.1.jar
-/mule-standalone-${productVersion}/lib/boot/log4j-jcl-2.8.1.jar
-/mule-standalone-${productVersion}/lib/boot/log4j-slf4j-impl-2.8.1.jar
-/mule-standalone-${productVersion}/lib/boot/log4j-jul-2.8.1.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-1.2-api-2.8.2.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-api-2.8.2.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-core-2.8.2.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-jcl-2.8.2.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-slf4j-impl-2.8.2.jar
+/mule-standalone-${productVersion}/lib/boot/log4j-jul-2.8.2.jar
 /mule-standalone-${productVersion}/lib/boot/slf4j-api-1.7.24.jar
-
 
 #
 # /lib/boot/exec
@@ -190,8 +189,8 @@
 /mule-standalone-${productVersion}/lib/opt/abdera-spring-0.4.0-incubating.jar
 /mule-standalone-${productVersion}/lib/opt/annotations-3.0.0.jar
 /mule-standalone-${productVersion}/lib/opt/annotations-api-6.0.53.jar
-/mule-standalone-${productVersion}/lib/opt/ant-1.7.0.jar
-/mule-standalone-${productVersion}/lib/opt/ant-launcher-1.7.0.jar
+/mule-standalone-${productVersion}/lib/opt/ant-1.9.6.jar
+/mule-standalone-${productVersion}/lib/opt/ant-launcher-1.9.6.jar
 /mule-standalone-${productVersion}/lib/opt/antlr-3.5.jar
 /mule-standalone-${productVersion}/lib/opt/antlr-runtime-3.5.jar
 /mule-standalone-${productVersion}/lib/opt/aopalliance-1.0.jar
@@ -203,16 +202,16 @@
 /mule-standalone-${productVersion}/lib/opt/async-http-client-1.9.39.jar
 /mule-standalone-${productVersion}/lib/opt/axiom-api-1.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/axiom-impl-1.2.5.jar
-/mule-standalone-${productVersion}/lib/opt/bcpg-jdk15on-1.54.jar
-/mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk15on-1.54.jar
-/mule-standalone-${productVersion}/lib/opt/bcprov-jdk15on-1.54.jar
-/mule-standalone-${productVersion}/lib/opt/bcpkix-jdk15on-1.54.jar
+/mule-standalone-${productVersion}/lib/opt/bcpg-jdk15on-1.56.jar
+/mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk15on-1.56.jar
+/mule-standalone-${productVersion}/lib/opt/bcprov-jdk15on-1.56.jar
+/mule-standalone-${productVersion}/lib/opt/bcpkix-jdk15on-1.56.jar
 /mule-standalone-${productVersion}/lib/opt/btf-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/bytelist-1.0.11.jar
 /mule-standalone-${productVersion}/lib/opt/cglib-nodep-2.2.jar
 /mule-standalone-${productVersion}/lib/opt/cometd-api-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/cometd-server-6.1.26.jar
-/mule-standalone-${productVersion}/lib/opt/commons-beanutils-1.9.2.jar
+/mule-standalone-${productVersion}/lib/opt/commons-beanutils-1.9.3.jar
 /mule-standalone-${productVersion}/lib/opt/commons-codec-1.9.jar
 /mule-standalone-${productVersion}/lib/opt/commons-collections-3.2.2.jar
 /mule-standalone-${productVersion}/lib/opt/commons-dbutils-1.2.jar
@@ -274,14 +273,14 @@
 /mule-standalone-${productVersion}/lib/opt/hk2-utils-2.3.0-b05.jar
 /mule-standalone-${productVersion}/lib/opt/invokebinder-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/isorelax-20030108.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-annotations-2.4.0.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-core-2.4.3.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-annotations-2.6.0.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-core-2.6.6.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-coreutils-1.8.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-core-asl-1.9.11.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-databind-2.4.3.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-databind-2.6.6.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-jaxrs-1.9.11.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-mapper-asl-1.9.11.jar
-/mule-standalone-${productVersion}/lib/opt/jackson-module-jsonSchema-2.4.4.jar
+/mule-standalone-${productVersion}/lib/opt/jackson-module-jsonSchema-2.6.6.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-xc-1.9.11.jar
 /mule-standalone-${productVersion}/lib/opt/jasper-6.0.53.jar
 /mule-standalone-${productVersion}/lib/opt/jasper-el-6.0.53.jar
@@ -447,4 +446,3 @@
 #
 /mule-standalone-${productVersion}/src/mule-${productVersion}-src.zip
 /mule-standalone-${productVersion}/src/README.txt
-

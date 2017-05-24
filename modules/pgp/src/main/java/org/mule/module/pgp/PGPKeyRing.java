@@ -16,7 +16,4 @@ public interface PGPKeyRing
     PGPSecretKey getSecretKey() throws Exception;
 
     PGPPublicKey getPublicKey(String principalId);
-
-    String getAvailablePrincipals ();
-
 }
