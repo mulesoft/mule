@@ -48,7 +48,7 @@ public class SplitterIteratorTestCase extends AbstractMuleTestCase {
     splitter.setMuleContext(muleContext);
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
     when(expressionConfig.getFullExpression()).thenReturn("fullExpression");
-    when(expressionManager.split(any(String.class), any(Integer.class), any(Event.class), any(BindingContext.class)))
+    when(expressionManager.split(any(String.class), any(Event.class), any(BindingContext.class)))
         .thenReturn(integers.iterator());
     when(muleEvent.getFlowCallStack()).thenReturn(flowCallStack);
     when(muleEvent.getError()).thenReturn(Optional.empty());

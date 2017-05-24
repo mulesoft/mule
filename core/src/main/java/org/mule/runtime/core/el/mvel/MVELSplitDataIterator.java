@@ -23,11 +23,9 @@ import static java.util.Collections.singletonList;
 public class MVELSplitDataIterator implements Iterator<TypedValue<?>> {
 
   private Iterator<?> delegate;
-  private int bachSize;
 
-  public MVELSplitDataIterator(Iterator<?> delegate, int bachSize) {
+  public MVELSplitDataIterator(Iterator<?> delegate) {
     this.delegate = delegate;
-    this.bachSize = bachSize;
   }
 
   @Override
@@ -37,22 +35,12 @@ public class MVELSplitDataIterator implements Iterator<TypedValue<?>> {
 
   @Override
   public TypedValue<?> next() {
-    if (bachSize > 0) {
-      int i = 0;
-      ArrayList<Object> bachedElements = new ArrayList<>();
-      while (delegate.hasNext() && i < bachSize) {
-        bachedElements.add(delegate.next());
-        i++;
-      }
-      return new TypedValue<>(bachedElements, DataType.builder().fromObject(bachedElements).build());
-    } else {
-      Object next = delegate.next();
-      return new TypedValue<>(next, DataType.builder().fromObject(next).build());
-    }
+    Object next = delegate.next();
+    return new TypedValue<>(next, DataType.builder().fromObject(next).build());
   }
 
 
-  public static Iterator<TypedValue<?>> createFrom(Object result, int bachSize) {
+  public static Iterator<TypedValue<?>> createFrom(Object result) {
     Iterator<Object> iter;
     if (result instanceof Object[]) {
       iter = asList((Object[]) result).iterator();
@@ -67,6 +55,6 @@ public class MVELSplitDataIterator implements Iterator<TypedValue<?>> {
     } else {
       iter = singletonList(result).iterator();
     }
-    return new MVELSplitDataIterator(iter, bachSize);
+    return new MVELSplitDataIterator(iter);
   }
 }

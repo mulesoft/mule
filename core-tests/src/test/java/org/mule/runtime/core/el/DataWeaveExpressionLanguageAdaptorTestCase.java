@@ -100,7 +100,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void splitByJson() throws Exception {
     Event jsonMessage = eventBuilder().message(Message.builder().payload("[1,2,3]").mediaType(APPLICATION_JSON).build()).build();
-    Iterator<TypedValue<?>> payload = expressionLanguage.split("payload", 0, jsonMessage, BindingContext.builder().build());
+    Iterator<TypedValue<?>> payload = expressionLanguage.split("payload", jsonMessage, BindingContext.builder().build());
     assertThat(payload.hasNext(), is(true));
     assertThat(payload.next().getValue().toString(), is("1"));
     assertThat(payload.hasNext(), is(true));

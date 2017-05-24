@@ -278,16 +278,16 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, FlowConstruct flowConstruct,
+  public Iterator<TypedValue<?>> split(String expression, Event event, FlowConstruct flowConstruct,
                                        BindingContext bindingContext)
       throws ExpressionRuntimeException {
-    return expressionLanguage.split(expression, bachSize, event, flowConstruct, bindingContext);
+    return expressionLanguage.split(expression, event, flowConstruct, bindingContext);
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, BindingContext bindingContext)
+  public Iterator<TypedValue<?>> split(String expression, Event event, BindingContext bindingContext)
       throws ExpressionRuntimeException {
-    return expressionLanguage.split(expression, bachSize, event, bindingContext);
+    return expressionLanguage.split(expression, event, bindingContext);
   }
 
   @Override
@@ -338,8 +338,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, int bachSize, BindingContext context) {
-    return expressionLanguage.split(expression, bachSize, null, context);
+  public Iterator<TypedValue<?>> split(String expression, BindingContext context) {
+    return expressionLanguage.split(expression, null, context);
   }
 
   /**

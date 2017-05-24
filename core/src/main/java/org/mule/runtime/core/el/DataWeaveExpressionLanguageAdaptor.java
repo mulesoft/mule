@@ -137,19 +137,19 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, FlowConstruct flowConstruct,
+  public Iterator<TypedValue<?>> split(String expression, Event event, FlowConstruct flowConstruct,
                                        BindingContext bindingContext)
       throws ExpressionRuntimeException {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, bindingContext);
     addFlowBindings(flowConstruct, contextBuilder);
-    return sanitizeAndEvaluate(expression, exp -> expressionExecutor.split(exp, bachSize, contextBuilder.build()));
+    return sanitizeAndEvaluate(expression, exp -> expressionExecutor.split(exp, contextBuilder.build()));
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, BindingContext bindingContext)
+  public Iterator<TypedValue<?>> split(String expression, Event event, BindingContext bindingContext)
       throws ExpressionRuntimeException {
     BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, bindingContext);
-    return sanitizeAndEvaluate(expression, exp -> expressionExecutor.split(exp, bachSize, contextBuilder.build()));
+    return sanitizeAndEvaluate(expression, exp -> expressionExecutor.split(exp, contextBuilder.build()));
   }
 
   @Override

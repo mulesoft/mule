@@ -169,19 +169,19 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, FlowConstruct flowConstruct,
+  public Iterator<TypedValue<?>> split(String expression, Event event, FlowConstruct flowConstruct,
                                        BindingContext bindingContext)
       throws ExpressionRuntimeException {
     TypedValue evaluate = evaluate(expression, event, flowConstruct, bindingContext);
-    return MVELSplitDataIterator.createFrom(evaluate.getValue(), bachSize);
+    return MVELSplitDataIterator.createFrom(evaluate.getValue());
 
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, BindingContext bindingContext)
+  public Iterator<TypedValue<?>> split(String expression, Event event, BindingContext bindingContext)
       throws ExpressionRuntimeException {
     TypedValue evaluate = evaluate(expression, event, bindingContext);
-    return MVELSplitDataIterator.createFrom(evaluate.getValue(), bachSize);
+    return MVELSplitDataIterator.createFrom(evaluate.getValue());
   }
 
 
