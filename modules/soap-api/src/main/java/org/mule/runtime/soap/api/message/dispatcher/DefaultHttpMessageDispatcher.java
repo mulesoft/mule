@@ -31,6 +31,8 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * Default {@link MessageDispatcher} implementation that aims to dispatch messages through HTTP
@@ -40,16 +42,20 @@ import java.util.concurrent.TimeoutException;
  */
 public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
 
+  private static final Logger LOGGER = Logger.getLogger(DefaultHttpMessageDispatcher.class);
+
   private final HttpClient client;
 
   public DefaultHttpMessageDispatcher(HttpService service) {
     this.client = service.getClientFactory().create(new HttpClientConfiguration.Builder()
-        .setName("wsc-http-dispatcher")
+        .setName("wsc-dispatcher")
         .build());
+    log("Creating http client [" + client + "]");
   }
 
   @Override
   public void initialise() throws InitialisationException {
+    log("Starting client [" + client + "]");
     client.start();
   }
 
@@ -97,6 +103,13 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
    */
   @Override
   public void dispose() {
+    log("Stopping http client [" + client + "]");
     client.stop();
+  }
+
+  private void log(String message) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(message);
+    }
   }
 }

@@ -12,6 +12,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.soap.api.client.SoapClientConfiguration.builder;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
@@ -41,12 +42,14 @@ import java.util.concurrent.ExecutionException;
 public class ForwardingSoapClient {
 
   private final LoadingCache<WebServiceDefinition, SoapClient> clientsCache;
-  private final MessageDispatcher dispatcher;
+  private final MessageDispatcherProvider<MessageDispatcher> dispatcherProvider;
   private final SoapServiceProvider serviceProvider;
 
-  ForwardingSoapClient(SoapService service, SoapServiceProvider serviceProvider, MessageDispatcher dispatcher) {
+  ForwardingSoapClient(SoapService service,
+                       SoapServiceProvider serviceProvider,
+                       MessageDispatcherProvider<MessageDispatcher> dispatcherProvider) {
     this.serviceProvider = serviceProvider;
-    this.dispatcher = dispatcher;
+    this.dispatcherProvider = dispatcherProvider;
     this.clientsCache = CacheBuilder.<WebServiceDefinition, SoapClient>newBuilder()
         .expireAfterAccess(1, MINUTES)
         .removalListener(new ForwardingClientRemovalListener())
@@ -82,13 +85,6 @@ public class ForwardingSoapClient {
   }
 
   /**
-   * @return the {@link MessageDispatcher} bounded to this connection.
-   */
-  MessageDispatcher getDispatcher() {
-    return dispatcher;
-  }
-
-  /**
    * {@link CacheLoader} implementation to load lazily {@link SoapClient}s.
    */
   private class SoapClientCacheLoader extends CacheLoader<WebServiceDefinition, SoapClient> {
@@ -104,7 +100,7 @@ public class ForwardingSoapClient {
       SoapClientFactory clientFactory = service.getClientFactory();
       SoapClientConfigurationBuilder configurationBuilder = builder()
           .withService(definition.getService())
-          .withDispatcher(dispatcher)
+          .withDispatcher(dispatcherProvider.connect())
           .withPort(definition.getPort())
           .withWsdlLocation(definition.getWsdlUrl().toString());
       if (definition.getAddress() != null) {

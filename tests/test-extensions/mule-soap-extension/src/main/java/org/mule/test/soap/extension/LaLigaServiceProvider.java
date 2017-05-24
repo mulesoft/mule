@@ -29,12 +29,19 @@ public class LaLigaServiceProvider implements SoapServiceProvider {
   @Parameter
   private String wsdlLocation;
 
+  public LaLigaServiceProvider() {}
+
+  LaLigaServiceProvider(String wsdlLocation) {
+    this.wsdlLocation = wsdlLocation;
+    this.firstDivision = "FIRST_DIV";
+  }
+
   @Override
   public List<WebServiceDefinition> getWebServiceDefinitions() {
     return ImmutableList.<WebServiceDefinition>builder().add(getFirstDivisionService()).build();
   }
 
-  private WebServiceDefinition getFirstDivisionService() {
+  WebServiceDefinition getFirstDivisionService() {
     return WebServiceDefinition.builder().withId("A").withFriendlyName(firstDivision).withWsdlUrl(wsdlLocation)
         .withService(LA_LIGA_SERVICE_A).withPort(LA_LIGA_PORT_A).build();
   }

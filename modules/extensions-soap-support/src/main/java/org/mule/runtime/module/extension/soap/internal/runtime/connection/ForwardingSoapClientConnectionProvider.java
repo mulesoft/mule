@@ -63,8 +63,7 @@ public class ForwardingSoapClientConnectionProvider implements PoolingConnection
    */
   @Override
   public ForwardingSoapClient connect() throws ConnectionException {
-    MessageDispatcher dispatcher = transportProvider.connect();
-    return new ForwardingSoapClient(soapService, serviceProvider, dispatcher);
+    return new ForwardingSoapClient(soapService, serviceProvider, transportProvider);
   }
 
   /**
@@ -75,7 +74,6 @@ public class ForwardingSoapClientConnectionProvider implements PoolingConnection
    */
   @Override
   public void disconnect(ForwardingSoapClient connection) {
-    transportProvider.disconnect(connection.getDispatcher());
     connection.disconnect();
   }
 
