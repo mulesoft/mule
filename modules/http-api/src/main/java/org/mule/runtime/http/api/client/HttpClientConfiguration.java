@@ -25,18 +25,20 @@ public class HttpClientConfiguration {
   private final int maxConnections;
   private final boolean usePersistentConnections;
   private final int connectionIdleTimeout;
+  private final boolean streaming;
   private final int responseBufferSize;
   private final String name;
 
   HttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig,
                           TcpClientSocketProperties clientSocketProperties, int maxConnections, boolean usePersistentConnections,
-                          int connectionIdleTimeout, int responseBufferSize, String name) {
+                          int connectionIdleTimeout, boolean streaming, int responseBufferSize, String name) {
     this.tlsContextFactory = tlsContextFactory;
     this.proxyConfig = proxyConfig;
     this.clientSocketProperties = clientSocketProperties;
     this.maxConnections = maxConnections;
     this.usePersistentConnections = usePersistentConnections;
     this.connectionIdleTimeout = connectionIdleTimeout;
+    this.streaming = streaming;
     this.responseBufferSize = responseBufferSize;
     this.name = name;
   }
@@ -65,6 +67,10 @@ public class HttpClientConfiguration {
     return connectionIdleTimeout;
   }
 
+  public boolean isStreaming() {
+    return streaming;
+  }
+
   public int getResponseBufferSize() {
     return responseBufferSize;
   }
@@ -84,6 +90,7 @@ public class HttpClientConfiguration {
     private int maxConnections = -1;
     private boolean usePersistentConnections = true;
     private int connectionIdleTimeout = 30000;
+    private boolean streaming = true;
     private int responseBufferSize = 10240;
     private String name;
 
@@ -158,6 +165,23 @@ public class HttpClientConfiguration {
     }
 
     /**
+     * Defines whether the HTTP response should be streamed, meaning processing will continue as soon as all headers are parsed and
+     * the body populated as it arrives. Default is {@code true}.
+     * <p/>
+     * When streaming is enabled, because of the internal buffer used to hold the arriving body chunks, the response MUST be
+     * eventually read or the worker threads handling the chunks will block waiting to allocate them. Likewise, read/write speed
+     * differences could cause issues. Buffer size can be customized for these reasons. Additionally, to avoid deadlocks, a hand
+     * off to another thread MUST be performed before consuming the response.
+     *
+     * @param streaming whether or not to enable streaming
+     * @return this builder
+     */
+    public Builder setStreaming(boolean streaming) {
+      this.streaming = streaming;
+      return this;
+    }
+
+    /**
      * Defines the size of the buffer in bytes used to store the HTTP response, the default value is 10KB.
      *
      * @param responseBufferSize buffer size (in bytes)
@@ -185,7 +209,7 @@ public class HttpClientConfiguration {
     public HttpClientConfiguration build() {
       checkNotNull(name, "Name is mandatory.");
       return new HttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
-                                         usePersistentConnections, connectionIdleTimeout, responseBufferSize, name);
+                                         usePersistentConnections, connectionIdleTimeout, streaming, responseBufferSize, name);
     }
   }
 }
