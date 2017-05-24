@@ -16,6 +16,10 @@ import org.mule.runtime.module.embedded.internal.NotExportedClassException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,21 +27,28 @@ import org.slf4j.LoggerFactory;
 // TODO MULE-11882 - Consolidate classloading isolation
 public class FilteringClassLoader extends ClassLoader {
 
+  private static final String SERVICE_PREFIX = "META-INF/services/";
+
   protected static final Logger logger = LoggerFactory.getLogger(FilteringClassLoader.class);
   public static final String SYSTEM_PROPERTY_PREFIX = "mule.";
   public static final String MULE_LOG_VERBOSE_CLASSLOADING = SYSTEM_PROPERTY_PREFIX + "classloading.verbose";
 
   private final ClassLoaderFilter filter;
+  private final List<ExportedService> exportedServices;
 
   /**
    * Creates a new filtering classLoader
    *
    * @param filter filters access to classes and resources from the artifact classLoader. Non null
+   * @param exportedServices exportedServices service providers that will be available from the filtered class loader. Non null.
    */
-  public FilteringClassLoader(ClassLoaderFilter filter) {
+  public FilteringClassLoader(ClassLoaderFilter filter,
+                              List<ExportedService> exportedServices) {
     checkArgument(filter != null, "Filter cannot be null");
+    checkArgument(exportedServices != null, "exportedServices cannot be null");
 
     this.filter = filter;
+    this.exportedServices = exportedServices;
   }
 
   @Override
@@ -60,12 +71,25 @@ public class FilteringClassLoader extends ClassLoader {
 
   @Override
   public URL getResource(String name) {
-    if (filter.exportsResource(name)) {
-      return getResourceFromDelegate(name);
+    if (isServiceResource(name)) {
+      Optional<ExportedService> exportedService = getExportedServiceStream(name).findFirst();
+
+      if (exportedService.isPresent()) {
+        logClassloadingTrace(format("Service resource '%s' found: '%s", name, exportedService.get()));
+        return exportedService.get().getResource();
+      } else {
+        logClassloadingTrace(format("Service resource '%s' not found", name));
+        return null;
+      }
     } else {
-      logClassloadingTrace(format("Resource '%s' not found in classloader", name));
-      logClassloadingTrace(format("Filter applied for resource '%s'", name));
-      return null;
+      if (filter.exportsResource(name)) {
+        return getResourceFromDelegate(name);
+      } else {
+        logClassloadingTrace(format("Resource '%s' not found in classloader.", name));
+        logClassloadingTrace(format("Filter applied for resource: %s", name));
+
+        return null;
+      }
     }
   }
 
@@ -75,13 +99,37 @@ public class FilteringClassLoader extends ClassLoader {
 
   @Override
   public Enumeration<URL> getResources(String name) throws IOException {
-    if (filter.exportsResource(name)) {
+    if (isServiceResource(name)) {
+      List<URL> exportedServiceProviders = getExportedServiceStream(name).map(s -> s.getResource()).collect(Collectors.toList());
+
+      if (exportedServiceProviders.isEmpty()) {
+        logClassloadingTrace(format("Service resource '%s' not found", name));
+      } else {
+
+        logClassloadingTrace(format("Service resources '%s' found: '%s", name, exportedServiceProviders));
+      }
+      return new EnumerationAdapter<>(exportedServiceProviders);
+    } else if (filter.exportsResource(name)) {
       return getResourcesFromDelegate(name);
     } else {
-      logClassloadingTrace(format("Resources '%s' not found in classloader.", name));
-      logClassloadingTrace(format("Filter applied for resources '%s'", name));
+      logClassloadingTrace(format("Resources '%s' not found ", name));
+      logClassloadingTrace(format("Filter applied for resources: '%s", name));
       return new EnumerationAdapter<>(emptyList());
     }
+  }
+
+  private Stream<ExportedService> getExportedServiceStream(String name) {
+    String serviceInterface = getServiceInterfaceFromResource(name);
+
+    return this.exportedServices.stream().filter(s -> serviceInterface.equals(s.getServiceInterface()));
+  }
+
+  private String getServiceInterfaceFromResource(String name) {
+    return name.substring(SERVICE_PREFIX.length());
+  }
+
+  private boolean isServiceResource(String name) {
+    return name.startsWith(SERVICE_PREFIX);
   }
 
   private void logClassloadingTrace(String message) {
