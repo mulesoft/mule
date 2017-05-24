@@ -19,15 +19,8 @@ import java.util.Set;
 public class JdkOnlyClassLoaderFactory {
 
   public static final Set<String> BOOT_PACKAGES =
-      ImmutableSet.of("java", "javax.smartcardio",
-                      // Java EE
-                      "javax.resource", "javax.servlet", "javax.ws", "javax.mail", "javax.inject", "org.apache.xerces",
-                      "org.apache.logging.log4j", "org.slf4j", "org.apache.commons.logging", "org.apache.log4j", "org.dom4j",
-                      "com.sun", "sun", "org.mule.mvel2",
-                      "org.codehaus.groovy",
-                      "org.aopalliance.aop",
-                      "com.yourkit",
-                      "jdk.nashorn.api.scripting");
+      ImmutableSet.of("org.apache.xerces",
+                      "com.yourkit");
 
   public static FilteringClassLoader create() {
     Set<String> packages = new HashSet<>(1024);
