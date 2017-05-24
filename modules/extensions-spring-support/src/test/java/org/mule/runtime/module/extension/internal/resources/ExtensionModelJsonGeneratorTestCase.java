@@ -37,7 +37,6 @@ import org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModel
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
-import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -124,9 +123,10 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
                                                                           new ExtensionJsonGeneratorTestUnit(javaLoader,
                                                                                                              SubTypesMappingConnector.class,
                                                                                                              "subtypes.json"),
-                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
-                                                                                                             MarvelExtension.class,
-                                                                                                             "marvel.json"),
+                                                                          // TODO MULE-12570 - Fix extension model generation
+                                                                          // new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                          // MarvelExtension.class,
+                                                                          // "marvel.json"),
                                                                           new ExtensionJsonGeneratorTestUnit(soapLoader,
                                                                                                              FootballSoapExtension.class,
                                                                                                              "soap.json"),
@@ -175,7 +175,9 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     Map<String, Object> params = new HashMap<>();
     params.put(TYPE_PROPERTY_NAME, clazz.getName());
     params.put(VERSION, "4.0.0-SNAPSHOT");
-    //TODO MULE-11797: as this utils is consumed from org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel), this util should get dropped once the ticket gets implemented.
+    // TODO MULE-11797: as this utils is consumed from
+    // org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel),
+    // this util should get dropped once the ticket gets implemented.
     final DslResolvingContext dslResolvingContext = getDefault(emptySet());
     return loader.loadExtensionModel(clazz.getClassLoader(), dslResolvingContext, params);
   }
