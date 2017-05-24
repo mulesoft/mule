@@ -20,8 +20,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule.distributions</groupId>
-            <artifactId>mule-module-embedded-api</artifactId>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-embedded-api</artifactId>
             <version>${muleEmbeddedApiVersion}</version>
         </dependency>
         <dependency>

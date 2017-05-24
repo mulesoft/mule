@@ -14,7 +14,6 @@
     <name>Mule Embedded</name>
 
     <modules>
-        <module>embedded-api</module>
         <module>embedded-impl</module>
         <module>embedded-test</module>
         <module>embedded-distribution</module>
