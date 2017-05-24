@@ -66,6 +66,8 @@ import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.streaming.DefaultStreamingManager;
+import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
+import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
@@ -510,6 +512,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
                              sourceModel,
                              source,
                              of(configurationInstance),
+                             new NullCursorStreamProviderFactory(new SimpleByteBufferManager()),
                              sourceCallbackFactory,
                              null, callbackParameters,
                              callbackParameters);

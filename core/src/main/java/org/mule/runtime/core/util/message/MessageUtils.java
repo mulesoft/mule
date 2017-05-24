@@ -11,6 +11,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.util.StreamingUtils;
 import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -56,18 +57,10 @@ public final class MessageUtils {
                                   CursorProviderFactory cursorProviderFactory,
                                   Event event) {
     return Message.builder()
-        .payload(streamingContent(result.getOutput(), cursorProviderFactory, event))
+        .payload(StreamingUtils.streamingContent(result.getOutput(), cursorProviderFactory, event))
         .mediaType(mediaType)
         .attributes(result.getAttributes().orElse(NULL_ATTRIBUTES))
         .build();
-  }
-
-  public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, Event event) {
-    if (cursorProviderFactory != null && cursorProviderFactory.accepts(value)) {
-      return cursorProviderFactory.of(event, value);
-    } else {
-      return value;
-    }
   }
 
   /**

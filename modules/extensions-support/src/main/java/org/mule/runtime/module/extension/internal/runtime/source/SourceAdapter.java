@@ -35,6 +35,8 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ExceptionCallback;
+import org.mule.runtime.core.streaming.CursorProviderFactory;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.util.func.CheckedRunnable;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -78,6 +80,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
   private final Optional<FieldSetter<Object, Object>> configurationSetter;
   private final Optional<FieldSetter<Object, Object>> connectionSetter;
   private final SourceCallbackFactory sourceCallbackFactory;
+  private final CursorProviderFactory cursorProviderFactory;
   private final ResolverSet nonCallbackParameters;
   private final ResolverSet successCallbackParameters;
   private final ResolverSet errorCallbackParameters;
@@ -89,11 +92,15 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
   private ConnectionManager connectionManager;
 
   @Inject
+  private StreamingManager streamingManager;
+
+  @Inject
   private MuleContext muleContext;
 
   public SourceAdapter(ExtensionModel extensionModel, SourceModel sourceModel,
                        Source source,
                        Optional<ConfigurationInstance> configurationInstance,
+                       CursorProviderFactory cursorProviderFactory,
                        SourceCallbackFactory sourceCallbackFactory,
                        ResolverSet nonCallbackParameters,
                        ResolverSet successCallbackParameters,
@@ -101,6 +108,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
     this.source = source;
+    this.cursorProviderFactory = cursorProviderFactory;
     this.configurationInstance = configurationInstance;
     this.sourceCallbackFactory = sourceCallbackFactory;
     this.nonCallbackParameters = nonCallbackParameters;
@@ -130,7 +138,10 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
   private SourceCallbackExecutor getMethodExecutor(Optional<Method> method, SourceCallbackModelProperty sourceCallbackModel) {
     return method.map(m -> (SourceCallbackExecutor) new ReflectiveSourceCallbackExecutor(extensionModel, configurationInstance,
                                                                                          sourceModel, source, m,
-                                                                                         muleContext, sourceCallbackModel))
+                                                                                         cursorProviderFactory,
+                                                                                         streamingManager,
+                                                                                         muleContext,
+                                                                                         sourceCallbackModel))
         .orElse(new NullSourceCallbackExecutor());
   }
 

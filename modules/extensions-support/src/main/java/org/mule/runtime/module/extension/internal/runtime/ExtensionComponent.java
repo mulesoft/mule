@@ -60,13 +60,13 @@ import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigur
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Optional;
 import java.util.function.Function;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class that groups all the common behaviour between different extension's components, like {@link OperationMessageProcessor} and
@@ -99,7 +99,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected ConnectionManagerAdapter connectionManager;
 
   @Inject
-  private StreamingManager streamingManager;
+  protected StreamingManager streamingManager;
 
   @Inject
   private MuleMetadataService metadataService;

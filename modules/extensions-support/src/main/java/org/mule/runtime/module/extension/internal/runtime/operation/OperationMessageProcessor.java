@@ -199,7 +199,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
       throws MuleException {
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, operationModel, event,
-                                         muleContext);
+                                         getCursorProviderFactory(), streamingManager, muleContext);
   }
 
   @Override
@@ -334,9 +334,6 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
 
   private ExecutionContextAdapter<OperationModel> createExecutionContext(Event event) throws MuleException {
     Optional<ConfigurationInstance> configuration = getConfiguration(event);
-
-
-
     return createExecutionContext(configuration, getResolutionResult(event, configuration), event);
   }
 
