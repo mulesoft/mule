@@ -22,6 +22,7 @@ import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.globalconfig.api.exception.RuntimeGlobalConfigException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -148,6 +149,31 @@ public class MavenConfigTestCase extends AbstractMuleTestCase {
       assertThat(mavenRemoteRepositories, hasSize(1));
       assertThat(mavenRemoteRepositories.get(0).getId(), is("mavenCentral"));
       assertThat(mavenRemoteRepositories.get(0).getUrl(), is(new URL(mavenCentralOverriddenUrl)));
+    });
+  }
+
+  @Description("Loads the global and user settings from system properties")
+  @Test
+  public void loadSettings() throws Exception {
+    File userSettings = temporaryFolder.newFile();
+    File globalSettings = temporaryFolder.newFile();
+
+    Map<String, String> properties = new HashMap<>();
+    properties.put("muleRuntimeConfig.maven.userSettingsLocation", userSettings.getAbsolutePath());
+    properties.put("muleRuntimeConfig.maven.globalSettingsLocation", globalSettings.getAbsolutePath());
+
+    testWithSystemProperties(properties, () -> {
+      GlobalConfigLoader.reset();
+      MavenConfiguration mavenConfig = getMavenConfig();
+      List<RemoteRepository> mavenRemoteRepositories = mavenConfig.getMavenRemoteRepositories();
+      assertThat(mavenRemoteRepositories, hasSize(1));
+      assertThat(mavenRemoteRepositories.get(0).getId(), is("mavenCentral"));
+
+      assertThat(mavenConfig.getGlobalSettingsLocation().isPresent(), is(true));
+      assertThat(mavenConfig.getGlobalSettingsLocation().get(), is(globalSettings));
+
+      assertThat(mavenConfig.getUserSettingsLocation().isPresent(), is(true));
+      assertThat(mavenConfig.getUserSettingsLocation().get(), is(userSettings));
     });
   }
 
