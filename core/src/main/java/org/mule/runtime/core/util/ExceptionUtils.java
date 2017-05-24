@@ -346,7 +346,8 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
       }
       if (cause instanceof MuleException || cause instanceof MuleRuntimeException) {
         ErrorType errorType = errorTypeLocator.lookupErrorType(cause);
-        if (!errorType.equals(errorTypeRepository.getErrorType(UNKNOWN).get())) {
+        ErrorType unknownErrorType = errorTypeRepository.getErrorType(UNKNOWN).get();
+        if (!errorType.equals(unknownErrorType)) {
           // search for a more specific wrapper first
           int nextCauseIndex = causeIndex + 1;
           ComponentLocation componentLocation =
@@ -355,7 +356,8 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
             Throwable causeOwnerException = causesAsList.get(nextCauseIndex);
             ErrorType causeOwnerErrorType = errorTypeLocator
                 .lookupComponentErrorType(componentLocation.getComponentIdentifier().getIdentifier(), causeOwnerException);
-            if (new SingleErrorTypeMatcher(causeOwnerErrorType).match(causeOwnerErrorType)) {
+            if (!unknownErrorType.equals(causeOwnerErrorType)
+                && new SingleErrorTypeMatcher(causeOwnerErrorType).match(causeOwnerErrorType)) {
               return of((Exception) causeOwnerException);
             }
           }
