@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.infrastructure.report;
+package org.mule.tck.report;
 
-import static org.mule.test.infrastructure.report.HeapDumper.dumpHeap;
+import static org.mule.tck.report.HeapDumper.dumpHeap;
 
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;

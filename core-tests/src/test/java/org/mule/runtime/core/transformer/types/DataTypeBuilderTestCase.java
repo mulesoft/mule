@@ -24,6 +24,7 @@ import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.util.IOUtils.toByteArray;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.message.Message;
@@ -36,8 +37,11 @@ import org.mule.runtime.core.internal.metadata.DefaultFunctionDataType;
 import org.mule.runtime.core.internal.metadata.DefaultMapDataType;
 import org.mule.runtime.core.internal.metadata.SimpleDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.FlakinessDetectorTestRunner;
+import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
+import org.mule.tck.report.HeapDumpOnFailure;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
@@ -52,11 +56,16 @@ import java.util.Set;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 
+@RunWith(FlakinessDetectorTestRunner.class)
 public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
+
+  @Rule
+  private HeapDumpOnFailure heapDumpOnFailure = new HeapDumpOnFailure();
 
   @Test
   public void buildSimple() {
@@ -286,6 +295,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @FlakyTest
   public void cacheClean() throws InterruptedException, ClassNotFoundException {
     ClassLoader custom = new ClassLoader(this.getClass().getClassLoader()) {
 
@@ -309,7 +319,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
     DataType.builder().type(custom.loadClass(Message.class.getName())).build();
     custom = null;
 
-    new PollingProber().check(new JUnitLambdaProbe(() -> {
+    new PollingProber(10000, 100).check(new JUnitLambdaProbe(() -> {
       System.gc();
       assertThat(clRef.isEnqueued(), is(true));
       return true;
