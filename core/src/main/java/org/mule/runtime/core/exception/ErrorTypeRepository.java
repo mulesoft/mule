@@ -11,10 +11,14 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.ANY;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CRITICAL;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.SOURCE_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.SOURCE_RESPONSE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.message.ErrorTypeBuilder;
@@ -38,6 +42,19 @@ public class ErrorTypeRepository {
   protected static final ErrorType ANY_ERROR_TYPE =
       ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(ANY_IDENTIFIER).build();
 
+  /**
+   * Parent error type for errors that occur on the source of a flow.
+   */
+  protected static final ErrorType SOURCE_ERROR_TYPE =
+      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(SOURCE_ERROR_IDENTIFIER)
+          .parentErrorType(ANY_ERROR_TYPE).build();
+
+  /**
+   * Parent error type for errors that occur in a source processing a successful response of a flow.
+   */
+  protected static final ErrorType SOURCE_RESPONSE_ERROR_TYPE =
+      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(SOURCE_RESPONSE_ERROR_IDENTIFIER)
+          .parentErrorType(SOURCE_ERROR_TYPE).build();
 
   /**
    * Error type for which there's no clear reason for failure. Will be used when no specific match is found.
@@ -59,6 +76,7 @@ public class ErrorTypeRepository {
 
   public ErrorTypeRepository() {
     this.errorTypes.put(ANY, ANY_ERROR_TYPE);
+    this.errorTypes.put(SOURCE, SOURCE_ERROR_TYPE);
     this.internalErrorTypes.put(CRITICAL, CRITICAL_ERROR_TYPE);
     this.internalErrorTypes.put(UNKNOWN, UNKNOWN_ERROR_TYPE);
   }
@@ -125,12 +143,30 @@ public class ErrorTypeRepository {
   }
 
   /**
-   * Gets the {@code ErrorType} instance for ANY error type.
+   * Gets the {@link ErrorType} instance for ANY error type.
    *
    * @return the ANY error type
    */
   public ErrorType getAnyErrorType() {
     return ANY_ERROR_TYPE;
+  }
+
+  /**
+   * Gets the {@link ErrorType} instance for SOURCE error type.
+   *
+   * @return the SOURCE error type
+   */
+  public ErrorType getSourceErrorType() {
+    return SOURCE_ERROR_TYPE;
+  }
+
+  /**
+   * Gets the {@link ErrorType} instance for SOURCE_RESPONSE error type.
+   *
+   * @return the SOURCE_RESPONSE error type
+   */
+  public ErrorType getSourceResponseErrorType() {
+    return SOURCE_RESPONSE_ERROR_TYPE;
   }
 
   /**

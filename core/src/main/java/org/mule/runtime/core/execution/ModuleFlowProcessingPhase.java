@@ -16,16 +16,24 @@ import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDI
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_GENERATE;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_SEND;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_GENERATE;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollection;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
@@ -33,7 +41,11 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.exception.ErrorTypeMatcher;
+import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.policy.FailureSourcePolicyResult;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.policy.SourcePolicy;
@@ -49,28 +61,50 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.MonoProcessor;
 
 /**
  * This phase routes the message through the flow.
  * <p>
  * To participate of this phase, {@link MessageProcessTemplate} must implement {@link ModuleFlowProcessingPhaseTemplate}
- *
+ * <p>
  * This implementation will know how to process messages from extension's sources
  */
 public class ModuleFlowProcessingPhase
-    extends NotificationFiringProcessingPhase<ModuleFlowProcessingPhaseTemplate> {
+    extends NotificationFiringProcessingPhase<ModuleFlowProcessingPhaseTemplate> implements Initialisable {
 
   // TODO MULE-11167 Policies should be non blocking
   public static final String ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY = "enableSourcePolicies";
 
   private static Logger LOGGER = LoggerFactory.getLogger(ModuleFlowProcessingPhase.class);
-  private static final boolean ENABLE_SOURCE_POLICIES = getProperty(ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY) != null;
+
+  private boolean enableSourcePolicies;
+
+  private ErrorTypeMatcher sourceResponseErrorTypeMatcher;
+  private ErrorType sourceResponseGenerateErrorType;
+  private ErrorType sourceResponseSendErrorType;
+  private ErrorType sourceErrorResponseGenerateErrorType;
+  private ErrorType sourceErrorResponseSendErrorType;
 
   private final PolicyManager policyManager;
 
   public ModuleFlowProcessingPhase(PolicyManager policyManager) {
     this.policyManager = policyManager;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    enableSourcePolicies = getProperty(ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY) != null;
+
+    final ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
+
+    sourceResponseErrorTypeMatcher = new SingleErrorTypeMatcher(errorTypeRepository.getSourceResponseErrorType());
+
+    sourceResponseGenerateErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_GENERATE).get();
+    sourceResponseSendErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_SEND).get();
+    sourceErrorResponseGenerateErrorType = errorTypeRepository.getErrorType(SOURCE_ERROR_RESPONSE_GENERATE).get();
+    sourceErrorResponseSendErrorType = errorTypeRepository.getErrorType(SOURCE_ERROR_RESPONSE_SEND).get();
   }
 
   @Override
@@ -96,7 +130,7 @@ public class ModuleFlowProcessingPhase
       Event templateEvent = createEvent(template, messageProcessContext, sourceLocation, responseCompletion);
 
       // TODO MULE-11167 Policies should be non blocking
-      if (!ENABLE_SOURCE_POLICIES) {
+      if (!enableSourcePolicies) {
         just(templateEvent)
             .doOnNext(request -> {
               fireNotification(messageProcessContext.getMessageSource(), request,
@@ -104,13 +138,45 @@ public class ModuleFlowProcessingPhase
                                MESSAGE_RECEIVED);
             })
             .then(request -> from(template.routeEventAsync(request)))
-            .doOnSuccess(getSuccessConsumer(messageSource, templateEvent, exceptionHandler, errorConsumer,
-                                            messageProcessContext, phaseResultNotifier,
-                                            template))
-            .doOnError(MessagingException.class, errorConsumer)
+            .doOnSuccess(getSuccessConsumer(messageSource, templateEvent, exceptionHandler, messageProcessContext,
+                                            phaseResultNotifier, template))
+            .doOnError(SourceErrorException.class, see -> {
+              if (sourceResponseErrorTypeMatcher.match(see.getErrorType())) {
+                Event event = Event.builder(see.getEvent())
+                    .error(ErrorBuilder.builder(see)
+                        .errorType(see.getErrorType())
+                        .build())
+                    .build();
+                MessagingException messagingException = new MessagingException(event, see);
+                exceptionHandler.handleException(messagingException, event);
+                errorConsumer.accept(messagingException);
+              }
+            })
+            .doOnError(MessagingException.class, me -> {
+              if (me.getCause() instanceof SourceErrorException
+                  && sourceResponseErrorTypeMatcher.match(((SourceErrorException) me.getCause()).getErrorType())) {
+                Event event = Event.builder(((SourceErrorException) me.getCause()).getEvent())
+                    .error(ErrorBuilder.builder(me.getCause())
+                        .errorType(((SourceErrorException) me.getCause()).getErrorType())
+                        .build())
+                    .build();
+                MessagingException messagingException = new MessagingException(event, me.getCause());
+                exceptionHandler.handleException(messagingException, event);
+                errorConsumer.accept(messagingException);
+              } else {
+                errorConsumer.accept(me);
+              }
+            })
             .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
-                       throwable -> LOGGER.error("Unhandled exception processing request" + throwable))
-            .doAfterTerminate((event, throwable) -> responseCompletion.onComplete())
+                       throwable -> LOGGER.error("Unhandled exception processing request", throwable))
+            .doAfterTerminate((event, throwable) -> {
+              // TODO Bazinga!
+              // try {
+              // onTerminate(terminateConsumer, event, throwable);
+              // } finally {
+              responseCompletion.onComplete();
+              // }
+            })
             .subscribe();
       } else {
         Processor nextOperation = createFlowExecutionProcessor(messageSource, exceptionHandler, messageProcessContext, template);
@@ -122,15 +188,17 @@ public class ModuleFlowProcessingPhase
           Consumer<MessagingException> onExceptionFunction = messagingException -> {
             messagingException
                 .setProcessedEvent(createErrorEvent(messagingException.getEvent(), messageSource, messagingException,
-                                                    messageProcessContext.getErrorTypeLocator()));
+                                                    muleContext.getErrorTypeLocator()));
             fireNotification(messageSource, messagingException.getEvent(), messageProcessContext.getFlowConstruct(),
                              MESSAGE_ERROR_RESPONSE);
             try {
               template.sendFailureResponseToClient(messagingException,
                                                    sourcePolicyResult.getLeft().getErrorResponseParameters(),
                                                    createSendFailureResponseCompletationCallback(phaseResultNotifier));
-            } catch (MuleException e) {
-              throw new MuleRuntimeException(e);
+            } catch (Exception e) {
+              throw new SourceErrorException(messagingException.getEvent(),
+                                             sourceErrorResponseSendErrorType,
+                                             e, messagingException);
             }
           };
 
@@ -153,10 +221,12 @@ public class ModuleFlowProcessingPhase
             try {
               template.sendResponseToClient(flowExecutionResponse, responseParameters, errorResponseParametersFunction,
                                             responseCompletationCallback);
-            } catch (MessagingException e) {
-              onExceptionFunction.accept(e);
-            } catch (MuleException e) {
-              onExceptionFunction.accept(new MessagingException(flowExecutionResponse, e));
+            } catch (Exception e) {
+              onExceptionFunction.accept(new MessagingException(Event.builder(flowExecutionResponse)
+                  .error(ErrorBuilder.builder()
+                      .errorType(muleContext.getErrorTypeRepository().getErrorType(SOURCE_RESPONSE_SEND).get())
+                      .build())
+                  .build(), e));
             }
           };
 
@@ -208,17 +278,24 @@ public class ModuleFlowProcessingPhase
                                                         ModuleFlowProcessingPhaseTemplate template,
                                                         PhaseResultNotifier phaseResultNotifier) {
     return messagingException -> {
-      messagingException
-          .setProcessedEvent(createErrorEvent(messagingException.getEvent(), messageSource, messagingException,
-                                              messageProcessContext.getErrorTypeLocator()));
+      Event errorEvent = createErrorEvent(messagingException.getEvent(), messageSource, messagingException,
+                                          muleContext.getErrorTypeLocator());
+      messagingException.setProcessedEvent(errorEvent);
       fireNotification(messageSource, messagingException.getEvent(), messageProcessContext.getFlowConstruct(),
                        MESSAGE_ERROR_RESPONSE);
+
+      Map<String, Object> parameters;
       try {
-        template.sendFailureResponseToClient(messagingException,
-                                             errorParametersFunction.apply(messagingException.getEvent()),
+        parameters = errorParametersFunction.apply(messagingException.getEvent());
+      } catch (Exception e) {
+        throw new SourceErrorException(errorEvent, sourceErrorResponseGenerateErrorType, e, messagingException);
+      }
+
+      try {
+        template.sendFailureResponseToClient(messagingException, parameters,
                                              createSendFailureResponseCompletationCallback(phaseResultNotifier));
-      } catch (MuleException e) {
-        throw new MuleRuntimeException(e);
+      } catch (Exception e) {
+        throw new SourceErrorException(errorEvent, sourceErrorResponseSendErrorType, e, messagingException);
       }
     };
   }
@@ -226,7 +303,6 @@ public class ModuleFlowProcessingPhase
   private Consumer<Event> getSuccessConsumer(MessageSource messageSource,
                                              Event request,
                                              MessagingExceptionHandler exceptionHandler,
-                                             Consumer<MessagingException> onExceptionFunction,
                                              MessageProcessContext messageProcessContext,
                                              PhaseResultNotifier phaseResultNotifier,
                                              ModuleFlowProcessingPhaseTemplate template) {
@@ -241,19 +317,21 @@ public class ModuleFlowProcessingPhase
         response = builder(request).message(of(null)).build();
       }
 
-      Map<String, Object> responseParameters =
-          template.getSuccessfulExecutionResponseParametersFunction().apply(response);
-
-      Function<Event, Map<String, Object>> errorResponseParametersFunction =
-          template.getFailedExecutionResponseParametersFunction();
+      Map<String, Object> responseParameters;
+      try {
+        responseParameters = template.getSuccessfulExecutionResponseParametersFunction().apply(response);
+      } catch (Exception e) {
+        throw new SourceErrorException(response, sourceResponseGenerateErrorType, e);
+      }
 
       try {
+        Function<Event, Map<String, Object>> errorResponseParametersFunction =
+            template.getFailedExecutionResponseParametersFunction();
+
         template.sendResponseToClient(response, responseParameters, errorResponseParametersFunction,
                                       responseCompletationCallback);
-      } catch (MessagingException e) {
-        onExceptionFunction.accept(e);
-      } catch (MuleException e) {
-        onExceptionFunction.accept(new MessagingException(response, e));
+      } catch (Exception e) {
+        throw new SourceErrorException(response, sourceResponseSendErrorType, e);
       }
     };
   }
@@ -264,7 +342,7 @@ public class ModuleFlowProcessingPhase
     return muleEvent -> {
       try {
         TransactionalErrorHandlingExecutionTemplate transactionTemplate =
-            createMainExecutionTemplate(messageProcessContext.getFlowConstruct().getMuleContext(),
+            createMainExecutionTemplate(muleContext,
                                         messageProcessContext.getFlowConstruct(),
                                         messageProcessContext.getTransactionConfig().orElse(new MuleTransactionConfig()),
                                         exceptionHandler);
@@ -339,6 +417,40 @@ public class ModuleFlowProcessingPhase
       return 1;
     }
     return 0;
+  }
+
+  static final class SourceErrorException extends MuleRuntimeException {
+
+    private Event event;
+    private ErrorType errorType;
+    private MessagingException originalCause;
+
+    public SourceErrorException(Event event, ErrorType errorType, Throwable cause) {
+      super(cause);
+      this.event = event;
+      this.errorType = errorType;
+      this.originalCause = null;
+    }
+
+    public SourceErrorException(Event event, ErrorType errorType, Throwable cause, MessagingException originalCause) {
+      super(cause);
+      this.event = event;
+      this.errorType = errorType;
+      this.originalCause = originalCause;
+    }
+
+    public Event getEvent() {
+      return event;
+    }
+
+    public ErrorType getErrorType() {
+      return errorType;
+    }
+
+    public MessagingException getOriginalCause() {
+      return originalCause;
+    }
+
   }
 
 }

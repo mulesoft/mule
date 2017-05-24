@@ -15,6 +15,10 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.REDELI
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.RETRY_EXHAUSTED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.ROUTING;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_GENERATE;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_SEND;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_GENERATE;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.STREAM_MAXIMUM_SIZE_EXCEEDED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.VALIDATION;
@@ -30,7 +34,7 @@ public class ErrorTypeRepositoryFactory {
 
   /**
    * Creates the default {@link ErrorTypeRepository} to use in mule.
-   * 
+   * <p>
    * The {@link ErrorTypeRepository} gets populated with the default mappings between common core exceptions and core error types.
    * 
    * @return a new {@link ErrorTypeRepository}.
@@ -42,13 +46,20 @@ public class ErrorTypeRepositoryFactory {
     final ErrorType validationErrorType = errorTypeRepository.addErrorType(VALIDATION, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addErrorType(DUPLICATE_MESSAGE, validationErrorType);
     errorTypeRepository.addErrorType(REDELIVERY_EXHAUSTED, errorTypeRepository.getAnyErrorType());
-    ErrorType connectivityErrorType = errorTypeRepository.addErrorType(CONNECTIVITY, errorTypeRepository.getAnyErrorType());
+    final ErrorType connectivityErrorType = errorTypeRepository.addErrorType(CONNECTIVITY, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addErrorType(RETRY_EXHAUSTED, connectivityErrorType);
     errorTypeRepository.addErrorType(ROUTING, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addErrorType(SECURITY, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addInternalErrorType(OVERLOAD, errorTypeRepository.getCriticalErrorType());
     errorTypeRepository.addErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED, errorTypeRepository.getAnyErrorType());
     errorTypeRepository.addInternalErrorType(FATAL, errorTypeRepository.getCriticalErrorType());
+
+    final ErrorType sourceErrorType = errorTypeRepository.getSourceErrorType();
+    errorTypeRepository.addErrorType(SOURCE_RESPONSE_GENERATE, errorTypeRepository.getSourceResponseErrorType());
+    errorTypeRepository.addErrorType(SOURCE_RESPONSE_SEND, errorTypeRepository.getSourceResponseErrorType());
+    errorTypeRepository.addErrorType(SOURCE_ERROR_RESPONSE_GENERATE, sourceErrorType);
+    errorTypeRepository.addErrorType(SOURCE_ERROR_RESPONSE_SEND, sourceErrorType);
+
     return errorTypeRepository;
   }
 

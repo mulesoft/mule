@@ -7,18 +7,19 @@
 package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.core.exception.Errors.Identifiers.FATAL_ERROR_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.DUPLICATE_MESSAGE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.EXPRESSION_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.FATAL_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.OVERLOAD_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ROUTING_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.SECURITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.SOURCE_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.SOURCE_RESPONSE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
@@ -100,6 +101,16 @@ public abstract class Errors {
     public static final String UNKNOWN_ERROR_IDENTIFIER = "UNKNOWN";
 
     /**
+     * Indicates that an error occurred in the source of the flow.
+     */
+    public static final String SOURCE_ERROR_IDENTIFIER = "SOURCE";
+
+    /**
+     * Indicates that an error occurred in the source of the flow processing a successful response.
+     */
+    public static final String SOURCE_RESPONSE_ERROR_IDENTIFIER = "SOURCE_RESPONSE";
+
+    /**
      * Indicates that a severe error occurred. Cannot be handled. Other unhandleable errors should go under it.
      */
     public static final String CRITICAL_IDENTIFIER = "CRITICAL";
@@ -141,11 +152,24 @@ public abstract class Errors {
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(SECURITY_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier OVERLOAD =
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(OVERLOAD_ERROR_IDENTIFIER).build();
+
+    public static final ComponentIdentifier SOURCE =
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SOURCE_ERROR_IDENTIFIER).build();
+    public static final ComponentIdentifier SOURCE_RESPONSE =
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SOURCE_RESPONSE_ERROR_IDENTIFIER).build();
+    public static final ComponentIdentifier SOURCE_RESPONSE_GENERATE =
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName("SOURCE_RESPONSE_GENERATE").build();
+    public static final ComponentIdentifier SOURCE_RESPONSE_SEND =
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName("SOURCE_RESPONSE_SEND").build();
+    public static final ComponentIdentifier SOURCE_ERROR_RESPONSE_GENERATE =
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName("SOURCE_ERROR_RESPONSE_GENERATE").build();
+    public static final ComponentIdentifier SOURCE_ERROR_RESPONSE_SEND =
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName("SOURCE_ERROR_RESPONSE_SEND").build();
+
     public static final ComponentIdentifier STREAM_MAXIMUM_SIZE_EXCEEDED =
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier FATAL =
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(FATAL_ERROR_IDENTIFIER).build();
-
 
     public static final ComponentIdentifier UNKNOWN =
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(UNKNOWN_ERROR_IDENTIFIER).build();

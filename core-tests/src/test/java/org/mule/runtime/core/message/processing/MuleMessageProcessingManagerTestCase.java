@@ -14,16 +14,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Answers;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
+import static org.mule.runtime.core.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -46,6 +38,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
+
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
 public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.AbstractMuleTestCase {
@@ -59,6 +62,7 @@ public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.Ab
 
   @Before
   public void setUp() {
+    when(mockMuleContext.getErrorTypeRepository()).thenReturn(createDefaultErrorTypeRepository());
     when(completeMessageProcessTemplateAndContext.getTransactionConfig()).thenReturn(empty());
   }
 

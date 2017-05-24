@@ -189,4 +189,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
     policyStateHandler.destroyState(executionIdentifier);
   }
 
+
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 }
