@@ -109,7 +109,7 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
 
   private void log(String message) {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.info(message);
+      LOGGER.debug(message);
     }
   }
 }
