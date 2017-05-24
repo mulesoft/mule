@@ -124,7 +124,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclarationTestCase {
 
   private static final String GET_GRAMS_IN_STORAGE = "getGramsInStorage";
-  private static final String EXTENDED_CONFIG_NAME = "extendedConfig";
+  private static final String EXTENDED_CONFIG_NAME = "extended-config";
   private static final String EXTENDED_CONFIG_DESCRIPTION = "extendedDescription";
   private static final String SOURCE_NAME = "ListenPayments";
   private static final String DEA_SOURCE_NAME = "dea-radio";

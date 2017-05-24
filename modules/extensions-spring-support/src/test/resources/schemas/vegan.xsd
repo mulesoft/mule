@@ -194,16 +194,16 @@
                             </xs:complexContent>
                         </xs:complexType>
                     </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="response">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension base="mule:abstractExtensionType">
-                  <xs:sequence></xs:sequence>
-                  <xs:attribute type="mule:expressionInt" use="optional" name="timeToPeel"></xs:attribute>
-                </xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="response">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension base="mule:abstractExtensionType">
+                                    <xs:sequence></xs:sequence>
+                                    <xs:attribute type="mule:expressionInt" use="optional" name="timeToPeel"></xs:attribute>
+                                </xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
                     <xs:annotation>
@@ -480,7 +480,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="grape">
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="grape-config">
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">

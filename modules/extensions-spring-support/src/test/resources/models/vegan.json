@@ -3760,7 +3760,7 @@
         }
       ],
       "messageSources": [],
-      "name": "grape",
+      "name": "grape-config",
       "description": "",
       "modelProperties": {}
     },

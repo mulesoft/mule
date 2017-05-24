@@ -5,9 +5,9 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/implicitexclusive http://www.mulesoft.org/schema/mule/implicitexclusive/current/mule-implicitexclusive.xsd">
 
-    <implicitexclusive:blaconf name="blaexplicit"/>
-    <implicitexclusive:blaconf name="blaexplicit2"/>
-    <implicitexclusive:bleconf name="bleexplicit" number="15"/>
+    <implicitexclusive:blaconf-config name="blaexplicit"/>
+    <implicitexclusive:blaconf-config name="blaexplicit2"/>
+    <implicitexclusive:bleconf-config name="bleexplicit" number="15"/>
 
     <flow name="implicitConfig">
         <implicitexclusive:bla/>
