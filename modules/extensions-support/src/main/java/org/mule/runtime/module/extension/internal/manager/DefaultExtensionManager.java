@@ -200,15 +200,20 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   private void createImplicitConfiguration(ExtensionModel extensionModel, ConfigurationModel implicitConfigurationModel,
                                            Event muleEvent) {
-    synchronized (extensionModel) {
-      // check that another thread didn't beat us to create the instance
-      if (!extensionRegistry
-          .getConfigurationProvider(getImplicitConfigurationProviderName(extensionModel, implicitConfigurationModel))
-          .isPresent()) {
-        registerConfigurationProvider(implicitConfigurationProviderFactory.createImplicitConfigurationProvider(extensionModel,
-                                                                                                               implicitConfigurationModel,
-                                                                                                               muleEvent,
-                                                                                                               muleContext));
+    String implicitConfigurationProviderName = getImplicitConfigurationProviderName(extensionModel, implicitConfigurationModel);
+    if (!extensionRegistry
+        .getConfigurationProvider(implicitConfigurationProviderName)
+        .isPresent()) {
+      synchronized (extensionModel) {
+        // check that another thread didn't beat us to create the instance
+        if (!extensionRegistry
+            .getConfigurationProvider(implicitConfigurationProviderName)
+            .isPresent()) {
+          registerConfigurationProvider(implicitConfigurationProviderFactory.createImplicitConfigurationProvider(extensionModel,
+                                                                                                                 implicitConfigurationModel,
+                                                                                                                 muleEvent,
+                                                                                                                 muleContext));
+        }
       }
     }
   }
