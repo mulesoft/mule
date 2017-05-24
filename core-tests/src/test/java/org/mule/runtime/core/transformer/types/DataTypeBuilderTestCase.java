@@ -65,7 +65,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
   public ExpectedException expected = ExpectedException.none();
 
   @Rule
-  private HeapDumpOnFailure heapDumpOnFailure = new HeapDumpOnFailure();
+  public HeapDumpOnFailure heapDumpOnFailure = new HeapDumpOnFailure();
 
   @Test
   public void buildSimple() {
