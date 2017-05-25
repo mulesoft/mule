@@ -40,7 +40,6 @@ if "%MULE_APP_LONG%" == "" (
     set MULE_APP_LONG=Mule
 )
 
-set PATH=%PATH%;%MULE_HOME%\lib\native\profiler
 set _WRAPPER_BASE=%MULE_HOME%\lib\boot\exec\wrapper
 
 rem Configure remote Java debugging options here

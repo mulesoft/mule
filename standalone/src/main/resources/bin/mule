@@ -153,8 +153,6 @@ PIDDIR="$MULE_BASE/."
 
 #-----------------------------------------------------------------------------
 
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$MULE_HOME/lib/native/profiler
-
 # If the PIDDIR is relative, set its value relative to the full REALPATH to avoid problems if
 #  the working directory is later changed.
 FIRST_CHAR=`echo $PIDDIR | cut -c1,1`
