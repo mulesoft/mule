@@ -579,11 +579,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>com.yourkit</groupId>
-                <artifactId>yjp-controller-api-redist</artifactId>
-                <version>9.0.8</version>
-            </dependency>
-            <dependency>
                 <groupId>org.codehaus.btm</groupId>
                 <artifactId>btm</artifactId>
                 <version>${bitronixTMVersion}</version>
