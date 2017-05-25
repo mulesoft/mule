@@ -20,6 +20,7 @@ public class JdkOnlyClassLoaderFactory {
 
   public static final Set<String> BOOT_PACKAGES =
       ImmutableSet.of("org.apache.xerces",
+                      "org.apache.logging.log4j", "org.slf4j", "org.apache.commons.logging", "org.apache.log4j",
                       "com.yourkit");
 
   public static FilteringClassLoader create() {
