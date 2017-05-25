@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static java.lang.Math.abs;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -19,7 +19,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 
 import java.nio.ByteBuffer;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.KeyedObjectPool;
@@ -50,9 +49,9 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
    * of a reaper thread (those performance test did not include such a reaper, so it's very possible that this is more
    * than just slightly faster)
    */
-  private final LoadingCache<Integer, BufferPool> pools = CacheBuilder.newBuilder()
+  private final LoadingCache<Integer, ObjectPool<ByteBuffer>> pools = CacheBuilder.newBuilder()
       .expireAfterAccess(10, SECONDS)
-      .removalListener((RemovalListener<Integer, BufferPool>) notification -> {
+      .removalListener((RemovalListener<Integer, ObjectPool<ByteBuffer>>) notification -> {
         try {
           notification.getValue().close();
         } catch (Exception e) {
@@ -60,10 +59,10 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
             LOGGER.debug("Found exception trying to dispose buffer pool for capacity " + notification.getKey(), e);
           }
         }
-      }).build(new CacheLoader<Integer, BufferPool>() {
+      }).build(new CacheLoader<Integer, ObjectPool<ByteBuffer>>() {
 
         @Override
-        public BufferPool load(Integer capacity) throws Exception {
+        public ObjectPool<ByteBuffer> load(Integer capacity) throws Exception {
           return createPool(capacity);
         }
       });
@@ -86,10 +85,10 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
   @Override
   public void deallocate(ByteBuffer byteBuffer) {
     int capacity = byteBuffer.capacity();
-    BufferPool pool = pools.getIfPresent(capacity);
+    ObjectPool<ByteBuffer> pool = pools.getIfPresent(capacity);
     if (pool != null) {
       try {
-        pool.returnBuffer(byteBuffer);
+        pool.returnObject(byteBuffer);
       } catch (Exception e) {
         throw new MuleRuntimeException(createStaticMessage("Could not deallocate buffer of capacity " + capacity), e);
       }
@@ -107,19 +106,19 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
     }
   }
 
-  private BufferPool createPool(int capacity) {
+  private ObjectPool<ByteBuffer> createPool(int capacity) {
     GenericObjectPoolConfig config = new GenericObjectPoolConfig();
     config.setMaxIdle(MAX_IDLE);
     config.setMaxTotal(-1);
     config.setBlockWhenExhausted(false);
-    config.setBlockWhenExhausted(false);
+    config.setTimeBetweenEvictionRunsMillis(MINUTES.toMillis(1));
     config.setTestOnBorrow(false);
     config.setTestOnReturn(false);
     config.setTestWhileIdle(false);
     config.setTestOnCreate(false);
     config.setJmxEnabled(false);
 
-    return new BufferPool(new GenericObjectPool<>(new BasePooledObjectFactory<ByteBuffer>() {
+    return new GenericObjectPool<>(new BasePooledObjectFactory<ByteBuffer>() {
 
       @Override
       public ByteBuffer create() throws Exception {
@@ -135,41 +134,6 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
       public void activateObject(PooledObject<ByteBuffer> p) throws Exception {
         p.getObject().clear();
       }
-    }, config));
-  }
-
-  /**
-   * This wrapper uses an AtomicInteger to count idle instances, so that we can do eviction without a reaper thread.
-   * The atomic integer is used instead of simply using {@link ObjectPool#getNumIdle()} because that method blocks
-   * the entire pool.
-   */
-  private class BufferPool {
-
-    private final ObjectPool<ByteBuffer> pool;
-    private AtomicInteger count = new AtomicInteger(0);
-
-    private BufferPool(ObjectPool<ByteBuffer> pool) {
-      this.pool = pool;
-    }
-
-    private ByteBuffer borrowObject() throws Exception {
-      ByteBuffer buffer = pool.borrowObject();
-      count.addAndGet(1);
-
-      return buffer;
-    }
-
-    private void returnBuffer(ByteBuffer buffer) throws Exception {
-      int idle = abs(count.addAndGet(-1));
-      if (idle > MAX_IDLE) {
-        pool.invalidateObject(buffer);
-      } else {
-        pool.returnObject(buffer);
-      }
-    }
-
-    private void close() throws Exception {
-      pool.close();
-    }
+    }, config);
   }
 }
