@@ -36,14 +36,12 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
   public void start() throws MuleException {
     scheduler = muleContext.getSchedulerService().customScheduler(muleContext.getSchedulerBaseConfig()
         .withName("processing.time.monitor").withMaxConcurrentTasks(1).withShutdownTimeout(0, MILLISECONDS));
-    scheduler.scheduleWithFixedDelay(new ProcessingTimeChecker(), 0, 1, MILLISECONDS);
+    scheduler.submit(new ProcessingTimeChecker());
   }
 
   @Override
   public void stop() throws MuleException {
-    if (scheduler != null) {
-      scheduler.stop();
-    }
+    scheduler.stop();
     refs.clear();
   }
 

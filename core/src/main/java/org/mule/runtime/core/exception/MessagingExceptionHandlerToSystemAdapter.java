@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.core.exception;
 
-import static java.util.Objects.requireNonNull;
-
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 
 public class MessagingExceptionHandlerToSystemAdapter implements MessagingExceptionHandler {
@@ -17,7 +15,6 @@ public class MessagingExceptionHandlerToSystemAdapter implements MessagingExcept
   private MuleContext muleContext;
 
   public MessagingExceptionHandlerToSystemAdapter(MuleContext muleContext) {
-    requireNonNull(muleContext);
     this.muleContext = muleContext;
   }
 
