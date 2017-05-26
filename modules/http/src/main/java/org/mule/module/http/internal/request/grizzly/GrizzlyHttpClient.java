@@ -756,16 +756,29 @@ public class GrizzlyHttpClient implements HttpClient
                                                  HttpRequestAuthentication authentication) throws IOException, TimeoutException
     {
         Request grizzlyRequest = createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
-        PipedOutputStream outPipe = new PipedOutputStream();
-        PipedInputStream inPipe = new PipedInputStream(outPipe, responseBufferSize);
-        BodyDeferringAsyncHandler asyncHandler = new BodyDeferringAsyncHandler(outPipe);
-        asyncHttpClient.executeRequest(grizzlyRequest, asyncHandler);
+        ListenableFuture<Response> future = asyncHttpClient.executeRequest(grizzlyRequest);
         try
         {
-            asyncHandler.getResponse();
-            return inPipe;
+            // No timeout is used to get the value of the future object, as the responseTimeout configured in the request that
+            // is being sent will make the call throw a {@code TimeoutException} if this time is exceeded.
+            Response response = future.get();
+
+            // Under high load, sometimes the get() method returns null. Retrying once fixes the problem (see MULE-8712).
+            if (response == null)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Null response returned by async client");
+                }
+                response = future.get();
+            }
+            return response.getResponseBodyAsStream();
         }
-        catch (IOException e)
+        catch (InterruptedException e)
+        {
+            throw new IOException(e);
+        }
+        catch (ExecutionException e)
         {
             if (e.getCause() instanceof TimeoutException)
             {
@@ -780,11 +793,6 @@ public class GrizzlyHttpClient implements HttpClient
                 throw new IOException(e);
             }
         }
-        catch (InterruptedException e)
-        {
-            throw new IOException(e);
-        }
-
     }
 
     private int retrieveMaximumHeaderSectionSize()

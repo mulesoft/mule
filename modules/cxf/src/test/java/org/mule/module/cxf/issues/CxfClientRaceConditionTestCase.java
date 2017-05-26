@@ -13,7 +13,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.transport.http.HttpConnector.HTTP;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -24,7 +23,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.size.SmallTest;
 import org.mule.util.IOUtils;
 
-import java.io.PipedInputStream;
+import java.io.InputStream;
 
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
@@ -134,7 +133,7 @@ public class CxfClientRaceConditionTestCase extends FunctionalTestCase
             MuleMessage request = new DefaultMuleMessage(HTTP_REQUEST_BODY, muleContext);
             MuleClient client = muleContext.getClient();
             MuleMessage message = client.send(protocol + "://" + host + ":" + port + "/" + method, request, options);
-            String response = IOUtils.toString((PipedInputStream) message.getPayload());
+            String response = IOUtils.toString((InputStream) message.getPayload());
             assertThat(response, equalTo(expectedMessage));
         }
     }
