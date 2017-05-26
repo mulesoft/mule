@@ -8,6 +8,7 @@ package org.mule.module.http.functional;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
+import static org.mule.api.config.MuleProperties.MULE_HTTP_STREAM_RESPONSE;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
 import org.mule.api.MuleEvent;
@@ -15,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +38,9 @@ public class HttpStreamingTestCase extends FunctionalTestCase
 
     @Rule
     public DynamicPort httpPort = new DynamicPort("httpPort");
+
+    @Rule
+    public SystemProperty streamResponse = new SystemProperty(MULE_HTTP_STREAM_RESPONSE, "true");
 
     @Override
     protected String getConfigFile()

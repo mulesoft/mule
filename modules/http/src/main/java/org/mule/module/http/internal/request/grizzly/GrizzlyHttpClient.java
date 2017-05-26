@@ -47,6 +47,7 @@ import org.mule.transport.tcp.TcpClientSocketProperties;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
+import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -54,6 +55,7 @@ import com.ning.http.client.BodyDeferringAsyncHandler;
 import com.ning.http.client.HttpResponseBodyPart;
 import com.ning.http.client.HttpResponseHeaders;
 import com.ning.http.client.HttpResponseStatus;
+import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.ProxyServer;
 import com.ning.http.client.Realm;
 import com.ning.http.client.Request;
@@ -72,6 +74,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -103,6 +106,7 @@ public class GrizzlyHttpClient implements HttpClient
     private int maxConnections;
     private boolean usePersistentConnections;
     private int connectionIdleTimeout;
+    private final boolean streaming;
     private int responseBufferSize;
     private String threadNamePrefix;
     private final Integer kernelCoreSize;
@@ -123,6 +127,7 @@ public class GrizzlyHttpClient implements HttpClient
         this.maxConnections = config.getMaxConnections();
         this.usePersistentConnections = config.isUsePersistentConnections();
         this.connectionIdleTimeout = config.getConnectionIdleTimeout();
+        this.streaming = config.isStreaming();
         this.responseBufferSize = config.getResponseBufferSize();
         this.threadNamePrefix = config.getThreadNamePrefix();
         this.ownerName = config.getOwnerName();
@@ -273,7 +278,28 @@ public class GrizzlyHttpClient implements HttpClient
     @Override
     public HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication) throws IOException, TimeoutException
     {
-        Request grizzlyRequest= createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
+        if (streaming)
+        {
+            return sendAndDefer(request, responseTimeout, followRedirects, authentication);
+        }
+        else
+        {
+            return sendAndWait(request, responseTimeout, followRedirects, authentication);
+        }
+    }
+
+    /**
+     * Blocking send which uses a {@link PipedOutputStream} to populate the HTTP response as it arrives and propagates a
+     * {@link PipedInputStream} as soon as the response headers are parsed.
+     * <p/>
+     * Because of the internal buffer used to hold the arriving chunks, the response MUST be eventually read or the worker threads
+     * will block waiting to allocate them. Likewise, read/write speed differences could cause issues. The buffer size can be
+     * customized for these reason.
+     */
+    public HttpResponse sendAndDefer(HttpRequest request, int responseTimeout, boolean followRedirects,
+                                     HttpRequestAuthentication authentication) throws IOException, TimeoutException
+    {
+        Request grizzlyRequest = createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
         PipedOutputStream outPipe = new PipedOutputStream();
         PipedInputStream inPipe = new PipedInputStream(outPipe, responseBufferSize);
         BodyDeferringAsyncHandler asyncHandler = new BodyDeferringAsyncHandler(outPipe);
@@ -304,15 +330,68 @@ public class GrizzlyHttpClient implements HttpClient
         }
     }
 
+    /**
+     * Blocking send which waits to load the whole response to memory before propagating it.
+     */
+    public HttpResponse sendAndWait(HttpRequest request, int responseTimeout, boolean followRedirects,
+                                    HttpRequestAuthentication authentication) throws IOException, TimeoutException
+    {
+        Request grizzlyRequest = createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
+        ListenableFuture<Response> future = asyncHttpClient.executeRequest(grizzlyRequest);
+        try
+        {
+            // No timeout is used to get the value of the future object, as the responseTimeout configured in the request that
+            // is being sent will make the call throw a {@code TimeoutException} if this time is exceeded.
+            Response response = future.get();
+
+            // Under high load, sometimes the get() method returns null. Retrying once fixes the problem (see MULE-8712).
+            if (response == null)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Null response returned by async client");
+                }
+                response = future.get();
+            }
+            return createMuleResponse(response, response.getResponseBodyAsStream());
+        }
+        catch (InterruptedException e)
+        {
+            throw new IOException(e);
+        }
+        catch (ExecutionException e)
+        {
+            if (e.getCause() instanceof TimeoutException)
+            {
+                throw (TimeoutException) e.getCause();
+            }
+            else if (e.getCause() instanceof IOException)
+            {
+                throw (IOException) e.getCause();
+            }
+            else
+            {
+                throw new IOException(e);
+            }
+        }
+    }
+
     @Override
     public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication
             authentication, final CompletionHandler<HttpResponse, Exception> completionHandler, WorkManager workManager)
     {
         try
         {
-            PipedOutputStream outPipe = new PipedOutputStream();
-            asyncHttpClient.executeRequest(createGrizzlyRequest(request, responseTimeout, followRedirects, authentication),
-                                           new WorkManagerBodyDeferringAsyncHandler(completionHandler, workManager, outPipe));
+            AsyncHandler handler;
+            if (streaming)
+            {
+                handler = new WorkManagerBodyDeferringAsyncHandler(completionHandler, workManager, new PipedOutputStream());
+            }
+            else
+            {
+                handler = new WorkManagerAsyncCompletionHandler(completionHandler, workManager);
+            }
+            asyncHttpClient.executeRequest(createGrizzlyRequest(request, responseTimeout, followRedirects, authentication), handler);
         }
         catch (Exception e)
         {
@@ -517,6 +596,55 @@ public class GrizzlyHttpClient implements HttpClient
         asyncHttpClient.close();
     }
 
+    private class WorkManagerAsyncCompletionHandler extends AsyncCompletionHandler<Response>
+    {
+
+        private CompletionHandler<HttpResponse, Exception> completionHandler;
+        private WorkManager workManager;
+
+        WorkManagerAsyncCompletionHandler(CompletionHandler<HttpResponse, Exception> completionHandler,
+                                          WorkManager workManager)
+        {
+            this.completionHandler = completionHandler;
+            this.workManager = workManager;
+        }
+
+        @Override
+        public Response onCompleted(final Response response) throws Exception
+        {
+            workManager.execute(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        completionHandler.onCompletion(createMuleResponse(response, response.getResponseBodyAsStream()));
+                    }
+                    catch (IOException e)
+                    {
+                        completionHandler.onFailure(e);
+                    }
+                }
+            });
+            return null;
+        }
+
+        @Override
+        public void onThrowable(final Throwable t)
+        {
+            workManager.execute(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    completionHandler.onFailure((Exception) t);
+                }
+            });
+
+        }
+    }
+
     private class WorkManagerBodyDeferringAsyncHandler implements AsyncHandler<Response>
     {
         private volatile Response response;
@@ -535,7 +663,7 @@ public class GrizzlyHttpClient implements HttpClient
             this.input = new PipedInputStream(output, responseBufferSize);
         }
 
-        public void onThrowable(Throwable t)
+        public void onThrowable(final Throwable t)
         {
             try
             {
@@ -547,7 +675,14 @@ public class GrizzlyHttpClient implements HttpClient
             }
             if (!handled.getAndSet(true))
             {
-                completionHandler.onFailure((Exception) t);
+                workManager.execute(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        completionHandler.onFailure((Exception) t);
+                    }
+                });
             }
         }
 
@@ -621,16 +756,29 @@ public class GrizzlyHttpClient implements HttpClient
                                                  HttpRequestAuthentication authentication) throws IOException, TimeoutException
     {
         Request grizzlyRequest = createGrizzlyRequest(request, responseTimeout, followRedirects, authentication);
-        PipedOutputStream outPipe = new PipedOutputStream();
-        PipedInputStream inPipe = new PipedInputStream(outPipe, responseBufferSize);
-        BodyDeferringAsyncHandler asyncHandler = new BodyDeferringAsyncHandler(outPipe);
-        asyncHttpClient.executeRequest(grizzlyRequest, asyncHandler);
+        ListenableFuture<Response> future = asyncHttpClient.executeRequest(grizzlyRequest);
         try
         {
-            asyncHandler.getResponse();
-            return inPipe;
+            // No timeout is used to get the value of the future object, as the responseTimeout configured in the request that
+            // is being sent will make the call throw a {@code TimeoutException} if this time is exceeded.
+            Response response = future.get();
+
+            // Under high load, sometimes the get() method returns null. Retrying once fixes the problem (see MULE-8712).
+            if (response == null)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Null response returned by async client");
+                }
+                response = future.get();
+            }
+            return response.getResponseBodyAsStream();
         }
-        catch (IOException e)
+        catch (InterruptedException e)
+        {
+            throw new IOException(e);
+        }
+        catch (ExecutionException e)
         {
             if (e.getCause() instanceof TimeoutException)
             {
@@ -645,11 +793,6 @@ public class GrizzlyHttpClient implements HttpClient
                 throw new IOException(e);
             }
         }
-        catch (InterruptedException e)
-        {
-            throw new IOException(e);
-        }
-
     }
 
     private int retrieveMaximumHeaderSectionSize()

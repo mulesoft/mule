@@ -7,9 +7,9 @@
 package org.mule.module.http.internal.request;
 
 import static java.lang.String.format;
+import static org.mule.api.config.MuleProperties.MULE_HTTP_STREAM_RESPONSE;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
-
 import org.mule.AbstractAnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -66,6 +66,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
     private int maxConnections = UNLIMITED_CONNECTIONS;
     private boolean usePersistentConnections = true;
     private int connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
+    private boolean streamResponse = Boolean.valueOf(System.getProperty(MULE_HTTP_STREAM_RESPONSE, "false"));
     private int responseBufferSize = DEFAULT_RESPONSE_BUFFER_SIZE;
 
     private boolean enableCookies = false;
@@ -116,6 +117,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
                 .setMaxConnections(maxConnections)
                 .setUsePersistentConnections(usePersistentConnections)
                 .setConnectionIdleTimeout(connectionIdleTimeout)
+                .setStreaming(streamResponse)
                 .setResponseBufferSize(responseBufferSize)
                 .setThreadNamePrefix(threadNamePrefix)
                 .setOwnerName(name)
