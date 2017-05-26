@@ -13,7 +13,6 @@ import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
-import org.mule.runtime.api.interception.InterceptionException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.MuleContext;
