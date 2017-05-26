@@ -575,13 +575,20 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
                     return FtpConnector.this;
                 }
             };
-            try
+            if (getRetryPolicyTemplate().isSynchronous())
             {
-                getRetryPolicyTemplate().execute(callbackReconnection, muleContext.getWorkManager());
+                try
+                {
+                    getRetryPolicyTemplate().execute(callbackReconnection, muleContext.getWorkManager());
+                }
+                catch (RetryPolicyExhaustedException retryPolicyExhaustedException)
+                {
+                    throw retryPolicyExhaustedException;
+                }
             }
-            catch (RetryPolicyExhaustedException retryPolicyExhaustedException)
+            else
             {
-                throw retryPolicyExhaustedException;
+                throw new IllegalArgumentException("FTP Connector doesn't support asynchronous retry policies.");
             }
 
             return storeFileStream(client[0], filename, uri);

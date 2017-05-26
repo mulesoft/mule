@@ -149,21 +149,29 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 return connector;
             }
         };
-        try
+        if(retryTemplate.isSynchronous())
         {
-            retryTemplate.execute(callbackReconnection, this.connector.getMuleContext().getWorkManager());
+            try
+            {
+                retryTemplate.execute(callbackReconnection, this.connector.getMuleContext().getWorkManager());
+            }
+            catch (RetryPolicyExhaustedException retryPolicyExhaustedException)
+            {
+                if (retryPolicyExhaustedException.getCause() instanceof java.net.ConnectException)
+                {
+                    throw new ConnectException(retryPolicyExhaustedException, this.connector);
+                }
+                else
+                {
+                    throw retryPolicyExhaustedException;
+                }
+            }
         }
-        catch (RetryPolicyExhaustedException retryPolicyExhaustedException)
+        else
         {
-            if (retryPolicyExhaustedException.getCause() instanceof java.net.ConnectException)
-            {
-                throw new ConnectException(retryPolicyExhaustedException, this.connector);
-            }
-            else
-            {
-                throw retryPolicyExhaustedException;
-            }
+            throw new IllegalArgumentException("FTP Connector doesn't support asynchronous retry policies.");
         }
+
 
         return filesToFTPArray(client[0]);
 
