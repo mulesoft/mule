@@ -61,8 +61,8 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
   }
 
   @Override
-  public EmbeddedContainer.EmbeddedContainerBuilder withApplicationConfiguration(ApplicationConfiguration applicationConfigruation) {
-    this.applicationConfiguration = applicationConfigruation;
+  public EmbeddedContainer.EmbeddedContainerBuilder withApplicationConfiguration(ApplicationConfiguration applicationConfiguration) {
+    this.applicationConfiguration = applicationConfiguration;
     return this;
   }
 
