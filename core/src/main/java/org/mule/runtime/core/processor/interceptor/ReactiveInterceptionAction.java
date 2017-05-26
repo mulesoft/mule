@@ -8,12 +8,18 @@
 package org.mule.runtime.core.processor.interceptor;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
+import static org.mule.runtime.core.util.ExceptionUtils.getErrorFromFailingProcessor;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.interception.DefaultInterceptionEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -24,13 +30,18 @@ import java.util.concurrent.CompletableFuture;
  */
 class ReactiveInterceptionAction implements InterceptionAction {
 
-  private DefaultInterceptionEvent interceptionEvent;
+  private MuleContext muleContext;
+
+  private Processor processor;
   private ReactiveProcessor next;
+  private DefaultInterceptionEvent interceptionEvent;
 
   public ReactiveInterceptionAction(DefaultInterceptionEvent interceptionEvent,
-                                    ReactiveProcessor next) {
+                                    ReactiveProcessor next, Processor processor, MuleContext muleContext) {
     this.interceptionEvent = interceptionEvent;
     this.next = next;
+    this.processor = processor;
+    this.muleContext = muleContext;
   }
 
   @Override
@@ -46,5 +57,24 @@ class ReactiveInterceptionAction implements InterceptionAction {
   public CompletableFuture<InterceptionEvent> skip() {
     interceptionEvent.resolve();
     return completedFuture(interceptionEvent);
+  }
+
+  @Override
+  public CompletableFuture<InterceptionEvent> fail(Throwable cause) {
+    Error newError = getErrorFromFailingProcessor(processor, cause, muleContext.getErrorTypeLocator());
+
+    interceptionEvent.setError(newError.getErrorType(), cause);
+    CompletableFuture<InterceptionEvent> completableFuture = new CompletableFuture<>();
+    completableFuture.completeExceptionally(new MessagingException(interceptionEvent.resolve(), cause, processor));
+    return completableFuture;
+  }
+
+  @Override
+  public CompletableFuture<InterceptionEvent> fail(ErrorType errorType) {
+    Throwable cause = new InterceptionException("");
+    interceptionEvent.setError(errorType, cause);
+    CompletableFuture<InterceptionEvent> completableFuture = new CompletableFuture<>();
+    completableFuture.completeExceptionally(new MessagingException(interceptionEvent.resolve(), cause, processor));
+    return completableFuture;
   }
 }

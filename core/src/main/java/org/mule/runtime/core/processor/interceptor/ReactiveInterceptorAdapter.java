@@ -37,6 +37,7 @@ import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
  *
@@ -108,7 +109,8 @@ public class ReactiveInterceptorAdapter
                                             Map<String, String> dslParameters,
                                             ReactiveProcessor next) {
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
-    final ReactiveInterceptionAction reactiveInterceptionAction = new ReactiveInterceptionAction(interceptionEvent, next);
+    final ReactiveInterceptionAction reactiveInterceptionAction =
+        new ReactiveInterceptionAction(interceptionEvent, next, component, flowConstruct.getMuleContext());
     return interceptor.around(resolveParameters(event, component, dslParameters), interceptionEvent,
                               reactiveInterceptionAction)
         .exceptionally(t -> {

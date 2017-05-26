@@ -374,8 +374,8 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
     return !error.get().getCause().equals(throwable);
   }
 
-  private static Error getErrorFromFailingProcessor(Object annotatedObject, Throwable causeException,
-                                                    ErrorTypeLocator errorTypeLocator) {
+  public static Error getErrorFromFailingProcessor(Object annotatedObject, Throwable causeException,
+                                                   ErrorTypeLocator errorTypeLocator) {
     ErrorType errorType = getErrorTypeFromFailingProcessor(annotatedObject, causeException, errorTypeLocator);
     if (causeException instanceof TypedException) {
       causeException = causeException.getCause();
@@ -396,9 +396,12 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
 
   public static MessagingException updateMessagingExceptionWithError(MessagingException exception, Processor failing,
                                                                      FlowConstruct flowConstruct) {
-    exception
-        .setProcessedEvent(createErrorEvent(exception.getEvent(), failing, exception,
-                                            flowConstruct.getMuleContext().getErrorTypeLocator()));
+    // If Event already has Error, for example because of an interceptor then conserve existing Error instance
+    if (!exception.getEvent().getError().isPresent()) {
+      exception
+          .setProcessedEvent(createErrorEvent(exception.getEvent(), failing, exception,
+                                              flowConstruct.getMuleContext().getErrorTypeLocator()));
+    }
     return putContext(exception, failing, exception.getEvent(), flowConstruct, flowConstruct.getMuleContext());
   }
 }

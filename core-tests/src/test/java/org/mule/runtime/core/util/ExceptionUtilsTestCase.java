@@ -16,13 +16,32 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.ExceptionUtils.containsType;
 import static org.mule.runtime.core.util.ExceptionUtils.extractCauseOfType;
 import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.core.util.ExceptionUtils.getDeepestOccurenceOfType;
 import static org.mule.runtime.core.util.ExceptionUtils.getFullStackTraceWithoutMessages;
+import static org.mule.runtime.core.util.ExceptionUtils.updateMessagingExceptionWithError;
+
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.FlowCallStack;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.exception.ErrorTypeLocator;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -115,7 +134,7 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void extractExceptionOfSubtype() {
-    Exception exception = new Exception(new IllegalStateException(new Error(new RuntimeException(new IOException()))));
+    Exception exception = new Exception(new IllegalStateException(new java.lang.Error(new RuntimeException(new IOException()))));
     Optional<RuntimeException> runtimeException = extractOfType(exception, RuntimeException.class);
     assertThat(runtimeException.isPresent(), is(true));
     assertThat(runtimeException.get(), instanceOf(IllegalStateException.class));
@@ -144,5 +163,76 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
     Exception withoutConnectionException = new Exception(new NullPointerException());
     Optional<ConnectionException> exception = extractConnectionException(withoutConnectionException);
     assertThat(exception.isPresent(), is(false));
+  }
+
+  @Test
+  public void updateMessaginExceptionWithErrorWithOutError() {
+    MessagingException messagingExceptionMock = mock(MessagingException.class);
+    Processor processorMock = mock(Processor.class);
+    FlowConstruct flowConstructMock = mock(FlowConstruct.class);
+    MuleContext muleContextMock = mock(MuleContext.class);
+    ErrorTypeLocator errorTypeLocatorMock = mock(ErrorTypeLocator.class);
+
+    Event eventMock = mock(Event.class);
+    FlowCallStack flowCallStackMock = mock(FlowCallStack.class);
+    Message messageMock = mock(Message.class);
+    EventContext eventContextMock = mock(EventContext.class);
+
+    Optional<Error> errorOptional = Optional.ofNullable(null);
+
+    when(messagingExceptionMock.getEvent()).thenReturn(eventMock);
+
+    when(eventMock.getError()).thenReturn(errorOptional);
+    when(eventMock.getFlowCallStack()).thenReturn(flowCallStackMock);
+    when(eventMock.getMessage()).thenReturn(messageMock);
+    when(eventMock.getContext()).thenReturn(eventContextMock);
+
+    when(eventContextMock.getId()).thenReturn("someid");
+
+    when(flowConstructMock.getMuleContext()).thenReturn(muleContextMock);
+    when(muleContextMock.getErrorTypeLocator()).thenReturn(errorTypeLocatorMock);
+
+    when(errorTypeLocatorMock.lookupErrorType(messagingExceptionMock)).thenReturn(mock(ErrorType.class));
+
+
+    updateMessagingExceptionWithError(messagingExceptionMock, processorMock, flowConstructMock);
+
+    verify(messagingExceptionMock, atLeast(1)).setProcessedEvent(any(Event.class));
+  }
+
+  @Test
+  public void updateMessaginExceptionWithError() {
+    MessagingException messagingExceptionMock = mock(MessagingException.class);
+    Processor processorMock = mock(Processor.class);
+    FlowConstruct flowConstructMock = mock(FlowConstruct.class);
+    MuleContext muleContextMock = mock(MuleContext.class);
+    ErrorTypeLocator errorTypeLocatorMock = mock(ErrorTypeLocator.class);
+
+    Event eventMock = mock(Event.class);
+    FlowCallStack flowCallStackMock = mock(FlowCallStack.class);
+    Message messageMock = mock(Message.class);
+    EventContext eventContextMock = mock(EventContext.class);
+
+    Error errorMock = mock(Error.class);
+    Optional<Error> errorOptional = Optional.ofNullable(errorMock);
+
+    when(messagingExceptionMock.getEvent()).thenReturn(eventMock);
+
+    when(eventMock.getError()).thenReturn(errorOptional);
+    when(eventMock.getFlowCallStack()).thenReturn(flowCallStackMock);
+    when(eventMock.getMessage()).thenReturn(messageMock);
+    when(eventMock.getContext()).thenReturn(eventContextMock);
+
+    when(eventContextMock.getId()).thenReturn("someid");
+
+    when(flowConstructMock.getMuleContext()).thenReturn(muleContextMock);
+    when(muleContextMock.getErrorTypeLocator()).thenReturn(errorTypeLocatorMock);
+
+    when(errorTypeLocatorMock.lookupErrorType(messagingExceptionMock)).thenReturn(mock(ErrorType.class));
+
+
+    updateMessagingExceptionWithError(messagingExceptionMock, processorMock, flowConstructMock);
+
+    verify(messagingExceptionMock, times(0)).setProcessedEvent(any(Event.class));
   }
 }
