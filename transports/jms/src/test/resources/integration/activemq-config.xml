@@ -27,6 +27,7 @@
                             cacheJmsSessions="true"
                             eagerConsumer="false"
                             specification="1.1"
+                            maxQueuePrefetch="5"
                             redeliveryHandlerFactory-ref="redeliveryHandlerFactory"/>
 
      <spring:bean name="redeliveryHandlerFactory" class="org.mule.transport.jms.test.TestRedeliveryHandlerFactory"/>
