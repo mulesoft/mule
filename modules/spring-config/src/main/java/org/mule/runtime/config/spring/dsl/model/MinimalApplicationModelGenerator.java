@@ -98,7 +98,7 @@ public class MinimalApplicationModelGenerator {
     applicationModel.executeOnEveryMuleComponentTree(componentModel -> {
       if (componentModel.getNameAttribute() != null && componentModel.isEnabled()) {
         List<ComponentModel> dependencies = resolveComponentModelDependencies(null, componentModel).stream()
-            .map(componentModelName -> applicationModel.findNamedComponent(componentModelName).get()).collect(toList());
+            .map(componentModelName -> applicationModel.findTopLevelNamedComponent(componentModelName).get()).collect(toList());
         componentModelDependencies.put(componentModel, dependencies);
       }
     });
@@ -134,13 +134,13 @@ public class MinimalApplicationModelGenerator {
   }
 
   private ComponentModel findRequiredComponentModel(String name) {
-    return applicationModel.findNamedComponent(name)
+    return applicationModel.findTopLevelNamedComponent(name)
         .orElseThrow(() -> new NoSuchComponentModelException(createStaticMessage("No named component with name " + name)));
   }
 
   private ComponentModel findRequiredComponentModel(Location location) {
     final Reference<ComponentModel> foundComponentModelReference = new Reference<>();
-    Optional<ComponentModel> globalComponent = applicationModel.findNamedComponent(location.getGlobalElementName());
+    Optional<ComponentModel> globalComponent = applicationModel.findTopLevelNamedComponent(location.getGlobalElementName());
     globalComponent.ifPresent(componentModel -> {
       findComponentWithLocation(componentModel, location).ifPresent(foundComponentModel -> {
         foundComponentModelReference.set(foundComponentModel);

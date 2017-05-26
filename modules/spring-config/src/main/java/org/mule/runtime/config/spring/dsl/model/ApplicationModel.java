@@ -508,7 +508,6 @@ public class ApplicationModel {
     // TODO MULE-9692 all this validations will be moved to an entity that does the validation and allows to aggregate all
     // validations instead of failing fast.
     validateNameIsNotRepeated();
-    validateNameIsOnlyOnTopLevelElements();
     validateErrorMappings();
     validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice();
     validateErrorHandlerStructure();
@@ -643,26 +642,6 @@ public class ApplicationModel {
     });
   }
 
-  private void validateNameIsOnlyOnTopLevelElements() throws ConfigurationException {
-    try {
-      List<ComponentModel> topLevelComponents = muleComponentModels.get(0).getInnerComponents();
-      topLevelComponents.stream().filter(this::isMuleComponent).forEach(topLevelComponent -> {
-        topLevelComponent.getInnerComponents().stream().filter(this::isMuleComponent).forEach((topLevelComponentChild -> {
-          executeOnComponentTree(topLevelComponentChild, (component) -> {
-            if (component.getNameAttribute() != null && !ignoredNameValidationComponentList.contains(component.getIdentifier())) {
-              throw new MuleRuntimeException(createStaticMessage(
-                                                                 "Only top level elements can have a name attribute. Component %s has attribute name with value %s",
-                                                                 component.getIdentifier(), component.getNameAttribute()));
-            }
-          }, true);
-        }));
-
-      });
-    } catch (Exception e) {
-      throw new ConfigurationException(e);
-    }
-  }
-
   private void validateNamedTopLevelElementsHaveName(ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry)
       throws ConfigurationException {
     try {
@@ -750,7 +729,7 @@ public class ApplicationModel {
    * @param name the expected value for the name attribute configuration.
    * @return the component if present, if not, an empty {@link Optional}
    */
-  public Optional<ComponentModel> findNamedComponent(String name) {
+  public Optional<ComponentModel> findTopLevelNamedComponent(String name) {
     Optional<ComponentModel> requestedComponentModelOptional = empty();
     for (ComponentModel muleComponentModel : muleComponentModels) {
       requestedComponentModelOptional = muleComponentModel.getInnerComponents().stream()
@@ -770,7 +749,7 @@ public class ApplicationModel {
    * @return the component if present, if not, an empty {@link Optional}
    */
   // TODO MULE-11355: Make the ComponentModel haven an ComponentConfiguration internally
-  public Optional<ComponentConfiguration> findNamedElement(String name) {
+  public Optional<ComponentConfiguration> findTopLevelNamedElement(String name) {
     Optional<ComponentConfiguration> requestedElement = empty();
     for (ComponentModel muleComponentModel : muleComponentModels) {
       requestedElement = muleComponentModel.getInnerComponents().stream()
