@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.api.exception;
 
+import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 
@@ -31,11 +33,15 @@ public interface MessagingExceptionHandler extends ExceptionHandler, Function<Me
 
   @Override
   default Publisher<Event> apply(MessagingException exception) {
-    exception.setProcessedEvent(handleException(exception, exception.getEvent()));
-    if (exception.handled()) {
-      return just(exception.getEvent());
-    } else {
-      return error(exception);
+    try {
+      exception.setProcessedEvent(handleException(exception, exception.getEvent()));
+      if (exception.handled()) {
+        return just(exception.getEvent());
+      } else {
+        return error(exception);
+      }
+    } catch (Throwable throwable) {
+      return error(propagateWrappingFatal(throwable));
     }
   }
 }
