@@ -10,6 +10,9 @@ import static java.lang.Boolean.FALSE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -19,6 +22,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.functional.Either.left;
+import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.core.execution.ModuleFlowProcessingPhase.ENABLE_SOURCE_POLICIES_SYSTEM_PROPERTY;
@@ -26,6 +31,7 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -36,6 +42,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.message.ErrorBuilder;
+import org.mule.runtime.core.message.ErrorTypeBuilder;
 import org.mule.runtime.core.policy.FailureSourcePolicyResult;
 import org.mule.runtime.core.policy.MessageSourceResponseParametersProcessor;
 import org.mule.runtime.core.policy.PolicyManager;
@@ -62,6 +70,9 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 @SmallTest
 public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
+
+  private static final ErrorType ERROR_FROM_FLOW =
+      ErrorTypeBuilder.builder().parentErrorType(mock(ErrorType.class)).namespace("TEST").identifier("FLOW_FAILED").build();
 
   @Rule
   public SystemProperty enableSourcePolicies;
@@ -126,16 +137,12 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     final PhaseResultNotifier notifier = mock(PhaseResultNotifier.class);
 
-    doAnswer(invocation -> {
-      throw invocation.getArgumentAt(0, Throwable.class);
-    }).when(notifier).phaseFailure(any());
-
     moduleFlowProcessingPhase.runPhase(template, context, notifier);
 
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template).sendResponseToClient(any(), any(), any(), any());
     verify(template, never()).sendFailureResponseToClient(any(), any(), any());
-    verify(template).sendAfterTerminateResponseToClient(any(), any());
+    verify(template).sendAfterTerminateResponseToClient(argThat(EitherMatcher.right(nullValue(MessagingException.class))), any());
   }
 
   @Test
@@ -153,17 +160,16 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     final PhaseResultNotifier notifier = mock(PhaseResultNotifier.class);
 
-    doAnswer(invocation -> {
-      throw (Throwable) invocation.getArguments()[0];
-    }).when(notifier).phaseFailure(any());
-
     moduleFlowProcessingPhase.runPhase(template, context, notifier);
 
     verify(flow.getExceptionListener())
         .handleException(any(), argThat(ErrorTypeInEventMatcher.errorType("MULE", "SOURCE_RESPONSE_GENERATE")));
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
-    verify(template).sendAfterTerminateResponseToClient(any(), any());
+    verify(template).sendAfterTerminateResponseToClient(argThat(allOf(EitherMatcher.left(nullValue(Event.class)),
+                                                                      failedWith(ErrorTypeInEventMatcher
+                                                                          .errorType("MULE", "SOURCE_RESPONSE_GENERATE")))),
+                                                        any());
   }
 
   @Test
@@ -180,17 +186,16 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     final PhaseResultNotifier notifier = mock(PhaseResultNotifier.class);
 
-    doAnswer(invocation -> {
-      throw (Throwable) invocation.getArguments()[0];
-    }).when(notifier).phaseFailure(any());
-
     moduleFlowProcessingPhase.runPhase(template, context, notifier);
 
     verify(flow.getExceptionListener())
         .handleException(any(), argThat(ErrorTypeInEventMatcher.errorType("MULE", "SOURCE_RESPONSE_SEND")));
     verify(template).sendResponseToClient(any(), any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
-    verify(template).sendAfterTerminateResponseToClient(any(), any());
+    verify(template).sendAfterTerminateResponseToClient(argThat(allOf(EitherMatcher.left(nullValue(Event.class)),
+                                                                      failedWith(ErrorTypeInEventMatcher
+                                                                          .errorType("MULE", "SOURCE_RESPONSE_SEND")))),
+                                                        any());
   }
 
   @Test
@@ -203,16 +208,16 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     final PhaseResultNotifier notifier = mock(PhaseResultNotifier.class);
 
-    doAnswer(invocation -> {
-      throw (Throwable) invocation.getArguments()[0];
-    }).when(notifier).phaseFailure(any());
-
     moduleFlowProcessingPhase.runPhase(template, context, notifier);
 
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
-    verify(template).sendAfterTerminateResponseToClient(any(), any());
+    verify(template).sendAfterTerminateResponseToClient(argThat(allOf(EitherMatcher.left(nullValue(Event.class)),
+                                                                      failedWith(ErrorTypeInEventMatcher
+                                                                          .errorType(ERROR_FROM_FLOW.getNamespace(),
+                                                                                     ERROR_FROM_FLOW.getIdentifier())))),
+                                                        any());
   }
 
   @Test
@@ -231,16 +236,15 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     final PhaseResultNotifier notifier = mock(PhaseResultNotifier.class);
 
-    doAnswer(invocation -> {
-      throw (Throwable) invocation.getArguments()[0];
-    }).when(notifier).phaseFailure(any());
-
     moduleFlowProcessingPhase.runPhase(template, context, notifier);
 
     verify(flow.getExceptionListener()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template, never()).sendFailureResponseToClient(any(), any(), any());
-    verify(template).sendAfterTerminateResponseToClient(any(), any());
+    verify(template).sendAfterTerminateResponseToClient(argThat(allOf(EitherMatcher.left(nullValue(Event.class)),
+                                                                      failedWith(ErrorTypeInEventMatcher
+                                                                          .errorType("MULE", "SOURCE_ERROR_RESPONSE_GENERATE")))),
+                                                        any());
   }
 
   @Test
@@ -253,21 +257,27 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     when(template.getSuccessfulExecutionResponseParametersFunction()).thenReturn(event -> {
       throw new NullPointerException("Mock");
     });
-    doThrow(new NullPointerException("Mock")).when(template).sendFailureResponseToClient(any(), any(), any());
+
+    doAnswer(invocation -> {
+      final MessagingException messagingException = invocation.getArgumentAt(0, MessagingException.class);
+      invocation.getArgumentAt(2, ResponseCompletionCallback.class).responseSentWithFailure(messagingException,
+                                                                                            messagingException.getEvent());
+      return null;
+    }).when(template).sendFailureResponseToClient(any(), any(), any());
+    // doThrow(new NullPointerException("Mock")).when(template).sendFailureResponseToClient(any(), any(), any());
     when(template.getFailedExecutionResponseParametersFunction()).thenReturn(event -> emptyMap());
 
     final PhaseResultNotifier notifier = mock(PhaseResultNotifier.class);
-
-    doAnswer(invocation -> {
-      throw (Throwable) invocation.getArguments()[0];
-    }).when(notifier).phaseFailure(any());
 
     moduleFlowProcessingPhase.runPhase(template, context, notifier);
 
     verify(flow.getExceptionListener()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
-    verify(template).sendAfterTerminateResponseToClient(any(), any());
+    verify(template).sendAfterTerminateResponseToClient(argThat(allOf(EitherMatcher.left(nullValue(Event.class)),
+                                                                      failedWith(ErrorTypeInEventMatcher
+                                                                          .errorType("MULE", "SOURCE_ERROR_RESPONSE_SEND")))),
+                                                        any());
   }
 
   @Test
@@ -278,7 +288,8 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     configureFailingFlow(template);
 
     when(template.getSuccessfulExecutionResponseParametersFunction()).thenReturn(event -> {
-      throw new NullPointerException("Mock");
+      fail("Must not call success handling methods");
+      return emptyMap();
     });
     when(template.getFailedExecutionResponseParametersFunction()).thenReturn(event -> {
       throw new NullPointerException("Mock");
@@ -286,16 +297,15 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     final PhaseResultNotifier notifier = mock(PhaseResultNotifier.class);
 
-    doAnswer(invocation -> {
-      throw (Throwable) invocation.getArguments()[0];
-    }).when(notifier).phaseFailure(any());
-
     moduleFlowProcessingPhase.runPhase(template, context, notifier);
 
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template, never()).sendFailureResponseToClient(any(), any(), any());
-    verify(template).sendAfterTerminateResponseToClient(any(), any());
+    verify(template).sendAfterTerminateResponseToClient(argThat(allOf(EitherMatcher.left(nullValue(Event.class)),
+                                                                      failedWith(ErrorTypeInEventMatcher
+                                                                          .errorType("MULE", "SOURCE_ERROR_RESPONSE_GENERATE")))),
+                                                        any());
   }
 
   @Test
@@ -306,42 +316,72 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     configureFailingFlow(template);
 
     when(template.getSuccessfulExecutionResponseParametersFunction()).thenReturn(event -> {
-      throw new NullPointerException("Mock");
+      fail("Must not call success handling methods");
+      return emptyMap();
     });
-    doThrow(new NullPointerException("Mock")).when(template).sendFailureResponseToClient(any(), any(), any());
+    doAnswer(invocation -> {
+      final MessagingException messagingException = invocation.getArgumentAt(0, MessagingException.class);
+      invocation.getArgumentAt(2, ResponseCompletionCallback.class).responseSentWithFailure(messagingException,
+                                                                                            messagingException.getEvent());
+      return null;
+    }).when(template).sendFailureResponseToClient(any(), any(), any());
+    // doThrow(new NullPointerException("Mock")).when(template).sendFailureResponseToClient(any(), any(), any());
     when(template.getFailedExecutionResponseParametersFunction()).thenReturn(event -> emptyMap());
 
     final PhaseResultNotifier notifier = mock(PhaseResultNotifier.class);
-
-    doAnswer(invocation -> {
-      throw (Throwable) invocation.getArguments()[0];
-    }).when(notifier).phaseFailure(any());
 
     moduleFlowProcessingPhase.runPhase(template, context, notifier);
 
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
-    verify(template).sendAfterTerminateResponseToClient(any(), any());
+    verify(template).sendAfterTerminateResponseToClient(argThat(allOf(EitherMatcher.left(nullValue(Event.class)),
+                                                                      failedWith(ErrorTypeInEventMatcher
+                                                                          .errorType("MULE", "SOURCE_ERROR_RESPONSE_SEND")))),
+                                                        any());
+  }
+
+  private EitherMatcher<Event, MessagingException> failedWith(final ErrorTypeInEventMatcher errorType) {
+    return EitherMatcher.right(new TypeSafeMatcher<MessagingException>() {
+
+      @Override
+      protected boolean matchesSafely(MessagingException item) {
+        return errorType.matches(item.getEvent());
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        errorType.describeTo(description);
+      }
+
+    });
   }
 
   private void configureSuccessfulFlow(final ModuleFlowProcessingPhaseTemplate template) throws Exception {
     when(template.routeEventAsync(any())).then(invocation -> just(invocation.getArgumentAt(0, Event.class)));
     when(sourcePolicy.process(any())).thenAnswer(invocation -> {
-      return Either.right(new SuccessSourcePolicyResult(invocation.getArgumentAt(0, Event.class),
-                                                        emptyMap(), mock(MessageSourceResponseParametersProcessor.class)));
+      return right(new SuccessSourcePolicyResult(invocation.getArgumentAt(0, Event.class),
+                                                 emptyMap(), mock(MessageSourceResponseParametersProcessor.class)));
     });
   }
 
   private void configureFailingFlow(final ModuleFlowProcessingPhaseTemplate template) throws Exception {
     when(template.routeEventAsync(any())).then(invocation -> {
-      throw new MessagingException(invocation.getArgumentAt(0, Event.class), new NullPointerException("Mock"));
+      final NullPointerException exception = new NullPointerException("Mock");
+      final Event event = Event.builder(invocation.getArgumentAt(0, Event.class))
+          .error(ErrorBuilder.builder(exception).errorType(ERROR_FROM_FLOW).build())
+          .build();
+      throw new MessagingException(event, exception);
     });
     when(sourcePolicy.process(any())).thenAnswer(invocation -> {
-      return Either.left(new FailureSourcePolicyResult(new MessagingException(invocation.getArgumentAt(0, Event.class),
-                                                                              new NullPointerException("Mock"),
-                                                                              mock(Processor.class)),
-                                                       emptyMap()));
+      final NullPointerException exception = new NullPointerException("Mock");
+      final Event event = Event.builder(invocation.getArgumentAt(0, Event.class))
+          .error(ErrorBuilder.builder(exception).errorType(ERROR_FROM_FLOW).build())
+          .build();
+      return left(new FailureSourcePolicyResult(new MessagingException(event,
+                                                                       exception,
+                                                                       mock(Processor.class)),
+                                                emptyMap()));
     });
   }
 
@@ -374,6 +414,45 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     public void describeTo(Description description) {
       description.appendText("an Event with ");
       matcher.describeTo(description);
+    }
+  }
+
+  private static class EitherMatcher<L, R> extends TypeSafeMatcher<Either<L, R>> {
+
+    private Matcher<L> leftMatcher;
+    private Matcher<R> rightMatcher;
+
+    public EitherMatcher(Matcher<L> leftMatcher, Matcher<R> rightMatcher) {
+      this.leftMatcher = leftMatcher;
+      this.rightMatcher = rightMatcher;
+    }
+
+    public static <L, R> EitherMatcher<L, R> left(Matcher<L> matcher) {
+      return new EitherMatcher(matcher, null);
+    }
+
+    public static <L, R> EitherMatcher<L, R> right(Matcher<R> matcher) {
+      return new EitherMatcher(null, matcher);
+    }
+
+    @Override
+    protected boolean matchesSafely(Either<L, R> item) {
+      if (leftMatcher != null) {
+        return leftMatcher.matches(item.getLeft());
+      } else {
+        return rightMatcher.matches(item.getRight());
+      }
+    }
+
+    @Override
+    public void describeTo(Description description) {
+      if (leftMatcher != null) {
+        description.appendText("left ");
+        leftMatcher.describeTo(description);
+      } else {
+        description.appendText("right ");
+        rightMatcher.describeTo(description);
+      }
     }
   }
 }

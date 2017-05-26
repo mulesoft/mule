@@ -14,10 +14,10 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.MessageSourceResponseParametersProcessor;
 
-import org.reactivestreams.Publisher;
-
 import java.util.Map;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Template methods for {@link MessageSource} specific behavior during flow execution.
@@ -69,11 +69,9 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
    * @param exception exception thrown during the flow execution.
    * @param parameters the resolved set of parameters required to send the failure response.
    * @param responseCompletionCallback callback to be used for notifying the result of the operation
-   * @throws Exception exception thrown when processing the message to send the response.
    */
   void sendFailureResponseToClient(MessagingException exception, Map<String, Object> parameters,
-                                   ResponseCompletionCallback responseCompletionCallback)
-      throws Exception;
+                                   ResponseCompletionCallback responseCompletionCallback);
 
   /**
    * TODO
