@@ -88,7 +88,7 @@ public class InputStreamSendHttpClientTestCase extends AbstractMuleTestCase
     {
         HttpClientConfiguration configuration = new HttpClientConfiguration.Builder().setUsePersistentConnections(true)
                                                                                      .setMaxConnections(1)
-                                                                                     .setResponseBufferSize(1024)
+                                                                                     .setStreaming(false)
                                                                                      .setConnectionIdleTimeout(-1)
                                                                                      .build();
         httpClient = new GrizzlyHttpClient(configuration);

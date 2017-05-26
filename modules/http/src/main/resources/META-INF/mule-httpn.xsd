@@ -625,6 +625,15 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="streamResponse" type="mule:substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether or not received responses should be streamed, meaning processing will continue as soon as all headers are parsed and
+                            the body streamed as it arrives. When enabled, the response MUST be eventually read since depending on the configured buffer
+                            size it may not fit into memory and processing will stop until space is available.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="responseBufferSize" type="mule:substitutableInt" default="10240">
                     <xsd:annotation>
                         <xsd:documentation>

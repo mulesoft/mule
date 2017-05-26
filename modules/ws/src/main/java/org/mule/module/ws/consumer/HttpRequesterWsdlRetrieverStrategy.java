@@ -45,6 +45,7 @@ public class HttpRequesterWsdlRetrieverStrategy implements WsdlRetrieverStrategy
     private static final int DEFAULT_RESPONSE_BUFFER_SIZE = 10240;
     private static final Boolean DEFAULT_FOLLOW_REDIRECTS = Boolean.TRUE;
     private static final Boolean DEFAULT_USE_PERSISTENT_CONNECTION = Boolean.TRUE;
+    private static final Boolean DEFAULT_STREAMING = Boolean.FALSE;
     private static final String HTTP_METHOD_WSDL_RETRIEVAL = "GET";
     private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.wsdl.%s";
     private static final String WSDL_RETRIEVER = "wsdl.retriever";
@@ -109,6 +110,7 @@ public class HttpRequesterWsdlRetrieverStrategy implements WsdlRetrieverStrategy
                                                                                      .setMaxConnections(DEFAULT_CONNECTIONS)
                                                                                      .setUsePersistentConnections(DEFAULT_USE_PERSISTENT_CONNECTION)
                                                                                      .setConnectionIdleTimeout(DEFAULT_CONNECTION_IDLE_TIMEOUT)
+                                                                                     .setStreaming(DEFAULT_STREAMING)
                                                                                      .setResponseBufferSize(DEFAULT_RESPONSE_BUFFER_SIZE)
                                                                                      .setThreadNamePrefix(threadNamePrefix)
                                                                                      .setOwnerName(WSDL_RETRIEVER)

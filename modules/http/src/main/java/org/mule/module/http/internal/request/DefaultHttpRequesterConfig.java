@@ -66,6 +66,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
     private int maxConnections = UNLIMITED_CONNECTIONS;
     private boolean usePersistentConnections = true;
     private int connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
+    private boolean streamResponse = false;
     private int responseBufferSize = DEFAULT_RESPONSE_BUFFER_SIZE;
 
     private boolean enableCookies = false;
@@ -116,6 +117,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
                 .setMaxConnections(maxConnections)
                 .setUsePersistentConnections(usePersistentConnections)
                 .setConnectionIdleTimeout(connectionIdleTimeout)
+                .setStreaming(streamResponse)
                 .setResponseBufferSize(responseBufferSize)
                 .setThreadNamePrefix(threadNamePrefix)
                 .setOwnerName(name)
@@ -370,6 +372,16 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
     public void setConnectionIdleTimeout(int connectionIdleTimeout)
     {
         this.connectionIdleTimeout = connectionIdleTimeout;
+    }
+
+    public boolean isStreamResponse()
+    {
+        return streamResponse;
+    }
+
+    public void setStreamResponse(boolean streamResponse)
+    {
+        this.streamResponse = streamResponse;
     }
 
     public int getResponseBufferSize()
