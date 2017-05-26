@@ -224,7 +224,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     final SettingsSupplierFactory settingsSupplierFactory = mavenClientProvider.getSettingsSupplierFactory();
 
     final Optional<File> globalSettings = settingsSupplierFactory.environmentGlobalSettingsSupplier();
-    final Optional<File> userSettings = settingsSupplierFactory.environmentUserSettingsSupplier(localMavenRepository);
+    final Optional<File> userSettings = settingsSupplierFactory.environmentUserSettingsSupplier();
 
     final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder()
         .withForcePolicyUpdateNever(true)
@@ -234,7 +234,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
       mavenConfigurationBuilder.withGlobalSettingsLocation(globalSettings.get());
     } else {
       LOGGER
-          .info("Maven global settings couldn't be found, M2_HOME environment variable has to be set. This could cause a wrong resolution for dependencies");
+          .info("Maven global settings couldn't be found, M2_HOME environment variable has to be set in order to use global settings (if needed)");
     }
 
     if (userSettings.isPresent()) {
