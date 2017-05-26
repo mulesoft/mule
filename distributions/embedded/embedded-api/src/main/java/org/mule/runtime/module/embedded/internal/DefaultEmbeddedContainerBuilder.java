@@ -44,7 +44,7 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
 
   private String muleVersion;
   private URL containerBaseFolder;
-  private ApplicationConfiguration applicationConfigruation;
+  private ApplicationConfiguration applicationConfiguration;
   private String log4jConfigurationFile;
   private MavenConfiguration mavenConfiguration;
 
@@ -61,8 +61,8 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
   }
 
   @Override
-  public EmbeddedContainer.EmbeddedContainerBuilder withApplicationConfiguration(ApplicationConfiguration applicationConfigruation) {
-    this.applicationConfigruation = applicationConfigruation;
+  public EmbeddedContainer.EmbeddedContainerBuilder withApplicationConfiguration(ApplicationConfiguration applicationConfiguration) {
+    this.applicationConfiguration = applicationConfiguration;
     return this;
   }
 
@@ -82,15 +82,14 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
   public EmbeddedContainer build() {
     checkState(muleVersion != null, "muleVersion cannot be null");
     checkState(containerBaseFolder != null, "containerBaseFolder cannot be null");
-    checkState(applicationConfigruation != null, "application cannot be null");
+    checkState(applicationConfiguration != null, "application cannot be null");
     checkState(mavenConfiguration != null, "mavenConfiguration cannot be null");
     try {
-      FilteringClassLoader jdkOnlyClassLoader = JdkOnlyClassLoaderFactory.create();
-
       if (log4jConfigurationFile != null) {
-        configureLogging(jdkOnlyClassLoader);
+        configureLogging(this.getClass().getClassLoader());
       }
 
+      FilteringClassLoader jdkOnlyClassLoader = JdkOnlyClassLoaderFactory.create();
       MavenClientProvider mavenClientProvider = discoverProvider(getClass().getClassLoader());
       MavenClient mavenClient = mavenClientProvider.createMavenClient(mavenConfiguration);
 
@@ -116,7 +115,7 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
         serialize(containerInfo, containerOutputStream);
 
         ByteArrayOutputStream appConfigOutputStream = new ByteArrayOutputStream(512);
-        serialize(applicationConfigruation, appConfigOutputStream);
+        serialize(applicationConfiguration, appConfigOutputStream);
         Object o = constructor.newInstance(containerOutputStream.toByteArray(), appConfigOutputStream.toByteArray());
 
         return new EmbeddedContainer() {
@@ -163,12 +162,12 @@ public class DefaultEmbeddedContainerBuilder implements EmbeddedContainer.Embedd
     }
   }
 
-  private void configureLogging(FilteringClassLoader jdkOnlyClassLoader)
+  private void configureLogging(ClassLoader classLoader)
       throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    final Class<?> log4jLogManagerClass = jdkOnlyClassLoader.loadClass("org.apache.logging.log4j.LogManager");
+    final Class<?> log4jLogManagerClass = classLoader.loadClass("org.apache.logging.log4j.LogManager");
     final Object logContext = log4jLogManagerClass.getMethod("getContext", boolean.class).invoke(null, false);
 
-    final Class<?> log4jLoggerContextClass = jdkOnlyClassLoader.loadClass("org.apache.logging.log4j.core.LoggerContext");
+    final Class<?> log4jLoggerContextClass = classLoader.loadClass("org.apache.logging.log4j.core.LoggerContext");
     log4jLoggerContextClass.getMethod("setConfigLocation", URI.class).invoke(logContext,
                                                                              new File(log4jConfigurationFile).toURI());
   }
