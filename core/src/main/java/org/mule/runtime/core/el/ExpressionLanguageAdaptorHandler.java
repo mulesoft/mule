@@ -111,16 +111,16 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, FlowConstruct flowConstruct,
+  public Iterator<TypedValue<?>> split(String expression, Event event, FlowConstruct flowConstruct,
                                        BindingContext bindingContext)
       throws ExpressionRuntimeException {
-    return selectExpressionLanguage(expression).split(expression, bachSize, event, flowConstruct, bindingContext);
+    return selectExpressionLanguage(expression).split(expression, event, flowConstruct, bindingContext);
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, BindingContext bindingContext)
+  public Iterator<TypedValue<?>> split(String expression, Event event, BindingContext bindingContext)
       throws ExpressionRuntimeException {
-    return selectExpressionLanguage(expression).split(expression, bachSize, event, bindingContext);
+    return selectExpressionLanguage(expression).split(expression, event, bindingContext);
   }
 
   private ExtendedExpressionLanguageAdaptor selectExpressionLanguage(String expression) {

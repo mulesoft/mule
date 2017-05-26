@@ -48,7 +48,7 @@ public class ExpressionSplittingStrategy implements SplittingStrategy<Event, Ite
 
   @Override
   public Iterator<TypedValue<?>> split(Event event) {
-    Iterator<TypedValue<?>> result = expressionManager.split(expression, 0, event, BindingContext.builder().build());
+    Iterator<TypedValue<?>> result = expressionManager.split(expression, event, BindingContext.builder().build());
     return result != null ? result : Collections.<TypedValue<?>>emptyList().iterator();
   }
 

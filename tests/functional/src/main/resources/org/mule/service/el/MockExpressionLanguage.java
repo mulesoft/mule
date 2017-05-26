@@ -34,7 +34,7 @@ public class MockExpressionLanguage implements ExpressionLanguage {
     throw new UnsupportedOperationException();
   }
 
-  public Iterator<TypedValue<?>> split(String expression, int bachSize, BindingContext context) {
+  public Iterator<TypedValue<?>> split(String expression, BindingContext context) {
     throw new UnsupportedOperationException();
   }
 

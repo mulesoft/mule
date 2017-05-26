@@ -184,7 +184,7 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, FlowConstruct flowConstruct,
+  Iterator<TypedValue<?>> split(String expression, Event event, FlowConstruct flowConstruct,
                                 BindingContext bindingContext)
       throws ExpressionRuntimeException;
 
@@ -198,7 +198,7 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  Iterator<TypedValue<?>> split(String expression, int bachSize, Event event, BindingContext bindingContext)
+  Iterator<TypedValue<?>> split(String expression, Event event, BindingContext bindingContext)
       throws ExpressionRuntimeException;
 
 }
