@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.module.extension;
+package org.mule.test.module.extension.source;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.hasSize;
@@ -13,17 +13,17 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.heisenberg.extension.DEARadioSource.MESSAGES_PER_POLL;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
+import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+
+import org.junit.Test;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.Test;
 
 public class ListOfMessagesSourceTestCase extends AbstractExtensionFunctionalTestCase implements Callable {
 

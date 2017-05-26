@@ -29,8 +29,6 @@ import org.mule.runtime.core.execution.ResponseCompletionCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +36,8 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.reactivestreams.Publisher;
+
+import java.util.Map;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)

@@ -79,6 +79,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
       ResolverSet responseCallbackParameters = getCallbackParameters(sourceModel.getSuccessCallback());
       ResolverSet errorCallbackParameters = getCallbackParameters(sourceModel.getErrorCallback());
+      ResolverSet terminateCallbackParameters = getCallbackParameters(sourceModel.getTerminateCallback());
 
       initialiseIfNeeded(nonCallbackParameters, true, muleContext);
       initialiseIfNeeded(responseCallbackParameters, true, muleContext);
@@ -87,7 +88,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
       return new ExtensionMessageSource(extensionModel,
                                         sourceModel,
                                         getSourceFactory(nonCallbackParameters, responseCallbackParameters,
-                                                         errorCallbackParameters),
+                                                         errorCallbackParameters, terminateCallbackParameters),
                                         configurationProvider,
                                         getRetryPolicyTemplate(),
                                         cursorProviderFactory,
@@ -111,7 +112,8 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
   private SourceAdapterFactory getSourceFactory(ResolverSet nonCallbackParameters,
                                                 ResolverSet successCallbackParameters,
-                                                ResolverSet errorCallbackParameters) {
+                                                ResolverSet errorCallbackParameters,
+                                                ResolverSet terminateCallbackParameters) {
     return (configurationInstance, sourceCallbackFactory) -> {
       Source source = MuleExtensionUtils.getSourceFactory(sourceModel).createSource();
       try {
@@ -126,6 +128,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                  sourceCallbackFactory,
                                  nonCallbackParameters,
                                  successCallbackParameters,
+                                 terminateCallbackParameters,
                                  errorCallbackParameters);
       } catch (Exception e) {
         throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s'",

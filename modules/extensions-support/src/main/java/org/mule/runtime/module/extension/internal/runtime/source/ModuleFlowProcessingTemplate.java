@@ -6,22 +6,24 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mule.runtime.core.api.functional.Either.right;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.ModuleFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
+import org.mule.runtime.core.util.func.CheckedFunction;
+
+import org.reactivestreams.Publisher;
 
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
 
 final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTemplate {
 
@@ -40,12 +42,12 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   }
 
   @Override
-  public Function<Event, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction() {
+  public CheckedFunction<Event, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction() {
     return event -> completionHandler.createResponseParameters(event);
   }
 
   @Override
-  public Function<Event, Map<String, Object>> getFailedExecutionResponseParametersFunction() {
+  public SourceParameterResolver getFailedExecutionResponseParametersFunction() {
     return event -> completionHandler.createFailureResponseParameters(event);
   }
 
@@ -80,6 +82,13 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
                                           Map<String, Object> parameters, ResponseCompletionCallback responseCompletionCallback) {
     runAndNotify(() -> completionHandler.onFailure(messagingException, parameters), messagingException.getEvent(),
                  responseCompletionCallback);
+  }
+
+  @Override
+  public void sendAfterTerminateResponseToClient(Either<Event, MessagingException> either,
+                                                 ResponseCompletionCallback responseCompletionCallback) {
+    either.apply(event -> completionHandler.onTerminate(either),
+                 messagingException -> completionHandler.onTerminate(right(messagingException)));
   }
 
   private void runAndNotify(Runnable runnable, Event event, ResponseCompletionCallback responseCompletionCallback) {

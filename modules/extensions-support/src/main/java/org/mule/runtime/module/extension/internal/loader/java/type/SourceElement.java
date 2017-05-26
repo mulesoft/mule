@@ -33,4 +33,6 @@ public interface SourceElement extends ParameterizableTypeElement {
   //TODO: MULE-9220 not more than one
   Optional<MethodElement> getOnErrorMethod();
 
+  Optional<MethodElement> getOnTerminateMethod();
+
 }

@@ -183,7 +183,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -1806,7 +1831,32 @@
         {
           "blocking": false,
           "executionType": "CPU_LITE",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -2377,7 +2427,72 @@
   ],
   "connectionProviders": [],
   "messageSources": [],
-  "errors": [],
+  "errors": [
+    {
+      "type": "CONNECTIVITY",
+      "namespace": "MARVEL",
+      "parent": {
+        "type": "CONNECTIVITY",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    },
+    {
+      "type": "CONNECTIVITY",
+      "namespace": "MULE",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "RETRY_EXHAUSTED",
+      "namespace": "MARVEL",
+      "parent": {
+        "type": "RETRY_EXHAUSTED",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    },
+    {
+      "type": "ANY",
+      "namespace": "MARVEL",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "ANY",
+      "namespace": "MULE"
+    },
+    {
+      "type": "RETRY_EXHAUSTED",
+      "namespace": "MULE",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "CUSTOM_ERROR",
+      "namespace": "MARVEL",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MARVEL",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    }
+  ],
   "modelProperties": {},
   "types": [
     {

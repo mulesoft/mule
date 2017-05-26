@@ -25,7 +25,6 @@ import static org.mule.runtime.core.exception.Errors.Identifiers.TRANSFORMATION_
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.VALIDATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 
 /**
@@ -90,7 +89,9 @@ public abstract class Errors {
      */
     public static final String ANY_IDENTIFIER = "ANY";
 
-
+    /**
+     * MG TODO
+     */
     public static final String STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER = "STREAM_MAXIMUM_SIZE_EXCEEDED";
 
     // UNHANDLEABLE

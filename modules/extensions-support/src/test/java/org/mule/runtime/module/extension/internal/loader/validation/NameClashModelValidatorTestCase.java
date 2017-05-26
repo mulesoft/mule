@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -38,11 +37,10 @@ import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
 import org.mule.runtime.extension.internal.loader.validator.NameClashModelValidator;
+import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
-import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -50,10 +48,6 @@ import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import com.google.common.collect.ImmutableList;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,6 +55,9 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -344,10 +341,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(group.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     when(group.getParameterModels()).thenReturn(asList(offending));
 
-    SourceModel sourceModel = new ImmutableSourceModel(SOURCE_NAME, "", false, asList(group), null, null,
-                                                       of(sourceCallbackModel), empty(), false, false,
-                                                       false, null, emptySet(), emptySet());
-
+    SourceModel sourceModel = null;
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     validate();
   }

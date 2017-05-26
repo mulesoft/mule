@@ -12,6 +12,8 @@ import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.Event.builder;
+import static org.mule.runtime.core.api.functional.Either.left;
+import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
@@ -22,6 +24,7 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
+import static org.mule.runtime.core.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollection;
 import static reactor.core.publisher.Mono.from;
@@ -35,22 +38,26 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.exception.SourceResponseException;
 import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.policy.FailureSourcePolicyResult;
 import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.policy.SourcePolicy;
 import org.mule.runtime.core.policy.SuccessSourcePolicyResult;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.util.func.CheckedConsumer;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;
@@ -124,6 +131,8 @@ public class ModuleFlowProcessingPhase
       Consumer<MessagingException> errorConsumer =
           getErrorConsumer(messageSource, template.getFailedExecutionResponseParametersFunction(),
                            messageProcessContext, template, phaseResultNotifier);
+      Consumer<Either<Event, MessagingException>> terminateConsumer =
+          getTerminateConsumer(messageSource, messageProcessContext, template, phaseResultNotifier);
 
       MonoProcessor<Void> responseCompletion = MonoProcessor.create();
 
@@ -170,12 +179,11 @@ public class ModuleFlowProcessingPhase
             .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
                        throwable -> LOGGER.error("Unhandled exception processing request", throwable))
             .doAfterTerminate((event, throwable) -> {
-              // TODO Bazinga!
-              // try {
-              // onTerminate(terminateConsumer, event, throwable);
-              // } finally {
-              responseCompletion.onComplete();
-              // }
+              try {
+                onTerminate(terminateConsumer, event, throwable);
+              } finally {
+                responseCompletion.onComplete();
+              }
             })
             .subscribe();
       } else {
@@ -194,7 +202,10 @@ public class ModuleFlowProcessingPhase
             try {
               template.sendFailureResponseToClient(messagingException,
                                                    sourcePolicyResult.getLeft().getErrorResponseParameters(),
-                                                   createSendFailureResponseCompletationCallback(phaseResultNotifier));
+                                                   createSendFailureResponseCompletationCallback(phaseResultNotifier,
+                                                                                                 messageSource,
+                                                                                                 muleContext
+                                                                                                     .getErrorTypeLocator()));
             } catch (Exception e) {
               throw new SourceErrorException(messagingException.getEvent(),
                                              sourceErrorResponseSendErrorType,
@@ -206,7 +217,8 @@ public class ModuleFlowProcessingPhase
             Event flowExecutionResponse = successSourcePolicyResult.getFlowExecutionResult();
             fireNotification(messageSource, flowExecutionResponse, messageProcessContext.getFlowConstruct(), MESSAGE_RESPONSE);
             ResponseCompletionCallback responseCompletationCallback =
-                createResponseCompletationCallback(phaseResultNotifier, exceptionHandler);
+                createResponseCompletationCallback(phaseResultNotifier, exceptionHandler, messageSource,
+                                                   muleContext.getErrorTypeLocator());
 
             // TODO MULE-11141 - This is the case of a filtered flow. This will eventually go away.
             if (flowExecutionResponse == null) {
@@ -272,11 +284,11 @@ public class ModuleFlowProcessingPhase
     return templateEvent;
   }
 
-  private Consumer<MessagingException> getErrorConsumer(MessageSource messageSource,
-                                                        Function<Event, Map<String, Object>> errorParametersFunction,
-                                                        MessageProcessContext messageProcessContext,
-                                                        ModuleFlowProcessingPhaseTemplate template,
-                                                        PhaseResultNotifier phaseResultNotifier) {
+  private CheckedConsumer<MessagingException> getErrorConsumer(MessageSource messageSource,
+                                                               Function<Event, Map<String, Object>> errorParametersFunction,
+                                                               MessageProcessContext messageProcessContext,
+                                                               ModuleFlowProcessingPhaseTemplate template,
+                                                               PhaseResultNotifier phaseResultNotifier) {
     return messagingException -> {
       Event errorEvent = createErrorEvent(messagingException.getEvent(), messageSource, messagingException,
                                           muleContext.getErrorTypeLocator());
@@ -293,10 +305,33 @@ public class ModuleFlowProcessingPhase
 
       try {
         template.sendFailureResponseToClient(messagingException, parameters,
-                                             createSendFailureResponseCompletationCallback(phaseResultNotifier));
+                                             createSendFailureResponseCompletationCallback(phaseResultNotifier, messageSource,
+                                                                                           muleContext.getErrorTypeLocator()));
       } catch (Exception e) {
         throw new SourceErrorException(errorEvent, sourceErrorResponseSendErrorType, e, messagingException);
       }
+    };
+  }
+
+  private Consumer<Either<Event, MessagingException>> getTerminateConsumer(MessageSource messageSource,
+                                                                           MessageProcessContext messageProcessContext,
+                                                                           ModuleFlowProcessingPhaseTemplate template,
+                                                                           PhaseResultNotifier phaseResultNotifier) {
+    return eventOrException -> {
+
+      ResponseCompletionCallback completionCallback =
+          createSendFailureResponseCompletationCallback(phaseResultNotifier, messageSource,
+                                                        messageProcessContext.getErrorTypeLocator());
+      eventOrException.apply(
+                             event -> safely(() -> template.sendAfterTerminateResponseToClient(left(event), completionCallback)),
+
+                             messagingException -> safely(() -> {
+                               messagingException
+                                   .setProcessedEvent(createErrorEvent(messagingException.getEvent(), messageSource,
+                                                                       messagingException, messageProcessContext
+                                                                           .getErrorTypeLocator()));
+                               template.sendAfterTerminateResponseToClient(right(messagingException), completionCallback);
+                             }));
     };
   }
 
@@ -310,7 +345,8 @@ public class ModuleFlowProcessingPhase
 
       fireNotification(messageSource, response, messageProcessContext.getFlowConstruct(), MESSAGE_RESPONSE);
       ResponseCompletionCallback responseCompletationCallback =
-          createResponseCompletationCallback(phaseResultNotifier, exceptionHandler);
+          createResponseCompletationCallback(phaseResultNotifier, exceptionHandler, messageSource,
+                                             messageProcessContext.getErrorTypeLocator());
 
       // TODO MULE-11141 - This is the case of a filtered flow. This will eventually go away.
       if (response == null) {
@@ -360,7 +396,9 @@ public class ModuleFlowProcessingPhase
     };
   }
 
-  private ResponseCompletionCallback createSendFailureResponseCompletationCallback(final PhaseResultNotifier phaseResultNotifier) {
+  private ResponseCompletionCallback createSendFailureResponseCompletationCallback(final PhaseResultNotifier phaseResultNotifier,
+                                                                                   AnnotatedObject annotatedObject,
+                                                                                   ErrorTypeLocator errorTypeLocator) {
     return new ResponseCompletionCallback() {
 
       @Override
@@ -370,14 +408,20 @@ public class ModuleFlowProcessingPhase
 
       @Override
       public Event responseSentWithFailure(MessagingException e, Event event) {
-        phaseResultNotifier.phaseFailure(e);
-        return event;
+        MessagingException messagingException = new MessagingException(event, new SourceResponseException(e.getCause()));
+        Event errorEvent = createErrorEvent(event, annotatedObject, messagingException, errorTypeLocator);
+
+        MessagingException reason = new MessagingException(errorEvent, messagingException);
+        phaseResultNotifier.phaseFailure(reason);
+        return errorEvent;
       }
     };
   }
 
   private ResponseCompletionCallback createResponseCompletationCallback(final PhaseResultNotifier phaseResultNotifier,
-                                                                        final MessagingExceptionHandler exceptionListener) {
+                                                                        final MessagingExceptionHandler exceptionListener,
+                                                                        MessageSource messageSource,
+                                                                        ErrorTypeLocator errorTypeLocator) {
     return new ResponseCompletionCallback() {
 
       @Override
@@ -393,6 +437,23 @@ public class ModuleFlowProcessingPhase
           return handleException;
         }, phaseResultNotifier);
       }
+
+
+      // @Override
+      // public Event responseSentWithFailure(final MessagingException e, final Event event) {
+      // return executeCallback(() -> {
+      // Event handleException = exceptionListener.handleException(e, createErrorEvent(event, messageSource, e,
+      // errorTypeLocator));
+      //// Event handleException = exceptionListener.handleException(e, event);
+      // if(handleException.getError().isPresent()){
+      // phaseResultNotifier.phaseFailure(e);
+      // throw e;
+      // } else {
+      // phaseResultNotifier.phaseSuccessfully();
+      // }
+      // return handleException;
+      // }, phaseResultNotifier);
+      // }
     };
   }
 
@@ -402,6 +463,14 @@ public class ModuleFlowProcessingPhase
     } catch (Exception callbackException) {
       phaseResultNotifier.phaseFailure(callbackException);
       throw new MuleRuntimeException(callbackException);
+    }
+  }
+
+  private void onTerminate(Consumer<Either<Event, MessagingException>> terminateConsumer, Event event, Throwable throwable) {
+    if (throwable != null && throwable instanceof MessagingException) {
+      terminateConsumer.accept(right((MessagingException) throwable));
+    } else {
+      terminateConsumer.accept(left(event));
     }
   }
 

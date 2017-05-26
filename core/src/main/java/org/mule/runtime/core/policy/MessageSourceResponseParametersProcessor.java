@@ -7,6 +7,7 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.exception.SourceParametersException;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -34,7 +35,15 @@ public interface MessageSourceResponseParametersProcessor {
    *
    * @return a function to resolve the failure response function parameters.
    */
-  Function<Event, Map<String, Object>> getFailedExecutionResponseParametersFunction();
+  SourceParameterResolver getFailedExecutionResponseParametersFunction();
+
+  @FunctionalInterface
+  interface SourceParameterResolver extends Function<Event, Map<String, Object>> {
+
+    @Override
+    Map<String, Object> apply(Event event) throws SourceParametersException;
+
+  }
 
 
 }

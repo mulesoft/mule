@@ -1,3 +1,4 @@
+
 {
   "name": "Heisenberg",
   "description": "My Test Extension just to unit test",
@@ -3173,6 +3174,34 @@
                     "name": "methylamine",
                     "description": "",
                     "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Boolean",
+                      "annotations": {
+                        "typeId": "boolean"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 15
+                    },
+                    "name": "propagateError",
+                    "description": "",
+                    "modelProperties": {}
                   }
                 ],
                 "exclusiveParametersModels": [],
@@ -3248,7 +3277,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 15
+                      "order": 16
                     },
                     "name": "nextDoor",
                     "description": "",
@@ -3531,6 +3560,12 @@
               }
             ],
             "name": "onError",
+            "description": "",
+            "modelProperties": {}
+          },
+          "terminateCallbackModel": {
+            "parameterGroupModels": [],
+            "name": "onTerminate",
             "description": "",
             "modelProperties": {}
           },
@@ -10489,6 +10524,14 @@
         "type": "ANY",
         "namespace": "MULE"
       }
+    },
+    {
+      "type": "SOURCE_RESPONSE_PARAMETERS",
+      "namespace": "MULE"
+    },
+    {
+      "type": "SOURCE_RESPONSE",
+      "namespace": "MULE"
     },
     {
       "type": "ANY",

@@ -7,7 +7,9 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.exception.SourceParametersException;
 import org.mule.runtime.core.execution.ExceptionCallback;
 
 import java.util.Map;
@@ -33,10 +35,12 @@ public interface SourceCompletionHandler {
 
   /**
    * Invoked when a failure occurs during the flow processing
+   *  @param exception the exception thrown during processing
    *
-   * @param exception the exception thrown during processing
    */
   void onFailure(MessagingException exception, Map<String, Object> parameters);
+
+  void onTerminate(Either<Event, MessagingException> eventOrException);
 
   /**
    * Resolves the set of parameters of the response function of the source against
@@ -45,7 +49,7 @@ public interface SourceCompletionHandler {
    * @param event the {@code Event} with the result of the successful flow processing.
    * @return the response function parameters with it's values.
    */
-  Map<String, Object> createResponseParameters(Event event);
+  Map<String, Object> createResponseParameters(Event event) throws MessagingException;
 
   /**
    * Resolves the set of parameters of the failure response function of the source against
@@ -54,6 +58,15 @@ public interface SourceCompletionHandler {
    * @param event the {@code Event} with the result of the failed flow processing.
    * @return the failed response function parameters with it's values.
    */
-  Map<String, Object> createFailureResponseParameters(Event event);
+  Map<String, Object> createFailureResponseParameters(Event event) throws SourceParametersException;
+
+  /**
+   * Resolves the set of parameters of the failure response function of the source against
+   * the supplied {@code Event}.
+   *
+   * @param event the {@code Event} with the result of the failed flow processing.
+   * @return the failed response function parameters with it's values.
+   */
+  Map<String, Object> createTerminateResponseParameters(Event event) throws MessagingException;
 
 }

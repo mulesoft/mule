@@ -22,7 +22,6 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.STREAM_MAXIMUM_SIZE_EXCEEDED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.VALIDATION;
-
 import org.mule.runtime.api.message.ErrorType;
 
 /**

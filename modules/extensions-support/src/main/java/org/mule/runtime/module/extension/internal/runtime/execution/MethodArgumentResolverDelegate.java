@@ -18,6 +18,8 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.util.collection.ImmutableMapCollector;
+import org.mule.runtime.extension.api.OnTerminateCallback;
+import org.mule.runtime.extension.api.OnTerminateInformation;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -38,6 +40,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ErrorArgument
 import org.mule.runtime.module.extension.internal.runtime.resolver.FlowListenerArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.LiteralArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MediaTypeArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.OnTerminateCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SecurityContextHandlerArgumentResolver;
@@ -74,6 +77,10 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private static final ArgumentResolver<FlowListener> FLOW_LISTENER_ARGUMENT_RESOLVER = new FlowListenerArgumentResolver();
   private static final ArgumentResolver<StreamingHelper> STREAMING_HELPER_ARGUMENT_RESOLVER =
       new StreamingHelperArgumentResolver();
+  private static final ArgumentResolver<OnTerminateInformation> ON_TERMINATE_INFORMATION_ARGUMENT_RESOLVER =
+      new OnTerminateAR(ERROR_ARGUMENT_RESOLVER, SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER);
+  private static final ArgumentResolver<OnTerminateCallback> ON_TERMINATE_CALLBACK =
+      new OnTerminateCallbackArgumentResolver(ERROR_ARGUMENT_RESOLVER);
 
 
   private final Method method;
@@ -128,7 +135,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       } else if (TypedValue.class.equals(parameterType)) {
         argumentResolver = new TypedValueArgumentResolver<>(paramNames.get(i));
       } else if (Literal.class.equals(parameterType)) {
-        argumentResolver = new LiteralArgumentResolver(paramNames.get(i), parameterType);
+        argumentResolver = new LiteralArgumentResolver<>(paramNames.get(i), parameterType);
       } else if (CompletionCallback.class.equals(parameterType)) {
         argumentResolver = NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER;
       } else if (MediaType.class.equals(parameterType)) {
@@ -139,6 +146,10 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = FLOW_LISTENER_ARGUMENT_RESOLVER;
       } else if (StreamingHelper.class.equals(parameterType)) {
         argumentResolver = STREAMING_HELPER_ARGUMENT_RESOLVER;
+      } else if (OnTerminateInformation.class.equals(parameterType)) {
+        argumentResolver = ON_TERMINATE_INFORMATION_ARGUMENT_RESOLVER;
+      } else if (OnTerminateCallback.class.equals(parameterType)) {
+        argumentResolver = ON_TERMINATE_CALLBACK;
       } else {
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
       }

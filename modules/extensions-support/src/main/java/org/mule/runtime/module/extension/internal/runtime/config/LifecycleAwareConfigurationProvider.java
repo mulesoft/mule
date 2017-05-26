@@ -31,10 +31,10 @@ import org.mule.runtime.core.lifecycle.SimpleLifecycleManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
+import org.slf4j.Logger;
+
 import java.util.LinkedList;
 import java.util.List;
-
-import org.slf4j.Logger;
 
 /**
  * Base class for implementations of {@link ConfigurationProvider} which keep track of the {@link ConfigurationInstance} they

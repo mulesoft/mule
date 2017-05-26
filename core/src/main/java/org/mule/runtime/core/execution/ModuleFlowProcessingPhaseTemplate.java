@@ -9,14 +9,15 @@ package org.mule.runtime.core.execution;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.MessageSourceResponseParametersProcessor;
 
+import org.reactivestreams.Publisher;
+
 import java.util.Map;
 import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Template methods for {@link MessageSource} specific behavior during flow execution.
@@ -47,9 +48,8 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
 
   /**
    * Template method to send a response after processing the message.
-   * <p/>
+   * <p>
    * This method is executed within the flow so if it fails it will trigger the exception strategy.
-   *
    *
    * @param flowExecutionResponse the result of the flow execution
    * @param parameters the resolved set of parameters required to send the response.
@@ -75,4 +75,13 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
                                    ResponseCompletionCallback responseCompletionCallback)
       throws Exception;
 
+  /**
+   * TODO
+   *
+   * @param either
+   * @param responseCompletionCallback
+   * @throws MuleException
+   */
+  void sendAfterTerminateResponseToClient(Either<Event, MessagingException> either,
+                                          ResponseCompletionCallback responseCompletionCallback);
 }

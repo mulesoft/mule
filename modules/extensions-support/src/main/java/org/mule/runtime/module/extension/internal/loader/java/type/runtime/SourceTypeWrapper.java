@@ -12,8 +12,9 @@ import static java.util.Optional.of;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodsAnnotatedWith;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
-import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
+import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ParameterizableTypeElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.SourceElement;
@@ -64,6 +65,11 @@ final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements S
   @Override
   public Optional<MethodElement> getOnErrorMethod() {
     return getMethodAnnotatedWith(OnError.class);
+  }
+
+  @Override
+  public Optional<MethodElement> getOnTerminateMethod() {
+    return getMethodAnnotatedWith(OnTerminate.class);
   }
 
   private Optional<MethodElement> getMethodAnnotatedWith(Class<? extends Annotation> annotationType) {

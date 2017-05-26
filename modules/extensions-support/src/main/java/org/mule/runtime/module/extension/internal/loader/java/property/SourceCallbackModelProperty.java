@@ -22,6 +22,7 @@ public final class SourceCallbackModelProperty implements ModelProperty {
 
   private final Optional<Method> onSuccessMethod;
   private final Optional<Method> onErrorMethod;
+  private Optional<Method> onTerminateMethod;
 
   /**
    * Creates a new instance
@@ -29,9 +30,11 @@ public final class SourceCallbackModelProperty implements ModelProperty {
    * @param onSuccessMethod an {@link Optional} with a reference to the success callback method
    * @param onErrorMethod   an {@link Optional} with a reference to the error callback method
    */
-  public SourceCallbackModelProperty(Optional<Method> onSuccessMethod, Optional<Method> onErrorMethod) {
+  public SourceCallbackModelProperty(Optional<Method> onSuccessMethod, Optional<Method> onErrorMethod,
+                                     Optional<Method> onTerminateMethod) {
     this.onSuccessMethod = onSuccessMethod;
     this.onErrorMethod = onErrorMethod;
+    this.onTerminateMethod = onTerminateMethod;
   }
 
   public Optional<Method> getOnSuccessMethod() {
@@ -40,6 +43,10 @@ public final class SourceCallbackModelProperty implements ModelProperty {
 
   public Optional<Method> getOnErrorMethod() {
     return onErrorMethod;
+  }
+
+  public Optional<Method> getOnTerminateMethod() {
+    return onTerminateMethod;
   }
 
   @Override

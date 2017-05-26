@@ -1546,7 +1546,7 @@
                             <id>apply-format</id>
                             <phase>compile</phase>
                             <goals>
-                                <goal>${formatterGoal}</goal>
+                                <goal>format</goal>
                             </goals>
                             <configuration>
                                 <skipFormatting>${skipVerifications}</skipFormatting>
@@ -1796,7 +1796,7 @@
                         <execution>
                             <phase>compile</phase>
                             <goals>
-                                <goal>check</goal>
+                                <goal>format</goal>
                             </goals>
                         </execution>
                     </executions>

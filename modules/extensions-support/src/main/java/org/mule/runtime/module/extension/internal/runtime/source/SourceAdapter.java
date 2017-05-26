@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -33,6 +34,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.core.exception.SourceParametersException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
@@ -54,6 +57,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -63,8 +68,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.apache.commons.collections.CollectionUtils;
-
 /**
  * An adapter for {@link Source} which acts as a bridge with {@link ExtensionMessageSource}. It also propagates lifecycle and
  * performs injection of both, dependencies and parameters
@@ -73,6 +76,7 @@ import org.apache.commons.collections.CollectionUtils;
  */
 public final class SourceAdapter implements Startable, Stoppable, Initialisable, FlowConstructAware {
 
+  private static final String SOURCE_RESULT = "sourceResult";
   private final ExtensionModel extensionModel;
   private final SourceModel sourceModel;
   private final Source source;
@@ -84,6 +88,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
   private final ResolverSet nonCallbackParameters;
   private final ResolverSet successCallbackParameters;
   private final ResolverSet errorCallbackParameters;
+  private final ResolverSet terminateCallbackParameters;
 
   private ConnectionHandler<Object> connectionHandler;
   private FlowConstruct flowConstruct;
@@ -104,6 +109,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
                        SourceCallbackFactory sourceCallbackFactory,
                        ResolverSet nonCallbackParameters,
                        ResolverSet successCallbackParameters,
+                       ResolverSet terminateCallbackParameters,
                        ResolverSet errorCallbackParameters) {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
@@ -113,6 +119,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
     this.sourceCallbackFactory = sourceCallbackFactory;
     this.nonCallbackParameters = nonCallbackParameters;
     this.successCallbackParameters = successCallbackParameters;
+    this.terminateCallbackParameters = terminateCallbackParameters;
     this.errorCallbackParameters = errorCallbackParameters;
     this.configurationSetter = fetchField(Config.class);
     this.connectionSetter = fetchField(Connection.class);
@@ -131,8 +138,9 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
   private SourceCompletionHandlerFactory doCreateCompletionHandler(SourceCallbackModelProperty modelProperty) {
     final SourceCallbackExecutor onSuccessExecutor = getMethodExecutor(modelProperty.getOnSuccessMethod(), modelProperty);
     final SourceCallbackExecutor onErrorExecutor = getMethodExecutor(modelProperty.getOnErrorMethod(), modelProperty);
+    final SourceCallbackExecutor onTerminateExecutor = getMethodExecutor(modelProperty.getOnTerminateMethod(), modelProperty);
 
-    return context -> new DefaultSourceCompletionHandler(onSuccessExecutor, onErrorExecutor, context);
+    return context -> new DefaultSourceCompletionHandler(onSuccessExecutor, onErrorExecutor, onTerminateExecutor, context);
   }
 
   private SourceCallbackExecutor getMethodExecutor(Optional<Method> method, SourceCallbackModelProperty sourceCallbackModel) {
@@ -158,12 +166,15 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
     private final SourceCallbackExecutor onSuccessExecutor;
     private final SourceCallbackExecutor onErrorExecutor;
     private final SourceCallbackContext context;
+    private final SourceCallbackExecutor onTerminateExecutor;
 
     public DefaultSourceCompletionHandler(SourceCallbackExecutor onSuccessExecutor,
                                           SourceCallbackExecutor onErrorExecutor,
+                                          SourceCallbackExecutor onTerminateExecutor,
                                           SourceCallbackContext context) {
       this.onSuccessExecutor = onSuccessExecutor;
       this.onErrorExecutor = onErrorExecutor;
+      this.onTerminateExecutor = onTerminateExecutor;
       this.context = context;
     }
 
@@ -181,6 +192,18 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
       });
     }
 
+    @Override
+    public void onTerminate(Either<Event, MessagingException> exception) {
+      //TODO CHANGE
+      Event event = exception.isLeft() ? exception.getLeft() : exception.getRight().getEvent();
+
+      safely(() -> onTerminateExecutor.execute(event, emptyMap(), context), callbackException -> {
+        throw new MuleRuntimeException(createStaticMessage(format("Found exception trying to handle error from source '%s'",
+                                                                  sourceModel.getName())),
+                                       callbackException);
+      });
+    }
+
     private void safely(CheckedRunnable task, ExceptionCallback exceptionCallback) {
       try {
         task.run();
@@ -189,12 +212,12 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
       }
     }
 
-    public Map<String, Object> createResponseParameters(Event event) {
+    public Map<String, Object> createResponseParameters(Event event) throws MessagingException {
       try {
         ResolverSetResult parameters = SourceAdapter.this.successCallbackParameters.resolve(from(event, configurationInstance));
         return parameters.asMap();
-      } catch (MuleException e) {
-        throw new MuleRuntimeException(e);
+      } catch (Exception e) {
+        throw new MessagingException(event, new SourceParametersException(e));
       }
     }
 
@@ -202,8 +225,18 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
       try {
         ResolverSetResult parameters = SourceAdapter.this.errorCallbackParameters.resolve(from(event, configurationInstance));
         return parameters.asMap();
-      } catch (MuleException e) {
-        throw new MuleRuntimeException(e);
+      } catch (Exception e) {
+        throw new SourceParametersException(e);
+      }
+    }
+
+    @Override
+    public Map<String, Object> createTerminateResponseParameters(Event event) throws MessagingException {
+      try {
+        ResolverSetResult parameters = SourceAdapter.this.terminateCallbackParameters.resolve(from(event, configurationInstance));
+        return parameters.asMap();
+      } catch (Exception e) {
+        throw new MessagingException(event, e);
       }
     }
   }

@@ -7,13 +7,20 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
+import static org.mule.runtime.extension.api.error.MuleErrors.SOURCE_RESPONSE;
+import static org.mule.runtime.extension.api.error.MuleErrors.SOURCE_RESPONSE_PARAMETERS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.CONNECTIVITY;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.RETRY_EXHAUSTED;
+import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
@@ -54,10 +61,25 @@ public class ConnectionErrorsDeclarationEnricher implements DeclarationEnricher 
           new IdempotentDeclarationWalker() {
 
             @Override
-            public void onOperation(WithOperationsDeclaration owner, OperationDeclaration operation) {
-              if (operation.getModelProperty(ConnectivityModelProperty.class).isPresent()) {
-                operation.addError(getErrorModel(CONNECTIVITY, errorModels, operation));
-                operation.addError(getErrorModel(RETRY_EXHAUSTED, errorModels, operation));
+            public void onOperation(WithOperationsDeclaration owner, OperationDeclaration operationDeclaration) {
+              if (operationDeclaration.getModelProperty(ConnectivityModelProperty.class).isPresent()) {
+                operationDeclaration.addError(getErrorModel(CONNECTIVITY, errorModels, operationDeclaration));
+                operationDeclaration.addError(getErrorModel(RETRY_EXHAUSTED, errorModels, operationDeclaration));
+              }
+            }
+
+            @Override
+            protected void onSource(WithSourcesDeclaration owner, SourceDeclaration sourceDeclaration) {
+              if (sourceDeclaration.getSuccessCallback().isPresent() || sourceDeclaration.getErrorCallback().isPresent()) {
+                ErrorModelBuilder ANY_ERROR = newError("ANY", MULE_NAMESPACE);
+                declaration
+                    .addErrorModel(newError(SOURCE_RESPONSE.getType(), MULE_NAMESPACE).withParent(ANY_ERROR.build()).build());
+                declaration.addErrorModel(newError(SOURCE_RESPONSE_PARAMETERS.getType(), MULE_NAMESPACE)
+                    .withParent(ANY_ERROR.build()).build());
+                Set<ErrorModel> enrichedErrorModels = declaration.getErrorModels();
+
+                sourceDeclaration.addError(getMuleErrorModel(SOURCE_RESPONSE_PARAMETERS, enrichedErrorModels, sourceDeclaration));
+                sourceDeclaration.addError(getMuleErrorModel(SOURCE_RESPONSE, enrichedErrorModels, sourceDeclaration));
               }
             }
           }.walk(declaration);
@@ -67,12 +89,22 @@ public class ConnectionErrorsDeclarationEnricher implements DeclarationEnricher 
   }
 
   private ErrorModel getErrorModel(ErrorTypeDefinition<?> errorTypeDefinition, Set<ErrorModel> errorModels,
-                                   OperationDeclaration operation) {
+                                   ComponentDeclaration component) {
     return errorModels
         .stream()
         .filter(error -> !error.getNamespace().equals(MULE_NAMESPACE) && error.getType().equals(errorTypeDefinition.getType()))
         .findFirst()
         .orElseThrow(() -> new IllegalModelDefinitionException(format("Trying to add the '%s' Error to the Component '%s' but the Extension doesn't declare it",
-                                                                      errorTypeDefinition, operation.getName())));
+                                                                      errorTypeDefinition, component.getName())));
+  }
+
+  private ErrorModel getMuleErrorModel(ErrorTypeDefinition<?> errorTypeDefinition, Set<ErrorModel> errorModels,
+                                       ComponentDeclaration component) {
+    return errorModels
+        .stream()
+        .filter(error -> error.getNamespace().equals(MULE_NAMESPACE) && error.getType().equals(errorTypeDefinition.getType()))
+        .findFirst()
+        .orElseThrow(() -> new IllegalModelDefinitionException(format("Trying to add the '%s' Error to the Component '%s' but the Extension doesn't declare it",
+                                                                      errorTypeDefinition, component.getName())));
   }
 }

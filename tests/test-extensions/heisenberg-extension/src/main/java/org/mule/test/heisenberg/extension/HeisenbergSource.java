@@ -9,17 +9,25 @@ package org.mule.test.heisenberg.extension;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
+import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_BODY;
+import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_PARAMETER;
+import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.NONE;
+import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.extension.api.OnTerminateCallback;
+import org.mule.runtime.extension.api.OnTerminateInformation;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
+import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -65,12 +73,27 @@ public class HeisenbergSource extends Source<String, Attributes> {
   public static boolean receivedGroupOnSource;
   public static boolean receivedInlineOnSuccess;
   public static boolean receivedInlineOnError;
+  public static boolean receivedOnTerminateInfo;
+
+  public static OnTerminateInformation onTerminateInfo;
+  public static TerminateStatus terminateStatus;
+
+  public static boolean executedOnSuccess;
+  public static boolean executedOnError;
+  public static boolean executedOnTerminate;
   public static long gatheredMoney;
 
   public HeisenbergSource() {
     receivedGroupOnSource = false;
     receivedInlineOnSuccess = false;
     receivedInlineOnError = false;
+    receivedOnTerminateInfo = false;
+
+    terminateStatus = NONE;
+
+    executedOnSuccess = false;
+    executedOnError = false;
+    executedOnTerminate = false;
     gatheredMoney = 0;
   }
 
@@ -86,26 +109,49 @@ public class HeisenbergSource extends Source<String, Attributes> {
 
     executor = schedulerService.cpuLightScheduler();
     scheduledFuture = executor.scheduleAtFixedRate(() -> sourceCallback.handle(makeResult(sourceCallback)), 0, 300, MILLISECONDS);
-
+    //      sourceCallback.handle(makeResult(sourceCallback));
   }
 
   @OnSuccess
-  public void onSuccess(@Optional(defaultValue = "#[payload]") Long payment, @Optional String sameNameParameter,
+  public void onSuccess(@Optional(defaultValue = PAYLOAD) Long payment, @Optional String sameNameParameter,
                         @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin,
-                        @ParameterGroup(name = "Success Info", showInDsl = true) PersonalInfo successInfo) {
+                        @ParameterGroup(name = "Success Info", showInDsl = true) PersonalInfo successInfo,
+                        @Optional boolean fail) {
 
     gatheredMoney += payment;
     receivedGroupOnSource = ricin != null && ricin.getNextDoor().getAddress() != null;
     receivedInlineOnSuccess = successInfo != null && successInfo.getAge() != null && successInfo.getKnownAddresses() != null;
+    executedOnSuccess = true;
+
+    if (fail) {
+      throw new RuntimeException("Some internal exception");
+    }
   }
 
   @OnError
   public void onError(Error error, @Optional String sameNameParameter, @Optional Methylamine methylamine,
                       @ParameterGroup(name = RICIN_GROUP_NAME) RicinGroup ricin,
-                      @ParameterGroup(name = "Error Info", showInDsl = true) PersonalInfo infoError) {
+                      @ParameterGroup(name = "Error Info", showInDsl = true) PersonalInfo infoError,
+                      @Optional boolean propagateError) {
     gatheredMoney = -1;
     receivedGroupOnSource = ricin != null && ricin.getNextDoor() != null && ricin.getNextDoor().getAddress() != null;
     receivedInlineOnError = infoError != null && infoError.getName() != null && !infoError.getName().equals(HEISENBERG);
+    executedOnError = true;
+    if (propagateError) {
+      throw new RuntimeException("Some internal exception");
+    }
+  }
+
+  @OnTerminate
+  public void onTerminate(OnTerminateInformation onTerminateInformation, OnTerminateCallback onTerminateCallback) {
+    onTerminateCallback.execute(
+                                success -> terminateStatus = SUCCESS,
+                                parameterError -> terminateStatus = ERROR_PARAMETER,
+                                bodyError -> terminateStatus = ERROR_BODY);
+
+    executedOnTerminate = true;
+    receivedOnTerminateInfo = true;
+    HeisenbergSource.onTerminateInfo = onTerminateInformation;
   }
 
   @Override
@@ -126,5 +172,9 @@ public class HeisenbergSource extends Source<String, Attributes> {
     return Result.<String, Attributes>builder()
         .output(format("Meth Batch %d. If found by DEA contact %s", ++initialBatchNumber, connection.getSaulPhoneNumber()))
         .build();
+  }
+
+  public static enum TerminateStatus {
+    SUCCESS, ERROR_PARAMETER, ERROR_BODY, NONE
   }
 }

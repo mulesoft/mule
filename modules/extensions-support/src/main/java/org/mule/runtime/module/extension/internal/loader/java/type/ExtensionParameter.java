@@ -15,6 +15,8 @@ import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.extension.api.OnTerminateCallback;
+import org.mule.runtime.extension.api.OnTerminateInformation;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -44,6 +46,8 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
       .add(AuthenticationHandler.class)
       .add(FlowListener.class)
       .add(StreamingHelper.class)
+      .add(OnTerminateInformation.class)
+      .add(OnTerminateCallback.class)
       .build();
 
   /**
