@@ -735,8 +735,7 @@ public class ApplicationModel {
       requestedComponentModelOptional = muleComponentModel.getInnerComponents().stream()
           .filter(componentModel -> name.equals(componentModel.getNameAttribute()))
           .findAny();
-      if (requestedComponentModelOptional.isPresent())
-      {
+      if (requestedComponentModelOptional.isPresent()) {
         break;
       }
     }
