@@ -151,27 +151,14 @@ public class ModuleFlowProcessingPhase
                                             phaseResultNotifier, template))
             .doOnError(SourceErrorException.class, see -> {
               if (sourceResponseErrorTypeMatcher.match(see.getErrorType())) {
-                Event event = Event.builder(see.getEvent())
-                    .error(ErrorBuilder.builder(see)
-                        .errorType(see.getErrorType())
-                        .build())
-                    .build();
-                MessagingException messagingException = new MessagingException(event, see);
-                exceptionHandler.handleException(messagingException, event);
-                errorConsumer.accept(messagingException);
+                handleSourceError(exceptionHandler, errorConsumer, see);
               }
             })
             .doOnError(MessagingException.class, me -> {
               if (me.getCause() instanceof SourceErrorException
                   && sourceResponseErrorTypeMatcher.match(((SourceErrorException) me.getCause()).getErrorType())) {
-                Event event = Event.builder(((SourceErrorException) me.getCause()).getEvent())
-                    .error(ErrorBuilder.builder(me.getCause())
-                        .errorType(((SourceErrorException) me.getCause()).getErrorType())
-                        .build())
-                    .build();
-                MessagingException messagingException = new MessagingException(event, me.getCause());
-                exceptionHandler.handleException(messagingException, event);
-                errorConsumer.accept(messagingException);
+
+                handleSourceError(exceptionHandler, errorConsumer, ((SourceErrorException) me.getCause()));
               } else {
                 errorConsumer.accept(me);
               }
@@ -252,6 +239,18 @@ public class ModuleFlowProcessingPhase
     } catch (Exception e) {
       phaseResultNotifier.phaseFailure(e);
     }
+  }
+
+  private void handleSourceError(final MessagingExceptionHandler exceptionHandler, Consumer<MessagingException> errorConsumer,
+                                 SourceErrorException see) {
+    Event event = Event.builder(see.getEvent())
+        .error(ErrorBuilder.builder(see)
+            .errorType(see.getErrorType())
+            .build())
+        .build();
+    MessagingException messagingException = new MessagingException(event, see);
+    exceptionHandler.handleException(messagingException, event);
+    errorConsumer.accept(messagingException);
   }
 
   private Event createEvent(ModuleFlowProcessingPhaseTemplate template, MessageProcessContext messageProcessContext,
@@ -467,8 +466,20 @@ public class ModuleFlowProcessingPhase
   }
 
   private void onTerminate(Consumer<Either<Event, MessagingException>> terminateConsumer, Event event, Throwable throwable) {
-    if (throwable != null && throwable instanceof MessagingException) {
-      terminateConsumer.accept(right((MessagingException) throwable));
+    if (throwable != null) {
+      if (throwable instanceof MessagingException) {
+        terminateConsumer.accept(right((MessagingException) throwable));
+      } else if (throwable instanceof SourceErrorException) {
+        SourceErrorException see = (SourceErrorException) throwable;
+        Event eventWithError = Event.builder(see.getEvent())
+            .error(ErrorBuilder.builder(see)
+                .errorType(see.getErrorType())
+                .build())
+            .build();
+        terminateConsumer.accept(right(new MessagingException(eventWithError, see)));
+      } else {
+        terminateConsumer.accept(right(new MessagingException(event, throwable)));
+      }
     } else {
       terminateConsumer.accept(left(event));
     }

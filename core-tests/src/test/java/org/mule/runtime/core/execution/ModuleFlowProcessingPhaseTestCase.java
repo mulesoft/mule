@@ -135,6 +135,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template).sendResponseToClient(any(), any(), any(), any());
     verify(template, never()).sendFailureResponseToClient(any(), any(), any());
+    verify(template).sendAfterTerminateResponseToClient(any(), any());
   }
 
   @Test
@@ -162,6 +163,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
         .handleException(any(), argThat(ErrorTypeInEventMatcher.errorType("MULE", "SOURCE_RESPONSE_GENERATE")));
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
+    verify(template).sendAfterTerminateResponseToClient(any(), any());
   }
 
   @Test
@@ -188,6 +190,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
         .handleException(any(), argThat(ErrorTypeInEventMatcher.errorType("MULE", "SOURCE_RESPONSE_SEND")));
     verify(template).sendResponseToClient(any(), any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
+    verify(template).sendAfterTerminateResponseToClient(any(), any());
   }
 
   @Test
@@ -197,7 +200,6 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     configureFailingFlow(template);
     when(template.getSuccessfulExecutionResponseParametersFunction()).thenReturn(event -> emptyMap());
     when(template.getFailedExecutionResponseParametersFunction()).thenReturn(event -> emptyMap());
-
 
     final PhaseResultNotifier notifier = mock(PhaseResultNotifier.class);
 
@@ -210,7 +212,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
-    // = assert onTerminate
+    verify(template).sendAfterTerminateResponseToClient(any(), any());
   }
 
   @Test
@@ -238,7 +240,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(flow.getExceptionListener()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template, never()).sendFailureResponseToClient(any(), any(), any());
-    // = assert onTerminate
+    verify(template).sendAfterTerminateResponseToClient(any(), any());
   }
 
   @Test
@@ -265,7 +267,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(flow.getExceptionListener()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
-    // = assert onTerminate
+    verify(template).sendAfterTerminateResponseToClient(any(), any());
   }
 
   @Test
@@ -293,7 +295,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template, never()).sendFailureResponseToClient(any(), any(), any());
-    // = assert onTerminate
+    verify(template).sendAfterTerminateResponseToClient(any(), any());
   }
 
   @Test
@@ -320,7 +322,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
-    // = assert onTerminate
+    verify(template).sendAfterTerminateResponseToClient(any(), any());
   }
 
   private void configureSuccessfulFlow(final ModuleFlowProcessingPhaseTemplate template) throws Exception {
