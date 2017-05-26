@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.Exceptions.unwrap;
 import org.mule.runtime.api.exception.MuleException;
@@ -78,7 +79,7 @@ public final class StreamingUtils {
       return value;
     } finally {
       if (cursor != null) {
-        cursor.release();
+        closeQuietly(cursor);
       }
     }
   }

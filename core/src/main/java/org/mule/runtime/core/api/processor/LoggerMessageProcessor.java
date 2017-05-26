@@ -59,7 +59,7 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject
   @Override
   public Event process(Event event) throws MuleException {
     return withCursoredEvent(event, cursored -> {
-      log(event);
+      log(cursored);
       return event;
     });
   }
