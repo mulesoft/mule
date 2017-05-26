@@ -80,7 +80,7 @@ final class ObjectTypeSchemaDelegate {
    * @param paramDsl the {@link ParameterDslConfiguration} associated to the parameter, if any is present.
    * @param description the documentation associated to the parameter
    * @param all the {@link ExplicitGroup group} the generated element should belong to
-   * @param required
+   * @param required whether or not the element should be required
    */
   void generatePojoElement(ObjectType type, DslElementSyntax paramSyntax, ParameterDslConfiguration paramDsl,
                            String description, List<TopLevelElement> all, boolean required) {

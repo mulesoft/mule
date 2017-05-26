@@ -70,8 +70,8 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
                                                                   RECONNECTION_STRATEGY_PARAMETER_NAME,
                                                                   REDELIVERY_POLICY_PARAMETER_NAME,
                                                                   TARGET_PARAMETER_NAME);
-  public static final String XMLNS_ATTRIBUTE_NAMESPACE = "http://www.w3.org/2000/xmlns/";
-  public static final String XMLNS = "xmlns:";
+  private static final String XMLNS_ATTRIBUTE_NAMESPACE = "http://www.w3.org/2000/xmlns/";
+  private static final String XMLNS = "xmlns:";
 
   private final Document doc;
 
