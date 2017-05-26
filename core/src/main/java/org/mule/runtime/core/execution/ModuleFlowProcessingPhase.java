@@ -11,6 +11,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.DefaultEventContext.create;
+import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.rx.Exceptions.UNEXPECTED_EXCEPTION_PREDICATE;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
@@ -141,7 +142,7 @@ public class ModuleFlowProcessingPhase
 
             // TODO MULE-11141 - This is the case of a filtered flow. This will eventually go away.
             if (flowExecutionResponse == null) {
-              flowExecutionResponse = Event.builder(templateEvent).message(of(null)).build();
+              flowExecutionResponse = builder(templateEvent).message(of(null)).build();
             }
 
             Map<String, Object> responseParameters = sourcePolicyResult.getRight().getResponseParameters();
@@ -176,7 +177,8 @@ public class ModuleFlowProcessingPhase
       throws MuleException {
     Message message = template.getMessage();
     Event templateEvent =
-        Event.builder(create(messageProcessContext.getFlowConstruct(), sourceLocation, null, responseCompletion)).message(message)
+        builder(create(messageProcessContext.getFlowConstruct(), sourceLocation, null, responseCompletion)).message(message)
+            .flow(messageProcessContext.getFlowConstruct())
             .build();
 
     if (message.getPayload().getValue() instanceof SourceResultAdapter) {
@@ -195,7 +197,7 @@ public class ModuleFlowProcessingPhase
         message = toMessage(result, result.getMediaType().orElse(ANY), adapter.getCursorProviderFactory(), templateEvent);
       }
 
-      templateEvent = Event.builder(templateEvent).message(message).build();
+      templateEvent = builder(templateEvent).message(message).build();
     }
     return templateEvent;
   }
@@ -236,7 +238,7 @@ public class ModuleFlowProcessingPhase
 
       // TODO MULE-11141 - This is the case of a filtered flow. This will eventually go away.
       if (response == null) {
-        response = Event.builder(request).message(of(null)).build();
+        response = builder(request).message(of(null)).build();
       }
 
       Map<String, Object> responseParameters =
