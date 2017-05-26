@@ -142,7 +142,6 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
 
     protected int expireAndCount()
     {
-        // first we trim the store according to max size
         int expiredEntries = 0;
 
         final long now = System.nanoTime();
@@ -205,6 +204,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
 
         if (isExpirationNeeded())
         {
+            // first we trim the store according to max size
             expiredEntries = trimToMaxSize(store.size());
             expiredEntries += this.expireAndCount();
         }
@@ -215,7 +215,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
     {
         if (maxEntries < 0)
         {
-            return currentSize;
+            return 0;
         }
 
         int excess = (currentSize - maxEntries);
@@ -231,8 +231,9 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
             {
                 logger.debug("Expired " + excess + " excess entries");
             }
+            return excess;
         }
-        return excess;
+        return 0;
     }
 
     @Override
