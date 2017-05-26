@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.object;
 
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -29,7 +27,7 @@ public class CharsetValueResolverParsingDelegate implements ValueResolverParsing
    */
   @Override
   public boolean accepts(MetadataType metadataType) {
-    return Charset.class.equals(getType(metadataType));
+    return getType(metadataType).map(Charset.class::equals).orElse(false);
   }
 
   /**

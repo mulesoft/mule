@@ -117,7 +117,8 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void nonBlockingExecutionType() {
     ExtensionModel extensionModel = createExtension(MarvelExtension.class);
-    OperationModel operation = extensionModel.getConfigurationModel("iron-man").get().getOperationModel("fireMissile").get();
+    OperationModel operation =
+        extensionModel.getConfigurationModel("iron-man-config").get().getOperationModel("fireMissile").get();
     assertThat(operation.isBlocking(), is(false));
     assertThat(operation.getExecutionType(), is(CPU_LITE));
     assertThat(operation.getOutput().getType(), equalTo(typeLoader.load(String.class)));

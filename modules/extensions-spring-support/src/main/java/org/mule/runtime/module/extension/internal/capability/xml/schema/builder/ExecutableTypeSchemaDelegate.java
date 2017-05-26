@@ -11,8 +11,6 @@ import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.GROUP_SUFFIX;
@@ -22,6 +20,8 @@ import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ME
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.OPERATION_SUBSTITUTION_GROUP_SUFFIX;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.UNBOUNDED;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -47,11 +47,12 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.TypeRestrictionModelProperty;
 
-import javax.xml.namespace.QName;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.namespace.QName;
 
 /**
  * Base builder delegation class to generate an XSD schema that describes an executable {@link ComponentModel}
@@ -180,9 +181,9 @@ abstract class ExecutableTypeSchemaDelegate {
 
       @Override
       public void visitObject(ObjectType objectType) {
-        if (NestedProcessor.class.isAssignableFrom(getType(objectType))) {
-          isOperation.set(true);
-        }
+        getType(objectType)
+            .filter(NestedProcessor.class::isAssignableFrom)
+            .ifPresent(clazz -> isOperation.set(true));
       }
 
       @Override

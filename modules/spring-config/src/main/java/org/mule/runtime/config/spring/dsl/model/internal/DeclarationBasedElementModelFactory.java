@@ -444,7 +444,8 @@ class DeclarationBasedElementModelFactory {
       @Override
       public void visitSimpleValue(ParameterSimpleValue text) {
         checkArgument(paramDsl.supportsAttributeDeclaration() || isContent(parameterModel) || isText(parameterModel),
-                      "Simple values can only be declared for parameters of simple type, or those with Content role");
+                      "Simple values can only be declared for parameters of simple type, or those with Content role."
+                          + " Invalid declaration for parameter: " + parameterName);
         createSimpleParameter(text, paramDsl, parentConfig, parentElement, parameterModel, true);
       }
 
@@ -458,7 +459,7 @@ class DeclarationBasedElementModelFactory {
         // the parameter is of list type, so we have nested elements
         // we'll resolve this based on the type of the parameter, since no
         // further model information is available
-        createList(list, paramDsl, (ArrayType) parameterModel.getType(), parentConfig, parentElement);
+        createList(list, paramDsl, parameterModel, (ArrayType) parameterModel.getType(), parentConfig, parentElement);
       }
 
       @Override
@@ -526,7 +527,7 @@ class DeclarationBasedElementModelFactory {
 
                 @Override
                 public void visitListValue(ParameterListValue list) {
-                  createList(list, valueDsl, (ArrayType) valueType, entryConfigBuilder, entryElement);
+                  createList(list, valueDsl, valueType, (ArrayType) valueType, entryConfigBuilder, entryElement);
                 }
 
                 @Override
@@ -674,22 +675,7 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       public void visitListValue(ParameterListValue list) {
-        DslElementModel.Builder<MetadataType> itemElement = DslElementModel.<MetadataType>builder()
-            .withModel(itemValueType)
-            .withDsl(itemDsl);
-
-        ComponentConfiguration.Builder itemConfig = ComponentConfiguration.builder()
-            .withIdentifier(asIdentifier(itemDsl));
-
-        MetadataType genericType = ((ArrayType) itemValueType).getType();
-        itemDsl.getGeneric(genericType)
-            .ifPresent(genericDsl -> list.getValues()
-                .forEach(value -> createListItemConfig(genericType, value, genericDsl, itemConfig, itemElement)));
-
-        ComponentConfiguration result = itemConfig.build();
-
-        parentConfig.withNestedComponent(result);
-        parentElement.containing(itemElement.withConfig(result).build());
+        createList(list, itemDsl, itemValueType, (ArrayType) itemValueType, parentConfig, parentElement);
       }
 
       @Override
@@ -744,7 +730,7 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       public void visitListValue(ParameterListValue list) {
-        createList(list, fieldDsl, (ArrayType) fieldType, objectConfig, objectElement);
+        createList(list, fieldDsl, fieldType, (ArrayType) fieldType, objectConfig, objectElement);
       }
 
       @Override
@@ -767,12 +753,13 @@ class DeclarationBasedElementModelFactory {
 
   private void createList(ParameterListValue list,
                           DslElementSyntax listDsl,
+                          Object model,
                           ArrayType listType,
                           ComponentConfiguration.Builder parentConfig,
                           DslElementModel.Builder parentElement) {
 
-    final DslElementModel.Builder<MetadataType> listElement = DslElementModel.<MetadataType>builder()
-        .withModel(listType)
+    final DslElementModel.Builder listElement = DslElementModel.builder()
+        .withModel(model)
         .withDsl(listDsl);
 
     final ComponentConfiguration.Builder listConfig = ComponentConfiguration.builder()
