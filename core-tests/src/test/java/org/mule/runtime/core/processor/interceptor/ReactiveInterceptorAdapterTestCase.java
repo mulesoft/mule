@@ -28,6 +28,19 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.interception.*;
+import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -44,20 +57,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
-
-import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.interception.*;
-import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
-import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
 import com.google.common.collect.ImmutableMap;
 
 /*

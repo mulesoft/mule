@@ -14,12 +14,6 @@ import static org.mule.runtime.core.api.context.notification.EnrichedNotificatio
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
@@ -34,6 +28,12 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.*;
 import org.mule.runtime.core.message.ErrorBuilder;
+
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.Callable;
 
 /**
  * Mule exception utilities.

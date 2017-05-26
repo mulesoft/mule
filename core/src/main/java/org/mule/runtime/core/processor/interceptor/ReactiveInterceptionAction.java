@@ -7,6 +7,10 @@
 
 package org.mule.runtime.core.processor.interceptor;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static org.mule.runtime.core.util.ExceptionUtils.getErrorFromFailingProcessor;
+import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.interception.InterceptionException;
@@ -19,10 +23,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.concurrent.CompletableFuture;
-
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.mule.runtime.core.util.ExceptionUtils.getErrorFromFailingProcessor;
-import static reactor.core.publisher.Mono.just;
 
 /**
  * Implementation of {@link InterceptionAction} that does the needed hooks with {@code Reactor} into the pipeline.
