@@ -19,6 +19,7 @@ public class HttpClientConfiguration
     private final int maxConnections;
     private final boolean usePersistentConnections;
     private final int connectionIdleTimeout;
+    private final boolean streaming;
     private final int responseBufferSize;
     private final String threadNamePrefix;
     private final String ownerName;
@@ -28,9 +29,12 @@ public class HttpClientConfiguration
     private final Integer kernelCoreSize;
     private final Integer selectorRunnersCount;
 
-    private HttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig, TcpClientSocketProperties clientSocketProperties,
-            int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout, int responseBufferSize, String threadNamePrefix, String ownerName,
-            Integer maxWorkerPoolSize, Integer workerCoreSize, Integer maxKernelPoolSize, Integer kernelCoreSize, Integer selectorRunnersCount)
+    private HttpClientConfiguration(TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig,
+                                    TcpClientSocketProperties clientSocketProperties,
+                                    int maxConnections, boolean usePersistentConnections, int connectionIdleTimeout,
+                                    boolean streaming, int responseBufferSize, String threadNamePrefix, String ownerName,
+                                    Integer maxWorkerPoolSize, Integer workerCoreSize, Integer maxKernelPoolSize,
+                                    Integer kernelCoreSize, Integer selectorRunnersCount)
     {
         this.tlsContextFactory = tlsContextFactory;
         this.proxyConfig = proxyConfig;
@@ -38,6 +42,7 @@ public class HttpClientConfiguration
         this.maxConnections = maxConnections;
         this.usePersistentConnections = usePersistentConnections;
         this.connectionIdleTimeout = connectionIdleTimeout;
+        this.streaming = streaming;
         this.responseBufferSize = responseBufferSize;
         this.threadNamePrefix = threadNamePrefix;
         this.ownerName = ownerName;
@@ -76,6 +81,11 @@ public class HttpClientConfiguration
     public int getConnectionIdleTimeout()
     {
         return connectionIdleTimeout;
+    }
+
+    public boolean isStreaming()
+    {
+        return streaming;
     }
 
     public int getResponseBufferSize() {
@@ -125,6 +135,7 @@ public class HttpClientConfiguration
         private int maxConnections;
         private boolean usePersistentConnections;
         private int connectionIdleTimeout;
+        private boolean streaming;
         private int responseBufferSize;
         private String threadNamePrefix;
         private String ownerName;
@@ -167,6 +178,12 @@ public class HttpClientConfiguration
         public Builder setConnectionIdleTimeout(int connectionIdleTimeout)
         {
             this.connectionIdleTimeout = connectionIdleTimeout;
+            return this;
+        }
+
+        public Builder setStreaming(boolean streaming)
+        {
+            this.streaming = streaming;
             return this;
         }
 
@@ -220,7 +237,7 @@ public class HttpClientConfiguration
         public HttpClientConfiguration build()
         {
             return new HttpClientConfiguration(tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
-                    usePersistentConnections, connectionIdleTimeout, responseBufferSize, threadNamePrefix, ownerName,
+                    usePersistentConnections, connectionIdleTimeout, streaming, responseBufferSize, threadNamePrefix, ownerName,
                     maxWorkerPoolSize, workerCoreSize, maxKernelPoolSize, kernelCoreSize, selectorRunnersCount);
         }
     }
