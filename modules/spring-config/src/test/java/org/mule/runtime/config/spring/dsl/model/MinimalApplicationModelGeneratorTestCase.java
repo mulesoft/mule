@@ -177,7 +177,8 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
     assertThat(minimalModel.findTopLevelNamedComponent("flowWithSource").get().getInnerComponents().size(), is(2));
     assertThat(minimalModel.findTopLevelNamedComponent("flowWithSource").get().getInnerComponents().get(1).getIdentifier(),
                is(buildFromStringRepresentation("mule:set-payload")));
-    assertThat(minimalModel.findTopLevelNamedComponent("flowWithSource").get().getInnerComponents().get(0).isEnabled(), is(false));
+    assertThat(minimalModel.findTopLevelNamedComponent("flowWithSource").get().getInnerComponents().get(0).isEnabled(),
+               is(false));
     assertThat(minimalModel.findTopLevelNamedComponent("flowWithSource").get().getInnerComponents().get(1).isEnabled(), is(true));
   }
 
@@ -196,9 +197,11 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
   public void nameAttributeOnNonTopLevelElementIsAllowed() throws Exception {
     MinimalApplicationModelGenerator generator = createGeneratorForConfig("low-level-name-attribute-config.xml");
     ApplicationModel minimalModel =
-            generator.getMinimalModel(builder().globalName("flowWithLowLevelNameAttribute").addProcessorsPart().addIndexPart(0).build());
+        generator
+            .getMinimalModel(builder().globalName("flowWithLowLevelNameAttribute").addProcessorsPart().addIndexPart(0).build());
     assertThat(minimalModel.findTopLevelNamedComponent("flowWithLowLevelNameAttribute").isPresent(), is(true));
-    assertThat(minimalModel.findTopLevelNamedComponent("flowWithLowLevelNameAttribute").get().getInnerComponents().get(0).getNameAttribute().equals("asyncName"), is(true));
+    assertThat(minimalModel.findTopLevelNamedComponent("flowWithLowLevelNameAttribute").get().getInnerComponents().get(0)
+        .getNameAttribute().equals("asyncName"), is(true));
   }
 
   private MinimalApplicationModelGenerator createGeneratorForConfig(String... configFileName) throws Exception {
