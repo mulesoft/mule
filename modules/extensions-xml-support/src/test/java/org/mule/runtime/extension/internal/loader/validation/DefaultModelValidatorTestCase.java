@@ -70,6 +70,12 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
     getExtensionModelFrom("validation/module-property-required-default.xml");
   }
 
+  @Test
+  public void wrongNamingForXmlThrowsException() {
+    exception.expectMessage("property with spaces");
+    getExtensionModelFrom("validation/module-not-xml-valid-names.xml");
+  }
+
   private ExtensionModel getExtensionModelFrom(String modulePath) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put(RESOURCE_XML, modulePath);

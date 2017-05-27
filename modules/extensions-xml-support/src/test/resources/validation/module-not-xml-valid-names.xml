@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-not-xml-valid-names"
+        minMuleVersion="4.0.0"
+
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <property name="property with spaces" type="string"/>
+    <operation name="operation with spaces">
+        <parameters>
+            <parameter name="parameters with spaces" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[parameters.value]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+</module>

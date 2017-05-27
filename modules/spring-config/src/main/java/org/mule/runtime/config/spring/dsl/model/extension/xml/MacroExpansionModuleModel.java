@@ -335,13 +335,14 @@ public class MacroExpansionModuleModel {
     String configParameter = operationRefModel.getParameters().get(MODULE_OPERATION_CONFIG_REF);
     if (configParameter != null) {
       ComponentModel configRefComponentModel = applicationModel.getRootComponentModel().getInnerComponents().stream()
-          .filter(componentModel -> componentModel.getIdentifier().getNamespace().equals(extensionModel.getName())
+          .filter(componentModel -> componentModel.getIdentifier().getNamespace()
+              .equals(extensionModel.getXmlDslModel().getPrefix())
               && componentModel.getIdentifier().getName().equals(MODULE_CONFIG_GLOBAL_ELEMENT_NAME)
               && configParameter.equals(componentModel.getParameters().get(NAME_ATTRIBUTE)))
           .findFirst()
           .orElseThrow(() -> new IllegalArgumentException(
                                                           format("There's no <%s:config> named [%s] in the current mule app",
-                                                                 extensionModel.getName(), configParameter)));
+                                                                 extensionModel.getXmlDslModel().getPrefix(), configParameter)));
       valuesMap
           .putAll(extractParameters(configRefComponentModel,
                                     extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).get()
