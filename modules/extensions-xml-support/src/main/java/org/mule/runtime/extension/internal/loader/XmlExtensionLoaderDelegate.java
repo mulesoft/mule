@@ -52,6 +52,7 @@ import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
 import org.mule.runtime.core.config.artifact.DefaultArtifactProperties;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
@@ -68,6 +69,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -105,6 +107,8 @@ final class XmlExtensionLoaderDelegate {
   private static final String PASSWORD = "password";
   private static final String ROLE = "role";
   private static final String ATTRIBUTE_USE = "use";
+
+  private static final Pattern VALID_XML_NAME = Pattern.compile("[A-Za-z]+[a-zA-Z0-9\\-_]*");
 
   /**
    * ENUM used to discriminate which type of {@link ParameterDeclarer} has to be created (required or not).
@@ -305,7 +309,7 @@ final class XmlExtensionLoaderDelegate {
   }
 
   private void extractOperationExtension(HasOperationDeclarer declarer, ComponentModel operationModel) {
-    String operationName = operationModel.getNameAttribute();
+    String operationName = assertValidName(operationModel.getNameAttribute());
     OperationDeclarer operationDeclarer = declarer.withOperation(operationName);
     ComponentModel bodyComponentModel = operationModel.getInnerComponents()
         .stream()
@@ -317,6 +321,15 @@ final class XmlExtensionLoaderDelegate {
     operationDeclarer.describedAs(getDescription(operationModel));
     extractOperationParameters(operationDeclarer, operationModel);
     extractOutputType(operationDeclarer, operationModel);
+  }
+
+  //TODO MULE-12619: until the internals of ExtensionModel doesn't validate or corrects the name, this is the custom validation
+  private String assertValidName(String name) {
+    if (!VALID_XML_NAME.matcher(name).matches()) {
+      throw new IllegalModelDefinitionException(format("The name being used '%s' is not XML valid, it must start with a letter and can be followed by any letter, number or -, _. ",
+                                                       name));
+    }
+    return name;
   }
 
   private void extractOperationParameters(OperationDeclarer operationDeclarer, ComponentModel componentModel) {
@@ -370,7 +383,7 @@ final class XmlExtensionLoaderDelegate {
    * @return the {@link ParameterDeclarer}, being created as required or optional with a default value if applies.
    */
   private ParameterDeclarer getParameterDeclarer(ParameterizedDeclarer parameterizedDeclarer, Map<String, String> parameters) {
-    final String parameterName = parameters.get(PARAMETER_NAME);
+    final String parameterName = assertValidName(parameters.get(PARAMETER_NAME));
     final String parameterDefaultValue = parameters.get(PARAMETER_DEFAULT_VALUE);
     final UseEnum use = UseEnum.valueOf(parameters.get(ATTRIBUTE_USE));
     if (UseEnum.REQUIRED.equals(use) && isNotBlank(parameterDefaultValue)) {
