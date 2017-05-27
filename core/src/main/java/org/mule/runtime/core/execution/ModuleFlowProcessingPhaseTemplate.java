@@ -55,14 +55,10 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
    * @param parameters the resolved set of parameters required to send the response.
    * @param errorResponseParametersFunction function that generates the error parameters to be sent in the case of a failure.
    * @param responseCompletionCallback callback to be used for notifying the result of the operation
-   * @throws Exception exception thrown when processing the message to send the response. If there's a failure when writing the
-   *         response using the underlying transport or connector then the exception to throw must be a
-   *         {@link ResponseDispatchException}.
    */
   void sendResponseToClient(Event flowExecutionResponse, Map<String, Object> parameters,
                             Function<Event, Map<String, Object>> errorResponseParametersFunction,
-                            ResponseCompletionCallback responseCompletionCallback)
-      throws Exception;
+                            ResponseCompletionCallback responseCompletionCallback);
 
 
   /**
