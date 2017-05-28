@@ -119,11 +119,11 @@ public interface OAuthDancerBuilder<D> {
    * be used when calling dancer methods that receive the {@code resourceOwnerId} as a parameter, and will be used when sending
    * data out as part of the OAuth dance or the token refresh.
    * 
-   * @param resourceOwnerIdStoreTransformer a transformer to apply to the {@code resourceOwnerId} before using it to access the
+   * @param resourceOwnerIdTransformer a transformer to apply to the {@code resourceOwnerId} before using it to access the
    *        provided {@code tokensStore}.
    * @return this builder
    */
-  OAuthDancerBuilder<D> resourceOwnerIdStoreTransformer(Function<String, String> resourceOwnerIdStoreTransformer);
+  OAuthDancerBuilder<D> resourceOwnerIdTransformer(Function<String, String> resourceOwnerIdTransformer);
 
   /**
    * Uses the configuration provided to this builder to create a new dancer.
