@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.internal.lock;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lock.LockProvider;
 
 import java.util.concurrent.locks.Lock;
@@ -23,19 +24,22 @@ public class MuleLockFactory implements LockFactory, MuleContextAware, Initialis
   private LockProvider lockProvider;
   private MuleContext muleContext;
 
+  @Override
   public synchronized Lock createLock(String lockId) {
     return new LockAdapter(lockId, lockGroup);
   }
 
   @Override
   public void dispose() {
-    lockGroup.dispose();
+    if (lockGroup != null) {
+      lockGroup.dispose();
+    }
   }
 
   @Override
   public void initialise() throws InitialisationException {
     if (lockProvider == null) {
-      lockProvider = muleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_PROVIDER);
+      lockProvider = muleContext.getRegistry().get(OBJECT_LOCK_PROVIDER);
     }
     lockGroup = new InstanceLockGroup(lockProvider);
   }

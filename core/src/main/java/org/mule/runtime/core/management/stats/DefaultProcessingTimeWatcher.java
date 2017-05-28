@@ -18,6 +18,7 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, MuleContextAware {
@@ -26,6 +27,7 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
   private final Map<ProcessingTimeReference, Object> refs = new ConcurrentHashMap<ProcessingTimeReference, Object>();
   private MuleContext muleContext;
   private Scheduler scheduler;
+  private Future<?> checkerTask;
 
   @Override
   public void addProcessingTime(ProcessingTime processingTime) {
@@ -36,12 +38,15 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
   public void start() throws MuleException {
     scheduler = muleContext.getSchedulerService().customScheduler(muleContext.getSchedulerBaseConfig()
         .withName("processing.time.monitor").withMaxConcurrentTasks(1).withShutdownTimeout(0, MILLISECONDS));
-    scheduler.submit(new ProcessingTimeChecker());
+    checkerTask = scheduler.submit(new ProcessingTimeChecker());
   }
 
   @Override
   public void stop() throws MuleException {
-    scheduler.stop();
+    if (scheduler != null) {
+      checkerTask.cancel(true);
+      scheduler.stop();
+    }
     refs.clear();
   }
 
@@ -57,16 +62,18 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
      */
     @Override
     public void run() {
-      try {
-        ProcessingTimeReference ref = (ProcessingTimeReference) queue.remove();
-        refs.remove(ref);
+      while (!currentThread().isInterrupted()) {
+        try {
+          ProcessingTimeReference ref = (ProcessingTimeReference) queue.remove();
+          refs.remove(ref);
 
-        FlowConstructStatistics stats = ref.getStatistics();
-        if (stats.isEnabled()) {
-          stats.addCompleteFlowExecutionTime(ref.getAccumulator().longValue());
+          FlowConstructStatistics stats = ref.getStatistics();
+          if (stats.isEnabled()) {
+            stats.addCompleteFlowExecutionTime(ref.getAccumulator().longValue());
+          }
+        } catch (InterruptedException ex) {
+          currentThread().interrupt();
         }
-      } catch (InterruptedException ex) {
-        currentThread().interrupt();
       }
     }
   }
