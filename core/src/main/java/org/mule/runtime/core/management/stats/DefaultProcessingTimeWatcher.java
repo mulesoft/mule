@@ -62,8 +62,8 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
      */
     @Override
     public void run() {
-      try {
-        while (true) {
+      while (!currentThread().isInterrupted()) {
+        try {
           ProcessingTimeReference ref = (ProcessingTimeReference) queue.remove();
           refs.remove(ref);
 
@@ -71,9 +71,9 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
           if (stats.isEnabled()) {
             stats.addCompleteFlowExecutionTime(ref.getAccumulator().longValue());
           }
+        } catch (InterruptedException ex) {
+          currentThread().interrupt();
         }
-      } catch (InterruptedException ex) {
-        currentThread().interrupt();
       }
     }
   }
