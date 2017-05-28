@@ -10,7 +10,7 @@
     <flow name="main">
         <scheduler>
             <scheduling-strategy>
-                <fixed-frequency-scheduler frequency="1000"/>
+                <fixed-frequency frequency="1000"/>
             </scheduling-strategy>
         </scheduler>
         <set-payload value=""/>

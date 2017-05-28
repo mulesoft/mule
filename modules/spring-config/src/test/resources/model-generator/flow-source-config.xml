@@ -6,7 +6,7 @@
     <flow name="flowWithSource">
         <scheduler>
             <scheduling-strategy>
-                <fixed-frequency-scheduler/>
+                <fixed-frequency/>
             </scheduling-strategy>
         </scheduler>
         <set-payload value="a value"/>
