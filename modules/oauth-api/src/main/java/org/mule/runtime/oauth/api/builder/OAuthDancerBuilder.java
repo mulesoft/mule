@@ -11,6 +11,7 @@ import org.mule.runtime.http.api.client.HttpClient;
 
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Builder that allows to configure the common attributes for any grant type.
@@ -107,6 +108,22 @@ public interface OAuthDancerBuilder<D> {
    * @return this builder
    */
   OAuthDancerBuilder<D> customParametersExtractorsExprs(Map<String, String> customParamsExtractorsExprs);
+
+  /**
+   * Allows to partition a {@code tokensStore} and reuse it among different dancers, as long as each dancer has its own proper
+   * {@code resourceOwnerIdStoreTransformer} and ensures there can be no collissions between the transformed
+   * {@code respurceOwnerIds} for different dancers.
+   * <p>
+   * Providing this transformer only affects how the dancer puts the contexts associated to a {@code reosurceOwner} in the
+   * {@code tokensStore} and the name of the locks generated from the {@code lockProvider} The un-transformed value still has to
+   * be used when calling dancer methods that receive the {@code resourceOwnerId} as a parameter, and will be used when sending
+   * data out as part of the OAuth dance or the token refresh.
+   * 
+   * @param resourceOwnerIdTransformer a transformer to apply to the {@code resourceOwnerId} before using it to access the
+   *        provided {@code tokensStore}.
+   * @return this builder
+   */
+  OAuthDancerBuilder<D> resourceOwnerIdTransformer(Function<String, String> resourceOwnerIdTransformer);
 
   /**
    * Uses the configuration provided to this builder to create a new dancer.
