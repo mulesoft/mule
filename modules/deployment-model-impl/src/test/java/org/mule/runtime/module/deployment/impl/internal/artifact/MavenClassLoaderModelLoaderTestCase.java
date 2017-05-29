@@ -36,7 +36,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-//@Ignore("MULE-12547: Flaky")
 public class MavenClassLoaderModelLoaderTestCase {
 
   public static final String MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION = "muleRuntimeConfig.maven.repositoryLocation";
@@ -59,9 +58,13 @@ public class MavenClassLoaderModelLoaderTestCase {
 
   @Test
   public void noMavenConfiguration() throws Exception {
+    Map<String, String> properties = getMuleFreeSystemProperties();
+    GlobalConfigLoader.reset(); //Change local repository path
     expectedException.expect(RuntimeException.class);
     expectedException.expectCause(instanceOf(DependencyCollectionException.class));
-    mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP);
+    testWithSystemProperties(properties, () -> {
+      mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP);
+    });
   }
 
   @Test
