@@ -594,13 +594,13 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withWrapperIdentifier("scheduling-strategy").build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("fixed-frequency-scheduler")
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("fixed-frequency")
         .withTypeDefinition(fromType(FixedFrequencyScheduler.class))
         .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
         .withSetterParameterDefinition("startDelay", fromSimpleParameter("startDelay").build())
         .withSetterParameterDefinition("timeUnit", fromSimpleParameter("timeUnit").build()).build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("cron-scheduler")
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("cron")
         .withTypeDefinition(fromType(CronScheduler.class))
         .withSetterParameterDefinition("expression", fromSimpleParameter("expression").build())
         .withSetterParameterDefinition("timeZone", fromSimpleParameter("timeZone").build()).build());

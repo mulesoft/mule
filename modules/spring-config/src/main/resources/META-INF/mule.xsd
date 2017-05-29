@@ -2529,7 +2529,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="fixed-frequency-scheduler" type="fixedSchedulerType" substitutionGroup="abstract-scheduling-strategy"/>
+    <xsd:element name="fixed-frequency" type="fixedSchedulerType" substitutionGroup="abstract-scheduling-strategy"/>
 
     <xsd:element name="scheduler" type="schedulerMessageSourceType" substitutionGroup="abstract-message-source">
         <xsd:annotation>
@@ -2549,7 +2549,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="cron-scheduler" type="cronSchedulerType" substitutionGroup="abstract-scheduling-strategy"/>
+    <xsd:element name="cron" type="cronSchedulerType" substitutionGroup="abstract-scheduling-strategy"/>
 
     <xsd:complexType name="cronSchedulerType">
         <xsd:complexContent>

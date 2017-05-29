@@ -150,6 +150,7 @@ import org.mule.runtime.core.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.security.UsernamePasswordAuthenticationFilter;
 import org.mule.runtime.core.security.filters.MuleEncryptionEndpointSecurityFilter;
+import org.mule.runtime.core.source.scheduler.schedule.CronScheduler;
 import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
 import org.mule.runtime.core.transaction.XaTransactionFactory;
 import org.mule.runtime.core.transformer.codec.Base64Decoder;
@@ -363,9 +364,10 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
                                  new ChildDefinitionParser("messageSource", CompositeMessageSourceFactoryBean.class));
 
     registerBeanDefinitionParser("scheduler", new ChildEmbeddedDefinitionParser(SchedulingMessageSourceFactoryBean.class));
-    registerBeanDefinitionParser("fixed-frequency-scheduler",
+    registerBeanDefinitionParser("fixed-frequency",
                                  new ChildDefinitionParser("scheduler", FixedFrequencyScheduler.class));
-
+    registerBeanDefinitionParser("cron",
+                                 new ChildDefinitionParser("scheduler", CronScheduler.class));
 
     registerBeanDefinitionParser("entry-point-resolver-set",
                                  new ChildDefinitionParser("entryPointResolverSet", DefaultEntryPointResolverSet.class));

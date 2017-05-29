@@ -30,7 +30,7 @@
     <flow name="pollingUMO_authenticated">
         <scheduler>
             <scheduling-strategy>
-                <fixed-frequency-scheduler frequency="2000"/>
+                <fixed-frequency frequency="2000"/>
             </scheduling-strategy>
         </scheduler>
         <http:request path="/" config-ref="secureRequestConfig">
@@ -45,7 +45,7 @@
     <flow name="pollingUMO_not_authenticated">
         <scheduler>
             <scheduling-strategy>
-                <fixed-frequency-scheduler frequency="2000"/>
+                <fixed-frequency frequency="2000"/>
             </scheduling-strategy>
         </scheduler>
         <http:request path="/" config-ref="requestConfig">
