@@ -183,7 +183,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -442,7 +467,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Streaming"
+                    "tabName": "Advanced"
                   },
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
@@ -900,7 +925,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Streaming"
+                    "tabName": "Advanced"
                   },
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
@@ -1371,7 +1396,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Advanced"
+                    "tabName": "Redelivery"
                   },
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
@@ -1572,7 +1597,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Streaming"
+                    "tabName": "Advanced"
                   },
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
@@ -1806,7 +1831,32 @@
         {
           "blocking": false,
           "executionType": "CPU_LITE",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "MARVEL",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -2377,7 +2427,72 @@
   ],
   "connectionProviders": [],
   "messageSources": [],
-  "errors": [],
+  "errors": [
+    {
+      "type": "CONNECTIVITY",
+      "namespace": "MARVEL",
+      "parent": {
+        "type": "CONNECTIVITY",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    },
+    {
+      "type": "CONNECTIVITY",
+      "namespace": "MULE",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "RETRY_EXHAUSTED",
+      "namespace": "MARVEL",
+      "parent": {
+        "type": "RETRY_EXHAUSTED",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    },
+    {
+      "type": "ANY",
+      "namespace": "MARVEL",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "ANY",
+      "namespace": "MULE"
+    },
+    {
+      "type": "RETRY_EXHAUSTED",
+      "namespace": "MULE",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "CUSTOM_ERROR",
+      "namespace": "MARVEL",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MARVEL",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    }
+  ],
   "modelProperties": {},
   "types": [
     {

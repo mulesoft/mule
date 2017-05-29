@@ -2103,7 +2103,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Streaming"
+                    "tabName": "Advanced"
                   },
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
@@ -3750,7 +3750,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Advanced"
+                    "tabName": "Redelivery"
                   },
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
@@ -3951,7 +3951,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Streaming"
+                    "tabName": "Advanced"
                   },
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
@@ -5038,7 +5038,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "tabName": "Streaming"
+                "tabName": "Advanced"
               },
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
@@ -5336,7 +5336,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "tabName": "Streaming"
+                "tabName": "Advanced"
               },
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
@@ -6450,7 +6450,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "tabName": "Streaming"
+                "tabName": "Advanced"
               },
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
@@ -8358,7 +8358,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "tabName": "Streaming"
+                "tabName": "Advanced"
               },
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
@@ -9466,7 +9466,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "tabName": "Streaming"
+                "tabName": "Advanced"
               },
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
@@ -10309,7 +10309,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "tabName": "Advanced"
+                "tabName": "Redelivery"
               },
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
