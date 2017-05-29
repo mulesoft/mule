@@ -24,6 +24,7 @@ import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.util.IOUtils.toByteArray;
+import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
@@ -56,6 +57,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
+
+  private static final int GC_POLLING_TIMEOUT = 10000;
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
@@ -314,7 +317,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
     DataType.builder().type(custom.loadClass(Message.class.getName())).build();
     custom = null;
 
-    new PollingProber(10000, 100).check(new JUnitLambdaProbe(() -> {
+    new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       System.gc();
       assertThat(clRef.isEnqueued(), is(true));
       return true;
