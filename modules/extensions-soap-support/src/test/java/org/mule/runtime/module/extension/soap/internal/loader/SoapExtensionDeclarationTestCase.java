@@ -105,7 +105,7 @@ public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDecla
     ParameterProber[] probers = new ParameterProber[] {
         new ParameterProber(OPERATION_PARAM, StringType.class),
         new ParameterProber(SERVICE_PARAM, StringType.class),
-        new ParameterProber(REQUEST_PARAM, "#[payload]", BinaryType.class, false),
+        new ParameterProber(REQUEST_PARAM, null, BinaryType.class, false),
         new ParameterProber(HEADERS_PARAM, null, BinaryType.class, false),
         new ParameterProber(TRANSPORT_HEADERS_PARAM, null, ObjectType.class, false),
         new ParameterProber(ATTACHMENTS_PARAM, null, ObjectType.class, false),

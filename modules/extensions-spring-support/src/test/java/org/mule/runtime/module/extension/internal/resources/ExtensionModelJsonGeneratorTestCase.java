@@ -10,9 +10,9 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
@@ -37,6 +37,7 @@ import org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModel
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -123,10 +124,9 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
                                                                           new ExtensionJsonGeneratorTestUnit(javaLoader,
                                                                                                              SubTypesMappingConnector.class,
                                                                                                              "subtypes.json"),
-                                                                          // TODO MULE-12570 - Fix extension model generation
-                                                                          // new ExtensionJsonGeneratorTestUnit(javaLoader,
-                                                                          // MarvelExtension.class,
-                                                                          // "marvel.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             MarvelExtension.class,
+                                                                                                             "marvel.json"),
                                                                           new ExtensionJsonGeneratorTestUnit(soapLoader,
                                                                                                              FootballSoapExtension.class,
                                                                                                              "soap.json"),

@@ -81,7 +81,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Transactions"
+                    "tabName": "Advanced"
                   },
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
@@ -211,7 +211,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Transactions"
+                    "tabName": "Advanced"
                   },
                   "name": "action",
                   "description": "The type of joining action that operations can take regarding transactions.",
@@ -330,7 +330,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Transactions"
+                    "tabName": "Advanced"
                   },
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
@@ -435,7 +435,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Transactions"
+                    "tabName": "Advanced"
                   },
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
@@ -514,7 +514,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Transactions"
+                    "tabName": "Advanced"
                   },
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
@@ -593,7 +593,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Transactions"
+                    "tabName": "Advanced"
                   },
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
@@ -672,7 +672,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Transactions"
+                    "tabName": "Advanced"
                   },
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
@@ -1394,7 +1394,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Transactions"
+                    "tabName": "Advanced"
                   },
                   "name": "transactionalAction",
                   "description": "The type of beginning action that sources can take regarding transactions.",
@@ -1510,7 +1510,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Advanced"
+                    "tabName": "Redelivery"
                   },
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
@@ -1767,7 +1767,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Transactions"
+                    "tabName": "Advanced"
                   },
                   "name": "transactionalAction",
                   "description": "The type of beginning action that sources can take regarding transactions.",
@@ -1885,7 +1885,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "tabName": "Advanced"
+                    "tabName": "Redelivery"
                   },
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
@@ -2164,7 +2164,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "tabName": "Transactions"
+                "tabName": "Advanced"
               },
               "name": "transactionalAction",
               "description": "The type of joining action that operations can take regarding transactions.",
@@ -2330,7 +2330,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "tabName": "Streaming"
+                "tabName": "Advanced"
               },
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
