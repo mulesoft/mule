@@ -75,9 +75,7 @@ public class ContainerClassLoaderFactory {
    * Boot packages define all the prefixes that must be loaded from the container classLoader without being filtered
    */
   public static final Set<String> BOOT_PACKAGES =
-      ImmutableSet.of(// Java EE
-                      "org.apache.xerces",
-                      // MULE-10194 Mechanism to add custom boot packages to be exported by the container
+      ImmutableSet.of(// MULE-10194 Mechanism to add custom boot packages to be exported by the container
                       "com.yourkit");
 
   private final ModuleRepository moduleRepository;
