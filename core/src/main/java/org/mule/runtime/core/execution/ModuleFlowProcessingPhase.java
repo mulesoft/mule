@@ -227,8 +227,6 @@ public class ModuleFlowProcessingPhase
     MessagingException messagingException = sourceErrorToMessagingException(see);
     exceptionHandler.handleException(messagingException, messagingException.getEvent());
     errorConsumer.accept(messagingException);
-
-    // throw new SourceErrorException(messagingException.getEvent(), see.getErrorType(), see.getCause());
   }
 
   private Event createEvent(ModuleFlowProcessingPhaseTemplate template, MessageProcessContext messageProcessContext,
