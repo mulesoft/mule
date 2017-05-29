@@ -264,7 +264,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
     // write set-variable
     elementModel.findElement(buildFromStringRepresentation("mule:set-variables"))
         .ifPresent(variables -> {
-          Element variablesList = doc.createElementNS(EE_NAMESPACE, EE_PREFIX + ":set-variables");
+          Element variablesList = doc.createElementNS(EE_NAMESPACE, EE_PREFIX + ":variables");
           transform.appendChild(variablesList);
 
           variables.getContainedElements()
