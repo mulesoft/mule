@@ -167,19 +167,18 @@ public class ModuleFlowProcessingPhase
         SourcePolicy policy = policyManager.createSourcePolicyInstance(sourceLocation, templateEvent, nextOperation, template);
 
         try {
-          Either<FailureSourcePolicyResult, SuccessSourcePolicyResult> sourcePolicyResult = policy.process(templateEvent);
+          Consumer<FailureSourcePolicyResult> onFailureFunction = failureSourcePolicyResult -> {
+            final MessagingException messagingException = failureSourcePolicyResult.getMessagingException();
+            try {
+              final ErrorType errorType = messagingException.getEvent().getError().orElseGet(() -> ErrorBuilder
+                  .builder(messagingException.getCause()).errorType(sourceResponseGenerateErrorType).build())
+                  .getErrorType();
 
-          Consumer<MessagingException> onExceptionFunction = messagingException -> {
-            messagingException
-                .setProcessedEvent(createErrorEvent(messagingException.getEvent(), messageSource, messagingException,
-                                                    muleContext.getErrorTypeLocator()));
-            fireNotification(messageSource, messagingException.getEvent(), messageProcessContext.getFlowConstruct(),
-                             MESSAGE_ERROR_RESPONSE);
-
-            template.sendFailureResponseToClient(messagingException,
-                                                 sourcePolicyResult.getLeft().getErrorResponseParameters(),
-                                                 createSendFailureResponseCompletationCallback(phaseResultNotifier,
-                                                                                               sourceErrorResponseSendErrorType));
+              errorConsumer.accept(messagingException);
+              throw new SourceErrorException(messagingException.getEvent(), errorType, messagingException);
+            } catch (SourceErrorException see) {
+              onTerminate(terminateConsumer, null, sourceErrorToMessagingException(see));
+            }
           };
 
           Consumer<SuccessSourcePolicyResult> onSuccessFunction = successSourcePolicyResult -> {
@@ -191,17 +190,21 @@ public class ModuleFlowProcessingPhase
               flowExecutionResponse = builder(templateEvent).message(of(null)).build();
             }
 
-            Map<String, Object> responseParameters = sourcePolicyResult.getRight().getResponseParameters();
+            Map<String, Object> responseParameters = successSourcePolicyResult.getResponseParameters();
 
-            template
-                .sendResponseToClient(flowExecutionResponse, responseParameters,
-                                      failureEvent -> sourcePolicyResult.getRight().createErrorResponseParameters(failureEvent),
-                                      createResponseCompletationCallback(phaseResultNotifier));
+            try {
+              template.sendResponseToClient(flowExecutionResponse, responseParameters,
+                                            failureEvent -> successSourcePolicyResult.createErrorResponseParameters(failureEvent),
+                                            createResponseCompletationCallback(phaseResultNotifier));
+            } catch (SourceErrorException see) {
+              errorConsumer.accept(sourceErrorToMessagingException(see));
+              onTerminate(terminateConsumer, null, see);
+            } finally {
+              onTerminate(terminateConsumer, flowExecutionResponse, null);
+            }
           };
 
-          sourcePolicyResult
-              .apply(failureSourcePolicyResult -> onExceptionFunction.accept(failureSourcePolicyResult.getMessagingException()),
-                     onSuccessFunction);
+          policy.process(templateEvent).apply(onFailureFunction, onSuccessFunction);
         } finally {
           policyManager.disposePoliciesResources(templateEvent.getContext().getId());
         }
@@ -282,9 +285,7 @@ public class ModuleFlowProcessingPhase
     return eventOrException -> {
 
       ResponseCompletionCallback completionCallback = createSendFailureResponseCompletationCallback(phaseResultNotifier, null);
-      eventOrException.apply(
-                             event -> safely(() -> template.sendAfterTerminateResponseToClient(left(event), completionCallback)),
-
+      eventOrException.apply(event -> safely(() -> template.sendAfterTerminateResponseToClient(left(event), completionCallback)),
                              messagingException -> safely(() -> {
                                messagingException
                                    .setProcessedEvent(createErrorEvent(messagingException.getEvent(), messageSource,
@@ -294,8 +295,7 @@ public class ModuleFlowProcessingPhase
     };
   }
 
-  private Consumer<Event> getSuccessConsumer(MessageSource messageSource,
-                                             Event request,
+  private Consumer<Event> getSuccessConsumer(MessageSource messageSource, Event request,
                                              MessageProcessContext messageProcessContext,
                                              PhaseResultNotifier phaseResultNotifier,
                                              ModuleFlowProcessingPhaseTemplate template) {
@@ -330,12 +330,10 @@ public class ModuleFlowProcessingPhase
                                         messageProcessContext.getFlowConstruct(),
                                         messageProcessContext.getTransactionConfig().orElse(new MuleTransactionConfig()),
                                         exceptionHandler);
-        final Event response = transactionTemplate.execute(() -> {
-
+        return transactionTemplate.execute(() -> {
           fireNotification(messageSource, muleEvent, messageProcessContext.getFlowConstruct(), MESSAGE_RECEIVED);
           return template.routeEvent(muleEvent);
         });
-        return response;
       } catch (MuleException e) {
         throw e;
       } catch (Exception e) {
