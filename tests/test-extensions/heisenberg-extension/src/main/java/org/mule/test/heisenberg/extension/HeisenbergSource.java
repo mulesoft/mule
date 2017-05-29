@@ -22,7 +22,7 @@ import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.extension.api.OnTerminateResult;
+import org.mule.runtime.extension.api.runtime.source.OnTerminateResult;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
@@ -37,7 +37,6 @@ import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
@@ -141,18 +140,20 @@ public class HeisenbergSource extends Source<String, Attributes> {
   }
 
   @OnTerminate
-  public void onTerminate(OnTerminateResult onTerminateResult, SourceCallbackContext sourceCallbackContext) {
-    onTerminateResult.execute(
-                              () -> terminateStatus = SUCCESS,
-                              parameterError -> {
-                                terminateStatus = ERROR_PARAMETER;
-                                error = of(parameterError);
-                              },
-                              bodyError -> {
-                                terminateStatus = ERROR_BODY;
-                                error = of(bodyError);
-                              });
+  public void onTerminate(OnTerminateResult onTerminateResult) {
+    if(onTerminateResult.isSuccess()){
+      terminateStatus = SUCCESS;
+    } else {
+      onTerminateResult.getParameterGenerationError().ifPresent(parameterError -> {
+        terminateStatus = ERROR_PARAMETER;
+        error = of(parameterError);
+      });
 
+      onTerminateResult.getResponseError().ifPresent(bodyError -> {
+        terminateStatus = ERROR_BODY;
+        error = of(bodyError);
+      });
+    }
     executedOnTerminate = true;
   }
 

@@ -18,7 +18,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.util.collection.ImmutableMapCollector;
-import org.mule.runtime.extension.api.OnTerminateResult;
+import org.mule.runtime.extension.api.runtime.source.OnTerminateResult;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -77,7 +77,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private static final ArgumentResolver<StreamingHelper> STREAMING_HELPER_ARGUMENT_RESOLVER =
       new StreamingHelperArgumentResolver();
   private static final ArgumentResolver<OnTerminateResult> ON_TERMINATE_CALLBACK =
-      new OnTerminateResultArgumentResolver(ERROR_ARGUMENT_RESOLVER);
+      new OnTerminateResultArgumentResolver(ERROR_ARGUMENT_RESOLVER, SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER);
 
 
   private final Method method;
