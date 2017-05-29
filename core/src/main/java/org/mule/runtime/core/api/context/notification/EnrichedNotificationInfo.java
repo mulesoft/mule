@@ -36,7 +36,7 @@ public class EnrichedNotificationInfo {
   private String originatingFlowName;
   private FlowCallStack flowCallStack;
 
-  // FIXME: STUDIO-9104: only for Studio beta, will be removed after release
+  // TODO: MULE-12626: remove when Studio uses interception API
   Event event;
 
   /**
@@ -159,6 +159,7 @@ public class EnrichedNotificationInfo {
     return flowCallStack;
   }
 
+  // TODO: MULE-12626: remove when Studio uses interception API
   public TypedValue evaluateExpression(ExpressionManager expressionManager, String script) {
     return expressionManager.evaluate(script, event);
   }

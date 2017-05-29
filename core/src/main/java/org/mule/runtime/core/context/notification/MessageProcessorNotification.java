@@ -88,6 +88,7 @@ public class MessageProcessorNotification extends EnrichedServerNotification imp
         + resourceIdentifier + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
   }
 
+  // TODO: MULE-12626: remove when Studio uses interception API
   public TypedValue evaluateExpression(ExpressionManager expressionManager, String script) {
     return getInfo().evaluateExpression(expressionManager, script);
   }
