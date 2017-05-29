@@ -11,6 +11,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.GroupCorrelation;
@@ -158,7 +159,7 @@ public class EnrichedNotificationInfo {
     return flowCallStack;
   }
 
-  public Event getEvent() {
-    return event;
+  public TypedValue evaluateExpression(ExpressionManager expressionManager, String script) {
+    return expressionManager.evaluate(script, event);
   }
 }

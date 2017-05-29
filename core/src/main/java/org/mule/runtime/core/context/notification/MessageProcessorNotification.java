@@ -89,6 +89,6 @@ public class MessageProcessorNotification extends EnrichedServerNotification imp
   }
 
   public TypedValue evaluateExpression(ExpressionManager expressionManager, String script) {
-    return expressionManager.evaluate(script, notificationInfo.getEvent());
+    return getInfo().evaluateExpression(expressionManager, script);
   }
 }
