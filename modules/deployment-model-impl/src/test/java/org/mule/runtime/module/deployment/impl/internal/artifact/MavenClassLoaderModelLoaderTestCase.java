@@ -20,7 +20,6 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperties;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
@@ -31,7 +30,6 @@ import java.util.Map;
 
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
