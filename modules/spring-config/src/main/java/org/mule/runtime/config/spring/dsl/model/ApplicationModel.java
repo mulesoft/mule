@@ -47,9 +47,6 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -65,6 +62,9 @@ import java.util.function.Consumer;
 
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.w3c.dom.Node;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -515,6 +515,7 @@ public class ApplicationModel {
     if (componentBuildingDefinitionRegistry.isPresent()) {
       validateNamedTopLevelElementsHaveName(componentBuildingDefinitionRegistry.get());
     }
+    validateSingleElementsExistence();
   }
 
   private void validateParameterAndChildForSameAttributeAreNotDefinedTogether() {
@@ -711,6 +712,36 @@ public class ApplicationModel {
       }
     }
     return null;
+  }
+
+  private void validateSingleElementsExistence() {
+    validateSingleElementExistence(ComponentIdentifier.buildFromStringRepresentation("munit:before-suite"));
+    validateSingleElementExistence(ComponentIdentifier.buildFromStringRepresentation("munit:after-suite"));
+    validateSingleElementExistence(ComponentIdentifier.buildFromStringRepresentation("munit:before-test"));
+    validateSingleElementExistence(ComponentIdentifier.buildFromStringRepresentation("munit:after-test"));
+
+  }
+
+  private void validateSingleElementExistence(ComponentIdentifier componentIdentifier) {
+    Map<ComponentIdentifier, ComponentModel> existingObjectsWithName = new HashMap<>();
+
+    executeOnEveryMuleComponentTree(componentModel -> {
+      ComponentIdentifier identifier = componentModel.getIdentifier();
+      if (componentIdentifier.getNamespace().equals(identifier.getNamespace())
+          && componentIdentifier.getName().equals(identifier.getName())) {
+
+        if (existingObjectsWithName.containsKey(identifier)) {
+          throw new MuleRuntimeException(createStaticMessage(
+                                                             "Two configuration elements %s have been defined. Element [%s] must be unique. Clashing components are %s and %s",
+                                                             identifier.getNamespace() + ":" + identifier.getName(),
+                                                             identifier.getNamespace() + ":" + identifier.getName(),
+                                                             componentModel.getNameAttribute(),
+                                                             existingObjectsWithName.get(identifier).getNameAttribute()));
+        }
+        existingObjectsWithName.put(identifier, componentModel);
+      }
+
+    });
   }
 
   /**
