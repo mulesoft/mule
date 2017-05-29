@@ -19,8 +19,8 @@ import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperties;
-
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
+import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
@@ -36,7 +36,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-@Ignore("MULE-12547: Flaky")
+//@Ignore("MULE-12547: Flaky")
 public class MavenClassLoaderModelLoaderTestCase {
 
   public static final String MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION = "muleRuntimeConfig.maven.repositoryLocation";
@@ -66,13 +66,28 @@ public class MavenClassLoaderModelLoaderTestCase {
 
   @Test
   public void changeMavenConfiguration() throws Exception {
+
+    Map<String, String> properties = getMuleFreeSystemProperties();
+    GlobalConfigLoader.reset(); //Change local repository path
     try {
-      mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP);
+      testWithSystemProperties(properties, () -> {
+        mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP);
+      });
       fail();
     } catch (Exception e) {
       // It is should fail
     }
+    properties.put("muleRuntimeConfig.maven.repositories.mavenCentral.url", "https://repo.maven.apache.org/maven2/");
+    testWithSystemProperties(properties,
+                             () -> {
+                               GlobalConfigLoader.reset();
+                               assertThat(mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP).getDependencies(),
+                                          hasItem(hasProperty("descriptor",
+                                                              (hasProperty("artifactId", equalTo("commons-collections"))))));
+                             });
+  }
 
+  private Map<String, String> getMuleFreeSystemProperties() {
     // Find any System property for muleRuntimeConfig from previous executions...
     final List<String> muleRuntimeConfig =
         System.getProperties().stringPropertyNames().stream()
@@ -81,17 +96,8 @@ public class MavenClassLoaderModelLoaderTestCase {
             .collect(
                      toList());
     Map<String, String> properties = new HashMap<>();
-    // It should clear those properties when running the test
     muleRuntimeConfig.forEach(property -> properties.put(property, null));
-    properties.put("muleRuntimeConfig.maven.repositories.mavenCentral.url", "https://repo.maven.apache.org/maven2/");
-
-    testWithSystemProperties(properties,
-                             () -> {
-                               GlobalConfigLoader.reset();
-                               assertThat(mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP).getDependencies(),
-                                          hasItem(hasProperty("descriptor",
-                                                              (hasProperty("artifactId", equalTo("commons-collections"))))));
-                             });
+    return properties;
   }
 
   private File getApplicationFolder(String appPath) throws URISyntaxException {
