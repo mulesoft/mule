@@ -13,7 +13,7 @@
 
     <property name="a-property" type="string"/>
 
-    <operation name="set-payload-hardcoded value">
+    <operation name="set-payload-hardcoded-value">
         <body>
             <mule:set-payload value="hardcoded value"/>
         </body>
