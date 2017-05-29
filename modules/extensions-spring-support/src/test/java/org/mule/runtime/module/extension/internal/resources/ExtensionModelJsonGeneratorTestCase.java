@@ -22,7 +22,6 @@ import static org.mule.runtime.module.extension.internal.loader.java.AbstractJav
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
@@ -54,8 +53,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -171,13 +168,6 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     if (!json.equals(expectedJson)) {
       System.out.println(json);
     }
-    System.out.println(json);
-    File file =
-        new File("/Users/estebanwasinger/Documents/workspace/mulesoft/sdk/mule/modules/extensions-spring-support/src/test/resources/models/"
-            + expectedSource);
-    FileOutputStream fileOutputStream = new FileOutputStream(file);
-    IOUtils.write(json, fileOutputStream);
-
     assertThat(json, is(equalTo(expectedJson)));
   }
 

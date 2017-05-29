@@ -108,7 +108,6 @@ public class HeisenbergSource extends Source<String, Attributes> {
 
     executor = schedulerService.cpuLightScheduler();
     scheduledFuture = executor.scheduleAtFixedRate(() -> sourceCallback.handle(makeResult(sourceCallback)), 0, 300, MILLISECONDS);
-    //      sourceCallback.handle(makeResult(sourceCallback));
   }
 
   @OnSuccess
