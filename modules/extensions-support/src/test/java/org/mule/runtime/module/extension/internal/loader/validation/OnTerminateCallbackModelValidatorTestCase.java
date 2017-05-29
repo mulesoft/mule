@@ -32,6 +32,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.List;
+import java.util.Optional;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -58,6 +59,8 @@ public class OnTerminateCallbackModelValidatorTestCase extends AbstractMuleTestC
     validator = new SourceCallbacksModelValidator();
     when(extensionModel.getSourceModels()).thenReturn(singletonList(sourceModel));
     when(sourceModel.getTerminateCallback()).thenReturn(of(onTerminateCallback));
+    when(sourceModel.getSuccessCallback()).thenReturn(Optional.empty());
+    when(sourceModel.getErrorCallback()).thenReturn(Optional.empty());
   }
 
   @Test
@@ -79,5 +82,19 @@ public class OnTerminateCallbackModelValidatorTestCase extends AbstractMuleTestC
     validator.validate(extensionModel, problemsReporter);
 
     assertThat(problemsReporter.getErrors(), is(empty()));
+  }
+
+  @Test
+  public void sourcesWithCallbacksShouldDefineOnTerminate() {
+    when(sourceModel.getTerminateCallback()).thenReturn(Optional.empty());
+    when(sourceModel.getSuccessCallback()).thenReturn(of(onTerminateCallback));
+    validator.validate(extensionModel, problemsReporter);
+
+    List<Problem> errors = problemsReporter.getErrors();
+    assertThat(errors, is(not(empty())));
+    Problem problem = errors.get(0);
+    assertThat(problem.getComponent(), is(sourceModel));
+    assertThat(problem.getMessage(),
+               is(containsString("Terminate Callback should also be defined")));
   }
 }

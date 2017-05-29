@@ -46,10 +46,9 @@ public class OnTerminateResultArgumentResolver implements ArgumentResolver<OnTer
       return success();
     } else {
       String errorIdentifier = resolve.getErrorType().getIdentifier();
-      if (isErrorGeneratingCallbackParameters(errorIdentifier)) {
-        return parameterResolutionError(resolve);
-      }
-      return responseError(resolve);
+      return isErrorGeneratingCallbackParameters(errorIdentifier)
+          ? parameterResolutionError(resolve)
+          : responseError(resolve);
     }
   }
 

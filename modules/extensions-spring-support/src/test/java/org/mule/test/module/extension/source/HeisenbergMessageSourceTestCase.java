@@ -94,7 +94,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     startFlow("source");
 
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
-            () -> assertState(true, false, true));
+          () -> assertState(true, false, true));
 
     assertThat(HeisenbergSource.terminateStatus, is(SUCCESS));
     assertThat(HeisenbergSource.error, empty());

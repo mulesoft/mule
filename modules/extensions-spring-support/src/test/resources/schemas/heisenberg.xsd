@@ -641,10 +641,12 @@
                 <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
                 <xs:attribute type="mule:expressionLong" use="optional" default="#[payload]" name="payment"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="sameNameParameter"></xs:attribute>
+                <xs:attribute type="mule:expressionBoolean" use="optional" name="fail"></xs:attribute>
                 <xs:attribute type="mule:expressionMap" use="optional" name="labeledRicin"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="nextDoor"></xs:attribute>
                 <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="methylamine"></xs:attribute>
+                <xs:attribute type="mule:expressionBoolean" use="optional" name="propagateError"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

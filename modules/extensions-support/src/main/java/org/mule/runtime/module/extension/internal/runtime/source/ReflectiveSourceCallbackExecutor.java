@@ -105,7 +105,9 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
                                                  SourceCallbackModelProperty sourceCallbackModel) {
     List<ParameterGroupModel> callbackParameters = sourceCallbackModel.getOnSuccessMethod().filter(method::equals)
         .map(m -> sourceModel.getSuccessCallback().get().getParameterGroupModels())
-        .orElseGet(() -> sourceModel.getErrorCallback().get().getParameterGroupModels());
+        .orElseGet(() -> sourceCallbackModel.getOnErrorMethod().filter(method::equals)
+            .map(m -> sourceModel.getErrorCallback().get().getParameterGroupModels())
+            .orElseGet(() -> sourceModel.getTerminateCallback().get().getParameterGroupModels()));
 
     return ImmutableList.<ParameterGroupModel>builder()
         .addAll(model.getParameterGroupModels())

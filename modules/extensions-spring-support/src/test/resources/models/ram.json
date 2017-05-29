@@ -519,6 +519,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
+                  "defaultValue": "#[payload]",
                   "role": "PRIMARY_CONTENT",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -1866,6 +1867,7 @@
               "required": false,
               "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
+              "defaultValue": "#[payload]",
               "role": "PRIMARY_CONTENT",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
