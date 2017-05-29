@@ -432,7 +432,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
               });
 
           line.getChildren().stream()
-              .filter(c -> c.getIdentifier().equals("set-variables"))
+              .filter(c -> c.getIdentifier().equals("variables"))
               .findFirst()
               .ifPresent(variablesConfig -> {
                 ParameterGroupElementDeclarer variablesGroup = newParameterGroup("Set Variables");
