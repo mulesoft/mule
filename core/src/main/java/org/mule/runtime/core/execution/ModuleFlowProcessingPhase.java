@@ -145,8 +145,7 @@ public class ModuleFlowProcessingPhase
                                MESSAGE_RECEIVED);
             })
             .then(request -> from(template.routeEventAsync(request)))
-            .doOnSuccess(getSuccessConsumer(messageSource, templateEvent, exceptionHandler, messageProcessContext,
-                                            phaseResultNotifier, errorConsumer, template))
+            .doOnSuccess(getSuccessConsumer(messageSource, templateEvent, messageProcessContext, phaseResultNotifier, template))
             .doOnError(MessagingException.class, me -> {
               if (me.getCause() instanceof SourceErrorException
                   && sourceResponseErrorTypeMatcher.match(((SourceErrorException) me.getCause()).getErrorType())) {
@@ -197,7 +196,7 @@ public class ModuleFlowProcessingPhase
             template
                 .sendResponseToClient(flowExecutionResponse, responseParameters,
                                       failureEvent -> sourcePolicyResult.getRight().createErrorResponseParameters(failureEvent),
-                                      createResponseCompletationCallback(phaseResultNotifier, exceptionHandler, errorConsumer));
+                                      createResponseCompletationCallback(phaseResultNotifier));
           };
 
           sourcePolicyResult
@@ -214,16 +213,11 @@ public class ModuleFlowProcessingPhase
 
   private void handleSourceError(final MessagingExceptionHandler exceptionHandler, Consumer<MessagingException> errorConsumer,
                                  SourceErrorException see) {
-    Event event = Event.builder(see.getEvent())
-        .error(ErrorBuilder.builder(see)
-            .errorType(see.getErrorType())
-            .build())
-        .build();
-    MessagingException messagingException = new MessagingException(event, see);
-    exceptionHandler.handleException(messagingException, event);
+    MessagingException messagingException = sourceErrorToMessagingException(see);
+    exceptionHandler.handleException(messagingException, messagingException.getEvent());
     errorConsumer.accept(messagingException);
 
-    throw new SourceErrorException(event, see.getErrorType(), see.getCause());
+    throw new SourceErrorException(messagingException.getEvent(), see.getErrorType(), see.getCause());
   }
 
   private Event createEvent(ModuleFlowProcessingPhaseTemplate template, MessageProcessContext messageProcessContext,
@@ -272,6 +266,7 @@ public class ModuleFlowProcessingPhase
       try {
         parameters = errorParametersFunction.apply(messagingException.getEvent());
       } catch (Exception e) {
+        phaseResultNotifier.phaseFailure(e);
         throw new SourceErrorException(errorEvent, sourceErrorResponseGenerateErrorType, e, messagingException);
       }
 
@@ -301,10 +296,8 @@ public class ModuleFlowProcessingPhase
 
   private Consumer<Event> getSuccessConsumer(MessageSource messageSource,
                                              Event request,
-                                             MessagingExceptionHandler exceptionHandler,
                                              MessageProcessContext messageProcessContext,
                                              PhaseResultNotifier phaseResultNotifier,
-                                             Consumer<MessagingException> errorConsumer,
                                              ModuleFlowProcessingPhaseTemplate template) {
     return response -> {
 
@@ -323,7 +316,7 @@ public class ModuleFlowProcessingPhase
       }
 
       template.sendResponseToClient(response, responseParameters, template.getFailedExecutionResponseParametersFunction(),
-                                    createResponseCompletationCallback(phaseResultNotifier, exceptionHandler, errorConsumer));
+                                    createResponseCompletationCallback(phaseResultNotifier));
     };
   }
 
@@ -366,9 +359,8 @@ public class ModuleFlowProcessingPhase
           Event errorEvent = Event.builder(event)
               .error(ErrorBuilder.builder(e.getCause()).errorType(failureErrorType).build()).build();
 
-          MessagingException reason = new MessagingException(errorEvent, e.getCause());
-          phaseResultNotifier.phaseFailure(reason);
-          throw new SourceErrorException(errorEvent, failureErrorType, e);
+          phaseResultNotifier.phaseFailure((Exception) e.getCause());
+          throw new SourceErrorException(errorEvent, failureErrorType, e.getCause());
         } else {
           LOGGER.error("Unhandled exception processing request", e);
           return event;
@@ -377,9 +369,7 @@ public class ModuleFlowProcessingPhase
     };
   }
 
-  private ResponseCompletionCallback createResponseCompletationCallback(final PhaseResultNotifier phaseResultNotifier,
-                                                                        final MessagingExceptionHandler exceptionListener,
-                                                                        Consumer<MessagingException> errorConsumer) {
+  private ResponseCompletionCallback createResponseCompletationCallback(final PhaseResultNotifier phaseResultNotifier) {
     return new ResponseCompletionCallback() {
 
       @Override
@@ -389,8 +379,12 @@ public class ModuleFlowProcessingPhase
 
       @Override
       public Event responseSentWithFailure(final MessagingException e, final Event event) {
-        phaseResultNotifier.phaseSuccessfully();
-        throw new SourceErrorException(event, sourceResponseSendErrorType, e.getCause());
+        if (e.getCause() instanceof SourceErrorException
+            && sourceResponseSendErrorType.equals(((SourceErrorException) e.getCause()).getErrorType())) {
+          throw (SourceErrorException) e.getCause();
+        } else {
+          throw new SourceErrorException(event, sourceResponseSendErrorType, e.getCause());
+        }
       }
     };
   }
@@ -400,19 +394,23 @@ public class ModuleFlowProcessingPhase
       if (throwable instanceof MessagingException) {
         terminateConsumer.accept(right((MessagingException) throwable));
       } else if (throwable instanceof SourceErrorException) {
-        SourceErrorException see = (SourceErrorException) throwable;
-        Event eventWithError = Event.builder(see.getEvent())
-            .error(ErrorBuilder.builder(see)
-                .errorType(see.getErrorType())
-                .build())
-            .build();
-        terminateConsumer.accept(right(new MessagingException(eventWithError, see)));
+        terminateConsumer.accept(right(sourceErrorToMessagingException((SourceErrorException) throwable)));
       } else {
         terminateConsumer.accept(right(new MessagingException(event, throwable)));
       }
     } else {
       terminateConsumer.accept(left(event));
     }
+  }
+
+  private MessagingException sourceErrorToMessagingException(SourceErrorException see) {
+    Event eventWithError = Event.builder(see.getEvent())
+        .error(ErrorBuilder.builder(see.getCause())
+            .errorType(see.getErrorType())
+            .build())
+        .build();
+    final MessagingException me = new MessagingException(eventWithError, see.getCause());
+    return me;
   }
 
   @Override
