@@ -181,7 +181,9 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verifyFlowErrorHandler(isErrorTypeSourceResponseGenerate());
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
-    verify(template).sendAfterTerminateResponseToClient(argThat(rightMatches(withEventThat(isErrorTypeSourceResponseGenerate()))),
+    // The error handler is called with the apropriate type, but for the termination it counts as successful if the error response
+    // was sent.
+    verify(template).sendAfterTerminateResponseToClient(argThat(leftMatches(Matchers.any(Event.class))),
                                                         any());
     verify(notifier).phaseSuccessfully();
     verify(notifier, never()).phaseFailure(any());
@@ -200,7 +202,9 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verifyFlowErrorHandler(isErrorTypeSourceResponseSend());
     verify(template).sendResponseToClient(any(), any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
-    verify(template).sendAfterTerminateResponseToClient(argThat(rightMatches(withEventThat(isErrorTypeSourceResponseSend()))),
+    // The error handler is called with the apropriate type, but for the termination it counts as successful if the error response
+    // was sent.
+    verify(template).sendAfterTerminateResponseToClient(argThat(leftMatches(Matchers.any(Event.class))),
                                                         any());
     verify(notifier).phaseSuccessfully();
     verify(notifier, never()).phaseFailure(any());

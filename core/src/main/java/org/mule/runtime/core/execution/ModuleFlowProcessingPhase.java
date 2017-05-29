@@ -145,22 +145,27 @@ public class ModuleFlowProcessingPhase
                                MESSAGE_RECEIVED);
             })
             .then(request -> from(template.routeEventAsync(request)))
-            .doOnSuccess(getSuccessConsumer(messageSource, templateEvent, messageProcessContext, phaseResultNotifier, template))
+            .doOnSuccess(getSuccessConsumer(messageSource, templateEvent, messageProcessContext, phaseResultNotifier, template,
+                                            terminateConsumer))
             .doOnError(MessagingException.class, me -> {
               if (me.getCause() instanceof SourceErrorException
                   && sourceResponseErrorTypeMatcher.match(((SourceErrorException) me.getCause()).getErrorType())) {
-                handleSourceError(exceptionHandler, errorConsumer, (SourceErrorException) me.getCause());
+                try {
+                  handleSourceError(exceptionHandler, errorConsumer, (SourceErrorException) me.getCause());
+                  onTerminate(terminateConsumer, me.getEvent(), null);
+                } catch (Exception e) {
+                  onTerminate(terminateConsumer, null, e);
+                }
               } else {
-                errorConsumer.accept(me);
+                try {
+                  errorConsumer.accept(me);
+                  onTerminate(terminateConsumer, null, me);
+                } catch (Exception e) {
+                  onTerminate(terminateConsumer, null, e);
+                }
               }
             })
-            .doAfterTerminate((event, throwable) -> {
-              try {
-                onTerminate(terminateConsumer, event, throwable);
-              } finally {
-                responseCompletion.onComplete();
-              }
-            })
+            .doAfterTerminate((event, throwable) -> responseCompletion.onComplete())
             .subscribe();
       } else {
         Processor nextOperation = createFlowExecutionProcessor(messageSource, exceptionHandler, messageProcessContext, template);
@@ -175,7 +180,12 @@ public class ModuleFlowProcessingPhase
                   .getErrorType();
 
               errorConsumer.accept(messagingException);
-              throw new SourceErrorException(messagingException.getEvent(), errorType, messagingException);
+
+              if (sourceResponseErrorTypeMatcher.match(errorType)) {
+                onTerminate(terminateConsumer, messagingException.getEvent(), null);
+              } else {
+                throw new SourceErrorException(messagingException.getEvent(), errorType, messagingException);
+              }
             } catch (SourceErrorException see) {
               onTerminate(terminateConsumer, null, sourceErrorToMessagingException(see));
             }
@@ -220,7 +230,7 @@ public class ModuleFlowProcessingPhase
     exceptionHandler.handleException(messagingException, messagingException.getEvent());
     errorConsumer.accept(messagingException);
 
-    throw new SourceErrorException(messagingException.getEvent(), see.getErrorType(), see.getCause());
+    // throw new SourceErrorException(messagingException.getEvent(), see.getErrorType(), see.getCause());
   }
 
   private Event createEvent(ModuleFlowProcessingPhaseTemplate template, MessageProcessContext messageProcessContext,
@@ -298,7 +308,8 @@ public class ModuleFlowProcessingPhase
   private Consumer<Event> getSuccessConsumer(MessageSource messageSource, Event request,
                                              MessageProcessContext messageProcessContext,
                                              PhaseResultNotifier phaseResultNotifier,
-                                             ModuleFlowProcessingPhaseTemplate template) {
+                                             ModuleFlowProcessingPhaseTemplate template,
+                                             Consumer<Either<Event, MessagingException>> terminateConsumer) {
     return response -> {
 
       fireNotification(messageSource, response, messageProcessContext.getFlowConstruct(), MESSAGE_RESPONSE);
@@ -317,6 +328,8 @@ public class ModuleFlowProcessingPhase
 
       template.sendResponseToClient(response, responseParameters, template.getFailedExecutionResponseParametersFunction(),
                                     createResponseCompletationCallback(phaseResultNotifier));
+
+      onTerminate(terminateConsumer, response, null);
     };
   }
 
