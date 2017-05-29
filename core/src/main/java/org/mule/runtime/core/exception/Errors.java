@@ -89,9 +89,6 @@ public abstract class Errors {
      */
     public static final String ANY_IDENTIFIER = "ANY";
 
-    /**
-     * MG TODO
-     */
     public static final String STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER = "STREAM_MAXIMUM_SIZE_EXCEEDED";
 
     // UNHANDLEABLE
