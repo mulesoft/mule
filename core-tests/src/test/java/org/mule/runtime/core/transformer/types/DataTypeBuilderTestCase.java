@@ -24,6 +24,8 @@ import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.util.IOUtils.toByteArray;
+import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.message.Message;
@@ -38,6 +40,7 @@ import org.mule.runtime.core.internal.metadata.SimpleDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
+import org.mule.tck.report.HeapDumpOnFailure;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
@@ -55,8 +58,13 @@ import org.junit.rules.ExpectedException;
 
 public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
+  private static final int GC_POLLING_TIMEOUT = 10000;
+
   @Rule
   public ExpectedException expected = ExpectedException.none();
+
+  @Rule
+  public HeapDumpOnFailure heapDumpOnFailure = new HeapDumpOnFailure();
 
   @Test
   public void buildSimple() {
@@ -77,10 +85,10 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
   public void buildFunction() {
     FunctionDataType dataType = (FunctionDataType) DataType.fromFunction(new SomeFunction());
 
-    //Return type
+    // Return type
     assertThat(dataType.getReturnType().isPresent(), is(true));
     assertThat(dataType.getReturnType().get(), equalTo(STRING));
-    //Parameters
+    // Parameters
     assertThat(dataType.getParameters(), hasSize(2));
     FunctionParameter first = dataType.getParameters().get(0);
     assertThat(first.getName(), is("fst"));
@@ -89,7 +97,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
     FunctionParameter second = dataType.getParameters().get(1);
     assertThat(second.getName(), is("snd"));
     assertThat(second.getType(), equalTo(OBJECT));
-    //Default
+    // Default
     assertThat(second.getDefaultValueResolver().getDefaultValue(builder().build()), is("wow"));
   }
 
@@ -309,7 +317,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
     DataType.builder().type(custom.loadClass(Message.class.getName())).build();
     custom = null;
 
-    new PollingProber().check(new JUnitLambdaProbe(() -> {
+    new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       System.gc();
       assertThat(clRef.isEnqueued(), is(true));
       return true;

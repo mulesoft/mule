@@ -127,7 +127,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   /**
    * Default timeout used when blocking on {@link org.reactivestreams.Publisher} completion.
    */
-  public static final int BLOCK_TIMEOUT = 200;
+  public static final int BLOCK_TIMEOUT = 500;
 
   /**
    * Use this as a semaphore to the unit test to indicate when a callback has successfully been called.

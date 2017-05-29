@@ -141,7 +141,7 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
       + "cause processing to block if there are concurrent requests and the number of custom async processor threads are reduced")
   public void asyncCpuLightConcurrent() throws Exception {
     internalConcurrent(true, CPU_LITE, 1, asyncProcessor);
-    assertThat(threads, hasSize(3));
+    assertThat(threads.size(), between(2, 3));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
     assertThat(threads, not(hasItem(startsWith(IO))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
