@@ -37,8 +37,6 @@ import org.mule.runtime.core.internal.metadata.DefaultFunctionDataType;
 import org.mule.runtime.core.internal.metadata.DefaultMapDataType;
 import org.mule.runtime.core.internal.metadata.SimpleDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.FlakinessDetectorTestRunner;
-import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.report.HeapDumpOnFailure;
@@ -56,9 +54,7 @@ import java.util.Set;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 
-@RunWith(FlakinessDetectorTestRunner.class)
 public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
   @Rule
@@ -86,10 +82,10 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
   public void buildFunction() {
     FunctionDataType dataType = (FunctionDataType) DataType.fromFunction(new SomeFunction());
 
-    //Return type
+    // Return type
     assertThat(dataType.getReturnType().isPresent(), is(true));
     assertThat(dataType.getReturnType().get(), equalTo(STRING));
-    //Parameters
+    // Parameters
     assertThat(dataType.getParameters(), hasSize(2));
     FunctionParameter first = dataType.getParameters().get(0);
     assertThat(first.getName(), is("fst"));
@@ -98,7 +94,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
     FunctionParameter second = dataType.getParameters().get(1);
     assertThat(second.getName(), is("snd"));
     assertThat(second.getType(), equalTo(OBJECT));
-    //Default
+    // Default
     assertThat(second.getDefaultValueResolver().getDefaultValue(builder().build()), is("wow"));
   }
 
@@ -295,7 +291,6 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  @FlakyTest
   public void cacheClean() throws InterruptedException, ClassNotFoundException {
     ClassLoader custom = new ClassLoader(this.getClass().getClassLoader()) {
 

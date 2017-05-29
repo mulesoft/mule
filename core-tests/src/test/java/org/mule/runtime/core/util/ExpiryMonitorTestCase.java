@@ -25,11 +25,10 @@ import org.junit.Test;
 
 public class ExpiryMonitorTestCase extends AbstractMuleContextTestCase {
 
-
   private static final int EXPIRE_TIME = 300;
   private static final int EXPIRE_INTERVAL = 100;
   // Add some time to account for the durations of the expiry process, since it is scheduled with fixed delay
-  private static final int EXPIRE_TIMEOUT = EXPIRE_TIME + EXPIRE_INTERVAL + 100;
+  private static final int EXPIRE_TIMEOUT = EXPIRE_TIME + EXPIRE_INTERVAL + 200;
   private static final long DELTA_TIME = 10;
 
   private boolean expired = false;

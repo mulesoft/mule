@@ -34,6 +34,7 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.Test;
+
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -160,7 +161,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
       + "This helps avoid deadlocks when there are reduced number of threads used by async processor.")
   public void asyncCpuLightConcurrent() throws Exception {
     super.asyncCpuLightConcurrent();
-    assertThat(threads.size(), between(2, 3));
+    assertThat(threads.size(), between(2, 4));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), between(2l, 4l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
     assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
