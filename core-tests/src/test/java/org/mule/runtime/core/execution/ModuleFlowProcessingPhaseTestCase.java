@@ -101,7 +101,6 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
   @Parameters
   public static Collection<Object> data() {
-    // TODO MULE-11167 Fix policy cases
     return asList(new Object[] {false, true});
   }
 
