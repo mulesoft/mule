@@ -8,7 +8,7 @@
     <flow name="schedulerFlow">
         <scheduler>
             <scheduling-strategy>
-                <fixed-frequency-scheduler frequency="100" startDelay="0"/>
+                <fixed-frequency frequency="100" startDelay="0"/>
             </scheduling-strategy>
         </scheduler>
         <file:write path="${file.path}">
