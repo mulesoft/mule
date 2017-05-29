@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -37,6 +38,7 @@ import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
 import org.mule.runtime.extension.internal.loader.validator.NameClashModelValidator;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
@@ -341,7 +343,9 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(group.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     when(group.getParameterModels()).thenReturn(asList(offending));
 
-    SourceModel sourceModel = null;
+    SourceModel sourceModel = new ImmutableSourceModel(SOURCE_NAME, "", false, asList(group), null, null,
+                                                       of(sourceCallbackModel), empty(), empty(), false, false, false, null,
+                                                       emptySet(), emptySet(), emptySet());
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     validate();
   }

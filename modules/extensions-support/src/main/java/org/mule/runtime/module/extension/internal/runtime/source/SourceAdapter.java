@@ -35,12 +35,9 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.exception.SourceParametersException;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.core.streaming.StreamingManager;
-import org.mule.runtime.core.util.func.CheckedRunnable;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -179,37 +176,19 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
     }
 
     @Override
-    public void onCompletion(Event event, Map<String, Object> parameters, ExceptionCallback<Throwable> exceptionCallback) {
-      safely(() -> onSuccessExecutor.execute(event, parameters, context), exceptionCallback);
+    public void onCompletion(Event event, Map<String, Object> parameters) throws Exception {
+      onSuccessExecutor.execute(event, parameters, context);
     }
 
     @Override
-    public void onFailure(MessagingException exception, Map<String, Object> parameters) {
-      safely(() -> onErrorExecutor.execute(exception.getEvent(), parameters, context), callbackException -> {
-        throw new MuleRuntimeException(createStaticMessage(format("Found exception trying to handle error from source '%s'",
-                                                                  sourceModel.getName())),
-                                       callbackException);
-      });
+    public void onFailure(MessagingException exception, Map<String, Object> parameters) throws Exception {
+      onErrorExecutor.execute(exception.getEvent(), parameters, context);
     }
 
     @Override
-    public void onTerminate(Either<Event, MessagingException> exception) {
-      //TODO CHANGE
+    public void onTerminate(Either<Event, MessagingException> exception) throws Exception {
       Event event = exception.isLeft() ? exception.getLeft() : exception.getRight().getEvent();
-
-      safely(() -> onTerminateExecutor.execute(event, emptyMap(), context), callbackException -> {
-        throw new MuleRuntimeException(createStaticMessage(format("Found exception trying to handle error from source '%s'",
-                                                                  sourceModel.getName())),
-                                       callbackException);
-      });
-    }
-
-    private void safely(CheckedRunnable task, ExceptionCallback exceptionCallback) {
-      try {
-        task.run();
-      } catch (Throwable e) {
-        exceptionCallback.onException(e);
-      }
+      onTerminateExecutor.execute(event, emptyMap(), context);
     }
 
     public Map<String, Object> createResponseParameters(Event event) throws MessagingException {
@@ -217,23 +196,13 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
         ResolverSetResult parameters = SourceAdapter.this.successCallbackParameters.resolve(from(event, configurationInstance));
         return parameters.asMap();
       } catch (Exception e) {
-        throw new MessagingException(event, new SourceParametersException(e));
+        throw new MessagingException(event, e);
       }
     }
 
-    public Map<String, Object> createFailureResponseParameters(Event event) {
+    public Map<String, Object> createFailureResponseParameters(Event event) throws MessagingException {
       try {
         ResolverSetResult parameters = SourceAdapter.this.errorCallbackParameters.resolve(from(event, configurationInstance));
-        return parameters.asMap();
-      } catch (Exception e) {
-        throw new SourceParametersException(e);
-      }
-    }
-
-    @Override
-    public Map<String, Object> createTerminateResponseParameters(Event event) throws MessagingException {
-      try {
-        ResolverSetResult parameters = SourceAdapter.this.terminateCallbackParameters.resolve(from(event, configurationInstance));
         return parameters.asMap();
       } catch (Exception e) {
         throw new MessagingException(event, e);

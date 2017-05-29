@@ -11,6 +11,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
+import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -47,6 +48,11 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Att
   @OnError
   public void onError() {
     isSuccess = false;
+  }
+
+  @OnTerminate
+  public void onTerminate() {
+
   }
 
 }

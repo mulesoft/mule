@@ -1,4 +1,3 @@
-
 {
   "name": "Heisenberg",
   "description": "My Test Extension just to unit test",
@@ -2757,6 +2756,34 @@
                     "name": "sameNameParameter",
                     "description": "",
                     "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Boolean",
+                      "annotations": {
+                        "typeId": "boolean"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 12
+                    },
+                    "name": "fail",
+                    "description": "",
+                    "modelProperties": {}
                   }
                 ],
                 "exclusiveParametersModels": [],
@@ -2832,7 +2859,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 12
+                      "order": 13
                     },
                     "name": "nextDoor",
                     "description": "",
@@ -3144,7 +3171,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 13
+                      "order": 14
                     },
                     "name": "sameNameParameter",
                     "description": "",
@@ -3169,7 +3196,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 14
+                      "order": 15
                     },
                     "name": "methylamine",
                     "description": "",
@@ -3197,7 +3224,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 15
+                      "order": 16
                     },
                     "name": "propagateError",
                     "description": "",
@@ -3277,7 +3304,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 16
+                      "order": 17
                     },
                     "name": "nextDoor",
                     "description": "",
@@ -3569,6 +3596,16 @@
             "description": "",
             "modelProperties": {}
           },
+          "errors": [
+            {
+              "type": "SOURCE",
+              "namespace": "MULE",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -10126,6 +10163,7 @@
   "messageSources": [
     {
       "hasResponse": false,
+      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -10526,14 +10564,6 @@
       }
     },
     {
-      "type": "SOURCE_RESPONSE_PARAMETERS",
-      "namespace": "MULE"
-    },
-    {
-      "type": "SOURCE_RESPONSE",
-      "namespace": "MULE"
-    },
-    {
       "type": "ANY",
       "namespace": "MULE"
     },
@@ -10599,6 +10629,14 @@
           "type": "ANY",
           "namespace": "MULE"
         }
+      }
+    },
+    {
+      "type": "SOURCE",
+      "namespace": "MULE",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
       }
     }
   ],

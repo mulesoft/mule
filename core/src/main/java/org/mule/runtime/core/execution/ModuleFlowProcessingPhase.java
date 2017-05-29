@@ -29,7 +29,6 @@ import static org.mule.runtime.core.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollection;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -57,17 +56,16 @@ import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.util.func.CheckedConsumer;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import reactor.core.publisher.MonoProcessor;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import reactor.core.publisher.MonoProcessor;
 
 /**
  * This phase routes the message through the flow.
@@ -295,12 +293,12 @@ public class ModuleFlowProcessingPhase
     return eventOrException -> {
 
       ResponseCompletionCallback completionCallback = createSendFailureResponseCompletationCallback(phaseResultNotifier, null);
-      eventOrException.apply(event -> safely(() -> template.sendAfterTerminateResponseToClient(left(event), completionCallback)),
+      eventOrException.apply(event -> safely(() -> template.sendAfterTerminateResponseToClient(left(event))),
                              messagingException -> safely(() -> {
                                messagingException
                                    .setProcessedEvent(createErrorEvent(messagingException.getEvent(), messageSource,
                                                                        messagingException, muleContext.getErrorTypeLocator()));
-                               template.sendAfterTerminateResponseToClient(right(messagingException), completionCallback);
+                               template.sendAfterTerminateResponseToClient(right(messagingException));
                              }));
     };
   }
@@ -432,7 +430,7 @@ public class ModuleFlowProcessingPhase
     return 0;
   }
 
-  static final class SourceErrorException extends MuleRuntimeException {
+  public static final class SourceErrorException extends MuleRuntimeException {
 
     private Event event;
     private ErrorType errorType;

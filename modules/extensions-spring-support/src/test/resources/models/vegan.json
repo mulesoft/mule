@@ -1054,6 +1054,7 @@
       "messageSources": [
         {
           "hasResponse": false,
+          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -1430,6 +1431,7 @@
             "description": "",
             "modelProperties": {}
           },
+          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -3162,6 +3164,7 @@
       "messageSources": [
         {
           "hasResponse": false,
+          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -4164,6 +4167,7 @@
       "messageSources": [
         {
           "hasResponse": false,
+          "errors": [],
           "output": {
             "type": {
               "format": "java",

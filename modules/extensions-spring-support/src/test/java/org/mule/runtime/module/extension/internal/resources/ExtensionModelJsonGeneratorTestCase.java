@@ -22,6 +22,7 @@ import static org.mule.runtime.module.extension.internal.loader.java.AbstractJav
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
@@ -37,6 +38,7 @@ import org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModel
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -52,6 +54,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -123,10 +127,9 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
                                                                           new ExtensionJsonGeneratorTestUnit(javaLoader,
                                                                                                              SubTypesMappingConnector.class,
                                                                                                              "subtypes.json"),
-                                                                          // TODO MULE-12570 - Fix extension model generation
-                                                                          // new ExtensionJsonGeneratorTestUnit(javaLoader,
-                                                                          // MarvelExtension.class,
-                                                                          // "marvel.json"),
+                                                                          new ExtensionJsonGeneratorTestUnit(javaLoader,
+                                                                                                             MarvelExtension.class,
+                                                                                                             "marvel.json"),
                                                                           new ExtensionJsonGeneratorTestUnit(soapLoader,
                                                                                                              FootballSoapExtension.class,
                                                                                                              "soap.json"),
@@ -169,6 +172,12 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
       System.out.println(json);
     }
     System.out.println(json);
+    File file =
+        new File("/Users/estebanwasinger/Documents/workspace/mulesoft/sdk/mule/modules/extensions-spring-support/src/test/resources/models/"
+            + expectedSource);
+    FileOutputStream fileOutputStream = new FileOutputStream(file);
+    IOUtils.write(json, fileOutputStream);
+
     assertThat(json, is(equalTo(expectedJson)));
   }
 

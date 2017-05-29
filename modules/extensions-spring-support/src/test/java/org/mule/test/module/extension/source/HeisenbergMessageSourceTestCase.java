@@ -7,8 +7,12 @@
 package org.mule.test.module.extension.source;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_GENERATE;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_SEND;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
+import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.sourceTimesStarted;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.CORE_POOL_SIZE_ERROR_MESSAGE;
@@ -18,7 +22,6 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.extension.api.OnTerminateInformation;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
@@ -31,10 +34,8 @@ import java.util.Optional;
 
 public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
-  public static final int TIMEOUT_MILLIS = 5000;
+  public static final int TIMEOUT_MILLIS = 50000;
   public static final int POLL_DELAY_MILLIS = 100;
-  public static final String SOURCE_RESPONSE_PARAMETERS = "SOURCE_RESPONSE_PARAMETERS";
-  public static final String MULE = "MULE";
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -50,10 +51,10 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     HeisenbergSource.receivedGroupOnSource = false;
     HeisenbergSource.receivedInlineOnError = false;
     HeisenbergSource.receivedInlineOnSuccess = false;
-    HeisenbergSource.receivedOnTerminateInfo = false;
     HeisenbergSource.executedOnSuccess = false;
     HeisenbergSource.executedOnError = false;
     HeisenbergSource.executedOnTerminate = false;
+    HeisenbergSource.error = Optional.empty();
     HeisenbergSource.gatheredMoney = 0;
   }
 
@@ -83,16 +84,20 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
+  public void reconnectWithEnrichedException() throws Exception {
+    startFlow("sourceFailedOnRuntime");
+    probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> sourceTimesStarted > 2);
+  }
+
+  @Test
   public void sourceOnSuccessCallsOnTerminate() throws Exception {
     startFlow("source");
 
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
-          () -> HeisenbergSource.executedOnSuccess
-              && !HeisenbergSource.executedOnError
-              && HeisenbergSource.executedOnTerminate
-              && HeisenbergSource.receivedOnTerminateInfo);
+            () -> assertState(true, false, true));
 
     assertThat(HeisenbergSource.terminateStatus, is(SUCCESS));
+    assertThat(HeisenbergSource.error, empty());
   }
 
   @Test
@@ -100,18 +105,10 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     startFlow("sourceWithInvalidSuccessParameter");
 
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
-          () -> !HeisenbergSource.executedOnSuccess
-              && HeisenbergSource.executedOnError
-              && HeisenbergSource.executedOnTerminate
-              && HeisenbergSource.receivedOnTerminateInfo);
+          () -> assertState(false, true, true));
 
-    assertThat(HeisenbergSource.terminateStatus, is(ERROR_PARAMETER));
-
-    OnTerminateInformation terminateInfo = HeisenbergSource.onTerminateInfo;
-    Optional<Error> optionalError = terminateInfo.getError();
-    assertThat(optionalError.isPresent(), is(true));
-    Error error = optionalError.get();
-    assertThat(error.getErrorType(), is(errorType(MULE, SOURCE_RESPONSE_PARAMETERS)));
+    assertThat(HeisenbergSource.terminateStatus, is(SUCCESS));
+    assertThat(HeisenbergSource.error, empty());
   }
 
   @Test
@@ -119,18 +116,10 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     startFlow("sourceFailsOnSuccessBodyCallsOnErrorAndOnTerminate");
 
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
-          () -> !HeisenbergSource.executedOnSuccess
-              && HeisenbergSource.executedOnError
-              && HeisenbergSource.executedOnTerminate
-              && HeisenbergSource.receivedOnTerminateInfo);
+          () -> assertState(true, true, true));
 
-    assertThat(HeisenbergSource.terminateStatus, is(ERROR_PARAMETER));
-
-    OnTerminateInformation terminateInfo = HeisenbergSource.onTerminateInfo;
-    Optional<Error> optionalError = terminateInfo.getError();
-    assertThat(optionalError.isPresent(), is(true));
-    Error error = optionalError.get();
-    assertThat(error.getErrorType(), is(errorType(MULE, "SOURCE_ERROR")));
+    assertThat(HeisenbergSource.terminateStatus, is(SUCCESS));
+    assertThat(HeisenbergSource.error, empty());
   }
 
   @Test
@@ -138,45 +127,54 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     startFlow("sourceWithInvalidSuccessAndErrorParameters");
 
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
-          () -> !HeisenbergSource.executedOnSuccess
-              && !HeisenbergSource.executedOnError
-              && HeisenbergSource.executedOnTerminate
-              && HeisenbergSource.receivedOnTerminateInfo);
+          () -> assertState(false, false, true));
 
     assertThat(HeisenbergSource.terminateStatus, is(ERROR_PARAMETER));
 
-    OnTerminateInformation terminateInfo = HeisenbergSource.onTerminateInfo;
-    Optional<Error> optionalError = terminateInfo.getError();
-    assertThat(optionalError.isPresent(), is(true));
-    Error error = optionalError.get();
-    assertThat(error.getErrorType(), is(errorType(MULE, SOURCE_RESPONSE_PARAMETERS)));
+    Optional<Error> optionalError = HeisenbergSource.error;
+    assertThat(optionalError, is(not(empty())));
+    assertThat(optionalError.get().getErrorType(), is(errorType(SOURCE_ERROR_RESPONSE_GENERATE)));
   }
 
   @Test
   public void sourceFailsInsideOnErrorAndCallsOnTerminate() throws Exception {
     startFlow("sourceFailsInsideOnError");
 
-    probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
-          () -> !HeisenbergSource.executedOnSuccess
-              && HeisenbergSource.executedOnError
-              && HeisenbergSource.executedOnTerminate
-              && HeisenbergSource.receivedOnTerminateInfo);
+    probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> assertState(false, true, true));
 
     assertThat(HeisenbergSource.terminateStatus, is(ERROR_BODY));
 
-    OnTerminateInformation terminateInfo = HeisenbergSource.onTerminateInfo;
-    Optional<Error> optionalError = terminateInfo.getError();
-    assertThat(optionalError.isPresent(), is(true));
-    Error error = optionalError.get();
+    Optional<Error> optionalError = HeisenbergSource.error;
+    assertThat(optionalError, is(not(empty())));
+    assertThat(optionalError.get().getErrorType(), is(errorType(SOURCE_ERROR_RESPONSE_SEND)));
   }
 
   @Test
-  public void reconnectWithEnrichedException() throws Exception {
-    startFlow("sourceFailedOnRuntime");
-    probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> sourceTimesStarted > 2);
+  public void failureInFlowCallsOnErrorDirectlyAndHandlesItCorrectly() throws Exception {
+    startFlow("failureInFlowCallsOnErrorDirectly");
+    probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> assertState(false, true, true));
+
+  }
+
+  @Test
+  public void failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt() throws Exception {
+    startFlow("failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt");
+    probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> assertState(false, false, true));
+
+    assertThat(HeisenbergSource.terminateStatus, is(ERROR_PARAMETER));
+
+    Optional<Error> optionalError = HeisenbergSource.error;
+    assertThat(optionalError, is(not(empty())));
+    assertThat(optionalError.get().getErrorType(), is(errorType(SOURCE_ERROR_RESPONSE_GENERATE)));
   }
 
   private void startFlow(String flowName) throws Exception {
     ((Flow) getFlowConstruct(flowName)).start();
+  }
+
+  private boolean assertState(boolean executedOnSuccess, boolean executedOnError, boolean executedOnTerminate) {
+    return HeisenbergSource.executedOnSuccess == executedOnSuccess
+        && HeisenbergSource.executedOnError == executedOnError
+        && HeisenbergSource.executedOnTerminate == executedOnTerminate;
   }
 }

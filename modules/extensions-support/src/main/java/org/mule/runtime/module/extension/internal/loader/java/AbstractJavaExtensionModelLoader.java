@@ -18,7 +18,7 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.module.extension.internal.loader.enricher.ClassLoaderDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ConfigNameDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ConnectionDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.enricher.ConnectionErrorsDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionsErrorsDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DataTypeDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DisplayDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.DynamicMetadataDeclarationEnricher;
@@ -70,7 +70,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new ConfigNameDeclarationEnricher(),
                                                                                                new ConnectionDeclarationEnricher(),
                                                                                                new ErrorsDeclarationEnricher(),
-                                                                                               new ConnectionErrorsDeclarationEnricher(),
+                                                                                               new ExtensionsErrorsDeclarationEnricher(),
                                                                                                new DataTypeDeclarationEnricher(),
                                                                                                new DisplayDeclarationEnricher(),
                                                                                                new DynamicMetadataDeclarationEnricher(),

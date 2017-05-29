@@ -34,7 +34,6 @@ import static org.mule.tck.junit4.matcher.EitherMatcher.rightMatches;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultMuleContext;
@@ -58,8 +57,6 @@ import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
 
-import java.util.Collection;
-
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -67,6 +64,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.util.Collection;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -163,8 +162,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template).sendResponseToClient(any(), any(), any(), any());
     verify(template, never()).sendFailureResponseToClient(any(), any(), any());
-    verify(template).sendAfterTerminateResponseToClient(argThat(leftMatches(Matchers.any(Event.class))),
-                                                        any());
+    verify(template).sendAfterTerminateResponseToClient(argThat(leftMatches(Matchers.any(Event.class))));
     verify(notifier).phaseSuccessfully();
     verify(notifier, never()).phaseFailure(any());
   }
@@ -183,8 +181,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(template).sendFailureResponseToClient(any(), any(), any());
     // The error handler is called with the apropriate type, but for the termination it counts as successful if the error response
     // was sent.
-    verify(template).sendAfterTerminateResponseToClient(argThat(leftMatches(Matchers.any(Event.class))),
-                                                        any());
+    verify(template).sendAfterTerminateResponseToClient(argThat(leftMatches(Matchers.any(Event.class))));
     verify(notifier).phaseSuccessfully();
     verify(notifier, never()).phaseFailure(any());
   }
@@ -204,8 +201,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(template).sendFailureResponseToClient(any(), any(), any());
     // The error handler is called with the apropriate type, but for the termination it counts as successful if the error response
     // was sent.
-    verify(template).sendAfterTerminateResponseToClient(argThat(leftMatches(Matchers.any(Event.class))),
-                                                        any());
+    verify(template).sendAfterTerminateResponseToClient(argThat(leftMatches(Matchers.any(Event.class))));
     verify(notifier).phaseSuccessfully();
     verify(notifier, never()).phaseFailure(any());
   }
@@ -222,8 +218,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
-    verify(template).sendAfterTerminateResponseToClient(argThat(rightMatches(withEventThat(isErrorTypeFlowFailure()))),
-                                                        any());
+    verify(template).sendAfterTerminateResponseToClient(argThat(rightMatches(withEventThat(isErrorTypeFlowFailure()))));
     verify(notifier).phaseSuccessfully();
     verify(notifier, never()).phaseFailure(any());
   }
@@ -243,8 +238,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template, never()).sendFailureResponseToClient(any(), any(), any());
     verify(template)
-        .sendAfterTerminateResponseToClient(argThat(rightMatches(withEventThat(isErrorTypeSourceErrorResponseGenerate()))),
-                                            any());
+        .sendAfterTerminateResponseToClient(argThat(rightMatches(withEventThat(isErrorTypeSourceErrorResponseGenerate()))));
     verify(notifier, never()).phaseSuccessfully();
     verify(notifier).phaseFailure(argThat(instanceOf(mockException().getClass())));
   }
@@ -263,8 +257,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
     verify(template)
-        .sendAfterTerminateResponseToClient(argThat(rightMatches(withEventThat(isErrorTypeSourceErrorResponseSend()))),
-                                            any());
+        .sendAfterTerminateResponseToClient(argThat(rightMatches(withEventThat(isErrorTypeSourceErrorResponseSend()))));
     verify(notifier, never()).phaseSuccessfully();
     verify(notifier).phaseFailure(argThat(instanceOf(mockException().getClass())));
   }
@@ -287,8 +280,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template, never()).sendFailureResponseToClient(any(), any(), any());
     verify(template)
-        .sendAfterTerminateResponseToClient(argThat(rightMatches(withEventThat(isErrorTypeSourceErrorResponseGenerate()))),
-                                            any());
+        .sendAfterTerminateResponseToClient(argThat(rightMatches(withEventThat(isErrorTypeSourceErrorResponseGenerate()))));
     verify(notifier, never()).phaseSuccessfully();
     verify(notifier).phaseFailure(argThat(instanceOf(mockException().getClass())));
   }
@@ -310,8 +302,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(template, never()).sendResponseToClient(any(), any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
     verify(template)
-        .sendAfterTerminateResponseToClient(argThat(rightMatches(withEventThat(isErrorTypeSourceErrorResponseSend()))),
-                                            any());
+        .sendAfterTerminateResponseToClient(argThat(rightMatches(withEventThat(isErrorTypeSourceErrorResponseSend()))));
     verify(notifier, never()).phaseSuccessfully();
     verify(notifier).phaseFailure(argThat(instanceOf(mockException().getClass())));
   }

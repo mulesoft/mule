@@ -7,10 +7,9 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.exception.SourceParametersException;
+import org.mule.runtime.core.util.func.CheckedFunction;
 
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Implementation of this interfaces must provide functions to convert and {@link Event} to the response parameters of the success
@@ -27,7 +26,7 @@ public interface MessageSourceResponseParametersProcessor {
    *
    * @return a function to resolve the response function parameters.
    */
-  Function<Event, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction();
+  CheckedFunction<Event, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction();
 
   /**
    * Generates the failure response function parameters. This function is later used to generate the response parameters and use
@@ -35,15 +34,5 @@ public interface MessageSourceResponseParametersProcessor {
    *
    * @return a function to resolve the failure response function parameters.
    */
-  SourceParameterResolver getFailedExecutionResponseParametersFunction();
-
-  @FunctionalInterface
-  interface SourceParameterResolver extends Function<Event, Map<String, Object>> {
-
-    @Override
-    Map<String, Object> apply(Event event) throws SourceParametersException;
-
-  }
-
-
+  CheckedFunction<Event, Map<String, Object>> getFailedExecutionResponseParametersFunction();
 }

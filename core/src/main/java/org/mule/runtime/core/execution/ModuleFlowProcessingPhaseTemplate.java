@@ -76,6 +76,5 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
    * @param responseCompletionCallback
    * @throws MuleException
    */
-  void sendAfterTerminateResponseToClient(Either<Event, MessagingException> either,
-                                          ResponseCompletionCallback responseCompletionCallback);
+  void sendAfterTerminateResponseToClient(Either<Event, MessagingException> either);
 }
