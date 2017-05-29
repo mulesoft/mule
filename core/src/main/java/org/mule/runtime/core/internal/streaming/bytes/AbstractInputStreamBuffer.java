@@ -173,13 +173,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
 
 
   protected ByteBuffer copy(long position, int length) {
-    ByteBuffer copy = buffer.duplicate();
-
-    final int newPosition = toIntExact(position);
-
-    copy.position(newPosition);
-    copy.limit(newPosition + min(copy.capacity(), min(length, copy.remaining())));
-
-    return copy;
+    final int offset = toIntExact(position);
+    return ByteBuffer.wrap(buffer.array(), offset, min(length, buffer.limit() - offset)).slice();
   }
 }
