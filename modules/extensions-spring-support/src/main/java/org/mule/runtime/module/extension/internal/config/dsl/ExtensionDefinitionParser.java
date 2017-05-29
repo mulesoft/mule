@@ -69,6 +69,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.declaration.type.TypeUtils;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.config.dsl.object.CharsetValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultObjectParsingDelegate;
@@ -295,7 +296,7 @@ public abstract class ExtensionDefinitionParser {
         }
 
         private boolean isNestedProcessor(MetadataType type) {
-          return NestedProcessor.class.isAssignableFrom(getType(type));
+          return ExtensionMetadataTypeUtils.getType(type).map(NestedProcessor.class::isAssignableFrom).orElse(false);
         }
       });
     });
@@ -553,7 +554,7 @@ public abstract class ExtensionDefinitionParser {
 
     parseAttributeParameter(key, name, arrayType, defaultValue, expressionSupport, required, modelProperties);
 
-    Class<? extends Iterable> collectionType = getType(arrayType);
+    Class<?> collectionType = ExtensionMetadataTypeUtils.getType(arrayType).orElse(null);
 
     if (Set.class.equals(collectionType)) {
       collectionType = HashSet.class;
@@ -576,7 +577,7 @@ public abstract class ExtensionDefinitionParser {
 
         private void addBasicTypeDefinition(MetadataType metadataType) {
           Builder itemDefinitionBuilder = baseDefinitionBuilder.copy().withIdentifier(itemIdentifier).withNamespace(itemNamespace)
-              .withTypeDefinition(fromType(getType(metadataType)))
+              .withTypeDefinition(fromType(ExtensionMetadataTypeUtils.getType(metadataType).orElse(Object.class)))
               .withTypeConverter(value -> resolverOf(name, metadataType, value, getDefaultValue(metadataType).orElse(null),
                                                      getExpressionSupport(metadataType), false, emptySet()));
           addDefinition(itemDefinitionBuilder.build());

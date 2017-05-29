@@ -75,24 +75,24 @@ final class ObjectTypeSchemaDelegate {
    * vary depending on the properties of the type itself along with the properties associated to the parameter.
    * <p>
    * This method serves as a resolver for all that logic, creating the required element for the parameter with complex type.
-   * 
-   * @param type the {@link ObjectType} of the parameter for which the element is being created
+   *  @param type the {@link ObjectType} of the parameter for which the element is being created
    * @param paramSyntax the {@link DslElementSyntax} of the parameter for which the element is being created
    * @param paramDsl the {@link ParameterDslConfiguration} associated to the parameter, if any is present.
    * @param description the documentation associated to the parameter
    * @param all the {@link ExplicitGroup group} the generated element should belong to
+   * @param required whether or not the element should be required
    */
   void generatePojoElement(ObjectType type, DslElementSyntax paramSyntax, ParameterDslConfiguration paramDsl,
-                           String description, List<TopLevelElement> all) {
+                           String description, List<TopLevelElement> all, boolean required) {
 
     if (paramSyntax.supportsChildDeclaration()) {
       if (builder.isImported(type)) {
-        addImportedTypeElement(paramSyntax, description, type, all);
+        addImportedTypeElement(paramSyntax, description, type, all, required);
       } else {
         if (paramSyntax.isWrapped()) {
-          declareRefToType(type, paramSyntax, description, all);
+          declareRefToType(type, paramSyntax, description, all, required);
         } else {
-          declareTypeInline(type, paramSyntax, description, all);
+          declareTypeInline(type, paramSyntax, description, all, required);
         }
       }
     }
@@ -106,18 +106,19 @@ final class ObjectTypeSchemaDelegate {
   }
 
   private void declareTypeInline(ObjectType objectType, DslElementSyntax paramDsl, String description,
-                                 List<TopLevelElement> all) {
+                                 List<TopLevelElement> all, boolean required) {
     registerPojoComplexType(objectType, null, description);
     String typeName = getBaseTypeName(objectType);
     QName localQName = new QName(paramDsl.getNamespace(), typeName, paramDsl.getPrefix());
-    addChildElementTypeExtension(localQName, description, paramDsl.getElementName(), !paramDsl.supportsAttributeDeclaration(),
+    addChildElementTypeExtension(localQName, description, paramDsl.getElementName(),
+                                 !paramDsl.supportsAttributeDeclaration() && required,
                                  all);
   }
 
   private void declareRefToType(ObjectType objectType, DslElementSyntax paramDsl, String description,
-                                List<TopLevelElement> all) {
+                                List<TopLevelElement> all, boolean required) {
     registerPojoSubtypes(objectType, builder.getTypesMapping().getSubTypes(objectType));
-    addAbstractTypeRef(paramDsl, description, objectType, all);
+    addAbstractTypeRef(paramDsl, description, objectType, all, required);
   }
 
   /**
@@ -133,7 +134,7 @@ final class ObjectTypeSchemaDelegate {
   }
 
   private void addImportedTypeElement(DslElementSyntax paramDsl, String description, MetadataType metadataType,
-                                      List<TopLevelElement> all) {
+                                      List<TopLevelElement> all, boolean required) {
 
     DslElementSyntax typeDsl = builder.getDslResolver().resolve(metadataType)
         .orElseThrow(() -> new IllegalArgumentException(format("The given type [%s] is not eligible for Import",
@@ -164,14 +165,15 @@ final class ObjectTypeSchemaDelegate {
     } else {
       QName extensionBase = new QName(typeDsl.getNamespace(), sanitizeName(getId(metadataType)), typeDsl.getPrefix());
       addChildElementTypeExtension(extensionBase, description, paramDsl.getElementName(),
-                                   !paramDsl.supportsAttributeDeclaration(), all);
+                                   !paramDsl.supportsAttributeDeclaration() && required, all);
     }
   }
 
   private void addAbstractTypeRef(DslElementSyntax paramDsl, String description, MetadataType metadataType,
-                                  List<TopLevelElement> all) {
+                                  List<TopLevelElement> all, boolean required) {
     TopLevelElement objectElement = builder.createTopLevelElement(paramDsl.getElementName(),
-                                                                  paramDsl.supportsAttributeDeclaration() ? ZERO : ONE,
+                                                                  !paramDsl.supportsAttributeDeclaration() && required ? ONE
+                                                                      : ZERO,
                                                                   MAX_ONE);
     objectElement.setAnnotation(builder.createDocAnnotation(description));
     objectElement.setComplexType(createComplexTypeWithAbstractElementRef(metadataType));

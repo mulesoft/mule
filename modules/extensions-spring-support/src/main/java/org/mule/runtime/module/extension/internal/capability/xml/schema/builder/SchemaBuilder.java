@@ -534,7 +534,7 @@ public final class SchemaBuilder {
                                            childElements);
           }
         } else {
-          objectTypeDelegate.generatePojoElement(objectType, paramDsl, dslModel, description, childElements);
+          objectTypeDelegate.generatePojoElement(objectType, paramDsl, dslModel, description, childElements, required);
         }
       }
 

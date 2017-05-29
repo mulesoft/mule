@@ -9,16 +9,17 @@ package org.mule.runtime.config.spring.dsl.declaration;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newFlow;
+import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newObjectValue;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.api.app.declaration.fluent.ParameterSimpleValue.cdata;
 import static org.mule.runtime.api.app.declaration.fluent.ParameterSimpleValue.plain;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.CONNECTION;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.IS_CDATA;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
@@ -53,7 +54,6 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ComponentElementDeclaration;
-import org.mule.runtime.api.app.declaration.ParameterGroupElementDeclaration;
 import org.mule.runtime.api.app.declaration.ParameterValue;
 import org.mule.runtime.api.app.declaration.RouteElementDeclaration;
 import org.mule.runtime.api.app.declaration.fluent.ArtifactDeclarer;
@@ -107,7 +107,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.w3c.dom.Document;
 
@@ -119,9 +118,9 @@ import org.w3c.dom.Document;
 public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLoader {
 
   public static final String TRANSFORM_IDENTIFIER = "transform";
-  public static final String TRANSFORMER_SET_VARIABLE = "SetVariables";
-  public static final String TRANSFORMER_GENERAL = "General";
-  public static final String SCRIPT = "script";
+  public static final String TRANSFORM_SCRIPT = "script";
+  public static final String TRANSFORM_RESOURCE = "resource";
+  public static final String TRANSFORM_VARIABLE_NAME = "variableName";
 
   private final DslResolvingContext context;
   private final Map<ExtensionModel, DslSyntaxResolver> resolvers;
@@ -325,7 +324,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
           }
 
         } else {
-          declareTransform(model, e -> e.newOperation(model.getName()));
+          declareTransform(model);
         }
       }
 
@@ -399,92 +398,85 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
         }
       }
 
-      private ComponentElementDeclarer declareComponent(ComponentModel model,
-                                                        Function<ElementDeclarer, ComponentElementDeclarer> declarerProvider) {
+      private void declareTransform(ComponentModel model) {
         final DslElementSyntax elementDsl = dsl.resolve(model);
-        if (elementDsl.getElementName().equals(line.getIdentifier())) {
-          ComponentElementDeclarer declarer = declarerProvider.apply(extensionElementsDeclarer);
+        if (model.getName().equals(TRANSFORM_IDENTIFIER) && elementDsl.getElementName().equals(line.getIdentifier())) {
 
-          if (line.getConfigAttributes().get(CONFIG_ATTRIBUTE_NAME) != null) {
-            declarer.withConfig(line.getConfigAttributes().get(CONFIG_ATTRIBUTE_NAME).getValue());
-          }
+          ComponentElementDeclarer transform = extensionElementsDeclarer.newOperation(TRANSFORM_IDENTIFIER);
 
-          declareParameterizedComponent(model, elementDsl, declarer, line.getConfigAttributes(), line.getChildren());
-          stop();
-          return declarer;
-        }
-        return null;
-      }
+          line.getChildren().stream()
+              .filter(c -> c.getIdentifier().equals("message"))
+              .findFirst()
+              .ifPresent(messageConfig -> {
+                ParameterGroupElementDeclarer messageGroup = newParameterGroup("Message");
 
-      private void declareTransform(ComponentModel model,
-                                    Function<ElementDeclarer, ComponentElementDeclarer> declarerProvider) {
-        final DslElementSyntax elementDsl = dsl.resolve(model);
-        if (elementDsl.getElementName().equals(line.getIdentifier())) {
-          ComponentElementDeclarer declarer = declarerProvider.apply(extensionElementsDeclarer);
-          copyExplicitAttributes(model, line.getConfigAttributes(), declarer);
+                messageConfig.getChildren().stream()
+                    .filter(c -> c.getIdentifier().equals("set-payload"))
+                    .findFirst()
+                    .ifPresent(payloadConfig -> {
+                      ParameterObjectValue.Builder payload = newObjectValue();
+                      populateTransformScriptParameter(payloadConfig, payload);
+                      messageGroup.withParameter("setPayload", payload.build());
+                    });
 
-          // handle set-payload and set-attributes
-          model.getParameterGroupModels().stream()
-              .filter(g -> !g.getName().equals(DEFAULT_GROUP_NAME))
-              .filter(ParameterGroupModel::isShowInDsl)
-              .forEach(group -> elementDsl.getChild(group.getName())
-                  .ifPresent(groupDsl -> line.getChildren().stream()
-                      .filter(c -> c.getIdentifier().equals(groupDsl.getElementName()))
-                      .findFirst()
-                      .ifPresent(groupConfig -> declarer.withParameterGroup(createTransformInlineGroup(group, groupConfig)))));
+                messageConfig.getChildren().stream()
+                    .filter(c -> c.getIdentifier().equals("set-attributes"))
+                    .findFirst()
+                    .ifPresent(attributesConfig -> {
+                      ParameterObjectValue.Builder attributes = newObjectValue();
+                      populateTransformScriptParameter(attributesConfig, attributes);
+                      messageGroup.withParameter("setAttributes", attributes.build());
+                    });
 
-          // handle set-variable
-          ParameterGroupElementDeclarer general = newParameterGroup();
-          model.getAllParameterModels().stream().filter(g -> g.getName().equals(TRANSFORMER_SET_VARIABLE)).findFirst()
-              .ifPresent(group -> {
-                ParameterListValue.Builder setVariablesListBuilder = ElementDeclarer.newListValue();
-                elementDsl.getChild(TRANSFORMER_SET_VARIABLE)
-                    .ifPresent(groupDsl -> line.getChildren().stream()
-                        .filter(c -> groupDsl.getElementName().contains(c.getIdentifier()))
-                        .forEach(variableConfig -> {
-                          setVariablesListBuilder.withValue(createTransformVariablesItem(variableConfig));
-                        }));
-                general.withParameter(TRANSFORMER_SET_VARIABLE, setVariablesListBuilder.build());
+                transform.withParameterGroup(messageGroup.getDeclaration());
               });
 
-          declarer.withParameterGroup(general.getDeclaration());
-          declarationConsumer.accept((ComponentElementDeclaration) declarer.getDeclaration());
+          line.getChildren().stream()
+              .filter(c -> c.getIdentifier().equals("variables"))
+              .findFirst()
+              .ifPresent(variablesConfig -> {
+                ParameterGroupElementDeclarer variablesGroup = newParameterGroup("Set Variables");
+                ParameterListValue.Builder variables = newListValue();
+
+                variablesConfig.getChildren()
+                    .forEach(variableConfig -> {
+                      ParameterObjectValue.Builder variable = newObjectValue();
+                      variable.withParameter(TRANSFORM_VARIABLE_NAME,
+                                             variableConfig.getConfigAttributes().get(TRANSFORM_VARIABLE_NAME).getValue());
+
+                      populateTransformScriptParameter(variableConfig, variable);
+
+                      variables.withValue(variable.build());
+
+                    });
+
+                transform.withParameterGroup(variablesGroup
+                    .withParameter("setVariables", variables.build())
+                    .getDeclaration());
+              });
+
+          line.getConfigAttributes().values().forEach(a -> transform.withCustomParameter(a.getName(), a.getValue()));
+
+          declarationConsumer.accept((ComponentElementDeclaration) transform.getDeclaration());
           stop();
         }
       }
     };
   }
 
-  private ParameterGroupElementDeclaration createTransformInlineGroup(ParameterGroupModel group,
-                                                                      ConfigLine groupConfig) {
-
-    ParameterGroupElementDeclarer groupDeclarer = newParameterGroup(group.getName());
-    groupConfig.getConfigAttributes().values().stream()
-        .filter(a -> !a.getName().equals(NAME_ATTRIBUTE_NAME) && !a.getName().equals(CONFIG_ATTRIBUTE_NAME))
-        .filter(a -> !a.isValueFromSchema())
-        .forEach(a -> group.getParameter(a.getName())
-            .ifPresent(parameter -> groupDeclarer.withParameter(a.getName(), ParameterSimpleValue.of(a.getValue()))));
-
-    // add DW script text content to script parameter
-    String content = groupConfig.getTextContent();
-    if (content != null) {
-      ParameterValue value = isCData(groupConfig) ? plain(content) : cdata(content);
-      groupDeclarer.withParameter(SCRIPT, value);
+  private void populateTransformScriptParameter(ConfigLine config, ParameterObjectValue.Builder builder) {
+    if (config.getConfigAttributes().containsKey(TRANSFORM_RESOURCE)) {
+      builder.withParameter(TRANSFORM_RESOURCE, config.getConfigAttributes().get(TRANSFORM_RESOURCE).getValue());
     }
-    return groupDeclarer.getDeclaration();
-  }
 
-  private ParameterObjectValue createTransformVariablesItem(ConfigLine configLine) {
-    ParameterObjectValue.Builder objectBuilder = ElementDeclarer.newObjectValue();
-    copyExplicitAttributes(configLine.getConfigAttributes(), objectBuilder);
-
-    // add DW script text content to script parameter
-    String content = configLine.getTextContent();
-    if (content != null) {
-      ParameterValue value = isCData(configLine) ? plain(content) : cdata(content);
-      objectBuilder.withParameter(SCRIPT, value);
+    if (!isBlank(config.getTextContent())) {
+      builder.withParameter(TRANSFORM_SCRIPT, config.getTextContent());
     }
-    return objectBuilder.build();
+
+    config.getConfigAttributes().entrySet().stream()
+        .filter(e -> !e.getKey().equals(TRANSFORM_RESOURCE))
+        .map(Map.Entry::getValue)
+        .forEach(a -> builder.withParameter(a.getName(), a.getValue()));
   }
 
   private boolean isCData(ConfigLine config) {
