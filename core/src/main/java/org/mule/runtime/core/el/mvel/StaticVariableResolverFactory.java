@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.core.el.mvel;
 
+import org.mule.mvel2.ParserConfiguration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.ExtendedServerContext;
 import org.mule.runtime.core.el.context.MuleInstanceContext;
-import org.mule.runtime.core.el.context.ServerContext;
 import org.mule.runtime.core.el.function.DateTimeExpressionLanguageFuntion;
 import org.mule.runtime.core.el.function.RegexExpressionLanguageFuntion;
 import org.mule.runtime.core.el.function.WildcardExpressionLanguageFuntion;
-import org.mule.mvel2.ParserConfiguration;
 
 public class StaticVariableResolverFactory extends MVELExpressionLanguageContext {
 

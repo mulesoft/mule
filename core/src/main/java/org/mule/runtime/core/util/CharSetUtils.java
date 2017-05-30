@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.SystemUtils.IS_JAVA_1_4;
+
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Method;
@@ -15,7 +17,7 @@ public class CharSetUtils extends org.apache.commons.lang.CharSetUtils {
 
   public static String defaultCharsetName() {
     try {
-      if (SystemUtils.IS_JAVA_1_4) {
+      if (IS_JAVA_1_4) {
         return new OutputStreamWriter(new ByteArrayOutputStream()).getEncoding();
       } else {
         Class target = Charset.class;

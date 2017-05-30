@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.SystemUtils.FILE_SEPARATOR;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -18,7 +19,7 @@ public class ApplicationStartupSplashScreen extends SplashScreen {
   @Override
   protected void doHeader(MuleContext context) {
     header.add("Application: " + context.getConfiguration().getId());
-    header.add(String.format("OS encoding: %s, Mule encoding: %s", SystemUtils.FILE_SEPARATOR,
+    header.add(String.format("OS encoding: %s, Mule encoding: %s", FILE_SEPARATOR,
                              context.getConfiguration().getDefaultEncoding()));
     header.add(" ");
   }
@@ -39,7 +40,7 @@ public class ApplicationStartupSplashScreen extends SplashScreen {
         String description = agent.getDescription();
         if (description.startsWith("'''")) {
           description = description.substring("'''".length());
-          // handle multiline descriptions better
+          // handle multi line descriptions better
           for (StringTokenizer st = new StringTokenizer(description, String.format("%n")); st.hasMoreTokens();) {
             footer.add("  " + st.nextToken());
           }

@@ -4,9 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util;
+package org.mule.runtime.core.internal.util;
 
+import static org.apache.commons.lang.SystemUtils.JAVA_VENDOR;
 import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.core.util.SystemUtils;
+import org.mule.runtime.core.util.VersionRange;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -269,7 +272,7 @@ public class JdkVersionUtils {
     }
     if (!isSupportedJdkVendor()) {
       logger.info("You're executing with a JDK made by a vendor that is not on the recommended list of vendors. Vendor: "
-          + SystemUtils.JAVA_VENDOR + " Please consider changing to a recommended JDK vendor.");
+          + JAVA_VENDOR + " Please consider changing to a recommended JDK vendor.");
     }
   }
 }

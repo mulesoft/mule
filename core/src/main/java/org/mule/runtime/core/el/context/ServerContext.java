@@ -6,8 +6,17 @@
  */
 package org.mule.runtime.core.el.context;
 
+import static org.apache.commons.lang.SystemUtils.FILE_SEPARATOR;
+import static org.apache.commons.lang.SystemUtils.JAVA_IO_TMPDIR;
+import static org.apache.commons.lang.SystemUtils.JAVA_VENDOR;
+import static org.apache.commons.lang.SystemUtils.JAVA_VERSION;
+import static org.apache.commons.lang.SystemUtils.OS_ARCH;
+import static org.apache.commons.lang.SystemUtils.OS_NAME;
+import static org.apache.commons.lang.SystemUtils.OS_VERSION;
+import static org.apache.commons.lang.SystemUtils.USER_DIR;
+import static org.apache.commons.lang.SystemUtils.USER_HOME;
+import static org.apache.commons.lang.SystemUtils.USER_NAME;
 import org.mule.runtime.core.util.NetworkUtils;
-import org.mule.runtime.core.util.SystemUtils;
 
 import java.net.UnknownHostException;
 import java.util.Calendar;
@@ -56,11 +65,11 @@ public class ServerContext {
   }
 
   public String getTmpDir() {
-    return SystemUtils.JAVA_IO_TMPDIR;
+    return JAVA_IO_TMPDIR;
   }
 
   public String getFileSeparator() {
-    return SystemUtils.FILE_SEPARATOR;
+    return FILE_SEPARATOR;
   }
 
   public Map<String, String> getEnv() {
@@ -72,35 +81,35 @@ public class ServerContext {
   }
 
   public String getOsName() {
-    return SystemUtils.OS_NAME;
+    return OS_NAME;
   }
 
   public String getOsArch() {
-    return SystemUtils.OS_ARCH;
+    return OS_ARCH;
   }
 
   public String getOsVersion() {
-    return SystemUtils.OS_VERSION;
+    return OS_VERSION;
   }
 
   public String getJavaVersion() {
-    return SystemUtils.JAVA_VERSION;
+    return JAVA_VERSION;
   }
 
   public String getJavaVendor() {
-    return SystemUtils.JAVA_VENDOR;
+    return JAVA_VENDOR;
   }
 
   public String getUserName() {
-    return SystemUtils.USER_NAME;
+    return USER_NAME;
   }
 
   public String getUserHome() {
-    return SystemUtils.USER_HOME;
+    return USER_HOME;
   }
 
   public String getUserDir() {
-    return SystemUtils.USER_DIR;
+    return USER_DIR;
   }
 
 }

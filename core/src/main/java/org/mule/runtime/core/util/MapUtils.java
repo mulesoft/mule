@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import java.util.Arrays;
@@ -81,7 +82,7 @@ public class MapUtils extends org.apache.commons.collections.MapUtils {
     buf.append('{');
 
     if (newline) {
-      buf.append(SystemUtils.LINE_SEPARATOR);
+      buf.append(LINE_SEPARATOR);
     }
 
     Object[] entries = props.entrySet().toArray();
@@ -94,7 +95,7 @@ public class MapUtils extends org.apache.commons.collections.MapUtils {
       buf.append(PropertiesUtils.maskedPropertyValue(property));
 
       if (newline) {
-        buf.append(SystemUtils.LINE_SEPARATOR);
+        buf.append(LINE_SEPARATOR);
       } else {
         buf.append(',').append(' ');
       }
@@ -107,7 +108,7 @@ public class MapUtils extends org.apache.commons.collections.MapUtils {
     buf.append(PropertiesUtils.maskedPropertyValue(lastProperty));
 
     if (newline) {
-      buf.append(SystemUtils.LINE_SEPARATOR);
+      buf.append(LINE_SEPARATOR);
     }
 
     buf.append('}');

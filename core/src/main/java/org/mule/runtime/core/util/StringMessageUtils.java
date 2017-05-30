@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
@@ -67,7 +68,7 @@ public final class StringMessageUtils {
         while (temp.length() > 0) {
           len = (trimLength <= temp.length() ? trimLength : temp.length());
           String msg = temp.substring(0, len);
-          x = msg.indexOf(SystemUtils.LINE_SEPARATOR);
+          x = msg.indexOf(LINE_SEPARATOR);
 
           if (x > -1) {
             msg = msg.substring(0, x);
@@ -90,13 +91,13 @@ public final class StringMessageUtils {
       }
     }
 
-    buf.append(SystemUtils.LINE_SEPARATOR);
+    buf.append(LINE_SEPARATOR);
     if (c != ' ') {
       buf.append(StringUtils.repeat(c, maxlength));
     }
 
     for (int i = 0; i < messages.size(); i++) {
-      buf.append(SystemUtils.LINE_SEPARATOR);
+      buf.append(LINE_SEPARATOR);
       if (c != ' ') {
         buf.append(c);
       }
@@ -118,7 +119,7 @@ public final class StringMessageUtils {
         buf.append(c);
       }
     }
-    buf.append(SystemUtils.LINE_SEPARATOR);
+    buf.append(LINE_SEPARATOR);
     if (c != ' ') {
       buf.append(StringUtils.repeat(c, maxlength));
     }

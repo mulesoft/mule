@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+
 import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.Array;
@@ -99,7 +101,7 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
     buf.append('[');
 
     if (newline) {
-      buf.append(SystemUtils.LINE_SEPARATOR);
+      buf.append(LINE_SEPARATOR);
     }
 
     Iterator items = c.iterator();
@@ -113,7 +115,7 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
       }
 
       if (newline) {
-        buf.append(SystemUtils.LINE_SEPARATOR);
+        buf.append(LINE_SEPARATOR);
       } else {
         buf.append(',').append(' ');
       }
@@ -128,7 +130,7 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
     }
 
     if (newline) {
-      buf.append(SystemUtils.LINE_SEPARATOR);
+      buf.append(LINE_SEPARATOR);
     }
 
     if (tooManyElements) {

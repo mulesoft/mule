@@ -12,8 +12,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.core.internal.util.JdkVersionUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.runtime.core.util.JdkVersionUtils.JdkVersion;
+import org.mule.runtime.core.internal.util.JdkVersionUtils.JdkVersion;
 
 import java.lang.reflect.Field;
 import java.util.jar.Attributes;

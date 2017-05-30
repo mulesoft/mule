@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.config.spring;
 
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
 import org.mule.runtime.config.spring.parsers.DefaultXmlMetadataAnnotations;
 import org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations;
-import org.mule.runtime.core.util.SystemUtils;
 import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.ByteArrayInputStream;
@@ -154,7 +154,7 @@ final public class MuleDocumentLoader implements DocumentLoader {
 
       if (!annotationsStack.isEmpty()) {
         annotationsStack.peek()
-            .appendElementBody(SystemUtils.LINE_SEPARATOR + metadataAnnotations.getElementString() + SystemUtils.LINE_SEPARATOR);
+            .appendElementBody(LINE_SEPARATOR + metadataAnnotations.getElementString() + LINE_SEPARATOR);
       }
 
       walker.getParentNode().setUserData(METADATA_ANNOTATIONS_KEY, metadataAnnotations, COPY_METADATA_ANNOTATIONS_DATA_HANDLER);

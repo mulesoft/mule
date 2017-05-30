@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -16,10 +20,6 @@ import java.util.Map;
 
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @SmallTest
 public class MapUtilsTestCase extends AbstractMuleTestCase {
@@ -70,7 +70,7 @@ public class MapUtilsTestCase extends AbstractMuleTestCase {
     Map props = MapUtils.mapWithKeysAndValues(HashMap.class, new Object[] {"foo"}, new Object[] {"bar"});
 
     assertEquals("{foo=bar}", MapUtils.toString(props, false));
-    assertEquals("{" + SystemUtils.LINE_SEPARATOR + "foo=bar" + SystemUtils.LINE_SEPARATOR + "}", MapUtils.toString(props, true));
+    assertEquals("{" + LINE_SEPARATOR + "foo=bar" + LINE_SEPARATOR + "}", MapUtils.toString(props, true));
   }
 
   @Test
@@ -82,10 +82,10 @@ public class MapUtilsTestCase extends AbstractMuleTestCase {
     assertTrue(result.indexOf("foozle=doozle") != -1);
 
     result = MapUtils.toString(props, true);
-    assertTrue(result.startsWith("{" + SystemUtils.LINE_SEPARATOR));
+    assertTrue(result.startsWith("{" + LINE_SEPARATOR));
     assertTrue(result.indexOf("foo=bar") != -1);
     assertTrue(result.indexOf("foozle=doozle") != -1);
-    assertTrue(result.endsWith(SystemUtils.LINE_SEPARATOR + "}"));
+    assertTrue(result.endsWith(LINE_SEPARATOR + "}"));
   }
 
 }

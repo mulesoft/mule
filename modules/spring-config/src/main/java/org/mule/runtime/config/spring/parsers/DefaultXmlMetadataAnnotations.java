@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.parsers;
 
-import org.mule.runtime.core.util.SystemUtils;
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -65,7 +65,7 @@ public class DefaultXmlMetadataAnnotations implements XmlMetadataAnnotations {
   @Override
   public String getElementString() {
     return xmlContent.toString()
-        .replaceAll(">\\s+<+", ">" + SystemUtils.LINE_SEPARATOR + "<") /* compact whitespaces and line breaks */
+        .replaceAll(">\\s+<+", ">" + LINE_SEPARATOR + "<") /* compact whitespaces and line breaks */
         .trim();
   }
 
