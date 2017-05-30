@@ -2877,6 +2877,7 @@
         "description": "",
         "modelProperties": {}
       },
+      "errors": [],
       "transactional": false,
       "requiresConnection": false,
       "parameterGroupModels": [
