@@ -141,7 +141,7 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
     List<URL> moduleProperties = new ArrayList();
     moduleProperties.add(getClass().getClassLoader().getResource("moduleJavaPackages.properties"));
     when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
-      .thenReturn(new EnumerationAdapter(moduleProperties));
+        .thenReturn(new EnumerationAdapter(moduleProperties));
 
     List<MuleModule> modules = moduleDiscoverer.discover();
     assertThat(modules.size(), equalTo(1));
