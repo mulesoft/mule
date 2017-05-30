@@ -11,7 +11,6 @@ import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import java.util.Collection;
 import java.util.Iterator;
 
-
 // @ThreadSafe
 public class CollectionUtils {
 

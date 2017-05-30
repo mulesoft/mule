@@ -11,6 +11,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,7 +105,7 @@ public final class StringMessageUtils {
       buf.append(" ");
       buf.append(messages.get(i));
 
-      String osEncoding = CharSetUtils.defaultCharsetName();
+      String osEncoding = Charset.defaultCharset().name();
       int padding;
       try {
         padding = trimLength - messages.get(i).toString().getBytes(osEncoding).length;
