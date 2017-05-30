@@ -375,6 +375,11 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
         this.connectionIdleTimeout = connectionIdleTimeout;
     }
 
+    public int getResponseBufferSize()
+    {
+      return responseBufferSize;
+    }
+
     public boolean isEnableCookies()
     {
         return enableCookies;
