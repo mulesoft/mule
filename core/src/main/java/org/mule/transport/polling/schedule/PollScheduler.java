@@ -32,6 +32,11 @@ public abstract class PollScheduler<T extends Runnable> implements Scheduler
         this.job = job;
     }
 
+    public T getJob()
+    {
+        return job;
+    }
+
     @Override
     public void setName(String name)
     {

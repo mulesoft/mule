@@ -56,7 +56,6 @@ public class FixedFrequencyScheduler<T extends Runnable> extends PollScheduler<T
     private long startDelay;
 
 
-
     /**
      * <p>
      * A {@link SimpleLifecycleManager} to manage the {@link Scheduler} lifecycle.
@@ -203,6 +202,11 @@ public class FixedFrequencyScheduler<T extends Runnable> extends PollScheduler<T
         }
     }
 
+    public boolean isStarted()
+    {
+        return lifecycleManager.getState().isStarted();
+    }
+
     private boolean isNotStopped()
     {
         return !lifecycleManager.getState().isStopped() && !lifecycleManager.getState().isStopping();
@@ -221,5 +225,10 @@ public class FixedFrequencyScheduler<T extends Runnable> extends PollScheduler<T
     public TimeUnit getTimeUnit()
     {
         return timeUnit;
+    }
+
+    public long getStartDelay()
+    {
+        return startDelay;
     }
 }

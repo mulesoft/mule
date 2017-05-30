@@ -7,6 +7,7 @@
 package org.mule.modules.schedulers.cron;
 
 import static org.mule.modules.schedulers.i18n.SchedulerMessages.couldNotCreateScheduler;
+import static org.mule.modules.schedulers.i18n.SchedulerMessages.couldNotGetSchedulerStatus;
 import static org.mule.modules.schedulers.i18n.SchedulerMessages.couldNotPauseSchedulers;
 import static org.mule.modules.schedulers.i18n.SchedulerMessages.couldNotScheduleJob;
 import static org.mule.modules.schedulers.i18n.SchedulerMessages.couldNotShutdownScheduler;
@@ -207,6 +208,19 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
     {
         this.context = context;
     }
+
+    public boolean isStarted() throws MuleException
+    {
+        try
+        {
+            return quartzScheduler.isStarted();
+        }
+        catch (SchedulerException e)
+        {
+            throw new DefaultMuleException(couldNotGetSchedulerStatus(), e);
+        }
+    }
+
 
     private JobDetail jobDetail(String jobName, String groupName, PollingReceiverWorker job)
     {
