@@ -25,7 +25,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.core.util.FilenameUtils;
+import org.mule.runtime.core.internal.util.FilenameUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -316,7 +316,7 @@ public class FakeMuleServer {
    * @throws IOException if the plugin URL cannot be accessed
    */
   public void addZippedServerPlugin(URL resource) throws IOException {
-    String baseName = FilenameUtils.getName(resource.getPath());
+    String baseName = org.apache.commons.io.FilenameUtils.getName(resource.getPath());
     File tempFile = new File(getServerPluginsDir(), baseName);
     copyURLToFile(resource, tempFile);
   }
@@ -338,7 +338,7 @@ public class FakeMuleServer {
    * @throws IOException if the service URL cannot be accessed
    */
   public void addZippedService(URL resource) throws IOException {
-    String baseName = FilenameUtils.getName(resource.getPath());
+    String baseName = org.apache.commons.io.FilenameUtils.getName(resource.getPath());
     File tempFile = new File(getServicesDir(), baseName);
     copyURLToFile(resource, tempFile);
   }

@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.config.builders;
 
+import static org.apache.commons.io.FilenameUtils.getFullPath;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.util.BeanUtils;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.FilenameUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +32,7 @@ public class PropertiesMuleConfigurationFactory {
   private Properties properties;
 
   public static String getMuleAppConfiguration(String muleConfig) {
-    String directory = FilenameUtils.getFullPath(muleConfig);
+    String directory = getFullPath(muleConfig);
     String muleAppConfiguration = directory + DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
     return muleAppConfiguration;
   }

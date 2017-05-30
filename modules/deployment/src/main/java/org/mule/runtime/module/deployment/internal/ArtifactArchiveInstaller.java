@@ -6,11 +6,10 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
-
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.core.util.FilenameUtils;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 
@@ -53,7 +52,7 @@ public class ArtifactArchiveInstaller {
       throw new IllegalArgumentException("Invalid Mule artifact archive: " + artifactUrl);
     }
 
-    final String baseName = FilenameUtils.getBaseName(artifactUrl.toString());
+    final String baseName = getBaseName(artifactUrl.toString());
     if (baseName.contains("%20")) {
       throw new DeploymentInitException(I18nMessageFactory
           .createStaticMessage("Mule artifact name may not contain spaces: " + baseName));
@@ -69,7 +68,7 @@ public class ArtifactArchiveInstaller {
         logger.info("Exploding a Mule artifact archive: " + fullPath);
       }
 
-      artifactName = FilenameUtils.getBaseName(fullPath);
+      artifactName = getBaseName(fullPath);
       artifactDir = new File(artifactParentDir, artifactName);
       // normalize the full path + protocol to make unzip happy
       final File source = new File(artifactUrl.toURI());

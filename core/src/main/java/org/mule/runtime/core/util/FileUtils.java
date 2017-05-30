@@ -7,6 +7,7 @@
 package org.mule.runtime.core.util;
 
 import static java.lang.System.getProperty;
+import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
@@ -227,7 +228,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
           if (topLevelDirsToIgnore != null) {
             for (int j = 0; j < topLevelDirsToIgnore.length; j++) {
               String ignored = topLevelDirsToIgnore[j];
-              if (ignored.equals(FilenameUtils.getBaseName(files[i].getName()))) {
+              if (ignored.equals(getBaseName(files[i].getName()))) {
                 break OUTER;
               }
             }
