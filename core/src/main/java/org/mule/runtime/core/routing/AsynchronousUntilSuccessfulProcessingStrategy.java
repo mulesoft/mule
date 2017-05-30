@@ -18,6 +18,7 @@ import static org.mule.runtime.core.util.StringUtils.DASH;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -152,6 +153,9 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   protected void doProcess(final Serializable eventStoreKey) {
     try {
       retrieveAndProcessEvent(eventStoreKey);
+    } catch (ObjectStoreException ose) {
+      // If the problem is in the ObjectStore, we won't be able to do the proper error handling anyway.
+      throw new MuleRuntimeException(ose);
     } catch (Exception e) {
       incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(eventStoreKey, e);
     }
