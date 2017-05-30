@@ -85,7 +85,7 @@ public class SoapInvokeOperationDeclarer {
         .withModelProperty(new OperationExecutorModelProperty(new SoapOperationExecutorFactory()))
         .requiresConnection(true).withModelProperty(new ConnectivityModelProperty(ForwardingSoapClient.class));
 
-    soapErrors.forEach(operation::withError);
+    soapErrors.forEach(operation::withErrorModel);
     declareMetadata(operation, loader);
     declareOutput(operation, loader);
     declareGeneralParameters(operation, loader);

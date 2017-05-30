@@ -10,23 +10,23 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.of;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_GENERATE;
-import static org.mule.runtime.extension.api.runtime.source.OnTerminateResult.parameterError;
-import static org.mule.runtime.extension.api.runtime.source.OnTerminateResult.responseError;
-import static org.mule.runtime.extension.api.runtime.source.OnTerminateResult.success;
+import static org.mule.runtime.extension.api.runtime.source.SourceResult.parameterError;
+import static org.mule.runtime.extension.api.runtime.source.SourceResult.responseError;
+import static org.mule.runtime.extension.api.runtime.source.SourceResult.success;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.extension.api.runtime.source.OnTerminateResult;
+import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import java.util.Set;
 
 /**
- * {@link ArgumentResolver} implementation which create instances of {@link OnTerminateResult}
+ * {@link ArgumentResolver} implementation which create instances of {@link SourceResult}
  *
  * @since 4.0
  */
-public class OnTerminateResultArgumentResolver implements ArgumentResolver<OnTerminateResult> {
+public class SourceResultArgumentResolver implements ArgumentResolver<SourceResult> {
 
   private ArgumentResolver<Error> errorArgumentResolver;
   private ArgumentResolver<SourceCallbackContext> callbackContextArgumentResolver;
@@ -36,24 +36,24 @@ public class OnTerminateResultArgumentResolver implements ArgumentResolver<OnTer
                                                               .map(ComponentIdentifier::getName)
                                                               .collect(toSet());
 
-  public OnTerminateResultArgumentResolver(ArgumentResolver<Error> errorArgumentResolver,
-                                           ArgumentResolver<SourceCallbackContext> callbackContextArgumentResolver) {
+  public SourceResultArgumentResolver(ArgumentResolver<Error> errorArgumentResolver,
+                                      ArgumentResolver<SourceCallbackContext> callbackContextArgumentResolver) {
     this.errorArgumentResolver = errorArgumentResolver;
     this.callbackContextArgumentResolver = callbackContextArgumentResolver;
   }
 
   @Override
-  public OnTerminateResult resolve(ExecutionContext executionContext) {
-    Error resolve = errorArgumentResolver.resolve(executionContext);
+  public SourceResult resolve(ExecutionContext executionContext) {
+    Error error = errorArgumentResolver.resolve(executionContext);
     SourceCallbackContext callbackContext = callbackContextArgumentResolver.resolve(executionContext);
 
-    if (resolve == null) {
+    if (error == null) {
       return success(callbackContext);
     } else {
-      String errorIdentifier = resolve.getErrorType().getIdentifier();
+      String errorIdentifier = error.getErrorType().getIdentifier();
       return isErrorGeneratingCallbackParameters(errorIdentifier)
-          ? parameterError(resolve, callbackContext)
-          : responseError(resolve, callbackContext);
+          ? parameterError(error, callbackContext)
+          : responseError(error, callbackContext);
     }
   }
 

@@ -18,7 +18,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.util.collection.ImmutableMapCollector;
-import org.mule.runtime.extension.api.runtime.source.OnTerminateResult;
+import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -40,7 +40,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ErrorArgument
 import org.mule.runtime.module.extension.internal.runtime.resolver.FlowListenerArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.LiteralArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MediaTypeArgumentResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.OnTerminateResultArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.SourceResultArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SecurityContextHandlerArgumentResolver;
@@ -76,8 +76,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private static final ArgumentResolver<FlowListener> FLOW_LISTENER_ARGUMENT_RESOLVER = new FlowListenerArgumentResolver();
   private static final ArgumentResolver<StreamingHelper> STREAMING_HELPER_ARGUMENT_RESOLVER =
       new StreamingHelperArgumentResolver();
-  private static final ArgumentResolver<OnTerminateResult> ON_TERMINATE_CALLBACK =
-      new OnTerminateResultArgumentResolver(ERROR_ARGUMENT_RESOLVER, SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER);
+  private static final ArgumentResolver<SourceResult> SOURCE_RESULT_ARGUMENT_RESOLVER =
+      new SourceResultArgumentResolver(ERROR_ARGUMENT_RESOLVER, SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER);
 
 
   private final Method method;
@@ -143,8 +143,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = FLOW_LISTENER_ARGUMENT_RESOLVER;
       } else if (StreamingHelper.class.equals(parameterType)) {
         argumentResolver = STREAMING_HELPER_ARGUMENT_RESOLVER;
-      } else if (OnTerminateResult.class.equals(parameterType)) {
-        argumentResolver = ON_TERMINATE_CALLBACK;
+      } else if (SourceResult.class.equals(parameterType)) {
+        argumentResolver = SOURCE_RESULT_ARGUMENT_RESOLVER;
       } else {
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
       }

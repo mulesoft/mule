@@ -23,6 +23,7 @@ import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
@@ -35,7 +36,6 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.source.OnTerminateResult;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.test.heisenberg.extension.model.Methylamine;
@@ -141,16 +141,16 @@ public class HeisenbergSource extends Source<String, Attributes> {
   }
 
   @OnTerminate
-  public void onTerminate(OnTerminateResult onTerminateResult) {
-    if (onTerminateResult.isSuccess()) {
+  public void onTerminate(SourceResult sourceResult) {
+    if (sourceResult.isSuccess()) {
       terminateStatus = SUCCESS;
     } else {
-      onTerminateResult.getParameterGenerationError().ifPresent(parameterError -> {
+      sourceResult.getParameterGenerationError().ifPresent(parameterError -> {
         terminateStatus = ERROR_PARAMETER;
         error = of(parameterError);
       });
 
-      onTerminateResult.getResponseError().ifPresent(bodyError -> {
+      sourceResult.getResponseError().ifPresent(bodyError -> {
         terminateStatus = ERROR_BODY;
         error = of(bodyError);
       });

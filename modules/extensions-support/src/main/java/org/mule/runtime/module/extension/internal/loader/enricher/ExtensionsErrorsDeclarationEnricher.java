@@ -7,13 +7,13 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
-import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
-import static org.mule.runtime.extension.api.error.MuleErrors.SOURCE;
+import static org.mule.runtime.extension.api.error.MuleErrors.SOURCE_ERROR_RESPONSE_GENERATE;
+import static org.mule.runtime.extension.api.error.MuleErrors.SOURCE_ERROR_RESPONSE_SEND;
+import static org.mule.runtime.extension.api.error.MuleErrors.SOURCE_RESPONSE_GENERATE;
+import static org.mule.runtime.extension.api.error.MuleErrors.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.CONNECTIVITY;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.RETRY_EXHAUSTED;
-
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
@@ -45,13 +45,15 @@ import java.util.Set;
  */
 public class ExtensionsErrorsDeclarationEnricher implements DeclarationEnricher {
 
-  public static final String MULE = CORE_NAMESPACE_NAME;
+  private static final String MULE = CORE_NAMESPACE_NAME;
+  private ErrorsModelFactory muleErrorsModelFactory;
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
     ExtensionDeclaration extensionDeclaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
     Optional<ImplementingTypeModelProperty> implementingType =
         extensionDeclaration.getModelProperty(ImplementingTypeModelProperty.class);
+    muleErrorsModelFactory = new ErrorsModelFactory(MuleErrors.class.getEnumConstants(), MULE);
 
     if (implementingType.isPresent()) {
       ExtensionElement extensionElement = new ExtensionTypeWrapper<>(implementingType.get().getType());
@@ -72,18 +74,22 @@ public class ExtensionsErrorsDeclarationEnricher implements DeclarationEnricher 
             @Override
             protected void onSource(WithSourcesDeclaration owner, SourceDeclaration sourceDeclaration) {
               if (sourceDeclaration.getSuccessCallback().isPresent() || sourceDeclaration.getErrorCallback().isPresent()) {
-                ErrorModel anyError = getMuleErrorModel(ANY, errorModels)
-                    .orElseThrow(() -> new IllegalStateException("Unable to retrieve the MULE:ANY error"));
-
-                ErrorModel sourceError = newError(SOURCE.getType(), MULE).withParent(anyError).build();
-                extensionDeclaration.addErrorModel(sourceError);
-                sourceDeclaration.addErrorModel(sourceError);
+                registerError(SOURCE_ERROR_RESPONSE_SEND, sourceDeclaration, extensionDeclaration);
+                registerError(SOURCE_ERROR_RESPONSE_GENERATE, sourceDeclaration, extensionDeclaration);
+                registerError(SOURCE_RESPONSE_SEND, sourceDeclaration, extensionDeclaration);
+                registerError(SOURCE_RESPONSE_GENERATE, sourceDeclaration, extensionDeclaration);
               }
             }
           }.walk(extensionDeclaration);
         }
       });
     }
+  }
+
+  private void registerError(MuleErrors error, SourceDeclaration sourceDeclaration, ExtensionDeclaration extensionDeclaration) {
+    ErrorModel errorModel = muleErrorsModelFactory.getErrorModel(error);
+    extensionDeclaration.addErrorModel(errorModel);
+    sourceDeclaration.addErrorModel(errorModel);
   }
 
   private ErrorModel getErrorModel(ErrorTypeDefinition<?> errorTypeDefinition, Set<ErrorModel> errorModels,
@@ -94,12 +100,5 @@ public class ExtensionsErrorsDeclarationEnricher implements DeclarationEnricher 
         .findFirst()
         .orElseThrow(() -> new IllegalModelDefinitionException(format("Trying to add the '%s' Error to the Component '%s' but the Extension doesn't declare it",
                                                                       errorTypeDefinition, component.getName())));
-  }
-
-  private Optional<ErrorModel> getMuleErrorModel(ErrorTypeDefinition<?> errorTypeDefinition, Set<ErrorModel> errorModels) {
-    return errorModels
-        .stream()
-        .filter(error -> error.getNamespace().equals(MULE) && error.getType().equals(errorTypeDefinition.getType()))
-        .findFirst();
   }
 }

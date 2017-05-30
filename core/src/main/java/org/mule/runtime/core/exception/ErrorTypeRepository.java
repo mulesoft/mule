@@ -12,6 +12,7 @@ import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.ANY;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CRITICAL;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
@@ -77,6 +78,7 @@ public class ErrorTypeRepository {
   public ErrorTypeRepository() {
     this.errorTypes.put(ANY, ANY_ERROR_TYPE);
     this.errorTypes.put(SOURCE, SOURCE_ERROR_TYPE);
+    this.errorTypes.put(SOURCE_RESPONSE, SOURCE_RESPONSE_ERROR_TYPE);
     this.internalErrorTypes.put(CRITICAL, CRITICAL_ERROR_TYPE);
     this.internalErrorTypes.put(UNKNOWN, UNKNOWN_ERROR_TYPE);
   }

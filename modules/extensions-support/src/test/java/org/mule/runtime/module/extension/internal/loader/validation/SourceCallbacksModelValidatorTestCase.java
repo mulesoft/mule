@@ -36,7 +36,7 @@ import java.util.Optional;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class OnTerminateCallbackModelValidatorTestCase extends AbstractMuleTestCase {
+public class SourceCallbacksModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Mock
   ExtensionModel extensionModel;
@@ -49,6 +49,12 @@ public class OnTerminateCallbackModelValidatorTestCase extends AbstractMuleTestC
 
   @Mock
   SourceCallbackModel onTerminateCallback;
+
+  @Mock
+  SourceCallbackModel onErrorCallback;
+
+  @Mock
+  SourceCallbackModel onSuccessCallback;
 
   private ProblemsReporter problemsReporter;
   private SourceCallbacksModelValidator validator;
@@ -68,12 +74,7 @@ public class OnTerminateCallbackModelValidatorTestCase extends AbstractMuleTestC
     when(onTerminateCallback.getAllParameterModels()).thenReturn(singletonList(invalidParameter));
     validator.validate(extensionModel, problemsReporter);
 
-    List<Problem> errors = problemsReporter.getErrors();
-    assertThat(errors, is(not(empty())));
-    Problem problem = errors.get(0);
-    assertThat(problem.getComponent(), is(sourceModel));
-    assertThat(problem.getMessage(),
-               is(containsString("'On Terminate Callbacks' can only receive parameters of the following types")));
+    assertProblemContaining("'On Terminate Callbacks' can only receive parameters of the following types");
   }
 
   @Test
@@ -87,14 +88,39 @@ public class OnTerminateCallbackModelValidatorTestCase extends AbstractMuleTestC
   @Test
   public void sourcesWithCallbacksShouldDefineOnTerminate() {
     when(sourceModel.getTerminateCallback()).thenReturn(Optional.empty());
-    when(sourceModel.getSuccessCallback()).thenReturn(of(onTerminateCallback));
+    when(sourceModel.getSuccessCallback()).thenReturn(of(onSuccessCallback));
     validator.validate(extensionModel, problemsReporter);
 
+    assertProblemContaining("Terminate Callback should also be defined");
+  }
+
+  @Test
+  public void sourcesWithOnErrorCallbackWithParameterShouldDefineOnTerminate() {
+    when(sourceModel.getTerminateCallback()).thenReturn(Optional.empty());
+    when(sourceModel.getErrorCallback()).thenReturn(of(onErrorCallback));
+    when(onErrorCallback.getAllParameterModels()).thenReturn(singletonList(invalidParameter));
+    validator.validate(extensionModel, problemsReporter);
+
+    assertProblemContaining("Terminate Callback should also be defined");
+  }
+
+  @Test
+  public void sourcesWithParameterlessOnErrorCallback() {
+    when(sourceModel.getTerminateCallback()).thenReturn(Optional.empty());
+    when(sourceModel.getSuccessCallback()).thenReturn(of(onSuccessCallback));
+    when(sourceModel.getErrorCallback()).thenReturn(of(onErrorCallback));
+    validator.validate(extensionModel, problemsReporter);
+
+    List<Problem> errors = problemsReporter.getErrors();
+    assertThat(errors, is(empty()));
+  }
+
+  private void assertProblemContaining(String substring) {
     List<Problem> errors = problemsReporter.getErrors();
     assertThat(errors, is(not(empty())));
     Problem problem = errors.get(0);
     assertThat(problem.getComponent(), is(sourceModel));
     assertThat(problem.getMessage(),
-               is(containsString("Terminate Callback should also be defined")));
+               is(containsString(substring)));
   }
 }
