@@ -159,7 +159,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   public void onException(Throwable exception) {
-    exception = exceptionEnricherManager.processException(exception);
+    exception = exceptionEnricherManager.process(exception);
     Optional<ConnectionException> connectionException = extractConnectionException(exception);
     if (connectionException.isPresent()) {
       try {
@@ -323,13 +323,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       } catch (Exception e) {
         stopSource();
         disposeSource();
-        Exception exception = exceptionEnricherManager.processException(e);
-        Optional<ConnectionException> connectionException = extractConnectionException(exception);
+        Throwable throwable = exceptionEnricherManager.process(e);
+        Optional<ConnectionException> connectionException = extractConnectionException(throwable);
         if (connectionException.isPresent()) {
-          exception = connectionException.get();
+          throwable = connectionException.get();
         }
-
-        throw exception;
+        throw throwable instanceof Exception ? ((Exception) throwable) : new MuleRuntimeException(throwable);
       }
     }
 

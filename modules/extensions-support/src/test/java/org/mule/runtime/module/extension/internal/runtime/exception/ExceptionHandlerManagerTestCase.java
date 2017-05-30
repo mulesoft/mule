@@ -35,7 +35,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ExceptionEnricherManagerTestCase {
+public class ExceptionHandlerManagerTestCase {
 
   private static final String ERROR_MESSAGE = "ERROR MESSAGE";
 
@@ -76,28 +76,29 @@ public class ExceptionEnricherManagerTestCase {
   @Test
   public void processAndEnrich() {
     ConnectionException connectionException = new ConnectionException("Connection Error");
-    Exception exception = manager.processException(connectionException);
-    assertThat(exception, is(not(sameInstance(connectionException))));
-    assertThat(exception, is(instanceOf(HeisenbergException.class)));
-    assertThat(exception.getMessage(), is(ERROR_MESSAGE));
+    Throwable throwable = manager.process(connectionException);
+    assertThat(throwable, is(not(sameInstance(connectionException))));
+    assertThat(throwable, is(instanceOf(HeisenbergException.class)));
+    assertThat(throwable.getMessage(), is(ERROR_MESSAGE));
   }
 
   @Test
   public void handleConnectionException() {
-    Throwable e =
-        new Throwable(new RuntimeException(new ExecutionException(new ConnectionException(ERROR_MESSAGE, new Exception()))));
-    Exception resultException = manager.handleException(e);
-    assertThat(resultException, is(instanceOf(ConnectionException.class)));
-    assertThat(resultException.getMessage(), is(ERROR_MESSAGE));
+    ConnectionException rootCause = new ConnectionException(ERROR_MESSAGE, new Exception());
+    Throwable throwable = manager.handleThrowable(new Throwable(new RuntimeException(new ExecutionException(rootCause))));
+    assertThat(throwable, is(instanceOf(ConnectionException.class)));
+    assertThat(throwable.getMessage(), is(ERROR_MESSAGE));
+    assertThat(throwable, is(sameInstance(rootCause)));
   }
 
   @Test
   public void handleInvocationTargetExceptionCause() {
-    Throwable e =
-        new Throwable(new RuntimeException(new UndeclaredThrowableException(new IOException(ERROR_MESSAGE, new Exception()))));
-    Exception resultException = manager.handleException(e);
-    assertThat(resultException, is(instanceOf(IOException.class)));
-    assertThat(resultException.getMessage(), is(ERROR_MESSAGE));
+    IOException rootCause = new IOException(ERROR_MESSAGE, new Exception());
+    // The root cause is contained in a reflective UndeclaredThrowableException exception
+    Throwable throwable = manager.handleThrowable(new Throwable(new Exception(new UndeclaredThrowableException(rootCause))));
+    assertThat(throwable, is(instanceOf(IOException.class)));
+    assertThat(throwable.getMessage(), is(ERROR_MESSAGE));
+    assertThat(throwable, is(sameInstance(rootCause)));
   }
 
   @Test
@@ -106,5 +107,13 @@ public class ExceptionEnricherManagerTestCase {
     mockExceptionEnricher(sourceModel, null);
     ExceptionHandlerManager manager = new ExceptionHandlerManager(extensionModel, sourceModel);
     assertThat(manager.getExceptionHandler(), is(extensionEnricher));
+  }
+
+  @Test
+  public void processError() {
+    Error rootCause = new Error(ERROR_MESSAGE, new Exception());
+    Throwable throwable = manager.process(rootCause);
+    assertThat(throwable.getMessage(), is(ERROR_MESSAGE));
+    assertThat(throwable, is(sameInstance(rootCause)));
   }
 }
