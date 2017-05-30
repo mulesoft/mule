@@ -57,10 +57,10 @@ public class DrStrangeOperations {
     throw new RuntimeException();
   }
 
-  public List<String> readObjectStream(@Content Iterator<String> values) {
+  public List<String> readObjectStream(@Content Iterator<String> iteratorValues) {
     List<String> objects = new LinkedList<>();
-    while (values.hasNext()) {
-      objects.add(values.next());
+    while (iteratorValues.hasNext()) {
+      objects.add(iteratorValues.next());
     }
 
     return objects;

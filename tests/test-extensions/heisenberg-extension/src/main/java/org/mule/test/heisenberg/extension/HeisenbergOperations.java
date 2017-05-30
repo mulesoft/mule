@@ -269,7 +269,7 @@ public class HeisenbergOperations implements Disposable {
 
   public String operationWithInputStreamContentParam(@ParameterGroup(name = "Test",
       showInDsl = true) InputStreamParameterGroup isGroup) {
-    return IOUtils.toString(isGroup.getContent());
+    return IOUtils.toString(isGroup.getInputStreamContent());
   }
 
   public void throwError() {

@@ -15,9 +15,9 @@ public class InputStreamParameterGroup {
 
   @Parameter
   @Content(primary = true)
-  private InputStream content;
+  private InputStream inputStreamContent;
 
-  public InputStream getContent() {
-    return content;
+  public InputStream getInputStreamContent() {
+    return inputStreamContent;
   }
 }
