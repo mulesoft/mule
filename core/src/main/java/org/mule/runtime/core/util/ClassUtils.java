@@ -9,6 +9,7 @@ package org.mule.runtime.core.util;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.internal.util.ExceptionUtils.tryExpecting;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.MapUtils.getValue;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
@@ -679,10 +680,6 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils {
     return true;
   }
 
-  public static Class wrapperToPrimitive(Class wrapper) {
-    return (Class) MapUtils.getObject(wrapperToPrimitiveMap, wrapper, wrapper);
-  }
-
   public static Class[] wrappersToPrimitives(Class[] wrappers) {
     if (wrappers == null) {
       return null;
@@ -695,7 +692,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils {
     Class[] primitives = new Class[wrappers.length];
 
     for (int i = 0; i < wrappers.length; i++) {
-      primitives[i] = (Class) MapUtils.getObject(wrapperToPrimitiveMap, wrappers[i], wrappers[i]);
+      primitives[i] = getValue(wrapperToPrimitiveMap, wrappers[i], wrappers[i]);
     }
 
     return primitives;

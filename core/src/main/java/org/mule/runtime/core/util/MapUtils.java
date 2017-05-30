@@ -7,7 +7,6 @@
 package org.mule.runtime.core.util;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,7 +15,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 // @ThreadSafe
-public class MapUtils extends org.apache.commons.collections.MapUtils {
+public class MapUtils {
 
   /**
    * Convenience method for CollectionUtil#mapWithKeysAndValues(Class, Iterator, Iterator); keys and values can be null or empty.
@@ -115,24 +114,12 @@ public class MapUtils extends org.apache.commons.collections.MapUtils {
     return buf.toString();
   }
 
-  /**
-   * Puts the {@code key}/{@code value} pair into the given {@code map} only as long as the {@code key} is not already present on
-   * the {@code map}. This method is not thread-safe per-se. If the {@code map} is a shared resource then it's up to the caller to
-   * handle concurrency.
-   *
-   * @param map a {@link Map}
-   * @param key the key
-   * @param value the value
-   * @param <K> the generic type of the key
-   * @param <V> the generic type of the value
-   * @throws IllegalStateException if the {@code map} already contains the {@code key}
-   */
-  public static <K, V> void idempotentPut(Map<K, V> map, K key, V value) {
-    checkArgument(key != null, "key cannot be null");
-    if (map.containsKey(key)) {
-      throw new IllegalStateException(String.format("Key '%s' is already registered with value %s", key, map.get(key)));
+  public static <T> T getValue(Map map, Object key, T defaultValue) {
+    // TODO(pablo.kraan): API - add tests
+    T value = null;
+    if (map != null) {
+      value = (T) map.get(key);
     }
-
-    map.put(key, value);
+    return value == null ? defaultValue : value;
   }
 }
