@@ -6,8 +6,7 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <http:request-config name="requestConfig" host="localhost" port="${httpPort}" responseBufferSize="${bufferSize}"
-    maxConnections="${maxConnections}" connectionIdleTimeout="${idleTimeout}" />
+    <http:request-config name="requestConfig" host="localhost" port="${httpPort}" maxConnections="${maxConnections}" connectionIdleTimeout="${idleTimeout}" />
 
     <flow name="client">
         <http:request config-ref="requestConfig" method="GET" path="/" />

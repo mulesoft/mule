@@ -204,4 +204,5 @@ public class MuleProperties
     public static final String MULE_USE_CONNECTOR_TO_RETRIEVE_WSDL = SYSTEM_PROPERTY_PREFIX + "ws.useConnectorToRetrieveWsdl";
     public static final String MULE_CHECK_TIMESTAMP_IN_WSS_RESPONSE = SYSTEM_PROPERTY_PREFIX + "ws.checkWssResponseTimestamp";
     public static final String MULE_HTTP_STREAM_RESPONSE = SYSTEM_PROPERTY_PREFIX + "http.streamResponse";
+    public static final String MULE_HTTP_RESPONSE_BUFFER_SIZE = SYSTEM_PROPERTY_PREFIX + "http.responseBufferSize";
 }

@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.request;
 
 import static java.lang.String.format;
+import static org.mule.api.config.MuleProperties.MULE_HTTP_RESPONSE_BUFFER_SIZE;
 import static org.mule.api.config.MuleProperties.MULE_HTTP_STREAM_RESPONSE;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
@@ -42,7 +43,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
     private static final int UNLIMITED_CONNECTIONS = -1;
     private static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 30 * 1000;
     private static final String THREAD_NAME_PREFIX_PATTERN = "%shttp.requester.%s";
-    private static final int DEFAULT_RESPONSE_BUFFER_SIZE =  10 * 1024;
+    private static final String DEFAULT_RESPONSE_BUFFER_SIZE =  "10240";
 
     private HttpConstants.Protocols protocol = HTTP;
     private String name;
@@ -67,7 +68,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
     private boolean usePersistentConnections = true;
     private int connectionIdleTimeout = DEFAULT_CONNECTION_IDLE_TIMEOUT;
     private boolean streamResponse = Boolean.valueOf(System.getProperty(MULE_HTTP_STREAM_RESPONSE, "false"));
-    private int responseBufferSize = DEFAULT_RESPONSE_BUFFER_SIZE;
+    private int responseBufferSize = Integer.valueOf(System.getProperty(MULE_HTTP_RESPONSE_BUFFER_SIZE, DEFAULT_RESPONSE_BUFFER_SIZE));
 
     private boolean enableCookies = false;
     private CookieManager cookieManager;
@@ -376,12 +377,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
 
     public int getResponseBufferSize()
     {
-        return responseBufferSize;
-    }
-
-    public void setResponseBufferSize(int responseBufferSize)
-    {
-        this.responseBufferSize = responseBufferSize;
+      return responseBufferSize;
     }
 
     public boolean isEnableCookies()
