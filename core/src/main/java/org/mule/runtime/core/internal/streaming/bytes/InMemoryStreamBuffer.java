@@ -35,6 +35,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
   private final int bufferSizeIncrement;
   private final int maxBufferSize;
   private long bufferTip = 0;
+  private boolean streamFullyConsumed = false;
 
   /**
    * Creates a new instance
@@ -149,6 +150,8 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
         }
 
         bufferTip += read;
+      } else {
+        streamFullyConsumed = true;
       }
     } finally {
       if (auxBuffer) {
@@ -179,6 +182,13 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
     deallocate(oldBuffer);
 
     return buffer;
+  }
+
+  @Override
+  protected boolean canDoSoftCopy() {
+    return streamFullyConsumed ||
+        buffer.capacity() >= maxBufferSize ||
+        bufferSizeIncrement == 0;
   }
 
   private boolean canBeExpandedTo(int newSize) {

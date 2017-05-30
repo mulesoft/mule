@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.streaming.bytes;
 
 import static java.lang.Math.min;
 import static java.lang.Math.toIntExact;
+import static java.lang.System.arraycopy;
 import static java.nio.channels.Channels.newChannel;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.core.internal.streaming.AbstractStreamingBuffer;
@@ -172,8 +173,23 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   }
 
 
-  protected ByteBuffer copy(long position, int length) {
+  protected final ByteBuffer copy(long position, int length) {
+    return canDoSoftCopy() ? softCopy(position, length) : hardCopy(position, length);
+  }
+
+  protected abstract boolean canDoSoftCopy();
+
+  private ByteBuffer softCopy(long position, int length) {
     final int offset = toIntExact(position);
     return ByteBuffer.wrap(buffer.array(), offset, min(length, buffer.limit() - offset)).slice();
+  }
+
+  private ByteBuffer hardCopy(long position, int length) {
+    final int offset = toIntExact(position);
+    length = min(length, buffer.limit() - offset);
+
+    byte[] b = new byte[length];
+    arraycopy(buffer.array(), offset, b, 0, length);
+    return ByteBuffer.wrap(b);
   }
 }
