@@ -8218,7 +8218,7 @@
                 "query": false,
                 "order": 1
               },
-              "name": "content",
+              "name": "inputStreamContent",
               "description": "",
               "modelProperties": {}
             }

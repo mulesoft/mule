@@ -229,7 +229,7 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="values"></xs:element>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="iterator-values"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>

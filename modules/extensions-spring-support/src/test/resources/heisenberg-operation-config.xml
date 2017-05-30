@@ -290,7 +290,7 @@
     <flow name="operationWithInputStreamContentParam">
         <heisenberg:operation-with-input-stream-content-param>
             <heisenberg:test>
-                <heisenberg:content>#[msg]</heisenberg:content>
+                <heisenberg:input-stream-content>#[msg]</heisenberg:input-stream-content>
             </heisenberg:test>
         </heisenberg:operation-with-input-stream-content-param>
     </flow>

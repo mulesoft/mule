@@ -1394,7 +1394,7 @@
                             <xs:complexContent>
                                 <xs:extension base="mule:abstractExtensionType">
                                     <xs:sequence>
-                                        <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
+                                        <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="input-stream-content"></xs:element>
                                     </xs:sequence>
                                 </xs:extension>
                             </xs:complexContent>

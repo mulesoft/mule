@@ -2368,7 +2368,7 @@
                 "query": false,
                 "order": 1
               },
-              "name": "values",
+              "name": "iteratorValues",
               "description": "",
               "modelProperties": {}
             }
