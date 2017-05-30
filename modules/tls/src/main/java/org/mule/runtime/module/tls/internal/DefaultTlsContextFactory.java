@@ -18,7 +18,7 @@ import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.security.tls.RestrictedSSLServerSocketFactory;
 import org.mule.runtime.core.api.security.tls.RestrictedSSLSocketFactory;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
-import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.runtime.core.internal.util.ArrayUtils;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.StringUtils;
 

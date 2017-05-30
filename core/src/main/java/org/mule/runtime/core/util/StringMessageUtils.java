@@ -9,6 +9,7 @@ package org.mule.runtime.core.util;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.internal.util.ArrayUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;

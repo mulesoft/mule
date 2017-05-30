@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.security.TlsDirectKeyStore;
 import org.mule.runtime.core.api.security.TlsDirectTrustStore;
 import org.mule.runtime.core.api.security.TlsIndirectKeyStore;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.runtime.core.internal.util.ArrayUtils;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.SecurityUtils;

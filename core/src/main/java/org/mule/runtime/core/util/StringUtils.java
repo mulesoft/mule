@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.util;
 
+import org.mule.runtime.core.internal.util.ArrayUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;

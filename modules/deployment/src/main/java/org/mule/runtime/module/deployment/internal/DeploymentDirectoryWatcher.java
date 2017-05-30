@@ -19,7 +19,6 @@ import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.config.StartupContext;
-import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
@@ -431,7 +430,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
       }
     }
 
-    return appNames.toArray(ArrayUtils.EMPTY_STRING_ARRAY);
+    return appNames.toArray(new String[appNames.size()]);
   }
 
   private void redeployModifiedDomains() {
