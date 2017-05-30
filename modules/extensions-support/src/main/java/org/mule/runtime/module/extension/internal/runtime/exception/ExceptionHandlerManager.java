@@ -38,26 +38,35 @@ public final class ExceptionHandlerManager {
     exceptionHandler = findExceptionHandler(extensionModel, componentModel);
   }
 
-  public Exception processException(Throwable t) {
-    Exception handledException = handleException(t);
-    Exception exception = exceptionHandler.enrichException(handledException);
-    return exception != null ? exception : handledException;
+  /**
+   * Process the {@link Throwable} parameter to obtain the correct failure and if its an exception this method will enrich it
+   * with the obtained {@link ExceptionHandler} for this manager instance.
+   */
+  public Throwable process(Throwable t) {
+    Throwable handled = handleThrowable(t);
+    Throwable result = enrich(handled);
+    return result != null ? result : handled;
   }
 
-  public Exception handleException(Throwable e) {
-    Throwable handled;
+  /**
+   * Given a {@link Throwable} instance this method will get the specific failure reason.
+   * <p>
+   * If there is a {@link ConnectionException} in the stacktrace is going to be considered the main failure reason,
+   * otherwise it will check if there is a {@link UndeclaredThrowableException} reflective wrapper exception
+   * in the stacktrace wrapping the real failure.
+   */
+  public Throwable handleThrowable(Throwable e) {
     Optional<ConnectionException> connectionException = extractConnectionException(e);
     if (connectionException.isPresent()) {
-      handled = connectionException.get();
+      return connectionException.get();
     } else {
       // unwraps the exception thrown by the reflective operation if exist any.
-      handled = extractCauseOfType(e, UndeclaredThrowableException.class).orElse(e);
+      return extractCauseOfType(e, UndeclaredThrowableException.class).orElse(e);
     }
-    return wrapInException(handled);
   }
 
-  private Exception wrapInException(Throwable t) {
-    return t instanceof Exception ? (Exception) t : new Exception(t);
+  private Throwable enrich(Throwable t) {
+    return t instanceof Exception ? exceptionHandler.enrichException(((Exception) t)) : t;
   }
 
   private ExceptionHandler findExceptionHandler(ExtensionModel extension, EnrichableModel child) {

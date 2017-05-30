@@ -134,7 +134,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
         sink.success(value);
       })
           .onErrorMap(e -> {
-            e = exceptionEnricherManager.processException(e);
+            e = exceptionEnricherManager.process(e);
             e = moduleExceptionHandler.processException(e);
             e = onError(context, e, interceptors);
 
@@ -166,7 +166,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
         interceptor.before(executionContext);
       }
     } catch (Exception e) {
-      return new InterceptorsExecutionResult(exceptionEnricherManager.handleException(e), interceptorList);
+      return new InterceptorsExecutionResult(exceptionEnricherManager.handleThrowable(e), interceptorList);
     }
     return new InterceptorsExecutionResult(null, interceptorList);
   }
