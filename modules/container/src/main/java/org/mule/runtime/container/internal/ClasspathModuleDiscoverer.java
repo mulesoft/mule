@@ -25,10 +25,15 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Discovers {@link MuleModule} searching for {@link #MODULE_PROPERTIES} files resources available in a given classloader.
  */
 public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
+
+  private static Logger logger = LoggerFactory.getLogger(ClasspathModuleDiscoverer.class);
 
   public static final String MODULE_PROPERTIES = "META-INF/mule-module.properties";
   public static final String EXPORTED_CLASS_PACKAGES_PROPERTY = "artifact.export.classPackages";
@@ -53,10 +58,11 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
         final MuleModule module = createModule(moduleProperties);
 
         if (moduleNames.contains(module.getName())) {
-          throw new IllegalStateException(String.format("Module '%s' was already defined", module.getName()));
+          logger.warn(format("Ignoring duplicated module '%s'", module.getName()));
+        } else {
+          moduleNames.add(module.getName());
+          modules.add(module);
         }
-        moduleNames.add(module.getName());
-        modules.add(module);
       }
     } catch (IOException e) {
       throw new RuntimeException("Cannot discover mule modules", e);
