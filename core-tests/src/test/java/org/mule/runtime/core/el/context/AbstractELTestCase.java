@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.runtime.core.internal.util.ExceptionUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Arrays;

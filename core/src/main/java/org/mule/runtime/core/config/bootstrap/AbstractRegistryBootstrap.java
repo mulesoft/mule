@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.runtime.core.internal.util.ExceptionUtils;
 import org.mule.runtime.core.util.PropertiesUtils;
 
 import java.lang.reflect.InvocationTargetException;

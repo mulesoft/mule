@@ -15,7 +15,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
-import static org.mule.runtime.core.util.ExceptionUtils.updateMessagingExceptionWithError;
+import static org.mule.runtime.core.internal.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -45,7 +45,7 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.streaming.StreamingManager;
-import org.mule.runtime.core.util.ExceptionUtils;
+import org.mule.runtime.core.internal.util.ExceptionUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;

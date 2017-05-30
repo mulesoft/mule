@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util;
+package org.mule.runtime.core.internal.util;
 
 import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
@@ -40,6 +40,7 @@ import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.message.ErrorBuilder;
+import org.mule.runtime.core.util.ExceptionHandler;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -75,7 +76,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
    * @return the throwable that is closest to the root in the throwable chain that matches the type or subclass of that type.
    */
   @SuppressWarnings("unchecked")
-  public static <ET> ET getDeepestOccurenceOfType(Throwable throwable, Class<ET> type) {
+  public static <ET> ET getDeepestOccurrenceOfType(Throwable throwable, Class<ET> type) {
     if (throwable == null || type == null) {
       return null;
     }

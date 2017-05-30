@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
-import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.core.internal.util.ExceptionUtils.extractConnectionException;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 

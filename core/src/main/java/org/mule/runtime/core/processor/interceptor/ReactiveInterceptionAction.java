@@ -8,7 +8,7 @@
 package org.mule.runtime.core.processor.interceptor;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.mule.runtime.core.util.ExceptionUtils.getErrorFromFailingProcessor;
+import static org.mule.runtime.core.internal.util.ExceptionUtils.getErrorFromFailingProcessor;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.interception.InterceptionAction;

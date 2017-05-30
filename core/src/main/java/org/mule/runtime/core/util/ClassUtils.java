@@ -7,7 +7,7 @@
 package org.mule.runtime.core.util;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.runtime.core.util.ExceptionUtils.tryExpecting;
+import static org.mule.runtime.core.internal.util.ExceptionUtils.tryExpecting;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
