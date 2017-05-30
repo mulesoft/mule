@@ -11,13 +11,13 @@ import org.mule.runtime.api.meta.NameableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ObjectUtils extends org.apache.commons.lang.ObjectUtils {
+public class ObjectUtils {
 
   /** logger used by this class */
   protected static final Logger logger = LoggerFactory.getLogger(ObjectUtils.class);
 
   /**
-   * Like {@link #identityToString(Object)} but without the object's full package name.
+   * Like {@link org.apache.commons.lang.ObjectUtils#identityToString(Object)} but without the object's full package name.
    *
    * @param obj the object for which the identity description is to be generated
    * @return the object's identity description in the form of "ClassName@IdentityCode" or "null" if the argument was null.
@@ -236,8 +236,12 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils {
   }
 
   public static String toString(Object obj) {
+    return toString(obj, "");
+  }
+
+  public static String toString(Object obj, String defaultValue) {
     if (obj == null) {
-      return "";
+      return defaultValue;
     }
 
     String str = obj.getClass().getName();
