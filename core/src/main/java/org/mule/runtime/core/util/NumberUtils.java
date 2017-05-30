@@ -13,7 +13,7 @@ import java.math.BigInteger;
  * <code>NumberUtils</code> contains useful methods for manipulating numbers.
  */
 // @ThreadSafe
-public class NumberUtils extends org.apache.commons.lang.math.NumberUtils {
+public class NumberUtils {
 
   public static final int INTEGER_ERROR = -999999999;
   public static final long LONG_ERROR = -999999999;
@@ -69,19 +69,19 @@ public class NumberUtils extends org.apache.commons.lang.math.NumberUtils {
   }
 
   public static int toInt(String str) {
-    return toInt(str, INTEGER_ERROR);
+    return org.apache.commons.lang.math.NumberUtils.toInt(str, INTEGER_ERROR);
   }
 
   public static long toLong(String str) {
-    return toLong(str, LONG_ERROR);
+    return org.apache.commons.lang.math.NumberUtils.toLong(str, LONG_ERROR);
   }
 
   public static float toFloat(String str) {
-    return toFloat(str, FLOAT_ERROR);
+    return org.apache.commons.lang.math.NumberUtils.toFloat(str, FLOAT_ERROR);
   }
 
   public static double toDouble(String str) {
-    return toDouble(str, DOUBLE_ERROR);
+    return org.apache.commons.lang.math.NumberUtils.toDouble(str, DOUBLE_ERROR);
   }
 
   /*

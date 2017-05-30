@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.math.NumberUtils.toInt;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
@@ -47,7 +48,7 @@ public class IOUtils {
 
   private static final Log logger = LogFactory.getLog(IOUtils.class);
 
-  protected static int bufferSize = NumberUtils.toInt(System.getProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE), 4 * 1024);
+  protected static int bufferSize = toInt(System.getProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE), 4 * 1024);
 
   /**
    * Attempts to load a resource from the file system, from a URL, or from the classpath, in that order.
