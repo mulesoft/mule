@@ -9,6 +9,7 @@ package org.mule.runtime.core.util;
 import static java.lang.System.getProperty;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.apache.commons.io.IOUtils.copy;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
@@ -66,12 +67,12 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
     try {
       FileOutputStream output = new FileOutputStream(destination);
       try {
-        IOUtils.copy(input, output);
+        copy(input, output);
       } finally {
-        IOUtils.closeQuietly(output);
+        org.apache.commons.io.IOUtils.closeQuietly(output);
       }
     } finally {
-      IOUtils.closeQuietly(input);
+      org.apache.commons.io.IOUtils.closeQuietly(input);
     }
   }
 
@@ -279,9 +280,9 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 
           InputStream is = zip.getInputStream(entry);
           OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
-          IOUtils.copy(is, os);
-          IOUtils.closeQuietly(is);
-          IOUtils.closeQuietly(os);
+          copy(is, os);
+          org.apache.commons.io.IOUtils.closeQuietly(is);
+          org.apache.commons.io.IOUtils.closeQuietly(os);
         }
       }
     } finally {
@@ -477,10 +478,10 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
           try {
             inputStream = jarFile.getInputStream(entry);
             outputStream = new BufferedOutputStream(new FileOutputStream(file));
-            IOUtils.copy(inputStream, outputStream);
+            copy(inputStream, outputStream);
           } finally {
-            IOUtils.closeQuietly(inputStream);
-            IOUtils.closeQuietly(outputStream);
+            org.apache.commons.io.IOUtils.closeQuietly(inputStream);
+            org.apache.commons.io.IOUtils.closeQuietly(outputStream);
           }
         }
 
@@ -615,50 +616,14 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
         // grr!
         success = false;
       } finally {
-        IOUtils.closeQuietly(fis);
-        IOUtils.closeQuietly(fos);
+        org.apache.commons.io.IOUtils.closeQuietly(fis);
+        org.apache.commons.io.IOUtils.closeQuietly(fos);
       }
     }
 
     return success;
   }
 
-
-  /**
-   * Copy in file to out file
-   * 
-   * Don't use java.nio as READ_ONLY memory mapped files cannot be deleted
-   * 
-   * @param in
-   * @param out
-   */
-  public static void safeCopyFile(File in, File out) throws IOException {
-    try {
-      FileInputStream fis = new FileInputStream(in);
-      FileOutputStream fos = new FileOutputStream(out);
-      try {
-        byte[] buf = new byte[1024];
-        int i = 0;
-        while ((i = fis.read(buf)) != -1) {
-          fos.write(buf, 0, i);
-        }
-      } catch (IOException e) {
-        throw e;
-      } finally {
-        try {
-          if (fis != null)
-            fis.close();
-          if (fos != null)
-            fos.close();
-        } catch (IOException e) {
-          throw e;
-        }
-
-      }
-    } catch (FileNotFoundException e) {
-      throw e;
-    }
-  }
 
   // Override the following methods to use a new version of doCopyFile(File
   // srcFile, File destFile, boolean preserveFileDate) that uses nio to copy file

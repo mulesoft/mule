@@ -11,7 +11,6 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.XMLEntityCodec;
 
 import java.io.InputStream;
@@ -40,10 +39,10 @@ public class XmlEntityEncoder extends AbstractTransformer {
         data = new String((byte[]) src, encoding);
       } else if (src instanceof CursorStreamProvider) {
         try (InputStream in = ((CursorStreamProvider) src).openCursor()) {
-          data = IOUtils.toString(in, encoding);
+          data = org.apache.commons.io.IOUtils.toString(in, encoding);
         }
       } else if (src instanceof InputStream) {
-        data = IOUtils.toString((InputStream) src, encoding);
+        data = org.apache.commons.io.IOUtils.toString((InputStream) src, encoding);
       } else {
         data = (String) src;
       }

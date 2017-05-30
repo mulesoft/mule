@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -53,7 +54,7 @@ public class StringAppendTransformer extends AbstractTransformer {
     try {
       string = IOUtils.toString(input);
     } finally {
-      IOUtils.closeQuietly(input);
+      closeQuietly(input);
     }
     return string;
   }

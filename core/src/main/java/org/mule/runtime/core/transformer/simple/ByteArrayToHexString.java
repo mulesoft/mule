@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
+import static org.mule.runtime.core.util.IOUtils.toByteArray;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.io.InputStream;
@@ -63,9 +64,9 @@ public class ByteArrayToHexString extends AbstractTransformer {
 
   private byte[] handleStream(InputStream input) {
     try {
-      return IOUtils.toByteArray(input);
+      return toByteArray(input);
     } finally {
-      IOUtils.closeQuietly(input);
+      closeQuietly(input);
     }
   }
 }

@@ -142,7 +142,7 @@ public class DisplayDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
   private OperationDeclaration getOperation(WithOperationsDeclaration declaration, final String operationName) {
     return (OperationDeclaration) find(declaration.getOperations(),
-                                                       object -> ((OperationDeclaration) object).getName().equals(operationName));
+                                       object -> ((OperationDeclaration) object).getName().equals(operationName));
   }
 
   private ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name) {

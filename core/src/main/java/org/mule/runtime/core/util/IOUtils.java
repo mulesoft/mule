@@ -43,7 +43,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Mule input/output utilities.
  */
-public class IOUtils extends org.apache.commons.io.IOUtils {
+public class IOUtils {
 
   private static final Log logger = LogFactory.getLog(IOUtils.class);
 
@@ -290,6 +290,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils {
    * @return a {@link org.mule.runtime.api.message.Message} of the corresponding attachment
    * @throws IOException if the transformation fails.
    */
+  // TODO(pablo.kraan): API - review if this method is needed
   public static Message toMuleMessagePart(String name, Object object, MediaType contentType) throws IOException {
     final Message.Builder builder;
 
@@ -339,7 +340,7 @@ public class IOUtils extends org.apache.commons.io.IOUtils {
       return function.apply(stream);
     } finally {
       if (shouldCloseStream) {
-        closeQuietly(stream);
+        org.apache.commons.io.IOUtils.closeQuietly(stream);
       }
     }
   }

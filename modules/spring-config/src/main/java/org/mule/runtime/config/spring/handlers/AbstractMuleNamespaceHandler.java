@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.handlers;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.runtime.config.spring.parsers.AbstractChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.DeprecatedBeanDefinitionParser;
@@ -18,7 +19,6 @@ import org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssembler;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
 import java.util.HashSet;
@@ -278,7 +278,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
       } catch (Exception e) {
         logger.debug("Error processing preferred properties", e);
       } finally {
-        IOUtils.closeQuietly(stream);
+        closeQuietly(stream);
       }
     }
     return basicConnector;

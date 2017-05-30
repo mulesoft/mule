@@ -7,25 +7,23 @@
 package org.mule.runtime.config.spring;
 
 
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.runtime.core.util.IOUtils;
-import org.w3c.dom.Document;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.junit.Test;
-
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.fail;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * Check that all top-level elements (direct children of Mule) are instances of "annotatedType"
@@ -109,7 +107,7 @@ public class CheckAnnotatedTestCase extends AbstractMuleTestCase {
       DocumentBuilder builder = factory.newDocumentBuilder();
       return builder.parse(input);
     } finally {
-      IOUtils.closeQuietly(input);
+      closeQuietly(input);
     }
   }
 

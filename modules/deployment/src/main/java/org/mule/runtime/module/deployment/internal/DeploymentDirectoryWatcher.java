@@ -446,7 +446,8 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   private <T extends DeployableArtifact> Collection getArtifactsToRedeploy(Collection<T> collection) {
     return select(collection,
-                object -> ((DeployableArtifactDescriptor) ((DeployableArtifact) object).getDescriptor()).isRedeploymentEnabled());
+                  object -> ((DeployableArtifactDescriptor) ((DeployableArtifact) object).getDescriptor())
+                      .isRedeploymentEnabled());
   }
 
   private <T extends Artifact> void redeployModifiedArtifacts(Collection<T> artifacts,

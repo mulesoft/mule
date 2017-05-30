@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.api.serialization;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.ByteArrayInputStream;
@@ -72,7 +72,7 @@ public abstract class AbstractSerializationProtocol implements SerializationProt
     } catch (IOException e) {
       throw new SerializationException("Could not write to output stream", e);
     } finally {
-      IOUtils.closeQuietly(out);
+      closeQuietly(out);
     }
   }
 
@@ -114,7 +114,7 @@ public abstract class AbstractSerializationProtocol implements SerializationProt
     } catch (Exception e) {
       throw new SerializationException("Could not deserialize object", e);
     } finally {
-      IOUtils.closeQuietly(inputStream);
+      closeQuietly(inputStream);
     }
   }
 

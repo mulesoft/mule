@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.config.spring.editors;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.beans.PropertyEditor;
 import java.io.InputStream;
@@ -84,7 +84,7 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
             customPropertyEditorsCache.put(requiredType, propertyEditorClass);
           }
         } finally {
-          IOUtils.closeQuietly(stream);
+          closeQuietly(stream);
         }
       }
     } catch (Exception e) {
