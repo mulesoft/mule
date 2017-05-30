@@ -26,14 +26,14 @@ import org.mule.runtime.soap.api.SoapService;
 import org.mule.runtime.soap.api.client.SoapClient;
 import org.mule.runtime.soap.api.client.SoapClientConfiguration;
 import org.mule.runtime.soap.api.client.SoapClientFactory;
-import org.mule.runtime.soap.api.client.metadata.SoapMetadataResolver;
 import org.mule.runtime.soap.api.message.SoapRequest;
 import org.mule.runtime.soap.api.message.SoapResponse;
 
-import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -42,6 +42,10 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class ForwardingSoapClientTestCase {
+
+  private static final String HEADER_VALUE_MASK = "<headerOne>service=%s, operation%s</headerOne>";
+  private static final String HEADER_NAME = "aHeader";
+  private static final String NULL_HEADERS_OPE = "nullHeaders";
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -66,7 +70,7 @@ public class ForwardingSoapClientTestCase {
 
   @Test
   public void invalidService() throws MuleException {
-    expectedException.expectMessage("Could not find a soap client id [invalid]");
+    expectedException.expectMessage("Could not find a web service definition with id=[invalid]");
     expectedException.expect(IllegalArgumentException.class);
     client.getSoapClient("invalid");
   }
@@ -98,6 +102,22 @@ public class ForwardingSoapClientTestCase {
     assertThat(((TestDispatcherProvider.TestMessageDispatcher) sc2.getDispatcher()).isDisconnected(), is(true));
   }
 
+  @Test
+  public void customHeadersAreResolvedCorrectly() {
+    String someOperationName = "someOperation";
+    Map<String, String> headers = client.getCustomHeaders("uno", someOperationName);
+    assertThat(headers.size(), is(1));
+    Map.Entry<String, String> header = headers.entrySet().iterator().next();
+    assertThat(header.getKey(), is(HEADER_NAME));
+    assertThat(header.getValue(), is(getHeaderValue("uno", someOperationName)));
+  }
+
+  @Test
+  public void customHeadersAreNeverNull() {
+    Map<String, String> headers = client.getCustomHeaders("uno", NULL_HEADERS_OPE);
+    assertThat(headers.size(), is(0));
+  }
+
   private class TestServiceProvider implements SoapServiceProvider {
 
     @Override
@@ -112,6 +132,17 @@ public class ForwardingSoapClientTestCase {
         throw new RuntimeException(e);
       }
     }
+
+    @Override
+    public Map<String, String> getCustomHeaders(WebServiceDefinition definition, String operation) {
+      if (operation.equals(NULL_HEADERS_OPE)) {
+        return null;
+      }
+      Map<String, String> headers = new HashMap<>();
+      headers.put(HEADER_NAME, getHeaderValue(definition.getServiceId(), operation));
+      return headers;
+    }
+
   }
 
   public class TestClientFactory implements SoapClientFactory {
@@ -120,6 +151,10 @@ public class ForwardingSoapClientTestCase {
     public SoapClient create(SoapClientConfiguration configuration) throws ConnectionException {
       return new TestSoapClient(configuration);
     }
+  }
+
+  private String getHeaderValue(String id, String ope) {
+    return String.format(HEADER_VALUE_MASK, id, ope);
   }
 }
 

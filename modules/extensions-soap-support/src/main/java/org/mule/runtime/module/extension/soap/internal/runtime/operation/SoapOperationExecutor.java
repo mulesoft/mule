@@ -15,7 +15,6 @@ import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeO
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_HEADERS_PARAM;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.justOrEmpty;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -58,11 +57,13 @@ public final class SoapOperationExecutor implements OperationExecutor {
    * {@inheritDoc}
    */
   @Override
-  public Publisher<Object> execute(ExecutionContext<OperationModel> executionContext) {
+  public Publisher<Object> execute(ExecutionContext<OperationModel> context) {
     try {
-      String serviceId = executionContext.getParameter(SERVICE_PARAM);
-      ForwardingSoapClient connection = (ForwardingSoapClient) connectionResolver.resolve(executionContext);
-      SoapResponse response = connection.getSoapClient(serviceId).consume(getRequest(executionContext));
+      String serviceId = context.getParameter(SERVICE_PARAM);
+      ForwardingSoapClient connection = (ForwardingSoapClient) connectionResolver.resolve(context);
+      Map<String, String> customHeaders = connection.getCustomHeaders(serviceId, getOperation(context));
+      SoapRequest request = getRequest(context, customHeaders);
+      SoapResponse response = connection.getSoapClient(serviceId).consume(request);
       return justOrEmpty(response.getAsResult());
     } catch (Exception e) {
       return error(soapExceptionEnricher.enrich(e));
@@ -74,20 +75,16 @@ public final class SoapOperationExecutor implements OperationExecutor {
   /**
    * Builds a Soap Request with the execution context to be sent using the {@link SoapClient}.
    */
-  private SoapRequest getRequest(ExecutionContext<OperationModel> context) {
-    Optional<String> operation = getParam(context, OPERATION_PARAM);
+  private SoapRequest getRequest(ExecutionContext<OperationModel> context, Map<String, String> fixedHeaders) {
     Optional<InputStream> request = getParam(context, REQUEST_PARAM);
     Optional<InputStream> headers = getParam(context, HEADERS_PARAM);
     Optional<Map<String, SoapAttachment>> attachments = getParam(context, ATTACHMENTS_PARAM);
     Optional<Map<String, String>> transportHeaders = getParam(context, TRANSPORT_HEADERS_PARAM);
 
-    if (!operation.isPresent()) {
-      throw new IllegalStateException("Execution Context does not have the required operation parameter");
-    }
-
-    SoapRequestBuilder builder = SoapRequest.builder().withOperation(operation.get());
+    SoapRequestBuilder builder = SoapRequest.builder().withOperation(getOperation(context));
     request.ifPresent(builder::withContent);
     headers.ifPresent(hs -> builder.withSoapHeaders((Map<String, String>) evaluateHeaders(hs)));
+    builder.withSoapHeaders(fixedHeaders);
     transportHeaders.ifPresent(builder::withTransportHeaders);
     attachments.ifPresent(as -> as.forEach((k, v) -> {
       SoapAttachment attachment = new SoapAttachment(v.getContent(), v.getContentType());
@@ -95,6 +92,11 @@ public final class SoapOperationExecutor implements OperationExecutor {
     }));
 
     return builder.build();
+  }
+
+  private String getOperation(ExecutionContext<OperationModel> context) {
+    return (String) getParam(context, OPERATION_PARAM)
+        .orElseThrow(() -> new IllegalStateException("Execution Context does not have the required operation parameter"));
   }
 
   private <T> Optional<T> getParam(ExecutionContext<OperationModel> context, String param) {

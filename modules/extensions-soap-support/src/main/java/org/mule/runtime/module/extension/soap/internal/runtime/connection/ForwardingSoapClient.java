@@ -7,10 +7,10 @@
 package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 
 import static com.google.common.collect.ImmutableList.copyOf;
+import static java.util.Collections.emptyMap;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.soap.api.client.SoapClientConfiguration.builder;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
@@ -28,6 +28,7 @@ import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -56,6 +57,11 @@ public class ForwardingSoapClient {
         .build(new SoapClientCacheLoader(service));
   }
 
+  public Map<String, String> getCustomHeaders(String id, String operation) {
+    Map<String, String> customHeaders = serviceProvider.getCustomHeaders(getWebServiceDefinitionById(id), operation);
+    return customHeaders != null ? customHeaders : emptyMap();
+  }
+
   /**
    * Returns a {@link SoapClient} instance connected to the {@link WebServiceDefinition} of the specified {@code id}.
    *
@@ -63,14 +69,17 @@ public class ForwardingSoapClient {
    * @return a {@link SoapClient} instance
    */
   public SoapClient getSoapClient(String id) {
-    List<WebServiceDefinition> webServiceDefinitions = serviceProvider.getWebServiceDefinitions();
-    WebServiceDefinition wsd = webServiceDefinitions.stream().filter(ws -> ws.getServiceId().equals(id)).findAny()
-        .orElseThrow(() -> new IllegalArgumentException("Could not find a soap client id [" + id + "]"));
     try {
-      return clientsCache.get(wsd);
+      return clientsCache.get(getWebServiceDefinitionById(id));
     } catch (ExecutionException e) {
       throw new MuleRuntimeException(createStaticMessage("Error while retrieving soap client id [" + id + "]"), e);
     }
+  }
+
+  private WebServiceDefinition getWebServiceDefinitionById(String id) {
+    List<WebServiceDefinition> webServiceDefinitions = serviceProvider.getWebServiceDefinitions();
+    return webServiceDefinitions.stream().filter(ws -> ws.getServiceId().equals(id)).findAny()
+        .orElseThrow(() -> new IllegalArgumentException("Could not find a web service definition with id=[" + id + "]"));
   }
 
   public List<WebServiceDefinition> getAllWebServices() {
