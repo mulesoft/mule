@@ -13,6 +13,7 @@ import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
 import static org.mule.runtime.extension.api.error.MuleErrors.SOURCE;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.CONNECTIVITY;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.RETRY_EXHAUSTED;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
@@ -37,8 +38,8 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * {@link DeclarationEnricher} implementation which enriches {@link OperationModel operationModels} adding connectivity
- * related {@link MuleErrors} if the operations are considered as a connected ones.
+ * {@link DeclarationEnricher} implementation which enriches {@link OperationModel operationModels} adding connectivity related
+ * {@link MuleErrors} if the operations are considered as a connected ones.
  *
  * @since 4.0
  */
@@ -63,8 +64,8 @@ public class ExtensionsErrorsDeclarationEnricher implements DeclarationEnricher 
             @Override
             public void onOperation(WithOperationsDeclaration owner, OperationDeclaration operationDeclaration) {
               if (operationDeclaration.getModelProperty(ConnectivityModelProperty.class).isPresent()) {
-                operationDeclaration.addError(getErrorModel(CONNECTIVITY, errorModels, operationDeclaration));
-                operationDeclaration.addError(getErrorModel(RETRY_EXHAUSTED, errorModels, operationDeclaration));
+                operationDeclaration.addErrorModel(getErrorModel(CONNECTIVITY, errorModels, operationDeclaration));
+                operationDeclaration.addErrorModel(getErrorModel(RETRY_EXHAUSTED, errorModels, operationDeclaration));
               }
             }
 
@@ -76,7 +77,7 @@ public class ExtensionsErrorsDeclarationEnricher implements DeclarationEnricher 
 
                 ErrorModel sourceError = newError(SOURCE.getType(), MULE).withParent(anyError).build();
                 extensionDeclaration.addErrorModel(sourceError);
-                sourceDeclaration.addError(sourceError);
+                sourceDeclaration.addErrorModel(sourceError);
               }
             }
           }.walk(extensionDeclaration);

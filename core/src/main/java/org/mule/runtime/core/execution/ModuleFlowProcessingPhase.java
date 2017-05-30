@@ -7,7 +7,6 @@
 package org.mule.runtime.core.execution;
 
 import static java.lang.System.getProperty;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
@@ -29,9 +28,9 @@ import static org.mule.runtime.core.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollection;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Attributes;
@@ -56,16 +55,16 @@ import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.util.func.CheckedConsumer;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.publisher.MonoProcessor;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import reactor.core.publisher.MonoProcessor;
 
 /**
  * This phase routes the message through the flow.
@@ -150,16 +149,16 @@ public class ModuleFlowProcessingPhase
                   && sourceResponseErrorTypeMatcher.match(((SourceErrorException) me.getCause()).getErrorType())) {
                 try {
                   handleSourceError(exceptionHandler, errorConsumer, (SourceErrorException) me.getCause());
-                  onTerminate(terminateConsumer, me.getEvent(), null);
+                  onTerminate(terminateConsumer, left(me.getEvent()));
                 } catch (Exception e) {
-                  onTerminate(terminateConsumer, null, e);
+                  onTerminate(terminateConsumer, right(e));
                 }
               } else {
                 try {
                   errorConsumer.accept(me);
-                  onTerminate(terminateConsumer, null, me);
+                  onTerminate(terminateConsumer, right(me));
                 } catch (Exception e) {
-                  onTerminate(terminateConsumer, null, e);
+                  onTerminate(terminateConsumer, right(e));
                 }
               }
             })
@@ -180,12 +179,12 @@ public class ModuleFlowProcessingPhase
               errorConsumer.accept(messagingException);
 
               if (sourceResponseErrorTypeMatcher.match(errorType)) {
-                onTerminate(terminateConsumer, messagingException.getEvent(), null);
+                onTerminate(terminateConsumer, left(messagingException.getEvent()));
               } else {
                 throw new SourceErrorException(messagingException.getEvent(), errorType, messagingException);
               }
             } catch (SourceErrorException see) {
-              onTerminate(terminateConsumer, null, sourceErrorToMessagingException(see));
+              onTerminate(terminateConsumer, right(see.toMessagingException()));
             }
           };
 
@@ -205,10 +204,10 @@ public class ModuleFlowProcessingPhase
                                             failureEvent -> successSourcePolicyResult.createErrorResponseParameters(failureEvent),
                                             createResponseCompletationCallback(phaseResultNotifier));
             } catch (SourceErrorException see) {
-              errorConsumer.accept(sourceErrorToMessagingException(see));
-              onTerminate(terminateConsumer, null, see);
+              errorConsumer.accept(see.toMessagingException());
+              onTerminate(terminateConsumer, right(see));
             } finally {
-              onTerminate(terminateConsumer, flowExecutionResponse, null);
+              onTerminate(terminateConsumer, left(flowExecutionResponse));
             }
           };
 
@@ -224,7 +223,7 @@ public class ModuleFlowProcessingPhase
 
   private void handleSourceError(final MessagingExceptionHandler exceptionHandler, Consumer<MessagingException> errorConsumer,
                                  SourceErrorException see) {
-    MessagingException messagingException = sourceErrorToMessagingException(see);
+    MessagingException messagingException = see.toMessagingException();
     exceptionHandler.handleException(messagingException, messagingException.getEvent());
     errorConsumer.accept(messagingException);
   }
@@ -289,15 +288,11 @@ public class ModuleFlowProcessingPhase
                                                                            ModuleFlowProcessingPhaseTemplate template,
                                                                            PhaseResultNotifier phaseResultNotifier) {
     return eventOrException -> {
-
-      ResponseCompletionCallback completionCallback = createSendFailureResponseCompletationCallback(phaseResultNotifier, null);
-      eventOrException.apply(event -> safely(() -> template.sendAfterTerminateResponseToClient(left(event))),
-                             messagingException -> safely(() -> {
-                               messagingException
-                                   .setProcessedEvent(createErrorEvent(messagingException.getEvent(), messageSource,
-                                                                       messagingException, muleContext.getErrorTypeLocator()));
-                               template.sendAfterTerminateResponseToClient(right(messagingException));
-                             }));
+      template.sendAfterTerminateResponseToClient(eventOrException.mapRight(messagingException -> {
+        messagingException.setProcessedEvent(createErrorEvent(messagingException.getEvent(), messageSource, messagingException,
+                                                              muleContext.getErrorTypeLocator()));
+        return messagingException;
+      }));
     };
   }
 
@@ -325,7 +320,7 @@ public class ModuleFlowProcessingPhase
       template.sendResponseToClient(response, responseParameters, template.getFailedExecutionResponseParametersFunction(),
                                     createResponseCompletationCallback(phaseResultNotifier));
 
-      onTerminate(terminateConsumer, response, null);
+      onTerminate(terminateConsumer, left(response));
     };
   }
 
@@ -396,28 +391,24 @@ public class ModuleFlowProcessingPhase
     };
   }
 
-  private void onTerminate(Consumer<Either<Event, MessagingException>> terminateConsumer, Event event, Throwable throwable) {
-    if (throwable != null) {
+  /**
+   * This method will not throw any {@link Exception}.
+   * 
+   * @param terminateConsumer the action to perform on the transformed result.
+   * @param result the outcome of trying to send the response of the source through the source. In the case of error, only
+   *        {@link MessagingException} or {@link SourceErrorException} are valid values on the {@code right} side of this
+   *        parameter.
+   */
+  private void onTerminate(Consumer<Either<Event, MessagingException>> terminateConsumer, Either<Event, Throwable> result) {
+    safely(() -> terminateConsumer.accept(result.mapRight(throwable -> {
       if (throwable instanceof MessagingException) {
-        terminateConsumer.accept(right((MessagingException) throwable));
+        return (MessagingException) throwable;
       } else if (throwable instanceof SourceErrorException) {
-        terminateConsumer.accept(right(sourceErrorToMessagingException((SourceErrorException) throwable)));
+        return ((SourceErrorException) throwable).toMessagingException();
       } else {
-        terminateConsumer.accept(right(new MessagingException(event, throwable)));
+        return null;
       }
-    } else {
-      terminateConsumer.accept(left(event));
-    }
-  }
-
-  private MessagingException sourceErrorToMessagingException(SourceErrorException see) {
-    Event eventWithError = Event.builder(see.getEvent())
-        .error(ErrorBuilder.builder(see.getCause())
-            .errorType(see.getErrorType())
-            .build())
-        .build();
-    final MessagingException me = new MessagingException(eventWithError, see.getCause());
-    return me;
+    })));
   }
 
   @Override
@@ -426,40 +417,6 @@ public class ModuleFlowProcessingPhase
       return 1;
     }
     return 0;
-  }
-
-  public static final class SourceErrorException extends MuleRuntimeException {
-
-    private Event event;
-    private ErrorType errorType;
-    private MessagingException originalCause;
-
-    public SourceErrorException(Event event, ErrorType errorType, Throwable cause) {
-      super(cause);
-      this.event = event;
-      this.errorType = errorType;
-      this.originalCause = null;
-    }
-
-    public SourceErrorException(Event event, ErrorType errorType, Throwable cause, MessagingException originalCause) {
-      super(cause);
-      this.event = event;
-      this.errorType = errorType;
-      this.originalCause = originalCause;
-    }
-
-    public Event getEvent() {
-      return event;
-    }
-
-    public ErrorType getErrorType() {
-      return errorType;
-    }
-
-    public Optional<MessagingException> getOriginalCause() {
-      return ofNullable(originalCause);
-    }
-
   }
 
 }

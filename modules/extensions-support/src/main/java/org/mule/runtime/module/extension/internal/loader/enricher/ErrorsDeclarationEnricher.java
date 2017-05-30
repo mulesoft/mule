@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
@@ -40,8 +41,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * {@link DeclarationEnricher} implementation which enriches the {@link ExtensionModel} and their {@link OperationModel}
- * from the used {@link ErrorTypes} and {@link Throws} in an Annotation based extension.
+ * {@link DeclarationEnricher} implementation which enriches the {@link ExtensionModel} and their {@link OperationModel} from the
+ * used {@link ErrorTypes} and {@link Throws} in an Annotation based extension.
  *
  * @since 4.0
  */
@@ -105,7 +106,7 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
               errorTypeProvider.getErrorTypes().stream()
                   .map(error -> validateOperationThrows(extensionErrorTypes, error))
                   .map(errorModelDescriber::getErrorModel)
-                  .forEach(operation::addError);
+                  .forEach(operation::addErrorModel);
 
 
             } catch (InstantiationException | IllegalAccessException e) {
