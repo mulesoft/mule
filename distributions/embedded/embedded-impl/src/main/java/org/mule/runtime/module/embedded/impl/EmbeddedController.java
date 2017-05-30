@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -187,18 +186,6 @@ public class EmbeddedController {
     setProperty(MULE_HOME_DIRECTORY_PROPERTY, containerInfo.getContainerBaseFolder().getPath());
     getDomainsFolder().mkdirs();
     getServicesFolder().mkdirs();
-    URLClassLoader urlClassLoader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
-    URL[] urLs = urlClassLoader.getURLs();
-    for (URL urL : urLs) {
-      File dependencyFile = new File(urL.getPath());
-      if (dependencyFile.getName().toLowerCase().endsWith("zip")) {
-        try {
-          copyFile(dependencyFile, new File(getServicesFolder(), dependencyFile.getName()));
-        } catch (IOException e) {
-          throw new RuntimeException("Failure copying services", e);
-        }
-      }
-    }
   }
 
   private File createDefaultDomainDir() {

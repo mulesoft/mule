@@ -9,6 +9,7 @@ package org.mule.runtime.module.embedded;
 
 import static com.mashape.unirest.http.Unirest.post;
 import static java.lang.String.valueOf;
+import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static java.nio.file.Files.delete;
 import static java.util.Collections.emptyMap;
@@ -29,13 +30,17 @@ import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.Deploym
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EMBEDDED_API;
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EmbeddedApiStory.CONFIGURATION;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.module.embedded.api.Application;
 import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
 import org.mule.runtime.module.embedded.api.DeploymentConfiguration;
 import org.mule.runtime.module.embedded.api.EmbeddedContainer;
+import org.mule.runtime.module.embedded.internal.classloading.FilteringClassLoader;
+import org.mule.runtime.module.embedded.internal.classloading.JdkOnlyClassLoaderFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.FreePortFinder;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,10 +58,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
-
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.exceptions.UnirestException;
-
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -169,52 +170,62 @@ public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
     }
   }
 
-  private void doWithinApplication(String applicaitonFolder, Consumer<Integer> portConsumer,
+  private void doWithinApplication(String applicationFolder, Consumer<Integer> portConsumer,
                                    Map<String, String> applicationProperties)
       throws URISyntaxException, IOException {
-    doWithinApplication(applicaitonFolder, portConsumer, false, applicationProperties, empty());
+    doWithinApplication(applicationFolder, portConsumer, false, applicationProperties, empty());
   }
 
-  private void doWithinApplication(String applicaitonFolder, Consumer<Integer> portConsumer, boolean enableTestDependencies,
+  private void doWithinApplication(String applicationFolder, Consumer<Integer> portConsumer, boolean enableTestDependencies,
                                    Map<String, String> applicationProperties, Optional<String> log4JConfigurationFileOptional)
       throws URISyntaxException, IOException {
-    Map<String, String> customizedApplicationProperties = new HashMap<>(applicationProperties);
-    Integer httpListenerPort = new FreePortFinder(6000, 9000).find();
-    customizedApplicationProperties.put("httpPort", valueOf(httpListenerPort));
-    Application application =
-        new Application(
-                        singletonList(getClasspathResourceAsUri(applicaitonFolder + File.separator + "mule-config.xml")), null,
-                        getClasspathResourceAsUri(applicaitonFolder + File.separator + "pom.xml").toURL(),
-                        getClasspathResourceAsUri(applicaitonFolder + File.separator + "mule-application.json").toURL());
-
-    File localRepositoryLocation = localRepositoryFolder.getRoot();
-    LOGGER.info("Using folder as local repository: " + localRepositoryLocation.getAbsolutePath());
-
-    EmbeddedContainer embeddedContainer = builder()
-        .withMuleVersion(System.getProperty("mule.version"))
-        .withContainerBaseFolder(containerFolder.newFolder().toURI().toURL())
-        .withMavenConfiguration(newMavenConfigurationBuilder()
-            .withLocalMavenRepositoryLocation(localRepositoryLocation)
-            .withRemoteRepository(newRemoteRepositoryBuilder().withId("mulesoft-public")
-                .withUrl(new URL("https://repository.mulesoft.org/nexus/content/repositories/public"))
-                .build())
-            .build())
-        .withLog4jConfigurationFile(log4JConfigurationFileOptional
-            .orElse(getClass().getClassLoader().getResource("log4j2-default.xml").getFile()))
-        .withApplicationConfiguration(ApplicationConfiguration.builder()
-            .withApplication(application)
-            .withDeploymentConfiguration(DeploymentConfiguration.builder()
-                .withTestDependenciesEnabled(enableTestDependencies)
-                .withArtifactProperties(customizedApplicationProperties)
-                .build())
-            .build())
-        .build();
-
-    embeddedContainer.start();
+    ClassLoader contextClassLoader = currentThread().getContextClassLoader();
     try {
-      portConsumer.accept(httpListenerPort);
+      // Sets a classloader with the JDK only to ensure that dependencies are read form the embedded container classloader
+      FilteringClassLoader jdkOnlyClassLoader = JdkOnlyClassLoaderFactory.create();
+      currentThread().setContextClassLoader(jdkOnlyClassLoader);
+
+      Map<String, String> customizedApplicationProperties = new HashMap<>(applicationProperties);
+      Integer httpListenerPort = new FreePortFinder(6000, 9000).find();
+      customizedApplicationProperties.put("httpPort", valueOf(httpListenerPort));
+      Application application =
+          new Application(
+                          singletonList(getClasspathResourceAsUri(applicationFolder + File.separator + "mule-config.xml")), null,
+                          getClasspathResourceAsUri(applicationFolder + File.separator + "pom.xml").toURL(),
+                          getClasspathResourceAsUri(applicationFolder + File.separator + "mule-application.json").toURL());
+
+      File localRepositoryLocation = localRepositoryFolder.getRoot();
+      LOGGER.info("Using folder as local repository: " + localRepositoryLocation.getAbsolutePath());
+
+      EmbeddedContainer embeddedContainer = builder()
+          .withMuleVersion(System.getProperty("mule.version"))
+          .withContainerBaseFolder(containerFolder.newFolder().toURI().toURL())
+          .withMavenConfiguration(newMavenConfigurationBuilder()
+              .withLocalMavenRepositoryLocation(localRepositoryLocation)
+              .withRemoteRepository(newRemoteRepositoryBuilder().withId("mulesoft-public")
+                  .withUrl(new URL(
+                                   "https://repository.mulesoft.org/nexus/content/repositories/public"))
+                  .build())
+              .build())
+          .withLog4jConfigurationFile(log4JConfigurationFileOptional
+              .orElse(getClass().getClassLoader().getResource("log4j2-default.xml").getFile()))
+          .withApplicationConfiguration(ApplicationConfiguration.builder()
+              .withApplication(application)
+              .withDeploymentConfiguration(DeploymentConfiguration.builder()
+                  .withTestDependenciesEnabled(enableTestDependencies)
+                  .withArtifactProperties(customizedApplicationProperties)
+                  .build())
+              .build())
+          .build();
+
+      embeddedContainer.start();
+      try {
+        portConsumer.accept(httpListenerPort);
+      } finally {
+        embeddedContainer.stop();
+      }
     } finally {
-      embeddedContainer.stop();
+      currentThread().setContextClassLoader(contextClassLoader);
     }
   }
 
