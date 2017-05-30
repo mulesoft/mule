@@ -19,12 +19,9 @@ import org.junit.Test;
 public class HttpRequestConfigTestCase extends FunctionalTestCase
 {
 
-  private static final int RESPONSE_BUFFER = 512;
   private static final int MAX_CONNECTIONS = 10;
   private static final int IDLE_TIMEOUT = 10000;
 
-  @Rule
-  public SystemProperty bufferSize = new SystemProperty("bufferSize", valueOf(RESPONSE_BUFFER));
   @Rule
   public SystemProperty maxConnections = new SystemProperty("maxConnections", valueOf(MAX_CONNECTIONS));
   @Rule
@@ -40,7 +37,6 @@ public class HttpRequestConfigTestCase extends FunctionalTestCase
   public void verifyConfig() throws Exception
   {
     DefaultHttpRequesterConfig requestConfig = muleContext.getRegistry().lookupObject("requestConfig");
-    assertThat(requestConfig.getResponseBufferSize(), equalTo(RESPONSE_BUFFER));
     assertThat(requestConfig.getMaxConnections(), equalTo(MAX_CONNECTIONS));
     assertThat(requestConfig.getConnectionIdleTimeout(), equalTo(IDLE_TIMEOUT));
   }
