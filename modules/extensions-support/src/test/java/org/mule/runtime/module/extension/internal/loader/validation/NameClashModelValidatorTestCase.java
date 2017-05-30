@@ -18,6 +18,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
@@ -33,7 +35,6 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
@@ -315,7 +316,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void contentParameterValidationIsSkipped() {
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
-    when(offending.getRole()).thenReturn(ParameterRole.CONTENT);
+    when(offending.getRole()).thenReturn(CONTENT);
     when(connectionProviderModel.getAllParameterModels())
         .thenReturn(asList(simpleConnectionProviderParam, topLevelConnectionProviderParam, offending));
     validate();
@@ -471,6 +472,18 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(configuration.getOperationModels()).thenReturn(ImmutableList.of());
     when(configuration.getConnectionProviders()).thenReturn(ImmutableList.of());
     when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel, configuration));
+    validate();
+  }
+
+  @Test
+  public void contentParamtersWithSameNameAndDifferentType() {
+    exception.expect(IllegalModelDefinitionException.class);
+    ParameterModel firtParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Object.class);
+    when(firtParam.getRole()).thenReturn(PRIMARY_CONTENT);
+    ParameterModel secondParam = getParameter(CHILD_SINGULAR_PARAM_NAME, TopLevelTest.class);
+    when(secondParam.getRole()).thenReturn(CONTENT);
+    when(operationModel.getAllParameterModels()).thenReturn(asList(firtParam));
+    when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
     validate();
   }
 
