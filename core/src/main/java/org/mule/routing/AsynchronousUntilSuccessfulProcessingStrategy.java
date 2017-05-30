@@ -9,6 +9,7 @@ package org.mule.routing;
 import static org.mule.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.VoidMuleEvent;
@@ -16,6 +17,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.MessagingExceptionHandlerAware;
@@ -210,6 +212,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
                 try
                 {
                     retrieveAndProcessEvent(eventStoreKey);
+                }
+                catch (ObjectStoreException ose)
+                {
+                    // If the problem is in the ObjectStore, we won't be able to do the proper error handling anyway.
+                    throw new MuleRuntimeException(ose);
                 }
                 catch (Exception e)
                 {
