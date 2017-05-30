@@ -273,6 +273,11 @@ public interface AllureConstants {
 
       String FOR_EACH = "Foreach";
     }
+
+    interface ScatterGatherStory {
+
+      String SCATTER_GATHER = "Scatter Gather";
+    }
   }
 
   interface TransformMessageFeature {
@@ -280,6 +285,17 @@ public interface AllureConstants {
     String TRANSFORM_MESSAGE = "Transform Message";
 
     interface TransformMessageStory {
+    }
+
+  }
+
+  interface ScopeFeature {
+
+    String SCOPE = "Scope";
+
+    interface ChoiceStory {
+
+      String CHOICE = "Choice";
     }
 
   }
