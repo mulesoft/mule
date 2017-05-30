@@ -105,7 +105,7 @@ public class ForwardingSoapClientTestCase {
   @Test
   public void customHeadersAreResolvedCorrectly() {
     String someOperationName = "someOperation";
-    Map<String, String> headers = client.getOperationFixedHeaders("uno", someOperationName);
+    Map<String, String> headers = client.getCustomHeaders("uno", someOperationName);
     assertThat(headers.size(), is(1));
     Map.Entry<String, String> header = headers.entrySet().iterator().next();
     assertThat(header.getKey(), is(HEADER_NAME));
@@ -114,7 +114,7 @@ public class ForwardingSoapClientTestCase {
 
   @Test
   public void customHeadersAreNeverNull() {
-    Map<String, String> headers = client.getOperationFixedHeaders("uno", NULL_HEADERS_OPE);
+    Map<String, String> headers = client.getCustomHeaders("uno", NULL_HEADERS_OPE);
     assertThat(headers.size(), is(0));
   }
 

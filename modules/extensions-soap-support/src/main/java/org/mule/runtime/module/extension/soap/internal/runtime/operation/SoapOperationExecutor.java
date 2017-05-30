@@ -61,8 +61,8 @@ public final class SoapOperationExecutor implements OperationExecutor {
     try {
       String serviceId = context.getParameter(SERVICE_PARAM);
       ForwardingSoapClient connection = (ForwardingSoapClient) connectionResolver.resolve(context);
-      Map<String, String> fixedHeaders = connection.getOperationFixedHeaders(serviceId, getOperation(context));
-      SoapRequest request = getRequest(context, fixedHeaders);
+      Map<String, String> customHeaders = connection.getCustomHeaders(serviceId, getOperation(context));
+      SoapRequest request = getRequest(context, customHeaders);
       SoapResponse response = connection.getSoapClient(serviceId).consume(request);
       return justOrEmpty(response.getAsResult());
     } catch (Exception e) {

@@ -57,7 +57,7 @@ public class ForwardingSoapClient {
         .build(new SoapClientCacheLoader(service));
   }
 
-  public Map<String, String> getOperationFixedHeaders(String id, String operation) {
+  public Map<String, String> getCustomHeaders(String id, String operation) {
     Map<String, String> customHeaders = serviceProvider.getCustomHeaders(getWebServiceDefinitionById(id), operation);
     return customHeaders != null ? customHeaders : emptyMap();
   }
