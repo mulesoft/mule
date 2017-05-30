@@ -6,22 +6,25 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mule.runtime.core.api.functional.Either.right;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.ModuleFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
-
-import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import org.mule.runtime.core.util.func.CheckedConsumer;
+import org.mule.runtime.core.util.func.CheckedFunction;
+import org.mule.runtime.core.util.func.CheckedRunnable;
 
 import org.reactivestreams.Publisher;
+
+import java.util.Map;
+import java.util.function.Function;
 
 final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTemplate {
 
@@ -40,12 +43,12 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   }
 
   @Override
-  public Function<Event, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction() {
+  public CheckedFunction<Event, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction() {
     return event -> completionHandler.createResponseParameters(event);
   }
 
   @Override
-  public Function<Event, Map<String, Object>> getFailedExecutionResponseParametersFunction() {
+  public CheckedFunction<Event, Map<String, Object>> getFailedExecutionResponseParametersFunction() {
     return event -> completionHandler.createFailureResponseParameters(event);
   }
 
@@ -68,11 +71,7 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   public void sendResponseToClient(Event event, Map<String, Object> parameters,
                                    Function<Event, Map<String, Object>> errorResponseParametersFunction,
                                    ResponseCompletionCallback responseCompletionCallback) {
-    Consumer<MessagingException> errorResponseCallback = (messagingException) -> completionHandler
-        .onFailure(messagingException, errorResponseParametersFunction.apply(messagingException.getEvent()));
-    ExtensionSourceExceptionCallback exceptionCallback =
-        new ExtensionSourceExceptionCallback(responseCompletionCallback, event, errorResponseCallback, messageProcessorContext);
-    runAndNotify(() -> completionHandler.onCompletion(event, parameters, exceptionCallback), event, responseCompletionCallback);
+    runAndNotify(() -> completionHandler.onCompletion(event, parameters), event, responseCompletionCallback);
   }
 
   @Override
@@ -82,7 +81,14 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
                  responseCompletionCallback);
   }
 
-  private void runAndNotify(Runnable runnable, Event event, ResponseCompletionCallback responseCompletionCallback) {
+  @Override
+  public void sendAfterTerminateResponseToClient(Either<Event, MessagingException> either) {
+    either.apply((CheckedConsumer<Event>) event -> completionHandler.onTerminate(either),
+                 (CheckedConsumer<MessagingException>) messagingException -> completionHandler
+                     .onTerminate(right(messagingException)));
+  }
+
+  private void runAndNotify(CheckedRunnable runnable, Event event, ResponseCompletionCallback responseCompletionCallback) {
     try {
       runnable.run();
       responseCompletionCallback.responseSentSuccessfully();

@@ -12,6 +12,7 @@ import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
+import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -34,5 +35,10 @@ public class TypedValueSource extends Source<String, Attributes> {
   @OnSuccess
   public void onSuccess(TypedValue<String> stringValue) {
     onSuccessValue = stringValue;
+  }
+
+  @OnTerminate
+  public void onTerminate() {
+
   }
 }

@@ -2756,6 +2756,34 @@
                     "name": "sameNameParameter",
                     "description": "",
                     "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Boolean",
+                      "annotations": {
+                        "typeId": "boolean"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 12
+                    },
+                    "name": "fail",
+                    "description": "",
+                    "modelProperties": {}
                   }
                 ],
                 "exclusiveParametersModels": [],
@@ -2831,7 +2859,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 12
+                      "order": 13
                     },
                     "name": "nextDoor",
                     "description": "",
@@ -3143,7 +3171,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 13
+                      "order": 14
                     },
                     "name": "sameNameParameter",
                     "description": "",
@@ -3168,9 +3196,37 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 14
+                      "order": 15
                     },
                     "name": "methylamine",
+                    "description": "",
+                    "modelProperties": {}
+                  },
+                  {
+                    "type": {
+                      "format": "java",
+                      "type": "Boolean",
+                      "annotations": {
+                        "typeId": "boolean"
+                      }
+                    },
+                    "hasDynamicType": false,
+                    "required": false,
+                    "isConfigOverride": false,
+                    "expressionSupport": "SUPPORTED",
+                    "role": "BEHAVIOUR",
+                    "dslConfiguration": {
+                      "allowsInlineDefinition": true,
+                      "allowsReferences": true,
+                      "allowTopLevelDefinition": false
+                    },
+                    "layoutModel": {
+                      "password": false,
+                      "text": false,
+                      "query": false,
+                      "order": 16
+                    },
+                    "name": "propagateError",
                     "description": "",
                     "modelProperties": {}
                   }
@@ -3248,7 +3304,7 @@
                       "password": false,
                       "text": false,
                       "query": false,
-                      "order": 15
+                      "order": 17
                     },
                     "name": "nextDoor",
                     "description": "",
@@ -3534,6 +3590,70 @@
             "description": "",
             "modelProperties": {}
           },
+          "terminateCallbackModel": {
+            "parameterGroupModels": [],
+            "name": "onTerminate",
+            "description": "",
+            "modelProperties": {}
+          },
+          "errors": [
+            {
+              "type": "SOURCE_RESPONSE_SEND",
+              "namespace": "MULE",
+              "parent": {
+                "type": "SOURCE_RESPONSE",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "SOURCE",
+                  "namespace": "MULE",
+                  "parent": {
+                    "type": "ANY",
+                    "namespace": "MULE"
+                  }
+                }
+              }
+            },
+            {
+              "type": "SOURCE_ERROR_RESPONSE_SEND",
+              "namespace": "MULE",
+              "parent": {
+                "type": "SOURCE",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "SOURCE_ERROR_RESPONSE_GENERATE",
+              "namespace": "MULE",
+              "parent": {
+                "type": "SOURCE",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "SOURCE_RESPONSE_GENERATE",
+              "namespace": "MULE",
+              "parent": {
+                "type": "SOURCE_RESPONSE",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "SOURCE",
+                  "namespace": "MULE",
+                  "parent": {
+                    "type": "ANY",
+                    "namespace": "MULE"
+                  }
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -10091,6 +10211,7 @@
   "messageSources": [
     {
       "hasResponse": false,
+      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -10555,6 +10676,62 @@
         "parent": {
           "type": "ANY",
           "namespace": "MULE"
+        }
+      }
+    },
+    {
+      "type": "SOURCE_ERROR_RESPONSE_SEND",
+      "namespace": "MULE",
+      "parent": {
+        "type": "SOURCE",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    },
+    {
+      "type": "SOURCE_ERROR_RESPONSE_GENERATE",
+      "namespace": "MULE",
+      "parent": {
+        "type": "SOURCE",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    },
+    {
+      "type": "SOURCE_RESPONSE_SEND",
+      "namespace": "MULE",
+      "parent": {
+        "type": "SOURCE_RESPONSE",
+        "namespace": "MULE",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "MULE",
+          "parent": {
+            "type": "ANY",
+            "namespace": "MULE"
+          }
+        }
+      }
+    },
+    {
+      "type": "SOURCE_RESPONSE_GENERATE",
+      "namespace": "MULE",
+      "parent": {
+        "type": "SOURCE_RESPONSE",
+        "namespace": "MULE",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "MULE",
+          "parent": {
+            "type": "ANY",
+            "namespace": "MULE"
+          }
         }
       }
     }

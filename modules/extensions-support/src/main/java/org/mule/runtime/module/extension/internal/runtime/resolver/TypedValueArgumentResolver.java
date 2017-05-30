@@ -18,7 +18,7 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
  */
 public final class TypedValueArgumentResolver<T> implements ArgumentResolver<TypedValue<T>> {
 
-  private final ByParameterNameArgumentResolver argumentResolver;
+  private final ByParameterNameArgumentResolver<T> argumentResolver;
 
   public TypedValueArgumentResolver(String parameterName) {
     argumentResolver = new ByParameterNameArgumentResolver<>(parameterName);
@@ -29,11 +29,9 @@ public final class TypedValueArgumentResolver<T> implements ArgumentResolver<Typ
    */
   @Override
   public TypedValue<T> resolve(ExecutionContext executionContext) {
-    Object value = argumentResolver.resolve(executionContext);
-    if (value instanceof TypedValue) {
-      return (TypedValue<T>) value;
-    } else {
-      return new TypedValue<>((T) value, DataType.fromObject(value));
-    }
+    T value = argumentResolver.resolve(executionContext);
+    return value instanceof TypedValue
+        ? (TypedValue<T>) value
+        : new TypedValue<>(value, DataType.fromObject(value));
   }
 }

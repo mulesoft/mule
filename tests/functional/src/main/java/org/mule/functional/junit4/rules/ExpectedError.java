@@ -19,14 +19,13 @@ import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
 
 import com.google.common.base.Joiner;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.hamcrest.Matcher;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * JUnit rule for Mule errors
@@ -92,7 +91,6 @@ public class ExpectedError implements TestRule {
   public ExpectedError expectCause(Matcher<? extends Throwable> expectedCause) {
     this.causeMatcher = expectedCause;
     return this;
-
   }
 
   private boolean expectsThrowable() {
@@ -105,7 +103,7 @@ public class ExpectedError implements TestRule {
 
   private void failWithNonMatchingException(Exception e) {
     fail(format("An exception was caught but it didn't met the following conditions:\n %s \n Caught exception was:\n %s %s",
-                Joiner.on("\n").join(matchers).toString(), e, getStackTraceAsString(e)));
+                Joiner.on("\n").join(matchers), e, getStackTraceAsString(e)));
   }
 
   private void failDueToUnexpectedException(Throwable e) {

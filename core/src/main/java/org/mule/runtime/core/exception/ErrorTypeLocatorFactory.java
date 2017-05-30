@@ -19,7 +19,6 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.STREAM
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.VALIDATION;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;

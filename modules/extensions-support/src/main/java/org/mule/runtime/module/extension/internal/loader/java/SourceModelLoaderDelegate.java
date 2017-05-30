@@ -140,12 +140,15 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
   private void declareSourceCallback(SourceElement sourceType, SourceDeclarer source) {
     final Optional<MethodElement> onResponseMethod = sourceType.getOnResponseMethod();
     final Optional<MethodElement> onErrorMethod = sourceType.getOnErrorMethod();
+    final Optional<MethodElement> onTerminateMethod = sourceType.getOnTerminateMethod();
 
     // TODO: MULE-9220 add syntax validator to check that none of these use @UseConfig or @Connection
     declareSourceCallbackParameters(source, onResponseMethod, source::onSuccess);
     declareSourceCallbackParameters(source, onErrorMethod, source::onError);
+    declareSourceCallbackParameters(source, onTerminateMethod, source::onTerminate);
 
-    source.withModelProperty(new SourceCallbackModelProperty(getMethod(onResponseMethod), getMethod(onErrorMethod)));
+    source.withModelProperty(new SourceCallbackModelProperty(getMethod(onResponseMethod), getMethod(onErrorMethod),
+                                                             getMethod(onTerminateMethod)));
   }
 
 

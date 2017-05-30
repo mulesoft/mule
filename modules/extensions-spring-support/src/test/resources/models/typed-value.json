@@ -1995,6 +1995,13 @@
         "description": "",
         "modelProperties": {}
       },
+      "terminateCallbackModel": {
+        "parameterGroupModels": [],
+        "name": "onTerminate",
+        "description": "",
+        "modelProperties": {}
+      },
+      "errors": [],
       "output": {
         "type": {
           "format": "java",

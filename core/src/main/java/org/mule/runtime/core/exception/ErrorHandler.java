@@ -25,10 +25,10 @@ import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
 
+import org.reactivestreams.Publisher;
+
 import java.util.List;
 import java.util.Optional;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3. On error

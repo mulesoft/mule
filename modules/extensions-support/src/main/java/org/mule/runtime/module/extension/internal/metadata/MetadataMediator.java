@@ -273,11 +273,14 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                                               inputMetadataDescriptor.getAllParameters()),
                                                     resolveSourceCallbackType(sourceModel.getErrorCallback(),
                                                                               inputMetadataDescriptor.getAllParameters()),
+                                                    resolveSourceCallbackType(sourceModel.getTerminateCallback(),
+                                                                              inputMetadataDescriptor.getAllParameters()),
                                                     sourceModel.requiresConnection(),
                                                     sourceModel.isTransactional(),
                                                     sourceModel.supportsStreaming(),
                                                     sourceModel.getDisplayModel().orElse(null),
                                                     sourceModel.getStereotypes(),
+                                                    sourceModel.getErrorModels(),
                                                     sourceModel.getModelProperties()));
       }
     });

@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.util.Collections.emptyMap;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.execution.ExceptionCallback;
 
 import java.util.Map;
 
@@ -21,12 +21,17 @@ import java.util.Map;
 public class NullSourceCompletionHandler implements SourceCompletionHandler {
 
   @Override
-  public void onCompletion(Event event, Map<String, Object> parameters, ExceptionCallback<Throwable> exceptionCallback) {
+  public void onCompletion(Event event, Map<String, Object> parameters) {
     // Nothing to do.
   }
 
   @Override
   public void onFailure(MessagingException exception, Map<String, Object> parameters) {
+    // Nothing to do.
+  }
+
+  @Override
+  public void onTerminate(Either<Event, MessagingException> eventOrException) {
     // Nothing to do.
   }
 
@@ -39,4 +44,5 @@ public class NullSourceCompletionHandler implements SourceCompletionHandler {
   public Map<String, Object> createFailureResponseParameters(Event event) {
     return emptyMap();
   }
+
 }

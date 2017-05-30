@@ -29,6 +29,23 @@ public class PollingProber implements Prober {
     this.pollDelayMillis = pollDelayMillis;
   }
 
+  public static void probe(CheckedSupplier<Boolean> probable) {
+    probe(probable, () -> null);
+  }
+
+  public static void probe(CheckedSupplier<Boolean> probable, CheckedSupplier<String> failureDescription) {
+    new PollingProber().check(new JUnitLambdaProbe(probable, failureDescription));
+  }
+
+  public static void probe(long timeoutMillis, long pollDelayMillis, CheckedSupplier<Boolean> probable) {
+    probe(timeoutMillis, pollDelayMillis, probable, () -> null);
+  }
+
+  public static void probe(long timeoutMillis, long pollDelayMillis, CheckedSupplier<Boolean> probable,
+                           CheckedSupplier<String> failureDescription) {
+    new PollingProber(timeoutMillis, pollDelayMillis).check(new JUnitLambdaProbe(probable, failureDescription));
+  }
+
   @Override
   public void check(Probe probe) {
     if (!poll(probe)) {

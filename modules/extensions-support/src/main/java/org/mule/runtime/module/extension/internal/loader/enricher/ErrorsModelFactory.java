@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.ANY;
@@ -18,11 +17,6 @@ import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.DirectedGraph;
@@ -31,6 +25,12 @@ import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Extension's {@link ErrorModel} factory.
@@ -70,7 +70,7 @@ public class ErrorsModelFactory {
    * @return A {@link Set} of converted {@link ErrorModel}s generated from the given {@link ErrorTypeDefinition} array
    */
   public Set<ErrorModel> getErrorModels() {
-    return errorModelMap.values().stream().collect(toSet());
+    return new HashSet<>(errorModelMap.values());
   }
 
   /**
@@ -124,7 +124,7 @@ public class ErrorsModelFactory {
     graph.addEdge(errorType, parentErrorType);
   }
 
-  private void detectCycleReferences(DefaultDirectedGraph graph) {
+  private void detectCycleReferences(DefaultDirectedGraph<?, ?> graph) {
     CycleDetector<?, ?> cycleDetector = new CycleDetector<>(graph);
     if (cycleDetector.detectCycles()) {
       throw new IllegalModelDefinitionException("Cyclic Error Types reference detected, offending types: "
@@ -147,6 +147,6 @@ public class ErrorsModelFactory {
   }
 
   private void initErrorModelMap(Map<String, ErrorModel> errorModelMap) {
-    errorModelMap.put(toIdentifier(MuleErrors.ANY), ErrorModelBuilder.newError(ANY.getType(), MULE).build());
+    errorModelMap.put(toIdentifier(MuleErrors.ANY), newError(MuleErrors.ANY.getType(), MULE).build());
   }
 }

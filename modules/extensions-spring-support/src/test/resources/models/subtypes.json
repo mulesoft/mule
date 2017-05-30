@@ -1877,6 +1877,7 @@
   "messageSources": [
     {
       "hasResponse": false,
+      "errors": [],
       "output": {
         "type": {
           "format": "java",

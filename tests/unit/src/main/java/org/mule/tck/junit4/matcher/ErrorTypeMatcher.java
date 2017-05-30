@@ -7,15 +7,15 @@
 package org.mule.tck.junit4.matcher;
 
 import static java.lang.String.format;
-import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.is;
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsAnything;
-import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
 /**
  * {@link Matcher} for {@link ErrorType} instances.
@@ -39,6 +39,10 @@ public final class ErrorTypeMatcher extends TypeSafeMatcher<ErrorType> {
 
   public static ErrorTypeMatcher errorType(String namespace, String type) {
     return new ErrorTypeMatcher(is(namespace), is(type));
+  }
+
+  public static ErrorTypeMatcher errorType(ComponentIdentifier errorIdentifier) {
+    return new ErrorTypeMatcher(is(errorIdentifier.getNamespace()), is(errorIdentifier.getName()));
   }
 
   public static ErrorTypeMatcher errorType(Matcher<String> namespace, Matcher<String> type) {

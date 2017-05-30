@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.functional;
 
+import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
@@ -136,5 +137,10 @@ final public class Either<L, R> {
     } else {
       return empty();
     }
+  }
+
+  @Override
+  public String toString() {
+    return format("%s - left: { %s }; right: { %s }", this.getClass().getSimpleName(), left.toString(), right.toString());
   }
 }

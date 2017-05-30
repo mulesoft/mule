@@ -1320,6 +1320,13 @@
             "description": "",
             "modelProperties": {}
           },
+          "terminateCallbackModel": {
+            "parameterGroupModels": [],
+            "name": "onTerminate",
+            "description": "",
+            "modelProperties": {}
+          },
+          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -1683,6 +1690,7 @@
         },
         {
           "hasResponse": false,
+          "errors": [],
           "output": {
             "type": {
               "format": "java",

@@ -4705,6 +4705,7 @@
       "messageSources": [
         {
           "hasResponse": false,
+          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -9707,6 +9708,7 @@
   "messageSources": [
     {
       "hasResponse": false,
+      "errors": [],
       "output": {
         "type": {
           "format": "java",

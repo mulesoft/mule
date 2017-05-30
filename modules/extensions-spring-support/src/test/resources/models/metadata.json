@@ -756,6 +756,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
+                  "defaultValue": "#[payload]",
                   "role": "PRIMARY_CONTENT",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -929,6 +930,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
+                  "defaultValue": "#[payload]",
                   "role": "PRIMARY_CONTENT",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -1886,6 +1888,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
+                  "defaultValue": "#[payload]",
                   "role": "PRIMARY_CONTENT",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -2340,6 +2343,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
+                  "defaultValue": "#[payload]",
                   "role": "PRIMARY_CONTENT",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -2892,6 +2896,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
+                  "defaultValue": "#[payload]",
                   "role": "PRIMARY_CONTENT",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -3044,6 +3049,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
+                  "defaultValue": "#[payload]",
                   "role": "PRIMARY_CONTENT",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -3484,6 +3490,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
+                  "defaultValue": "#[payload]",
                   "role": "PRIMARY_CONTENT",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -3611,6 +3618,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
+                  "defaultValue": "#[payload]",
                   "role": "PRIMARY_CONTENT",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -3755,6 +3763,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
+                  "defaultValue": "#[payload]",
                   "role": "PRIMARY_CONTENT",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
@@ -4242,6 +4251,7 @@
       "messageSources": [
         {
           "hasResponse": false,
+          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -6576,6 +6586,7 @@
   "messageSources": [
     {
       "hasResponse": false,
+      "errors": [],
       "output": {
         "type": {
           "format": "java",
