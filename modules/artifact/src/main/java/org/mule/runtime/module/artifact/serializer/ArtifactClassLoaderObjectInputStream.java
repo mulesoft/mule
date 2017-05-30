@@ -8,6 +8,7 @@
 package org.mule.runtime.module.artifact.serializer;
 
 import static java.lang.Class.forName;
+
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 
 import java.io.IOException;
@@ -16,9 +17,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
 
 /**
- * Customized version of {@link ObjectInputStream} that reads the identifier of the class loader that loaded the
- * class of the serialized object.
- * <p/>
+ * Customized version of {@link ObjectInputStream} that reads the identifier of the class loader that loaded the class of the
+ * serialized object.
+ * <p>
  * Is intended to be used along with {@link ArtifactClassLoaderObjectOutputStream}.
  */
 public class ArtifactClassLoaderObjectInputStream extends ObjectInputStream {
@@ -30,7 +31,7 @@ public class ArtifactClassLoaderObjectInputStream extends ObjectInputStream {
    *
    * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
    * @param input input stream to read from. Non null.
-   * @throws  IOException if an I/O error occurs while reading stream header
+   * @throws IOException if an I/O error occurs while reading stream header
    */
   public ArtifactClassLoaderObjectInputStream(ClassLoaderRepository classLoaderRepository, InputStream input)
       throws IOException {
@@ -46,9 +47,7 @@ public class ArtifactClassLoaderObjectInputStream extends ObjectInputStream {
     }
 
     byte[] bytes = new byte[val];
-    if (read(bytes) < val) {
-      throw new IOException("Stream does not contain a classloader ID");
-    }
+    readFully(bytes);
 
     String classLoaderId = new String(bytes);
     ClassLoader classLoader = classLoaderRepository.find(classLoaderId)

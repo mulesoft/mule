@@ -7,29 +7,31 @@
 
 package org.mule.runtime.core.util.store;
 
+import static java.lang.String.format;
+import static java.util.Collections.unmodifiableList;
 import static org.apache.commons.io.FileUtils.moveFileToDirectory;
 import static org.apache.commons.io.FileUtils.readFileToString;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.store.ObjectStoreManager.UNBOUNDED;
+import static org.mule.runtime.core.config.i18n.CoreMessages.failedToCreate;
 import static org.mule.runtime.core.util.FileUtils.cleanDirectory;
 import static org.mule.runtime.core.util.FileUtils.newFile;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.serialization.ObjectSerializer;
-import org.mule.runtime.core.api.store.ExpirableObjectStore;
-import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.store.ExpirableObjectStore;
+import org.mule.runtime.core.api.store.ListableObjectStore;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -38,7 +40,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.collections.BidiMap;
@@ -51,7 +52,9 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
   private static final String OBJECT_FILE_EXTENSION = ".obj";
   private static final String PARTITION_DESCRIPTOR_FILE = "partition-descriptor";
   public static final String CORRUPTED_FOLDER = "corrupted-files";
-  protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+  private static final Logger logger = LoggerFactory.getLogger(PersistentObjectStorePartition.class);
+
   private final MuleContext muleContext;
   private final ObjectSerializer serializer;
 
@@ -99,7 +102,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     assureLoaded();
 
     synchronized (realKeyToUUIDIndex) {
-      return Collections.unmodifiableList(new ArrayList<Serializable>(realKeyToUUIDIndex.keySet()));
+      return unmodifiableList(new ArrayList<Serializable>(realKeyToUUIDIndex.keySet()));
     }
   }
 
@@ -132,7 +135,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
       try {
         cleanDirectory(this.partitionDirectory);
       } catch (IOException e) {
-        throw new ObjectStoreException(I18nMessageFactory.createStaticMessage("Could not clear ObjectStore"), e);
+        throw new ObjectStoreException(createStaticMessage("Could not clear ObjectStore"), e);
       }
 
       realKeyToUUIDIndex.clear();
@@ -145,8 +148,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
 
     synchronized (realKeyToUUIDIndex) {
       if (!realKeyToUUIDIndex.containsKey(key)) {
-        String message = "Key does not exist: " + key;
-        throw new ObjectDoesNotExistException(CoreMessages.createStaticMessage(message));
+        throw new ObjectDoesNotExistException(createStaticMessage("Key does not exist: " + key));
       }
       String filename = (String) realKeyToUUIDIndex.get(key);
       File file = getValueFile(filename);
@@ -217,36 +219,37 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     moveFileToDirectory(file, corruptedFile.getParentFile(), true);
   }
 
-  private synchronized void loadStoredKeysAndFileNames() throws ObjectStoreException {
-    /*
-     * by re-checking this condition here we can avoid contention in {@link #assureLoaded}. The amount of times that this
-     * condition should evaluate to {@code true} is really limited, which provides better performance in the long run
-     */
-    if (loaded) {
-      return;
-    }
-
-    try {
-      File[] files = listValuesFiles();
-      for (File file : files) {
-        try {
-          StoreValue<T> storeValue = deserialize(file);
-          realKeyToUUIDIndex.put(storeValue.getKey(), file.getName());
-        } catch (ObjectStoreException e) {
-          if (logger.isWarnEnabled()) {
-            logger.warn(String.format(
-                                      "Could not deserialize the ObjectStore file: %s. The file will be skipped " +
-                                          "and moved " + "to the Garbage folder",
-                                      file.getName()));
-          }
-          moveToCorruptedFilesFolder(file);
-        }
+  private void loadStoredKeysAndFileNames() throws ObjectStoreException {
+    synchronized (realKeyToUUIDIndex) {
+      /*
+       * by re-checking this condition here we can avoid contention in {@link #assureLoaded}. The amount of times that this
+       * condition should evaluate to {@code true} is really limited, which provides better performance in the long run
+       */
+      if (loaded) {
+        return;
       }
 
-      loaded = true;
-    } catch (Exception e) {
-      String message = String.format("Could not restore object store data from %1s", partitionDirectory.getAbsolutePath());
-      throw new ObjectStoreException(CoreMessages.createStaticMessage(message));
+      try {
+        File[] files = listValuesFiles();
+        for (File file : files) {
+          try {
+            StoreValue<T> storeValue = deserialize(file);
+            realKeyToUUIDIndex.put(storeValue.getKey(), file.getName());
+          } catch (ObjectStoreException e) {
+            if (logger.isWarnEnabled()) {
+              logger
+                  .warn(format("Could not deserialize the ObjectStore file: %s. The file will be skipped and moved to the Garbage folder",
+                               file.getName()));
+            }
+            moveToCorruptedFilesFolder(file);
+          }
+        }
+
+        loaded = true;
+      } catch (Exception e) {
+        throw new ObjectStoreException(createStaticMessage(format("Could not restore object store data from %1s",
+                                                                  partitionDirectory.getAbsolutePath())));
+      }
     }
   }
 
@@ -265,8 +268,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
       // inside
       // synchronized method
       if (!directory.exists() && !directory.mkdirs()) {
-        I18nMessage message = CoreMessages.failedToCreate("object store directory " + directory.getAbsolutePath());
-        throw new MuleRuntimeException(message);
+        throw new MuleRuntimeException(failedToCreate("object store directory " + directory.getAbsolutePath()));
       }
     } catch (Exception e) {
       throw new ObjectStoreException(e);
@@ -307,54 +309,32 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
   }
 
   protected void serialize(File outputFile, StoreValue<T> storeValue) throws ObjectStoreException {
-    FileOutputStream out = null;
-    try {
-      out = new FileOutputStream(outputFile);
-      ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
+    try (ObjectOutputStream objectOutputStream =
+        new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(outputFile)))) {
       serializer.getInternalProtocol().serialize(storeValue, objectOutputStream);
+      objectOutputStream.flush();
     } catch (Exception se) {
       throw new ObjectStoreException(se);
-    } finally {
-      if (out != null) {
-        try {
-          out.close();
-        } catch (Exception e) {
-          logger.warn("error closing file " + outputFile.getAbsolutePath());
-        }
-      }
     }
   }
 
   @SuppressWarnings("unchecked")
   protected StoreValue<T> deserialize(File file) throws ObjectStoreException {
-    ObjectInputStream objectInputStream = null;
-    try {
-      objectInputStream = new ObjectInputStream(new FileInputStream(file));
+    try (ObjectInputStream objectInputStream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)))) {
       StoreValue<T> storedValue = serializer.getInternalProtocol().deserialize(objectInputStream);
       if (storedValue.getValue() instanceof DeserializationPostInitialisable) {
         DeserializationPostInitialisable.Implementation.init(storedValue.getValue(), muleContext);
       }
       return storedValue;
-    } catch (FileNotFoundException e) {
-      throw new ObjectDoesNotExistException(e);
     } catch (Exception e) {
       throw new ObjectStoreException(e);
-    } finally {
-      if (objectInputStream != null) {
-        try {
-          objectInputStream.close();
-        } catch (Exception e) {
-          logger.warn("error closing opened file " + file.getAbsolutePath());
-        }
-      }
     }
   }
 
   protected void deleteStoreFile(File file) throws ObjectStoreException {
     if (file.exists()) {
       if (!file.delete()) {
-        I18nMessage message = CoreMessages.createStaticMessage("Deleting " + file.getAbsolutePath() + " failed");
-        throw new ObjectStoreException(message);
+        throw new ObjectStoreException(createStaticMessage("Deleting " + file.getAbsolutePath() + " failed"));
       }
       realKeyToUUIDIndex.removeValue(file.getName());
     } else {

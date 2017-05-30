@@ -15,12 +15,11 @@ import java.io.OutputStream;
 import java.util.Optional;
 
 /**
- * Customized version of {@link ObjectOutputStream} that for each serialized object, writes the identifier of the classLoader
- * that loaded the object's class.
- * <p/>
+ * Customized version of {@link ObjectOutputStream} that for each serialized object, writes the identifier of the classLoader that
+ * loaded the object's class.
+ * <p>
  * Is intended to be used along with {@link ArtifactClassLoaderObjectInputStream}.
  */
-
 public class ArtifactClassLoaderObjectOutputStream extends ObjectOutputStream {
 
   private final ClassLoaderRepository classLoaderRepository;
