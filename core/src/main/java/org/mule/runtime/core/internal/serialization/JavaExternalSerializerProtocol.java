@@ -14,7 +14,7 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.serialization.AbstractSerializationProtocol;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.api.serialization.SerializationProtocol;
-import org.mule.runtime.core.util.SerializationUtils;
+import org.mule.runtime.core.internal.util.SerializationUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +45,7 @@ public class JavaExternalSerializerProtocol extends AbstractSerializationProtoco
 
   private void doSerialize(Object object, OutputStream out) {
     validateForSerialization(object);
-    SerializationUtils.serialize((Serializable) object, out);
+    org.apache.commons.lang.SerializationUtils.serialize((Serializable) object, out);
   }
 
   /**
@@ -56,11 +56,11 @@ public class JavaExternalSerializerProtocol extends AbstractSerializationProtoco
     //TODO: MULE-11939
     if (object instanceof CursorStreamProvider) {
       try (CursorStream cursor = ((CursorStreamProvider) object).openCursor()) {
-        return SerializationUtils.serialize(toByteArray(cursor));
+        return org.apache.commons.lang.SerializationUtils.serialize(toByteArray(cursor));
       }
     }
     validateForSerialization(object);
-    return SerializationUtils.serialize((Serializable) object);
+    return org.apache.commons.lang.SerializationUtils.serialize((Serializable) object);
   }
 
   /**

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util;
+package org.mule.runtime.core.internal.util;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
@@ -17,7 +17,7 @@ import java.io.ObjectInputStream;
 import org.apache.commons.io.input.ClassLoaderObjectInputStream;
 import org.apache.commons.lang.SerializationException;
 
-public class SerializationUtils extends org.apache.commons.lang.SerializationUtils {
+public class SerializationUtils {
 
   public static Object deserialize(InputStream inputStream, MuleContext muleContext) {
     if (muleContext == null) {
