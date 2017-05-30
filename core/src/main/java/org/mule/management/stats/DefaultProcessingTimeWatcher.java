@@ -6,6 +6,8 @@
  */
 package org.mule.management.stats;
 
+import static java.lang.Thread.currentThread;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
@@ -69,7 +71,7 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
          */
         public void run()
         {
-            while (true)
+            while (!currentThread().isInterrupted())
             {
                 try
                 {
@@ -84,7 +86,7 @@ public class DefaultProcessingTimeWatcher implements ProcessingTimeWatcher, Mule
                 }
                 catch (InterruptedException ex)
                 {
-                    Thread.currentThread().interrupt();
+                    currentThread().interrupt();
                     break;
                 }
                 catch (Exception ex)
