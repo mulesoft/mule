@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * <code>BeanUtils</code> provides functions for altering the way commons BeanUtils works
  */
 // @ThreadSafe
-public class BeanUtils extends org.apache.commons.beanutils.BeanUtils {
+public class BeanUtils {
 
   public static final String SET_PROPERTIES_METHOD = "setProperties";
 
@@ -43,7 +43,7 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils {
     // map should be set
     if (ClassUtils.getMethod(object.getClass(), SET_PROPERTIES_METHOD, new Class[] {Map.class}) != null) {
       try {
-        BeanUtils.setProperty(object, "properties", props);
+        org.apache.commons.beanutils.BeanUtils.setProperty(object, "properties", props);
       } catch (Exception e) {
         // this should never happen since we explicitly check for the method
         // above
@@ -57,7 +57,7 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils {
         Map.Entry entry = (Map.Entry) iterator.next();
 
         try {
-          BeanUtils.setProperty(object, entry.getKey().toString(), entry.getValue());
+          org.apache.commons.beanutils.BeanUtils.setProperty(object, entry.getKey().toString(), entry.getValue());
         } catch (Exception e) {
           if (logWarnings) {
             logger.warn("Property: " + entry.getKey() + "=" + entry.getValue() + " not found on object: "
@@ -81,7 +81,7 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils {
     // Check to see if our object has a setProperties method where the properties
     // map should be set
     if (ClassUtils.getMethod(bean.getClass(), SET_PROPERTIES_METHOD, new Class[] {Map.class}) != null) {
-      BeanUtils.setProperty(bean, "properties", props);
+      org.apache.commons.beanutils.BeanUtils.setProperty(bean, "properties", props);
     } else {
       Map master = describe(bean);
       for (Iterator iterator = props.keySet().iterator(); iterator.hasNext();) {
@@ -102,7 +102,7 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils {
    * @param object the object to Describe
    * @return a map of the properties on the object
    */
-  public static Map describe(Object object) {
+  private static Map describe(Object object) {
     Map props = new HashMap(object.getClass().getDeclaredFields().length);
     for (int i = 0; i < object.getClass().getDeclaredFields().length; i++) {
       Field field = object.getClass().getDeclaredFields()[i];
