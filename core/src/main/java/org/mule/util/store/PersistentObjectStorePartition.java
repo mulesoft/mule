@@ -7,9 +7,9 @@
 
 package org.mule.util.store;
 
+import static org.apache.commons.io.FileUtils.moveFileToDirectory;
+import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
-import static org.mule.util.FileUtils.moveFileToDirectory;
-import static org.mule.util.FileUtils.readFileToString;
 import static org.mule.util.FileUtils.cleanDirectory;
 import static org.mule.util.FileUtils.newFile;
 
@@ -25,8 +25,9 @@ import org.mule.api.store.ObjectStoreNotAvaliableException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.util.FileUtils;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -264,49 +265,52 @@ public class PersistentObjectStorePartition<T extends Serializable>
         moveFileToDirectory(file, corruptedFile.getParentFile(), true);
     }
 
-    private synchronized void loadStoredKeysAndFileNames() throws ObjectStoreException
+    private void loadStoredKeysAndFileNames() throws ObjectStoreException
     {
-        /*
-        by re-checking this condition here we can avoid contention in
-        {@link #assureLoaded}. The amount of times that this condition
-        should evaluate to {@code true} is really limited, which provides
-        better performance in the long run
-        */
-        if (loaded)
+        synchronized (realKeyToUUIDIndex)
         {
-            return;
-        }
-
-        try
-        {
-            File[] files = listValuesFiles();
-            for (int i = 0; i < files.length; i++)
+            /*
+            by re-checking this condition here we can avoid contention in
+            {@link #assureLoaded}. The amount of times that this condition
+            should evaluate to {@code true} is really limited, which provides
+            better performance in the long run
+            */
+            if (loaded)
             {
-                File file = files[i];
-                try
-                {
-                    StoreValue<T> storeValue = deserialize(file);
-                    realKeyToUUIDIndex.put(storeValue.getKey(), file.getName());
-                }
-                catch (ObjectStoreException e)
-                {
-                    if (logger.isWarnEnabled())
-                    {
-                        logger.warn(String.format(
-                                "Could not deserialize the ObjectStore file: %s. The file will be skipped and moved " +
-                                "to the Garbage folder", file.getName()));
-                    }
-                    moveToCorruptedFilesFolder(file);
-                }
+                return;
             }
-
-            loaded = true;
-        }
-        catch (Exception e)
-        {
-            String message = String.format("Could not restore object store data from %1s",
-                partitionDirectory.getAbsolutePath());
-            throw new ObjectStoreException(CoreMessages.createStaticMessage(message));
+    
+            try
+            {
+                File[] files = listValuesFiles();
+                for (int i = 0; i < files.length; i++)
+                {
+                    File file = files[i];
+                    try
+                    {
+                        StoreValue<T> storeValue = deserialize(file);
+                        realKeyToUUIDIndex.put(storeValue.getKey(), file.getName());
+                    }
+                    catch (ObjectStoreException e)
+                    {
+                        if (logger.isWarnEnabled())
+                        {
+                            logger.warn(String.format(
+                                    "Could not deserialize the ObjectStore file: %s. The file will be skipped and moved " +
+                                    "to the Garbage folder", file.getName()));
+                        }
+                        moveToCorruptedFilesFolder(file);
+                    }
+                }
+    
+                loaded = true;
+            }
+            catch (Exception e)
+            {
+                String message = String.format("Could not restore object store data from %1s",
+                    partitionDirectory.getAbsolutePath());
+                throw new ObjectStoreException(CoreMessages.createStaticMessage(message));
+            }
         }
     }
 
@@ -395,11 +399,11 @@ public class PersistentObjectStorePartition<T extends Serializable>
 
     protected void serialize(File outputFile, StoreValue<T> storeValue) throws ObjectStoreException
     {
-        FileOutputStream out = null;
+        ObjectOutputStream objectOutputStream = null;
         try
         {
-            out = new FileOutputStream(outputFile);
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
+            FileOutputStream out = new FileOutputStream(outputFile);
+            objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(out));
             serializer.serialize(storeValue, objectOutputStream);
         }
         catch (Exception se)
@@ -408,11 +412,11 @@ public class PersistentObjectStorePartition<T extends Serializable>
         }
         finally
         {
-            if (out != null)
+            if (objectOutputStream != null)
             {
                 try
                 {
-                    out.close();
+                    objectOutputStream.close();
                 }
                 catch (Exception e)
                 {
@@ -428,7 +432,7 @@ public class PersistentObjectStorePartition<T extends Serializable>
         ObjectInputStream objectInputStream = null;
         try
         {
-            objectInputStream = new ObjectInputStream(new FileInputStream(file));
+            objectInputStream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
             StoreValue<T> storedValue = serializer.deserialize(objectInputStream);
             if (storedValue.getValue() instanceof DeserializationPostInitialisable)
             {
