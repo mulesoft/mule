@@ -331,7 +331,7 @@ public class TransientRegistry extends AbstractRegistry {
       Lock readLock = registryLock.readLock();
       try {
         readLock.lock();
-        return CollectionUtils.select(registry.values(), predicate);
+        return org.apache.commons.collections.CollectionUtils.select(registry.values(), predicate);
       } finally {
         readLock.unlock();
       }

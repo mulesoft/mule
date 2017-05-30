@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.core.util;
 
-import static junit.framework.Assert.assertFalse;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -18,39 +16,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 
 import org.junit.Test;
 
 @SmallTest
 public class CollectionUtilsTestCase extends AbstractMuleTestCase {
-
-  @Test
-  public void testToArrayOfComponentTypeNullCollection() {
-    assertNull(CollectionUtils.toArrayOfComponentType(null, String.class));
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testToArrayOfComponentTypeNullType() {
-    CollectionUtils.toArrayOfComponentType(Collections.EMPTY_LIST, null);
-  }
-
-  @Test
-  public void testToArrayOfComponentTypeEmptyCollection() {
-    assertTrue(Arrays.equals(new String[0], CollectionUtils.toArrayOfComponentType(Collections.EMPTY_LIST, String.class)));
-  }
-
-  @Test(expected = ArrayStoreException.class)
-  public void testToArrayOfComponentTypeWrongElement() {
-    CollectionUtils.toArrayOfComponentType(Collections.singleton("foo"), Integer.class);
-  }
-
-  @Test
-  public void testToArrayOfComponentTypeOK() {
-    String[] objects = new String[] {"foo", "bar", "baz"};
-    assertTrue(Arrays.equals(objects, CollectionUtils.toArrayOfComponentType(Arrays.asList(objects), String.class)));
-  }
 
   @Test
   public void testToStringNull() throws Exception {
@@ -96,41 +66,4 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase {
     assertTrue(result.endsWith("[..]]"));
     assertEquals(9, StringUtils.countMatches(result, ","));
   }
-
-  @Test
-  public void testContainsTypeTrue() {
-    Collection<Object> c = new ArrayList<>();
-    c.add(new String());
-    c.add(new Date());
-    assertTrue(CollectionUtils.containsType(c, Date.class));
-  }
-
-  @Test
-  public void testContainsTypeFalse() {
-    Collection<Object> c = new ArrayList<>();
-    c.add(new String());
-    c.add(new Integer(1));
-    assertFalse(CollectionUtils.containsType(c, Date.class));
-  }
-
-  @Test
-  public void testContainsTypeNullChecks() {
-    Collection<Object> c = new ArrayList<>();
-    c.add(new String());
-    c.add(new Integer(1));
-    assertFalse(CollectionUtils.containsType(c, null));
-    assertFalse(CollectionUtils.containsType(null, Date.class));
-  }
-
-  @Test
-  public void testRemoveType() {
-    Collection<Object> c = new ArrayList<>();
-    c.add(new String());
-    c.add(new Integer(1));
-    CollectionUtils.removeType(c, String.class);
-    assertEquals(1, c.size());
-    assertFalse(CollectionUtils.containsType(c, null));
-    assertFalse(CollectionUtils.containsType(null, Date.class));
-  }
-
 }

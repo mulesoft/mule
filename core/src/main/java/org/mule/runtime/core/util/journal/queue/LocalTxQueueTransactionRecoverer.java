@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.util.journal.queue;
 
+import static org.apache.commons.collections.CollectionUtils.find;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.queue.QueueProvider;
 import org.mule.runtime.core.util.queue.RecoverableQueueStore;
 
@@ -56,7 +56,7 @@ public class LocalTxQueueTransactionRecoverer {
     int txRecovered = 0;
     for (Integer txId : allEntries.keySet()) {
       Collection<LocalQueueTxJournalEntry> entries = allEntries.get(txId);
-      Object commitOrRollback = CollectionUtils.find(entries, new Predicate() {
+      Object commitOrRollback = find(entries, new Predicate() {
 
         @Override
         public boolean evaluate(Object object) {

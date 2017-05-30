@@ -7,6 +7,7 @@
 package org.mule.runtime.core.util;
 
 import static java.lang.System.getProperty;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -757,27 +758,6 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
     return "file".equals(url.getProtocol());
   }
 
-  /**
-   * Returns a file timestamp.
-   *
-   * @param url the file URL.
-   * @return the file's timestamp if the URL has the file protocol, otherwise. returns -1.
-   */
-  public static long getFileTimeStamp(URL url) {
-    long timeStamp = -1;
-
-    if (isFile(url)) {
-      try {
-        String file = URLDecoder.decode(url.getFile(), "UTF-8");
-        timeStamp = new File(file).lastModified();
-      } catch (UnsupportedEncodingException e) {
-        // Ignore
-      }
-    }
-
-    return timeStamp;
-  }
-
   public static Collection<File> findFiles(File folder, IOFileFilter filter, boolean recursive) {
     return listFiles(folder, filter, recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE);
   }
@@ -796,7 +776,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
       }
     }, true);
 
-    return CollectionUtils.isEmpty(files) ? null : files.iterator().next();
+    return isEmpty(files) ? null : files.iterator().next();
   }
 
   /**

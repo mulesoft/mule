@@ -10,11 +10,11 @@ package org.mule.runtime.container.internal;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.container.internal.JreExplorer.exploreJdk;
-import static org.mule.runtime.core.util.CollectionUtils.singletonList;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.classloader.ExportedService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,6 +49,6 @@ public class JreModuleDiscoverer implements ModuleDiscoverer {
 
     MuleModule jdkModule = new MuleModule(JRE_MODULE_NAME, packages, resources, emptySet(), emptySet(), services);
 
-    return singletonList(jdkModule);
+    return Collections.singletonList(jdkModule);
   }
 }

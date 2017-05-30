@@ -7,12 +7,12 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
-import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
@@ -60,7 +60,7 @@ public final class ConfigNameDeclarationEnricher implements DeclarationEnricher 
     declaration.getModelProperty(ImplementingTypeModelProperty.class).ifPresent(p -> {
       ImplementingTypeModelProperty typeProperty = (ImplementingTypeModelProperty) p;
       Collection<Field> fields = getAllFields(typeProperty.getType(), withAnnotation(ConfigName.class));
-      if (CollectionUtils.isEmpty(fields)) {
+      if (isEmpty(fields)) {
         return;
       }
 
