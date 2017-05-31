@@ -9,15 +9,15 @@ package org.mule.runtime.core.api.security;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.security.SecurityException;
+import org.mule.runtime.api.security.ServerSecurityException;
 
 /**
- * {@code UnsupportedAuthenticationSchemeException} is thrown when a authentication scheme is being used on the message that
- * the Security filter does not understand.
+ * {@code UnsupportedAuthenticationSchemeException} is thrown when a authentication scheme is being used on the message that the
+ * Security filter does not understand.
  *
  * @since 4.0
  */
-public class UnsupportedAuthenticationSchemeException extends SecurityException implements ErrorMessageAwareException {
+public class UnsupportedAuthenticationSchemeException extends ServerSecurityException implements ErrorMessageAwareException {
 
   /**
    * Serial version

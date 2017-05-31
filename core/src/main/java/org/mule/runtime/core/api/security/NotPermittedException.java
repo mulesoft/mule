@@ -9,15 +9,14 @@ package org.mule.runtime.core.api.security;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authSetButNoContext;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authorizationDeniedOnEndpoint;
-
-import org.mule.runtime.api.security.SecurityException;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.security.ServerSecurityException;
+import org.mule.runtime.core.api.Event;
 
 /**
  * <code>NotPermittedException</code> is thrown if the user isn't authorized to perform an action.
  */
-public class NotPermittedException extends SecurityException {
+public class NotPermittedException extends ServerSecurityException {
 
   /**
    * Serial version

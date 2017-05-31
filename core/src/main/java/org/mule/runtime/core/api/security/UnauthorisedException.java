@@ -8,14 +8,14 @@ package org.mule.runtime.core.api.security;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.security.SecurityException;
+import org.mule.runtime.api.security.ServerSecurityException;
 
 /**
  * {@code UnauthorisedException} is thrown if authentication fails.
  *
  * @since 4.0
  */
-public class UnauthorisedException extends SecurityException {
+public class UnauthorisedException extends ServerSecurityException {
 
   /**
    * Serial version

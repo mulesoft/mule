@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.extension.http.api.request.validator.ResponseValidatorException;
+import org.mule.extension.http.api.request.validator.ResponseValidatorTypedException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -67,7 +67,7 @@ public class ModuleWithGlobalElementTestCase extends AbstractModuleWithHttpTestC
       fail("Should not have reach here");
     } catch (MessagingException me) {
       Throwable cause = me.getEvent().getError().get().getCause();
-      assertThat(cause, instanceOf(ResponseValidatorException.class));
+      assertThat(cause, instanceOf(ResponseValidatorTypedException.class));
       assertThat(cause.getMessage(), containsString("failed: unauthorized (401)"));
     }
   }

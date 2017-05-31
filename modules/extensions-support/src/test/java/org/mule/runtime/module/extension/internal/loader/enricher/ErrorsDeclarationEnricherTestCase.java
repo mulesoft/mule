@@ -7,18 +7,20 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.util.Collections.singleton;
+import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
 import static org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes.EXTENSION;
 import static org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes.OPERATION;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.loadExtension;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.loadExtension;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -28,7 +30,6 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
-import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergErrors;
@@ -106,7 +107,7 @@ public class ErrorsDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
     Optional<ErrorModel> muleAnyError = anyExtensionError.get().getParent();
     assertThat(muleAnyError.isPresent(), is(true));
-    assertThat(muleAnyError.get().getType(), is(MuleErrors.ANY.getType()));
+    assertThat(muleAnyError.get().getType(), is(ANY.getType()));
     assertThat(muleAnyError.get().getNamespace(), is(MULE_NAMESPACE));
   }
 
@@ -177,9 +178,25 @@ public class ErrorsDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
     public static class ErrorTypeProviderWithInvalidErrors implements ErrorTypeProvider {
 
+      public enum WrongErrors implements ErrorTypeDefinition<org.mule.runtime.extension.api.error.MuleErrors> {
+        WHATEVER {
+
+          @Override
+          public Optional<ErrorTypeDefinition<?>> getParent() {
+            return empty();
+          }
+        };
+
+        @Override
+        public Optional<ErrorTypeDefinition<?>> getParent() {
+          return Optional.of(ANY);
+        }
+      }
+
+
       @Override
       public Set<ErrorTypeDefinition> getErrorTypes() {
-        return singleton(MuleErrors.CONNECTIVITY);
+        return singleton(WrongErrors.WHATEVER);
       }
     }
   }
