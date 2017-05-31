@@ -6,6 +6,7 @@
  */
 package org.mule.transport.ftp;
 
+import static org.mule.transport.ftp.FtpConnector.ASYNCHRONOUS_RECONNECTION_ERROR_MESSAGE;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -169,7 +170,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         }
         else
         {
-            throw new IllegalArgumentException("FTP Connector doesn't support asynchronous retry policies.");
+            throw new IllegalArgumentException(ASYNCHRONOUS_RECONNECTION_ERROR_MESSAGE);
         }
 
 

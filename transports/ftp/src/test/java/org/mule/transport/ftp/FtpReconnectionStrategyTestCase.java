@@ -14,6 +14,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.transport.ftp.FtpConnector.ASYNCHRONOUS_RECONNECTION_ERROR_MESSAGE;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,7 +37,6 @@ public class FtpReconnectionStrategyTestCase extends FunctionalTestCase
     private final InboundEndpoint inboundEndpoint = mock(InboundEndpoint.class, RETURNS_DEEP_STUBS);
     private  FtpMessageReceiver ftpMessageReceiver = null;
     private Connector connector = null;
-    private static final String ASYNCHRONOUS_RECCONECTION_ERROR_MESSAGE = "FTP Connector doesn't support asynchronous retry policies.";
 
     @Override
     protected String getConfigFile()
@@ -71,7 +71,7 @@ public class FtpReconnectionStrategyTestCase extends FunctionalTestCase
         }
         catch (Exception e)
         {
-            assertThat(e.getMessage(), is(ASYNCHRONOUS_RECCONECTION_ERROR_MESSAGE));
+            assertThat(e.getMessage(), is(ASYNCHRONOUS_RECONNECTION_ERROR_MESSAGE));
         }
     }
 
@@ -85,7 +85,7 @@ public class FtpReconnectionStrategyTestCase extends FunctionalTestCase
         }
         catch (Exception e)
         {
-            assertThat(e.getCause().getMessage(), is(ASYNCHRONOUS_RECCONECTION_ERROR_MESSAGE));
+            assertThat(e.getCause().getMessage(), is(ASYNCHRONOUS_RECONNECTION_ERROR_MESSAGE));
         }
     }
 
