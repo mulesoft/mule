@@ -622,6 +622,8 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
                                                                                                              "TRANSFORMATION",
                                                                                                              "EXPRESSION",
                                                                                                              "SECURITY",
+                                                                                                             "CLIENT_SECURITY",
+                                                                                                             "SERVER_SECURITY",
                                                                                                              "ROUTING",
                                                                                                              "CONNECTIVITY",
                                                                                                              "RETRY_EXHAUSTED"));

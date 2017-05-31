@@ -354,10 +354,15 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
               processor instanceof AnnotatedObject ? ((AnnotatedObject) processor).getLocation() : null;
           if (causesAsList.size() > nextCauseIndex && componentLocation != null) {
             Throwable causeOwnerException = causesAsList.get(nextCauseIndex);
-            ErrorType causeOwnerErrorType = errorTypeLocator
-                .lookupComponentErrorType(componentLocation.getComponentIdentifier().getIdentifier(), causeOwnerException);
+            ErrorType causeOwnerErrorType;
+            if (causeOwnerException instanceof TypedException) {
+              causeOwnerErrorType = ((TypedException) causeOwnerException).getErrorType();
+            } else {
+              causeOwnerErrorType = errorTypeLocator
+                  .lookupComponentErrorType(componentLocation.getComponentIdentifier().getIdentifier(), causeOwnerException);
+            }
             if (!unknownErrorType.equals(causeOwnerErrorType)
-                && new SingleErrorTypeMatcher(causeOwnerErrorType).match(causeOwnerErrorType)) {
+                && new SingleErrorTypeMatcher(errorType).match(causeOwnerErrorType)) {
               return of((Exception) causeOwnerException);
             }
           }

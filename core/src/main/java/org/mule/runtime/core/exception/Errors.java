@@ -8,6 +8,7 @@ package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.CLIENT_SECURITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.DUPLICATE_MESSAGE_ERROR_IDENTIFIER;
@@ -18,6 +19,7 @@ import static org.mule.runtime.core.exception.Errors.Identifiers.REDELIVERY_EXHA
 import static org.mule.runtime.core.exception.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ROUTING_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.SECURITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.SERVER_SECURITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.SOURCE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.SOURCE_RESPONSE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER;
@@ -85,6 +87,16 @@ public abstract class Errors {
     public static final String SECURITY_ERROR_IDENTIFIER = "SECURITY";
 
     /**
+     * Indicates a security type problem enforced by an external entity
+     */
+    public static final String CLIENT_SECURITY_ERROR_IDENTIFIER = "CLIENT_SECURITY";
+
+    /**
+     * Indicates a security type problem enforced by the mule runtime
+     */
+    public static final String SERVER_SECURITY_ERROR_IDENTIFIER = "SERVER_SECURITY";
+
+    /**
      * Wild card that matches with any error
      */
     public static final String ANY_IDENTIFIER = "ANY";
@@ -148,6 +160,10 @@ public abstract class Errors {
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(CONNECTIVITY_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier SECURITY =
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(SECURITY_ERROR_IDENTIFIER).build();
+    public static final ComponentIdentifier CLIENT_SECURITY =
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(CLIENT_SECURITY_ERROR_IDENTIFIER).build();
+    public static final ComponentIdentifier SERVER_SECURITY =
+        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SERVER_SECURITY_ERROR_IDENTIFIER).build();
     public static final ComponentIdentifier OVERLOAD =
         builder().withNamespace(CORE_NAMESPACE_NAME).withName(OVERLOAD_ERROR_IDENTIFIER).build();
 

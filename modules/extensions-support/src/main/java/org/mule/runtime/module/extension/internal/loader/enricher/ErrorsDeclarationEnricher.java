@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -128,6 +129,10 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
 
   private ErrorTypeDefinition validateOperationThrows(ErrorTypeDefinition<?>[] errorTypes, ErrorTypeDefinition error) {
     Class<?> extensionErrorType = errorTypes.getClass().getComponentType();
+
+    if (error.getClass().equals(MuleErrors.class)) {
+      return error;
+    }
 
     if (!error.getClass().equals(extensionErrorType) && !error.getClass().getSuperclass().equals(extensionErrorType)) {
       throw new IllegalModelDefinitionException(format("Invalid operation throws detected, the extension declared" +

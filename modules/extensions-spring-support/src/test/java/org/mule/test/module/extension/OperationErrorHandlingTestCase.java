@@ -12,6 +12,8 @@ import static org.junit.Assert.fail;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.mule.functional.junit4.rules.ExpectedError.none;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CRITICAL;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.FATAL;
 import static org.mule.runtime.core.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -19,6 +21,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 
 import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.core.exception.Errors;
 import org.mule.runtime.core.exception.MuleFatalException;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.Processor;
@@ -76,15 +79,15 @@ public class OperationErrorHandlingTestCase extends AbstractExtensionFunctionalT
   @Test
   public void errorIsPropagatedCorrectly() throws Exception {
     expectedError
-        .expectErrorType(HEISENBERG, CONNECTIVITY_ERROR_IDENTIFIER)
-        .expectCause(instanceOf(ConnectionException.class));
+        .expectErrorType(FATAL.getNamespace().toUpperCase(), FATAL.getName())
+        .expectCause(instanceOf(MuleFatalException.class));
 
     try {
       flowRunner("throwError").run();
       fail("Should've thrown an exception");
 
     } catch (Throwable t) {
-      Throwable problem = t.getCause().getCause();
+      Throwable problem = t.getCause();
       assertThat(problem, instanceOf(MuleFatalException.class));
       assertThat(problem.getCause(), instanceOf(LinkageError.class));
       throw t;

@@ -7,14 +7,14 @@
 package org.mule.runtime.core.api.security;
 
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.security.SecurityException;
+import org.mule.runtime.api.security.ServerSecurityException;
 
 /**
  * <code>EncryptionNotSupportedException</code> is thrown if an algorithm is set in the MULE_USER header but it doesn't match the
  * algorithm set on the security filter
  */
 
-public class EncryptionNotSupportedException extends SecurityException {
+public class EncryptionNotSupportedException extends ServerSecurityException {
 
   /**
    * Serial version

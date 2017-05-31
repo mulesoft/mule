@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.exception;
 
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CLIENT_SECURITY;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CONNECTIVITY;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.DUPLICATE_MESSAGE;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.EXPRESSION;
@@ -15,12 +16,15 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.REDELI
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.RETRY_EXHAUSTED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.ROUTING;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SERVER_SECURITY;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.STREAM_MAXIMUM_SIZE_EXCEEDED;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.VALIDATION;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.security.ClientSecurityException;
 import org.mule.runtime.api.security.SecurityException;
+import org.mule.runtime.api.security.ServerSecurityException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.routing.DuplicateMessageException;
@@ -59,6 +63,8 @@ public class ErrorTypeLocatorFactory {
             .addExceptionMapping(RetryPolicyExhaustedException.class, errorTypeRepository.lookupErrorType(RETRY_EXHAUSTED).get())
             .addExceptionMapping(IOException.class, errorTypeRepository.lookupErrorType(CONNECTIVITY).get())
             .addExceptionMapping(SecurityException.class, errorTypeRepository.lookupErrorType(SECURITY).get())
+            .addExceptionMapping(ClientSecurityException.class, errorTypeRepository.lookupErrorType(CLIENT_SECURITY).get())
+            .addExceptionMapping(ServerSecurityException.class, errorTypeRepository.lookupErrorType(SERVER_SECURITY).get())
             .addExceptionMapping(RejectedExecutionException.class, errorTypeRepository.getErrorType(OVERLOAD).get())
             .addExceptionMapping(MessageRedeliveredException.class,
                                  errorTypeRepository.lookupErrorType(REDELIVERY_EXHAUSTED).get())
