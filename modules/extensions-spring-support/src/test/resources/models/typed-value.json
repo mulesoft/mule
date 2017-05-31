@@ -2001,7 +2001,40 @@
         "description": "",
         "modelProperties": {}
       },
-      "errors": [],
+      "errors": [
+        {
+          "type": "SOURCE_RESPONSE_SEND",
+          "namespace": "MULE",
+          "parent": {
+            "type": "SOURCE_RESPONSE",
+            "namespace": "MULE",
+            "parent": {
+              "type": "SOURCE",
+              "namespace": "MULE",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            }
+          }
+        },
+        {
+          "type": "SOURCE_RESPONSE_GENERATE",
+          "namespace": "MULE",
+          "parent": {
+            "type": "SOURCE_RESPONSE",
+            "namespace": "MULE",
+            "parent": {
+              "type": "SOURCE",
+              "namespace": "MULE",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            }
+          }
+        }
+      ],
       "output": {
         "type": {
           "format": "java",
@@ -2331,7 +2364,84 @@
       "modelProperties": {}
     }
   ],
-  "errors": [],
+  "errors": [
+    {
+      "type": "CONNECTIVITY",
+      "namespace": "MULE",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "CONNECTIVITY",
+      "namespace": "TYPED-VALUE",
+      "parent": {
+        "type": "CONNECTIVITY",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    },
+    {
+      "type": "ANY",
+      "namespace": "MULE"
+    },
+    {
+      "type": "RETRY_EXHAUSTED",
+      "namespace": "MULE",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "RETRY_EXHAUSTED",
+      "namespace": "TYPED-VALUE",
+      "parent": {
+        "type": "RETRY_EXHAUSTED",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    },
+    {
+      "type": "SOURCE_RESPONSE_SEND",
+      "namespace": "MULE",
+      "parent": {
+        "type": "SOURCE_RESPONSE",
+        "namespace": "MULE",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "MULE",
+          "parent": {
+            "type": "ANY",
+            "namespace": "MULE"
+          }
+        }
+      }
+    },
+    {
+      "type": "SOURCE_RESPONSE_GENERATE",
+      "namespace": "MULE",
+      "parent": {
+        "type": "SOURCE_RESPONSE",
+        "namespace": "MULE",
+        "parent": {
+          "type": "SOURCE",
+          "namespace": "MULE",
+          "parent": {
+            "type": "ANY",
+            "namespace": "MULE"
+          }
+        }
+      }
+    }
+  ],
   "modelProperties": {},
   "types": [
     {

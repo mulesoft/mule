@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
@@ -63,13 +62,15 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
     ExtensionDeclaration declaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
     Optional<ImplementingTypeModelProperty> implementingType = declaration.getModelProperty(ImplementingTypeModelProperty.class);
+    String extensionNamespace = getExtensionsErrorNamespace(declaration);
+    errorModelDescriber = new ErrorsModelFactory(extensionNamespace);
+    errorModelDescriber.getErrorModels().forEach(declaration::addErrorModel);
 
     if (implementingType.isPresent()) {
 
       extensionElement = new ExtensionTypeWrapper<>(implementingType.get().getType());
       extensionElement.getAnnotation(ErrorTypes.class).ifPresent(errorTypesAnnotation -> {
 
-        String extensionNamespace = getExtensionsErrorNamespace(declaration);
         ErrorTypeDefinition<?>[] errorTypes = (ErrorTypeDefinition<?>[]) errorTypesAnnotation.value().getEnumConstants();
 
         if (errorTypes.length > 0) {

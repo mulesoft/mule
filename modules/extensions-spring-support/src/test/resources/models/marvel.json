@@ -2463,7 +2463,11 @@
     },
     {
       "type": "ANY",
-      "namespace": "MARVEL",
+      "namespace": "MULE"
+    },
+    {
+      "type": "RETRY_EXHAUSTED",
+      "namespace": "MULE",
       "parent": {
         "type": "ANY",
         "namespace": "MULE"
@@ -2471,11 +2475,7 @@
     },
     {
       "type": "ANY",
-      "namespace": "MULE"
-    },
-    {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "MULE",
+      "namespace": "MARVEL",
       "parent": {
         "type": "ANY",
         "namespace": "MULE"

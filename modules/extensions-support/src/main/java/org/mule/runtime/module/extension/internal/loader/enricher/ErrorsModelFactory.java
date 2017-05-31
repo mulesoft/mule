@@ -17,6 +17,12 @@ import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.DirectedGraph;
@@ -25,12 +31,6 @@ import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * Extension's {@link ErrorModel} factory.
@@ -63,6 +63,19 @@ public class ErrorsModelFactory {
       ErrorModel errorModel = toErrorModel(errorType, errorModelMap);
       errorModelMap.put(errorModel.toString(), errorModel);
     });
+    addConnectivityErrors(errorModelMap);
+  }
+
+  /**
+   * Creates a new instance of the factory populated with Mule's errors as well as the extension default errors
+   *
+   * @param extensionNamespace the namespace for the {@link ErrorModel} to be generated
+   */
+  public ErrorsModelFactory(String extensionNamespace)
+      throws IllegalModelDefinitionException {
+    this.extensionNamespace = extensionNamespace.toUpperCase();
+    errorModelMap = new HashMap<>();
+    initErrorModelMap(errorModelMap);
     addConnectivityErrors(errorModelMap);
   }
 

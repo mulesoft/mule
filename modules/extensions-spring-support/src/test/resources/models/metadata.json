@@ -149,7 +149,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -319,7 +344,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -503,7 +553,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -687,7 +762,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -828,7 +928,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -1012,7 +1137,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -1153,7 +1303,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -1280,7 +1455,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -1464,7 +1664,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -1591,7 +1816,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -1785,7 +2035,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -1969,7 +2244,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -2153,7 +2453,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -2238,7 +2563,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -2423,7 +2773,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -2565,7 +2940,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -2791,7 +3191,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -2975,7 +3400,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -3116,7 +3566,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -3258,7 +3733,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -3400,7 +3900,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -3527,7 +4052,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -3654,7 +4204,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -3838,7 +4413,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "METADATA",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -7046,7 +7646,52 @@
       }
     }
   ],
-  "errors": [],
+  "errors": [
+    {
+      "type": "CONNECTIVITY",
+      "namespace": "MULE",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "ANY",
+      "namespace": "MULE"
+    },
+    {
+      "type": "RETRY_EXHAUSTED",
+      "namespace": "MULE",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "CONNECTIVITY",
+      "namespace": "METADATA",
+      "parent": {
+        "type": "CONNECTIVITY",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    },
+    {
+      "type": "RETRY_EXHAUSTED",
+      "namespace": "METADATA",
+      "parent": {
+        "type": "RETRY_EXHAUSTED",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    }
+  ],
   "modelProperties": {},
   "types": [
     {

@@ -10616,43 +10616,11 @@
       "namespace": "MULE"
     },
     {
-      "type": "OAUTH2",
-      "namespace": "HEISENBERG",
-      "parent": {
-        "type": "CONNECTIVITY",
-        "namespace": "HEISENBERG",
-        "parent": {
-          "type": "CONNECTIVITY",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
-        }
-      }
-    },
-    {
       "type": "RETRY_EXHAUSTED",
       "namespace": "MULE",
       "parent": {
         "type": "ANY",
         "namespace": "MULE"
-      }
-    },
-    {
-      "type": "HEALTH",
-      "namespace": "HEISENBERG",
-      "parent": {
-        "type": "CONNECTIVITY",
-        "namespace": "HEISENBERG",
-        "parent": {
-          "type": "CONNECTIVITY",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
-        }
       }
     },
     {
@@ -10680,26 +10648,34 @@
       }
     },
     {
-      "type": "SOURCE_ERROR_RESPONSE_SEND",
-      "namespace": "MULE",
+      "type": "OAUTH2",
+      "namespace": "HEISENBERG",
       "parent": {
-        "type": "SOURCE",
-        "namespace": "MULE",
+        "type": "CONNECTIVITY",
+        "namespace": "HEISENBERG",
         "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
+          "type": "CONNECTIVITY",
+          "namespace": "MULE",
+          "parent": {
+            "type": "ANY",
+            "namespace": "MULE"
+          }
         }
       }
     },
     {
-      "type": "SOURCE_ERROR_RESPONSE_GENERATE",
-      "namespace": "MULE",
+      "type": "HEALTH",
+      "namespace": "HEISENBERG",
       "parent": {
-        "type": "SOURCE",
-        "namespace": "MULE",
+        "type": "CONNECTIVITY",
+        "namespace": "HEISENBERG",
         "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
+          "type": "CONNECTIVITY",
+          "namespace": "MULE",
+          "parent": {
+            "type": "ANY",
+            "namespace": "MULE"
+          }
         }
       }
     },
@@ -10732,6 +10708,30 @@
             "type": "ANY",
             "namespace": "MULE"
           }
+        }
+      }
+    },
+    {
+      "type": "SOURCE_ERROR_RESPONSE_SEND",
+      "namespace": "MULE",
+      "parent": {
+        "type": "SOURCE",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    },
+    {
+      "type": "SOURCE_ERROR_RESPONSE_GENERATE",
+      "namespace": "MULE",
+      "parent": {
+        "type": "SOURCE",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
         }
       }
     }
