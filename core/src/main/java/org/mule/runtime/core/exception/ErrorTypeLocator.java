@@ -35,11 +35,14 @@ public class ErrorTypeLocator {
 
   private ExceptionMapper defaultExceptionMapper;
   private Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers;
+  private final ErrorType defaultError;
 
   private ErrorTypeLocator(ExceptionMapper defaultExceptionMapper,
-                           Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers) {
+                           Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers,
+                           ErrorType defaultError) {
     this.defaultExceptionMapper = defaultExceptionMapper;
     this.componentExceptionMappers = componentExceptionMappers;
+    this.defaultError = defaultError;
   }
 
   /**
@@ -56,12 +59,12 @@ public class ErrorTypeLocator {
   /**
    * Finds the {@code ErrorType} related to the provided {@code exception} based on the general mapping rules of the runtime.
    *
-   * @param exceptionType the exception {@link Class} related to the error type
+   * @param type the exception {@link Class} related to the error type
    * @return the error type related to the exception. If there's no mapping then the error type related to UNKNOWN will be
    *         returned.
    */
-  public ErrorType lookupErrorType(Class<? extends Throwable> exceptionType) {
-    return defaultExceptionMapper.resolveErrorType(exceptionType).get();
+  public ErrorType lookupErrorType(Class<? extends Throwable> type) {
+    return defaultExceptionMapper.resolveErrorType(type).orElse(defaultError);
   }
 
   /**
@@ -75,15 +78,14 @@ public class ErrorTypeLocator {
    * @return the error type related to the exception based on the component mappings. If there's no mapping then the error type
    *         related to UNKNOWN will be returned.
    */
-  public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier,
-                                            Class<? extends Throwable> exception) {
+  public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier, Class<? extends Throwable> exception) {
     ExceptionMapper exceptionMapper =
         componentExceptionMappers.get(componentIdentifier);
     Optional<ErrorType> errorType = empty();
     if (exceptionMapper != null) {
       errorType = exceptionMapper.resolveErrorType(exception);
     }
-    return errorType.orElseGet(() -> defaultExceptionMapper.resolveErrorType(exception).get());
+    return errorType.orElseGet(() -> lookupErrorType(exception));
   }
 
   /**
@@ -113,7 +115,7 @@ public class ErrorTypeLocator {
 
   /**
    * Builder for creating instances of {@link ErrorTypeLocator}.
-   * 
+   *
    * @param errorTypeRepository repository of error types.
    * @return a builder for creating an {@link ErrorTypeLocator}
    */
@@ -135,6 +137,7 @@ public class ErrorTypeLocator {
       checkArgument(errorTypeRepository != null, "error type repository cannot be null");
     }
 
+    private ErrorType defaultError;
     private ExceptionMapper defaultExceptionMapper;
     private Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers = new HashedMap();
 
@@ -169,7 +172,18 @@ public class ErrorTypeLocator {
     public ErrorTypeLocator build() {
       checkState(defaultExceptionMapper != null, "default exception mapper cannot not be null");
       checkState(componentExceptionMappers != null, "component exception mappers cannot not be null");
-      return new ErrorTypeLocator(defaultExceptionMapper, componentExceptionMappers);
+      checkState(defaultError != null, "default error cannot not be null");
+      return new ErrorTypeLocator(defaultExceptionMapper, componentExceptionMappers, defaultError);
+    }
+
+    /**
+     * Adds an {@link ErrorType} that is used when no mapping is found for a component.
+     *
+     * @return {@code this} builder.
+     */
+    public Builder defaultError(ErrorType defaultError) {
+      this.defaultError = defaultError;
+      return this;
     }
   }
 }
