@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * <code>FileUtils</code> contains useful methods for dealing with files & directories.
  */
 // @ThreadSafe
-public class FileUtils extends org.apache.commons.io.FileUtils {
+public class FileUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
   private static final String TEMP_DIR_SYSTEM_PROPERTY = "java.io.tmpdir";
@@ -409,7 +409,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
       } else {
         outputDir = FileUtils.newFile(outputDir.getPath());
       }
-      copyDirectory(file, outputDir);
+      org.apache.commons.io.FileUtils.copyDirectory(file, outputDir);
     } else {
 
       if (keepParentDirectory) {
@@ -417,7 +417,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
       } else {
         outputDir = FileUtils.newFile(outputDir.getPath() + File.separator + file.getName());
       }
-      copyFile(file, outputDir);
+      org.apache.commons.io.FileUtils.copyFile(file, outputDir);
     }
   }
 
@@ -640,7 +640,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
    * @throws NullPointerException if source or destination is <code>null</code>
    * @throws IOException if source or destination is invalid
    * @throws IOException if an IO error occurs during copying
-   * @see #copyFileToDirectory(File, File, boolean)
+   * @see org.apache.commons.io.FileUtils#copyFileToDirectory(File, File, boolean)
    */
   public static void copyFile(File srcFile, File destFile, boolean preserveFileDate) throws IOException {
     if (srcFile == null) {
@@ -724,10 +724,11 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
   }
 
   public static Collection<File> findFiles(File folder, IOFileFilter filter, boolean recursive) {
-    return listFiles(folder, filter, recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE);
+    return org.apache.commons.io.FileUtils.listFiles(folder, filter,
+                                                     recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE);
   }
 
-  public static File findFileByName(File folder, final String filename, boolean recursive) {
+  public static File findFileByName(File folder, final String filename) {
     Collection<File> files = FileUtils.findFiles(folder, new IOFileFilter() {
 
       @Override

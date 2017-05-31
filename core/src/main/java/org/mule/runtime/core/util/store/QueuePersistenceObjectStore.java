@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util.store;
 
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -304,7 +305,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
       String fileName = storeDirectory + File.separator + qkey.queueName + File.separator + qkey.id + FILE_EXTENSION;
       File file = new File(fileName);
       if (file.length() == 0) {
-        FileUtils.deleteQuietly(file);
+        deleteQuietly(file);
         logger.info("Removing zero size file: " + file.getAbsolutePath());
       }
     }

@@ -7,11 +7,11 @@
 
 package org.mule.runtime.container.internal;
 
+import static org.apache.commons.io.FileUtils.copyFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mule.runtime.container.internal.ExportedServiceMatcher.like;
-import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.module.artifact.classloader.ExportedService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -70,7 +70,7 @@ public class JreExplorerTestCase extends AbstractMuleTestCase {
 
     File libFolder = temporaryFolder.newFolder(LIB_FOLDER);
     File innerFooJar = new File(libFolder, FOO_JAR_FILENAME);
-    FileUtils.copyFile(fooJar, innerFooJar);
+    copyFile(fooJar, innerFooJar);
 
     List<String> paths = Collections.singletonList(libFolder.getAbsolutePath());
 
@@ -90,7 +90,7 @@ public class JreExplorerTestCase extends AbstractMuleTestCase {
     File libFolder = temporaryFolder.newFolder(LIB_FOLDER);
     File subFolder = new File(libFolder, SUB_FOLDER);
     File innerFooJar = new File(subFolder, FOO_JAR_FILENAME);
-    FileUtils.copyFile(fooJar, innerFooJar);
+    copyFile(fooJar, innerFooJar);
 
     List<String> paths = Collections.singletonList(libFolder.getAbsolutePath());
 
@@ -109,9 +109,9 @@ public class JreExplorerTestCase extends AbstractMuleTestCase {
     File libFolder = temporaryFolder.newFolder(LIB_FOLDER);
     File subFolder = new File(libFolder, SUB_FOLDER);
     File innerFooJar = new File(libFolder, FOO_JAR_FILENAME);
-    FileUtils.copyFile(fooJar, innerFooJar);
+    copyFile(fooJar, innerFooJar);
     File innerBarJar = new File(subFolder, BAR_JAR_FILENAMEß);
-    FileUtils.copyFile(barJar, innerBarJar);
+    copyFile(barJar, innerBarJar);
 
     List<String> paths = Collections.singletonList(libFolder.getAbsolutePath());
 

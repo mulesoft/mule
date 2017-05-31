@@ -6,11 +6,11 @@
  */
 package org.mule.test.infrastructure.process;
 
+import static org.apache.commons.io.FileUtils.copyFile;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.test.infrastructure.process.MuleContextProcessBuilder.MULE_CORE_EXTENSIONS_PROPERTY;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.util.FileUtils;
 import org.mule.test.infrastructure.deployment.FakeMuleServer;
 
 import java.io.File;
@@ -51,7 +51,7 @@ public class MuleContextProcessApplication {
       if (!applicationConfigurationFile.exists()) {
         throw new RuntimeException("Could not find file for application configuration " + applicationConfiguration);
       }
-      FileUtils.copyFile(applicationConfigurationFile, new File(applicationDirectory, DEFAULT_CONFIGURATION_RESOURCE));
+      copyFile(applicationConfigurationFile, new File(applicationDirectory, DEFAULT_CONFIGURATION_RESOURCE));
       System.out.println("Test app config file created");
 
       ApplicationStartedDeploymentListener applicationStartedDeploymentListener = new ApplicationStartedDeploymentListener();

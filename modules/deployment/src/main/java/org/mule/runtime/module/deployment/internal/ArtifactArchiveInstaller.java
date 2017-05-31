@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -75,7 +78,7 @@ public class ArtifactArchiveInstaller {
 
       FileUtils.unzip(source, artifactDir);
       if ("file".equals(artifactUrl.getProtocol())) {
-        FileUtils.deleteQuietly(source);
+        deleteQuietly(source);
       }
     } catch (URISyntaxException e) {
       errorEncountered = true;
@@ -108,7 +111,7 @@ public class ArtifactArchiveInstaller {
   public void desinstallArtifact(final String artifactName) {
     try {
       final File artifactDir = new File(artifactParentDir, artifactName);
-      FileUtils.deleteDirectory(artifactDir);
+      deleteDirectory(artifactDir);
       // remove a marker, harmless, but a tidy artifact dir is always better :)
       File marker = getArtifactAnchorFile(artifactName);
       marker.delete();
@@ -130,7 +133,7 @@ public class ArtifactArchiveInstaller {
   public void createAnchorFile(String artifactName) throws IOException {
     // save artifact's state in the marker file
     File marker = getArtifactAnchorFile(artifactName);
-    FileUtils.writeStringToFile(marker, ANCHOR_FILE_BLURB);
+    writeStringToFile(marker, ANCHOR_FILE_BLURB);
   }
 
 }

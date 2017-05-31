@@ -6,6 +6,7 @@
  */
 package org.mule.test.infrastructure.deployment;
 
+import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyURLToFile;
 import static org.apache.commons.lang.StringUtils.removeEnd;
 import static org.apache.commons.lang.StringUtils.removeEndIgnoreCase;
@@ -25,7 +26,6 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleCoreExtension;
-import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -440,7 +440,7 @@ public class FakeMuleServer {
     ReentrantLock lock = this.deploymentService.getLock();
     lock.lock();
     try {
-      FileUtils.copyDirectory(artifactFolder, new File(artifactDirectory, artifactName));
+      copyDirectory(artifactFolder, new File(artifactDirectory, artifactName));
     } catch (IOException e) {
       throw new MuleRuntimeException(e);
     } finally {

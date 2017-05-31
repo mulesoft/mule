@@ -7,7 +7,7 @@
 
 package org.mule.runtime.deployment.model.internal.nativelib;
 
-import org.mule.runtime.core.util.FileUtils;
+import static org.apache.commons.io.FileUtils.copyFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,7 +79,7 @@ public class PerAppCopyNativeLibraryFinder extends PerAppNativeLibraryFinder {
 
     try {
       final File library = new File(libraryPath);
-      FileUtils.copyFile(library, tempLibrary);
+      copyFile(library, tempLibrary);
 
       return tempLibrary;
     } catch (IOException e) {
