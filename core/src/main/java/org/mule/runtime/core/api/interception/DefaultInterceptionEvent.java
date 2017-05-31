@@ -94,17 +94,12 @@ public class DefaultInterceptionEvent implements InterceptionEvent {
   }
 
   public DefaultInterceptionEvent setError(ErrorType errorType, Throwable cause) {
-    ErrorBuilder errorBuilder = ErrorBuilder.builder();
-    errorBuilder
-        .errorType(errorType)
-        .description(cause.getMessage())
-        .detailedDescription(cause.getMessage())
-        .exception(cause);
+    ErrorBuilder errorBuilder = ErrorBuilder.builder(cause);
+    errorBuilder.errorType(errorType);
 
     interceptedOutput = interceptedOutput.error(errorBuilder.build());
     return this;
   }
-
 
   /**
    * Updates the state of this object, overriding the {@code interceptedInput} with the result built from
