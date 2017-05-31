@@ -20,6 +20,7 @@ import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
+import static org.apache.commons.lang.StringUtils.removeEnd;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
@@ -109,7 +110,6 @@ import org.mule.runtime.core.policy.PolicyPointcut;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
@@ -3888,7 +3888,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       final String tempFileName = new File((targetFile == null ? url.getFile() : targetFile) + ".part").getName();
       final File tempFile = new File(outputDir, tempFileName);
       FileUtils.copyURLToFile(url, tempFile);
-      final File destFile = new File(StringUtils.removeEnd(tempFile.getAbsolutePath(), ".part"));
+      final File destFile = new File(removeEnd(tempFile.getAbsolutePath(), ".part"));
       File deployFolder = new File(destFile.getAbsolutePath().replace(JAR_FILE_SUFFIX, ""));
       if (deployFolder.exists()) {
         // Delete META-INF folder so maven file do not get duplicated during redeployment testing.

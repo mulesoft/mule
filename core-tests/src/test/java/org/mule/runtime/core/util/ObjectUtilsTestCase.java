@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.StringUtils.split;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 @SmallTest
 public class ObjectUtilsTestCase extends AbstractMuleTestCase {
@@ -27,7 +27,7 @@ public class ObjectUtilsTestCase extends AbstractMuleTestCase {
 
     String source = "foo";
     String description = ObjectUtils.identityToShortString(source);
-    String[] components = StringUtils.split(description, '@');
+    String[] components = split(description, '@');
 
     assertNotNull(components);
     assertEquals(2, components.length);

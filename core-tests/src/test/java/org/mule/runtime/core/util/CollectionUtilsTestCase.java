@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.StringUtils.countMatches;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -64,6 +65,6 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase {
     // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
     String result = CollectionUtils.toString(test, 10);
     assertTrue(result.endsWith("[..]]"));
-    assertEquals(9, StringUtils.countMatches(result, ","));
+    assertEquals(9, countMatches(result, ","));
   }
 }

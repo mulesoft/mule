@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.config.builders;
 
+import static org.apache.commons.lang.StringUtils.substringAfterLast;
 import static org.mule.runtime.core.util.ClassUtils.getResource;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ParentMuleContextAwareConfigurationBuilder;
@@ -17,7 +18,6 @@ import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -62,7 +62,7 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
     Map<String, List<ConfigResource>> configsMap = new LinkedHashMap<String, List<ConfigResource>>();
 
     for (int i = 0; i < resources.length; i++) {
-      String configExtension = StringUtils.substringAfterLast((resources[i]).getUrl().getFile(), ".");
+      String configExtension = substringAfterLast((resources[i]).getUrl().getFile(), ".");
       List<ConfigResource> configs = configsMap.get(configExtension);
       if (configs == null) {
         configs = new ArrayList<ConfigResource>();

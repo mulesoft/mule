@@ -14,6 +14,7 @@ import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.util.StringMessageUtils.getBoilerPlate;
+import static org.mule.runtime.core.util.StringUtils.isBlank;
 import static org.mule.runtime.core.util.SystemUtils.parsePropertyDefinitions;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
@@ -67,7 +68,7 @@ public abstract class AbstractMuleTestCase {
 
   static {
     String muleOpts = SystemUtils.getenv("MULE_TEST_OPTS");
-    if (StringUtils.isNotBlank(muleOpts)) {
+    if (!isBlank(muleOpts)) {
       Map<String, String> parsedOpts = parsePropertyDefinitions(muleOpts);
       String optVerbose = parsedOpts.get("mule.verbose");
       verbose = Boolean.valueOf(optVerbose);

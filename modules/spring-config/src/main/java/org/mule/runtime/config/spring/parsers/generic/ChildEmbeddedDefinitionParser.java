@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.config.spring.parsers.generic;
 
+import static org.mule.runtime.core.util.StringUtils.isBlank;
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
@@ -23,7 +23,7 @@ public class ChildEmbeddedDefinitionParser extends ChildDefinitionParser {
   public BeanDefinitionBuilder createBeanDefinitionBuilder(Element element, Class<?> beanClass) {
     BeanDefinitionBuilder builder = super.createBeanDefinitionBuilder(element, beanClass);
     String global = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
-    if (StringUtils.isNotBlank(global)) {
+    if (!isBlank(global)) {
       builder.addConstructorArgReference(global);
       builder.addDependsOn(global);
     }

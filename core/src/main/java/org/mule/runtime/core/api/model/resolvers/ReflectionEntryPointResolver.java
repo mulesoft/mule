@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.model.resolvers;
 
+import static org.apache.commons.lang.StringUtils.join;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
@@ -61,7 +62,7 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver {
   }
 
   private void updateFilter() {
-    filter = new WildcardFilter(StringUtils.join(ignoredMethods, ','));
+    filter = new WildcardFilter(join(ignoredMethods, ','));
   }
 
   /**

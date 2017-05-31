@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.config.i18n;
 
+import static org.apache.commons.lang.StringUtils.defaultString;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.metadata.DataType;
@@ -17,10 +18,9 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.internal.util.DateUtils;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.Date;
@@ -53,7 +53,7 @@ public class CoreMessages extends I18nMessageFactory {
   }
 
   public static I18nMessage version() {
-    String version = StringUtils.defaultString(MuleManifest.getProductVersion(), notSet().getMessage());
+    String version = defaultString(MuleManifest.getProductVersion(), notSet().getMessage());
     return factory.createMessage(BUNDLE_PATH, 6, version);
   }
 
@@ -615,10 +615,10 @@ public class CoreMessages extends I18nMessageFactory {
    */
   public static I18nMessage productInformation() {
     String notset = CoreMessages.notSet().getMessage();
-    return factory.createMessage(BUNDLE_PATH, 236, StringUtils.defaultString(MuleManifest.getProductDescription(), notset),
-                                 StringUtils.defaultString(MuleManifest.getProductVersion(), notset),
-                                 StringUtils.defaultString(MuleManifest.getVendorName(), notset) + " "
-                                     + StringUtils.defaultString(MuleManifest.getVendorUrl(), notset));
+    return factory.createMessage(BUNDLE_PATH, 236, defaultString(MuleManifest.getProductDescription(), notset),
+                                 defaultString(MuleManifest.getProductVersion(), notset),
+                                 defaultString(MuleManifest.getVendorName(), notset) + " "
+                                     + defaultString(MuleManifest.getVendorUrl(), notset));
   }
 
   public static I18nMessage noTransformerFoundForMessage(DataType input, DataType output) {
@@ -663,7 +663,7 @@ public class CoreMessages extends I18nMessageFactory {
   }
 
   public static I18nMessage noJtaTransactionAvailable(final Thread callingThread) {
-    return factory.createMessage(BUNDLE_PATH, 247, StringUtils.defaultString(callingThread.toString()));
+    return factory.createMessage(BUNDLE_PATH, 247, defaultString(callingThread.toString()));
   }
 
   public static I18nMessage notMuleXaTransaction(Object tx) {

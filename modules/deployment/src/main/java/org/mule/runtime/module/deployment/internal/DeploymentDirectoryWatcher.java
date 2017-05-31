@@ -14,12 +14,12 @@ import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.collections.CollectionUtils.select;
 import static org.apache.commons.collections.CollectionUtils.subtract;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
+import static org.apache.commons.lang.StringUtils.removeEnd;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.config.StartupContext;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -358,7 +358,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     }
 
     for (String deletedAnchor : deletedAnchors) {
-      String artifactName = StringUtils.removeEnd(deletedAnchor, ARTIFACT_ANCHOR_SUFFIX);
+      String artifactName = removeEnd(deletedAnchor, ARTIFACT_ANCHOR_SUFFIX);
       try {
         if (findArtifact(artifactName, artifacts) != null) {
           archiveDeployer.undeployArtifact(artifactName);

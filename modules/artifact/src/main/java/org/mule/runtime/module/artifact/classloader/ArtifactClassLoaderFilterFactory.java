@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.artifact.classloader;
 
-import org.mule.runtime.core.util.StringUtils;
+import static org.mule.runtime.core.util.StringUtils.isBlank;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,7 +33,7 @@ public class ArtifactClassLoaderFilterFactory implements ClassLoaderFilterFactor
 
   public static Set<String> parseExportedResource(String exportedPackages) {
     Set<String> exported = new HashSet<>();
-    if (StringUtils.isNotBlank(exportedPackages)) {
+    if (!isBlank(exportedPackages)) {
       final String[] exports = exportedPackages.split(",");
       for (String export : exports) {
         export = export.trim();

@@ -6,17 +6,17 @@
  */
 package org.mule.functional.config;
 
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.core.component.DefaultJavaComponent;
-import org.mule.runtime.config.spring.parsers.specific.ComponentDefinitionParser;
-import org.mule.runtime.core.object.AbstractObjectFactory;
-import org.mule.runtime.core.object.SingletonObjectFactory;
+import static org.mule.runtime.core.util.StringUtils.isEmpty;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.config.spring.parsers.specific.ComponentDefinitionParser;
+import org.mule.runtime.core.component.DefaultJavaComponent;
+import org.mule.runtime.core.object.AbstractObjectFactory;
+import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -81,7 +81,7 @@ public class TestComponentDefinitionParser extends ComponentDefinitionParser {
     for (int i = 0; i < list.getLength(); i++) {
       if ("return-data".equals(list.item(i).getLocalName())) {
         Element rData = (Element) list.item(i);
-        if (StringUtils.isNotEmpty(rData.getAttribute("file"))) {
+        if (!isEmpty(rData.getAttribute("file"))) {
           String file = rData.getAttribute("file");
           try {
             returnData = IOUtils.getResourceAsString(file, getClass());

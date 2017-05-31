@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.StringUtils.INDEX_NOT_FOUND;
+import static org.apache.commons.lang.StringUtils.indexOf;
+import static org.apache.commons.lang.StringUtils.substring;
 import static org.apache.commons.lang.SystemUtils.JAVA_VM_VENDOR;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -131,8 +134,8 @@ public class SystemUtils {
     // this is the main loop that scans for all tokens
     findtoken: while (tokenStart < input.length()) {
       // find first definition or bail
-      tokenStart = StringUtils.indexOf(input, "-D", tokenStart);
-      if (tokenStart == StringUtils.INDEX_NOT_FOUND) {
+      tokenStart = indexOf(input, "-D", tokenStart);
+      if (tokenStart == INDEX_NOT_FOUND) {
         break findtoken;
       } else {
         // skip leading -D
@@ -159,8 +162,8 @@ public class SystemUtils {
       // '-D='
       if (cursor == '=') {
         // skip over garbage to next potential definition
-        tokenStart = StringUtils.indexOf(input, ' ', tokenStart);
-        if (tokenStart != StringUtils.INDEX_NOT_FOUND) {
+        tokenStart = indexOf(input, ' ', tokenStart);
+        if (tokenStart != INDEX_NOT_FOUND) {
           // '-D= ..' - continue with next token
           continue findtoken;
         } else {
@@ -189,7 +192,7 @@ public class SystemUtils {
       }
 
       // yay, finally a key
-      String key = StringUtils.substring(input, keyStart, keyEnd);
+      String key = substring(input, keyStart, keyEnd);
 
       // assume that there is no value following
       int valueStart = keyEnd;
@@ -208,19 +211,19 @@ public class SystemUtils {
         cursor = input.charAt(valueStart);
         if (cursor == '"') {
           // opening "
-          valueEnd = StringUtils.indexOf(input, '"', ++valueStart);
+          valueEnd = indexOf(input, '"', ++valueStart);
         } else {
           // unquoted value
-          valueEnd = StringUtils.indexOf(input, ' ', valueStart);
+          valueEnd = indexOf(input, ' ', valueStart);
         }
 
         // no '"' or ' ' delimiter found - use the rest of the string
-        if (valueEnd == StringUtils.INDEX_NOT_FOUND) {
+        if (valueEnd == INDEX_NOT_FOUND) {
           valueEnd = input.length();
         }
 
         // create value
-        value = StringUtils.substring(input, valueStart, valueEnd);
+        value = substring(input, valueStart, valueEnd);
       }
 
       // finally create key and value && loop again for next token

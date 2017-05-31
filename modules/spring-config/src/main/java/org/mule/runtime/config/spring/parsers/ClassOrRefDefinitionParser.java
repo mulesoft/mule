@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.parsers;
 
+import static org.mule.runtime.core.util.StringUtils.isBlank;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -36,12 +37,12 @@ public class ClassOrRefDefinitionParser extends AbstractBeanDefinitionParser {
     String ref = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
     String className = element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_CLASS);
 
-    if (StringUtils.isBlank(ref) && StringUtils.isBlank(className)) {
+    if (isBlank(ref) && isBlank(className)) {
       String elementName = element.getLocalName();
       throw new IllegalArgumentException("Neither ref nor class attribute specified for the " + elementName + " element");
     }
 
-    if (StringUtils.isNotBlank(ref)) {
+    if (!isBlank(ref)) {
       // add a ref to other bean
       parentProps.addPropertyValue(propertyName, new RuntimeBeanReference(ref));
     } else {

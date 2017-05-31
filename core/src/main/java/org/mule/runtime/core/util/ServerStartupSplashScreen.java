@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.StringUtils.defaultString;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.config.MuleManifest;
@@ -27,12 +28,12 @@ public class ServerStartupSplashScreen extends SplashScreen {
     Manifest mf = MuleManifest.getManifest();
     Attributes att = mf.getMainAttributes();
     if (att.values().size() > 0) {
-      header.add(StringUtils.defaultString(MuleManifest.getProductDescription(), notset));
+      header.add(defaultString(MuleManifest.getProductDescription(), notset));
       header.add(CoreMessages.version().getMessage() + " Build: "
-          + StringUtils.defaultString(MuleManifest.getBuildNumber(), notset));
+          + defaultString(MuleManifest.getBuildNumber(), notset));
 
-      header.add(StringUtils.defaultString(MuleManifest.getVendorName(), notset));
-      header.add(StringUtils.defaultString(MuleManifest.getProductMoreInfo(), notset));
+      header.add(defaultString(MuleManifest.getVendorName(), notset));
+      header.add(defaultString(MuleManifest.getProductMoreInfo(), notset));
     } else {
       header.add(CoreMessages.versionNotSet().getMessage());
     }

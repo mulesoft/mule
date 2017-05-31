@@ -7,6 +7,7 @@
 package org.mule.runtime.core.util;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.StringUtils.isEmpty;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -58,7 +59,7 @@ public final class PropertiesUtils {
    * @throws IllegalArgumentException is name is null or empty.
    */
   public static void registerMaskedPropertyName(String name) {
-    if (StringUtils.isNotEmpty(name)) {
+    if (!isEmpty(name)) {
       maskedProperties.add(name);
     } else {
       throw new IllegalArgumentException("Cannot mask empty property name.");
@@ -224,7 +225,7 @@ public final class PropertiesUtils {
   public static Properties getPropertiesFromQueryString(String query) {
     Properties props = new Properties();
 
-    if (StringUtils.isEmpty(query)) {
+    if (isEmpty(query)) {
       return props;
     }
 
@@ -298,7 +299,7 @@ public final class PropertiesUtils {
    * @throws IOException when a property file cannot be processed
    */
   public static List<Properties> discoverProperties(ClassLoader classLoader, String resource) throws IOException {
-    checkArgument(!StringUtils.isEmpty(resource), "Resource cannot be empty");
+    checkArgument(!isEmpty(resource), "Resource cannot be empty");
     checkArgument(classLoader != null, "ClassLoader cannot be null");
 
     List<Properties> result = new LinkedList<>();

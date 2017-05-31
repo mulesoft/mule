@@ -12,6 +12,7 @@ import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang.StringUtils.split;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_ACTIVE;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_IDLE;
@@ -228,7 +229,6 @@ import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.queue.QueueStore;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -825,7 +825,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("flags", fromSimpleParameter("flags", value -> {
           String flags = (String) value;
           int combinedFlags = 0;
-          String[] flagStrings = StringUtils.split(flags, ',');
+          String[] flagStrings = split(flags, ',');
           for (String flagString : flagStrings) {
             Integer flag = regExFlagsMapping.get(flagString);
             if (flag == null) {

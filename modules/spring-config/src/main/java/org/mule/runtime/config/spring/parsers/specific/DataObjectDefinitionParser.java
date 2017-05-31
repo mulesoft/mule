@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
+import static org.mule.runtime.core.util.StringUtils.isEmpty;
 import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
@@ -56,7 +56,7 @@ public class DataObjectDefinitionParser extends ChildDefinitionParser {
 
   @Override
   protected void postProcess(ParserContext context, BeanAssembler assembler, Element element) {
-    if (StringUtils.isNotEmpty(element.getTextContent())) {
+    if (!isEmpty(element.getTextContent())) {
       assembler.extendBean("data", element.getTextContent(), false);
     }
     super.postProcess(context, assembler, element);

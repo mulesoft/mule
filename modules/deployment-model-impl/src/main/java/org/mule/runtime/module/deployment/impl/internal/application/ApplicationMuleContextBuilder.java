@@ -7,11 +7,11 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.util.StringUtils.isBlank;
 import org.mule.runtime.config.builders.PropertiesMuleConfigurationFactory;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Map;
 
@@ -43,7 +43,7 @@ public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder {
     PropertiesMuleConfigurationFactory.initializeFromProperties(configuration, appProperties);
     configuration.setId(appName);
     final String encoding = defaultEncoding;
-    if (StringUtils.isNotBlank(encoding)) {
+    if (!isBlank(encoding)) {
       configuration.setDefaultEncoding(encoding);
     }
     return configuration;

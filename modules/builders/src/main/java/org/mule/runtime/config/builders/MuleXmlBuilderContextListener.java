@@ -8,6 +8,7 @@ package org.mule.runtime.config.builders;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -20,7 +21,6 @@ import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 
@@ -105,7 +105,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener {
    */
   protected MuleContext createMuleContext(String configResource, ServletContext servletContext)
       throws ConfigurationException, InitialisationException {
-    String serverId = StringUtils.defaultIfEmpty(servletContext.getInitParameter("mule.serverId"), null);
+    String serverId = defaultIfEmpty(servletContext.getInitParameter("mule.serverId"), null);
 
     // serverId will be used as a sub-folder in Mule working directory (.mule)
 

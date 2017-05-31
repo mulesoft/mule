@@ -7,6 +7,8 @@
 package org.mule.test.infrastructure.deployment;
 
 import static org.apache.commons.io.FileUtils.copyURLToFile;
+import static org.apache.commons.lang.StringUtils.removeEnd;
+import static org.apache.commons.lang.StringUtils.removeEndIgnoreCase;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -20,13 +22,10 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTOR
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.core.internal.util.FilenameUtils;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -257,7 +256,7 @@ public class FakeMuleServer {
 
   public void deploy(String resource) throws IOException {
     int lastSeparator = resource.lastIndexOf(File.separator);
-    String appName = StringUtils.removeEndIgnoreCase(resource.substring(lastSeparator + 1), JAR_FILE_SUFFIX);
+    String appName = removeEndIgnoreCase(resource.substring(lastSeparator + 1), JAR_FILE_SUFFIX);
     deploy(resource, appName);
   }
 
@@ -293,7 +292,7 @@ public class FakeMuleServer {
     final String tempFileName = new File((targetFile == null ? url.getFile() : targetFile) + ".part").getName();
     final File tempFile = new File(appsDir, tempFileName);
     copyURLToFile(url, tempFile);
-    boolean renamed = tempFile.renameTo(new File(StringUtils.removeEnd(tempFile.getAbsolutePath(), ".part")));
+    boolean renamed = tempFile.renameTo(new File(removeEnd(tempFile.getAbsolutePath(), ".part")));
     if (!renamed) {
       throw new IllegalStateException("Unable to add application archive");
     }
