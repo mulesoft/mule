@@ -10,9 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant.SERVICE;
 
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.Message;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
@@ -24,7 +27,10 @@ import org.junit.Test;
 
 public abstract class AbstractFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
+    private static String expectedPayload ;
+
     protected String prefix;
+
 
     public AbstractFunctionalTestCase(ConfigVariant variant, String configResources)
     {
@@ -46,13 +52,28 @@ public abstract class AbstractFunctionalTestCase extends AbstractServiceAndFlowT
 
         // send String
         message = client.send("vm://testin", "test matching component first time", null);
-        assertNotNull(message);
-        assertEquals(message.getPayload(), "emit tsrif tnenopmoc gnihctam tset");
+        if(variant.equals(SERVICE))
+        {
+            assertNotNull(message);
+            assertEquals(message.getPayload(), "emit tsrif tnenopmoc gnihctam tset");
+        }
+        else
+        {
+            assertEquals(expectedPayload, "emit tsrif tnenopmoc gnihctam tset");
+        }
 
         // send String
         message = client.send("vm://testin", "test mathching component second time", null);
-        assertNotNull(message);
-        assertEquals(message.getPayload(), "emit dnoces tnenopmoc gnihchtam tset");
+
+        if(variant.equals(SERVICE))
+        {
+            assertNotNull(message);
+            assertEquals(message.getPayload(), "emit dnoces tnenopmoc gnihchtam tset");
+        }
+        else
+        {
+            assertEquals(expectedPayload, "emit dnoces tnenopmoc gnihchtam tset");
+        }
 
         // send Integer
         message = client.send("vm://testin", 15, null);
@@ -136,5 +157,16 @@ public abstract class AbstractFunctionalTestCase extends AbstractServiceAndFlowT
         MuleMessage message = client.send("GoodType", "hello", null);
         assertNotNull(message);
         assertEquals("olleh", message.getPayloadAsString());
+    }
+
+    public static class TestJavaComponent implements Callable
+    {
+
+        @Override
+        public Object onCall(MuleEventContext eventContext) throws Exception
+        {
+            expectedPayload = eventContext.getMessage().getPayloadAsString();
+            return null;
+        }
     }
 }
