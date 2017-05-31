@@ -64,8 +64,6 @@ public class MacroExpansionModuleModel {
    * can properly set the paths for every element (even the macro expanded)
    */
   public static final String ORIGINAL_IDENTIFIER = "ORIGINAL_IDENTIFIER";
-  //  public static final String ORIGINAL_LINE_NUMBER = "ORIGINAL_LINE_NUMBER";
-  //  public static final String ORIGINAL_CONFIG_FILE_NAME = "ORIGINAL_CONFIG_FILE_NAME";
 
   private final ApplicationModel applicationModel;
   private final List<ExtensionModel> extensions;
@@ -263,19 +261,10 @@ public class MacroExpansionModuleModel {
     for (ComponentModel processorChainModelChild : processorChainModel.getInnerComponents()) {
       processorChainModelChild.setParent(processorChainModel);
     }
-    //    final String moduleConfigFileName = operationComponentModelModelProperty.getOperationComponentModel().getConfigFileName()
-    //        .orElseThrow(() -> new IllegalArgumentException(format("The is no config file name for the operation [%s] in the module [%s]",
-    //                                                               operationModel.getName(), extensionModel.getName())));
-    //    final Integer moduleLineNumber = operationComponentModelModelProperty.getOperationComponentModel().getLineNumber()
-    //        .orElseThrow(() -> new IllegalArgumentException(format("The is no line number for the operation [%s] in the module [%s]",
-    //                                                               operationModel.getName(), extensionModel.getName())));
 
     operationRefModel.getConfigFileName().ifPresent(processorChainBuilder::setConfigFileName);
     operationRefModel.getLineNumber().ifPresent(processorChainBuilder::setLineNumber);
-
     processorChainBuilder.addCustomAttribute(ORIGINAL_IDENTIFIER, operationRefModel.getIdentifier());
-    //    processorChainBuilder.addCustomAttribute(ORIGINAL_LINE_NUMBER, moduleLineNumber);
-    //    processorChainBuilder.addCustomAttribute(ORIGINAL_CONFIG_FILE_NAME, moduleConfigFileName);
     return processorChainModel;
   }
 
