@@ -150,7 +150,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -223,7 +248,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
+          "errors": [
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "TEST-OAUTH",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            }
+          ],
           "output": {
             "type": {
               "format": "java",
@@ -2774,7 +2824,52 @@
     }
   ],
   "messageSources": [],
-  "errors": [],
+  "errors": [
+    {
+      "type": "RETRY_EXHAUSTED",
+      "namespace": "TEST-OAUTH",
+      "parent": {
+        "type": "RETRY_EXHAUSTED",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    },
+    {
+      "type": "CONNECTIVITY",
+      "namespace": "MULE",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "ANY",
+      "namespace": "MULE"
+    },
+    {
+      "type": "RETRY_EXHAUSTED",
+      "namespace": "MULE",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "CONNECTIVITY",
+      "namespace": "TEST-OAUTH",
+      "parent": {
+        "type": "CONNECTIVITY",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    }
+  ],
   "modelProperties": {},
   "types": [
     {

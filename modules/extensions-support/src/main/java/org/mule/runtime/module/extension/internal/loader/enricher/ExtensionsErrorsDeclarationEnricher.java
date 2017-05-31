@@ -22,7 +22,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclarat
 import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.error.MuleErrors;
@@ -30,11 +29,7 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -51,39 +46,28 @@ public class ExtensionsErrorsDeclarationEnricher implements DeclarationEnricher 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
     ExtensionDeclaration extensionDeclaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
-    Optional<ImplementingTypeModelProperty> implementingType =
-        extensionDeclaration.getModelProperty(ImplementingTypeModelProperty.class);
     muleErrorsModelFactory = new ErrorsModelFactory(MuleErrors.class.getEnumConstants(), MULE);
+    Set<ErrorModel> errorModels = extensionDeclaration.getErrorModels();
+    new IdempotentDeclarationWalker() {
 
-    if (implementingType.isPresent()) {
-      ExtensionElement extensionElement = new ExtensionTypeWrapper<>(implementingType.get().getType());
-      extensionElement.getAnnotation(ErrorTypes.class).ifPresent(errorTypesAnnotation -> {
-
-        Set<ErrorModel> errorModels = extensionDeclaration.getErrorModels();
-        if (!errorModels.isEmpty()) {
-          new IdempotentDeclarationWalker() {
-
-            @Override
-            public void onOperation(WithOperationsDeclaration owner, OperationDeclaration operationDeclaration) {
-              if (operationDeclaration.getModelProperty(ConnectivityModelProperty.class).isPresent()) {
-                operationDeclaration.addErrorModel(getErrorModel(CONNECTIVITY, errorModels, operationDeclaration));
-                operationDeclaration.addErrorModel(getErrorModel(RETRY_EXHAUSTED, errorModels, operationDeclaration));
-              }
-            }
-
-            @Override
-            protected void onSource(WithSourcesDeclaration owner, SourceDeclaration sourceDeclaration) {
-              if (sourceDeclaration.getSuccessCallback().isPresent() || sourceDeclaration.getErrorCallback().isPresent()) {
-                registerError(SOURCE_ERROR_RESPONSE_SEND, sourceDeclaration, extensionDeclaration);
-                registerError(SOURCE_ERROR_RESPONSE_GENERATE, sourceDeclaration, extensionDeclaration);
-                registerError(SOURCE_RESPONSE_SEND, sourceDeclaration, extensionDeclaration);
-                registerError(SOURCE_RESPONSE_GENERATE, sourceDeclaration, extensionDeclaration);
-              }
-            }
-          }.walk(extensionDeclaration);
+      @Override
+      public void onOperation(WithOperationsDeclaration owner, OperationDeclaration operationDeclaration) {
+        if (operationDeclaration.getModelProperty(ConnectivityModelProperty.class).isPresent()) {
+          operationDeclaration.addErrorModel(getErrorModel(CONNECTIVITY, errorModels, operationDeclaration));
+          operationDeclaration.addErrorModel(getErrorModel(RETRY_EXHAUSTED, errorModels, operationDeclaration));
         }
-      });
-    }
+      }
+
+      @Override
+      protected void onSource(WithSourcesDeclaration owner, SourceDeclaration sourceDeclaration) {
+        if (sourceDeclaration.getSuccessCallback().isPresent() || sourceDeclaration.getErrorCallback().isPresent()) {
+          registerError(SOURCE_ERROR_RESPONSE_SEND, sourceDeclaration, extensionDeclaration);
+          registerError(SOURCE_ERROR_RESPONSE_GENERATE, sourceDeclaration, extensionDeclaration);
+          registerError(SOURCE_RESPONSE_SEND, sourceDeclaration, extensionDeclaration);
+          registerError(SOURCE_RESPONSE_GENERATE, sourceDeclaration, extensionDeclaration);
+        }
+      }
+    }.walk(extensionDeclaration);
   }
 
   private void registerError(MuleErrors error, SourceDeclaration sourceDeclaration, ExtensionDeclaration extensionDeclaration) {
