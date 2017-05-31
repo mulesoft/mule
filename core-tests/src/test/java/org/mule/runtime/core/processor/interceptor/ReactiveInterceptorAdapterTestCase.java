@@ -31,6 +31,8 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.PROCESSOR;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
+import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorTypeThat;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
 
@@ -397,6 +399,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     };
     startFlowWithInterceptors(interceptor);
 
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorType(UNKNOWN.getNamespace(), UNKNOWN.getName())));
     expected.expectCause(sameInstance(cause));
     process(flow, eventBuilder().message(Message.of("")).build());
   }
@@ -413,6 +417,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     };
     startFlowWithInterceptors(interceptor);
 
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorType(UNKNOWN.getNamespace(), UNKNOWN.getName())));
     expected.expectCause(sameInstance(expectedException));
     process(flow, eventBuilder().message(Message.of("")).build());
   }
@@ -552,6 +558,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor);
 
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorType(UNKNOWN.getNamespace(), UNKNOWN.getName())));
     expected.expectCause(sameInstance(expectedException));
     try {
       process(flow, eventBuilder().message(Message.of("")).build());
@@ -581,6 +589,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor);
 
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorType(UNKNOWN.getNamespace(), UNKNOWN.getName())));
     expected.expectCause(sameInstance(expectedException));
     try {
       process(flow, eventBuilder().message(Message.of("")).build());
@@ -602,6 +612,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     when(processor.process(any())).thenThrow(expectedException);
 
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorType(UNKNOWN.getNamespace(), UNKNOWN.getName())));
     expected.expectCause(sameInstance(expectedException));
     try {
       process(flow, eventBuilder().message(Message.of("")).build());
