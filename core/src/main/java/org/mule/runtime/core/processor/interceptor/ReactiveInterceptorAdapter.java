@@ -10,6 +10,7 @@ import static java.lang.String.valueOf;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+import static org.mule.runtime.core.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromFuture;
 
@@ -114,7 +115,12 @@ public class ReactiveInterceptorAdapter
     return interceptor.around(resolveParameters(event, component, dslParameters), interceptionEvent,
                               reactiveInterceptionAction)
         .exceptionally(t -> {
-          throw new CompletionException(new MessagingException(event, t.getCause(), component));
+          if (t instanceof MessagingException) {
+            throw new CompletionException(t);
+          } else {
+            throw new CompletionException(updateMessagingExceptionWithError(new MessagingException(event, t.getCause()),
+                                                                            component, flowConstruct));
+          }
         })
         .thenApply(interceptedEvent -> ((DefaultInterceptionEvent) interceptedEvent).resolve());
   }

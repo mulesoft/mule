@@ -8,6 +8,7 @@ package org.mule.tck.junit4.matcher;
 
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
@@ -22,10 +23,14 @@ import org.hamcrest.TypeSafeMatcher;
  */
 public class EventMatcher extends TypeSafeMatcher<Event> {
 
-  private ErrorTypeMatcher errorTypeMatcher;
+  private Matcher<ErrorType> errorTypeMatcher;
 
-  public EventMatcher(ErrorTypeMatcher errorTypeMatcher) {
+  public EventMatcher(Matcher<ErrorType> errorTypeMatcher) {
     this.errorTypeMatcher = errorTypeMatcher;
+  }
+
+  public static EventMatcher hasErrorTypeThat(Matcher<ErrorType> errorTypeMatcher) {
+    return new EventMatcher(errorTypeMatcher);
   }
 
   public static EventMatcher hasErrorType(ErrorTypeDefinition type) {

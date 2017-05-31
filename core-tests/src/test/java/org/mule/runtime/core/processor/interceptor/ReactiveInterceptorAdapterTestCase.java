@@ -11,8 +11,8 @@ import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsSame.sameInstance;
@@ -22,6 +22,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -30,6 +31,10 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.PROCESSOR;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
+import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
+import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorTypeThat;
+import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -43,9 +48,12 @@ import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 import java.util.Optional;
@@ -62,8 +70,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
-import org.mockito.Mockito;
-import com.google.common.collect.ImmutableMap;
 
 /*
  * The test methods with 'noMock' suffix exercise the optimized interception path when 'around' is not implemented.
@@ -303,33 +309,53 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void interceptorMutatesEventAroundAfterFailWithErrorType() throws Exception {
-    ErrorType errorTypeMock = Mockito.mock(ErrorType.class);
+    ErrorType errorTypeMock = mock(ErrorType.class);
     ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
 
       @Override
       public CompletableFuture<InterceptionEvent> around(Map<String, Object> parameters, InterceptionEvent event,
                                                          InterceptionAction action) {
-        action.fail(errorTypeMock);
-        return supplyAsync(() -> {
-          event.message(Message.of(TEST_PAYLOAD));
-          return event;
-        });
+        event.message(Message.of(TEST_PAYLOAD));
+        return action.fail(errorTypeMock);
       }
     });
     startFlowWithInterceptors(interceptor);
 
-    Event result = process(flow, eventBuilder().message(Message.of("")).build());
-    assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
-    assertThat(result.getError().isPresent(), is(true));
-    assertThat(result.getError().get().getCause(), is(instanceOf(InterceptionException.class)));
-    assertThat(result.getError().get().getErrorType(), is(sameInstance(errorTypeMock)));
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorTypeThat(sameInstance(errorTypeMock))));
+    expected.expectCause(instanceOf(InterceptionException.class));
+    try {
+      process(flow, eventBuilder().message(Message.of("")).build());
+    } finally {
 
-    InOrder inOrder = inOrder(processor, interceptor);
+      InOrder inOrder = inOrder(processor, interceptor);
 
-    inOrder.verify(interceptor).before(mapArgWithEntry("param", ""), any());
-    inOrder.verify(interceptor).around(mapArgWithEntry("param", ""), any(), any());
-    inOrder.verify(processor, never()).process(any());
-    inOrder.verify(interceptor).after(argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
+      inOrder.verify(interceptor).before(mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor).around(mapArgWithEntry("param", ""), any(), any());
+      inOrder.verify(processor, never()).process(any());
+      inOrder.verify(interceptor).after(argThat(interceptionHasPayloadValue(TEST_PAYLOAD)),
+                                        argThat(not(empty())));
+    }
+  }
+
+  @Test
+  public void interceptorMutatesEventAroundAfterFailWithErrorTypeNoMock() throws Exception {
+    ErrorType errorTypeMock = mock(ErrorType.class);
+    ProcessorInterceptor interceptor = new ProcessorInterceptor() {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(Map<String, Object> parameters, InterceptionEvent event,
+                                                         InterceptionAction action) {
+        event.message(Message.of(TEST_PAYLOAD));
+        return action.fail(errorTypeMock);
+      }
+    };
+    startFlowWithInterceptors(interceptor);
+
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorTypeThat(sameInstance(errorTypeMock))));
+    expected.expectCause(instanceOf(InterceptionException.class));
+    process(flow, eventBuilder().message(Message.of("")).build());
   }
 
   @Test
@@ -340,32 +366,65 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       @Override
       public CompletableFuture<InterceptionEvent> around(Map<String, Object> parameters, InterceptionEvent event,
                                                          InterceptionAction action) {
-        action.fail(cause);
-        return supplyAsync(() -> {
-          event.message(Message.of(TEST_PAYLOAD));
-          return event;
-        });
+        event.message(Message.of(TEST_PAYLOAD));
+        return action.fail(cause);
       }
     });
     startFlowWithInterceptors(interceptor);
 
-    Event result = process(flow, eventBuilder().message(Message.of("")).build());
-    assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
-    assertThat(result.getError().isPresent(), is(true));
-    assertThat(result.getError().get().getCause(), is(instanceOf(RuntimeException.class)));
-    assertThat(result.getError().get().getErrorType().getNamespace(), is(equalTo("MULE")));
-    assertThat(result.getError().get().getErrorType().getIdentifier(), is(equalTo("UNKNOWN")));
+    expected.expectCause(sameInstance(cause));
+    try {
+      process(flow, eventBuilder().message(Message.of("")).build());
+    } finally {
+      InOrder inOrder = inOrder(processor, interceptor);
 
-    InOrder inOrder = inOrder(processor, interceptor);
+      inOrder.verify(interceptor).before(mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor).around(mapArgWithEntry("param", ""), any(), any());
+      inOrder.verify(processor, never()).process(any());
+      inOrder.verify(interceptor).after(argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(of(cause)));
+    }
+  }
 
-    inOrder.verify(interceptor).before(mapArgWithEntry("param", ""), any());
-    inOrder.verify(interceptor).around(mapArgWithEntry("param", ""), any(), any());
-    inOrder.verify(processor, never()).process(any());
-    inOrder.verify(interceptor).after(argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
+  @Test
+  public void interceptorMutatesEventAroundAfterFailWithCauseNoMock() throws Exception {
+    Throwable cause = new RuntimeException("");
+    ProcessorInterceptor interceptor = new ProcessorInterceptor() {
+
+      @Override
+      public CompletableFuture<InterceptionEvent> around(Map<String, Object> parameters, InterceptionEvent event,
+                                                         InterceptionAction action) {
+        event.message(Message.of(TEST_PAYLOAD));
+        return action.fail(cause);
+      }
+    };
+    startFlowWithInterceptors(interceptor);
+
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorType(UNKNOWN.getNamespace(), UNKNOWN.getName())));
+    expected.expectCause(sameInstance(cause));
+    process(flow, eventBuilder().message(Message.of("")).build());
   }
 
   @Test
   public void interceptorThrowsExceptionBefore() throws Exception {
+    RuntimeException expectedException = new RuntimeException("Some Error");
+    ProcessorInterceptor interceptor = new ProcessorInterceptor() {
+
+      @Override
+      public void before(Map<String, Object> parameters, InterceptionEvent event) {
+        throw expectedException;
+      }
+    };
+    startFlowWithInterceptors(interceptor);
+
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorType(UNKNOWN.getNamespace(), UNKNOWN.getName())));
+    expected.expectCause(sameInstance(expectedException));
+    process(flow, eventBuilder().message(Message.of("")).build());
+  }
+
+  @Test
+  public void interceptorThrowsExceptionBeforeNoMock() throws Exception {
     RuntimeException expectedException = new RuntimeException("Some Error");
     ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
 
@@ -390,15 +449,15 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   }
 
   @Test
-  public void interceptorThrowsExceptionBeforeNoMock() throws Exception {
+  public void interceptorThrowsExceptionAfter() throws Exception {
     RuntimeException expectedException = new RuntimeException("Some Error");
-    ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
+    ProcessorInterceptor interceptor = new ProcessorInterceptor() {
 
       @Override
-      public void before(Map<String, Object> parameters, InterceptionEvent event) {
+      public void after(InterceptionEvent event, Optional<Throwable> thrown) {
         throw expectedException;
       }
-    });
+    };
     startFlowWithInterceptors(interceptor);
 
     expected.expectCause(sameInstance(expectedException));
@@ -406,7 +465,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   }
 
   @Test
-  public void interceptorThrowsExceptionAfter() throws Exception {
+  public void interceptorThrowsExceptionAfterNoMock() throws Exception {
     RuntimeException expectedException = new RuntimeException("Some Error");
     ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
 
@@ -428,22 +487,6 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
       inOrder.verify(interceptor).after(any(), eq(empty()));
     }
-  }
-
-  @Test
-  public void interceptorThrowsExceptionAfterNoMock() throws Exception {
-    RuntimeException expectedException = new RuntimeException("Some Error");
-    ProcessorInterceptor interceptor = spy(new ProcessorInterceptor() {
-
-      @Override
-      public void after(InterceptionEvent event, Optional<Throwable> thrown) {
-        throw expectedException;
-      }
-    });
-    startFlowWithInterceptors(interceptor);
-
-    expected.expectCause(sameInstance(expectedException));
-    process(flow, eventBuilder().message(Message.of("")).build());
   }
 
   @Test
@@ -515,6 +558,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor);
 
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorType(UNKNOWN.getNamespace(), UNKNOWN.getName())));
     expected.expectCause(sameInstance(expectedException));
     try {
       process(flow, eventBuilder().message(Message.of("")).build());
@@ -544,6 +589,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor);
 
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorType(UNKNOWN.getNamespace(), UNKNOWN.getName())));
     expected.expectCause(sameInstance(expectedException));
     try {
       process(flow, eventBuilder().message(Message.of("")).build());
@@ -565,6 +612,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     when(processor.process(any())).thenThrow(expectedException);
 
+    expected.expect(MessagingException.class);
+    expected.expect(withEventThat(hasErrorType(UNKNOWN.getNamespace(), UNKNOWN.getName())));
     expected.expectCause(sameInstance(expectedException));
     try {
       process(flow, eventBuilder().message(Message.of("")).build());
