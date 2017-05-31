@@ -8,6 +8,7 @@ package org.mule.tck.junit4.matcher;
 
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
