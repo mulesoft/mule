@@ -94,7 +94,10 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
         }
       } else if (isProcessor(componentModel)) {
         if (isModuleOperation(componentModel.getParent())) {
-          componentLocation = processModuleOperationChildren(componentModel);
+          final Optional<TypedComponentIdentifier> operationTypedIdentifier =
+              ApplicationModel.MODULE_OPERATION_CHAIN.equals(typedComponentIdentifier.get().getIdentifier())
+                  ? getModuleOperationTypeComponentIdentifier(componentModel) : typedComponentIdentifier;
+          componentLocation = processModuleOperationChildren(componentModel, operationTypedIdentifier);
         } else {
           componentLocation = parentComponentLocation.appendProcessorsPart().appendLocationPart(findProcessorPath(componentModel),
                                                                                                 typedComponentIdentifier,
@@ -205,14 +208,16 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
    * It rewrites the history for those macro expanded operations that are not direct children from a flow, which means the returned
    * {@link ComponentLocation} are mapped to the new operation rather the original flow.
    * @param componentModel source to generate the new {@link ComponentLocation}, it also relies in its parent {@link ComponentModel#getParent()}
+   * @param operationTypedIdentifier identifier of the current operation
    * @return a fictitious {@link ComponentLocation}
    */
-  private DefaultComponentLocation processModuleOperationChildren(ComponentModel componentModel) {
-    final Optional<TypedComponentIdentifier> operationTypedIdentifier =
+  private DefaultComponentLocation processModuleOperationChildren(ComponentModel componentModel,
+                                                                  Optional<TypedComponentIdentifier> operationTypedIdentifier) {
+    final Optional<TypedComponentIdentifier> parentOperationTypedIdentifier =
         getModuleOperationTypeComponentIdentifier(componentModel.getParent());
-    final String operationName = operationTypedIdentifier.get().getIdentifier().getName();
+    final String operationName = parentOperationTypedIdentifier.get().getIdentifier().getName();
     return new DefaultComponentLocation(of(operationName), Collections.EMPTY_LIST)
-        .appendLocationPart(operationName, operationTypedIdentifier, componentModel.getConfigFileName(),
+        .appendLocationPart(operationName, parentOperationTypedIdentifier, componentModel.getConfigFileName(),
                             componentModel.getLineNumber())
         .appendLocationPart(PROCESSORS_PART_NAME, empty(), empty(), empty())
         .appendLocationPart(findProcessorPath(componentModel), operationTypedIdentifier, componentModel.getConfigFileName(),
