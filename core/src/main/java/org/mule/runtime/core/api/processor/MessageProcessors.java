@@ -183,8 +183,7 @@ public class MessageProcessors {
     EventContext child = child(event.getContext());
     just(Event.builder(child, event).build())
         .transform(processor)
-        .subscribe(result -> child.success(result),
-                   throwable -> child.error(throwable));
+        .subscribe(child::success, child::error);
     return from(child.getResponsePublisher())
         .map(result -> Event.builder(event.getContext(), result).build())
         .doOnError(MessagingException.class, me -> me.setProcessedEvent(builder(event.getContext(), me.getEvent()).build()));

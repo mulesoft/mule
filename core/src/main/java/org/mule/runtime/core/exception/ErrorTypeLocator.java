@@ -35,11 +35,14 @@ public class ErrorTypeLocator {
 
   private ExceptionMapper defaultExceptionMapper;
   private Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers;
+  private final ErrorType defaultError;
 
   private ErrorTypeLocator(ExceptionMapper defaultExceptionMapper,
-                           Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers) {
+                           Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers,
+                           ErrorType defaultError) {
     this.defaultExceptionMapper = defaultExceptionMapper;
     this.componentExceptionMappers = componentExceptionMappers;
+    this.defaultError = defaultError;
   }
 
   /**
@@ -83,7 +86,7 @@ public class ErrorTypeLocator {
     if (exceptionMapper != null) {
       errorType = exceptionMapper.resolveErrorType(exception);
     }
-    return errorType.orElseGet(() -> defaultExceptionMapper.resolveErrorType(exception).get());
+    return errorType.orElseGet(() -> defaultExceptionMapper.resolveErrorType(exception).orElse(defaultError));
   }
 
   /**
@@ -111,9 +114,10 @@ public class ErrorTypeLocator {
     this.componentExceptionMappers.put(componentIdentifier, exceptionMapper);
   }
 
+
   /**
    * Builder for creating instances of {@link ErrorTypeLocator}.
-   * 
+   *
    * @param errorTypeRepository repository of error types.
    * @return a builder for creating an {@link ErrorTypeLocator}
    */
@@ -135,6 +139,7 @@ public class ErrorTypeLocator {
       checkArgument(errorTypeRepository != null, "error type repository cannot be null");
     }
 
+    private ErrorType defaultError;
     private ExceptionMapper defaultExceptionMapper;
     private Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers = new HashedMap();
 
@@ -169,7 +174,18 @@ public class ErrorTypeLocator {
     public ErrorTypeLocator build() {
       checkState(defaultExceptionMapper != null, "default exception mapper cannot not be null");
       checkState(componentExceptionMappers != null, "component exception mappers cannot not be null");
-      return new ErrorTypeLocator(defaultExceptionMapper, componentExceptionMappers);
+      checkState(defaultError != null, "default error cannot not be null");
+      return new ErrorTypeLocator(defaultExceptionMapper, componentExceptionMappers, defaultError);
+    }
+
+    /**
+     * Adds an {@link ErrorType} that is used when no mapping is found for a component.
+     *
+     * @return {@code this} builder.
+     */
+    public Builder defaultError(ErrorType defaultError) {
+      this.defaultError = defaultError;
+      return this;
     }
   }
 }

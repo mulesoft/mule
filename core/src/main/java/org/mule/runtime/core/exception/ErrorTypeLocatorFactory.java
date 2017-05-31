@@ -23,6 +23,7 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOW
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.VALIDATION;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.security.ClientSecurityException;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.ServerSecurityException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
@@ -51,6 +52,7 @@ public class ErrorTypeLocatorFactory {
    * @return a new {@link ErrorTypeLocator}.
    */
   public static ErrorTypeLocator createDefaultErrorTypeLocator(ErrorTypeRepository errorTypeRepository) {
+    ErrorType unknown = errorTypeRepository.getErrorType(UNKNOWN).get();
     return ErrorTypeLocator.builder(errorTypeRepository)
         .defaultExceptionMapper(ExceptionMapper.builder()
             .addExceptionMapping(MessageTransformerException.class, errorTypeRepository.lookupErrorType(TRANSFORMATION).get())
@@ -68,12 +70,14 @@ public class ErrorTypeLocatorFactory {
             .addExceptionMapping(RejectedExecutionException.class, errorTypeRepository.getErrorType(OVERLOAD).get())
             .addExceptionMapping(MessageRedeliveredException.class,
                                  errorTypeRepository.lookupErrorType(REDELIVERY_EXHAUSTED).get())
-            .addExceptionMapping(Exception.class, errorTypeRepository.getErrorType(UNKNOWN).get())
+            .addExceptionMapping(Exception.class, unknown)
+            .addExceptionMapping(Throwable.class, unknown)
             .addExceptionMapping(Error.class, errorTypeRepository.getCriticalErrorType())
             .addExceptionMapping(StreamingBufferSizeExceededException.class,
                                  errorTypeRepository.lookupErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED).get())
             .addExceptionMapping(MuleFatalException.class, errorTypeRepository.getErrorType(FATAL).get())
             .build())
+        .defaultError(unknown)
         .build();
   }
 
