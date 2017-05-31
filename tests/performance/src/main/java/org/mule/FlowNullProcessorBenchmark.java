@@ -25,7 +25,7 @@ public class FlowNullProcessorBenchmark extends AbstractFlowBenchmark {
 
   @Override
   protected int getStreamIterations() {
-    return 1000;
+    return 100;
   }
 
   @Benchmark

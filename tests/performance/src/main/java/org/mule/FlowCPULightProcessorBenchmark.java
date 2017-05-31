@@ -33,7 +33,7 @@ public class FlowCPULightProcessorBenchmark extends AbstractFlowBenchmark {
 
   @Override
   protected int getStreamIterations() {
-    return 1000;
+    return 100;
   }
 
 }
