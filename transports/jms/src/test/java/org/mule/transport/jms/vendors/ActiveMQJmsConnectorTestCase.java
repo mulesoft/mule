@@ -11,6 +11,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import static org.mule.tck.MuleTestUtils.TestCallback;
+import static org.mule.api.config.MuleProperties.MULE_JMS_MAX_QUEUE_PREFETCH;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.DefaultJmsTopicResolver;
 import org.mule.transport.jms.JmsConnector;
@@ -75,11 +78,29 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         assertFalse(c.isNoLocal());
         assertFalse(c.isPersistentDelivery());
         assertEquals(0, c.getMaxRedelivery());
+        assertEquals(-1, c.getMaxQueuePrefetch());
         assertTrue(c.isCacheJmsSessions());
         assertFalse(c.isEagerConsumer());
 
         assertEquals("1.0.2b", c.getSpecification());
     }
+
+    @Test
+    public void testJmsQueuePrefetch() throws Exception
+    {
+        testWithSystemProperty(MULE_JMS_MAX_QUEUE_PREFETCH, "5", new TestCallback()
+        {
+            public void run() throws Exception
+            {
+                JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("customActiveMqJmsConnector");
+
+                assertNotNull(c);
+                assertTrue(c instanceof ActiveMQJmsConnector);
+                assertEquals(5, c.getMaxQueuePrefetch());
+            }
+        });
+    }
+    
     
     @Test
     public void testCustomActiveMqConnectorConfig() throws Exception
