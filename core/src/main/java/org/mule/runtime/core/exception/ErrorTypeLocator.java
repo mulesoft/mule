@@ -114,7 +114,6 @@ public class ErrorTypeLocator {
     this.componentExceptionMappers.put(componentIdentifier, exceptionMapper);
   }
 
-
   /**
    * Builder for creating instances of {@link ErrorTypeLocator}.
    *
