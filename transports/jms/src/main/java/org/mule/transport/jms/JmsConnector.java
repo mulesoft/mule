@@ -6,6 +6,8 @@
  */
 package org.mule.transport.jms;
 
+import static org.mule.api.config.MuleProperties.MULE_JMS_MAX_QUEUE_PREFETCH;
+
 import org.mule.api.Closeable;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
@@ -77,6 +79,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     public static final int REDELIVERY_FAIL_ON_FIRST = 0;
 
     public static final int REDELIVERY_IGNORE = -1;
+    
+    public static final int PREFETCH_DEFAULT = -1;
 
     private AtomicInteger receiverReportedExceptionCount = new AtomicInteger();
 
@@ -97,6 +101,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     private boolean honorQosHeaders;
 
     private int maxRedelivery = REDELIVERY_FAIL_ON_FIRST;
+    
+    private int maxQueuePrefetch = PREFETCH_DEFAULT;
 
     private boolean cacheJmsSessions = true;
 
@@ -1123,6 +1129,12 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     public int getMaxRedelivery()
     {
         return maxRedelivery;
+    }
+
+    public int getMaxQueuePrefetch()
+    {
+        String maxQueuePrefetch = System.getProperty(MULE_JMS_MAX_QUEUE_PREFETCH, "-1");
+        return Integer.parseInt(maxQueuePrefetch);
     }
 
     public void setMaxRedelivery(int maxRedelivery)

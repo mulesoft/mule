@@ -53,6 +53,15 @@ public class ActiveMQJmsConnector extends JmsConnector
     {
         try
         {
+            Method getPrefetchPolicy = connectionFactory.getClass().getMethod("getPrefetchPolicy");
+            Object prefetchPolicy = getPrefetchPolicy.invoke(connectionFactory);
+            Method setQueuePrefetch = prefetchPolicy.getClass().getMethod("setQueuePrefetch", Integer.TYPE);
+            int maxQueuePrefetch = getMaxQueuePrefetch();
+            if (maxQueuePrefetch != PREFETCH_DEFAULT)
+            {
+                setQueuePrefetch.invoke(prefetchPolicy, maxQueuePrefetch);
+            }
+
             Method getRedeliveryPolicyMethod = connectionFactory.getClass().getMethod("getRedeliveryPolicy");
             Object redeliveryPolicy = getRedeliveryPolicyMethod.invoke(connectionFactory);
             Method setMaximumRedeliveriesMethod = redeliveryPolicy.getClass().getMethod("setMaximumRedeliveries", Integer.TYPE);
