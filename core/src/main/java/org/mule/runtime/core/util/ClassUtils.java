@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.ClassUtils.primitiveToWrapper;
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.runtime.core.internal.util.ExceptionUtils.tryExpecting;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.ExceptionUtils.tryExpecting;
 import static org.mule.runtime.core.util.MapUtils.getValue;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 
@@ -27,9 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.PrivilegedAction;
@@ -39,7 +37,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +51,7 @@ import java.util.concurrent.Callable;
  * servers. The resource and classloading methods are SecurityManager friendly.
  * </p>
  */
-public class ClassUtils extends org.apache.commons.lang.ClassUtils {
+public class ClassUtils {
 
   public static final Object[] NO_ARGS = new Object[] {};
   public static final Class<?>[] NO_ARGS_TYPE = new Class<?>[] {};
@@ -343,7 +340,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils {
    */
   public static Class<?> initializeClass(Class<?> clazz) {
     try {
-      return getClass(clazz.getName(), true);
+      return org.apache.commons.lang.ClassUtils.getClass(clazz.getName(), true);
     } catch (ClassNotFoundException e) {
       IllegalStateException ise = new IllegalStateException();
       ise.initCause(e);
@@ -351,7 +348,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils {
     }
   }
 
-  public static <T> T instanciateClass(Class<? extends T> clazz, Object... constructorArgs) throws SecurityException,
+  public static <T> T instantiateClass(Class<? extends T> clazz, Object... constructorArgs) throws SecurityException,
       NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
     Class<?>[] args;
     if (constructorArgs != null) {
@@ -388,19 +385,19 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils {
     return (T) ctor.newInstance(constructorArgs);
   }
 
-  public static Object instanciateClass(String name, Object... constructorArgs) throws ClassNotFoundException, SecurityException,
+  public static Object instantiateClass(String name, Object... constructorArgs) throws ClassNotFoundException, SecurityException,
       NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
-    return instanciateClass(name, constructorArgs, (ClassLoader) null);
+    return instantiateClass(name, constructorArgs, (ClassLoader) null);
   }
 
-  public static Object instanciateClass(String name, Object[] constructorArgs, Class<?> callingClass)
+  public static Object instantiateClass(String name, Object[] constructorArgs, Class<?> callingClass)
       throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
       IllegalAccessException, InvocationTargetException {
     Class<?> clazz = loadClass(name, callingClass);
-    return instanciateClass(clazz, constructorArgs);
+    return instantiateClass(clazz, constructorArgs);
   }
 
-  public static Object instanciateClass(String name, Object[] constructorArgs, ClassLoader classLoader)
+  public static Object instantiateClass(String name, Object[] constructorArgs, ClassLoader classLoader)
       throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
       IllegalAccessException, InvocationTargetException {
     Class<?> clazz;
@@ -412,7 +409,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils {
     if (clazz == null) {
       throw new ClassNotFoundException(name);
     }
-    return instanciateClass(clazz, constructorArgs);
+    return instantiateClass(clazz, constructorArgs);
   }
 
   public static Class<?>[] getParameterTypes(Object bean, String methodName) {
@@ -543,36 +540,6 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils {
           if ((returnType.equals("void") && voidOk) || !returnType.equals("void")) {
             result.add(method);
           }
-        }
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * Match all method son a class with a defined return type
-   *
-   * @param implementation the class to search
-   * @param returnType the return type to match
-   * @param matchOnObject whether {@link Object} methods should be matched
-   * @param ignoredMethodNames a set of method names to ignore
-   * @return the list of methods that matched the return type and criteria. If none are found an empty result is returned
-   */
-  public static List<Method> getSatisfiableMethodsWithReturnType(Class implementation, Class returnType, boolean matchOnObject,
-                                                                 Set<String> ignoredMethodNames) {
-    List<Method> result = new ArrayList<>();
-
-    if (ignoredMethodNames == null) {
-      ignoredMethodNames = Collections.emptySet();
-    }
-
-    for (Method method : implementation.getMethods()) {
-      Class returns = method.getReturnType();
-
-      if (compare(new Class[] {returns}, new Class[] {returnType}, matchOnObject)) {
-        if (!ignoredMethodNames.contains(method.getName())) {
-          result.add(method);
         }
       }
     }
@@ -790,40 +757,6 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils {
     return hash;
   }
 
-  public static void addLibrariesToClasspath(List urls)
-      throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-    ClassLoader sys = ClassLoader.getSystemClassLoader();
-    if (!(sys instanceof URLClassLoader)) {
-      throw new IllegalArgumentException("PANIC: Mule has been started with an unsupported classloader: "
-          + sys.getClass().getName() + ". " + "Please report this error to user<at>mule<dot>codehaus<dot>org");
-    }
-
-    // system classloader is in this case the one that launched the application,
-    // which is usually something like a JDK-vendor proprietary AppClassLoader
-    URLClassLoader sysCl = (URLClassLoader) sys;
-
-    /*
-     * IMPORTANT NOTE: The more 'natural' way would be to create a custom URLClassLoader and configure it, but then there's a
-     * chicken-and-egg problem, as all classes MuleBootstrap depends on would have been loaded by a parent classloader, and not
-     * ours. There's no straightforward way to change this, and is documented in a Sun's classloader guide. The solution would've
-     * involved overriding the ClassLoader.findClass() method and modifying the semantics to be child-first, but that way we are
-     * calling for trouble. Hacking the primordial classloader is a bit brutal, but works perfectly in case of running from the
-     * command-line as a standalone app. All Mule embedding options then delegate the classpath config to the embedder (a
-     * developer embedding Mule in the app), thus classloaders are not modified in those scenarios.
-     */
-
-    // get a Method ref from the normal class, but invoke on a proprietary parent
-    // object,
-    // as this method is usually protected in those classloaders
-    Class refClass = URLClassLoader.class;
-    Method methodAddUrl = refClass.getDeclaredMethod("addURL", new Class[] {URL.class});
-    methodAddUrl.setAccessible(true);
-    for (Iterator it = urls.iterator(); it.hasNext();) {
-      URL url = (URL) it.next();
-      methodAddUrl.invoke(sysCl, url);
-    }
-  }
-
   // this is a shorter version of the snippet from:
   // http://www.davidflanagan.com/blog/2005_06.html#000060
   // (see comments; DF's "manual" version works fine too)
@@ -863,27 +796,6 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils {
 
     Class<?> valueType = value.getClass();
     return isWrapperAndPrimitivePair(type, valueType) || isWrapperAndPrimitivePair(valueType, type);
-  }
-
-  public static URL getPathURL(Class<?> type) {
-    String packageName = type.getPackage().getName();
-    String classFileName = type.getName().substring(packageName.length() + 1) + ".class";
-    String classFilePath = type.getResource(classFileName).toString();
-    // get rid of the package part of the path to avoid conflicts with user-defined directories
-    String packagePath = packageName.replace(".", "/");
-    classFilePath = classFilePath.substring(0, classFilePath.lastIndexOf(packagePath));
-    // get the target index since the class could be in /classes too
-    int pathIndex = classFilePath.lastIndexOf("/target/");
-
-    if (pathIndex != -1) {
-      classFilePath = classFilePath.substring(0, pathIndex + 1);
-    }
-
-    try {
-      return new URL(classFilePath);
-    } catch (MalformedURLException e) {
-      throw new RuntimeException("Could not locate type in path", e);
-    }
   }
 
   /**

@@ -22,7 +22,7 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_GENERATE;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
-import static org.mule.runtime.core.internal.util.ExceptionUtils.createErrorEvent;
+import static org.mule.runtime.core.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollection;

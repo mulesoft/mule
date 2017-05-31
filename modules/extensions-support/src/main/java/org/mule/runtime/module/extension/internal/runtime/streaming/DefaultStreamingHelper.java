@@ -7,13 +7,13 @@
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.core.streaming.StreamingManager;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 
 import java.io.InputStream;
@@ -120,7 +120,7 @@ public class DefaultStreamingHelper implements StreamingHelper {
     checkArgument(map != null, "Map cannot be null");
     Map<K, Object> resolved;
     try {
-      resolved = instanciateClass(map.getClass());
+      resolved = ClassUtils.instantiateClass(map.getClass());
     } catch (Exception e) {
       resolved = new LinkedHashMap<>();
     }

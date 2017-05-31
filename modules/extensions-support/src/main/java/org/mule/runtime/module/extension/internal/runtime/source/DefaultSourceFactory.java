@@ -23,7 +23,7 @@ public final class DefaultSourceFactory implements SourceFactory {
   @Override
   public Source createSource() {
     try {
-      return ClassUtils.instanciateClass(sourceType);
+      return ClassUtils.instantiateClass(sourceType);
     } catch (Exception e) {
       throw new RuntimeException("Exception found trying to instantiate source type " + sourceType.getName(), e);
     }

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.execution;
 
-import static org.mule.runtime.core.internal.util.ExceptionUtils.putContext;
-import static org.mule.runtime.core.internal.util.ExceptionUtils.updateMessagingException;
+import static org.mule.runtime.core.util.ExceptionUtils.putContext;
+import static org.mule.runtime.core.util.ExceptionUtils.updateMessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;

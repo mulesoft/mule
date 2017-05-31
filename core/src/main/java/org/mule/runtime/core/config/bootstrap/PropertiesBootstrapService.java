@@ -39,7 +39,7 @@ public class PropertiesBootstrapService implements BootstrapService {
   @Override
   public Object instantiateClass(String name, Object... constructorArgs) throws ClassNotFoundException, NoSuchMethodException,
       InvocationTargetException, InstantiationException, IllegalAccessException {
-    return ClassUtils.instanciateClass(name, constructorArgs, classLoader);
+    return ClassUtils.instantiateClass(name, constructorArgs, classLoader);
   }
 
   @Override

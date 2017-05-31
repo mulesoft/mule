@@ -541,7 +541,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     File[] files = directory.listFiles();
     for (File file : files) {
       if (file.getName().endsWith(".class")) {
-        classes.add(ClassUtils.getClass(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
+        classes.add(org.apache.commons.lang.ClassUtils
+            .getClass(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
       }
     }
     return classes;

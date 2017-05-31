@@ -39,7 +39,7 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STARTING;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPING;
-import static org.mule.runtime.core.internal.util.ExceptionUtils.getRootCauseException;
+import static org.mule.runtime.core.util.ExceptionUtils.getRootCauseException;
 import static org.mule.runtime.core.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;

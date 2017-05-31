@@ -95,7 +95,7 @@ public class TestComponentDefinitionParser extends ComponentDefinitionParser {
         Element ele = (Element) list.item(i);
         String c = ele.getAttribute("class");
         try {
-          EventCallback cb = (EventCallback) ClassUtils.instanciateClass(c);
+          EventCallback cb = (EventCallback) ClassUtils.instantiateClass(c);
           props.put("eventCallback", cb);
 
         } catch (Exception e) {

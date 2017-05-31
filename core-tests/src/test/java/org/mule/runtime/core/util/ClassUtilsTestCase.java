@@ -110,11 +110,11 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testInstanciateClass() throws Exception {
-    Object object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.Orange");
+    Object object = ClassUtils.instantiateClass("org.mule.tck.testmodels.fruit.Orange");
     assertNotNull(object);
     assertTrue(object instanceof Orange);
 
-    object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Apple(), new Banana());
+    object = ClassUtils.instantiateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Apple(), new Banana());
     assertNotNull(object);
     assertTrue(object instanceof FruitBowl);
 
@@ -124,7 +124,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
     assertTrue(bowl.hasBanana());
 
     try {
-      ClassUtils.instanciateClass("java.lang.Bing");
+      ClassUtils.instantiateClass("java.lang.Bing");
       fail("Class does not exist, ClassNotFoundException should have been thrown");
     } catch (ClassNotFoundException e) {
       // expected

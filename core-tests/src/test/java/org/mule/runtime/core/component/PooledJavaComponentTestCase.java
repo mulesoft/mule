@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.component;
 
+import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -14,13 +15,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-
-import org.mule.runtime.core.api.component.LifecycleAdapter;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.component.LifecycleAdapter;
+import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
-import org.mule.runtime.core.internal.util.ExceptionUtils;
 import org.mule.runtime.core.util.pool.AbstractPoolingTestCase;
 import org.mule.tck.services.UniqueComponent;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -312,7 +311,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase {
         }
         component.returnComponentLifecycleAdaptor(object);
       } catch (Exception e) {
-        fail("Borrower thread failed:\n" + ExceptionUtils.getStackTrace(e));
+        fail("Borrower thread failed:\n" + getStackTrace(e));
       }
     }
   }

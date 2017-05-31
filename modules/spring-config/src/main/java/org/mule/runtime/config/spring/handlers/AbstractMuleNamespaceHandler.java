@@ -273,7 +273,7 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
         String preferredConnectorName = preferredProperties.getProperty("connector");
         if (preferredConnectorName != null) {
           logger.debug("Found preferred connector class " + preferredConnectorName);
-          return ClassUtils.getClass(preferredConnectorName);
+          return org.apache.commons.lang.ClassUtils.getClass(preferredConnectorName);
         }
       } catch (Exception e) {
         logger.debug("Error processing preferred properties", e);

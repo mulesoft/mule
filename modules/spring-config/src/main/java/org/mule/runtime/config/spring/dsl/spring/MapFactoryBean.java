@@ -33,7 +33,7 @@ public class MapFactoryBean implements FactoryBean {
 
   @Override
   public Map getObject() throws Exception {
-    Map map = ClassUtils.instanciateClass(mapType);
+    Map map = ClassUtils.instantiateClass(mapType);
     for (MapEntry mapEntry : mapEntries) {
       map.put(mapEntry.getKey(), mapEntry.getValue());
     }

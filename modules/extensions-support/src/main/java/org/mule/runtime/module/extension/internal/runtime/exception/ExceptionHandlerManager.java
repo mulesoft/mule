@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
-import static org.mule.runtime.core.internal.util.ExceptionUtils.extractCauseOfType;
-import static org.mule.runtime.core.internal.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.core.util.ExceptionUtils.extractCauseOfType;
+import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.ComponentModel;

@@ -69,7 +69,7 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
         String extName = (String) entry.getKey();
         String extClass = (String) entry.getValue();
         try {
-          MuleCoreExtension extension = (MuleCoreExtension) ClassUtils.instanciateClass(extClass);
+          MuleCoreExtension extension = (MuleCoreExtension) ClassUtils.instantiateClass(extClass);
           extension.setContainerClassLoader(containerClassLoader);
           result.add(extension);
         } catch (Exception ex) {

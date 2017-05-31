@@ -73,7 +73,7 @@ public abstract class AbstractObjectFactory extends AbstractAnnotatedObject impl
 
   protected Class<?> setupObjectClassFromObjectClassName() {
     try {
-      Class<?> klass = ClassUtils.getClass(objectClassName);
+      Class<?> klass = org.apache.commons.lang.ClassUtils.getClass(objectClassName);
       objectClass = klass;
       return klass;
     } catch (ClassNotFoundException e) {
@@ -110,7 +110,7 @@ public abstract class AbstractObjectFactory extends AbstractAnnotatedObject impl
       throw new InitialisationException(I18nMessageFactory.createStaticMessage("Object factory has not been initialized."), this);
     }
 
-    Object object = ClassUtils.instanciateClass(objectClass);
+    Object object = ClassUtils.instantiateClass(objectClass);
 
     if (properties != null) {
       BeanUtils.populateWithoutFail(object, properties, true);

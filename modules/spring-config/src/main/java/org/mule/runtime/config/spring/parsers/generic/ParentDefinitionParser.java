@@ -31,7 +31,7 @@ public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
   @Override
   protected Class getBeanClass(Element element) {
     try {
-      return ClassUtils.getClass(getParentBeanDefinition(element).getBeanClassName());
+      return org.apache.commons.lang.ClassUtils.getClass(getParentBeanDefinition(element).getBeanClassName());
     } catch (Exception e) {
       // Should continue to work, but automatic collection detection etc will fail
       logger.debug("No class for " + element);

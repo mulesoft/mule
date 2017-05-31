@@ -6,16 +6,13 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.core.util.ProcessingStrategyUtils.parseProcessingStrategy;
-
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.AttributeDefinitionVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -33,7 +30,6 @@ import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
@@ -94,7 +90,7 @@ class ComponentConfigurationBuilder {
           try {
             String beanClassName = cdm.getBeanDefinition().getBeanClassName();
             if (beanClassName != null) {
-              beanDefinitionType = ClassUtils.getClass(beanClassName);
+              beanDefinitionType = org.apache.commons.lang.ClassUtils.getClass(beanClassName);
             } else {
               // Happens in case of spring:property
               beanDefinitionType = Object.class;

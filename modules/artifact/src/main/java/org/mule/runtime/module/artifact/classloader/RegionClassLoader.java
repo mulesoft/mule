@@ -12,8 +12,8 @@ import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.module.artifact.classloader.exception.ClassNotFoundInRegionException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
@@ -174,7 +174,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   @Override
   public Class<?> findLocalClass(String name) throws ClassNotFoundException {
     synchronized (getClassLoadingLock(name)) {
-      final String packageName = ClassUtils.getPackageName(name);
+      final String packageName = getPackageName(name);
 
       final ArtifactClassLoader artifactClassLoader = packageMapping.get(packageName);
       if (artifactClassLoader != null) {

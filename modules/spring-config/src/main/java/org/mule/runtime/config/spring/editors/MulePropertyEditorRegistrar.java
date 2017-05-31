@@ -52,7 +52,7 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
     }
     for (Map.Entry<Class<?>, Class<PropertyEditor>> entry : customPropertyEditorsCache.entrySet()) {
       try {
-        final PropertyEditor customEditor = ClassUtils.instanciateClass(entry.getValue());
+        final PropertyEditor customEditor = ClassUtils.instantiateClass(entry.getValue());
         if (customEditor instanceof MuleContextAware) {
           ((MuleContextAware) customEditor).setMuleContext(muleContext);
         }

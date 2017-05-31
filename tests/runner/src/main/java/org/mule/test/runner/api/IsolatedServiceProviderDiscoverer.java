@@ -10,11 +10,10 @@ package org.mule.test.runner.api;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
-import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.ServiceProvider;
+import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.service.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.ServiceResolutionError;
@@ -71,7 +70,7 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
     try {
       reflectedObject = withContextClassLoader(classLoader, () -> {
         try {
-          return instanciateClass(className);
+          return ClassUtils.instantiateClass(className);
         } catch (Exception e) {
           throw new MuleRuntimeException(createStaticMessage("Unable to create service from class: " + className), e);
         }

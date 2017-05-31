@@ -32,7 +32,8 @@ public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase
   @Test(expected = ClassNotFoundException.class)
   public void registeringOptionalTransaction() throws Exception {
     createTestRegistryBootstrap(APP);
-    muleContext.getTransactionFactoryManager().getTransactionFactoryFor(ClassUtils.getClass(TEST_TRANSACTION_FACTORY_CLASS));
+    muleContext.getTransactionFactoryManager()
+        .getTransactionFactoryFor(org.apache.commons.lang.ClassUtils.getClass(TEST_TRANSACTION_FACTORY_CLASS));
   }
 
   @Test

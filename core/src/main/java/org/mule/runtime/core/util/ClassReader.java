@@ -265,8 +265,8 @@ public class ClassReader extends ByteArrayInputStream {
       if (c == null) {
         pos = cpoolIndex[i];
         String name = resolveUtf8(readShort());
-        cpool[i] = ClassUtils.getClass(classDescriptorToName(name));
-        c = ClassUtils.getClass(classDescriptorToName(name));
+        cpool[i] = org.apache.commons.lang.ClassUtils.getClass(classDescriptorToName(name));
+        c = org.apache.commons.lang.ClassUtils.getClass(classDescriptorToName(name));
       }
       return c;
     } finally {

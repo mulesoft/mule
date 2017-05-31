@@ -10,7 +10,6 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.internal.util.ArrayUtils;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Ricin;
@@ -20,6 +19,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.ArrayUtils;
 
 public abstract class AbstractConfigParserTestCase extends AbstractExtensionFunctionalTestCase {
 

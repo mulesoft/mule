@@ -173,7 +173,7 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
   protected void throwException() throws Exception {
     if (getExceptionToThrow() != null) {
       if (StringUtils.isNotBlank(exceptionText)) {
-        Throwable exception = ClassUtils.instanciateClass(getExceptionToThrow(),
+        Throwable exception = ClassUtils.instantiateClass(getExceptionToThrow(),
                                                           new Object[] {exceptionText});
         throw (Exception) exception;
       } else {

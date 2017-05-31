@@ -6,13 +6,17 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.collections.MapUtils.getBooleanValue;
+import static org.apache.commons.collections.MapUtils.getDoubleValue;
+import static org.apache.commons.collections.MapUtils.getIntValue;
+import static org.apache.commons.collections.MapUtils.getLongValue;
+import static org.apache.commons.collections.MapUtils.getString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.util.MapUtils.getValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -74,12 +78,11 @@ public class PropertiesUtilsTestCase extends AbstractMuleTestCase {
 
     props = PropertiesUtils.removeNamespaces(props);
 
-    assertTrue(getValue(props, "booleanProperty", false));
-    assertEquals(0.124, 0, getValue(props, "doubleProperty", 0));
-    // TODO(pablo.kraan):  API - why this does not work?
-    //assertEquals(14, MapUtils.getIntValue(props, "intProperty", 0));
-    assertEquals(999999999, 0, getValue(props, "longProperty", 0));
-    assertEquals("string", getValue(props, "stringProperty", ""));
+    assertTrue(getBooleanValue(props, "booleanProperty", false));
+    assertEquals(0.124, 0, getDoubleValue(props, "doubleProperty", 0));
+    assertEquals(14, getIntValue(props, "intProperty", 0));
+    assertEquals(999999999, 0, getLongValue(props, "longProperty", 0));
+    assertEquals("string", getString(props, "stringProperty", ""));
   }
 
   @Test

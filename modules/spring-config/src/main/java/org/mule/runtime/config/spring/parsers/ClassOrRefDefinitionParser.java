@@ -49,7 +49,7 @@ public class ClassOrRefDefinitionParser extends AbstractBeanDefinitionParser {
       // class attributed specified, instantiate and set directly
       Object instance;
       try {
-        instance = ClassUtils.instanciateClass(className, ClassUtils.NO_ARGS, getClass());
+        instance = ClassUtils.instantiateClass(className, ClassUtils.NO_ARGS, getClass());
       } catch (Exception e) {
         throw new RuntimeException(e);
       }

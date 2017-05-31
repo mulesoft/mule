@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
+import static org.apache.commons.lang.exception.ExceptionUtils.getRootCause;
+import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
@@ -16,12 +18,9 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.internal.util.ExceptionUtils;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.DeploymentStopException;
@@ -126,7 +125,7 @@ public class DefaultMuleDomain implements Domain {
     doInit(true);
   }
 
-  public void doInit(boolean lazy) {
+  public void doInit(boolean lazy) throws DeploymentInitException {
     if (logger.isInfoEnabled()) {
       logger.info(miniSplash(String.format("Initializing domain '%s'", getArtifactName())));
     }
@@ -148,8 +147,8 @@ public class DefaultMuleDomain implements Domain {
       }
     } catch (Exception e) {
       // log it here so it ends up in app log, sys log will only log a message without stacktrace
-      logger.error(null, ExceptionUtils.getRootCause(e));
-      throw new DeploymentInitException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
+      logger.error(null, getRootCause(e));
+      throw new DeploymentInitException(CoreMessages.createStaticMessage(getRootCauseMessage(e)), e);
     }
   }
 
@@ -171,16 +170,6 @@ public class DefaultMuleDomain implements Domain {
     }
   }
 
-  private ConfigurationBuilder createConfigurationBuilder() {
-    try {
-      return (ConfigurationBuilder) ClassUtils
-          .instanciateClass("org.mule.runtime.config.spring.SpringXmlDomainConfigurationBuilder",
-                            new Object[] {getResourceFiles()[0].getName()}, deploymentClassLoader.getClassLoader());
-    } catch (Exception e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
-
   @Override
   public void start() {
     try {
@@ -188,8 +177,8 @@ public class DefaultMuleDomain implements Domain {
         try {
           this.artifactContext.getMuleContext().start();
         } catch (MuleException e) {
-          logger.error(null, ExceptionUtils.getRootCause(e));
-          throw new DeploymentStartException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
+          logger.error(null, getRootCause(e));
+          throw new DeploymentStartException(CoreMessages.createStaticMessage(getRootCauseMessage(e)), e);
         }
       }
       // null CCL ensures we log at 'system' level

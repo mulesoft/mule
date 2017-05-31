@@ -57,7 +57,7 @@ public class MapToBean extends AbstractTransformer implements DiscoverableTransf
         clazz = ClassUtils.loadClass(c, getClass());
       }
 
-      Object result = ClassUtils.instanciateClass(clazz, ClassUtils.NO_ARGS);
+      Object result = ClassUtils.instantiateClass(clazz, ClassUtils.NO_ARGS);
       BeanUtils.populate(result, props);
 
       return result;

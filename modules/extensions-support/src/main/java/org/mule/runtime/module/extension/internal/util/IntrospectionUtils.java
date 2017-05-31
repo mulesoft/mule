@@ -635,8 +635,13 @@ public final class IntrospectionUtils {
   }
 
   public static List<Field> getFields(Class<?> clazz) {
-    return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields()))
-        .collect(new ImmutableListCollector<>());
+    try {
+      return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields()))
+          .collect(new ImmutableListCollector<>());
+    } catch (Throwable e) {
+      System.out.println("MONCHO class: " + clazz.getName());
+      throw new RuntimeException(e);
+    }
   }
 
   /**

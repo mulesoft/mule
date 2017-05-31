@@ -468,7 +468,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     if (args == null) {
       args = ClassUtils.NO_ARGS;
     }
-    Object o = ClassUtils.instanciateClass(clazz, args);
+    Object o = ClassUtils.instantiateClass(clazz, args);
     muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
     return (T) o;
   }

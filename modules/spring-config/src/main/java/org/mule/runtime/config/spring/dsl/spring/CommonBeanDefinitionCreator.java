@@ -97,7 +97,8 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
   private BeanDefinitionPostProcessor resolvePostProcessor() {
     for (ClassLoader classLoader : resolveContextArtifactPluginClassLoaders()) {
       try {
-        return (BeanDefinitionPostProcessor) ClassUtils.getClass(classLoader, TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS)
+        return (BeanDefinitionPostProcessor) org.apache.commons.lang.ClassUtils
+            .getClass(classLoader, TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS)
             .newInstance();
       } catch (Exception e) {
         // Nothing to do, we just don't have compatibility plugin in the app
@@ -295,7 +296,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
         return originalBeanDefinition;
       }
       try {
-        beanClass = ClassUtils.getClass(originalBeanDefinition.getBeanClassName());
+        beanClass = org.apache.commons.lang.ClassUtils.getClass(originalBeanDefinition.getBeanClassName());
       } catch (ClassNotFoundException e) {
         throw new RuntimeException(e);
       }

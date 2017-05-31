@@ -58,7 +58,7 @@ public final class ResolverSupplier<T extends NamedTypeResolver> implements Supp
 
   private T instantiateResolver(Class<T> factoryType) {
     try {
-      return ClassUtils.instanciateClass(factoryType);
+      return ClassUtils.instantiateClass(factoryType);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create instance of type "
           + getClassName(factoryType)), e);

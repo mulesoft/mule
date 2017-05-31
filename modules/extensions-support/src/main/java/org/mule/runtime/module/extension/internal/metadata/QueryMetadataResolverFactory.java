@@ -94,7 +94,7 @@ public final class QueryMetadataResolverFactory implements MetadataResolverFacto
 
   private <T> T instantiateResolver(Class<?> factoryType) {
     try {
-      return (T) ClassUtils.instanciateClass(factoryType);
+      return (T) ClassUtils.instantiateClass(factoryType);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create NamedTypeResolver of type "
           + getClassName(factoryType)), e);

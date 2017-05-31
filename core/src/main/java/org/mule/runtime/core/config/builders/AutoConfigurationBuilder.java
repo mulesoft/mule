@@ -87,7 +87,7 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
         ConfigResource[] constructorArg = new ConfigResource[configs.size()];
         System.arraycopy(configs.toArray(), 0, constructorArg, 0, configs.size());
         ConfigurationBuilder cb = (ConfigurationBuilder) ClassUtils
-            .instanciateClass(className, new Object[] {constructorArg, getArtifactProperties(), artifactType});
+            .instantiateClass(className, new Object[] {constructorArg, getArtifactProperties(), artifactType});
         if (parentContext != null && cb instanceof ParentMuleContextAwareConfigurationBuilder) {
           ((ParentMuleContextAwareConfigurationBuilder) cb).setParentContext(parentContext);
         } else if (parentContext != null) {

@@ -70,7 +70,7 @@ import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamPr
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
-import org.mule.runtime.core.internal.util.ExceptionUtils;
+import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;

@@ -28,7 +28,6 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSI
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYPE_OBJECT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_ELEMENT;
 import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
-import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
@@ -1131,7 +1130,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   private static Object createNewInstance(Class classType) {
     try {
-      return instanciateClass(classType);
+      return ClassUtils.instantiateClass(classType);
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
@@ -1140,7 +1139,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   private static Object createNewInstance(String className) {
     try {
-      return instanciateClass(className, new Object[0]);
+      return ClassUtils.instantiateClass(className, new Object[0]);
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
@@ -1605,7 +1604,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("factory", fromSimpleReferenceParameter("factory-ref").build())
         .withSetterParameterDefinition("factory", fromSimpleParameter("factory-class", o -> {
           try {
-            return ClassUtils.instanciateClass((String) o);
+            return ClassUtils.instantiateClass((String) o);
           } catch (Exception e) {
             return null;
           }
