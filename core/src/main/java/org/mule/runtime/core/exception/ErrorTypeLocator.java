@@ -59,12 +59,12 @@ public class ErrorTypeLocator {
   /**
    * Finds the {@code ErrorType} related to the provided {@code exception} based on the general mapping rules of the runtime.
    *
-   * @param exceptionType the exception {@link Class} related to the error type
+   * @param type the exception {@link Class} related to the error type
    * @return the error type related to the exception. If there's no mapping then the error type related to UNKNOWN will be
    *         returned.
    */
-  public ErrorType lookupErrorType(Class<? extends Throwable> exceptionType) {
-    return defaultExceptionMapper.resolveErrorType(exceptionType).get();
+  public ErrorType lookupErrorType(Class<? extends Throwable> type) {
+    return defaultExceptionMapper.resolveErrorType(type).orElse(defaultError);
   }
 
   /**
@@ -78,15 +78,14 @@ public class ErrorTypeLocator {
    * @return the error type related to the exception based on the component mappings. If there's no mapping then the error type
    *         related to UNKNOWN will be returned.
    */
-  public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier,
-                                            Class<? extends Throwable> exception) {
+  public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier, Class<? extends Throwable> exception) {
     ExceptionMapper exceptionMapper =
         componentExceptionMappers.get(componentIdentifier);
     Optional<ErrorType> errorType = empty();
     if (exceptionMapper != null) {
       errorType = exceptionMapper.resolveErrorType(exception);
     }
-    return errorType.orElseGet(() -> defaultExceptionMapper.resolveErrorType(exception).orElse(defaultError));
+    return errorType.orElseGet(() -> lookupErrorType(exception));
   }
 
   /**

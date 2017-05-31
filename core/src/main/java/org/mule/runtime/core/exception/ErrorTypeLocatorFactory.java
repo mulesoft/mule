@@ -80,5 +80,4 @@ public class ErrorTypeLocatorFactory {
         .defaultError(unknown)
         .build();
   }
-
 }
