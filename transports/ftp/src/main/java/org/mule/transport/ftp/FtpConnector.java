@@ -60,7 +60,6 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
     public static final String PROPERTY_BINARY_TRANSFER = "binary";
     public static final String ASYNCHRONOUS_RECONNECTION_ERROR_MESSAGE = "FTP Connector doesn't support asynchronous retry policies.";
 
-
     // message properties
     public static final String PROPERTY_FILENAME = "filename";
 
