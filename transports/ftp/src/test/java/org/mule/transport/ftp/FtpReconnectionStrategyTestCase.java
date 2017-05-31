@@ -7,6 +7,7 @@
 
 package org.mule.transport.ftp;
 
+import static java.lang.Integer.parseInt;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -35,6 +36,7 @@ public class FtpReconnectionStrategyTestCase extends FunctionalTestCase
     private final InboundEndpoint inboundEndpoint = mock(InboundEndpoint.class, RETURNS_DEEP_STUBS);
     private  FtpMessageReceiver ftpMessageReceiver = null;
     private Connector connector = null;
+    private static final String ASYNCHRONOUS_RECCONECTION_ERROR_MESSAGE = "FTP Connector doesn't support asynchronous retry policies.";
 
     @Override
     protected String getConfigFile()
@@ -52,7 +54,7 @@ public class FtpReconnectionStrategyTestCase extends FunctionalTestCase
         when(inboundEndpoint.getEndpointURI()).thenReturn(endpointUri);
         when(inboundEndpoint.getMuleContext()).thenReturn(muleContext);
         when(endpointUri.getHost()).thenReturn("localhost");
-        when(endpointUri.getPort()).thenReturn(Integer.parseInt(ftpPort.getValue()));
+        when(endpointUri.getPort()).thenReturn(parseInt(ftpPort.getValue()));
         when(endpointUri.getUser()).thenReturn("user");
         when(endpointUri.getPassword()).thenReturn("password");
         ftpMessageReceiver = new FtpMessageReceiver(connector, flowConstruct, inboundEndpoint, 1000);
@@ -69,7 +71,7 @@ public class FtpReconnectionStrategyTestCase extends FunctionalTestCase
         }
         catch (Exception e)
         {
-            assertThat(e.getMessage(), is("FTP Connector doesn't support asynchronous retry policies."));
+            assertThat(e.getMessage(), is(ASYNCHRONOUS_RECCONECTION_ERROR_MESSAGE));
         }
     }
 
@@ -83,7 +85,7 @@ public class FtpReconnectionStrategyTestCase extends FunctionalTestCase
         }
         catch (Exception e)
         {
-            assertThat(e.getCause().getMessage(), is("FTP Connector doesn't support asynchronous retry policies."));
+            assertThat(e.getCause().getMessage(), is(ASYNCHRONOUS_RECCONECTION_ERROR_MESSAGE));
         }
     }
 
