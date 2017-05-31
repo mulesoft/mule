@@ -586,10 +586,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                 final String contentType = getStringPropertyValue(CONTENT_TYPE_PROPERTY, value);
                 MimeType mimeType = new MimeType(contentType);
 
-                if(payload != NullPayload.getInstance())
-                {
-                    dataType.setMimeType(mimeType.getPrimaryType() + "/" + mimeType.getSubType());
-                }
+                dataType.setMimeType(mimeType.getPrimaryType() + "/" + mimeType.getSubType());
 
                 String encoding = mimeType.getParameter(CHARSET_PARAM);
                 if (!StringUtils.isEmpty(encoding))
