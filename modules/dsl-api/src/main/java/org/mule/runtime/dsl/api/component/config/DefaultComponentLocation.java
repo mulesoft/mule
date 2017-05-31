@@ -255,6 +255,16 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
       result = 31 * result + (getLineInFile() != null ? getLineInFile().hashCode() : 0);
       return result;
     }
+
+    @Override
+    public String toString() {
+      return "DefaultLocationPart{" +
+          "partPath='" + partPath + '\'' +
+          ", partIdentifier=" + partIdentifier +
+          ", fileName='" + fileName + '\'' +
+          ", lineInFile=" + lineInFile +
+          '}';
+    }
   }
 
   @Override
@@ -283,5 +293,14 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
     result = 31 * result + getParts().hashCode();
     result = 31 * result + (getLocation() != null ? getLocation().hashCode() : 0);
     return result;
+  }
+
+  @Override
+  public String toString() {
+    return "DefaultComponentLocation{" +
+        "name='" + name + '\'' +
+        ", parts=" + parts +
+        ", location='" + location + '\'' +
+        '}';
   }
 }
