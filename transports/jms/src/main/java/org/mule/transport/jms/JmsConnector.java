@@ -80,6 +80,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     public static final int REDELIVERY_FAIL_ON_FIRST = 0;
 
     public static final int REDELIVERY_IGNORE = -1;
+    
+    public static final int PREFETCH_DEFAULT = -1;
 
     private AtomicInteger receiverReportedExceptionCount = new AtomicInteger();
 
@@ -100,6 +102,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     private boolean honorQosHeaders;
 
     private int maxRedelivery = REDELIVERY_FAIL_ON_FIRST;
+    
+    private int maxQueuePrefetch = PREFETCH_DEFAULT;
 
     private boolean cacheJmsSessions = true;
 
@@ -1132,9 +1136,19 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         return maxRedelivery;
     }
 
+    public int getMaxQueuePrefetch()
+    {
+        return maxQueuePrefetch;
+    }
+
     public void setMaxRedelivery(int maxRedelivery)
     {
         this.maxRedelivery = maxRedelivery;
+    }
+
+    public void setMaxQueuePrefetch(int maxPrefetch)
+    {
+        this.maxQueuePrefetch = maxPrefetch;
     }
 
     @Override

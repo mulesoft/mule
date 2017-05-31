@@ -75,6 +75,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         assertFalse(c.isNoLocal());
         assertFalse(c.isPersistentDelivery());
         assertEquals(0, c.getMaxRedelivery());
+        assertEquals(-1, c.getMaxQueuePrefetch());
         assertTrue(c.isCacheJmsSessions());
         assertFalse(c.isEagerConsumer());
 
@@ -104,6 +105,7 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
         assertTrue(c.isNoLocal());
         assertTrue(c.isPersistentDelivery());
         assertEquals(5, c.getMaxRedelivery());
+        assertEquals(5, c.getMaxQueuePrefetch());
         assertTrue(c.isCacheJmsSessions());
         assertFalse(c.isEagerConsumer());
 
