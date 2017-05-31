@@ -184,12 +184,20 @@
                                         <argument>-classpath</argument>
                                         <classpath/>
                                         <mainClass>org.openjdk.jmh.Main</mainClass>
+                                        <!--Run only a certain class-->
+                                        <argument>${jmh.benchmark}</argument>
                                         <!--Create json report-->
                                         <argument>-rf</argument>
                                         <argument>json</argument>
                                         <!--Enable gc profiler-->
                                         <argument>-prof</argument>
                                         <argument>gc</argument>
+                                        <!--Number of Iterations-->
+                                        <argument>-i</argument>
+                                        <argument>10</argument>
+                                        <!--Number of Warmup Iterations-->
+                                        <argument>-wi</argument>
+                                        <argument>10</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
