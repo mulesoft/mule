@@ -2019,30 +2019,6 @@
           }
         },
         {
-          "type": "SOURCE_ERROR_RESPONSE_SEND",
-          "namespace": "MULE",
-          "parent": {
-            "type": "SOURCE",
-            "namespace": "MULE",
-            "parent": {
-              "type": "ANY",
-              "namespace": "MULE"
-            }
-          }
-        },
-        {
-          "type": "SOURCE_ERROR_RESPONSE_GENERATE",
-          "namespace": "MULE",
-          "parent": {
-            "type": "SOURCE",
-            "namespace": "MULE",
-            "parent": {
-              "type": "ANY",
-              "namespace": "MULE"
-            }
-          }
-        },
-        {
           "type": "SOURCE_RESPONSE_GENERATE",
           "namespace": "MULE",
           "parent": {
@@ -2426,30 +2402,6 @@
       "namespace": "TYPED-VALUE",
       "parent": {
         "type": "RETRY_EXHAUSTED",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "SOURCE_ERROR_RESPONSE_SEND",
-      "namespace": "MULE",
-      "parent": {
-        "type": "SOURCE",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "SOURCE_ERROR_RESPONSE_GENERATE",
-      "namespace": "MULE",
-      "parent": {
-        "type": "SOURCE",
         "namespace": "MULE",
         "parent": {
           "type": "ANY",

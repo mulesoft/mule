@@ -60,12 +60,15 @@ public class ExtensionsErrorsDeclarationEnricher implements DeclarationEnricher 
 
       @Override
       protected void onSource(WithSourcesDeclaration owner, SourceDeclaration sourceDeclaration) {
-        if (sourceDeclaration.getSuccessCallback().isPresent() || sourceDeclaration.getErrorCallback().isPresent()) {
-          registerError(SOURCE_ERROR_RESPONSE_SEND, sourceDeclaration, extensionDeclaration);
-          registerError(SOURCE_ERROR_RESPONSE_GENERATE, sourceDeclaration, extensionDeclaration);
+        sourceDeclaration.getSuccessCallback().ifPresent(callback -> {
           registerError(SOURCE_RESPONSE_SEND, sourceDeclaration, extensionDeclaration);
           registerError(SOURCE_RESPONSE_GENERATE, sourceDeclaration, extensionDeclaration);
-        }
+        });
+
+        sourceDeclaration.getErrorCallback().ifPresent(callback -> {
+          registerError(SOURCE_ERROR_RESPONSE_SEND, sourceDeclaration, extensionDeclaration);
+          registerError(SOURCE_ERROR_RESPONSE_GENERATE, sourceDeclaration, extensionDeclaration);
+        });
       }
     }.walk(extensionDeclaration);
   }
