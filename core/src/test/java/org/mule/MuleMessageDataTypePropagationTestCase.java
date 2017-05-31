@@ -85,6 +85,14 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    public void updatesContentTypeWhenNullpayload() throws Exception
+    {
+        DefaultMuleMessage muleMessage = new DefaultMuleMessage(null, muleContext);
+        muleMessage.setProperty(MuleProperties.CONTENT_TYPE_PROPERTY, CUSTOM_MIME_TYPE, PropertyScope.OUTBOUND);
+        assertDataType(muleMessage, Object.class, CUSTOM_MIME_TYPE, DEFAULT_ENCODING);        
+    }
+    
+    @Test
     public void updatesEncodingWithPropertyAndScope() throws Exception
     {
         DefaultMuleMessage muleMessage = new DefaultMuleMessage(TEST, muleContext);
