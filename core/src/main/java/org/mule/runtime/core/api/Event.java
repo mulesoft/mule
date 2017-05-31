@@ -350,11 +350,12 @@ public interface Event extends Serializable {
     Builder removeVariable(String key);
 
     /**
-     * Set a map of properties to be consumed within a {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
-     * <p/>
+     * Set a map of properties to be consumed within a
+     * {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
+     * <p>
      * For every module's <operation/> being consumed in a Mule Application, when being macro expanded, these properties will be
-     * feed to it in a new and isolated {@link Event}, so that we can guarantee that for each invocation there's a real
-     * variable scoping for them.
+     * feed to it in a new and isolated {@link Event}, so that we can guarantee that for each invocation there's a real variable
+     * scoping for them.
      *
      * @param properties properties to be set.
      * @return the builder instance
@@ -363,17 +364,29 @@ public interface Event extends Serializable {
     Builder properties(Map<String, Object> properties);
 
     /**
-     * Set a map of parameters to be consumed within a {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
-     * <p/>
+     * Set a map of parameters to be consumed within a
+     * {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
+     * <p>
      * For every module's <operation/> being consumed in a Mule Application, when being macro expanded, these parameters will be
-     * feed to it in a new and isolated {@link Event}, so that we can guarantee that for each invocation there's a real
-     * variable scoping for them.
+     * feed to it in a new and isolated {@link Event}, so that we can guarantee that for each invocation there's a real variable
+     * scoping for them.
      *
      * @param parameters parameters to be set.
      * @return the builder instance
-     * @see #properties(Map) 
+     * @see #properties(Map)
      */
     Builder parameters(Map<String, Object> parameters);
+
+    /**
+     * Remove a parameter.
+     * <p>
+     * 
+     * @see #parameters(Map)
+     *
+     * @param key the parameter key.
+     * @return the builder instance
+     */
+    Builder removeParameter(String key);
 
     /**
      * Set correlationId overriding the correlationId from {@link EventContext#getCorrelationId()} that came from the source

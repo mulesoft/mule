@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
-import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 
@@ -47,6 +47,7 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -93,13 +94,12 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
    */
   @Override
   public Publisher<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) {
-    final List<Interceptor> interceptors = collectInterceptors(context.getConfiguration(), executor);
     final Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(context);
     stats.ifPresent(s -> s.addInflightOperation());
 
     try {
       return (Mono<Object>) getExecutionTemplate(context)
-          .execute(() -> executeWithInterceptors(executor, context, interceptors, stats));
+          .execute(() -> executeWithInterceptors(executor, context, collectInterceptors(context, executor), stats));
     } catch (Exception e) {
       return error(e);
     } catch (Throwable t) {
@@ -156,7 +156,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
                                                                                    .discountInflightOperation())));
   }
 
-  private InterceptorsExecutionResult before(ExecutionContext executionContext, List<Interceptor> interceptors) {
+  InterceptorsExecutionResult before(ExecutionContext executionContext, List<Interceptor> interceptors) {
 
     List<Interceptor> interceptorList = new ArrayList<>();
 
@@ -172,11 +172,9 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   }
 
   private void onSuccess(ExecutionContext executionContext, Object result, List<Interceptor> interceptors) {
-    intercept(interceptors,
-              interceptor -> interceptor.onSuccess(executionContext, result), interceptor -> format(
-                                                                                                    "Interceptor %s threw exception executing 'onSuccess' phase. Exception will be ignored. Next interceptors (if any)"
-                                                                                                        + "will be executed and the operation's result will be returned",
-                                                                                                    interceptor));
+    intercept(interceptors, interceptor -> interceptor.onSuccess(executionContext, result),
+              interceptor -> format("Interceptor %s threw exception executing 'onSuccess' phase. Exception will be ignored. Next interceptors (if any) will be executed and the operation's result will be returned",
+                                    interceptor));
   }
 
   private Throwable onError(ExecutionContext executionContext, Throwable e, List<Interceptor> interceptors) {
@@ -187,21 +185,17 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
       if (decoratedException != null) {
         exceptionHolder.set(decoratedException);
       }
-    }, interceptor -> format(
-                             "Interceptor %s threw exception executing 'onError' phase. Exception will be ignored. Next interceptors (if any)"
-                                 + "will be executed and the operation's exception will be returned",
+    }, interceptor -> format("Interceptor %s threw exception executing 'onError' phase. Exception will be ignored. Next interceptors (if any) will be executed and the operation's exception will be returned",
                              interceptor));
 
     return exceptionHolder.get();
   }
 
-  private void after(ExecutionContext executionContext, Object result, List<Interceptor> interceptors) {
+  void after(ExecutionContext executionContext, Object result, List<Interceptor> interceptors) {
     {
-      intercept(interceptors,
-                interceptor -> interceptor.after(executionContext, result), interceptor -> format(
-                                                                                                  "Interceptor %s threw exception executing 'after' phase. Exception will be ignored. Next interceptors (if any)"
-                                                                                                      + "will be executed and the operation's result be returned",
-                                                                                                  interceptor));
+      intercept(interceptors, interceptor -> interceptor.after(executionContext, result),
+                interceptor -> format("Interceptor %s threw exception executing 'after' phase. Exception will be ignored. Next interceptors (if any) will be executed and the operation's result be returned",
+                                      interceptor));
     }
   }
 
@@ -246,8 +240,15 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
         .map(s -> (MutableConfigurationStats) s);
   }
 
-  private List<Interceptor> collectInterceptors(Optional<ConfigurationInstance> configurationInstance,
-                                                OperationExecutor executor) {
+  private List<Interceptor> collectInterceptors(ExecutionContextAdapter context, OperationExecutor executor) {
+    return collectInterceptors(context.getConfiguration(),
+                               context instanceof PrecalculatedExecutionContextAdapter
+                                   ? ((PrecalculatedExecutionContextAdapter) context).getOperationExecutor()
+                                   : executor);
+  }
+
+  List<Interceptor> collectInterceptors(Optional<ConfigurationInstance> configurationInstance,
+                                        OperationExecutor executor) {
     List<Interceptor> accumulator = new LinkedList<>();
     configurationInstance.ifPresent(config -> collectInterceptors(accumulator, config));
     collectInterceptors(accumulator, executor);

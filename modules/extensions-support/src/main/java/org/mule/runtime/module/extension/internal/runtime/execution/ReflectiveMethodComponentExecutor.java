@@ -114,14 +114,17 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   @Override
   public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
     return ec -> {
-      // TODO MULE-11527 avoid doing unnecessary evaluations
-      final Object[] resolved = argumentResolverDelegate.resolve(ec, method.getParameterTypes());
+      return withContextClassLoader(extensionClassLoader,
+                                    () -> {
+                                      final Object[] resolved =
+                                          getParameterValues((ExecutionContext<M>) ec, method.getParameterTypes());
 
-      final Map<String, Object> resolvedParams = new HashMap<>();
-      for (int i = 0; i < method.getParameterCount(); ++i) {
-        resolvedParams.put(method.getParameters()[i].getName(), resolved[i]);
-      }
-      return resolvedParams;
+                                      final Map<String, Object> resolvedParams = new HashMap<>();
+                                      for (int i = 0; i < method.getParameterCount(); ++i) {
+                                        resolvedParams.put(method.getParameters()[i].getName(), resolved[i]);
+                                      }
+                                      return resolvedParams;
+                                    });
     };
   }
 }
