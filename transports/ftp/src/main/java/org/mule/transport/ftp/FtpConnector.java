@@ -58,6 +58,7 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
     public static final String PROPERTY_OUTPUT_PATTERN = "outputPattern"; // outbound only
     public static final String PROPERTY_PASSIVE_MODE = "passive";
     public static final String PROPERTY_BINARY_TRANSFER = "binary";
+    public static final String ASYNCHRONOUS_RECONNECTION_ERROR_MESSAGE = "FTP Connector doesn't support asynchronous retry policies.";
 
     // message properties
     public static final String PROPERTY_FILENAME = "filename";
@@ -575,13 +576,20 @@ public class FtpConnector extends AbstractInboundEndpointNameableConnector
                     return FtpConnector.this;
                 }
             };
-            try
+            if (getRetryPolicyTemplate().isSynchronous())
             {
-                getRetryPolicyTemplate().execute(callbackReconnection, muleContext.getWorkManager());
+                try
+                {
+                    getRetryPolicyTemplate().execute(callbackReconnection, muleContext.getWorkManager());
+                }
+                catch (RetryPolicyExhaustedException retryPolicyExhaustedException)
+                {
+                    throw retryPolicyExhaustedException;
+                }
             }
-            catch (RetryPolicyExhaustedException retryPolicyExhaustedException)
+            else
             {
-                throw retryPolicyExhaustedException;
+                throw new IllegalArgumentException(ASYNCHRONOUS_RECONNECTION_ERROR_MESSAGE);
             }
 
             return storeFileStream(client[0], filename, uri);

@@ -6,6 +6,7 @@
  */
 package org.mule.transport.ftp;
 
+import static org.mule.transport.ftp.FtpConnector.ASYNCHRONOUS_RECONNECTION_ERROR_MESSAGE;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -149,21 +150,29 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 return connector;
             }
         };
-        try
+        if(retryTemplate.isSynchronous())
         {
-            retryTemplate.execute(callbackReconnection, this.connector.getMuleContext().getWorkManager());
+            try
+            {
+                retryTemplate.execute(callbackReconnection, this.connector.getMuleContext().getWorkManager());
+            }
+            catch (RetryPolicyExhaustedException retryPolicyExhaustedException)
+            {
+                if (retryPolicyExhaustedException.getCause() instanceof java.net.ConnectException)
+                {
+                    throw new ConnectException(retryPolicyExhaustedException, this.connector);
+                }
+                else
+                {
+                    throw retryPolicyExhaustedException;
+                }
+            }
         }
-        catch (RetryPolicyExhaustedException retryPolicyExhaustedException)
+        else
         {
-            if (retryPolicyExhaustedException.getCause() instanceof java.net.ConnectException)
-            {
-                throw new ConnectException(retryPolicyExhaustedException, this.connector);
-            }
-            else
-            {
-                throw retryPolicyExhaustedException;
-            }
+            throw new IllegalArgumentException(ASYNCHRONOUS_RECONNECTION_ERROR_MESSAGE);
         }
+
 
         return filesToFTPArray(client[0]);
 

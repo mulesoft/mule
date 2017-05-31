@@ -17,6 +17,7 @@ MULE-11825: In a DB template query, to set a DB param with the null value, you c
 MULE-11948: Saxon was upgraded from 9.6.0-7 to 9.6.0-10
 MULE-12017: log4j was updated from 2.5 to 2.8.2 and slf4j from 1.7.7 to 1.7.24. There is a minor incompatibility with code using logger.error(null, "message", e), in which case the first null argument should be omitted.
 MULE-12147: added proxy support to the SFTP connector through system properties: "mule.sftp.proxy.host", "mule.sftp.proxy.port", "mule.sftp.proxy.protocol" (can be "HTTP", "SOCKS4" or "SOCKS5"), "mule.sftp.proxy.username" (if required), "mule.sftp.proxy.password" (if required).
+MULE-12612: As FTP reconnection is at operation level, FTP connector does not support asynchronous reconnection strategies because it only makes sense if reconnection takes place during the start phase of the connector lifecycle. In case you use this kind of reconnection, please change them as follows: <reconnect blocking="true"/> inside FTP Connector, or just remove the blocking attribute.
 
 Migration changes from 3.7.x to 3.8.x
 MULE-9368: System property mule.sftp.knownHostsFile is now removed. Instead, the file with the known hosts must now be provided through the mule xml config file, in the knownHostsFile attribute of the connector or the endpoints.
