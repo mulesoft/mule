@@ -261,14 +261,9 @@ public class MacroExpansionModuleModel {
     for (ComponentModel processorChainModelChild : processorChainModel.getInnerComponents()) {
       processorChainModelChild.setParent(processorChainModel);
     }
-    final String configFileName = operationComponentModelModelProperty.getOperationComponentModel().getConfigFileName()
-        .orElseThrow(() -> new IllegalArgumentException(format("The is no config file name for the operation [%s] in the module [%s]",
-                                                               operationModel.getName(), extensionModel.getName())));
-    final Integer lineNumber = operationComponentModelModelProperty.getOperationComponentModel().getLineNumber()
-        .orElseThrow(() -> new IllegalArgumentException(format("The is no line number for the operation [%s] in the module [%s]",
-                                                               operationModel.getName(), extensionModel.getName())));
-    processorChainBuilder.setConfigFileName(configFileName);
-    processorChainBuilder.setLineNumber(lineNumber);
+
+    operationRefModel.getConfigFileName().ifPresent(processorChainBuilder::setConfigFileName);
+    operationRefModel.getLineNumber().ifPresent(processorChainBuilder::setLineNumber);
     processorChainBuilder.addCustomAttribute(ORIGINAL_IDENTIFIER, operationRefModel.getIdentifier());
     return processorChainModel;
   }

@@ -21,13 +21,13 @@ import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isP
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isRouter;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.isTemplateOnErrorHandler;
 import static org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper.resolveComponentType;
+import com.google.common.collect.ImmutableList;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
-
-import com.google.common.collect.ImmutableList;
 
 import java.util.Collections;
 import java.util.List;
@@ -93,8 +93,8 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
               .appendLocationPart(findNonProcessorPath(componentModel), empty(), empty(), empty());
         }
       } else if (isProcessor(componentModel)) {
-        if (isModuleOperation(componentModel)) {
-          componentLocation = processModuleOperationChain(componentModel);
+        if (isModuleOperation(componentModel.getParent())) {
+          componentLocation = processModuleOperationChildren(componentModel);
         } else {
           componentLocation = parentComponentLocation.appendProcessorsPart().appendLocationPart(findProcessorPath(componentModel),
                                                                                                 typedComponentIdentifier,
@@ -172,13 +172,13 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                      componentModel.getLineNumber());
     } else if (isProcessor(componentModel)) {
       if (isModuleOperation(componentModel)) {
-        componentLocation = processModuleOperationChain(componentModel);
-      } else {
-        componentLocation = parentComponentLocation
-            .appendLocationPart(PROCESSORS_PART_NAME, empty(), empty(), empty())
-            .appendLocationPart(findProcessorPath(componentModel), typedComponentIdentifier, componentModel.getConfigFileName(),
-                                componentModel.getLineNumber());
+        //just point to the correct typed component operation identifier
+        typedComponentIdentifier = getModuleOperationTypeComponentIdentifier(componentModel);
       }
+      componentLocation = parentComponentLocation
+          .appendLocationPart(PROCESSORS_PART_NAME, empty(), empty(), empty())
+          .appendLocationPart(findProcessorPath(componentModel), typedComponentIdentifier, componentModel.getConfigFileName(),
+                              componentModel.getLineNumber());
     } else if (isErrorHandler(componentModel)) {
       componentLocation = processErrorHandlerComponent(componentModel, parentComponentLocation, typedComponentIdentifier);
     } else {
@@ -189,16 +189,28 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
     return componentLocation;
   }
 
-  private DefaultComponentLocation processModuleOperationChain(ComponentModel componentModel) {
+  private Optional<TypedComponentIdentifier> getModuleOperationTypeComponentIdentifier(ComponentModel componentModel) {
     final ComponentIdentifier originalIdentifier =
         (ComponentIdentifier) componentModel.getCustomAttributes().get(ORIGINAL_IDENTIFIER);
+
     final String namespace = originalIdentifier.getNamespace();
     final String operationName = originalIdentifier.getName();
 
     final ComponentIdentifier operationIdentifier =
         ComponentIdentifier.builder().withNamespace(namespace).withName(operationName).build();
+    return of(builder().withIdentifier(operationIdentifier).withType(OPERATION).build());
+  }
+
+  /**
+   * It rewrites the history for those macro expanded operations that are not direct children from a flow, which means the returned
+   * {@link ComponentLocation} are mapped to the new operation rather the original flow.
+   * @param componentModel source to generate the new {@link ComponentLocation}, it also relies in its parent {@link ComponentModel#getParent()}
+   * @return a fictitious {@link ComponentLocation}
+   */
+  private DefaultComponentLocation processModuleOperationChildren(ComponentModel componentModel) {
     final Optional<TypedComponentIdentifier> operationTypedIdentifier =
-        of(builder().withIdentifier(operationIdentifier).withType(OPERATION).build());
+        getModuleOperationTypeComponentIdentifier(componentModel.getParent());
+    final String operationName = operationTypedIdentifier.get().getIdentifier().getName();
     return new DefaultComponentLocation(of(operationName), Collections.EMPTY_LIST)
         .appendLocationPart(operationName, operationTypedIdentifier, componentModel.getConfigFileName(),
                             componentModel.getLineNumber())
