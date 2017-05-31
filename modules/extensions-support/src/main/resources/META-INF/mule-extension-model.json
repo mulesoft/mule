@@ -2489,6 +2489,8 @@
                           "TRANSFORMATION",
                           "EXPRESSION",
                           "SECURITY",
+                          "CLIENT_SECURITY",
+                          "SERVER_SECURITY",
                           "ROUTING",
                           "CONNECTIVITY",
                           "RETRY_EXHAUSTED"
@@ -2690,6 +2692,8 @@
                           "TRANSFORMATION",
                           "EXPRESSION",
                           "SECURITY",
+                          "CLIENT_SECURITY",
+                          "SERVER_SECURITY",
                           "ROUTING",
                           "CONNECTIVITY",
                           "RETRY_EXHAUSTED"

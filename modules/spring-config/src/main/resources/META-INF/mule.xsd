@@ -1658,6 +1658,20 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:enumeration>
+                    <xsd:enumeration value="CLIENT_SECURITY">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Occurs when there's a security error related to security failures calling external endpoint.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="SERVER_SECURITY">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Occurs when there's a security error related to security enforced within the mule runtime.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
                     <xsd:enumeration value="ROUTING">
                         <xsd:annotation>
                             <xsd:documentation>
