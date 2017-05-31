@@ -6,6 +6,7 @@
  */
 package org.mule.processor;
 
+import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -60,10 +61,11 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     protected abstract boolean accept(MuleEvent event);
 
     protected MuleEvent handleUnaccepted(MuleEvent event) throws MuleException
-    {        
+    {
         if (unacceptedMessageProcessor != null)
         {
-            return unacceptedMessageProcessor.process(event);
+            unacceptedMessageProcessor.process(event);
+            return null;
         }
         else if (throwOnUnaccepted)
         {
