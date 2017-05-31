@@ -25,8 +25,16 @@ public class HttpMultipartMuleMessageFactory extends HttpMuleMessageFactory
     private Collection<Part> parts;
 
     @Override
-    protected synchronized MuleMessage doCreate(Object transportMessage, MuleMessage previousMessage, String encoding, MuleContext muleContext) throws Exception
+    protected MuleMessage doCreate(Object transportMessage, MuleMessage previousMessage, String encoding, MuleContext muleContext) throws Exception
     {
+        if (transportMessage instanceof HttpRequest && isHttpMultipartRequest((HttpRequest) transportMessage))
+        {
+            synchronized (this)
+            {
+                return super.doCreate(transportMessage, previousMessage, encoding, muleContext);
+            }
+        }
+
         return super.doCreate(transportMessage, previousMessage, encoding, muleContext);
     }
 
@@ -35,7 +43,7 @@ public class HttpMultipartMuleMessageFactory extends HttpMuleMessageFactory
     {
         Object body = null;
 
-        if (httpRequest.getContentType().contains("multipart/form-data"))
+        if (isHttpMultipartRequest(httpRequest))
         {
             MultiPartInputStream in = new MultiPartInputStream(httpRequest.getBody(), httpRequest.getContentType(), null);
 

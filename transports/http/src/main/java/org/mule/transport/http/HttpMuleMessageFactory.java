@@ -144,7 +144,10 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
             httpVersion = httpRequest.getRequestLine().getHttpVersion();
             uri = httpRequest.getRequestLine().getUri();
             headers = convertHeadersToMap(httpRequest.getHeaders(), uri);
-            convertMultiPartHeaders(headers);
+            if (isHttpMultipartRequest(httpRequest))
+            {
+                convertMultiPartHeaders(headers);
+            }
         }
         else if (transportMessage instanceof HttpMethod)
         {
@@ -454,5 +457,10 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     public void setExchangePattern(MessageExchangePattern mep)
     {
         exchangePattern = mep;
+    }
+
+    protected boolean isHttpMultipartRequest (HttpRequest httpRequest)
+    {
+        return httpRequest.getContentType().contains("multipart/form-data");
     }
 }
