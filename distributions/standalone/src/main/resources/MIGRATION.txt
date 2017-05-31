@@ -40,6 +40,7 @@ MULE-10306: XML entity expansion in XML transformers is now disabled by default 
 MULE-10979: The default response timeout and default transaction timeout can't be configured using system properties on the command line or in the wrapper.conf file anymore. In replacement, use the configuration element. For example: <configuration defaultResponseTimeout="20000"  defaultTransactionTimeout="40000"/>.
 MULE-11118: The HTTP listener now replies with status code 503 when the thread pool is exhausted (and poolExhaustedAction="ABORT") instead of closing the socket.
 MULE-11825: In a DB template query, to set a DB param with the null value, you can use the "NULL" literal value. For example: <db:in-param name="name" defaultValue="NULL"/>
+MULE-12612: As FTP reconnection is at operation level, FTP connector does not support asynchronous reconnection strategies because it only makes sense if reconnection takes place during the start phase of the connector lifecycle. In case you use this kind of reconnection, please change them as follows: <reconnect blocking="true"/> inside FTP Connector, or just remove the blocking attribute.
 
 Migration changes from 3.6.x to 3.7.x
 
