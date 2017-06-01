@@ -104,58 +104,6 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidModelDueToReservedName() {
-    when(invalidParameterModel.getType()).thenReturn(toMetadataType(String.class));
-    when(invalidParameterModel.getName()).thenReturn("name");
-    mockParameters(operationModel, invalidParameterModel);
-    validate(extensionModel, validator);
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidParameterDueToReservedName() {
-    when(invalidParameterModel.getType()).thenReturn(toMetadataType(InvalidPojo.class));
-    when(invalidParameterModel.getName()).thenReturn("pojo");
-    mockParameters(operationModel, invalidParameterModel);
-    validate(extensionModel, validator);
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidParameterCollectionDueToReservedName() {
-    when(invalidParameterModel.getType())
-        .thenReturn(ExtensionsTestUtils.arrayOf(List.class, objectTypeBuilder(InvalidPojo.class)));
-    when(invalidParameterModel.getType()).thenReturn(arrayOf(List.class, objectTypeBuilder(InvalidPojo.class)));
-    when(invalidParameterModel.getName()).thenReturn("pojos");
-    mockParameters(operationModel, invalidParameterModel);
-    validate(extensionModel, validator);
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidParameterDictionaryDueToReservedName() {
-    when(invalidParameterModel.getType())
-        .thenReturn(dictionaryOf(Map.class, objectTypeBuilder(InvalidPojo.class)));
-    when(invalidParameterModel.getModelProperty(InfrastructureParameterModelProperty.class)).thenReturn(Optional.empty());
-    when(invalidParameterModel.getName()).thenReturn("pojos");
-    mockParameters(operationModel, invalidParameterModel);
-    validate(extensionModel, validator);
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidRecursiveParameterDueToReservedName() {
-    when(invalidParameterModel.getType()).thenReturn(toMetadataType(RecursivePojo.class));
-    when(invalidParameterModel.getName()).thenReturn("pojo");
-    mockParameters(operationModel, invalidParameterModel);
-    validate(extensionModel, validator);
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidNestedParameterDueToReservedName() {
-    when(invalidParameterModel.getType()).thenReturn(toMetadataType(NestedInvalidPojo.class));
-    when(invalidParameterModel.getName()).thenReturn("pojo");
-    mockParameters(operationModel, invalidParameterModel);
-    validate(extensionModel, validator);
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
   public void invalidModelDueToDefaultValueWhenRequired() {
     when(invalidParameterModel.getType()).thenReturn(toMetadataType(String.class));
     when(invalidParameterModel.isRequired()).thenReturn(true);
@@ -171,54 +119,6 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
     when(invalidParameterModel.getName()).thenReturn("thing");
     mockParameters(operationModel, invalidParameterModel);
     validate(extensionModel, validator);
-  }
-
-  @XmlHints(allowTopLevelDefinition = true)
-  private static class InvalidPojo {
-
-    public InvalidPojo() {
-      // needs to be instantiable
-    }
-
-    @Parameter
-    private String name;
-
-    public String getName() {
-      return name;
-    }
-  }
-
-  public static class NestedInvalidPojo {
-
-    @Parameter
-    private InvalidPojo invalidPojo;
-
-    public InvalidPojo getInvalidPojo() {
-      return invalidPojo;
-    }
-  }
-
-  public static class RecursivePojo {
-
-    @Parameter
-    private RecursivePojo pojo;
-
-    @Parameter
-    private InvalidPojo invalidPojo;
-
-    public RecursivePojo getPojo() {
-      return pojo;
-    }
-
-    public InvalidPojo getInvalidPojo() {
-      return invalidPojo;
-    }
-  }
-
-  public static class InvalidPojoParameterGroup {
-
-    @ParameterGroup(name = "exclusion")
-    private Serializable nonInstantiableField;
   }
 
 }
