@@ -27,7 +27,8 @@ public interface ByteBufferManager {
    * buffer once it's no longer needed.
    *
    * @param capacity the capacity of the returned buffer
-   * @return a {@link ByteBuffer} of the given {@code capacitiy}
+   * @return a {@link ByteBuffer} of the given {@code capacity}
+   * @throws MaxStreamingMemoryExceededException if no more streaming memory is available
    */
   ByteBuffer allocate(int capacity);
 

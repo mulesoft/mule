@@ -6,11 +6,19 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import static java.lang.Math.toIntExact;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.core.streaming.MemoryManager;
+import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -73,6 +81,53 @@ public class PoolingByteBufferManagerTestCase extends AbstractMuleTestCase {
     assertCapacity(OTHER_CAPACITY);
   }
 
+  @Test
+  public void limitTotalMemory() throws Exception {
+    final long maxMemory = 40L;
+    final int bufferCapacity = toIntExact(maxMemory / 4);
+    final long waitTimeoutMillis = SECONDS.toMillis(2);
+
+    MemoryManager memoryManager = mock(MemoryManager.class);
+    when(memoryManager.getMaxMemory()).thenReturn(maxMemory);
+
+    bufferManager = new PoolingByteBufferManager(memoryManager, waitTimeoutMillis);
+
+    ByteBuffer buffer1 = bufferManager.allocate(bufferCapacity);
+    ByteBuffer buffer2 = bufferManager.allocate(bufferCapacity);
+    assertThat(buffer1.capacity(), is(bufferCapacity));
+    assertThat(buffer2.capacity(), is(bufferCapacity));
+
+    Latch latch = new Latch();
+    Reference<Boolean> maxMemoryExhausted = new Reference<>(false);
+
+    new Thread(() -> {
+      try {
+        bufferManager.allocate(bufferCapacity);
+        latch.release();
+      } catch (Exception e) {
+        maxMemoryExhausted.set(e.getCause() instanceof MaxStreamingMemoryExceededException);
+      }
+    }).start();
+
+    assertThat(latch.await(waitTimeoutMillis * 2, MILLISECONDS), is(false));
+    assertThat(maxMemoryExhausted.get(), is(true));
+
+    bufferManager.deallocate(buffer1);
+
+    Latch secondLatch = new Latch();
+    new Thread(() -> {
+      try {
+        bufferManager.allocate(bufferCapacity);
+        maxMemoryExhausted.set(false);
+      } finally {
+        secondLatch.release();
+      }
+    }).start();
+
+    assertThat(secondLatch.await(waitTimeoutMillis, MILLISECONDS), is(true));
+    assertThat(maxMemoryExhausted.get(), is(false));
+  }
+
   private void assertCapacity(int capacity) {
     ByteBuffer buffer = bufferManager.allocate(capacity);
     try {
@@ -81,5 +136,4 @@ public class PoolingByteBufferManagerTestCase extends AbstractMuleTestCase {
       bufferManager.deallocate(buffer);
     }
   }
-
 }

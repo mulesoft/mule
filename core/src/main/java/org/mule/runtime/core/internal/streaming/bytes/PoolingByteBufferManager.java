@@ -6,12 +6,18 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.lang.Math.round;
+import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.ConcurrencyUtils.withLock;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.core.internal.streaming.DefaultMemoryManager;
+import org.mule.runtime.core.streaming.MemoryManager;
+import org.mule.runtime.core.util.func.CheckedRunnable;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -19,6 +25,10 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.KeyedObjectPool;
@@ -35,6 +45,13 @@ import org.slf4j.Logger;
  * Buffers are kept in separate pools depending on their capacity.
  * <p>
  * Idle buffers and capacity pools are automatically expired.
+ * <p>
+ * Unlike traditional pools which are exhausted in terms of number of instances, we don't care about
+ * the number of buffers pooled but in the amount of memory they retain. This pool will be exhausted
+ * when a certain threshold of retained memory is reached. When exhausted, invokations to
+ * {@link #allocate(int)} will block until more memory becomes available (by invoking {@link #deallocate(ByteBuffer)}).
+ * If {@link #allocate(int)} is blocked by more than {@link #waitTimeoutMillis} milliseconds, then a
+ * {@link MaxStreamingMemoryExceededException} is thrown.
  *
  * @since 4.0
  */
@@ -43,15 +60,19 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
   private static final Logger LOGGER = getLogger(PoolingByteBufferManager.class);
   private static final int MAX_IDLE = Runtime.getRuntime().availableProcessors();
 
+  private final AtomicLong streamingMemory = new AtomicLong(0);
+  private final long maxStreamingMemory;
+  private final long waitTimeoutMillis;
+
   /**
    * Using a cache of pools instead of a {@link KeyedObjectPool} because performance tests indicates that this
    * option is slightly faster, plus it gives us the ability to expire unfrequent capacity buffers without the use
    * of a reaper thread (those performance test did not include such a reaper, so it's very possible that this is more
    * than just slightly faster)
    */
-  private final LoadingCache<Integer, ObjectPool<ByteBuffer>> pools = CacheBuilder.newBuilder()
+  private final LoadingCache<Integer, BufferPool> pools = CacheBuilder.newBuilder()
       .expireAfterAccess(10, SECONDS)
-      .removalListener((RemovalListener<Integer, ObjectPool<ByteBuffer>>) notification -> {
+      .removalListener((RemovalListener<Integer, BufferPool>) notification -> {
         try {
           notification.getValue().close();
         } catch (Exception e) {
@@ -59,13 +80,33 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
             LOGGER.debug("Found exception trying to dispose buffer pool for capacity " + notification.getKey(), e);
           }
         }
-      }).build(new CacheLoader<Integer, ObjectPool<ByteBuffer>>() {
+      }).build(new CacheLoader<Integer, BufferPool>() {
 
         @Override
-        public ObjectPool<ByteBuffer> load(Integer capacity) throws Exception {
-          return createPool(capacity);
+        public BufferPool load(Integer capacity) throws Exception {
+          return new BufferPool(capacity);
         }
       });
+
+  /**
+   * Creates a new instance which allows the pool to grow up to 50% of the runtime's max memory and has a wait
+   * timeout of 10 seconds. The definition of max memory is that of {@link MemoryManager#getMaxMemory()}
+   */
+  public PoolingByteBufferManager() {
+    this(new DefaultMemoryManager(), SECONDS.toMillis(10));
+  }
+
+  /**
+   * Creates a new instance which allows the pool to grow up to 50% of calling {@link MemoryManager#getMaxMemory()}
+   * on the given {@code memoryManager}, and has {@code waitTimeoutMillis} as wait timeout.
+   *
+   * @param memoryManager     a {@link MemoryManager} used to determine the runtime's max memory
+   * @param waitTimeoutMillis how long to wait when the pool is exhausted
+   */
+  public PoolingByteBufferManager(MemoryManager memoryManager, long waitTimeoutMillis) {
+    maxStreamingMemory = round(memoryManager.getMaxMemory() * 0.5);
+    this.waitTimeoutMillis = waitTimeoutMillis;
+  }
 
   /**
    * {@inheritDoc}
@@ -73,7 +114,7 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
   @Override
   public ByteBuffer allocate(int capacity) {
     try {
-      return pools.getUnchecked(capacity).borrowObject();
+      return pools.getUnchecked(capacity).take();
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not allocate byte buffer"), e);
     }
@@ -85,10 +126,10 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
   @Override
   public void deallocate(ByteBuffer byteBuffer) {
     int capacity = byteBuffer.capacity();
-    ObjectPool<ByteBuffer> pool = pools.getIfPresent(capacity);
+    BufferPool pool = pools.getIfPresent(capacity);
     if (pool != null) {
       try {
-        pool.returnObject(byteBuffer);
+        pool.returnBuffer(byteBuffer);
       } catch (Exception e) {
         throw new MuleRuntimeException(createStaticMessage("Could not deallocate buffer of capacity " + capacity), e);
       }
@@ -106,34 +147,98 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
     }
   }
 
-  private ObjectPool<ByteBuffer> createPool(int capacity) {
-    GenericObjectPoolConfig config = new GenericObjectPoolConfig();
-    config.setMaxIdle(MAX_IDLE);
-    config.setMaxTotal(-1);
-    config.setBlockWhenExhausted(false);
-    config.setTimeBetweenEvictionRunsMillis(MINUTES.toMillis(1));
-    config.setTestOnBorrow(false);
-    config.setTestOnReturn(false);
-    config.setTestWhileIdle(false);
-    config.setTestOnCreate(false);
-    config.setJmxEnabled(false);
+  private class BufferPool {
 
-    return new GenericObjectPool<>(new BasePooledObjectFactory<ByteBuffer>() {
+    private final int bufferCapacity;
+    private final ObjectPool<ByteBuffer> pool;
+    private final Lock lock = new ReentrantLock();
+    private final Condition poolNotFull = lock.newCondition();
 
-      @Override
-      public ByteBuffer create() throws Exception {
-        return ByteBuffer.allocate(capacity);
+    private BufferPool(int bufferCapacity) {
+      this.bufferCapacity = bufferCapacity;
+      GenericObjectPoolConfig config = new GenericObjectPoolConfig();
+      config.setMaxIdle(MAX_IDLE);
+      config.setMaxTotal(-1);
+      config.setBlockWhenExhausted(false);
+      config.setTimeBetweenEvictionRunsMillis(SECONDS.toMillis(30));
+      config.setTestOnBorrow(false);
+      config.setTestOnReturn(false);
+      config.setTestWhileIdle(false);
+      config.setTestOnCreate(false);
+      config.setJmxEnabled(false);
+
+      pool = new GenericObjectPool<>(new BasePooledObjectFactory<ByteBuffer>() {
+
+        @Override
+        public ByteBuffer create() throws Exception {
+          if (streamingMemory.addAndGet(bufferCapacity) <= maxStreamingMemory) {
+            return ByteBuffer.allocate(bufferCapacity);
+          }
+
+          streamingMemory.addAndGet(-bufferCapacity);
+          throw new MaxStreamingMemoryExceededException(createStaticMessage(format(
+                                                                                   "Max streaming memory limit of %d bytes was exceeded",
+                                                                                   maxStreamingMemory)));
+        }
+
+        @Override
+        public PooledObject<ByteBuffer> wrap(ByteBuffer obj) {
+          return new DefaultPooledObject<>(obj);
+        }
+
+        @Override
+        public void activateObject(PooledObject<ByteBuffer> p) throws Exception {
+          p.getObject().clear();
+        }
+
+        @Override
+        public void destroyObject(PooledObject<ByteBuffer> p) throws Exception {
+          if (streamingMemory.addAndGet(-bufferCapacity) < maxStreamingMemory) {
+            signalPoolNotFull();
+          }
+        }
+      }, config);
+    }
+
+    private ByteBuffer take() throws Exception {
+      ByteBuffer buffer = null;
+      do {
+        try {
+          buffer = pool.borrowObject();
+        } catch (MaxStreamingMemoryExceededException e) {
+          signal(() -> {
+            while (streamingMemory.get() >= maxStreamingMemory) {
+              if (!poolNotFull.await(waitTimeoutMillis, MILLISECONDS)) {
+                throw e;
+              }
+            }
+          });
+        }
+      } while (buffer == null);
+
+      return buffer;
+    }
+
+    private void returnBuffer(ByteBuffer buffer) throws Exception {
+      pool.returnObject(buffer);
+      signalPoolNotFull();
+    }
+
+    private void signalPoolNotFull() {
+      signal(poolNotFull::signal);
+    }
+
+    private void close() {
+      streamingMemory.addAndGet(-bufferCapacity * (pool.getNumActive() + pool.getNumIdle()));
+      try {
+        pool.close();
+      } finally {
+        signal(poolNotFull::signalAll);
       }
+    }
 
-      @Override
-      public PooledObject<ByteBuffer> wrap(ByteBuffer obj) {
-        return new DefaultPooledObject<>(obj);
-      }
-
-      @Override
-      public void activateObject(PooledObject<ByteBuffer> p) throws Exception {
-        p.getObject().clear();
-      }
-    }, config);
+    private void signal(CheckedRunnable task) {
+      withLock(lock, task);
+    }
   }
 }
