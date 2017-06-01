@@ -20,7 +20,6 @@ import static org.mule.runtime.module.embedded.internal.MavenUtils.createModelFr
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
-import org.mule.runtime.core.util.FilenameUtils;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -36,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
