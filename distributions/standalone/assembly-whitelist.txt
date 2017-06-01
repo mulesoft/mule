@@ -305,7 +305,8 @@
 /mule-standalone-${productVersion}/lib/opt/jbossjta-4.15.0.Final.jar
 /mule-standalone-${productVersion}/lib/opt/jcifs-1.3.3.jar
 /mule-standalone-${productVersion}/lib/opt/jcodings-1.0.16.jar
-/mule-standalone-${productVersion}/lib/opt/jdom-2.0.2.jar
+/mule-standalone-${productVersion}/lib/opt/jdom-1.1.3.jar
+/mule-standalone-${productVersion}/lib/opt/jdom2-2.0.6.jar
 /mule-standalone-${productVersion}/lib/opt/jersey-client-2.11.jar
 /mule-standalone-${productVersion}/lib/opt/jersey-common-2.11.jar
 /mule-standalone-${productVersion}/lib/opt/jersey-guava-2.11.jar
