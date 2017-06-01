@@ -7,6 +7,7 @@
 package org.mule.test.heisenberg.extension.exception;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.core.exception.MuleFatalException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 
 public class HeisenbergConnectionExceptionEnricher extends ExceptionHandler {
@@ -15,6 +16,9 @@ public class HeisenbergConnectionExceptionEnricher extends ExceptionHandler {
 
   @Override
   public Exception enrichException(Exception e) {
+    if (e instanceof MuleFatalException) {
+      return e;
+    }
     return new ConnectionException(ENRICHED_MESSAGE + e.getMessage(), e);
   }
 }

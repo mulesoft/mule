@@ -71,7 +71,6 @@ public class ErrorTypeLocatorFactory {
             .addExceptionMapping(MessageRedeliveredException.class,
                                  errorTypeRepository.lookupErrorType(REDELIVERY_EXHAUSTED).get())
             .addExceptionMapping(Exception.class, unknown)
-            .addExceptionMapping(Throwable.class, unknown)
             .addExceptionMapping(Error.class, errorTypeRepository.getCriticalErrorType())
             .addExceptionMapping(StreamingBufferSizeExceededException.class,
                                  errorTypeRepository.lookupErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED).get())
