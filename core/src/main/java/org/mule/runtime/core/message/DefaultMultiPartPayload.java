@@ -8,6 +8,7 @@ package org.mule.runtime.core.message;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
@@ -17,6 +18,7 @@ import com.google.common.collect.ImmutableList.Builder;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a payload of a {@link Message} composed of many different parts. Each parts is in itself a {@link Message}, and has
@@ -45,7 +47,7 @@ public class DefaultMultiPartPayload implements Serializable, MultiPartPayload {
   /**
    * Builds a new {@link DefaultMultiPartPayload} with the given {@link Message}s as parts.
    * 
-   * @param parts
+   * @param parts the contained parts.
    */
   public DefaultMultiPartPayload(Message... parts) {
     this(asList(parts));
@@ -54,7 +56,7 @@ public class DefaultMultiPartPayload implements Serializable, MultiPartPayload {
   /**
    * Builds a new {@link DefaultMultiPartPayload} with the given {@link Message}s as parts.
    * 
-   * @param parts
+   * @param parts the contained parts.
    */
   public DefaultMultiPartPayload(List<Message> parts) {
     final Builder<Message> builder = ImmutableList.builder();
@@ -102,6 +104,11 @@ public class DefaultMultiPartPayload implements Serializable, MultiPartPayload {
   @Override
   public Message getPart(String partName) {
     return parts.stream().filter(m -> partName.equals(getPartAttributes(m).getName())).findFirst().get();
+  }
+
+  @Override
+  public Map<String, Message> getNamedParts() {
+    return parts.stream().collect(toMap(m -> getPartAttributes(m).getName(), m -> m));
   }
 
   /**
