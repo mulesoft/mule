@@ -113,21 +113,4 @@ public class MapUtils {
     buf.append('}');
     return buf.toString();
   }
-
-  /**
-   * Returns
-   * @param map
-   * @param key
-   * @param defaultValue
-   * @param <T>
-   * @return
-   */
-  public static <T> T getValue(Map map, Object key, T defaultValue) {
-    // TODO(pablo.kraan): API - add tests
-    T value = null;
-    if (map != null) {
-      value = (T) map.get(key);
-    }
-    return value == null ? defaultValue : value;
-  }
 }
