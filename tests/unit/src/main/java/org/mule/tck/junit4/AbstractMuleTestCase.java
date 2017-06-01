@@ -14,7 +14,8 @@ import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.util.StringMessageUtils.getBoilerPlate;
-import static org.mule.runtime.core.util.SystemUtils.parsePropertyDefinitions;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.core.api.util.SystemUtils.parsePropertyDefinitions;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -22,8 +23,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.core.util.SystemUtils;
+import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.tck.junit4.rule.WarningTimeout;
 
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public abstract class AbstractMuleTestCase {
 
   static {
     String muleOpts = SystemUtils.getenv("MULE_TEST_OPTS");
-    if (StringUtils.isNotBlank(muleOpts)) {
+    if (!isBlank(muleOpts)) {
       Map<String, String> parsedOpts = parsePropertyDefinitions(muleOpts);
       String optVerbose = parsedOpts.get("mule.verbose");
       verbose = Boolean.valueOf(optVerbose);

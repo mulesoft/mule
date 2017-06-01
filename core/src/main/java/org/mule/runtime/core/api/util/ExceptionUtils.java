@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util;
+package org.mule.runtime.core.api.util;
 
 import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
@@ -40,6 +40,7 @@ import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.exception.TypedException;
 import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.message.ErrorBuilder;
+import org.mule.runtime.core.util.ExceptionHandler;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -52,7 +53,7 @@ import org.slf4j.Logger;
 /**
  * Mule exception utilities.
  */
-public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionUtils {
+public class ExceptionUtils {
 
   /**
    * This method returns true if the throwable contains a {@link Throwable} that matches the specified class or subclass in the
@@ -63,7 +64,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
    * @return the index into the throwable chain, false if no match or null input
    */
   public static boolean containsType(Throwable throwable, Class<?> type) {
-    return indexOfType(throwable, type) > -1;
+    return org.apache.commons.lang.exception.ExceptionUtils.indexOfType(throwable, type) > -1;
   }
 
   /**
@@ -75,11 +76,11 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
    * @return the throwable that is closest to the root in the throwable chain that matches the type or subclass of that type.
    */
   @SuppressWarnings("unchecked")
-  public static <ET> ET getDeepestOccurenceOfType(Throwable throwable, Class<ET> type) {
+  public static <ET> ET getDeepestOccurrenceOfType(Throwable throwable, Class<ET> type) {
     if (throwable == null || type == null) {
       return null;
     }
-    List<Throwable> throwableList = getThrowableList(throwable);
+    List<Throwable> throwableList = org.apache.commons.lang.exception.ExceptionUtils.getThrowableList(throwable);
     ListIterator<Throwable> listIterator = throwableList.listIterator(throwableList.size());
     while (listIterator.hasPrevious()) {
       Throwable candidate = listIterator.previous();
@@ -91,7 +92,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
   }
 
   /**
-   * Similar to {@link #getFullStackTrace(Throwable)} but removing the exception and causes messages. This is useful to determine
+   * Similar to {@link org.apache.commons.lang.exception.ExceptionUtils#getFullStackTrace(Throwable)} but removing the exception and causes messages. This is useful to determine
    * if two exceptions have matching stack traces regardless of the messages which may contain invokation specific data
    *
    * @param throwable the throwable to inspect, may be <code>null</code>
@@ -100,7 +101,7 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
   public static String getFullStackTraceWithoutMessages(Throwable throwable) {
     StringBuilder builder = new StringBuilder();
 
-    for (String frame : getStackFrames(throwable)) {
+    for (String frame : org.apache.commons.lang.exception.ExceptionUtils.getStackFrames(throwable)) {
       builder.append(frame.replaceAll(":\\s+([\\w\\s]*.*)", "").trim()).append(LINE_SEPARATOR);
     }
 
@@ -149,7 +150,8 @@ public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionU
       return empty();
     }
 
-    return (Optional<T>) stream(getThrowables(throwable)).filter(throwableType::isInstance).findFirst();
+    return (Optional<T>) stream(org.apache.commons.lang.exception.ExceptionUtils.getThrowables(throwable))
+        .filter(throwableType::isInstance).findFirst();
   }
 
   /**

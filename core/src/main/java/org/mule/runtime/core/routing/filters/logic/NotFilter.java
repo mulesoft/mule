@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.routing.filters.logic;
 
-import static org.mule.runtime.core.util.ClassUtils.equal;
-import static org.mule.runtime.core.util.ClassUtils.hash;
+import static org.mule.runtime.core.api.util.ClassUtils.equal;
+import static org.mule.runtime.core.api.util.ClassUtils.hash;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;

@@ -14,7 +14,7 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.failedToInvoke;
 import static org.mule.runtime.core.config.i18n.CoreMessages.initialisationFailure;
 import static org.mule.runtime.core.config.i18n.CoreMessages.methodWithNumParamsNotFoundOnObject;
 import static org.mule.runtime.core.config.i18n.CoreMessages.methodWithParamsNotFoundOnObject;
-import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -33,7 +33,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transformer.TransformerTemplate;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.util.TemplateParser;
 import org.mule.runtime.core.util.TemplateParser.PatternInfo;
 

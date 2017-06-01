@@ -12,7 +12,6 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.Base64;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,7 +60,7 @@ public class Base64Decoder extends AbstractTransformer {
   private String handleStream(InputStream input, Charset outputEncoding) throws IOException {
     String data;
     try {
-      data = IOUtils.toString(input, outputEncoding);
+      data = org.apache.commons.io.IOUtils.toString(input, outputEncoding);
     } finally {
       input.close();
     }

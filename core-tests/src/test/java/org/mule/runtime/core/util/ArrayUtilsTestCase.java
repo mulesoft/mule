@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.StringUtils.countMatches;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.runtime.core.internal.util.ArrayUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -65,7 +67,7 @@ public class ArrayUtilsTestCase extends AbstractMuleTestCase {
     // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
     String result = ArrayUtils.toString(test, 10);
     assertTrue(result.endsWith("[..]}"));
-    assertEquals(9, StringUtils.countMatches(result, ","));
+    assertEquals(9, countMatches(result, ","));
   }
 
   @Test(expected = IllegalArgumentException.class)

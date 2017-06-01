@@ -8,7 +8,7 @@ package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 /**
  * A simple tuple that stores a listener with an optional subscription (used to match a resource ID).

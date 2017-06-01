@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.config.bootstrap;
 
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
@@ -39,7 +39,7 @@ public class PropertiesBootstrapService implements BootstrapService {
   @Override
   public Object instantiateClass(String name, Object... constructorArgs) throws ClassNotFoundException, NoSuchMethodException,
       InvocationTargetException, InstantiationException, IllegalAccessException {
-    return ClassUtils.instanciateClass(name, constructorArgs, classLoader);
+    return ClassUtils.instantiateClass(name, constructorArgs, classLoader);
   }
 
   @Override

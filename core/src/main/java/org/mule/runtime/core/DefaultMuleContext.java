@@ -39,9 +39,9 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STARTING;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPING;
-import static org.mule.runtime.core.util.ExceptionUtils.getRootCauseException;
+import static org.mule.runtime.core.api.util.ExceptionUtils.getRootCauseException;
 import static org.mule.runtime.core.util.FunctionalUtils.safely;
-import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
+import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.unwrap;
 
@@ -116,7 +116,7 @@ import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.util.ApplicationShutdownSplashScreen;
 import org.mule.runtime.core.util.ApplicationStartupSplashScreen;
-import org.mule.runtime.core.util.JdkVersionUtils;
+import org.mule.runtime.core.internal.util.JdkVersionUtils;
 import org.mule.runtime.core.util.ServerShutdownSplashScreen;
 import org.mule.runtime.core.util.ServerStartupSplashScreen;
 import org.mule.runtime.core.util.SplashScreen;

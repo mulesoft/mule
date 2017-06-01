@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.StringUtils.countMatches;
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -72,7 +74,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase {
     // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
     String result = StringMessageUtils.toString(test);
     assertTrue(result.endsWith("[..]}"));
-    assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, StringUtils.countMatches(result, ","));
+    assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, countMatches(result, ","));
   }
 
   @Test
@@ -100,7 +102,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase {
     // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
     String result = StringMessageUtils.toString(list);
     assertTrue(result.endsWith("[..]]"));
-    assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, StringUtils.countMatches(result, ","));
+    assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, countMatches(result, ","));
   }
 
   @Test
@@ -122,8 +124,8 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void testBoilerPlateSingleLine() {
     String plate = StringMessageUtils.getBoilerPlate("Single message.", '*', 12);
-    assertEquals(SystemUtils.LINE_SEPARATOR + "************" + SystemUtils.LINE_SEPARATOR + "* Single   *"
-        + SystemUtils.LINE_SEPARATOR + "* message. *" + SystemUtils.LINE_SEPARATOR + "************", plate);
+    assertEquals(LINE_SEPARATOR + "************" + LINE_SEPARATOR + "* Single   *"
+        + LINE_SEPARATOR + "* message. *" + LINE_SEPARATOR + "************", plate);
   }
 
   @Test
@@ -134,9 +136,9 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase {
     msgs.add("Boiler Plate");
 
     String plate = StringMessageUtils.getBoilerPlate(msgs, '*', 12);
-    assertEquals(SystemUtils.LINE_SEPARATOR + "************" + SystemUtils.LINE_SEPARATOR + "* This     *"
-        + SystemUtils.LINE_SEPARATOR + "* is a     *" + SystemUtils.LINE_SEPARATOR + "* Boiler   *" + SystemUtils.LINE_SEPARATOR
-        + "* Plate    *" + SystemUtils.LINE_SEPARATOR + "************", plate);
+    assertEquals(LINE_SEPARATOR + "************" + LINE_SEPARATOR + "* This     *"
+        + LINE_SEPARATOR + "* is a     *" + LINE_SEPARATOR + "* Boiler   *" + LINE_SEPARATOR
+        + "* Plate    *" + LINE_SEPARATOR + "************", plate);
 
   }
 
@@ -148,13 +150,13 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase {
     msgs.add("Boiler Plate Message that should get wrapped to the next line if it is working properly");
 
     String plate = StringMessageUtils.getBoilerPlate(msgs, '*', 12);
-    assertEquals(SystemUtils.LINE_SEPARATOR + "************" + SystemUtils.LINE_SEPARATOR + "* This     *"
-        + SystemUtils.LINE_SEPARATOR + "* is a     *" + SystemUtils.LINE_SEPARATOR + "* Boiler   *" + SystemUtils.LINE_SEPARATOR
-        + "* Plate    *" + SystemUtils.LINE_SEPARATOR + "* Message  *" + SystemUtils.LINE_SEPARATOR + "* that     *"
-        + SystemUtils.LINE_SEPARATOR + "* should   *" + SystemUtils.LINE_SEPARATOR + "* get      *" + SystemUtils.LINE_SEPARATOR
-        + "* wrapped  *" + SystemUtils.LINE_SEPARATOR + "* to the   *" + SystemUtils.LINE_SEPARATOR + "* next     *"
-        + SystemUtils.LINE_SEPARATOR + "* line if  *" + SystemUtils.LINE_SEPARATOR + "* it is    *" + SystemUtils.LINE_SEPARATOR
-        + "* working  *" + SystemUtils.LINE_SEPARATOR + "* properly *" + SystemUtils.LINE_SEPARATOR + "************", plate);
+    assertEquals(LINE_SEPARATOR + "************" + LINE_SEPARATOR + "* This     *"
+        + LINE_SEPARATOR + "* is a     *" + LINE_SEPARATOR + "* Boiler   *" + LINE_SEPARATOR
+        + "* Plate    *" + LINE_SEPARATOR + "* Message  *" + LINE_SEPARATOR + "* that     *"
+        + LINE_SEPARATOR + "* should   *" + LINE_SEPARATOR + "* get      *" + LINE_SEPARATOR
+        + "* wrapped  *" + LINE_SEPARATOR + "* to the   *" + LINE_SEPARATOR + "* next     *"
+        + LINE_SEPARATOR + "* line if  *" + LINE_SEPARATOR + "* it is    *" + LINE_SEPARATOR
+        + "* working  *" + LINE_SEPARATOR + "* properly *" + LINE_SEPARATOR + "************", plate);
   }
 
   @Test

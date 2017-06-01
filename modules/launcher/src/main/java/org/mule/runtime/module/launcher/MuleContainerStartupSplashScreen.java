@@ -8,9 +8,10 @@ package org.mule.runtime.module.launcher;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.sort;
+import static org.apache.commons.lang.StringUtils.defaultString;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getUserLibFolder;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.config.MuleManifest;
@@ -18,7 +19,6 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.NetworkUtils;
 import org.mule.runtime.core.util.SecurityUtils;
 import org.mule.runtime.core.util.SplashScreen;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -38,12 +38,12 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
     Manifest mf = MuleManifest.getManifest();
     Attributes att = mf.getMainAttributes();
     if (att.values().size() > 0) {
-      doBody(StringUtils.defaultString(MuleManifest.getProductDescription(), notset));
+      doBody(defaultString(MuleManifest.getProductDescription(), notset));
       doBody(String.format("%s Build: %s", CoreMessages.version().getMessage(),
-                           StringUtils.defaultString(MuleManifest.getBuildNumber(), notset)));
+                           defaultString(MuleManifest.getBuildNumber(), notset)));
 
-      doBody(StringUtils.defaultString(MuleManifest.getVendorName(), notset));
-      doBody(StringUtils.defaultString(MuleManifest.getProductMoreInfo(), notset));
+      doBody(defaultString(MuleManifest.getVendorName(), notset));
+      doBody(defaultString(MuleManifest.getProductMoreInfo(), notset));
     } else {
       doBody(CoreMessages.versionNotSet().getMessage());
     }

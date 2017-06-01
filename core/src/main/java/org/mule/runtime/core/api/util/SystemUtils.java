@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util;
+package org.mule.runtime.core.api.util;
 
+import static org.apache.commons.lang.StringUtils.INDEX_NOT_FOUND;
+import static org.apache.commons.lang.StringUtils.indexOf;
+import static org.apache.commons.lang.StringUtils.substring;
+import static org.apache.commons.lang.SystemUtils.JAVA_VM_VENDOR;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY;
-
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,14 +29,10 @@ import org.slf4j.LoggerFactory;
 
 // @ThreadSafe
 
-public class SystemUtils extends org.apache.commons.lang.SystemUtils {
+public class SystemUtils {
 
   // class logger
   protected static final Logger logger = LoggerFactory.getLogger(SystemUtils.class);
-
-  // bash prepends: declare -x
-  // zsh prepends: typeset -x
-  private static final String[] UNIX_ENV_PREFIXES = new String[] {"declare -", "typeset -"};
 
   // the environment of the VM process
   private static Map environment = null;
@@ -49,16 +45,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils {
   public static synchronized Map getenv() {
     if (environment == null) {
       try {
-        if (SystemUtils.IS_JAVA_1_4) {
-          // fallback to external process
-          environment = Collections.unmodifiableMap(getenvJDK14());
-        } else {
-          // the following runaround is necessary since we still want to
-          // compile on JDK 1.4
-          Class target = System.class;
-          Method envMethod = target.getMethod("getenv", ArrayUtils.EMPTY_CLASS_ARRAY);
-          environment = Collections.unmodifiableMap((Map) envMethod.invoke(target, (Object[]) null));
-        }
+        environment = System.getenv();
       } catch (Exception ex) {
         logger.error("Could not access OS environment: ", ex);
         environment = Collections.EMPTY_MAP;
@@ -68,74 +55,22 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils {
     return environment;
   }
 
-  private static Map getenvJDK14() throws Exception {
-    Map env = new HashMap();
-    Process process = null;
-
-    try {
-      boolean isUnix = true;
-      String command;
-
-      if (SystemUtils.IS_OS_WINDOWS) {
-        command = "cmd /c set";
-        isUnix = false;
-      } else {
-        command = "env";
-      }
-
-      process = Runtime.getRuntime().exec(command);
-      BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-      String line;
-      while ((line = br.readLine()) != null) {
-        for (String element : UNIX_ENV_PREFIXES) {
-          if (line.startsWith(element)) {
-            line = line.substring(element.length());
-          }
-        }
-
-        int index = -1;
-        if ((index = line.indexOf('=')) > -1) {
-          String key = line.substring(0, index).trim();
-          String value = line.substring(index + 1).trim();
-          // remove quotes, if any
-          if (isUnix && value.length() > 1 && (value.startsWith("\"") || value.startsWith("'"))) {
-            value = value.substring(1, value.length() - 1);
-          }
-          env.put(key, value);
-        } else {
-          env.put(line, StringUtils.EMPTY);
-        }
-      }
-    } catch (Exception e) {
-      throw e; // bubble up
-    } finally {
-      if (process != null) {
-        process.destroy();
-      }
-    }
-
-    return env;
-  }
-
   public static String getenv(String name) {
     return (String) SystemUtils.getenv().get(name);
   }
 
   public static boolean isSunJDK() {
-    return SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("SUN") != -1
-        || SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("ORACLE") != -1;
+    return JAVA_VM_VENDOR.toUpperCase().indexOf("SUN") != -1
+        || JAVA_VM_VENDOR.toUpperCase().indexOf("ORACLE") != -1;
   }
 
   public static boolean isAppleJDK() {
-    return SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("APPLE") != -1;
+    return JAVA_VM_VENDOR.toUpperCase().indexOf("APPLE") != -1;
   }
 
   public static boolean isIbmJDK() {
-    return SystemUtils.JAVA_VM_VENDOR.toUpperCase().indexOf("IBM") != -1;
+    return JAVA_VM_VENDOR.toUpperCase().indexOf("IBM") != -1;
   }
-
-  public static final boolean IS_JAVA_1_7 = (JAVA_VERSION_TRIMMED != null) && JAVA_VERSION_TRIMMED.startsWith("1.7");
 
   // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
 
@@ -157,26 +92,6 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils {
     } catch (ParseException p) {
       throw new DefaultMuleException("Unable to parse the Mule command line because of: " + p.toString(), p);
     }
-  }
-
-  /**
-   * Returns the value corresponding to the given option from the command line, for example if the options are "-config
-   * mule-config.xml" getCommandLineOption("config") would return "mule-config.xml"
-   */
-  // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
-  public static String getCommandLineOption(String option, String args[], String opts[][]) throws DefaultMuleException {
-    CommandLine line = parseCommandLine(args, opts);
-    return line.getOptionValue(option);
-  }
-
-  /**
-   * Checks whether a command line option is set. This is useful for command line options that don't have an argument, like
-   * "-cluster", which means that this Mule instance is part of a cluster.
-   */
-  // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
-  public static boolean hasCommandLineOption(String option, String args[], String opts[][]) throws DefaultMuleException {
-    CommandLine line = parseCommandLine(args, opts);
-    return line.hasOption(option);
   }
 
   /**
@@ -219,8 +134,8 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils {
     // this is the main loop that scans for all tokens
     findtoken: while (tokenStart < input.length()) {
       // find first definition or bail
-      tokenStart = StringUtils.indexOf(input, "-D", tokenStart);
-      if (tokenStart == StringUtils.INDEX_NOT_FOUND) {
+      tokenStart = indexOf(input, "-D", tokenStart);
+      if (tokenStart == INDEX_NOT_FOUND) {
         break findtoken;
       } else {
         // skip leading -D
@@ -247,8 +162,8 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils {
       // '-D='
       if (cursor == '=') {
         // skip over garbage to next potential definition
-        tokenStart = StringUtils.indexOf(input, ' ', tokenStart);
-        if (tokenStart != StringUtils.INDEX_NOT_FOUND) {
+        tokenStart = indexOf(input, ' ', tokenStart);
+        if (tokenStart != INDEX_NOT_FOUND) {
           // '-D= ..' - continue with next token
           continue findtoken;
         } else {
@@ -277,7 +192,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils {
       }
 
       // yay, finally a key
-      String key = StringUtils.substring(input, keyStart, keyEnd);
+      String key = substring(input, keyStart, keyEnd);
 
       // assume that there is no value following
       int valueStart = keyEnd;
@@ -296,19 +211,19 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils {
         cursor = input.charAt(valueStart);
         if (cursor == '"') {
           // opening "
-          valueEnd = StringUtils.indexOf(input, '"', ++valueStart);
+          valueEnd = indexOf(input, '"', ++valueStart);
         } else {
           // unquoted value
-          valueEnd = StringUtils.indexOf(input, ' ', valueStart);
+          valueEnd = indexOf(input, ' ', valueStart);
         }
 
         // no '"' or ' ' delimiter found - use the rest of the string
-        if (valueEnd == StringUtils.INDEX_NOT_FOUND) {
+        if (valueEnd == INDEX_NOT_FOUND) {
           valueEnd = input.length();
         }
 
         // create value
-        value = StringUtils.substring(input, valueStart, valueEnd);
+        value = substring(input, valueStart, valueEnd);
       }
 
       // finally create key and value && loop again for next token
@@ -322,19 +237,7 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils {
   }
 
   /**
-   * Ensure a generated file name is legal.
-   */
-  public static String legalizeFileName(String name) {
-    if (!SystemUtils.IS_OS_WINDOWS) {
-      return name;
-    }
-
-    // Assume slashes are deliberate. Change other illegal characters
-    return name.replaceAll("[:\\\\]", "_");
-  }
-
-  /**
-   * @return the configured default encoding, checking in the follwing order until a value is found:
+   * @return the configured default encoding, checking in the following order until a value is found:
    *         <ul>
    *         <li>{@code muleContext} -> {@link org.mule.runtime.core.api.config.MuleConfiguration#getDefaultEncoding()}</li>
    *         <li>The value of the system property 'mule.encoding'</li>

@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.config.spring.editors;
 
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.beans.PropertyEditor;
 import java.io.InputStream;
@@ -52,7 +52,7 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
     }
     for (Map.Entry<Class<?>, Class<PropertyEditor>> entry : customPropertyEditorsCache.entrySet()) {
       try {
-        final PropertyEditor customEditor = ClassUtils.instanciateClass(entry.getValue());
+        final PropertyEditor customEditor = ClassUtils.instantiateClass(entry.getValue());
         if (customEditor instanceof MuleContextAware) {
           ((MuleContextAware) customEditor).setMuleContext(muleContext);
         }
@@ -65,7 +65,7 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
   }
 
   private void discoverCustomPropertyEditor() {
-    customPropertyEditorsCache = new HashMap<Class<?>, Class<PropertyEditor>>();
+    customPropertyEditorsCache = new HashMap<>();
 
     // Look for any editors needed by extensions
     try {
@@ -84,7 +84,7 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
             customPropertyEditorsCache.put(requiredType, propertyEditorClass);
           }
         } finally {
-          IOUtils.closeQuietly(stream);
+          closeQuietly(stream);
         }
       }
     } catch (Exception e) {

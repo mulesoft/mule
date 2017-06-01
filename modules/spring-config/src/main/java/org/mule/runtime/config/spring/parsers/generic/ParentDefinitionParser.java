@@ -9,7 +9,6 @@ package org.mule.runtime.config.spring.parsers.generic;
 import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.runtime.config.spring.parsers.AbstractHierarchicalDefinitionParser;
 import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
-import org.mule.runtime.core.util.ClassUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -31,7 +30,7 @@ public class ParentDefinitionParser extends AbstractHierarchicalDefinitionParser
   @Override
   protected Class getBeanClass(Element element) {
     try {
-      return ClassUtils.getClass(getParentBeanDefinition(element).getBeanClassName());
+      return org.apache.commons.lang.ClassUtils.getClass(getParentBeanDefinition(element).getBeanClassName());
     } catch (Exception e) {
       // Should continue to work, but automatic collection detection etc will fail
       logger.debug("No class for " + element);

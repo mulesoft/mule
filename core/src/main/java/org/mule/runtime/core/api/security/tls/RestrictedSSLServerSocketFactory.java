@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.security.tls;
 
-import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.runtime.core.internal.util.ArrayUtils;
 
 import com.google.common.base.Joiner;
 

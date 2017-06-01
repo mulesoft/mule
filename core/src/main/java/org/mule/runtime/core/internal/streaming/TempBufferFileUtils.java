@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static org.mule.runtime.core.util.FileUtils.createTempFile;
+import static org.mule.runtime.core.api.util.FileUtils.createTempFile;
 
 import java.io.File;
 

@@ -6,7 +6,7 @@
  */
 package org.mule.tck.junit4;
 
-import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.api.util.FileUtils;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -71,9 +71,9 @@ public class TestsLogConfigurationHelper {
       folder = folder.getParentFile();
     }
 
-    File logConfigFile = FileUtils.findFileByName(folder, "log4j2-test.xml", true);
+    File logConfigFile = FileUtils.findFileByName(folder, "log4j2-test.xml");
     if (logConfigFile == null) {
-      logConfigFile = FileUtils.findFileByName(folder, "log4j2.xml", true);
+      logConfigFile = FileUtils.findFileByName(folder, "log4j2.xml");
     }
 
     String logConfigPath = logConfigFile != null && logConfigFile.isFile() ? logConfigFile.toURI().toString() : NULL_CONFIG_FILE;

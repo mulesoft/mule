@@ -8,7 +8,6 @@ package org.mule.runtime.core.policy;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.core.util.StringUtils;
 
 /**
  * Identifier for a policy state.

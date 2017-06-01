@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.core.util.compression;
 
+import static org.apache.commons.io.IOUtils.copy;
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,8 +92,8 @@ public class GZipCompression implements CompressionStrategy {
     } catch (IOException ioex) {
       throw ioex;
     } finally {
-      IOUtils.closeQuietly(gzos);
-      IOUtils.closeQuietly(baos);
+      closeQuietly(gzos);
+      closeQuietly(baos);
     }
   }
 
@@ -136,7 +138,7 @@ public class GZipCompression implements CompressionStrategy {
       gzis = new GZIPInputStream(bais);
       baos = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
 
-      IOUtils.copy(gzis, baos);
+      copy(gzis, baos);
       gzis.close();
       bais.close();
 
@@ -151,9 +153,9 @@ public class GZipCompression implements CompressionStrategy {
     } catch (IOException ioex) {
       throw ioex;
     } finally {
-      IOUtils.closeQuietly(gzis);
-      IOUtils.closeQuietly(bais);
-      IOUtils.closeQuietly(baos);
+      closeQuietly(gzis);
+      closeQuietly(bais);
+      closeQuietly(baos);
     }
   }
 

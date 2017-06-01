@@ -18,8 +18,15 @@ import static java.util.Collections.singletonMap;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.copyFileToDirectory;
+import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
+import static org.apache.commons.io.FileUtils.copyURLToFile;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.apache.commons.io.FileUtils.forceDelete;
+import static org.apache.commons.io.FileUtils.moveDirectory;
+import static org.apache.commons.io.FileUtils.touch;
+import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
+import static org.apache.commons.lang.StringUtils.removeEnd;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
@@ -59,7 +66,7 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
@@ -107,9 +114,8 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.core.policy.PolicyPointcut;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.FileUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
@@ -1027,7 +1033,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                  Paths.get("mule", DOMAIN_CONFIG_FILE).toString());
     String correctDomainConfigContent = IOUtils.toString(new FileInputStream(domainConfigFile));
     String wrongDomainFileContext = correctDomainConfigContent.replace("test-shared-config", "test-shared-config-wrong");
-    FileUtils.copyInputStreamToFile(new ByteArrayInputStream(wrongDomainFileContext.getBytes()), domainConfigFile);
+    copyInputStreamToFile(new ByteArrayInputStream(wrongDomainFileContext.getBytes()), domainConfigFile);
     long firstFileTimestamp = domainConfigFile.lastModified();
 
     startDeployment();
@@ -1039,7 +1045,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     reset(applicationDeploymentListener);
     reset(domainDeploymentListener);
 
-    FileUtils.copyInputStreamToFile(new ByteArrayInputStream(correctDomainConfigContent.getBytes()), domainConfigFile);
+    copyInputStreamToFile(new ByteArrayInputStream(correctDomainConfigContent.getBytes()), domainConfigFile);
     alterTimestampIfNeeded(domainConfigFile, firstFileTimestamp);
 
     assertDeploymentSuccess(domainDeploymentListener, sharedDomainFileBuilder.getId());
@@ -1260,7 +1266,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     File appFolder = new File(appsDir.getPath(), emptyAppFileBuilder.getId());
 
     File configFile = new File(appFolder, MULE_CONFIG_XML_FILE);
-    FileUtils.writeStringToFile(configFile, "you shall not pass");
+    writeStringToFile(configFile, "you shall not pass");
 
     startDeployment();
     assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.getId());
@@ -2844,7 +2850,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     File domainFolder = new File(domainsDir.getPath(), sharedDomainFileBuilder.getId());
     File configFile = new File(domainFolder, sharedDomainFileBuilder.getConfigFile());
     long firstFileTimestamp = configFile.lastModified();
-    FileUtils.touch(configFile);
+    touch(configFile);
     alterTimestampIfNeeded(configFile, firstFileTimestamp);
 
     assertUndeploymentSuccess(applicationDeploymentListener, sharedAAppFileBuilder.getId());
@@ -3171,7 +3177,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     reset(applicationDeploymentListener);
 
     File originalConfigFile = new File(appsDir + "/" + emptyAppFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
-    FileUtils.forceDelete(originalConfigFile);
+    forceDelete(originalConfigFile);
 
     assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.getId());
     assertStatus(emptyAppFileBuilder.getId(), ApplicationStatus.DEPLOYMENT_FAILED);
@@ -3887,8 +3893,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       // copy is not atomic, copy to a temp file and rename instead (rename is atomic)
       final String tempFileName = new File((targetFile == null ? url.getFile() : targetFile) + ".part").getName();
       final File tempFile = new File(outputDir, tempFileName);
-      FileUtils.copyURLToFile(url, tempFile);
-      final File destFile = new File(StringUtils.removeEnd(tempFile.getAbsolutePath(), ".part"));
+      copyURLToFile(url, tempFile);
+      final File destFile = new File(removeEnd(tempFile.getAbsolutePath(), ".part"));
       File deployFolder = new File(destFile.getAbsolutePath().replace(JAR_FILE_SUFFIX, ""));
       if (deployFolder.exists()) {
         // Delete META-INF folder so maven file do not get duplicated during redeployment testing.
@@ -3968,7 +3974,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         FileUtils.deleteTree(appFolder);
       }
 
-      FileUtils.moveDirectory(tempFolder, appFolder);
+      moveDirectory(tempFolder, appFolder);
     } finally {
       lock.unlock();
     }

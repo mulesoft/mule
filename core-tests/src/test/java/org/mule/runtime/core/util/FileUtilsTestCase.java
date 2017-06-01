@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -13,7 +14,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.tck.ZipUtils.compress;
-import static org.mule.runtime.core.util.FileUtils.unzip;
+import static org.mule.runtime.core.api.util.FileUtils.unzip;
+import org.mule.runtime.core.api.util.FileUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -53,7 +56,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase {
 
       file = FileUtils.stringToFile(TEST_FILE, " and this is appended content", true);
 
-      String content = FileUtils.readFileToString(FileUtils.newFile(TEST_FILE), (String) null);
+      String content = readFileToString(FileUtils.newFile(TEST_FILE), (String) null);
 
       assertNotNull(content);
       assertTrue(content.indexOf("this is a test file") > -1);

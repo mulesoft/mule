@@ -4,11 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util;
+package org.mule.runtime.core.internal.util;
+
+import org.mule.runtime.core.api.util.FileUtils;
 
 import java.io.File;
 
-public class FilenameUtils extends org.apache.commons.io.FilenameUtils {
+public class FilenameUtils {
 
   public static File fileWithPathComponents(String[] pathComponents) {
     if (pathComponents == null) {

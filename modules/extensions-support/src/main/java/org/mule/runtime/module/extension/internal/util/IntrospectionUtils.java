@@ -12,6 +12,7 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
@@ -57,8 +58,7 @@ import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
@@ -83,7 +83,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.loader.java.property.TypedValueTypeModelProperty;
 
 import com.google.common.collect.ImmutableList;
-import org.springframework.core.ResolvableType;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -108,6 +107,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import org.springframework.core.ResolvableType;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -433,7 +434,7 @@ public final class IntrospectionUtils {
 
   public static Optional<Field> getField(Class<?> clazz, String name) {
     Collection<Field> candidates = getAllFields(clazz, withName(name));
-    return CollectionUtils.isEmpty(candidates) ? Optional.empty() : Optional.of(candidates.iterator().next());
+    return isEmpty(candidates) ? Optional.empty() : Optional.of(candidates.iterator().next());
   }
 
   /**
@@ -507,7 +508,7 @@ public final class IntrospectionUtils {
 
     List<Type> generics = getSuperClassGenerics(type, superClass);
 
-    if (CollectionUtils.isEmpty(generics) && !Object.class.equals(superClass)) {
+    if (isEmpty(generics) && !Object.class.equals(superClass)) {
       return findGenericsInSuperHierarchy(superClass);
     }
 
@@ -634,8 +635,13 @@ public final class IntrospectionUtils {
   }
 
   public static List<Field> getFields(Class<?> clazz) {
-    return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields()))
-        .collect(new ImmutableListCollector<>());
+    try {
+      return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields()))
+          .collect(new ImmutableListCollector<>());
+    } catch (Throwable e) {
+      System.out.println("MONCHO class: " + clazz.getName());
+      throw new RuntimeException(e);
+    }
   }
 
   /**

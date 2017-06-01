@@ -6,7 +6,7 @@
  */
 package org.mule.tck.services;
 
-import org.mule.runtime.core.util.StringUtils;
+import static org.apache.commons.lang.StringUtils.reverse;
 
 import java.rmi.Remote;
 
@@ -16,7 +16,7 @@ import java.rmi.Remote;
 public class MatchingMethodsComponent implements Remote {
 
   public String reverseString(String string) {
-    return StringUtils.reverse(string);
+    return reverse(string);
   }
 
   public String upperCaseString(String string) {

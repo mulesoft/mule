@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static org.apache.commons.lang.StringUtils.join;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.nio.charset.Charset;
 
@@ -40,7 +40,7 @@ public class ObjectArrayToString extends AbstractTransformer implements Discover
     }
 
     Object[] in = (Object[]) src;
-    String out = StringUtils.join(in, getDelimiter());
+    String out = join(in, getDelimiter());
 
     /*
      * for (int i = 0; i < in.length; i++) { if (in[i] != null) { if (i > 0) out += getDelimiter(); out += in[i].toString(); } }

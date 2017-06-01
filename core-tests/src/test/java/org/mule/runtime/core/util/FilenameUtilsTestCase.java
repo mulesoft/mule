@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.SystemUtils.getUserDir;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import org.mule.runtime.core.api.util.FileUtils;
+import org.mule.runtime.core.internal.util.FilenameUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 @SmallTest
 public class FilenameUtilsTestCase extends AbstractMuleTestCase {
@@ -52,7 +54,7 @@ public class FilenameUtilsTestCase extends AbstractMuleTestCase {
    * Used to obtain base directory used in tests. Uses the build directory; "target" in the current working directory.
    */
   private File getBuidDirectory() {
-    return FileUtils.newFile(SystemUtils.getUserDir(), "target");
+    return FileUtils.newFile(getUserDir(), "target");
   }
 
 }

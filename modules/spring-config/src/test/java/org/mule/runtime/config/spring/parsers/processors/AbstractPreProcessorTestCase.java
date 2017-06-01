@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.parsers.processors;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.config.spring.parsers.PreProcessor;
-import org.mule.runtime.core.util.ArrayUtils;
+import org.mule.runtime.core.internal.util.ArrayUtils;
 
 import java.util.StringTokenizer;
 

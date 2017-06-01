@@ -39,7 +39,7 @@ import org.mule.runtime.core.context.notification.RoutingNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessorBase;
-import org.mule.runtime.core.util.ObjectUtils;
+import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
@@ -75,7 +75,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   protected final ConcurrentMap<String, Event> responseEvents = new ConcurrentHashMap<>();
   protected final Object processedLock = new Object();
   // @GuardedBy processedLock
-  protected final BoundedFifoBuffer processed = new BoundedFifoBuffer(MAX_PROCESSED_GROUPS);
+  private final BoundedFifoBuffer processed = new BoundedFifoBuffer(MAX_PROCESSED_GROUPS);
 
   protected ListableObjectStore store;
 

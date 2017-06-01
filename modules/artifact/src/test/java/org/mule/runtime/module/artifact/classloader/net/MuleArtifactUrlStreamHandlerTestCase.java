@@ -6,13 +6,17 @@
  */
 package org.mule.runtime.module.artifact.classloader.net;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mule.runtime.core.util.IOUtils;
+import static java.io.File.separator;
+import static org.apache.commons.io.IOUtils.contentEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlConnection.CLASSES_FOLDER;
+import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlConnection.SEPARATOR;
+import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler.PROTOCOL;
+import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler.register;
+import static org.mule.runtime.module.artifact.classloader.net.MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -33,16 +37,12 @@ import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static java.io.File.*;
-import static org.apache.commons.io.IOUtils.contentEquals;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlConnection.CLASSES_FOLDER;
-import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlConnection.SEPARATOR;
-import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler.PROTOCOL;
-import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler.register;
-import static org.mule.runtime.module.artifact.classloader.net.MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
  * Tests urls on a ZIP file that imitates a mule plugin successfully.
@@ -88,7 +88,7 @@ public class MuleArtifactUrlStreamHandlerTestCase extends AbstractMuleTestCase {
     InputStream actualInputStream = url.openStream();
     assertThat(actualInputStream, notNullValue());
 
-    String expectedRootResourceContent = IOUtils.toString(getClass().getClassLoader()
+    String expectedRootResourceContent = org.apache.commons.io.IOUtils.toString(getClass().getClassLoader()
         .getResource(
                      new File(MULE_MODULE_ARTIFACT_PLUGIN + separator + rootResource)
                          .getPath()));

@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.component.simple.StaticComponent;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -39,7 +39,7 @@ public class StaticComponentDefinitionParser extends SimpleComponentDefinitionPa
     for (int i = 0; i < list.getLength(); i++) {
       if ("return-data".equals(list.item(i).getLocalName())) {
         Element rData = (Element) list.item(i);
-        if (StringUtils.isNotEmpty(rData.getAttribute("file"))) {
+        if (!isEmpty(rData.getAttribute("file"))) {
           String file = rData.getAttribute("file");
           try {
             returnData = IOUtils.getResourceAsString(file, getClass());

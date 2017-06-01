@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.util.FileUtils.newFile;
+import static org.mule.runtime.core.api.util.FileUtils.newFile;
 
 import org.mule.runtime.module.deployment.impl.internal.AbstractSplashScreenTestCase;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;

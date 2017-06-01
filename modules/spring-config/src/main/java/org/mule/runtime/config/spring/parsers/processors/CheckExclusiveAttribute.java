@@ -9,7 +9,6 @@ package org.mule.runtime.config.spring.parsers.processors;
 import org.mule.runtime.config.spring.parsers.PreProcessor;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -42,7 +41,7 @@ public class CheckExclusiveAttribute implements PreProcessor {
       if (!config.isIgnored(alias)) {
         if (attribute.equals(alias)) {
           found = true;
-        } else if (StringUtils.equals(element.getNamespaceURI(), attribute.getNamespaceURI())) {
+        } else if (org.apache.commons.lang.StringUtils.equals(element.getNamespaceURI(), attribute.getNamespaceURI())) {
           foundAttributes.add(alias);
         }
       }

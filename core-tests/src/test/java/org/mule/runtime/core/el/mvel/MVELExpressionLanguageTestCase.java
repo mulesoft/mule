@@ -47,7 +47,6 @@ import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.function.RegexExpressionLanguageFuntion;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.File;
@@ -541,7 +540,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     File[] files = directory.listFiles();
     for (File file : files) {
       if (file.getName().endsWith(".class")) {
-        classes.add(ClassUtils.getClass(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
+        classes.add(org.apache.commons.lang.ClassUtils
+            .getClass(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
       }
     }
     return classes;

@@ -19,8 +19,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.util.ClassUtils.getSatisfiableMethods;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.getSatisfiableMethods;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.AbstractFruit;
@@ -110,11 +111,11 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testInstanciateClass() throws Exception {
-    Object object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.Orange");
+    Object object = ClassUtils.instantiateClass("org.mule.tck.testmodels.fruit.Orange");
     assertNotNull(object);
     assertTrue(object instanceof Orange);
 
-    object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Apple(), new Banana());
+    object = ClassUtils.instantiateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Apple(), new Banana());
     assertNotNull(object);
     assertTrue(object instanceof FruitBowl);
 
@@ -124,7 +125,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
     assertTrue(bowl.hasBanana());
 
     try {
-      ClassUtils.instanciateClass("java.lang.Bing");
+      ClassUtils.instantiateClass("java.lang.Bing");
       fail("Class does not exist, ClassNotFoundException should have been thrown");
     } catch (ClassNotFoundException e) {
       // expected

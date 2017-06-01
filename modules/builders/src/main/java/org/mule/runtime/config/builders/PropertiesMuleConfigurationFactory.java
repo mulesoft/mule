@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.config.builders;
 
+import static org.apache.commons.beanutils.BeanUtils.setProperty;
+import static org.apache.commons.io.FilenameUtils.getFullPath;
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.util.BeanUtils;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.FilenameUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +22,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class PropertiesMuleConfigurationFactory {
   private Properties properties;
 
   public static String getMuleAppConfiguration(String muleConfig) {
-    String directory = FilenameUtils.getFullPath(muleConfig);
+    String directory = getFullPath(muleConfig);
     String muleAppConfiguration = directory + DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
     return muleAppConfiguration;
   }
@@ -48,7 +48,7 @@ public class PropertiesMuleConfigurationFactory {
       } catch (IOException e) {
         logger.debug("Unable to read properties", e);
       } finally {
-        IOUtils.closeQuietly(inputStream);
+        closeQuietly(inputStream);
       }
     }
   }
@@ -77,7 +77,7 @@ public class PropertiesMuleConfigurationFactory {
       } else if (key.startsWith("mule.config.")) {
         String configProperty = key.substring(12);
         try {
-          BeanUtils.setProperty(configuration, configProperty, value);
+          setProperty(configuration, configProperty, value);
         } catch (IllegalAccessException | InvocationTargetException e) {
           logger.error("Cannot set configuration property", e);
         }

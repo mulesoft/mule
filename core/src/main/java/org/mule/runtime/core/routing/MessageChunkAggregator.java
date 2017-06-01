@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.routing;
 
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.serialization.SerializationException;
-import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.runtime.core.routing.correlation.CorrelationSequenceComparator;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
@@ -18,7 +19,6 @@ import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
 public class MessageChunkAggregator extends AbstractAggregator {
@@ -77,7 +77,7 @@ public class MessageChunkAggregator extends AbstractAggregator {
         } catch (Exception e) {
           throw new AggregationException(events, MessageChunkAggregator.this, e);
         } finally {
-          IOUtils.closeQuietly(baos);
+          closeQuietly(baos);
         }
       }
     };

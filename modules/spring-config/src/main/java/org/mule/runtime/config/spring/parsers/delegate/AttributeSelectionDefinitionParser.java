@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.parsers.delegate;
 
 import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
-import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.api.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.Map;

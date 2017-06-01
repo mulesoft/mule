@@ -17,7 +17,7 @@ import org.mule.metadata.api.model.impl.BaseMetadataType;
 import org.mule.metadata.json.JsonTypeLoader;
 import org.mule.metadata.xml.SchemaCollector;
 import org.mule.metadata.xml.XmlTypeLoader;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;

@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
-import org.mule.runtime.core.util.BeanUtils;
+import org.mule.runtime.core.api.util.BeanUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;

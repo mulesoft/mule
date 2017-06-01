@@ -7,10 +7,10 @@
 
 package org.mule.runtime.module.artifact.util;
 
+import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import org.mule.runtime.core.util.FileUtils;
 import org.mule.tck.ZipUtils;
 import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -48,8 +48,8 @@ public class FileJarExplorerTestCase extends AbstractMuleTestCase {
     final File orgFolder = new File(folder, "org");
     final File orgFooFolder = new File(orgFolder, "foo");
     final File orgFooBarFolder = new File(orgFolder, "bar");
-    FileUtils.writeStringToFile(new File(orgFooFolder, "Foo.class"), "foo");
-    FileUtils.writeStringToFile(new File(orgFooBarFolder, "Bar.class"), "bar");
+    writeStringToFile(new File(orgFooFolder, "Foo.class"), "foo");
+    writeStringToFile(new File(orgFooBarFolder, "Bar.class"), "bar");
 
     final Set<String> packages = packageExplorer.explore(folder.toURI().toURL()).getPackages();
     assertThat(packages.size(), equalTo(2));

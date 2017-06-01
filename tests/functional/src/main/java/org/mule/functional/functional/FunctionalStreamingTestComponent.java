@@ -6,12 +6,12 @@
  */
 package org.mule.functional.functional;
 
-import static org.mule.runtime.core.util.IOUtils.ifInputStream;
+import static org.mule.runtime.core.api.util.IOUtils.ifInputStream;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.io.IOException;

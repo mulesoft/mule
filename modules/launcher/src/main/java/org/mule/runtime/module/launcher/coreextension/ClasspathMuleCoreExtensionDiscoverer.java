@@ -10,7 +10,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.net.URL;
@@ -69,7 +69,7 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
         String extName = (String) entry.getKey();
         String extClass = (String) entry.getValue();
         try {
-          MuleCoreExtension extension = (MuleCoreExtension) ClassUtils.instanciateClass(extClass);
+          MuleCoreExtension extension = (MuleCoreExtension) ClassUtils.instantiateClass(extClass);
           extension.setContainerClassLoader(containerClassLoader);
           result.add(extension);
         } catch (Exception ex) {

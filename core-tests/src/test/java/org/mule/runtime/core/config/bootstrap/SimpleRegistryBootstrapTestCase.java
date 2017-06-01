@@ -16,7 +16,6 @@ import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
@@ -32,7 +31,8 @@ public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase
   @Test(expected = ClassNotFoundException.class)
   public void registeringOptionalTransaction() throws Exception {
     createTestRegistryBootstrap(APP);
-    muleContext.getTransactionFactoryManager().getTransactionFactoryFor(ClassUtils.getClass(TEST_TRANSACTION_FACTORY_CLASS));
+    muleContext.getTransactionFactoryManager()
+        .getTransactionFactoryFor(org.apache.commons.lang.ClassUtils.getClass(TEST_TRANSACTION_FACTORY_CLASS));
   }
 
   @Test

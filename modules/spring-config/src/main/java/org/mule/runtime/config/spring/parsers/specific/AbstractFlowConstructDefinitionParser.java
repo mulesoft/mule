@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
-import org.mule.runtime.core.util.StringUtils;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -48,7 +48,7 @@ public abstract class AbstractFlowConstructDefinitionParser extends AbstractMule
 
   private void handleParentAttribute(Element element, BeanDefinitionBuilder builder) {
     final String parentAttribute = element.getAttribute(PARENT_ATTRIBUTE);
-    if (StringUtils.isNotBlank(parentAttribute)) {
+    if (!isBlank(parentAttribute)) {
       builder.setParentName(parentAttribute);
     }
     element.removeAttribute(PARENT_ATTRIBUTE);
@@ -56,7 +56,7 @@ public abstract class AbstractFlowConstructDefinitionParser extends AbstractMule
 
   private void handleAbstractAttribute(Element element, BeanDefinitionBuilder builder) {
     final String abstractAttribute = element.getAttribute(ABSTRACT_ATTRIBUTE);
-    if (StringUtils.isNotBlank(abstractAttribute)) {
+    if (!isBlank(abstractAttribute)) {
       builder.setAbstract(Boolean.parseBoolean(abstractAttribute));
     }
     element.removeAttribute(ABSTRACT_ATTRIBUTE);

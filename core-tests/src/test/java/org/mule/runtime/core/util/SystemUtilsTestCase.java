@@ -6,6 +6,13 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.SystemUtils.IS_OS_WINDOWS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import org.mule.runtime.core.api.util.MapUtils;
+import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -14,11 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
 
 @SmallTest
 public class SystemUtilsTestCase extends AbstractMuleTestCase {
@@ -31,7 +33,7 @@ public class SystemUtilsTestCase extends AbstractMuleTestCase {
     assertSame(env, SystemUtils.getenv());
 
     String envVarToTest = "PATH";
-    if (SystemUtils.IS_OS_WINDOWS) {
+    if (IS_OS_WINDOWS) {
       // Depending on the presence of Cygwin, it might be one or the other.
       if (env.get(envVarToTest) == null) {
         envVarToTest = "Path";

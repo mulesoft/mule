@@ -9,6 +9,10 @@ package org.mule.runtime.module.reboot;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_BASE_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 
+import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.util.FileUtils;
+import org.mule.runtime.core.api.util.IOUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -145,7 +149,7 @@ public final class MuleContainerBootstrapUtils {
   //////////////////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @see org.mule.runtime.core.util.ClassUtils#getResource
+   * @see ClassUtils#getResource
    */
   public static URL getResource(final String resourceName, final Class<?> callingClass) {
     URL url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> {
@@ -166,7 +170,7 @@ public final class MuleContainerBootstrapUtils {
   }
 
   /**
-   * @see org.mule.runtime.core.util.FileUtils#renameFile
+   * @see FileUtils#renameFile
    */
   public static boolean renameFile(File srcFile, File destFile) throws IOException {
     boolean isRenamed = false;
@@ -184,7 +188,7 @@ public final class MuleContainerBootstrapUtils {
   }
 
   /**
-   * @see org.mule.runtime.core.util.FileUtils#renameFileHard
+   * @see FileUtils#renameFileHard
    */
   public static boolean renameFileHard(File srcFile, File destFile) throws IOException {
     boolean isRenamed = false;
@@ -218,7 +222,7 @@ public final class MuleContainerBootstrapUtils {
   }
 
   /**
-   * @see org.mule.runtime.core.util.IOUtils#copy
+   * @see IOUtils#copy
    */
   public static int copy(InputStream input, OutputStream output) throws IOException {
     long count = copyLarge(input, output);
@@ -229,7 +233,7 @@ public final class MuleContainerBootstrapUtils {
   }
 
   /**
-   * @see org.mule.runtime.core.util.IOUtils#copyLarge
+   * @see IOUtils#copyLarge
    */
   public static long copyLarge(InputStream input, OutputStream output) throws IOException {
     byte[] buffer = new byte[1024 * 4];

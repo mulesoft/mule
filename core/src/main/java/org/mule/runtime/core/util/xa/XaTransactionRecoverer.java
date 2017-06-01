@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util.xa;
 
-import org.mule.runtime.core.util.CollectionUtils;
+import static org.apache.commons.collections.CollectionUtils.find;
 import org.mule.runtime.core.util.journal.queue.XaQueueTxJournalEntry;
 import org.mule.runtime.core.util.journal.queue.XaTxQueueTransactionJournal;
 import org.mule.runtime.core.util.queue.PersistentXaTransactionContext;
@@ -58,7 +58,7 @@ public class XaTransactionRecoverer {
     List<Xid> txsToRecover = new ArrayList<Xid>();
     for (Xid xid : xidXaJournalEntryMultimap.keySet()) {
       Collection<XaQueueTxJournalEntry> entries = xidXaJournalEntryMultimap.get(xid);
-      Object commitOrRollback = CollectionUtils.find(entries, new Predicate() {
+      Object commitOrRollback = find(entries, new Predicate() {
 
         @Override
         public boolean evaluate(Object object) {

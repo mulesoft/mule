@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
+import static org.apache.commons.lang.StringUtils.split;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.runtime.core.routing.filters.RegExFilter;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class RegExFilterDefinitionParser extends FilterDefinitionParser {
     public Object rewrite(String value) {
       int combinedFlags = 0;
 
-      String[] flagStrings = StringUtils.split(value, ',');
+      String[] flagStrings = split(value, ',');
       for (String flagString : flagStrings) {
         Integer flag = FlagsMapping.get(flagString);
         if (flag == null) {

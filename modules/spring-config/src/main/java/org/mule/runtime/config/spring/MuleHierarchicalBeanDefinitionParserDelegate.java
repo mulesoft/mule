@@ -43,8 +43,7 @@ import org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 
 import com.google.common.collect.ImmutableList;
@@ -280,7 +279,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
       if (currentDefinition instanceof AbstractBeanDefinition) {
         return of(((AbstractBeanDefinition) currentDefinition).getBeanClass());
       }
-      return of(ClassUtils.getClass(currentDefinition.getBeanClassName()));
+      return of(org.apache.commons.lang.ClassUtils.getClass(currentDefinition.getBeanClassName()));
     } catch (Exception e) {
       return empty();
     }
@@ -304,17 +303,19 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     {
       if (finalChild != null) {
         try {
-          Class<?> type = ClassUtils.getClass(finalChild.getBeanClassName());
+          Class<?> type = org.apache.commons.lang.ClassUtils.getClass(finalChild.getBeanClassName());
           if (FactoryBean.class.isAssignableFrom(type)) {
             try {
               // When the FactoryBean implementation implements the FactoryBean directly.
-              type = (Class<?>) ((ParameterizedType) ClassUtils.getClass(finalChild.getBeanClassName()).getGenericInterfaces()[0])
-                  .getActualTypeArguments()[0];
+              type = (Class<?>) ((ParameterizedType) org.apache.commons.lang.ClassUtils.getClass(finalChild.getBeanClassName())
+                  .getGenericInterfaces()[0])
+                      .getActualTypeArguments()[0];
             } catch (Exception e2) {
               try {
                 // When the FactoryBean implementation extends a Class that implements FactoryBean.
-                type = (Class<?>) ((ParameterizedType) ClassUtils.getClass(finalChild.getBeanClassName()).getGenericSuperclass())
-                    .getActualTypeArguments()[0];
+                type = (Class<?>) ((ParameterizedType) org.apache.commons.lang.ClassUtils.getClass(finalChild.getBeanClassName())
+                    .getGenericSuperclass())
+                        .getActualTypeArguments()[0];
               } catch (Exception e3) {
                 try {
                   // We get the type directly from a FactoryBean instance if it has a default constructor.

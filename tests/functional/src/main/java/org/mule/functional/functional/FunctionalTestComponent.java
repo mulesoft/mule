@@ -25,8 +25,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.NumberUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.util.ArrayList;
@@ -174,7 +173,7 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
   protected void throwException() throws Exception {
     if (getExceptionToThrow() != null) {
       if (StringUtils.isNotBlank(exceptionText)) {
-        Throwable exception = ClassUtils.instanciateClass(getExceptionToThrow(),
+        Throwable exception = ClassUtils.instantiateClass(getExceptionToThrow(),
                                                           new Object[] {exceptionText});
         throw (Exception) exception;
       } else {
@@ -362,7 +361,7 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
     if (messageHistory != null) {
       return messageHistory.size();
     } else {
-      return NumberUtils.INTEGER_MINUS_ONE.intValue();
+      return -1;
     }
   }
 

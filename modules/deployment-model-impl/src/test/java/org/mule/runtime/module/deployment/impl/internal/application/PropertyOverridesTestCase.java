@@ -7,12 +7,12 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.util.Collections.emptyList;
+import static org.apache.commons.io.IOUtils.copy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
@@ -58,7 +58,7 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase {
     File tempProps = File.createTempFile("property", "overrides");
     InputStream input = getClass().getClassLoader().getResourceAsStream("overridden.properties");
     FileOutputStream output = new FileOutputStream(tempProps);
-    IOUtils.copy(input, output);
+    copy(input, output);
     input.close();
     output.close();
     ApplicationDescriptor descriptor = new ApplicationDescriptor("app");

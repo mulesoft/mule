@@ -22,9 +22,9 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
-import static org.mule.runtime.core.util.IOUtils.getResourceAsUrl;
-import static org.mule.runtime.core.util.IOUtils.toMuleMessagePart;
 
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
+import static org.mule.runtime.core.api.util.IOUtils.toMuleMessagePart;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.api.transformer.TransformerException;

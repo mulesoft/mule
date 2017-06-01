@@ -94,7 +94,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     initialiseIfNeeded(byteArrayToHexString, muleContext);
   }
 
-  protected Factory internalObjectStoreFactory() {
+  private Factory internalObjectStoreFactory() {
     return () -> {
       ObjectStoreManager objectStoreManager = muleContext.getObjectStoreManager();
       return objectStoreManager.getObjectStore(flowConstruct.getName() + "." + getClass().getName(), false, -1, 60 * 5 * 1000,

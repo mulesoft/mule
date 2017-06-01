@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 public final class DefaultSourceFactory implements SourceFactory {
 
@@ -23,7 +23,7 @@ public final class DefaultSourceFactory implements SourceFactory {
   @Override
   public Source createSource() {
     try {
-      return ClassUtils.instanciateClass(sourceType);
+      return ClassUtils.instantiateClass(sourceType);
     } catch (Exception e) {
       throw new RuntimeException("Exception found trying to instantiate source type " + sourceType.getName(), e);
     }

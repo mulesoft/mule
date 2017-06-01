@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring.dsl.spring;
 
 import org.mule.runtime.dsl.api.component.MapEntry;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class MapFactoryBean implements FactoryBean {
 
   @Override
   public Map getObject() throws Exception {
-    Map map = ClassUtils.instanciateClass(mapType);
+    Map map = ClassUtils.instantiateClass(mapType);
     for (MapEntry mapEntry : mapEntries) {
       map.put(mapEntry.getKey(), mapEntry.getValue());
     }

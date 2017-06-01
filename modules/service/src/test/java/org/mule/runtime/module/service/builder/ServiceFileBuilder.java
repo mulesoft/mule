@@ -9,7 +9,7 @@ package org.mule.runtime.module.service.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.mule.runtime.module.service.ServiceDescriptor.SERVICE_PROPERTIES;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.tck.ZipUtils;
 

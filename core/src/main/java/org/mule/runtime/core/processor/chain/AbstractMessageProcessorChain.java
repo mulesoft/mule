@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor.chain;
 
+import static org.apache.commons.lang.StringUtils.replace;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -15,7 +16,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
-import static org.mule.runtime.core.util.ExceptionUtils.updateMessagingExceptionWithError;
+import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -43,10 +45,9 @@ import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
+import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.streaming.StreamingManager;
-import org.mule.runtime.core.util.ExceptionUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -285,7 +286,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   public String toString() {
     StringBuilder string = new StringBuilder();
     string.append(getClass().getSimpleName());
-    if (StringUtils.isNotBlank(name)) {
+    if (!isBlank(name)) {
       string.append(String.format(" '%s' ", name));
     }
 
@@ -298,7 +299,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
       string.append(String.format("%n[ "));
       while (mpIterator.hasNext()) {
         Processor mp = mpIterator.next();
-        final String indented = StringUtils.replace(mp.toString(), nl, String.format("%n  "));
+        final String indented = replace(mp.toString(), nl, String.format("%n  "));
         string.append(String.format("%n  %s", indented));
         if (mpIterator.hasNext()) {
           string.append(", ");

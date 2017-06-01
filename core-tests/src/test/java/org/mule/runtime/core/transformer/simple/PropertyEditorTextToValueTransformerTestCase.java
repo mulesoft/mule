@@ -7,7 +7,6 @@
 package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 
 import java.beans.PropertyEditor;
@@ -41,7 +40,7 @@ public class PropertyEditorTextToValueTransformerTestCase extends AbstractTransf
     ClassNotFoundException exception = null;
     for (String className : classNames) {
       try {
-        return (PropertyEditor) ClassUtils.getClass(className).newInstance();
+        return (PropertyEditor) org.apache.commons.lang.ClassUtils.getClass(className).newInstance();
       } catch (ClassNotFoundException e) {
         exception = e;
       }

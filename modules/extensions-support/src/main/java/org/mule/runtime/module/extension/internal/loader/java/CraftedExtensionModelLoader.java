@@ -9,10 +9,10 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
-import static org.mule.runtime.core.util.ClassUtils.loadClass;
+import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingDelegate;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
@@ -56,7 +56,7 @@ public class CraftedExtensionModelLoader extends ExtensionModelLoader {
 
     ExtensionLoadingDelegate delegate;
     try {
-      delegate = (ExtensionLoadingDelegate) instanciateClass(delegateType);
+      delegate = (ExtensionLoadingDelegate) ClassUtils.instantiateClass(delegateType);
     } catch (Throwable e) {
       throw new MuleRuntimeException(createStaticMessage(format("Could not instantiate type '%s'", delegateType.getName())), e);
     }

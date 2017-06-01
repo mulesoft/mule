@@ -9,14 +9,14 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.ClassUtils.getClassName;
+import static org.mule.runtime.core.api.util.ClassUtils.getClassName;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.param.Query;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
@@ -94,7 +94,7 @@ public final class QueryMetadataResolverFactory implements MetadataResolverFacto
 
   private <T> T instantiateResolver(Class<?> factoryType) {
     try {
-      return (T) ClassUtils.instanciateClass(factoryType);
+      return (T) ClassUtils.instantiateClass(factoryType);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create NamedTypeResolver of type "
           + getClassName(factoryType)), e);

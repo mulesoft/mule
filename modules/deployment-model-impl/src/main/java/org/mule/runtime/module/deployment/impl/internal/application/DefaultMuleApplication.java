@@ -7,27 +7,25 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang.exception.ExceptionUtils.getRootCause;
+import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
-import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.DeploymentStopException;
@@ -46,12 +44,10 @@ import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,7 +155,7 @@ public class DefaultMuleApplication implements Application {
       if (e instanceof MuleException) {
         logger.error(((MuleException) e).getDetailedMessage());
       } else {
-        logger.error(null, ExceptionUtils.getRootCause(e));
+        logger.error(null, getRootCause(e));
       }
 
       throw new DeploymentStartException(createStaticMessage(format("Error starting application '%s'", descriptor.getName())), e);
@@ -201,8 +197,8 @@ public class DefaultMuleApplication implements Application {
       setStatusToFailed();
 
       // log it here so it ends up in app log, sys log will only log a message without stacktrace
-      logger.error(null, ExceptionUtils.getRootCause(e));
-      throw new DeploymentInitException(createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
+      logger.error(null, getRootCause(e));
+      throw new DeploymentInitException(createStaticMessage(getRootCauseMessage(e)), e);
     }
   }
 
@@ -247,19 +243,6 @@ public class DefaultMuleApplication implements Application {
     }
 
     status = ApplicationStatus.DEPLOYMENT_FAILED;
-  }
-
-  protected ConfigurationBuilder createConfigurationBuilderFromApplicationProperties() {
-    // Load application properties first since they may be needed by other configuration builders
-    final Map<String, String> appProperties = descriptor.getAppProperties();
-
-    // Add the app.home variable to the context
-    File appPath = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), getArtifactName());
-    appProperties.put(MuleProperties.APP_HOME_DIRECTORY_PROPERTY, appPath.getAbsolutePath());
-
-    appProperties.put(MuleProperties.APP_NAME_PROPERTY, getArtifactName());
-
-    return new SimpleConfigurationBuilder(appProperties);
   }
 
   @Override

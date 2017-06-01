@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.core.management.stats.printers;
 
-import org.mule.runtime.core.util.StringUtils;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
+import org.mule.runtime.core.api.util.StringUtils;
 
 import java.io.OutputStream;
 import java.io.Writer;
@@ -40,13 +41,13 @@ public class HtmlTablePrinter extends AbstractTablePrinter {
       println("<tr class=\"" + ((i % 2 == 0) ? "darkline" : "clearline") + "\">");
       for (int j = 0; j < table.length; j++) {
         if (j == 0) {
-          if (StringUtils.equals(table[1][i], "-")) {
-            if (StringUtils.equals(table[j][i], "By Provider")) {
+          if (org.apache.commons.lang.StringUtils.equals(table[1][i], "-")) {
+            if (org.apache.commons.lang.StringUtils.equals(table[j][i], "By Provider")) {
               println("<td class=\"statisticsrow\"><div class=\"tablesubheader\">" + table[j][i] + "</div></td>");
             } else {
               println("<td class=\"statisticsrow\"><div class=\"tableheader\">" + table[j][i] + "</div></td>");
             }
-          } else if (StringUtils.isNotEmpty(table[j][i])) {
+          } else if (!isEmpty(table[j][i])) {
             println("<td class=\"statisticsrow\">" + table[j][i] + "</td>");
           } else {
             println("<td class=\"statisticsrow\">&nbsp;</td>");
@@ -55,12 +56,13 @@ public class HtmlTablePrinter extends AbstractTablePrinter {
           if (providerStats) {
             println("<td class=\"statisticsrow\">" + getProviderStatsHtml(table[j][i]) + "</td>");
           } else {
-            println("<td class=\"statisticsrow\">" + ((StringUtils.equals(table[j][i], "-")) ? "" : table[j][i]) + "</td>");
+            println("<td class=\"statisticsrow\">"
+                + ((org.apache.commons.lang.StringUtils.equals(table[j][i], "-")) ? "" : table[j][i]) + "</td>");
           }
         }
       }
       println("</tr>");
-      if (StringUtils.equals(table[0][i], "By Provider")) {
+      if (org.apache.commons.lang.StringUtils.equals(table[0][i], "By Provider")) {
         providerStats = true;
       } else {
         providerStats = false;

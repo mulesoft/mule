@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -53,7 +54,7 @@ public class StringAppendTransformer extends AbstractTransformer {
     try {
       string = IOUtils.toString(input);
     } finally {
-      IOUtils.closeQuietly(input);
+      closeQuietly(input);
     }
     return string;
   }

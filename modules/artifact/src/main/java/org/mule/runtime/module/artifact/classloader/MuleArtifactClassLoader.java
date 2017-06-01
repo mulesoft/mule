@@ -9,10 +9,10 @@ package org.mule.runtime.module.artifact.classloader;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
-import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.core.util.IOUtils;
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import java.io.InputStream;

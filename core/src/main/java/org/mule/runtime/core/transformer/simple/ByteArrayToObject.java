@@ -7,9 +7,8 @@
 package org.mule.runtime.core.transformer.simple;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint;
-import static org.mule.runtime.core.util.IOUtils.ifInputStream;
+import static org.mule.runtime.core.api.util.IOUtils.ifInputStream;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.exception.NotAnInputStreamException;
 
 import java.io.IOException;
@@ -45,7 +44,7 @@ public class ByteArrayToObject extends ByteArrayToSerializable {
               return super.doTransform(pushbackStream, encoding);
             } else {
               try {
-                return IOUtils.toString(pushbackStream, encoding);
+                return org.apache.commons.io.IOUtils.toString(pushbackStream, encoding);
               } finally {
                 // this also closes the underlying stream that's stored in src
                 pushbackStream.close();

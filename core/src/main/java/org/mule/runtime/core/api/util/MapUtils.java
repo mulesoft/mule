@@ -4,9 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util;
+package org.mule.runtime.core.api.util;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+
+import org.mule.runtime.core.util.PropertiesUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,7 +17,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 // @ThreadSafe
-public class MapUtils extends org.apache.commons.collections.MapUtils {
+public class MapUtils {
 
   /**
    * Convenience method for CollectionUtil#mapWithKeysAndValues(Class, Iterator, Iterator); keys and values can be null or empty.
@@ -81,7 +83,7 @@ public class MapUtils extends org.apache.commons.collections.MapUtils {
     buf.append('{');
 
     if (newline) {
-      buf.append(SystemUtils.LINE_SEPARATOR);
+      buf.append(LINE_SEPARATOR);
     }
 
     Object[] entries = props.entrySet().toArray();
@@ -94,7 +96,7 @@ public class MapUtils extends org.apache.commons.collections.MapUtils {
       buf.append(PropertiesUtils.maskedPropertyValue(property));
 
       if (newline) {
-        buf.append(SystemUtils.LINE_SEPARATOR);
+        buf.append(LINE_SEPARATOR);
       } else {
         buf.append(',').append(' ');
       }
@@ -107,31 +109,11 @@ public class MapUtils extends org.apache.commons.collections.MapUtils {
     buf.append(PropertiesUtils.maskedPropertyValue(lastProperty));
 
     if (newline) {
-      buf.append(SystemUtils.LINE_SEPARATOR);
+      buf.append(LINE_SEPARATOR);
     }
 
     buf.append('}');
     return buf.toString();
   }
 
-  /**
-   * Puts the {@code key}/{@code value} pair into the given {@code map} only as long as the {@code key} is not already present on
-   * the {@code map}. This method is not thread-safe per-se. If the {@code map} is a shared resource then it's up to the caller to
-   * handle concurrency.
-   *
-   * @param map a {@link Map}
-   * @param key the key
-   * @param value the value
-   * @param <K> the generic type of the key
-   * @param <V> the generic type of the value
-   * @throws IllegalStateException if the {@code map} already contains the {@code key}
-   */
-  public static <K, V> void idempotentPut(Map<K, V> map, K key, V value) {
-    checkArgument(key != null, "key cannot be null");
-    if (map.containsKey(key)) {
-      throw new IllegalStateException(String.format("Key '%s' is already registered with value %s", key, map.get(key)));
-    }
-
-    map.put(key, value);
-  }
 }

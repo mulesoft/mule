@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.core.transformer;
 
+import static org.apache.commons.lang.StringUtils.capitalize;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -164,7 +164,7 @@ public class TransformerUtils {
       if (target.equals("byte[]")) {
         target = "byteArray";
       }
-      transformerName = transformerName.substring(0, i + 2) + StringUtils.capitalize(target);
+      transformerName = transformerName.substring(0, i + 2) + capitalize(target);
     }
     return transformerName;
   }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.parsers.assembly.configuration;
 
+import static org.apache.commons.lang.StringUtils.chomp;
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
 import java.util.ArrayList;
@@ -158,9 +159,8 @@ public class SimplePropertyConfiguration implements PropertyConfiguration {
   }
 
   protected String dropRef(String name) {
-    return org.mule.runtime.core.util.StringUtils
-        .chomp(org.mule.runtime.core.util.StringUtils.chomp(name, AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF_SUFFIX),
-               AbstractMuleBeanDefinitionParser.ATTRIBUTE_REFS_SUFFIX);
+    return chomp(chomp(name, AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF_SUFFIX),
+                 AbstractMuleBeanDefinitionParser.ATTRIBUTE_REFS_SUFFIX);
   }
 
   @Override
@@ -212,7 +212,7 @@ public class SimplePropertyConfiguration implements PropertyConfiguration {
     }
 
     public MapValueMap(String definition) {
-      map = new HashMap<String, Object>();
+      map = new HashMap<>();
 
       String[] values = StringUtils.tokenizeToStringArray(definition, ",");
       for (int i = 0; i < values.length; i++) {
@@ -236,18 +236,5 @@ public class SimplePropertyConfiguration implements PropertyConfiguration {
       }
     }
 
-  }
-
-  public static class IndentityMapValueMap extends MapValueMap {
-
-    public IndentityMapValueMap(Map<String, Object> map) {
-      super(map);
-    }
-
-    @Override
-    public Object rewrite(String value) {
-      Object result = map.get(value);
-      return result;
-    }
   }
 }

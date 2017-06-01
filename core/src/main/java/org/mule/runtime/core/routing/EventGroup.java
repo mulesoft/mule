@@ -8,7 +8,7 @@ package org.mule.runtime.core.routing;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.message.GroupCorrelation.NOT_SET;
-import static org.mule.runtime.core.util.StringUtils.DASH;
+import static org.mule.runtime.core.api.util.StringUtils.DASH;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.session.DefaultMuleSession;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;

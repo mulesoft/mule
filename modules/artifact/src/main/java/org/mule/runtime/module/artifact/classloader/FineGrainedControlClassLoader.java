@@ -11,7 +11,7 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.classloader.exception.CompositeClassNotFoundException;
 
 import java.io.IOException;

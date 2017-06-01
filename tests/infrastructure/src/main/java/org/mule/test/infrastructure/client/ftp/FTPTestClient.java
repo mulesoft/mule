@@ -6,8 +6,6 @@
  */
 package org.mule.test.infrastructure.client.ftp;
 
-import org.mule.runtime.core.util.ArrayUtils;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
@@ -70,7 +68,7 @@ public class FTPTestClient {
 
   public FTPFile get(String path) throws IOException {
     FTPFile[] files = client.listFiles(path);
-    if (ArrayUtils.isEmpty(files)) {
+    if (files == null && files.length == 0) {
       throw new RuntimeException("Could not find file " + path);
     } else if (files.length > 1) {
       throw new RuntimeException("Too many matches for path " + path);

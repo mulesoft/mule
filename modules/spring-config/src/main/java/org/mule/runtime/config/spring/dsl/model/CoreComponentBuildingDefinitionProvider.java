@@ -12,6 +12,7 @@ import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang.StringUtils.split;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_ACTIVE;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_IDLE;
@@ -27,7 +28,6 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSI
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYPE_OBJECT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_ELEMENT;
 import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
-import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
@@ -227,8 +227,7 @@ import org.mule.runtime.core.transformer.simple.MapToBean;
 import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.util.queue.QueueStore;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -825,7 +824,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("flags", fromSimpleParameter("flags", value -> {
           String flags = (String) value;
           int combinedFlags = 0;
-          String[] flagStrings = StringUtils.split(flags, ',');
+          String[] flagStrings = split(flags, ',');
           for (String flagString : flagStrings) {
             Integer flag = regExFlagsMapping.get(flagString);
             if (flag == null) {
@@ -1131,7 +1130,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   private static Object createNewInstance(Class classType) {
     try {
-      return instanciateClass(classType);
+      return ClassUtils.instantiateClass(classType);
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
@@ -1140,7 +1139,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   private static Object createNewInstance(String className) {
     try {
-      return instanciateClass(className, new Object[0]);
+      return ClassUtils.instantiateClass(className, new Object[0]);
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
@@ -1605,7 +1604,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("factory", fromSimpleReferenceParameter("factory-ref").build())
         .withSetterParameterDefinition("factory", fromSimpleParameter("factory-class", o -> {
           try {
-            return ClassUtils.instanciateClass((String) o);
+            return ClassUtils.instantiateClass((String) o);
           } catch (Exception e) {
             return null;
           }

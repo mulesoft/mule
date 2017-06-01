@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.parsers.generic;
 
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

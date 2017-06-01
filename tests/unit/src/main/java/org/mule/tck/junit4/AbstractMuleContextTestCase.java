@@ -14,8 +14,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.util.FileUtils.deleteTree;
-import static org.mule.runtime.core.util.FileUtils.newFile;
+import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
+import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
@@ -53,8 +53,8 @@ import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.object.SingletonObjectFactory;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -468,7 +468,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     if (args == null) {
       args = ClassUtils.NO_ARGS;
     }
-    Object o = ClassUtils.instanciateClass(clazz, args);
+    Object o = ClassUtils.instantiateClass(clazz, args);
     muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
     return (T) o;
   }

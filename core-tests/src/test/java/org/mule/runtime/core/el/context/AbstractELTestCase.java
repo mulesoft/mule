@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.el.context;
 
+import static org.apache.commons.lang.exception.ExceptionUtils.getRootCause;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
@@ -21,7 +22,6 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Arrays;
@@ -96,7 +96,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
       evaluate(expression);
       fail("ExpressionRuntimeException expected");
     } catch (ExpressionRuntimeException e) {
-      assertEquals(UnsupportedOperationException.class, ExceptionUtils.getRootCause(e).getClass());
+      assertEquals(UnsupportedOperationException.class, getRootCause(e).getClass());
     }
   }
 
@@ -105,7 +105,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
       evaluate(expression, event);
       fail("ExpressionRuntimeException expected");
     } catch (ExpressionRuntimeException e) {
-      assertEquals(UnsupportedOperationException.class, ExceptionUtils.getRootCause(e).getClass());
+      assertEquals(UnsupportedOperationException.class, getRootCause(e).getClass());
     }
   }
 
@@ -114,7 +114,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
       evaluate(expression);
       fail("ExpressionRuntimeException expected");
     } catch (ExpressionRuntimeException e) {
-      assertEquals(ImmutableElementException.class, ExceptionUtils.getRootCause(e).getClass());
+      assertEquals(ImmutableElementException.class, getRootCause(e).getClass());
     }
   }
 
@@ -123,7 +123,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
       evaluate(expression, event);
       fail("ExpressionRuntimeException expected");
     } catch (ExpressionRuntimeException e) {
-      assertEquals(ImmutableElementException.class, ExceptionUtils.getRootCause(e).getClass());
+      assertEquals(ImmutableElementException.class, getRootCause(e).getClass());
     }
   }
 
@@ -132,7 +132,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
       evaluate(expression);
       fail("ExpressionRuntimeException expected");
     } catch (ExpressionRuntimeException e) {
-      assertEquals(PropertyAccessException.class, ExceptionUtils.getRootCause(e).getClass());
+      assertEquals(PropertyAccessException.class, getRootCause(e).getClass());
     }
   }
 
@@ -141,7 +141,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
       evaluate(expression, event);
       fail("ExpressionRuntimeException expected");
     } catch (ExpressionRuntimeException e) {
-      assertEquals(PropertyAccessException.class, ExceptionUtils.getRootCause(e).getClass());
+      assertEquals(PropertyAccessException.class, getRootCause(e).getClass());
     }
   }
 

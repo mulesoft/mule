@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.core.transformer.wire;
 
+import static org.apache.commons.io.IOUtils.copy;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,7 +58,7 @@ public class TransformerPairWireFormat implements WireFormat {
     } else {
       try {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        IOUtils.copy(in, baos);
+        copy(in, baos);
         return inboundTransformer.transform(baos.toByteArray());
       } catch (IOException e) {
         throw new DefaultMuleException(CoreMessages.failedToReadPayload(), e);

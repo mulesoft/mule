@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.util;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static org.apache.commons.collections.CollectionUtils.find;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -39,7 +40,6 @@ import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MapDataType;
-import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -52,9 +52,6 @@ import org.mule.tck.testmodels.fruit.FruitBox;
 import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.test.petstore.extension.PhoneNumber;
 
-import org.junit.Test;
-import org.springframework.core.ResolvableType;
-
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -65,6 +62,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
+import org.junit.Test;
+import org.springframework.core.ResolvableType;
 
 @SmallTest
 public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
@@ -245,7 +245,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   private Field findField(String name, Collection<Field> fields) {
-    return (Field) CollectionUtils.find(fields, f -> name.equals(((Field) f).getName()));
+    return (Field) find(fields, f -> name.equals(((Field) f).getName()));
   }
 
   private void assertType(MetadataType type, Class<?> rawType) {

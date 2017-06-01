@@ -6,10 +6,17 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.util.CollectionUtils;
+import org.mule.runtime.core.api.util.FileUtils;
+import org.mule.runtime.core.api.util.MapUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.internal.util.ArrayUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,7 +74,7 @@ public final class StringMessageUtils {
         while (temp.length() > 0) {
           len = (trimLength <= temp.length() ? trimLength : temp.length());
           String msg = temp.substring(0, len);
-          x = msg.indexOf(SystemUtils.LINE_SEPARATOR);
+          x = msg.indexOf(LINE_SEPARATOR);
 
           if (x > -1) {
             msg = msg.substring(0, x);
@@ -90,20 +97,20 @@ public final class StringMessageUtils {
       }
     }
 
-    buf.append(SystemUtils.LINE_SEPARATOR);
+    buf.append(LINE_SEPARATOR);
     if (c != ' ') {
       buf.append(StringUtils.repeat(c, maxlength));
     }
 
     for (int i = 0; i < messages.size(); i++) {
-      buf.append(SystemUtils.LINE_SEPARATOR);
+      buf.append(LINE_SEPARATOR);
       if (c != ' ') {
         buf.append(c);
       }
       buf.append(" ");
       buf.append(messages.get(i));
 
-      String osEncoding = CharSetUtils.defaultCharsetName();
+      String osEncoding = Charset.defaultCharset().name();
       int padding;
       try {
         padding = trimLength - messages.get(i).toString().getBytes(osEncoding).length;
@@ -118,7 +125,7 @@ public final class StringMessageUtils {
         buf.append(c);
       }
     }
-    buf.append(SystemUtils.LINE_SEPARATOR);
+    buf.append(LINE_SEPARATOR);
     if (c != ' ') {
       buf.append(StringUtils.repeat(c, maxlength));
     }

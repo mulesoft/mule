@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.handlers;
 
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.runtime.config.spring.parsers.AbstractChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.DeprecatedBeanDefinitionParser;
@@ -17,8 +18,6 @@ import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssembler;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
 import java.util.HashSet;
@@ -273,12 +272,12 @@ public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSuppo
         String preferredConnectorName = preferredProperties.getProperty("connector");
         if (preferredConnectorName != null) {
           logger.debug("Found preferred connector class " + preferredConnectorName);
-          return ClassUtils.getClass(preferredConnectorName);
+          return org.apache.commons.lang.ClassUtils.getClass(preferredConnectorName);
         }
       } catch (Exception e) {
         logger.debug("Error processing preferred properties", e);
       } finally {
-        IOUtils.closeQuietly(stream);
+        closeQuietly(stream);
       }
     }
     return basicConnector;

@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.config.spring.dsl.spring;
 
-import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 
@@ -35,7 +35,7 @@ public class ConfigurableObjectFactory<T> extends AbstractAnnotatedObjectFactory
   public T doGetObject() throws Exception {
     Object instance = factory.createInstance(parameters);
     if (commonConfiguratorType != null) {
-      ObjectFactoryCommonConfigurator commonConfigurator = instanciateClass(commonConfiguratorType);
+      ObjectFactoryCommonConfigurator commonConfigurator = ClassUtils.instantiateClass(commonConfiguratorType);
       commonConfigurator.configure(instance, parameters);
     }
     if (instance instanceof MuleContextAware) {

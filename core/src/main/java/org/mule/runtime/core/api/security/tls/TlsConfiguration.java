@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.api.security.tls;
 
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.security.TlsDirectKeyStore;
 import org.mule.runtime.core.api.security.TlsDirectTrustStore;
 import org.mule.runtime.core.api.security.TlsIndirectKeyStore;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.ArrayUtils;
-import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.internal.util.ArrayUtils;
+import org.mule.runtime.core.api.util.FileUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.util.SecurityUtils;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -225,7 +225,7 @@ public final class TlsConfiguration implements TlsDirectTrustStore, TlsDirectKey
   }
 
   protected void checkKeyStoreContainsAlias(KeyStore keyStore) throws KeyStoreException {
-    if (StringUtils.isNotBlank(keyAlias)) {
+    if (!isBlank(keyAlias)) {
       boolean keyAliasFound = false;
 
       Enumeration<String> aliases = keyStore.aliases();

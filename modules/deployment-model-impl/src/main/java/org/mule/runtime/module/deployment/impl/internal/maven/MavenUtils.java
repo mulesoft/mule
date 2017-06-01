@@ -11,7 +11,7 @@ import static java.io.File.separator;
 import static java.lang.String.format;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.util.FileUtils.createFile;
+import static org.mule.runtime.core.api.util.FileUtils.createFile;
 import static org.mule.runtime.core.util.JarUtils.getUrlWithinJar;
 import static org.mule.runtime.core.util.JarUtils.getUrlsWithinJar;
 import static org.mule.runtime.core.util.JarUtils.loadFileContentFrom;

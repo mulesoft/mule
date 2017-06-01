@@ -16,6 +16,8 @@ import static org.mockito.Mockito.verify;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

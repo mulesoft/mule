@@ -7,7 +7,7 @@
 
 package org.mule.runtime.deployment.model.internal.nativelib;
 
-import org.mule.runtime.core.util.SystemUtils;
+import static org.apache.commons.lang.SystemUtils.IS_OS_MAC;
 
 import java.io.File;
 
@@ -38,7 +38,7 @@ public class PerAppNativeLibraryFinder implements NativeLibraryFinder {
     String nativeLibName = System.mapLibraryName(name);
     File library = new File(libDir, nativeLibName);
 
-    if (!library.exists() && SystemUtils.IS_OS_MAC) {
+    if (!library.exists() && IS_OS_MAC) {
       nativeLibName = nativeLibName.replace(DYLIB_EXTENSION, JNILIB_EXTENSION);
       library = new File(libDir, nativeLibName);
     }

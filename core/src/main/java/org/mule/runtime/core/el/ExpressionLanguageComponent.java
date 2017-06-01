@@ -7,7 +7,7 @@
 package org.mule.runtime.core.el;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
-import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util;
+package org.mule.runtime.core.internal.util;
 
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
@@ -16,7 +16,7 @@ import java.util.Date;
  * <code>DateUtils</code> contains some useful methods dealing date/time conversion, formatting etc.
  */
 // @ThreadSafe
-public class DateUtils extends org.apache.commons.lang.time.DateUtils {
+public class DateUtils {
 
   public static String getTimeStamp(String format) {
     // Format the current time.

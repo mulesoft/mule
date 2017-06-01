@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.config;
 
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

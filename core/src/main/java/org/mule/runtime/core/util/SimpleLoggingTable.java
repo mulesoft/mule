@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.lang.StringUtils.center;
+import static org.apache.commons.lang.StringUtils.rightPad;
+import static org.apache.commons.lang.StringUtils.substring;
+
+import org.mule.runtime.core.api.util.StringUtils;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -103,15 +109,15 @@ public class SimpleLoggingTable {
   }
 
   private String formatValue(String value, int size) {
-    String result = StringUtils.substring(value, 0, size);
-    result = StringUtils.rightPad(result, size, ' ');
+    String result = substring(value, 0, size);
+    result = rightPad(result, size, ' ');
 
     return result;
   }
 
   private String formatHeaderValue(String value, int size) {
-    String result = StringUtils.substring(value, 0, size);
-    result = StringUtils.center(String.format("- - + %s + - -", result), size, ' ');
+    String result = substring(value, 0, size);
+    result = center(String.format("- - + %s + - -", result), size, ' ');
 
     return result;
   }

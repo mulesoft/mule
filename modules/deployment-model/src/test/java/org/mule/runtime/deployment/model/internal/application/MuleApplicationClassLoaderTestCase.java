@@ -18,7 +18,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.internal.domain.MuleSharedDomainClassLoader;

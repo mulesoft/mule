@@ -8,7 +8,7 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.util.FileUtils.createFile;
+import static org.mule.runtime.core.api.util.FileUtils.createFile;
 import static org.mule.tck.ZipUtils.compress;
 import org.mule.tck.ZipUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;

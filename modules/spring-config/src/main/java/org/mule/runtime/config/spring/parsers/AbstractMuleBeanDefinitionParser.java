@@ -8,6 +8,10 @@ package org.mule.runtime.config.spring.parsers;
 
 import static org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
 import static org.mule.runtime.core.api.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromXml;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.parsers.assembly.BeanAssembler;
@@ -16,13 +20,9 @@ import org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssemblerFacto
 import org.mule.runtime.config.spring.parsers.assembly.configuration.ReusablePropertyConfiguration;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
-import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.util.XMLUtils;
 
 import java.util.HashMap;
@@ -331,7 +331,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
     String att = beanPropertyConfiguration.getAttributeAlias(ATTRIBUTE_CLASS);
     String className = element.getAttribute(att);
     Class<?> clazz = null;
-    if (StringUtils.isNotBlank(className)) {
+    if (!isBlank(className)) {
       try {
         element.removeAttribute(att);
         clazz = ClassUtils.loadClass(className, getClass());

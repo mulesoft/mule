@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.StringMessageUtils;
-import org.mule.runtime.core.util.SystemUtils;
+import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.runtime.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.module.deployment.api.DeploymentService;

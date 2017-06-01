@@ -13,7 +13,6 @@ import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.config.spring.dsl.spring.ObjectFactoryCommonConfigurator;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.Map;
 
@@ -31,7 +30,7 @@ public class TransformerConfigurator implements ObjectFactoryCommonConfigurator<
     Class<?> returnType = Object.class;
     if (returnClass != null) {
       try {
-        returnType = ClassUtils.getClass(returnClass);
+        returnType = org.apache.commons.lang.ClassUtils.getClass(returnClass);
       } catch (ClassNotFoundException e) {
         throw new MuleRuntimeException(e);
       }

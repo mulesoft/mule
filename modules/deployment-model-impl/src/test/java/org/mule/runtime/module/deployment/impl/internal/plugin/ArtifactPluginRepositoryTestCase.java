@@ -8,6 +8,8 @@
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static java.io.File.separator;
+import static org.apache.commons.io.FileUtils.forceDelete;
+import static org.apache.commons.io.FileUtils.write;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.anyObject;
@@ -15,11 +17,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.container.api.MuleFoldersUtil.CONTAINER_APP_PLUGINS;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import org.mule.runtime.core.util.FileUtils;
+import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
-import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
-import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPluginRepository;
 import org.mule.tck.ZipUtils;
 import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -87,11 +87,11 @@ public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase {
   private File createPluginZipFile(File pluginsLibFolder, String pluginName) throws IOException {
     final File pluginFolder = new File(pluginsLibFolder, pluginName);
     final File pluginPropertiesFile = new File(pluginFolder, PLUGIN_PROPERTIES);
-    FileUtils.write(pluginPropertiesFile, "foo");
+    write(pluginPropertiesFile, "foo");
     final File libFolder = new File(pluginFolder, PLUGIN_LIB_FOLDER);
     final String libraryJarName = "library.jar";
     final File dummyJar = new File(libFolder, libraryJarName);
-    FileUtils.write(dummyJar, "bar");
+    write(dummyJar, "bar");
 
 
     File zipFile = new File(pluginsLibFolder, pluginName + ".zip");
@@ -100,7 +100,7 @@ public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase {
                           new ZipResource(dummyJar.getAbsolutePath(), PLUGIN_LIB_FOLDER + separator + libraryJarName),
                           new ZipResource(pluginPropertiesFile.getAbsolutePath(), pluginPropertiesFile.getName())});
 
-    FileUtils.forceDelete(pluginFolder);
+    forceDelete(pluginFolder);
 
     return zipFile;
   }
@@ -108,8 +108,8 @@ public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase {
   private File createPluginFolder(File pluginsLibFolder, String pluginName) throws IOException {
     final File pluginZipFile = createPluginZipFile(pluginsLibFolder, pluginName);
     final File pluginFolder = new File(pluginsLibFolder, pluginName);
-    FileUtils.unzip(pluginZipFile, pluginFolder);
-    FileUtils.forceDelete(pluginZipFile);
+    unzip(pluginZipFile, pluginFolder);
+    forceDelete(pluginZipFile);
     return pluginFolder;
   }
 }

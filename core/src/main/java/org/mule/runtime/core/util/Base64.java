@@ -56,6 +56,10 @@
 
 package org.mule.runtime.core.util;
 
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+
+import org.mule.runtime.core.api.util.FileUtils;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -71,7 +75,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
 public final class Base64 {
@@ -334,10 +337,10 @@ public final class Base64 {
       return null;
     } // end catch
     finally {
-      IOUtils.closeQuietly(oos);
-      IOUtils.closeQuietly(gzos);
-      IOUtils.closeQuietly(b64os);
-      IOUtils.closeQuietly(baos);
+      closeQuietly(oos);
+      closeQuietly(gzos);
+      closeQuietly(b64os);
+      closeQuietly(baos);
     } // end finally
 
     // Return value according to relevant encoding.
@@ -447,9 +450,9 @@ public final class Base64 {
         throw e;
       } // end catch
       finally {
-        IOUtils.closeQuietly(gzos);
-        IOUtils.closeQuietly(b64os);
-        IOUtils.closeQuietly(baos);
+        closeQuietly(gzos);
+        closeQuietly(b64os);
+        closeQuietly(baos);
       } // end finally
 
       // Return value according to relevant encoding.
@@ -703,9 +706,9 @@ public final class Base64 {
           // Just return originally-decoded bytes
         } // end catch
         finally {
-          IOUtils.closeQuietly(baos);
-          IOUtils.closeQuietly(gzis);
-          IOUtils.closeQuietly(bais);
+          closeQuietly(baos);
+          closeQuietly(gzis);
+          closeQuietly(bais);
         } // end finally
 
       } // end if: gzipped
@@ -741,8 +744,8 @@ public final class Base64 {
       throw e;
     } // end catch
     finally {
-      IOUtils.closeQuietly(bais);
-      IOUtils.closeQuietly(ois);
+      closeQuietly(bais);
+      closeQuietly(ois);
     } // end finally
 
     return obj;
@@ -766,7 +769,7 @@ public final class Base64 {
       throw e;
     } // end catch: IOException
     finally {
-      IOUtils.closeQuietly(bos);
+      closeQuietly(bos);
     } // end finally
   } // end encodeToFile
 
@@ -788,7 +791,7 @@ public final class Base64 {
       throw e;
     } // end catch: IOException
     finally {
-      IOUtils.closeQuietly(bos);
+      closeQuietly(bos);
     } // end finally
   } // end decodeToFile
 
@@ -832,7 +835,7 @@ public final class Base64 {
       throw e;
     } // end catch: IOException
     finally {
-      IOUtils.closeQuietly(bis);
+      closeQuietly(bis);
     } // end finally
 
     return decodedData;
@@ -871,7 +874,7 @@ public final class Base64 {
       throw e;
     } // end catch: IOException
     finally {
-      IOUtils.closeQuietly(bis);
+      closeQuietly(bis);
     } // end finally
 
     return encodedData;

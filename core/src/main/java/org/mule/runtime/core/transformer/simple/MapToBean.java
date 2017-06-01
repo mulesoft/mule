@@ -12,8 +12,8 @@ import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.util.BeanUtils;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.BeanUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -57,7 +57,7 @@ public class MapToBean extends AbstractTransformer implements DiscoverableTransf
         clazz = ClassUtils.loadClass(c, getClass());
       }
 
-      Object result = ClassUtils.instanciateClass(clazz, ClassUtils.NO_ARGS);
+      Object result = ClassUtils.instantiateClass(clazz, ClassUtils.NO_ARGS);
       BeanUtils.populate(result, props);
 
       return result;

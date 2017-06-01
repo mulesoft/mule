@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.apache.commons.collections.CollectionUtils.collect;
+import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.lang.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleAppsDir;
-
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.module.artifact.Artifact;
@@ -92,8 +92,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   @Override
   public boolean isUpdatedZombieArtifact(String artifactName) {
     @SuppressWarnings("rawtypes")
-    Collection<String> deployedAppNames =
-        CollectionUtils.collect(artifacts, new BeanToPropertyValueTransformer(ARTIFACT_NAME_PROPERTY));
+    Collection<String> deployedAppNames = collect(artifacts, new BeanToPropertyValueTransformer(ARTIFACT_NAME_PROPERTY));
 
     if (deployedAppNames.contains(artifactName) && (!artifactZombieMap.containsKey(artifactName))) {
       return false;
@@ -120,7 +119,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     }
 
-    T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactId));
+    T artifact = (T) find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactId));
     undeploy(artifact);
   }
 
@@ -218,7 +217,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
 
     // check if this artifact is running first, undeployArtifact it then
-    T artifact = (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
+    T artifact = (T) find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
     if (artifact != null) {
       deploymentTemplate.preRedeploy(artifact);
       undeployArtifact(artifactName);
@@ -322,7 +321,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private T findArtifact(String artifactName) {
-    return (T) CollectionUtils.find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
+    return (T) find(artifacts, new BeanPropertyValueEqualsPredicate(ARTIFACT_NAME_PROPERTY, artifactName));
   }
 
   private void trackArtifact(T artifact) {

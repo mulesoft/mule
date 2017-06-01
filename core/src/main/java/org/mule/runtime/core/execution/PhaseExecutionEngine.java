@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 
 import java.util.List;

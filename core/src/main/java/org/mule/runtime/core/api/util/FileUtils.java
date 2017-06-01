@@ -4,9 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util;
+package org.mule.runtime.core.api.util;
 
 import static java.lang.System.getProperty;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.apache.commons.io.IOUtils.copy;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
@@ -47,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * <code>FileUtils</code> contains useful methods for dealing with files & directories.
  */
 // @ThreadSafe
-public class FileUtils extends org.apache.commons.io.FileUtils {
+public class FileUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
   private static final String TEMP_DIR_SYSTEM_PROPERTY = "java.io.tmpdir";
@@ -64,7 +67,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
     try {
       FileOutputStream output = new FileOutputStream(destination);
       try {
-        IOUtils.copy(input, output);
+        copy(input, output);
       } finally {
         IOUtils.closeQuietly(output);
       }
@@ -227,7 +230,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
           if (topLevelDirsToIgnore != null) {
             for (int j = 0; j < topLevelDirsToIgnore.length; j++) {
               String ignored = topLevelDirsToIgnore[j];
-              if (ignored.equals(FilenameUtils.getBaseName(files[i].getName()))) {
+              if (ignored.equals(getBaseName(files[i].getName()))) {
                 break OUTER;
               }
             }
@@ -277,7 +280,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 
           InputStream is = zip.getInputStream(entry);
           OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
-          IOUtils.copy(is, os);
+          copy(is, os);
           IOUtils.closeQuietly(is);
           IOUtils.closeQuietly(os);
         }
@@ -406,7 +409,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
       } else {
         outputDir = FileUtils.newFile(outputDir.getPath());
       }
-      copyDirectory(file, outputDir);
+      org.apache.commons.io.FileUtils.copyDirectory(file, outputDir);
     } else {
 
       if (keepParentDirectory) {
@@ -414,7 +417,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
       } else {
         outputDir = FileUtils.newFile(outputDir.getPath() + File.separator + file.getName());
       }
-      copyFile(file, outputDir);
+      org.apache.commons.io.FileUtils.copyFile(file, outputDir);
     }
   }
 
@@ -475,7 +478,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
           try {
             inputStream = jarFile.getInputStream(entry);
             outputStream = new BufferedOutputStream(new FileOutputStream(file));
-            IOUtils.copy(inputStream, outputStream);
+            copy(inputStream, outputStream);
           } finally {
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
@@ -622,42 +625,6 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
   }
 
 
-  /**
-   * Copy in file to out file
-   * 
-   * Don't use java.nio as READ_ONLY memory mapped files cannot be deleted
-   * 
-   * @param in
-   * @param out
-   */
-  public static void safeCopyFile(File in, File out) throws IOException {
-    try {
-      FileInputStream fis = new FileInputStream(in);
-      FileOutputStream fos = new FileOutputStream(out);
-      try {
-        byte[] buf = new byte[1024];
-        int i = 0;
-        while ((i = fis.read(buf)) != -1) {
-          fos.write(buf, 0, i);
-        }
-      } catch (IOException e) {
-        throw e;
-      } finally {
-        try {
-          if (fis != null)
-            fis.close();
-          if (fos != null)
-            fos.close();
-        } catch (IOException e) {
-          throw e;
-        }
-
-      }
-    } catch (FileNotFoundException e) {
-      throw e;
-    }
-  }
-
   // Override the following methods to use a new version of doCopyFile(File
   // srcFile, File destFile, boolean preserveFileDate) that uses nio to copy file
 
@@ -673,7 +640,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
    * @throws NullPointerException if source or destination is <code>null</code>
    * @throws IOException if source or destination is invalid
    * @throws IOException if an IO error occurs during copying
-   * @see #copyFileToDirectory(File, File, boolean)
+   * @see org.apache.commons.io.FileUtils#copyFileToDirectory(File, File, boolean)
    */
   public static void copyFile(File srcFile, File destFile, boolean preserveFileDate) throws IOException {
     if (srcFile == null) {
@@ -756,32 +723,12 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
     return "file".equals(url.getProtocol());
   }
 
-  /**
-   * Returns a file timestamp.
-   *
-   * @param url the file URL.
-   * @return the file's timestamp if the URL has the file protocol, otherwise. returns -1.
-   */
-  public static long getFileTimeStamp(URL url) {
-    long timeStamp = -1;
-
-    if (isFile(url)) {
-      try {
-        String file = URLDecoder.decode(url.getFile(), "UTF-8");
-        timeStamp = new File(file).lastModified();
-      } catch (UnsupportedEncodingException e) {
-        // Ignore
-      }
-    }
-
-    return timeStamp;
+  private static Collection<File> findFiles(File folder, IOFileFilter filter, boolean recursive) {
+    return org.apache.commons.io.FileUtils.listFiles(folder, filter,
+                                                     recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE);
   }
 
-  public static Collection<File> findFiles(File folder, IOFileFilter filter, boolean recursive) {
-    return listFiles(folder, filter, recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE);
-  }
-
-  public static File findFileByName(File folder, final String filename, boolean recursive) {
+  public static File findFileByName(File folder, final String filename) {
     Collection<File> files = FileUtils.findFiles(folder, new IOFileFilter() {
 
       @Override
@@ -795,7 +742,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
       }
     }, true);
 
-    return CollectionUtils.isEmpty(files) ? null : files.iterator().next();
+    return isEmpty(files) ? null : files.iterator().next();
   }
 
   /**

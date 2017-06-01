@@ -9,15 +9,14 @@ package org.mule.runtime.module.artifact.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Optional.empty;
+import static org.apache.commons.io.FileUtils.write;
+import static org.apache.commons.io.FilenameUtils.getName;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.mule.tck.ZipUtils.compress;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
-import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.core.util.FilenameUtils;
-import org.mule.runtime.module.artifact.descriptor.BundleDescriptorLoader;
 import org.mule.tck.ZipUtils.ZipResource;
 
 import java.io.File;
@@ -109,7 +108,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
   public T usingLibrary(String jarFile) {
     checkImmutable();
     checkArgument(!isEmpty(jarFile), "Jar file cannot be empty");
-    resources.add(new ZipResource(jarFile, "lib/" + FilenameUtils.getName(jarFile)));
+    resources.add(new ZipResource(jarFile, "lib/" + getName(jarFile)));
 
     return getThis();
   }
@@ -214,7 +213,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
 
   private void buildBrokenJarFile(File tempFile) throws UncheckedIOException {
     try {
-      FileUtils.write(tempFile, "This content represents invalid compressed data");
+      write(tempFile, "This content represents invalid compressed data");
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }

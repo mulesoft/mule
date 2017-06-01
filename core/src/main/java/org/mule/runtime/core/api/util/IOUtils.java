@@ -4,8 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util;
+package org.mule.runtime.core.api.util;
 
+import static org.apache.commons.lang.math.NumberUtils.toInt;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
@@ -20,6 +21,7 @@ import org.mule.runtime.core.message.ds.StringDataSource;
 import org.mule.runtime.core.util.func.CheckedConsumer;
 import org.mule.runtime.core.util.func.CheckedFunction;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -43,11 +45,11 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Mule input/output utilities.
  */
-public class IOUtils extends org.apache.commons.io.IOUtils {
+public class IOUtils {
 
   private static final Log logger = LogFactory.getLog(IOUtils.class);
 
-  protected static int bufferSize = NumberUtils.toInt(System.getProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE), 4 * 1024);
+  protected static int bufferSize = toInt(System.getProperty(MuleProperties.MULE_STREAMING_BUFFER_SIZE), 4 * 1024);
 
   /**
    * Attempts to load a resource from the file system, from a URL, or from the classpath, in that order.
@@ -342,5 +344,14 @@ public class IOUtils extends org.apache.commons.io.IOUtils {
         closeQuietly(stream);
       }
     }
+  }
+
+  /**
+   * Closes a {#link Closable} instance catching any exceptions
+   *
+   * @param closeable instance to be closed. Non null.
+   */
+  public static void closeQuietly(Closeable closeable) {
+    org.apache.commons.io.IOUtils.closeQuietly(closeable);
   }
 }

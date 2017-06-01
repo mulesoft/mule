@@ -9,7 +9,7 @@ package org.mule.runtime.module.tooling.internal;
 import static com.google.common.base.Throwables.getCausalChain;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.FileUtils.deleteTree;
+import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;

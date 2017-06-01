@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.util.StreamCloser;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SimpleRegistry;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.util.Map;
 
@@ -46,7 +46,7 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap {
   protected void doRegisterTransformer(TransformerBootstrapProperty bootstrapProperty, Class<?> returnClass,
                                        Class<? extends Transformer> transformerClass)
       throws Exception {
-    Transformer trans = ClassUtils.instanciateClass(transformerClass);
+    Transformer trans = ClassUtils.instantiateClass(transformerClass);
     if (!(trans instanceof DiscoverableTransformer)) {
       throw new RegistrationException(CoreMessages.transformerNotImplementDiscoverable(trans));
     }

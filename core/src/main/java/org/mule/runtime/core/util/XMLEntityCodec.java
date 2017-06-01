@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.util;
 
+import org.mule.runtime.core.api.util.StringUtils;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;

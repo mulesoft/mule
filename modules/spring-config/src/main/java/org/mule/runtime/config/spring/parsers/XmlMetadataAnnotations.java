@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public interface XmlMetadataAnnotations {
 
-  public static final String METADATA_ANNOTATIONS_KEY = "metadataAnnotations";
+  String METADATA_ANNOTATIONS_KEY = "metadataAnnotations";
 
   /**
    * Builds the opening tag of the xml element.

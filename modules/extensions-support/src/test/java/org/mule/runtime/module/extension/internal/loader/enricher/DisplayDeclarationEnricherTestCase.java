@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.util.Collections.emptySet;
+import static org.apache.commons.collections.CollectionUtils.find;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,15 +23,12 @@ import static org.mule.test.heisenberg.extension.HeisenbergOperations.KNOCKEABLE
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_EXAMPLE;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME;
-import org.junit.Before;
-import org.junit.Test;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
-import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -38,6 +36,9 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
 
 import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class DisplayDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
@@ -140,12 +141,11 @@ public class DisplayDeclarationEnricherTestCase extends AbstractMuleTestCase {
   }
 
   private OperationDeclaration getOperation(WithOperationsDeclaration declaration, final String operationName) {
-    return (OperationDeclaration) CollectionUtils.find(declaration.getOperations(),
-                                                       object -> ((OperationDeclaration) object).getName().equals(operationName));
+    return (OperationDeclaration) find(declaration.getOperations(),
+                                       object -> ((OperationDeclaration) object).getName().equals(operationName));
   }
 
   private ParameterDeclaration findParameter(List<ParameterDeclaration> parameters, final String name) {
-    return (ParameterDeclaration) CollectionUtils.find(parameters,
-                                                       object -> name.equals(((ParameterDeclaration) object).getName()));
+    return (ParameterDeclaration) find(parameters, object -> name.equals(((ParameterDeclaration) object).getName()));
   }
 }

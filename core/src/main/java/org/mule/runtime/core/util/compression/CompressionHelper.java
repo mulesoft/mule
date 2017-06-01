@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util.compression;
 
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;

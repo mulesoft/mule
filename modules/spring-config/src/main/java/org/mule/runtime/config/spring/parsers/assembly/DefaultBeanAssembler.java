@@ -17,7 +17,6 @@ import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinition
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.MapCombiner;
 
 import java.lang.reflect.Method;
@@ -149,7 +148,7 @@ public class DefaultBeanAssembler implements BeanAssembler {
    */
   public final boolean isAnnotationsPropertyAvailable(String beanClassName) {
     try {
-      return AnnotatedObject.class.isAssignableFrom(ClassUtils.getClass(beanClassName));
+      return AnnotatedObject.class.isAssignableFrom(org.apache.commons.lang.ClassUtils.getClass(beanClassName));
     } catch (Exception e) {
       return false;
     }
@@ -475,7 +474,7 @@ public class DefaultBeanAssembler implements BeanAssembler {
       // BeanWrapperImpl instantiates an instance, which we don't want.
       // if there really is no better way, i guess it should go in
       // class or bean utils.
-      Class clazz = ClassUtils.getClass(className);
+      Class clazz = org.apache.commons.lang.ClassUtils.getClass(className);
       Method[] methods = clazz.getMethods();
       String setter = "set" + newName;
       for (int i = 0; i < methods.length; ++i) {

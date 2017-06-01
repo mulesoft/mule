@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.config.bootstrap;
 
+import static org.apache.commons.lang.exception.ExceptionUtils.getCause;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.ALL;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.runtime.core.util.PropertiesUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -269,7 +268,7 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
 
       doRegisterObject(bootstrapProperty);
     } catch (InvocationTargetException e) {
-      Throwable cause = ExceptionUtils.getCause(e);
+      Throwable cause = getCause(e);
       throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && bootstrapProperty.getOptional(), cause,
                                   bootstrapProperty);
     } catch (NoClassDefFoundError | ClassNotFoundException | NoSuchMethodException e) {
@@ -309,7 +308,7 @@ public abstract class AbstractRegistryBootstrap implements Initialisable {
 
         doRegisterTransformer(bootstrapProperty, returnClass, transformerClass);
       } catch (InvocationTargetException e) {
-        Throwable cause = ExceptionUtils.getCause(e);
+        Throwable cause = getCause(e);
         throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && bootstrapProperty.getOptional(), cause,
                                     bootstrapProperty);
       } catch (NoClassDefFoundError | ClassNotFoundException e) {

@@ -28,7 +28,7 @@ import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
-import org.mule.runtime.core.util.JdkVersionUtils;
+import org.mule.runtime.core.internal.util.JdkVersionUtils;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.queue.QueueManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;

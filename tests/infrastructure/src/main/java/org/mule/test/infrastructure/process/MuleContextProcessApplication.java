@@ -6,12 +6,11 @@
  */
 package org.mule.test.infrastructure.process;
 
+import static org.apache.commons.io.FileUtils.copyFile;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.test.infrastructure.process.MuleContextProcessBuilder.MULE_CORE_EXTENSIONS_PROPERTY;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.FileUtils;
 import org.mule.test.infrastructure.deployment.FakeMuleServer;
 
 import java.io.File;
@@ -52,7 +51,7 @@ public class MuleContextProcessApplication {
       if (!applicationConfigurationFile.exists()) {
         throw new RuntimeException("Could not find file for application configuration " + applicationConfiguration);
       }
-      FileUtils.copyFile(applicationConfigurationFile, new File(applicationDirectory, DEFAULT_CONFIGURATION_RESOURCE));
+      copyFile(applicationConfigurationFile, new File(applicationDirectory, DEFAULT_CONFIGURATION_RESOURCE));
       System.out.println("Test app config file created");
 
       ApplicationStartedDeploymentListener applicationStartedDeploymentListener = new ApplicationStartedDeploymentListener();
@@ -82,13 +81,14 @@ public class MuleContextProcessApplication {
   }
 
   private static List<MuleCoreExtension> retrieveConfiguredCoreExtensions() {
-    List<MuleCoreExtension> muleCoreExtensions = new ArrayList<MuleCoreExtension>();
+    List<MuleCoreExtension> muleCoreExtensions = new ArrayList<>();
     String coreExtensionsProperty = System.getProperty(MULE_CORE_EXTENSIONS_PROPERTY);
     if (coreExtensionsProperty != null) {
       String[] coreExtensionsAsString = coreExtensionsProperty.split(",");
       for (String coreExtensionClassName : coreExtensionsAsString) {
         try {
-          muleCoreExtensions.add((MuleCoreExtension) ClassUtils.getClass(coreExtensionClassName).newInstance());
+          muleCoreExtensions
+              .add((MuleCoreExtension) org.apache.commons.lang.ClassUtils.getClass(coreExtensionClassName).newInstance());
         } catch (Exception e) {
           throw new RuntimeException(e);
         }

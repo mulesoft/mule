@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.core.util;
 
+import static org.apache.commons.collections.MapUtils.getBooleanValue;
+import static org.apache.commons.collections.MapUtils.getDoubleValue;
+import static org.apache.commons.collections.MapUtils.getIntValue;
+import static org.apache.commons.collections.MapUtils.getLongValue;
+import static org.apache.commons.collections.MapUtils.getString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -73,11 +78,11 @@ public class PropertiesUtilsTestCase extends AbstractMuleTestCase {
 
     props = PropertiesUtils.removeNamespaces(props);
 
-    assertTrue(MapUtils.getBooleanValue(props, "booleanProperty", false));
-    assertEquals(0.124, 0, MapUtils.getDoubleValue(props, "doubleProperty", 0));
-    assertEquals(14, MapUtils.getIntValue(props, "intProperty", 0));
-    assertEquals(999999999, 0, MapUtils.getLongValue(props, "longProperty", 0));
-    assertEquals("string", MapUtils.getString(props, "stringProperty", ""));
+    assertTrue(getBooleanValue(props, "booleanProperty", false));
+    assertEquals(0.124, 0, getDoubleValue(props, "doubleProperty", 0));
+    assertEquals(14, getIntValue(props, "intProperty", 0));
+    assertEquals(999999999, 0, getLongValue(props, "longProperty", 0));
+    assertEquals("string", getString(props, "stringProperty", ""));
   }
 
   @Test

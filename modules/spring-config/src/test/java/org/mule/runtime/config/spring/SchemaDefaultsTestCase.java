@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import org.dom4j.Document;
 import org.dom4j.Element;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.artifact.classloader.net;
 
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +85,7 @@ public class MuleUrlStreamHandlerFactory extends Object implements URLStreamHand
       String packagePrefix = tokenizer.nextToken().trim();
       String className = packagePrefix + "." + protocol + ".Handler";
       try {
-        handler = (URLStreamHandler) ClassUtils.instanciateClass(className);
+        handler = (URLStreamHandler) ClassUtils.instantiateClass(className);
       } catch (Exception ex) {
         // not much we can do here
       }

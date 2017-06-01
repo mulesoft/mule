@@ -8,14 +8,13 @@ package org.mule.runtime.config.spring.dsl.processor;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 
@@ -76,7 +75,7 @@ public class TransformerObjectFactory extends AbstractAnnotatedObjectFactory<Tra
   protected AbstractTransformer createInstance() {
     checkArgument(transformerClass != null, "Default createInstance method is used but no transformerClass was provided");
     try {
-      return instanciateClass(transformerClass, new Object[0]);
+      return ClassUtils.instantiateClass(transformerClass, new Object[0]);
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
@@ -86,7 +85,7 @@ public class TransformerObjectFactory extends AbstractAnnotatedObjectFactory<Tra
     Class<?> returnType = Object.class;
     if (returnClass != null) {
       try {
-        returnType = ClassUtils.getClass(returnClass);
+        returnType = org.apache.commons.lang.ClassUtils.getClass(returnClass);
       } catch (ClassNotFoundException e) {
         throw new MuleRuntimeException(e);
       }

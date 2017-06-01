@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollection;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessageIterator;
 import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;

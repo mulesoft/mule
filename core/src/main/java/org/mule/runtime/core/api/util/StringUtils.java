@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util;
+package org.mule.runtime.core.api.util;
+
+import org.mule.runtime.core.internal.util.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +20,18 @@ import org.apache.commons.lang.CharUtils;
  * <code>StringUtils</code> contains useful methods for manipulating Strings.
  */
 // @ThreadSafe
-public class StringUtils extends org.apache.commons.lang.StringUtils {
+public class StringUtils {
 
   public static final String WHITE_SPACE = " ";
   public static final String DASH = "-";
+  public static final String EMPTY = "";
+
+  // lookup tables needed for toHexString(byte[], boolean)
+  private static final String HEX_CHARACTERS = "0123456789abcdef";
+  private static final String HEX_CHARACTERS_UC = HEX_CHARACTERS.toUpperCase();
 
   /**
-   * Like {@link StringUtils#split(String, String)}, but additionally trims whitespace from the result
+   * Like {@link org.apache.commons.lang.StringUtils#split(String, String)}, but additionally trims whitespace from the result
    * tokens.
    */
   public static String[] splitAndTrim(String string, String delim) {
@@ -36,12 +43,12 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
       return ArrayUtils.EMPTY_STRING_ARRAY;
     }
 
-    String[] rawTokens = StringUtils.split(string, delim);
+    String[] rawTokens = org.apache.commons.lang.StringUtils.split(string, delim);
     List<String> tokens = new ArrayList<String>();
     if (rawTokens != null) {
       for (int i = 0; i < rawTokens.length; i++) {
         String token = StringUtils.trim(rawTokens[i]);
-        if (StringUtils.isNotEmpty(token)) {
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(token)) {
           tokens.add(token);
         }
       }
@@ -78,10 +85,10 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
   }
 
   /**
-   * Like {@link #repeat(String, int)} but with a single character as argument.
+   * Like {@link org.apache.commons.lang.StringUtils#repeat(String, int)} but with a single character as argument.
    */
   public static String repeat(char c, int len) {
-    return StringUtils.repeat(CharUtils.toString(c), len);
+    return org.apache.commons.lang.StringUtils.repeat(CharUtils.toString(c), len);
   }
 
   /**
@@ -150,7 +157,15 @@ public class StringUtils extends org.apache.commons.lang.StringUtils {
     }
   }
 
-  // lookup tables needed for toHexString(byte[], boolean)
-  private static final String HEX_CHARACTERS = "0123456789abcdef";
-  private static final String HEX_CHARACTERS_UC = HEX_CHARACTERS.toUpperCase();
+  public static boolean isEmpty(String str) {
+    return org.apache.commons.lang.StringUtils.isEmpty(str);
+  }
+
+  public static boolean isBlank(String str) {
+    return org.apache.commons.lang.StringUtils.isBlank(str);
+  }
+
+  public static String trim(String str) {
+    return org.apache.commons.lang.StringUtils.trim(str);
+  }
 }

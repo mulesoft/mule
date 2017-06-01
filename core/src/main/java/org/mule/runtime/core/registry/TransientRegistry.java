@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.core.registry;
 
-import org.mule.runtime.core.api.MuleContext;
+import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
+import static org.apache.commons.lang.exception.ExceptionUtils.getMessage;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.agent.Agent;
-import org.mule.runtime.core.api.endpoint.LegacyImmutableEndpoint;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.agent.Agent;
+import org.mule.runtime.core.api.endpoint.LegacyImmutableEndpoint;
 import org.mule.runtime.core.api.registry.InjectProcessor;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.ObjectProcessor;
@@ -19,26 +22,15 @@ import org.mule.runtime.core.api.registry.PreInitProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.LegacyConnector;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.runtime.core.util.CollectionUtils;
-import org.mule.runtime.core.util.ExceptionUtils;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.registry.map.RegistryMap;
+import org.mule.runtime.core.api.util.StringUtils;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.functors.InstanceofPredicate;
-import org.slf4j.Logger;
 
 /**
  * Use the registryLock when reading/writing/iterating over the contents of the registry hashmap.
@@ -64,7 +56,6 @@ public class TransientRegistry extends AbstractRegistry {
   private void putDefaultEntriesIntoRegistry() {
     Map<String, Object> processors = new HashMap<>();
     processors.put("_muleContextProcessor", new MuleContextProcessor(muleContext));
-    // processors("_muleNotificationProcessor", new NotificationListenersProcessor(muleContext));
     processors.put("_muleLifecycleStateInjectorProcessor", new LifecycleStateInjectorProcessor(getLifecycleManager().getState()));
     processors.put("_muleLifecycleManager", getLifecycleManager());
     registryMap.putAll(processors);
@@ -90,9 +81,9 @@ public class TransientRegistry extends AbstractRegistry {
       try {
         ((Disposable) obj).dispose();
       } catch (Exception e) {
-        logger.warn("Can not dispose object. " + ExceptionUtils.getMessage(e));
+        logger.warn("Can not dispose object. " + getMessage(e));
         if (logger.isDebugEnabled()) {
-          logger.debug("Can not dispose object. " + ExceptionUtils.getFullStackTrace(e));
+          logger.debug("Can not dispose object. " + getFullStackTrace(e));
         }
       }
     }
@@ -132,7 +123,7 @@ public class TransientRegistry extends AbstractRegistry {
   @Override
   @SuppressWarnings("unchecked")
   public <T> Map<String, T> lookupByType(Class<T> type) {
-    final Map<String, T> results = new HashMap<String, T>();
+    final Map<String, T> results = new HashMap<>();
     try {
       registryMap.lockForReading();
 
@@ -300,121 +291,4 @@ public class TransientRegistry extends AbstractRegistry {
     return false;
   }
 
-  /**
-   * This class encapsulates the {@link HashMap} that's used for storing the objects in the transient registry and also shields
-   * client code from having to deal with locking the {@link ReadWriteLock} for the exposed Map operations.
-   */
-  protected static class RegistryMap {
-
-    private final Map<String, Object> registry = new HashMap<String, Object>();
-    private final ReadWriteLock registryLock = new ReentrantReadWriteLock();
-    private final Set<Object> lostObjects = new TreeSet<Object>(new Comparator<Object>() {
-
-      @Override
-      public int compare(Object o1, Object o2) {
-        return o1 == o2 ? 0 : nvl(o1) - nvl(o2);
-      }
-
-      private int nvl(Object o) {
-        return o != null ? o.hashCode() : 0;
-      }
-    });
-
-    private Logger logger;
-
-    public RegistryMap(Logger log) {
-      super();
-      logger = log;
-    }
-
-    public Collection<?> select(Predicate predicate) {
-      Lock readLock = registryLock.readLock();
-      try {
-        readLock.lock();
-        return CollectionUtils.select(registry.values(), predicate);
-      } finally {
-        readLock.unlock();
-      }
-    }
-
-    public void clear() {
-      Lock writeLock = registryLock.writeLock();
-      try {
-        writeLock.lock();
-        registry.clear();
-        lostObjects.clear();
-      } finally {
-        writeLock.unlock();
-      }
-    }
-
-    public void putAndLogWarningIfDuplicate(String key, Object object) {
-      Lock writeLock = registryLock.writeLock();
-      try {
-        writeLock.lock();
-
-        final Object previousObject = registry.put(key, object);
-        if (previousObject != null && previousObject != object) {
-          if (previousObject instanceof Disposable) {
-            lostObjects.add(previousObject);
-          }
-          // registry.put(key, value) would overwrite a previous entity with the same name. Is this really what we want?
-          // Not sure whether to throw an exception or log a warning here.
-          // throw new RegistrationException("TransientRegistry already contains an object named '" + key + "'. The previous
-          // object would be overwritten.");
-          logger.warn("TransientRegistry already contains an object named '" + key
-              + "'.  The previous object will be overwritten.");
-        }
-      } finally {
-        writeLock.unlock();
-      }
-    }
-
-    public void putAll(Map<String, Object> map) {
-      Lock writeLock = registryLock.writeLock();
-      try {
-        writeLock.lock();
-        registry.putAll(map);
-      } finally {
-        writeLock.unlock();
-      }
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T get(String key) {
-      Lock readLock = registryLock.readLock();
-      try {
-        readLock.lock();
-        return (T) registry.get(key);
-      } finally {
-        readLock.unlock();
-      }
-    }
-
-    public Object remove(String key) {
-      Lock writeLock = registryLock.writeLock();
-      try {
-        writeLock.lock();
-        return registry.remove(key);
-      } finally {
-        writeLock.unlock();
-      }
-    }
-
-    public Set<Entry<String, Object>> entrySet() {
-      return registry.entrySet();
-    }
-
-    public Set<Object> getLostObjects() {
-      return lostObjects;
-    }
-
-    public void lockForReading() {
-      registryLock.readLock().lock();
-    }
-
-    public void unlockForReading() {
-      registryLock.readLock().unlock();
-    }
-  }
 }

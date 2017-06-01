@@ -39,7 +39,7 @@ import org.mule.runtime.core.context.notification.RegistryNotification;
 import org.mule.runtime.core.context.notification.RoutingNotification;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.context.notification.TransactionNotification;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.util.HashMap;
 import java.util.Map;

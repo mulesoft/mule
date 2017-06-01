@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.transformer;
 
+import static org.apache.commons.lang.StringUtils.capitalize;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -13,7 +14,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.util.StringUtils;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -98,7 +98,7 @@ public class TransformerChain extends AbstractMessageTransformer {
       if (target.equals("byte[]")) {
         target = "byteArray";
       }
-      name = name.substring(0, i + 2) + StringUtils.capitalize(target);
+      name = name.substring(0, i + 2) + capitalize(target);
     }
     return name;
   }

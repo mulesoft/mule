@@ -6,7 +6,7 @@
  */
 package org.mule.functional.util.ftp;
 
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

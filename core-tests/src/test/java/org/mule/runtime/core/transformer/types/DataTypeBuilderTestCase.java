@@ -23,7 +23,7 @@ import static org.mule.runtime.api.el.BindingContext.builder;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.core.util.IOUtils.toByteArray;
+import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 
 import org.mule.runtime.api.el.BindingContext;

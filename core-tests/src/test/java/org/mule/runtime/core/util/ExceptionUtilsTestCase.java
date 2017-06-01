@@ -22,13 +22,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.util.ExceptionUtils.containsType;
-import static org.mule.runtime.core.util.ExceptionUtils.extractCauseOfType;
-import static org.mule.runtime.core.util.ExceptionUtils.extractConnectionException;
-import static org.mule.runtime.core.util.ExceptionUtils.extractOfType;
-import static org.mule.runtime.core.util.ExceptionUtils.getDeepestOccurenceOfType;
-import static org.mule.runtime.core.util.ExceptionUtils.getFullStackTraceWithoutMessages;
-import static org.mule.runtime.core.util.ExceptionUtils.updateMessagingExceptionWithError;
+import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractCauseOfType;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
+import static org.mule.runtime.core.api.util.ExceptionUtils.getDeepestOccurrenceOfType;
+import static org.mule.runtime.core.api.util.ExceptionUtils.getFullStackTraceWithoutMessages;
+import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Error;
@@ -84,23 +84,23 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   private void assertExpectationsForDeepestOccurence(IllegalArgumentException expected) {
-    assertSame(expected, getDeepestOccurenceOfType(expected, IllegalArgumentException.class));
+    assertSame(expected, getDeepestOccurrenceOfType(expected, IllegalArgumentException.class));
 
-    assertSame(expected, getDeepestOccurenceOfType(new Exception(expected), IllegalArgumentException.class));
+    assertSame(expected, getDeepestOccurrenceOfType(new Exception(expected), IllegalArgumentException.class));
 
     assertSame(expected,
-               getDeepestOccurenceOfType(new IllegalArgumentException(new Exception(expected)), IllegalArgumentException.class));
+               getDeepestOccurrenceOfType(new IllegalArgumentException(new Exception(expected)), IllegalArgumentException.class));
 
-    assertNull(getDeepestOccurenceOfType(new IllegalArgumentException(new Exception(expected)), IOException.class));
+    assertNull(getDeepestOccurrenceOfType(new IllegalArgumentException(new Exception(expected)), IOException.class));
   }
 
   @Test
   public void testLastIndexOfType_nullParameters() throws Exception {
-    assertNull(getDeepestOccurenceOfType(null, null));
+    assertNull(getDeepestOccurrenceOfType(null, null));
 
-    assertNull(getDeepestOccurenceOfType(new Exception(), null));
+    assertNull(getDeepestOccurrenceOfType(new Exception(), null));
 
-    assertNull(getDeepestOccurenceOfType(null, Exception.class));
+    assertNull(getDeepestOccurrenceOfType(null, Exception.class));
   }
 
   @Test
