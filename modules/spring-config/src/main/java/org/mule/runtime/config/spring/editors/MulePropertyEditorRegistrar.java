@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.config.spring.editors;
 
-import static org.mule.runtime.core.util.IOUtils.closeQuietly;
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.beans.PropertyEditor;
 import java.io.InputStream;

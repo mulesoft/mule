@@ -22,7 +22,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;

@@ -6,7 +6,7 @@
  */
 package org.mule.functional.config;
 
-import static org.mule.runtime.core.util.StringUtils.isEmpty;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -15,8 +15,8 @@ import org.mule.runtime.config.spring.parsers.specific.ComponentDefinitionParser
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.object.AbstractObjectFactory;
 import org.mule.runtime.core.object.SingletonObjectFactory;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.IOException;
 import java.util.HashMap;

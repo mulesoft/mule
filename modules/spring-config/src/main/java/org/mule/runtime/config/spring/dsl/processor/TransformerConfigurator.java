@@ -13,7 +13,6 @@ import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.config.spring.dsl.spring.ObjectFactoryCommonConfigurator;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.Map;
 

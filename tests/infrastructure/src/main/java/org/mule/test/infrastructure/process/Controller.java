@@ -16,7 +16,7 @@ import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
 import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.listFiles;
-import static org.mule.runtime.core.util.FileUtils.newFile;
+import static org.mule.runtime.core.api.util.FileUtils.newFile;
 
 import java.io.File;
 import java.io.IOException;

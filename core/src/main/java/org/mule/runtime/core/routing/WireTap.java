@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.util.ObjectUtils;
+import org.mule.runtime.core.api.util.ObjectUtils;
 
 import java.util.List;
 

@@ -37,7 +37,6 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.routing.MessageFilter;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import com.google.common.collect.ImmutableSet;

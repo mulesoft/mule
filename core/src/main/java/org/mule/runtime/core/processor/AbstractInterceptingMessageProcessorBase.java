@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.util.ObjectUtils;
+import org.mule.runtime.core.api.util.ObjectUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

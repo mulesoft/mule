@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.util.ObjectUtils;
+import org.mule.runtime.core.api.util.ObjectUtils;
 
 public class FlowConstructStatisticsMessageProcessor extends AbstractAnnotatedObject
     implements Processor, FlowConstructAware, InternalMessageProcessor {

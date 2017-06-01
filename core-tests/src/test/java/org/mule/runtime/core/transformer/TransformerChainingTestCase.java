@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;

@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.context.notification;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.util.EventObject;
 import java.util.Map;

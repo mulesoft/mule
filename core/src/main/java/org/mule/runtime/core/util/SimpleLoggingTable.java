@@ -10,6 +10,8 @@ import static org.apache.commons.lang.StringUtils.center;
 import static org.apache.commons.lang.StringUtils.rightPad;
 import static org.apache.commons.lang.StringUtils.substring;
 
+import org.mule.runtime.core.api.util.StringUtils;
+
 import java.util.LinkedList;
 import java.util.List;
 

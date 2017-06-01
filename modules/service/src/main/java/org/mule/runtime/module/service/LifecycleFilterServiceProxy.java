@@ -8,7 +8,7 @@ package org.mule.runtime.module.service;
 
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.ClassUtils.findImplementedInterfaces;
+import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
 
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;

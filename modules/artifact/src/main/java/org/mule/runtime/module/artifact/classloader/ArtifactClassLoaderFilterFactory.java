@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.artifact.classloader;
 
-import static org.mule.runtime.core.util.StringUtils.isBlank;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -10,6 +10,7 @@ import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.mule.runtime.core.api.util.MapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

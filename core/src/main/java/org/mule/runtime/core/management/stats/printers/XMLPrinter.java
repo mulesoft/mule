@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.management.stats.printers;
 
-import static org.mule.runtime.core.util.StringUtils.isEmpty;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import org.mule.runtime.core.management.stats.RouterStatistics;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 
 import java.io.OutputStream;
 import java.io.Writer;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util;
+package org.mule.runtime.core.api.util;
 
 import static org.apache.commons.lang.StringUtils.INDEX_NOT_FOUND;
 import static org.apache.commons.lang.StringUtils.indexOf;

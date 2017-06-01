@@ -16,7 +16,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.APP_NAME_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.UUID.getUUID;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.location.Location;

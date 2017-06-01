@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.connection.ConnectionProvider;

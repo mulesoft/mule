@@ -15,8 +15,6 @@
 
 package org.mule.runtime.module.extension.internal.capability.xml.schema.model;
 
-import org.mule.runtime.core.util.StringUtils;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;

@@ -8,12 +8,12 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.ClassUtils.getClassName;
+import static org.mule.runtime.core.api.util.ClassUtils.getClassName;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverSupplier;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 
 import java.util.function.Supplier;

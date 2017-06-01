@@ -12,7 +12,7 @@ import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 

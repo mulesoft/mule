@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.api.model.InvocationResult;
-import org.mule.runtime.core.util.CollectionUtils;
+import org.mule.runtime.core.api.util.CollectionUtils;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;

@@ -39,7 +39,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.el.mvel.datatype.MvelDataTypeResolver;
 import org.mule.runtime.core.el.mvel.datatype.MvelEnricherDataTypePropagator;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.IOException;
 import java.io.Serializable;

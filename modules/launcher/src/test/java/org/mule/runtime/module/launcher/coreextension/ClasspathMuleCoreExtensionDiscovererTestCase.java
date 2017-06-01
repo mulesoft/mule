@@ -13,7 +13,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.launcher.coreextension.ClasspathMuleCoreExtensionDiscoverer.CORE_EXTENSION_RESOURCE_NAME;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.DefaultMuleException;

@@ -10,7 +10,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;

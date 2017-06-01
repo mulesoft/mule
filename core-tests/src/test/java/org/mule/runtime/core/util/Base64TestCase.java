@@ -8,6 +8,7 @@ package org.mule.runtime.core.util;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.util.compression.GZIPCompressorInputStream;

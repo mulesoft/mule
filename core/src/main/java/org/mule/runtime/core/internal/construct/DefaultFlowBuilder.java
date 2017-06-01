@@ -12,7 +12,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
-import static org.mule.runtime.core.util.ExceptionUtils.updateMessagingExceptionWithError;
+import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;

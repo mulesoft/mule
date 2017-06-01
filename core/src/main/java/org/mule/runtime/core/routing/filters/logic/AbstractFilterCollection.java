@@ -8,7 +8,7 @@ package org.mule.runtime.core.routing.filters.logic;
 
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.ObjectFilter;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.List;

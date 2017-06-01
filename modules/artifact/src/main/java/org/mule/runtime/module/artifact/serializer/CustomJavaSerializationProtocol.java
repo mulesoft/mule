@@ -9,7 +9,7 @@ package org.mule.runtime.module.artifact.serializer;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.IOUtils.toByteArray;
+import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.serialization.AbstractSerializationProtocol;

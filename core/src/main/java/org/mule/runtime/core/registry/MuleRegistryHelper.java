@@ -30,7 +30,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.util.UUID;
 
 import com.google.common.collect.ImmutableList;

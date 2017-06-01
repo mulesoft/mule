@@ -32,7 +32,7 @@ import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;

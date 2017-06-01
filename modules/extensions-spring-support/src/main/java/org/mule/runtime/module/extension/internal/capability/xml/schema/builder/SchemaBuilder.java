@@ -61,7 +61,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;

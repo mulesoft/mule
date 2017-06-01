@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.core.util.ClassUtils.isInstance;
+import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;

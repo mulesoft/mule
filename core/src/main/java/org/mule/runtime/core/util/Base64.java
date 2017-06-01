@@ -56,7 +56,9 @@
 
 package org.mule.runtime.core.util;
 
-import static org.mule.runtime.core.util.IOUtils.closeQuietly;
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+
+import org.mule.runtime.core.api.util.FileUtils;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;

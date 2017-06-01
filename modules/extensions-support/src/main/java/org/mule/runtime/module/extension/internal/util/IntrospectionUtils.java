@@ -58,7 +58,7 @@ import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;

@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.internal.util.DateUtils;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.lang.reflect.Method;

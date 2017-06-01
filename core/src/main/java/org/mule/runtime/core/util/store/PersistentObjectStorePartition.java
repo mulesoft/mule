@@ -14,8 +14,8 @@ import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.store.ObjectStoreManager.UNBOUNDED;
 import static org.mule.runtime.core.config.i18n.CoreMessages.failedToCreate;
-import static org.mule.runtime.core.util.FileUtils.cleanDirectory;
-import static org.mule.runtime.core.util.FileUtils.newFile;
+import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
+import static org.mule.runtime.core.api.util.FileUtils.newFile;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;

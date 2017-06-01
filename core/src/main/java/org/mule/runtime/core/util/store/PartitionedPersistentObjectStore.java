@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableExpirableObjectStore;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.util.UUID;
 
 import java.io.File;

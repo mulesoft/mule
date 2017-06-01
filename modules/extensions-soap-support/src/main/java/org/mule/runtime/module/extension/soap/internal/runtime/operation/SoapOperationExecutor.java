@@ -20,7 +20,7 @@ import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.soap.SoapAttachment;

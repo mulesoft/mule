@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.expression.transformers;
 
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;

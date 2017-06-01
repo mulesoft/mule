@@ -7,7 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.util.StringUtils.isBlank;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import org.mule.runtime.config.builders.PropertiesMuleConfigurationFactory;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;

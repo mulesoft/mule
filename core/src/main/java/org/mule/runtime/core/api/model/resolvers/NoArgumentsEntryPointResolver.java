@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.model.resolvers;
 
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 /**
  * Allows for arguments with no parameters to be called. Regardless of the payload of the current event, this resolver will always

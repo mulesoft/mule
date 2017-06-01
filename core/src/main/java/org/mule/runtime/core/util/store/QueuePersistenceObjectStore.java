@@ -17,7 +17,7 @@ import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.util.queue.objectstore.QueueKey;
 
 import java.io.File;

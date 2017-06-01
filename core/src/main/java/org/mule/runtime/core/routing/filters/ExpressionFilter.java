@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.routing.filters;
 
-import static org.mule.runtime.core.util.ClassUtils.equal;
-import static org.mule.runtime.core.util.ClassUtils.hash;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.equal;
+import static org.mule.runtime.core.api.util.ClassUtils.hash;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;

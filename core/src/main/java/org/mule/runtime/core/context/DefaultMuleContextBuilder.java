@@ -59,7 +59,7 @@ import org.mule.runtime.core.processor.interceptor.DefaultProcessorInterceptorMa
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.RegistryDelegatingInjector;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.util.SplashScreen;
 
 import org.slf4j.Logger;

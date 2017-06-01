@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.model.resolvers;
 
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 /**
  * Will resolver entry point methods on a service service that accept a single array. i.e.

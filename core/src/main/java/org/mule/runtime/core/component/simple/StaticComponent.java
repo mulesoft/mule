@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.IOException;
 

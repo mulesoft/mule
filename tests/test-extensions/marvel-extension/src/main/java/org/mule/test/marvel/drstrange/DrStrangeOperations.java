@@ -12,7 +12,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM_ERROR;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;

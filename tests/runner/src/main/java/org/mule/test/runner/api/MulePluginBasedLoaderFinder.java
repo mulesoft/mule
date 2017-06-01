@@ -12,7 +12,7 @@ import static org.mule.test.runner.utils.ExtensionLoaderUtils.getLoaderById;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 
 import java.io.File;

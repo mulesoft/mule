@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.metadata.api.model.ObjectType;

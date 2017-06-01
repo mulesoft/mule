@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.core.api.security.tls;
 
-import static org.mule.runtime.core.util.StringUtils.isBlank;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.security.TlsDirectKeyStore;
 import org.mule.runtime.core.api.security.TlsDirectTrustStore;
 import org.mule.runtime.core.api.security.TlsIndirectKeyStore;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.util.ArrayUtils;
-import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.FileUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.util.SecurityUtils;
 
 import java.io.FileNotFoundException;

@@ -68,7 +68,7 @@ import org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFacto
 import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.runtime.core.routing.filters.AcceptAllFilter;
-import org.mule.runtime.core.util.ObjectUtils;
+import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.size.SmallTest;
 

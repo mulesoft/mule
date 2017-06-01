@@ -12,8 +12,8 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ShutdownListener;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.util.FileUtils;
 
 import java.io.File;
 import java.io.Serializable;

@@ -8,6 +8,10 @@ package org.mule.runtime.core.util;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.util.CollectionUtils;
+import org.mule.runtime.core.api.util.FileUtils;
+import org.mule.runtime.core.api.util.MapUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.util.ArrayUtils;
 

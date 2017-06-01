@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.transformer.simple;
 
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import static org.mule.runtime.core.config.i18n.CoreMessages.errorReadingStream;
-import static org.mule.runtime.core.util.IOUtils.copyLarge;
+import static org.mule.runtime.core.api.util.IOUtils.copyLarge;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;

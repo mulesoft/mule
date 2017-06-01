@@ -13,7 +13,7 @@ import static java.lang.reflect.Proxy.newProxyInstance;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.deepEquals;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.ClassUtils.findImplementedInterfaces;
+import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
 
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.container.api.ServiceInvocationHandler;

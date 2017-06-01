@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaXmlResourceFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;

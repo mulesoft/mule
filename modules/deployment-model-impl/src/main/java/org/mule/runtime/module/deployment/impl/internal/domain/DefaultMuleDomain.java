@@ -10,7 +10,7 @@ import static org.apache.commons.lang.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import org.mule.runtime.api.exception.MuleException;

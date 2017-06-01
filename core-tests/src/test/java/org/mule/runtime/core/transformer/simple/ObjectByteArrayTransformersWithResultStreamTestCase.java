@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

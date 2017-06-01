@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.InputStream;
 import java.io.Serializable;

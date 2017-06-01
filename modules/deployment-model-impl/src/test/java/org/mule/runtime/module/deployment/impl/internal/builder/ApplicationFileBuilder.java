@@ -27,7 +27,7 @@ import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.tck.ZipUtils.ZipResource;
 
 import java.io.File;

@@ -11,7 +11,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.lang.reflect.Constructor;
 

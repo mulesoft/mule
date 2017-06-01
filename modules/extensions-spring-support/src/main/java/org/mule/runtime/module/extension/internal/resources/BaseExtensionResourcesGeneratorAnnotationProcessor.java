@@ -11,7 +11,7 @@ import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.VERSION;
 import org.mule.runtime.api.meta.model.ExtensionModel;

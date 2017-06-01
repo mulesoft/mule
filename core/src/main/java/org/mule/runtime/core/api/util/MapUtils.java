@@ -4,9 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util;
+package org.mule.runtime.core.api.util;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+
+import org.mule.runtime.core.util.PropertiesUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -113,4 +115,5 @@ public class MapUtils {
     buf.append('}');
     return buf.toString();
   }
+
 }

@@ -30,6 +30,7 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

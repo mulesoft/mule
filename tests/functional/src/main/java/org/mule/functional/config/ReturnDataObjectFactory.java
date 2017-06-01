@@ -6,7 +6,7 @@
  */
 package org.mule.functional.config;
 
-import static org.mule.runtime.core.util.IOUtils.getResourceAsString;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 

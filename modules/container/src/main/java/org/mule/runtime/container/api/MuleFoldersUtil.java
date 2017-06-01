@@ -11,7 +11,7 @@ import static java.io.File.separator;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleBase;
 import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleHome;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 
 import java.io.File;
 

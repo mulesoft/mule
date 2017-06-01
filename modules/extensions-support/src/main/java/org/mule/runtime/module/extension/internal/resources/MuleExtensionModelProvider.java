@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExtensionTypeAnnotationsRegistry;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 

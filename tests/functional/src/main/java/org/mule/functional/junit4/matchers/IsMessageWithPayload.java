@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static org.junit.Assert.fail;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.InputStream;
 

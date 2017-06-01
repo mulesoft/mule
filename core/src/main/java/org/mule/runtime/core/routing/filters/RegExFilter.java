@@ -9,7 +9,7 @@ package org.mule.runtime.core.routing.filters;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.config.i18n.CoreMessages.transformFailedBeforeFilter;
-import static org.mule.runtime.core.util.ClassUtils.hash;
+import static org.mule.runtime.core.api.util.ClassUtils.hash;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.routing.filter.ObjectFilter;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.util.AttributeEvaluator;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.util.regex.Pattern;
 

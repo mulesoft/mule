@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.util.FileUtils.newFile;
+import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;

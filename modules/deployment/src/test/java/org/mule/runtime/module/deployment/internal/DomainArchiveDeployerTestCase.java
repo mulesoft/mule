@@ -13,7 +13,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import org.mule.runtime.core.util.FileUtils;
+import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.api.DeploymentService;

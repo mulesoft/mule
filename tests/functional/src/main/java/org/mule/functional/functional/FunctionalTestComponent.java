@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.util.ArrayList;

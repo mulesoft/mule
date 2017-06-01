@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.handlers;
 
-import static org.mule.runtime.core.util.IOUtils.closeQuietly;
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import org.mule.runtime.config.spring.MuleHierarchicalBeanDefinitionParserDelegate;
 import org.mule.runtime.config.spring.parsers.AbstractChildDefinitionParser;
 import org.mule.runtime.config.spring.parsers.DeprecatedBeanDefinitionParser;

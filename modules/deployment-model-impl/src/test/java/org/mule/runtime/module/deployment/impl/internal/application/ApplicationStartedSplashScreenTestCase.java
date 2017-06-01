@@ -10,7 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.util.FileUtils.newFile;
+import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;

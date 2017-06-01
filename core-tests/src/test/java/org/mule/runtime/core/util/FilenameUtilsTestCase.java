@@ -9,6 +9,7 @@ package org.mule.runtime.core.util;
 import static org.apache.commons.lang.SystemUtils.getUserDir;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.internal.util.FilenameUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

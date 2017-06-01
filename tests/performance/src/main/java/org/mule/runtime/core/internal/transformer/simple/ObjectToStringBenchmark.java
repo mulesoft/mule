@@ -13,7 +13,7 @@ import static org.apache.commons.lang3.RandomStringUtils.random;
 
 import org.mule.AbstractBenchmark;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

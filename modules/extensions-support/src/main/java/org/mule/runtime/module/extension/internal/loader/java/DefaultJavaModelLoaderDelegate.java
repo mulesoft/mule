@@ -11,7 +11,7 @@ import static java.util.Arrays.stream;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang.ArrayUtils.EMPTY_CLASS_ARRAY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.StringUtils.ifNotBlank;
+import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.MuleVersion;

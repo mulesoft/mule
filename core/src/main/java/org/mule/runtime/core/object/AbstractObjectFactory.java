@@ -14,8 +14,8 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
 import org.mule.runtime.core.api.object.ObjectFactory;
-import org.mule.runtime.core.util.BeanUtils;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.BeanUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.List;

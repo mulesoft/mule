@@ -25,7 +25,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.resources.GeneratedResource;

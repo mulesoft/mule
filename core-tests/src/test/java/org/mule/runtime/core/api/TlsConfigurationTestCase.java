@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.util.SecurityUtils;
 
 import java.io.File;

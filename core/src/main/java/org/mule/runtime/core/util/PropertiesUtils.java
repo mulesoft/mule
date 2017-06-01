@@ -7,8 +7,10 @@
 package org.mule.runtime.core.util;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.StringUtils.isEmpty;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.api.i18n.I18nMessage;
 

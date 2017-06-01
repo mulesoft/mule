@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
-import static org.mule.runtime.core.util.FileUtils.openDirectory;
+import static org.mule.runtime.core.api.util.FileUtils.openDirectory;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;

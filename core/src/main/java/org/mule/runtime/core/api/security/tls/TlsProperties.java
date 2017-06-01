@@ -8,8 +8,8 @@ package org.mule.runtime.core.api.security.tls;
 
 
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

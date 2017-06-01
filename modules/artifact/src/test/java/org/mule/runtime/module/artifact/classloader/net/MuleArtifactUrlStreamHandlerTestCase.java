@@ -16,7 +16,7 @@ import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlCo
 import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler.PROTOCOL;
 import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler.register;
 import static org.mule.runtime.module.artifact.classloader.net.MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

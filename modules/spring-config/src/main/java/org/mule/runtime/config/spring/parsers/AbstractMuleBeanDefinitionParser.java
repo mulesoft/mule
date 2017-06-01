@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.parsers;
 
 import static org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
 import static org.mule.runtime.core.api.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromXml;
-import static org.mule.runtime.core.util.StringUtils.isBlank;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -22,7 +22,7 @@ import org.mule.runtime.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.util.XMLUtils;
 
 import java.util.HashMap;

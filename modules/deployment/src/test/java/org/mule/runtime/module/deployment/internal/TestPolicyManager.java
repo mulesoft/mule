@@ -11,7 +11,7 @@ import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
-import static org.mule.runtime.core.util.FileUtils.unzip;
+import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationPolicyManager;

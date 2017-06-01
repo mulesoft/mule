@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.core.api.MuleContext;

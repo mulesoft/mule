@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.canBeUsedImplicitly;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
 import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;

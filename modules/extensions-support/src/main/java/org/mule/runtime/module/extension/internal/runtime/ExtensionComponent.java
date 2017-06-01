@@ -13,7 +13,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;

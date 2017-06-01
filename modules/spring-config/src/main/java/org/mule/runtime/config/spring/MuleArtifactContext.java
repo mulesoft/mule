@@ -63,7 +63,7 @@ import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
 

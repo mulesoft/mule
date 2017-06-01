@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.component.AbstractJavaComponent;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

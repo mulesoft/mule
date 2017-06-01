@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.dsl.spring;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 

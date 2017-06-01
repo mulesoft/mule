@@ -227,7 +227,7 @@ import org.mule.runtime.core.transformer.simple.MapToBean;
 import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.util.queue.QueueStore;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;

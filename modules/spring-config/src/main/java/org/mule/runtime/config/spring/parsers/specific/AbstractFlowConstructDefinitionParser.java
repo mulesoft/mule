@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
-import static org.mule.runtime.core.util.StringUtils.isBlank;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
 import org.springframework.beans.factory.config.BeanDefinition;

@@ -4,15 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util;
+package org.mule.runtime.core.api.util;
 
 import static org.apache.commons.collections.MapUtils.getObject;
 import static org.apache.commons.lang.ClassUtils.primitiveToWrapper;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.ExceptionUtils.tryExpecting;
+import static org.mule.runtime.core.api.util.ExceptionUtils.tryExpecting;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
+import org.mule.runtime.core.util.ExceptionHandler;
 
 import com.google.common.primitives.Primitives;
 

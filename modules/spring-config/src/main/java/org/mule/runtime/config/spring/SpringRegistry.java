@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.lifecycle.RegistryLifecycleManager;
 import org.mule.runtime.core.registry.AbstractRegistry;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Collections;

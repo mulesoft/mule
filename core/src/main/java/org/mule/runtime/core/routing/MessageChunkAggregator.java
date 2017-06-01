@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
-import static org.mule.runtime.core.util.IOUtils.closeQuietly;
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.Event;

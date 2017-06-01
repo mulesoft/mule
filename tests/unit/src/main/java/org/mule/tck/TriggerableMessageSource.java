@@ -12,7 +12,7 @@ import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.util.ObjectUtils;
+import org.mule.runtime.core.api.util.ObjectUtils;
 
 import org.reactivestreams.Publisher;
 

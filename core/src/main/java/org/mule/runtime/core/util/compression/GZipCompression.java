@@ -7,7 +7,7 @@
 package org.mule.runtime.core.util.compression;
 
 import static org.apache.commons.io.IOUtils.copy;
-import static org.mule.runtime.core.util.IOUtils.closeQuietly;
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

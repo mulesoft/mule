@@ -7,7 +7,6 @@
 package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 
 import java.beans.PropertyEditor;

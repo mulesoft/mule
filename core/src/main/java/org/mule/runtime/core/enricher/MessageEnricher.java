@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.session.DefaultMuleSession;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

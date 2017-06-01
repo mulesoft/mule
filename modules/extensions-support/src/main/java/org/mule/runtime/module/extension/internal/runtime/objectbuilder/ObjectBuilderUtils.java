@@ -7,9 +7,9 @@
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 /**
  * Utilities to power {@link ObjectBuilder} implementations

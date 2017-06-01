@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.util;
 
 import static org.apache.commons.lang.SystemUtils.JAVA_VENDOR;
 import org.mule.runtime.core.config.MuleManifest;
-import org.mule.runtime.core.util.SystemUtils;
+import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.runtime.core.util.VersionRange;
 
 import java.util.ArrayList;

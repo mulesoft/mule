@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.serialization;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.IOUtils.toByteArray;
+import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.serialization.AbstractSerializationProtocol;

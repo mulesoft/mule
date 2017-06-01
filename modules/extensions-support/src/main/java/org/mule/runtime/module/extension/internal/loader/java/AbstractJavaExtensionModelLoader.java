@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.mule.runtime.core.util.ClassUtils.loadClass;
+import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;

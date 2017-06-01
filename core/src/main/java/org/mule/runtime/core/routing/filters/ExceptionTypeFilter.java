@@ -11,7 +11,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.util.Optional;
 

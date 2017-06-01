@@ -14,7 +14,7 @@ import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.internal.util.generics.GenericsUtils.getCollectionType;
 import static org.mule.runtime.core.internal.util.generics.GenericsUtils.getMapKeyType;
 import static org.mule.runtime.core.internal.util.generics.GenericsUtils.getMapValueType;
-import static org.mule.runtime.core.util.StringUtils.isEmpty;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.CollectionDataType;
@@ -26,7 +26,7 @@ import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;

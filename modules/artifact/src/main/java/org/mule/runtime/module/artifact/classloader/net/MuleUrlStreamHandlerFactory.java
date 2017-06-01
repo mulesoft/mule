@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.artifact.classloader.net;
 
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -12,7 +12,7 @@ import org.mule.runtime.config.spring.parsers.MuleDefinitionParser;
 import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.runtime.config.spring.parsers.PreProcessor;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;

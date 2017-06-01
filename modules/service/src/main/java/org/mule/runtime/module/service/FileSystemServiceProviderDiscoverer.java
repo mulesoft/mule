@@ -13,12 +13,12 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesTempFolder;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.util.FileUtils.unzip;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.container.api.MuleFoldersUtil;
-import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFactory;
 

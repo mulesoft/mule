@@ -10,7 +10,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.util.BeanUtils;
+import org.mule.runtime.core.api.util.BeanUtils;
 
 import java.nio.charset.Charset;
 import java.util.Map;

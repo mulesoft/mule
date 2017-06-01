@@ -11,7 +11,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
-import static org.mule.runtime.core.util.ClassUtils.loadClass;
+import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.param.Parameter;

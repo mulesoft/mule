@@ -13,7 +13,7 @@ import static org.apache.commons.io.FileUtils.copyFile;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.util.FileUtils.deleteTree;
+import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader.ADD_TEST_DEPENDENCIES_KEY;
 import static org.mule.runtime.module.embedded.impl.SerializationUtils.deserialize;
 import static org.mule.runtime.module.embedded.internal.MavenUtils.createModelFromPom;

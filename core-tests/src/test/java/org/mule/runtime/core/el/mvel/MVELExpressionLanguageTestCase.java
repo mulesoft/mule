@@ -47,7 +47,6 @@ import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.function.RegexExpressionLanguageFuntion;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.File;

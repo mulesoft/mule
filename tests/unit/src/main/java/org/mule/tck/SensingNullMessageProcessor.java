@@ -8,14 +8,14 @@ package org.mule.tck;
 
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.util.StringUtils.isEmpty;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.util.ObjectUtils;
+import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 

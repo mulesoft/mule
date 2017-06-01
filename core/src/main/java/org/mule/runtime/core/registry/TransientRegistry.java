@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.registry.map.RegistryMap;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 
 import java.util.Collection;
 import java.util.HashMap;

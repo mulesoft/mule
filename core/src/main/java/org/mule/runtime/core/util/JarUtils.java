@@ -11,6 +11,8 @@ import static java.util.Optional.of;
 import static org.apache.commons.io.IOUtils.toByteArray;
 import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleHome;
 
+import org.mule.runtime.core.api.util.FileUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;

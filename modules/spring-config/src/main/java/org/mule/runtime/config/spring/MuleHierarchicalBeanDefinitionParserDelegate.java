@@ -43,8 +43,7 @@ import org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.runtime.config.spring.util.SpringXMLUtils;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 
 import com.google.common.collect.ImmutableList;
