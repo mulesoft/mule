@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.module.extension.internal.loader.java.ConfigModelLoaderDelegate.CUSTOM_CONFIG_SUFFIX;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
@@ -77,7 +78,7 @@ final class ExtensionDescriptionDocumenter extends AbstractDescriptionDocumenter
     return configurations.stream()
         .filter(config -> {
           Configuration configurationAnnotation = element.getAnnotation(Configuration.class);
-          String name = config.getName();
+          String name = config.getName().replace(CUSTOM_CONFIG_SUFFIX, "");
           String annotationName = configurationAnnotation != null ? configurationAnnotation.name() : "";
           String defaultNaming = hyphenize(element.getSimpleName().toString().replace("Configuration", ""));
           return name.equals(defaultNaming) || name.equals(annotationName);
