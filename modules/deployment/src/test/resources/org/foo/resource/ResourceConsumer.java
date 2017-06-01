@@ -7,23 +7,19 @@
 
 package org.foo.resource;
 
-import org.mule.runtime.core.util.FileUtils;
-
-import java.io.File;
 import java.net.URL;
-import java.util.List;
 
 public class ResourceConsumer {
     public ResourceConsumer() {
     }
 
-    public List<String> consumeResource(Object payload) {
+    public String consumeResource(Object payload) {
         URL resource = this.getClass().getResource("/META-INF/app-resource.txt");
 
-        try {
-            return FileUtils.readLines(new File(resource.toURI()));
-        } catch (Exception var4) {
-            throw new IllegalStateException("Error reading app resource", var4);
+        if (resource == null) {
+            throw new IllegalStateException("Error reading app resource");
         }
+
+        return "success";
     }
 }

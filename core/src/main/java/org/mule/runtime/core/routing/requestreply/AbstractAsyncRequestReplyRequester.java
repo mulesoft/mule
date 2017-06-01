@@ -75,7 +75,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   protected final ConcurrentMap<String, Event> responseEvents = new ConcurrentHashMap<>();
   protected final Object processedLock = new Object();
   // @GuardedBy processedLock
-  protected final BoundedFifoBuffer processed = new BoundedFifoBuffer(MAX_PROCESSED_GROUPS);
+  private final BoundedFifoBuffer processed = new BoundedFifoBuffer(MAX_PROCESSED_GROUPS);
 
   protected ListableObjectStore store;
 

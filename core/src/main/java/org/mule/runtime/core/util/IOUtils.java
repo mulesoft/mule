@@ -21,6 +21,7 @@ import org.mule.runtime.core.message.ds.StringDataSource;
 import org.mule.runtime.core.util.func.CheckedConsumer;
 import org.mule.runtime.core.util.func.CheckedFunction;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -291,7 +292,6 @@ public class IOUtils {
    * @return a {@link org.mule.runtime.api.message.Message} of the corresponding attachment
    * @throws IOException if the transformation fails.
    */
-  // TODO(pablo.kraan): API - review if this method is needed
   public static Message toMuleMessagePart(String name, Object object, MediaType contentType) throws IOException {
     final Message.Builder builder;
 
@@ -341,8 +341,17 @@ public class IOUtils {
       return function.apply(stream);
     } finally {
       if (shouldCloseStream) {
-        org.apache.commons.io.IOUtils.closeQuietly(stream);
+        closeQuietly(stream);
       }
     }
+  }
+
+  /**
+   * Closes a {#link Closable} instance catching any exceptions
+   *
+   * @param closeable instance to be closed. Non null.
+   */
+  public static void closeQuietly(Closeable closeable) {
+    org.apache.commons.io.IOUtils.closeQuietly(closeable);
   }
 }

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import static org.apache.commons.io.IOUtils.closeQuietly;
+import static org.mule.runtime.core.util.IOUtils.closeQuietly;
 import static org.mule.runtime.core.util.IOUtils.toByteArray;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;

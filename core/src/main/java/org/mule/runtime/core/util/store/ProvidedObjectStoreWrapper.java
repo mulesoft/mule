@@ -32,6 +32,7 @@ public class ProvidedObjectStoreWrapper<T extends Serializable> implements Objec
    * @param providedObjectStore the objectStroe provided through config to use. May be null.
    * @param objectStoreFactory the factory to use to build an object store if {@code providedObjectStore} is null.
    */
+  // TODO(pablo.kraan): MULE-12606: remove Factory from the API
   public ProvidedObjectStoreWrapper(ObjectStore<T> providedObjectStore, Factory objectStoreFactory) {
     if (providedObjectStore == null) {
       provided = false;

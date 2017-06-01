@@ -29,6 +29,7 @@ import org.apache.commons.collections.map.AbstractHashedMap;
  *
  * @since 3.0.0
  */
+// TODO(pablo.kraan): MULE-12606 - remove this class from the API or avoid exposing apache classes
 public class CaseInsensitiveHashMap extends AbstractHashedMap implements Serializable {
 
   /**

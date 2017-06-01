@@ -7,10 +7,10 @@
 package org.mule.runtime.config.spring;
 
 
-import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.util.IOUtils.closeQuietly;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.InputStream;

@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
  * <code>CommonsPoolProxyPool</code> is an implementation of {@link ObjectPool} that internally uses the commons-pool
  * {@link GenericObjectPool} and uses a {@link ObjectFactory} for creating new pooled instances.
  */
+// TODO(pablo.kraan): MULE-12606 - remove this class from the API or avoid exposing apache classes
 public class CommonsPoolObjectPool implements ObjectPool {
 
   /**

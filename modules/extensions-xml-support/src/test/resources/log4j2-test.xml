@@ -19,7 +19,6 @@
 
         <!-- Mule classes -->
         <AsyncLogger name="org.mule" level="WARN"/>
-        <AsyncLogger name="org.mule.test.runner" level="DEBUG"/>
         <AsyncLogger name="com.mulesoft" level="WARN"/>
 
         <AsyncRoot level="INFO">

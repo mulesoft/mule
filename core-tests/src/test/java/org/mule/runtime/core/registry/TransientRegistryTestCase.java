@@ -17,6 +17,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.registry.map.RegistryMap;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
@@ -66,7 +67,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase {
   @Test
   public void doesNotTracksNonDisposableOverriddenObjects() throws Exception {
     final Logger log = mock(Logger.class);
-    final TransientRegistry.RegistryMap registryMap = new TransientRegistry.RegistryMap(log);
+    final RegistryMap registryMap = new RegistryMap(log);
     Object value1 = new Object();
     Object value2 = new Object();
     registryMap.putAndLogWarningIfDuplicate(TEST_KEY, value1);

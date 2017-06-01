@@ -41,7 +41,6 @@ public class HtmlTablePrinter extends AbstractTablePrinter {
       println("<tr class=\"" + ((i % 2 == 0) ? "darkline" : "clearline") + "\">");
       for (int j = 0; j < table.length; j++) {
         if (j == 0) {
-          // TODO(pablo.kraan): API - revisar si el API tiene qu etener equals
           if (org.apache.commons.lang.StringUtils.equals(table[1][i], "-")) {
             if (org.apache.commons.lang.StringUtils.equals(table[j][i], "By Provider")) {
               println("<td class=\"statisticsrow\"><div class=\"tablesubheader\">" + table[j][i] + "</div></td>");

@@ -92,7 +92,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
     }
   }
 
-  protected Factory internalProcessedGroupsObjectStoreFactory() {
+  private Factory internalProcessedGroupsObjectStoreFactory() {
     return () -> {
       ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(OBJECT_STORE_MANAGER);
       return objectStoreManager.getObjectStore(storePrefix + ".processedGroups", persistentStores, MAX_PROCESSED_GROUPS, -1,
@@ -112,7 +112,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
     }
   }
 
-  protected Factory internalEventsGroupsObjectStoreFactory() {
+  private Factory internalEventsGroupsObjectStoreFactory() {
     return () -> {
       ObjectStore objectStore;
       if (persistentStores) {

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.editors;
 
-import static org.apache.commons.io.IOUtils.closeQuietly;
+import static org.mule.runtime.core.util.IOUtils.closeQuietly;
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -65,7 +65,7 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
   }
 
   private void discoverCustomPropertyEditor() {
-    customPropertyEditorsCache = new HashMap<Class<?>, Class<PropertyEditor>>();
+    customPropertyEditorsCache = new HashMap<>();
 
     // Look for any editors needed by extensions
     try {

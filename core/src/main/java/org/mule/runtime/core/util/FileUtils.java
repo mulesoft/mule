@@ -69,10 +69,10 @@ public class FileUtils {
       try {
         copy(input, output);
       } finally {
-        org.apache.commons.io.IOUtils.closeQuietly(output);
+        IOUtils.closeQuietly(output);
       }
     } finally {
-      org.apache.commons.io.IOUtils.closeQuietly(input);
+      IOUtils.closeQuietly(input);
     }
   }
 
@@ -281,8 +281,8 @@ public class FileUtils {
           InputStream is = zip.getInputStream(entry);
           OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
           copy(is, os);
-          org.apache.commons.io.IOUtils.closeQuietly(is);
-          org.apache.commons.io.IOUtils.closeQuietly(os);
+          IOUtils.closeQuietly(is);
+          IOUtils.closeQuietly(os);
         }
       }
     } finally {
@@ -480,8 +480,8 @@ public class FileUtils {
             outputStream = new BufferedOutputStream(new FileOutputStream(file));
             copy(inputStream, outputStream);
           } finally {
-            org.apache.commons.io.IOUtils.closeQuietly(inputStream);
-            org.apache.commons.io.IOUtils.closeQuietly(outputStream);
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
           }
         }
 
@@ -616,8 +616,8 @@ public class FileUtils {
         // grr!
         success = false;
       } finally {
-        org.apache.commons.io.IOUtils.closeQuietly(fis);
-        org.apache.commons.io.IOUtils.closeQuietly(fos);
+        IOUtils.closeQuietly(fis);
+        IOUtils.closeQuietly(fos);
       }
     }
 
@@ -723,7 +723,7 @@ public class FileUtils {
     return "file".equals(url.getProtocol());
   }
 
-  public static Collection<File> findFiles(File folder, IOFileFilter filter, boolean recursive) {
+  private static Collection<File> findFiles(File folder, IOFileFilter filter, boolean recursive) {
     return org.apache.commons.io.FileUtils.listFiles(folder, filter,
                                                      recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE);
   }

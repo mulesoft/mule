@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.serialization;
 
-import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.IOUtils.closeQuietly;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
