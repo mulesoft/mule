@@ -59,7 +59,7 @@
         <dependency>
             <groupId>org.jruby</groupId>
             <artifactId>jruby-core</artifactId>
-            <version>1.7.24</version>
+            <version>1.7.27</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.github.jnr</groupId>
@@ -70,7 +70,7 @@
         <dependency>
             <groupId>org.jruby</groupId>
             <artifactId>jruby-stdlib</artifactId>
-            <version>1.7.24</version>
+            <version>1.7.27</version>
         </dependency>
 
         <dependency>
