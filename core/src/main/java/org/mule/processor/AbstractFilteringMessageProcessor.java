@@ -6,7 +6,6 @@
  */
 package org.mule.processor;
 
-import org.mule.VoidMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
