@@ -530,12 +530,13 @@ public final class IntrospectionUtils {
   }
 
   public static List<Type> getSuperClassGenerics(Class<?> type, Class<?> superClass) {
+    if (!superClass.isAssignableFrom(type)) {
+      throw new IllegalArgumentException(
+                                         format("Class '%s' does not extend the '%s' class", type.getName(),
+                                                superClass.getName()));
+    }
+
     Class<?> searchClass = type;
-
-    checkArgument(searchClass.getSuperclass().equals(superClass), format(
-                                                                         "Class '%s' does not extend the '%s' class",
-                                                                         type.getName(), superClass.getName()));
-
     while (!Object.class.equals(searchClass)) {
       if (searchClass.getSuperclass().equals(superClass)) {
         Type superType = searchClass.getGenericSuperclass();
@@ -620,24 +621,50 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Returns all the methods in the {@code declaringClass} which are annotated with {@code annotationType}
+   * Returns all the methods in the {@code declaringClass} which are annotated with {@code annotationType}, including
+   * those declared in super classes.
    *
    * @param declaringClass the type to introspect
    * @param annotationType the annotation you're looking for
    * @return a {@link Collection} of {@link Method}s
    */
   public static Collection<Method> getMethodsAnnotatedWith(Class<?> declaringClass, Class<? extends Annotation> annotationType) {
-    return getMethodsStream(declaringClass)
+    return getMethodsAnnotatedWith(declaringClass, annotationType, true);
+  }
+
+  /**
+   * Returns all the methods in the {@code declaringClass} which are annotated with {@code annotationType}
+   *
+   * @param declaringClass the type to introspect
+   * @param annotationType the annotation you're looking for
+   * @param superClasses   whether to consider supper classes or not
+   * @return a {@link Collection} of {@link Method}s
+   */
+  public static Collection<Method> getMethodsAnnotatedWith(Class<?> declaringClass,
+                                                           Class<? extends Annotation> annotationType,
+                                                           boolean superClasses) {
+    return getMethodsStream(declaringClass, superClasses)
         .filter(method -> method.getAnnotation(annotationType) != null)
         .collect(toCollection(LinkedHashSet::new));
   }
 
   private static Stream<Method> getMethodsStream(Class<?> declaringClass) {
-    return getAllSuperTypes(declaringClass).stream()
-        .filter(type -> !type.isInterface())
-        .flatMap(type -> Stream.of(type.getDeclaredMethods()))
-        .filter(method -> isPublic(method.getModifiers()));
+    return getMethodsStream(declaringClass, true);
   }
+
+  private static Stream<Method> getMethodsStream(Class<?> declaringClass, boolean superClasses) {
+    Stream<Method> methodStream;
+    if (superClasses) {
+      methodStream = getAllSuperTypes(declaringClass).stream()
+          .filter(type -> !type.isInterface())
+          .flatMap(type -> Stream.of(type.getDeclaredMethods()));
+    } else {
+      methodStream = Stream.of(declaringClass.getDeclaredMethods());
+    }
+
+    return methodStream.filter(method -> isPublic(method.getModifiers()));
+  }
+
 
   public static List<Field> getAnnotatedFields(Class<?> clazz, Class<? extends Annotation> annotationType) {
     return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields()))

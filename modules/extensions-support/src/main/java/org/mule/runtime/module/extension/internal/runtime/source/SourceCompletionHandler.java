@@ -12,6 +12,8 @@ import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.Map;
 
+import org.reactivestreams.Publisher;
+
 /**
  * Handles the result of flow processing.
  *
@@ -28,14 +30,14 @@ public interface SourceCompletionHandler {
    *
    * @param event            the result of the flow execution
    */
-  void onCompletion(Event event, Map<String, Object> parameters) throws Exception;
+  Publisher<Void> onCompletion(Event event, Map<String, Object> parameters);
 
   /**
    * Invoked when a failure occurs during the flow processing
    *  @param exception the exception thrown during processing
    *
    */
-  void onFailure(MessagingException exception, Map<String, Object> parameters) throws Exception;
+  Publisher<Void> onFailure(MessagingException exception, Map<String, Object> parameters);
 
   void onTerminate(Either<Event, MessagingException> eventOrException) throws Exception;
 

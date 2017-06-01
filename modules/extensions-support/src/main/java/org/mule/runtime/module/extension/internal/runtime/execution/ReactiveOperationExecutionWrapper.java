@@ -64,13 +64,11 @@ public final class ReactiveOperationExecutionWrapper
 
     ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter<OperationModel>) executionContext;
     return Mono.create(sink -> {
-      ReactorCompletionCallback callback = new ReactorCompletionCallback(sink, context.getEvent());
+      ReactorCompletionCallback callback = new ReactorCompletionCallback(sink);
       context.setVariable(COMPLETION_CALLBACK_CONTEXT_PARAM, callback);
 
       try {
         delegate.execute(executionContext);
-      } catch (Exception e) {
-        sink.error(e);
       } catch (Throwable t) {
         sink.error(wrapFatal(t));
       }

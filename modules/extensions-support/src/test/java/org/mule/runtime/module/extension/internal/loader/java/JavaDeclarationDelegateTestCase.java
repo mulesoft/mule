@@ -75,12 +75,14 @@ import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionE
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Fruit;
+import org.mule.test.heisenberg.extension.AsyncHeisenbergSource;
 import org.mule.test.heisenberg.extension.HeisenbergConnectionProvider;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
@@ -103,10 +105,6 @@ import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
 
 import com.google.common.reflect.TypeToken;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -118,6 +116,11 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
+
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclarationTestCase {
@@ -126,6 +129,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   private static final String EXTENDED_CONFIG_NAME = "extended-config";
   private static final String EXTENDED_CONFIG_DESCRIPTION = "extendedDescription";
   private static final String SOURCE_NAME = "ListenPayments";
+  private static final String ASYNC_SOURCE_NAME = "AsyncListenPayments";
   private static final String DEA_SOURCE_NAME = "dea-radio";
   private static final String SOURCE_PARAMETER = "initialBatchNumber";
   private static final String SOURCE_CALLBACK_PARAMETER = "payment";
@@ -727,8 +731,14 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
                       TYPE_LOADER.load(DEAOfficerAttributes.class));
     assertThat(source.getOutputAttributes().getType(), equalTo(TYPE_LOADER.load(Attributes.class)));
 
-    source = extensionDeclaration.getConfigurations().get(0).getMessageSources().get(0);
-    assertThat(source.getName(), is(SOURCE_NAME));
+    ConfigurationDeclaration config = extensionDeclaration.getConfigurations().get(0);
+    assertThat(config.getMessageSources(), hasSize(2));
+    assertHeisenbergSource(config.getMessageSources().get(0), ASYNC_SOURCE_NAME, AsyncHeisenbergSource.class);
+    assertHeisenbergSource(config.getMessageSources().get(1), SOURCE_NAME, HeisenbergSource.class);
+  }
+
+  private void assertHeisenbergSource(SourceDeclaration source, String sourceName, Class<? extends Source> type) {
+    assertThat(source.getName(), is(sourceName));
 
     List<ParameterDeclaration> parameters = source.getAllParameters();
     assertThat(parameters, hasSize(28));
@@ -738,7 +748,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertParameter(parameters, SOURCE_REPEATED_CALLBACK_PARAMETER, "", toMetadataType(String.class), false, SUPPORTED, null);
     assertParameter(parameters, "methylamine", "", toMetadataType(Methylamine.class), false, SUPPORTED, null);
     ImplementingTypeModelProperty typeModelProperty = source.getModelProperty(ImplementingTypeModelProperty.class).get();
-    assertThat(typeModelProperty.getType(), equalTo(HeisenbergSource.class));
+    assertThat(typeModelProperty.getType(), equalTo(type));
   }
 
   private void assertOperation(WithOperationsDeclaration declaration, String operationName, String operationDescription)

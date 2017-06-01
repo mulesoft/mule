@@ -25,12 +25,12 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.Optional;
 
 public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -62,6 +62,10 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   public void source() throws Exception {
     startFlow("source");
 
+    assertSourceCompleted();
+  }
+
+  protected void assertSourceCompleted() {
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> HeisenbergSource.gatheredMoney > 100
         && HeisenbergSource.receivedGroupOnSource
         && HeisenbergSource.receivedInlineOnSuccess);
@@ -70,7 +74,10 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   @Test
   public void onException() throws Exception {
     startFlow("sourceFailed");
+    assertSourceFailed();
+  }
 
+  protected void assertSourceFailed() {
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
           () -> HeisenbergSource.gatheredMoney == -1
               && HeisenbergSource.receivedGroupOnSource
@@ -168,7 +175,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(optionalError.get().getErrorType(), is(errorType(SOURCE_ERROR_RESPONSE_GENERATE)));
   }
 
-  private void startFlow(String flowName) throws Exception {
+  protected void startFlow(String flowName) throws Exception {
     ((Flow) getFlowConstruct(flowName)).start();
   }
 

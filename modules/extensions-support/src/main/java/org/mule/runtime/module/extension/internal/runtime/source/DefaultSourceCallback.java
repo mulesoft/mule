@@ -11,7 +11,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
-
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
@@ -49,6 +48,7 @@ class DefaultSourceCallback<T, A> implements SourceCallback<T, A> {
 
   private static final String UNABLE_TO_START_TX_ERROR_MSG_TEMPLATE =
       "Unable to start a transaction from the Source '%s' of the extension '%s' without a %s";
+
 
   /**
    * A Builder to create instance of {@link DefaultSourceCallback}
@@ -216,11 +216,9 @@ class DefaultSourceCallback<T, A> implements SourceCallback<T, A> {
   }
 
   private void executeFlow(SourceCallbackContext context, MessageProcessContext messageProcessContext, Message message) {
-    messageProcessingManager.processMessage(new ModuleFlowProcessingTemplate(message,
-                                                                             listener,
-                                                                             completionHandlerFactory
-                                                                                 .createCompletionHandler(context),
-                                                                             messageProcessContext),
+    messageProcessingManager.processMessage(
+                                            new ModuleFlowProcessingTemplate(message, listener, completionHandlerFactory
+                                                .createCompletionHandler(context)),
                                             messageProcessContext);
   }
 
