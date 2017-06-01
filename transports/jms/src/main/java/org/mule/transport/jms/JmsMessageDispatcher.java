@@ -568,7 +568,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         {
             // Since we are supporting the JMS Message ID Pattern for request-response, the correlationID will be null
             // if it is not manually setted up, and the selector must be set to the messageID.
-            String jmsCorrelationId = jmsMessage.getJMSCorrelationID();
+            String jmsCorrelationId = encodeVendorSpecificID(jmsMessage.getJMSCorrelationID());
             if (jmsCorrelationId == null)
             {
                 jmsCorrelationId = jmsMessage.getJMSMessageID();
@@ -603,6 +603,14 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
         return connector.getJmsSupport().createConsumer(session, replyTo, selector,
                                                         connector.isNoLocal(), null, topic, endpoint);
+    }
+
+    protected String encodeVendorSpecificID(String jmsCorrelationID)
+    {
+        // By default, no encoding is performed. In case an encoding is
+        // needed to create the replyTo, this method has to be 
+        // overridden.
+        return jmsCorrelationID;
     }
 
     protected Destination getReplyToDestination(Message message, Session session, MuleEvent event, boolean remoteSync, boolean topic) throws JMSException, EndpointException, InitialisationException
