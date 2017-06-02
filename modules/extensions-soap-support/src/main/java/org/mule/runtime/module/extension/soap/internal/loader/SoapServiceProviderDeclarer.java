@@ -42,6 +42,7 @@ import java.util.List;
  */
 public class SoapServiceProviderDeclarer {
 
+  public static final String TRANSPORT_GROUP = "Transport Configuration";
   public static final String CUSTOM_TRANSPORT = "customTransport";
 
   private final ParameterModelsLoaderDelegate parametersLoader;
@@ -71,10 +72,10 @@ public class SoapServiceProviderDeclarer {
     ParameterDeclarationContext context = new ParameterDeclarationContext("Service Provider", providerDeclarer.getDeclaration());
     parametersLoader.declare(providerDeclarer, provider.getParameters(), context);
     if (hasCustomTransports) {
-      providerDeclarer.onParameterGroup(CUSTOM_TRANSPORT + "Group")
+      providerDeclarer.onParameterGroup(TRANSPORT_GROUP)
           .withRequiredParameter(CUSTOM_TRANSPORT)
           .ofType(typeLoader.load(MessageDispatcherProvider.class))
-          .withLayout(LayoutModel.builder().build())
+          .withLayout(LayoutModel.builder().order(1).build())
           .withExpressionSupport(NOT_SUPPORTED);
     }
   }

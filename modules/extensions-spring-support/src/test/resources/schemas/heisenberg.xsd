@@ -568,13 +568,6 @@
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" name="methylamine">
-                        <xs:complexType>
-                            <xs:complexContent>
-                                <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.Methylamine"></xs:extension>
-                            </xs:complexContent>
-                        </xs:complexType>
-                    </xs:element>
                     <xs:element minOccurs="1" maxOccurs="1" name="success-info">
                         <xs:complexType>
                             <xs:complexContent>
@@ -603,6 +596,13 @@
                             </xs:complexContent>
                         </xs:complexType>
                     </xs:element>
+                  <xs:element minOccurs="0" maxOccurs="1" name="methylamine">
+                    <xs:complexType>
+                      <xs:complexContent>
+                        <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.Methylamine"></xs:extension>
+                      </xs:complexContent>
+                    </xs:complexType>
+                  </xs:element>
                     <xs:element minOccurs="1" maxOccurs="1" name="error-info">
                         <xs:complexType>
                             <xs:complexContent>

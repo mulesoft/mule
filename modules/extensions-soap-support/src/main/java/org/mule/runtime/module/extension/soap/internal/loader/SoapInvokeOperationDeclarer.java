@@ -14,16 +14,19 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.UnionTypeBuilder;
-import org.mule.metadata.api.model.BinaryType;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
+import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
+import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.soap.SoapAttachment;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
@@ -60,42 +63,49 @@ import java.util.function.Supplier;
 public class SoapInvokeOperationDeclarer {
 
   private static final String KEYS_GROUP = "WebServiceConfiguration";
+  private static final String TRANSPORT_GROUP = "Transport Configuration";
   static final String OPERATION_NAME = "invoke";
   static final String OPERATION_DESCRIPTION = "invokes Web Service operations";
 
   public static final String SERVICE_PARAM = "service";
   public static final String OPERATION_PARAM = "operation";
   public static final String HEADERS_PARAM = "headers";
-  public static final String REQUEST_PARAM = "request";
+  public static final String BODY_PARAM = "body";
   public static final String ATTACHMENTS_PARAM = "attachments";
+  public static final String MESSAGE_GROUP = "Message";
+  public static final String HEADERS_DISPLAY_NAME = "Headers";
   public static final String TRANSPORT_HEADERS_PARAM = "transportHeaders";
 
   private static final BaseTypeBuilder TYPE_BUILDER = BaseTypeBuilder.create(JAVA);
+  private static final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   /**
    * Declares the invoke operation.
-   * @param declarer the soap extension declarer
-   * @param loader   a {@link ClassTypeLoader} to load some parameters types.
+   *
+   * @param declarer   the soap extension declarer
+   * @param loader     a {@link ClassTypeLoader} to load some parameters types.
    * @param soapErrors the {@link ErrorModel}s that this operation can throw.
    */
   public OperationDeclarer declare(ExtensionDeclarer declarer, ClassTypeLoader loader, Set<ErrorModel> soapErrors) {
 
     OperationDeclarer operation = declarer.withOperation(OPERATION_NAME)
         .describedAs(OPERATION_DESCRIPTION)
+        .requiresConnection(true)
+        .blocking(true)
         .withModelProperty(new OperationExecutorModelProperty(new SoapOperationExecutorFactory()))
-        .requiresConnection(true).withModelProperty(new ConnectivityModelProperty(ForwardingSoapClient.class));
+        .withModelProperty(new ConnectivityModelProperty(ForwardingSoapClient.class));
 
     soapErrors.forEach(operation::withErrorModel);
     declareMetadata(operation, loader);
     declareOutput(operation, loader);
-    declareGeneralParameters(operation, loader);
+    declareRequestParameters(operation, loader);
     declareMetadataKeyParameters(operation);
     return operation;
   }
 
   private void declareMetadata(OperationDeclarer operation, ClassTypeLoader loader) {
     ImmutableMap.Builder<String, Supplier<? extends InputTypeResolver>> inputResolver = ImmutableMap.builder();
-    inputResolver.put(REQUEST_PARAM, InvokeRequestTypeResolver::new);
+    inputResolver.put(BODY_PARAM, InvokeRequestTypeResolver::new);
     inputResolver.put(HEADERS_PARAM, InvokeInputHeadersTypeResolver::new);
     inputResolver.put(ATTACHMENTS_PARAM, InvokeInputAttachmentsTypeResolver::new);
     DefaultMetadataResolverFactory factory = new DefaultMetadataResolverFactory(InvokeKeysResolver::new,
@@ -116,27 +126,56 @@ public class SoapInvokeOperationDeclarer {
   }
 
   /**
-   * Given the Invoke Operation Declarer declares all the parameters that the operation has.
+   * Given the Invoke Operation Declarer declares the parameters for the soap request.
    *
    * @param operation the invoke operation declarer.
    * @param loader    a {@link ClassTypeLoader} to load some parameters types.
    */
-  private void declareGeneralParameters(OperationDeclarer operation, ClassTypeLoader loader) {
-    ParameterGroupDeclarer group = operation.blocking(true).onDefaultParameterGroup();
-    StringType stringType = TYPE_BUILDER.stringType().build();
-    BinaryType binary = TYPE_BUILDER.binaryType().with(new TypeIdAnnotation(InputStream.class.getName())).build();
+  private void declareRequestParameters(OperationDeclarer operation, ClassTypeLoader loader) {
+    ParameterGroupDeclarer message = operation.onParameterGroup(MESSAGE_GROUP)
+        .withDslInlineRepresentation(true)
+        .withLayout(getLayout(1));
+
+    MetadataType binaryType = TYPE_LOADER.load(InputStream.class);
     ObjectType attachments = TYPE_BUILDER.objectType()
         .openWith(loader.load(SoapAttachment.class))
         .with(new TypeIdAnnotation(Map.class.getName()))
         .build();
 
-    group.withOptionalParameter(HEADERS_PARAM).ofDynamicType(binary).withRole(CONTENT).withLayout(getLayout(3));
-    group.withOptionalParameter(REQUEST_PARAM).ofDynamicType(binary).withRole(PRIMARY_CONTENT).withLayout(getLayout(4));
-    group.withOptionalParameter(ATTACHMENTS_PARAM).ofDynamicType(attachments).withRole(CONTENT).withLayout(getLayout(5));
-    group.withOptionalParameter(TRANSPORT_HEADERS_PARAM).ofType(TYPE_BUILDER.objectType()
-        .openWith(stringType)
-        .with(new TypeIdAnnotation(Map.class.getName()))
-        .build()).withLayout(getLayout(6));
+    message.withOptionalParameter(BODY_PARAM).ofDynamicType(binaryType)
+        .withRole(PRIMARY_CONTENT)
+        .withLayout(getLayout(3))
+        .withDisplay(DisplayModel.builder()
+            .summary("The XML body to include in the SOAP message, with all the required parameters.")
+            .build());
+
+    message.withOptionalParameter(HEADERS_PARAM).ofDynamicType(binaryType)
+        .withRole(CONTENT)
+        .withLayout(getLayout(4))
+        .withDisplay(DisplayModel.builder()
+            .displayName(HEADERS_DISPLAY_NAME)
+            .summary("The XML headers to include in the SOAP message.")
+            .build());
+
+    message.withOptionalParameter(ATTACHMENTS_PARAM).ofDynamicType(attachments)
+        .withRole(CONTENT)
+        .withLayout(getLayout(5))
+        .withDisplay(DisplayModel.builder()
+            .summary("The attachments to include in the SOAP request.")
+            .build());
+
+    operation.onParameterGroup(TRANSPORT_GROUP).withLayout(getLayout(2))
+        .withOptionalParameter(TRANSPORT_HEADERS_PARAM)
+        .ofType(TYPE_BUILDER.objectType()
+            .openWith(TYPE_LOADER.load(String.class))
+            .with(new TypeIdAnnotation(Map.class.getName()))
+            .build())
+        .withDsl(ParameterDslConfiguration.getDefaultInstance())
+        .withLayout(LayoutModel.builder().order(2).build())
+        .withDisplay(DisplayModel.builder()
+            .displayName(HEADERS_DISPLAY_NAME)
+            .summary("The headers to set in the transport configuration.")
+            .build());
   }
 
   /**
@@ -146,10 +185,9 @@ public class SoapInvokeOperationDeclarer {
    */
   private void declareMetadataKeyParameters(OperationDeclarer operation) {
     TypeWrapper keyType = new TypeWrapper(WebServiceTypeKey.class);
-    ParameterGroupDescriptor descriptor = new ParameterGroupDescriptor(KEYS_GROUP, keyType);
-    ParameterGroupDeclarer group = operation.blocking(true)
+    ParameterGroupDeclarer group = operation
         .onParameterGroup(KEYS_GROUP)
-        .withModelProperty(new ParameterGroupModelProperty(descriptor));
+        .withModelProperty(new ParameterGroupModelProperty(new ParameterGroupDescriptor(KEYS_GROUP, keyType)));
 
     StringType stringType = TYPE_BUILDER.stringType().build();
     group.withRequiredParameter(SERVICE_PARAM)

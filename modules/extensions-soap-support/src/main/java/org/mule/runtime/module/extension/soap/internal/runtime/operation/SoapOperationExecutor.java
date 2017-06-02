@@ -8,9 +8,10 @@ package org.mule.runtime.module.extension.soap.internal.runtime.operation;
 
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.ATTACHMENTS_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.BODY_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.HEADERS_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.MESSAGE_GROUP;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.OPERATION_PARAM;
-import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.REQUEST_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.SERVICE_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_HEADERS_PARAM;
 import static reactor.core.publisher.Mono.error;
@@ -76,21 +77,33 @@ public final class SoapOperationExecutor implements OperationExecutor {
    * Builds a Soap Request with the execution context to be sent using the {@link SoapClient}.
    */
   private SoapRequest getRequest(ExecutionContext<OperationModel> context, Map<String, String> fixedHeaders) {
-    Optional<InputStream> request = getParam(context, REQUEST_PARAM);
-    Optional<InputStream> headers = getParam(context, HEADERS_PARAM);
-    Optional<Map<String, SoapAttachment>> attachments = getParam(context, ATTACHMENTS_PARAM);
-    Optional<Map<String, String>> transportHeaders = getParam(context, TRANSPORT_HEADERS_PARAM);
-
     SoapRequestBuilder builder = SoapRequest.builder().withOperation(getOperation(context));
-    request.ifPresent(builder::withContent);
-    headers.ifPresent(hs -> builder.withSoapHeaders((Map<String, String>) evaluateHeaders(hs)));
     builder.withSoapHeaders(fixedHeaders);
-    transportHeaders.ifPresent(builder::withTransportHeaders);
-    attachments.ifPresent(as -> as.forEach((k, v) -> {
-      SoapAttachment attachment = new SoapAttachment(v.getContent(), v.getContentType());
-      builder.withAttachment(k, attachment);
-    }));
 
+    getParam(context, MESSAGE_GROUP)
+        .map(m -> (Map<String, Object>) m)
+        .ifPresent(message -> {
+          InputStream body = (InputStream) message.get(BODY_PARAM);
+          if (body != null) {
+            builder.withContent(body);
+          }
+
+          InputStream headers = (InputStream) message.get(HEADERS_PARAM);
+          if (headers != null) {
+            builder.withSoapHeaders((Map<String, String>) evaluateHeaders(headers));
+          }
+
+          Map<String, SoapAttachment> attachments = (Map<String, SoapAttachment>) message.get(ATTACHMENTS_PARAM);
+          if (attachments != null) {
+            attachments.forEach((k, v) -> {
+              SoapAttachment attachment = new SoapAttachment(v.getContent(), v.getContentType());
+              builder.withAttachment(k, attachment);
+            });
+          }
+        });
+
+    getParam(context, TRANSPORT_HEADERS_PARAM)
+        .ifPresent(th -> builder.withTransportHeaders((Map<String, String>) th));
     return builder.build();
   }
 

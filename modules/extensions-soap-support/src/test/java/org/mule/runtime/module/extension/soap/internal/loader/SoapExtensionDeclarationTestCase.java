@@ -25,7 +25,7 @@ import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeO
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.OPERATION_DESCRIPTION;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.OPERATION_NAME;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.OPERATION_PARAM;
-import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.REQUEST_PARAM;
+import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.BODY_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.SERVICE_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_HEADERS_PARAM;
 import static org.mule.test.soap.extension.CalcioServiceProvider.CALCIO_DESC;
@@ -105,7 +105,7 @@ public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDecla
     ParameterProber[] probers = new ParameterProber[] {
         new ParameterProber(OPERATION_PARAM, StringType.class),
         new ParameterProber(SERVICE_PARAM, StringType.class),
-        new ParameterProber(REQUEST_PARAM, null, BinaryType.class, false),
+        new ParameterProber(BODY_PARAM, null, BinaryType.class, false),
         new ParameterProber(HEADERS_PARAM, null, BinaryType.class, false),
         new ParameterProber(TRANSPORT_HEADERS_PARAM, null, ObjectType.class, false),
         new ParameterProber(ATTACHMENTS_PARAM, null, ObjectType.class, false),

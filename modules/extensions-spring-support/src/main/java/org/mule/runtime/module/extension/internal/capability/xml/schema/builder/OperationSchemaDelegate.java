@@ -6,14 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.capitalize;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_OPERATOR;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_OPERATOR_TYPE;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.TYPE_SUFFIX;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
@@ -21,8 +18,6 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Ex
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExtendingOperationModelProperty;
-
-import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -57,24 +52,8 @@ class OperationSchemaDelegate extends ExecutableTypeSchemaDelegate {
     initialiseSequence(operationType);
     ExplicitGroup sequence = operationType.getSequence();
     builder.addInfrastructureParameters(operationType, operationModel, sequence);
-
-    List<ParameterModel> inlineGroupedParameters = operationModel.getParameterGroupModels().stream()
-        .filter(ParameterGroupModel::isShowInDsl)
-        .flatMap(g -> g.getParameterModels().stream())
-        .collect(toList());
-
-    List<ParameterModel> flatParameters = operationModel.getAllParameterModels().stream()
-        .filter(p -> !inlineGroupedParameters.contains(p))
-        .collect(toList());
-
-    registerParameters(operationType, flatParameters);
-
-    operationModel.getParameterGroupModels().stream()
-        .filter(ParameterGroupModel::isShowInDsl)
-        .forEach(g -> {
-          initialiseSequence(operationType);
-          builder.addInlineParameterGroup(g, operationType.getSequence());
-        });
+    operationModel.getParameterGroupModels()
+        .forEach(group -> registerParameterGroup(operationType, group));
   }
 
   private QName getOperationSubstitutionGroup(OperationModel operationModel) {

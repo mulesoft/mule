@@ -541,7 +541,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
-                  "role": "CONTENT",
+                  "role": "PRIMARY_CONTENT",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
                     "allowsReferences": false,
@@ -553,7 +553,10 @@
                     "query": false,
                     "order": 3
                   },
-                  "name": "headers",
+                  "name": "body",
+                  "displayModel": {
+                    "summary": "The XML body to include in the SOAP message, with all the required parameters."
+                  },
                   "description": "",
                   "modelProperties": {}
                 },
@@ -569,7 +572,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
-                  "role": "PRIMARY_CONTENT",
+                  "role": "CONTENT",
                   "dslConfiguration": {
                     "allowsInlineDefinition": true,
                     "allowsReferences": false,
@@ -581,7 +584,11 @@
                     "query": false,
                     "order": 4
                   },
-                  "name": "request",
+                  "name": "headers",
+                  "displayModel": {
+                    "displayName": "Headers",
+                    "summary": "The XML headers to include in the SOAP message."
+                  },
                   "description": "",
                   "modelProperties": {}
                 },
@@ -750,9 +757,27 @@
                     "order": 5
                   },
                   "name": "attachments",
+                  "displayModel": {
+                    "summary": "The attachments to include in the SOAP request."
+                  },
                   "description": "",
                   "modelProperties": {}
-                },
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "showInDsl": true,
+              "name": "Message",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
                 {
                   "type": {
                     "format": "java",
@@ -761,7 +786,10 @@
                       "typeId": "java.util.Map"
                     },
                     "open": {
-                      "type": "String"
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
                     },
                     "fields": []
                   },
@@ -779,16 +807,26 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 6
+                    "order": 2
                   },
                   "name": "transportHeaders",
+                  "displayModel": {
+                    "displayName": "Headers",
+                    "summary": "The headers to set in the transport configuration."
+                  },
                   "description": "",
                   "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
               "showInDsl": false,
-              "name": "General",
+              "name": "Transport Configuration",
               "description": "",
               "modelProperties": {}
             },
@@ -989,7 +1027,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 1
+                    "order": 2
                   },
                   "name": "wsdlUrl",
                   "description": "",
@@ -1017,7 +1055,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2
+                    "order": 3
                   },
                   "name": "service",
                   "description": "",
@@ -1045,7 +1083,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3
+                    "order": 4
                   },
                   "name": "port",
                   "description": "",
@@ -1098,7 +1136,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4
+                    "order": 1
                   },
                   "name": "customTransport",
                   "description": "",
@@ -1107,7 +1145,7 @@
               ],
               "exclusiveParametersModels": [],
               "showInDsl": false,
-              "name": "customTransportGroup",
+              "name": "Transport Configuration",
               "description": "",
               "modelProperties": {}
             },
@@ -1938,7 +1976,7 @@
               "required": false,
               "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
-              "role": "CONTENT",
+              "role": "PRIMARY_CONTENT",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
                 "allowsReferences": false,
@@ -1950,7 +1988,10 @@
                 "query": false,
                 "order": 3
               },
-              "name": "headers",
+              "name": "body",
+              "displayModel": {
+                "summary": "The XML body to include in the SOAP message, with all the required parameters."
+              },
               "description": "",
               "modelProperties": {}
             },
@@ -1966,7 +2007,7 @@
               "required": false,
               "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
-              "role": "PRIMARY_CONTENT",
+              "role": "CONTENT",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
                 "allowsReferences": false,
@@ -1978,7 +2019,11 @@
                 "query": false,
                 "order": 4
               },
-              "name": "request",
+              "name": "headers",
+              "displayModel": {
+                "displayName": "Headers",
+                "summary": "The XML headers to include in the SOAP message."
+              },
               "description": "",
               "modelProperties": {}
             },
@@ -2147,9 +2192,27 @@
                 "order": 5
               },
               "name": "attachments",
+              "displayModel": {
+                "summary": "The attachments to include in the SOAP request."
+              },
               "description": "",
               "modelProperties": {}
-            },
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": true,
+          "name": "Message",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
             {
               "type": {
                 "format": "java",
@@ -2158,7 +2221,10 @@
                   "typeId": "java.util.Map"
                 },
                 "open": {
-                  "type": "String"
+                  "type": "String",
+                  "annotations": {
+                    "typeId": "java.lang.String"
+                  }
                 },
                 "fields": []
               },
@@ -2176,16 +2242,26 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 6
+                "order": 2
               },
               "name": "transportHeaders",
+              "displayModel": {
+                "displayName": "Headers",
+                "summary": "The headers to set in the transport configuration."
+              },
               "description": "",
               "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
           "showInDsl": false,
-          "name": "General",
+          "name": "Transport Configuration",
           "description": "",
           "modelProperties": {}
         },
