@@ -52,7 +52,10 @@ public class DefaultClassLoaderManager implements ArtifactClassLoaderManager, Cl
 
   @Override
   public Optional<String> getId(ClassLoader classLoader) {
-    return empty();
+    return artifactClassLoaders.values().stream()
+        .filter(artifactClassLoader -> artifactClassLoader.getClassLoader().equals(classLoader))
+        .findFirst()
+        .map(ArtifactClassLoader::getArtifactId);
   }
 
   private void checkClassLoaderId(String classLoaderId) {
