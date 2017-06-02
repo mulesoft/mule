@@ -161,7 +161,7 @@ class DeclarationBasedElementModelFactory {
 
     }.walk(currentExtension);
 
-    if (LOGGER.isDebugEnabled()) {
+    if (LOGGER.isDebugEnabled() && elementModel.get() == null) {
       LOGGER.debug(String.format("No model found with name [%s] of type [%s] for extension [%s]",
                                  declaration.getName(), declaration.getClass().getName(), declaration.getDeclaringExtension()));
     }
