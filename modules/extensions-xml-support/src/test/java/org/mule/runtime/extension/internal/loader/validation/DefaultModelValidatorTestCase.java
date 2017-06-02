@@ -53,12 +53,6 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void forbiddenNamesThrowsException() {
-    exception.expectMessage("operation-with-forbidden-names");
-    getExtensionModelFrom("validation/module-forbidden-name.xml");
-  }
-
-  @Test
   public void parameterWithRequiredAndDefaultThrowsException() {
     exception.expectMessage("aWrongDefinedParameter");
     getExtensionModelFrom("validation/module-parameter-required-default.xml");
