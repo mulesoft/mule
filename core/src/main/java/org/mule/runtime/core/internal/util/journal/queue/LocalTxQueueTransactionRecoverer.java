@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.journal.queue;
+package org.mule.runtime.core.internal.util.journal.queue;
 
 import static org.apache.commons.collections.CollectionUtils.find;
 import org.mule.runtime.api.exception.MuleRuntimeException;

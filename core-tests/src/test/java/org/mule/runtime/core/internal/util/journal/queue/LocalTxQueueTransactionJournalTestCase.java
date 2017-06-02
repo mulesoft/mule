@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.journal.queue;
+package org.mule.runtime.core.internal.util.journal.queue;
 
 import static java.lang.Math.abs;
 import static org.hamcrest.Matchers.greaterThan;
@@ -14,10 +14,12 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.util.journal.TransactionJournal.TX1_LOG_FILE_NAME;
-import static org.mule.runtime.core.util.journal.TransactionJournal.TX2_LOG_FILE_NAME;
+import static org.mule.runtime.core.internal.util.journal.TransactionJournal.TX1_LOG_FILE_NAME;
+import static org.mule.runtime.core.internal.util.journal.TransactionJournal.TX2_LOG_FILE_NAME;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.internal.util.journal.queue.LocalQueueTxJournalEntry;
+import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
 import org.mule.runtime.core.util.queue.DefaultQueueStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

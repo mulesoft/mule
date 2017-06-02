@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.journal.queue;
+package org.mule.runtime.core.internal.util.journal.queue;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.journal.JournalEntry;
+import org.mule.runtime.core.internal.util.journal.JournalEntry;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * Base implementation for a queue {@link org.mule.runtime.core.util.journal.JournalEntry}.
+ * Base implementation for a queue {@link JournalEntry}.
  *
  * @param <T> type of the entry identifier
  */

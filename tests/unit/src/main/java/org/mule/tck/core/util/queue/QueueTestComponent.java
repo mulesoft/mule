@@ -10,9 +10,9 @@ package org.mule.tck.core.util.queue;
 import static junit.framework.Assert.assertNotSame;
 import static org.junit.Assert.assertEquals;
 
-import org.mule.runtime.core.util.queue.Queue;
-import org.mule.runtime.core.util.queue.QueueManager;
-import org.mule.runtime.core.util.queue.QueueSession;
+import org.mule.runtime.core.api.util.queue.Queue;
+import org.mule.runtime.core.api.util.queue.QueueManager;
+import org.mule.runtime.core.api.util.queue.QueueSession;
 
 public class QueueTestComponent {
 

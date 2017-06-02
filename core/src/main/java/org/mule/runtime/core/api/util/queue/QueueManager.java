@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.util.queue;
+package org.mule.runtime.core.api.util.queue;
 
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -24,18 +24,18 @@ public interface QueueManager extends Startable, Stoppable {
   QueueSession getQueueSession();
 
   /**
-   * Sets the default {@link org.mule.runtime.core.util.queue.QueueConfiguration} for any created {@link Queue} for which a custom
+   * Sets the default {@link QueueConfiguration} for any created {@link Queue} for which a custom
    * configuration hasn't been specified
    * 
-   * @param config an instance of {@link org.mule.runtime.core.util.queue.QueueConfiguration}
+   * @param config an instance of {@link QueueConfiguration}
    */
   void setDefaultQueueConfiguration(QueueConfiguration config);
 
   /**
-   * Specifies a {@link org.mule.runtime.core.util.queue.QueueConfiguration} for the queue which name matches queueName
+   * Specifies a {@link QueueConfiguration} for the queue which name matches queueName
    * 
    * @param queueName the name of a {@link Queue}
-   * @param config an instance of {@link org.mule.runtime.core.util.queue.QueueConfiguration}
+   * @param config an instance of {@link QueueConfiguration}
    */
   void setQueueConfiguration(String queueName, QueueConfiguration config);
 }

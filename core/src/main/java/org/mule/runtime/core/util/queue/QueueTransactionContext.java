@@ -13,16 +13,16 @@ import java.io.Serializable;
  */
 public interface QueueTransactionContext {
 
-  public boolean offer(QueueStore queue, Serializable item, long offerTimeout) throws InterruptedException;
+  boolean offer(QueueStore queue, Serializable item, long offerTimeout) throws InterruptedException;
 
-  public void untake(QueueStore queue, Serializable item) throws InterruptedException;
+  void untake(QueueStore queue, Serializable item) throws InterruptedException;
 
-  public void clear(QueueStore queue) throws InterruptedException;
+  void clear(QueueStore queue) throws InterruptedException;
 
-  public Serializable poll(QueueStore queue, long pollTimeout) throws InterruptedException;
+  Serializable poll(QueueStore queue, long pollTimeout) throws InterruptedException;
 
-  public Serializable peek(QueueStore queue) throws InterruptedException;
+  Serializable peek(QueueStore queue) throws InterruptedException;
 
-  public int size(QueueStore queue);
+  int size(QueueStore queue);
 
 }

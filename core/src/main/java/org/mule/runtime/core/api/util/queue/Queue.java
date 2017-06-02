@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.util.queue;
+package org.mule.runtime.core.api.util.queue;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.NamedObject;
@@ -48,7 +48,7 @@ public interface Queue extends NamedObject {
    * 
    * @throws InterruptedException
    */
-  public void clear() throws InterruptedException;
+  void clear() throws InterruptedException;
 
   /**
    * Disposes this queue by releasing it's storage and associated memory and storage. If after disposing the queue you try go get
@@ -57,6 +57,6 @@ public interface Queue extends NamedObject {
    * @throws MuleException
    * @throws InterruptedException
    */
-  public void dispose() throws MuleException, InterruptedException;
+  void dispose() throws MuleException, InterruptedException;
 
 }

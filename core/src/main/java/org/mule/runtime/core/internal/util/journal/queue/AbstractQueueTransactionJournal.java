@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.journal.queue;
+package org.mule.runtime.core.internal.util.journal.queue;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.core.util.journal.JournalEntry;
-import org.mule.runtime.core.util.journal.JournalEntrySerializer;
-import org.mule.runtime.core.util.journal.TransactionCompletePredicate;
-import org.mule.runtime.core.util.journal.TransactionJournal;
+import org.mule.runtime.core.internal.util.journal.JournalEntry;
+import org.mule.runtime.core.internal.util.journal.JournalEntrySerializer;
+import org.mule.runtime.core.internal.util.journal.TransactionCompletePredicate;
+import org.mule.runtime.core.internal.util.journal.TransactionJournal;
 import org.mule.runtime.core.util.queue.QueueStore;
 
 import com.google.common.collect.Multimap;
@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * Base implementation for a queue transaction journal.
  *
  * @param <T> type of transaction identifier
- * @param <K> type of the actual journal entry which must extend {@link org.mule.runtime.core.util.journal.JournalEntry}
+ * @param <K> type of the actual journal entry which must extend {@link JournalEntry}
  */
 public abstract class AbstractQueueTransactionJournal<T, K extends JournalEntry<T>> {
 
@@ -82,22 +82,22 @@ public abstract class AbstractQueueTransactionJournal<T, K extends JournalEntry<
   }
 
   /**
-   * Creates a {@link org.mule.runtime.core.util.journal.JournalEntry} for an update operation in the queue.
+   * Creates a {@link JournalEntry} for an update operation in the queue.
    *
    * @param txId transaction identifier
    * @param operation operation done over the queue
    * @param queueName queueName of the queue in which the operation has been done
    * @param serialize value of the operation
-   * @return a new {@link org.mule.runtime.core.util.journal.JournalEntry}
+   * @return a new {@link JournalEntry}
    */
   protected abstract K createUpdateJournalEntry(T txId, byte operation, String queueName, Serializable serialize);
 
   /**
-   * Creates a checkpoint {@link org.mule.runtime.core.util.journal.JournalEntry}.
+   * Creates a checkpoint {@link JournalEntry}.
    *
    * @param txId transaction identifier
    * @param operation checkpoint operation
-   * @return a new {@link org.mule.runtime.core.util.journal.JournalEntry}
+   * @return a new {@link JournalEntry}
    */
   protected abstract K createCheckpointJournalEntry(T txId, byte operation);
 

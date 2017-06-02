@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.internal.streaming.object.iterator;
 
-import org.mule.runtime.core.util.queue.Queue;
+import org.mule.runtime.core.api.util.queue.Queue;
 
 import java.io.IOException;
 
@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link Producer} to stream the contents of a {@link org.mule.runtime.core.util.queue.Queue} A polling timeout
+ * Implementation of {@link Producer} to stream the contents of a {@link Queue} A polling timeout
  * value might be specified, otherwise the default value of 5000 milliseconds will be assumed
  */
 public class QueueProducer<T> implements Producer<T> {

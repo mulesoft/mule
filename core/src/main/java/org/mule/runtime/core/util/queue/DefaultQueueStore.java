@@ -7,6 +7,7 @@
 package org.mule.runtime.core.util.queue;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.queue.QueueConfiguration;
 
 import java.io.Serializable;
 

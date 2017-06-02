@@ -16,8 +16,9 @@ import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionJournal;
-import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionRecoverer;
+import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
+import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionRecoverer;
+import org.mule.runtime.core.internal.util.queue.PersistentQueueTransactionContext;
 import org.mule.runtime.core.util.xa.ResourceManagerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

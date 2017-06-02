@@ -4,9 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.journal.queue;
+package org.mule.runtime.core.internal.util.journal.queue;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.util.journal.JournalEntry;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -14,7 +15,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * {@link org.mule.runtime.core.util.journal.JournalEntry} for a local queue transaction
+ * {@link JournalEntry} for a local queue transaction
  */
 public class LocalQueueTxJournalEntry extends AbstractQueueTxJournalEntry<Integer> {
 

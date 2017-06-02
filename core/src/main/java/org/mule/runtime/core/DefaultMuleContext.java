@@ -92,6 +92,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
+import org.mule.runtime.core.api.util.queue.Queue;
 import org.mule.runtime.core.config.ClusterConfiguration;
 import org.mule.runtime.core.config.NullClusterConfiguration;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
@@ -122,7 +123,7 @@ import org.mule.runtime.core.util.ServerStartupSplashScreen;
 import org.mule.runtime.core.util.SplashScreen;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.core.util.queue.QueueManager;
+import org.mule.runtime.core.api.util.queue.QueueManager;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -670,12 +671,12 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   /**
-   * When running in clustered mode, it returns a {@link org.mule.runtime.core.util.queue.QueueManager} that creates
-   * {@link org.mule.runtime.core.util.queue.Queue} instances which are only local to the current node. This is just a workaround
+   * When running in clustered mode, it returns a {@link QueueManager} that creates
+   * {@link Queue} instances which are only local to the current node. This is just a workaround
    * until we introduce a solution for durable persistent queues in HA. This is not part of Mule's API and you should not use this
    * in your apps or extensions
    *
-   * @return a {@link org.mule.runtime.core.util.queue.QueueManager}
+   * @return a {@link QueueManager}
    * @since 3.5.0
    */
   public QueueManager getLocalQueueManager() {

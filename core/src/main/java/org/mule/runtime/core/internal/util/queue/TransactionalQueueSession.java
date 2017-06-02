@@ -4,14 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.queue;
+package org.mule.runtime.core.internal.util.queue;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionJournal;
+import org.mule.runtime.core.api.util.queue.QueueSession;
+import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
+import org.mule.runtime.core.util.queue.AbstractQueueSession;
+import org.mule.runtime.core.util.queue.LocalQueueTransactionContext;
+import org.mule.runtime.core.util.queue.QueueProvider;
+import org.mule.runtime.core.util.queue.QueueTransactionContext;
+import org.mule.runtime.core.util.queue.QueueXaResourceManager;
 import org.mule.runtime.core.util.xa.AbstractResourceManager;
 import org.mule.runtime.core.util.xa.AbstractTransactionContext;
 import org.mule.runtime.core.util.xa.ResourceManagerException;
-import org.mule.runtime.core.util.xa.XaTransactionRecoverer;
+import org.mule.runtime.core.internal.util.xa.XaTransactionRecoverer;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 

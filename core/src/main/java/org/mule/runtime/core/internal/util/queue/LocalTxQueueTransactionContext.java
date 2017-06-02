@@ -4,9 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.queue;
+package org.mule.runtime.core.internal.util.queue;
 
-import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionJournal;
+import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
+import org.mule.runtime.core.util.queue.LocalQueueTransactionContext;
+import org.mule.runtime.core.util.queue.QueueProvider;
+import org.mule.runtime.core.util.queue.QueueStore;
+import org.mule.runtime.core.util.queue.QueueTransactionContextFactory;
+import org.mule.runtime.core.util.queue.QueueTypeTransactionContextAdapter;
+import org.mule.runtime.core.util.queue.TransientQueueTransactionContext;
 import org.mule.runtime.core.util.xa.AbstractTransactionContext;
 import org.mule.runtime.core.util.xa.ResourceManagerException;
 

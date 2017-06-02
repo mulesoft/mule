@@ -17,9 +17,9 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.queue.AbstractQueueManager;
 import org.mule.runtime.core.util.queue.DefaultQueueConfiguration;
-import org.mule.runtime.core.util.queue.Queue;
-import org.mule.runtime.core.util.queue.QueueManager;
-import org.mule.runtime.core.util.queue.QueueSession;
+import org.mule.runtime.core.api.util.queue.Queue;
+import org.mule.runtime.core.api.util.queue.QueueManager;
+import org.mule.runtime.core.api.util.queue.QueueSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;

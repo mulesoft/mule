@@ -4,10 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.queue;
+package org.mule.runtime.core.internal.util.queue;
 
-import org.mule.runtime.core.util.journal.queue.XaQueueTxJournalEntry;
-import org.mule.runtime.core.util.journal.queue.XaTxQueueTransactionJournal;
+import org.mule.runtime.core.internal.util.journal.queue.XaQueueTxJournalEntry;
+import org.mule.runtime.core.internal.util.journal.queue.XaTxQueueTransactionJournal;
+import org.mule.runtime.core.util.queue.QueueProvider;
+import org.mule.runtime.core.util.queue.QueueStore;
+import org.mule.runtime.core.util.queue.XaQueueTransactionContext;
 import org.mule.runtime.core.util.xa.ResourceManagerException;
 
 import java.io.Serializable;
