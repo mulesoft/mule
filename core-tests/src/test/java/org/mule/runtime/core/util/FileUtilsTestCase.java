@@ -172,7 +172,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase {
     if (!outputDir.exists()) {
       outputDir.mkdirs();
     }
-    String res = "org/mule/runtime/core/util/FileUtils.class";
+    String res = "org/mule/runtime/core/api/util/FileUtils.class";
     FileUtils.extractResources(res, FileUtils.class, outputDir, true);
     File result = FileUtils.newFile(testDir, res);
     assertNotNull(result);
@@ -246,7 +246,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase {
       outputDir.mkdirs();
     }
     String fileName = "FileUtils.class";
-    String res = "org/mule/runtime/core/util/" + fileName;
+    String res = "org/mule/runtime/core/api/util/" + fileName;
     FileUtils.extractResources(res, FileUtils.class, outputDir, false);
     File result = FileUtils.newFile(testDir, fileName);
     assertNotNull(result);
