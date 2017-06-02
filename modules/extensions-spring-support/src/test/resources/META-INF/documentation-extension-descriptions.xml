@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension-documentation>
-    <elements name="anotherConfig">
+    <elements name="another-config">
         <description><![CDATA[This is some Another Config documentation.]]></description>
         <parameters>
             <parameter name="magicParam">

@@ -37,9 +37,9 @@ import java.util.Map;
  * Helper class for declaring connection providers through a {@link DefaultJavaModelLoaderDelegate}
  * @since 4.0
  */
-final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDelegate {
+public final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
-  private static final String CUSTOM_CONNECTION_PROVIDER_SUFFIX = "-" + DEFAULT_CONNECTION_PROVIDER_NAME;
+  public static final String CUSTOM_CONNECTION_PROVIDER_SUFFIX = "-" + DEFAULT_CONNECTION_PROVIDER_NAME;
   private static final String CONNECTION_PROVIDER = "Connection Provider";
 
   private final Map<Class<?>, ConnectionProviderDeclarer> connectionProviderDeclarers = new HashMap<>();
