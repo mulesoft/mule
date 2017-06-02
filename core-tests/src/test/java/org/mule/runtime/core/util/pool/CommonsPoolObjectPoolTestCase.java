@@ -6,18 +6,19 @@
  */
 package org.mule.runtime.core.util.pool;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.object.ObjectFactory;
-import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.core.api.util.pool.ObjectPool;
+import org.mule.runtime.core.internal.util.pool.CommonsPoolObjectPool;
 import org.mule.tck.testmodels.fruit.BananaFactory;
 
 import java.util.NoSuchElementException;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class CommonsPoolObjectPoolTestCase extends AbstractPoolingTestCase {
 
