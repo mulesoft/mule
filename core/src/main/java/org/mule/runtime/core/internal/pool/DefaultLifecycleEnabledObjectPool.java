@@ -4,9 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.pool;
+package org.mule.runtime.core.internal.pool;
 
 import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.component.JavaComponent;
@@ -16,6 +17,8 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.component.PooledJavaComponent;
+import org.mule.runtime.core.internal.util.pool.CommonsPoolObjectPool;
+import org.mule.runtime.core.api.util.pool.LifecyleEnabledObjectPool;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -32,16 +35,18 @@ import org.slf4j.LoggerFactory;
  * 
  * @see PooledJavaComponent
  */
-public class DefaultLifecycleEnabledObjectPool extends CommonsPoolObjectPool implements LifecyleEnabledObjectPool {
+public class DefaultLifecycleEnabledObjectPool implements LifecyleEnabledObjectPool {
 
   /**
    * logger used by this class
    */
   protected static final Logger logger = LoggerFactory.getLogger(DefaultLifecycleEnabledObjectPool.class);
+  private final MuleContext muleContext;
 
   protected AtomicBoolean started = new AtomicBoolean(false);
 
   private List items = new LinkedList();
+  private final CommonsPoolObjectPool pool;
 
   /**
    * @param objectFactory The object factory that should be used to create new
@@ -50,11 +55,13 @@ public class DefaultLifecycleEnabledObjectPool extends CommonsPoolObjectPool imp
    * @param muleContext
    */
   public DefaultLifecycleEnabledObjectPool(ObjectFactory objectFactory, PoolingProfile poolingProfile, MuleContext muleContext) {
-    super(objectFactory, poolingProfile, muleContext);
-  }
+    this.muleContext = muleContext;
+    pool = new CommonsPoolObjectPool(objectFactory, poolingProfile, muleContext) {
 
-  protected PoolableObjectFactory getPooledObjectFactory() {
-    return new LifecycleEnabledPoolabeObjectFactoryAdapter();
+      protected PoolableObjectFactory getPooledObjectFactory() {
+        return new LifecycleEnabledPoolabeObjectFactoryAdapter();
+      }
+    };
   }
 
   public void start() throws MuleException {
@@ -73,6 +80,56 @@ public class DefaultLifecycleEnabledObjectPool extends CommonsPoolObjectPool imp
         ((Stoppable) i.next()).stop();
       }
     }
+  }
+
+  @Override
+  public Object borrowObject() throws Exception {
+    return pool.borrowObject();
+  }
+
+  @Override
+  public void returnObject(Object object) {
+    pool.returnObject(object);
+  }
+
+  @Override
+  public int getNumActive() {
+    return pool.getNumActive();
+  }
+
+  @Override
+  public int getMaxActive() {
+    return pool.getMaxActive();
+  }
+
+  @Override
+  public void clear() {
+    pool.clear();
+  }
+
+  @Override
+  public void close() {
+    pool.close();
+  }
+
+  @Override
+  public void setObjectFactory(ObjectFactory objectFactory) {
+    pool.setObjectFactory(objectFactory);
+  }
+
+  @Override
+  public ObjectFactory getObjectFactory() {
+    return pool.getObjectFactory();
+  }
+
+  @Override
+  public void dispose() {
+    pool.dispose();
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    pool.initialise();
   }
 
   /**
@@ -98,7 +155,7 @@ public class DefaultLifecycleEnabledObjectPool extends CommonsPoolObjectPool imp
     }
 
     public Object makeObject() throws Exception {
-      Object object = objectFactory.getInstance(muleContext);
+      Object object = getObjectFactory().getInstance(muleContext);
       // Only start newly created objects if pool is started
       if (started.get() && object instanceof Startable) {
         ((Startable) object).start();
