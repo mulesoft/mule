@@ -153,11 +153,13 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
         OperationExecutionFunction operationExecutionFunction;
 
         if (event.getParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+          // If the event already contains an execution context, use that one.
           ExecutionContextAdapter<OperationModel> operationContext = getPrecalculatedContext(event);
           configuration = operationContext.getConfiguration();
 
           operationExecutionFunction = (parameters, operationEvent) -> doProcess(operationEvent, operationContext).block();
         } else {
+          // Otherwise, generate the context as usual.
           configuration = getConfiguration(event);
 
           operationExecutionFunction =
@@ -181,8 +183,10 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
       return from(publisher).flatMap(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
         ExecutionContextAdapter<OperationModel> operationContext;
         if (event.getParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+          // If the event already contains an execution context, use that one.
           operationContext = getPrecalculatedContext(event);
         } else {
+          // Otherwise, generate the context as usual.
           operationContext = createExecutionContext(event);
         }
 
@@ -335,8 +339,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     ProcessingType processingType = asProcessingType(operationModel.getExecutionType());
     if (processingType == CPU_LITE && !operationModel.isBlocking()) {
       // If processing type is CPU_LITE and operation is non-blocking then use CPU_LITE_ASYNC processing type so that the Flow can
-      // return
-      // processing to a Flow thread.
+      // return processing to a Flow thread.
       return CPU_LITE_ASYNC;
     } else {
       return processingType;
@@ -369,6 +372,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     }
   }
 
+  @Override
   public void disposeResolvedParameters(ExecutionContext<OperationModel> executionContext) {
     final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
     List<Interceptor> interceptors = mediator.collectInterceptors(executionContext.getConfiguration(),

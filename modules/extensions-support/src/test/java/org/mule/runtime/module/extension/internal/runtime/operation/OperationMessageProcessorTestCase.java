@@ -99,8 +99,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
   @Override
   protected OperationMessageProcessor createOperationMessageProcessor() {
-    return spy(new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                             cursorStreamProviderFactory, extensionManager, mockPolicyManager));
+    return new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
+                                         cursorStreamProviderFactory, extensionManager, mockPolicyManager);
   }
 
   @Test
