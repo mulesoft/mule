@@ -49,7 +49,7 @@ final class ConfigurationDescriptionDocumenter extends AbstractDescriptionDocume
     parameterDeclarer.document(declaration, configElement);
   }
 
-  private void documentConnectionProviders(ConnectedDeclaration declaration, TypeElement element) {
+  private void documentConnectionProviders(ConfigurationDeclaration declaration, TypeElement element) {
     getConnectionProviderClasses(processingEnv, element)
         .forEach(providerElement -> findMatchingProvider(declaration, providerElement)
             .ifPresent(provider -> {

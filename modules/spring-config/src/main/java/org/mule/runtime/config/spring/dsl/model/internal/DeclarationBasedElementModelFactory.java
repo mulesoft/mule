@@ -81,6 +81,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Implementation of {@link DslElementModelFactory} that creates a {@link DslElementModel} based on its {@link ElementDeclaration}
  * representation.
@@ -88,6 +91,8 @@ import java.util.function.Function;
  * @since 4.0
  */
 class DeclarationBasedElementModelFactory {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DeclarationBasedElementModelFactory.class);
 
   private final DslResolvingContext context;
   private final InfrastructureElementModelDelegate infrastructureDelegate;
@@ -116,10 +121,7 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       protected void onConfiguration(ConfigurationModel model) {
-        if (equalsName.apply(model)) {
-          checkArgument(declaration instanceof ConfigurationElementDeclaration,
-                        format("Found a Configuration with the given name, but expected a '%s'",
-                               declaration.getClass().getName()));
+        if (equalsName.apply(model) && declaration instanceof ConfigurationElementDeclaration) {
           elementModel.set(createConfigurationElement(model, (ConfigurationElementDeclaration) declaration));
           stop();
         }
@@ -127,10 +129,7 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       protected void onOperation(HasOperationModels owner, OperationModel model) {
-        if (equalsName.apply(model)) {
-          checkArgument(declaration instanceof OperationElementDeclaration,
-                        format("Found an Operation with the given name, but expected a '%s'",
-                               declaration.getClass().getName()));
+        if (equalsName.apply(model) && declaration instanceof OperationElementDeclaration) {
           elementModel.set(createComponentElement(model, (OperationElementDeclaration) declaration));
           stop();
         }
@@ -138,10 +137,7 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       protected void onScope(HasOperationModels owner, ScopeModel model) {
-        if (equalsName.apply(model)) {
-          checkArgument(declaration instanceof ScopeElementDeclaration,
-                        format("Found an Scope with the given name, but expected a '%s'",
-                               declaration.getClass().getName()));
+        if (equalsName.apply(model) && declaration instanceof ScopeElementDeclaration) {
           elementModel.set(createScopeElement(model, (ScopeElementDeclaration) declaration));
           stop();
         }
@@ -149,10 +145,7 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       protected void onRouter(HasOperationModels owner, RouterModel model) {
-        if (equalsName.apply(model)) {
-          checkArgument(declaration instanceof RouterElementDeclaration,
-                        format("Found an Router with the given name, but expected a '%s'",
-                               declaration.getClass().getName()));
+        if (equalsName.apply(model) && declaration instanceof RouterElementDeclaration) {
           elementModel.set(createRouterElement(model, (RouterElementDeclaration) declaration));
           stop();
         }
@@ -160,16 +153,18 @@ class DeclarationBasedElementModelFactory {
 
       @Override
       protected void onSource(HasSourceModels owner, SourceModel model) {
-        if (equalsName.apply(model)) {
-          checkArgument(declaration instanceof SourceElementDeclaration,
-                        format("Found a Source with the given name, but expected a '%s'",
-                               declaration.getClass().getName()));
+        if (equalsName.apply(model) && declaration instanceof SourceElementDeclaration) {
           elementModel.set(createComponentElement(model, (SourceElementDeclaration) declaration));
           stop();
         }
       }
 
     }.walk(currentExtension);
+
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(String.format("No model found with name [%s] of type [%s] for extension [%s]",
+                                 declaration.getName(), declaration.getClass().getName(), declaration.getDeclaringExtension()));
+    }
 
     return Optional.ofNullable(elementModel.get());
   }

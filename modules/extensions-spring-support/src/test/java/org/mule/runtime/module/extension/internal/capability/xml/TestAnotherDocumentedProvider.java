@@ -15,7 +15,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
 /**
  * Another Provider Documentation
  */
-@Alias("aliased")
+@Alias("another")
 public class TestAnotherDocumentedProvider implements ConnectionProvider<String> {
 
   @Override
