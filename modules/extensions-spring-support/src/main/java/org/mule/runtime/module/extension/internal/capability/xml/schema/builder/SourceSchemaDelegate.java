@@ -21,6 +21,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Ex
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -57,22 +58,32 @@ class SourceSchemaDelegate extends ExecutableTypeSchemaDelegate {
     ExplicitGroup sequence = sourceType.getSequence();
     builder.addInfrastructureParameters(sourceType, sourceModel, sequence);
 
-    List<ParameterGroupModel> inlineGroupedParameters = getInlineGroups(sourceModel);
-    sourceModel.getSuccessCallback().ifPresent(cb -> inlineGroupedParameters.addAll(getInlineGroups(cb)));
-    sourceModel.getErrorCallback().ifPresent(cb -> inlineGroupedParameters.addAll(getInlineGroups(cb)));
+    List<ParameterModel> visitedParameters = new LinkedList<>();
+    sourceModel.getParameterGroupModels().forEach(group -> {
+      registerParameterGroup(sourceType, group);
+      visitedParameters.addAll(group.getParameterModels());
+    });
 
-    List<ParameterModel> flatParameters = sourceModel.getAllParameterModels().stream()
-        .filter(p -> inlineGroupedParameters.stream().noneMatch(g -> g.getParameterModels().contains(p)))
-        .collect(toList());
+    sourceModel.getSuccessCallback().map(ParameterizedModel::getParameterGroupModels)
+        .ifPresent(groups -> groups
+            .forEach(group -> registerCallbackParameters(sourceType, visitedParameters, group)));
 
-    registerParameters(sourceType, flatParameters);
-    inlineGroupedParameters.forEach(g -> builder.addInlineParameterGroup(g, sourceType.getSequence()));
-
+    sourceModel.getErrorCallback().map(ParameterizedModel::getParameterGroupModels)
+        .ifPresent(groups -> groups
+            .forEach(group -> registerCallbackParameters(sourceType, visitedParameters, group)));
   }
 
-  private List<ParameterGroupModel> getInlineGroups(ParameterizedModel model) {
-    return model.getParameterGroupModels().stream()
-        .filter(ParameterGroupModel::isShowInDsl)
-        .collect(toList());
+  private void registerCallbackParameters(ExtensionType sourceType, List<ParameterModel> visitedParameters,
+                                          ParameterGroupModel group) {
+    if (group.isShowInDsl()) {
+      builder.addInlineParameterGroup(group, sourceType.getSequence());
+    } else {
+      List<ParameterModel> callbackParameters = group.getParameterModels().stream()
+          .filter(p -> !visitedParameters.contains(p)).collect(toList());
+
+      registerParameters(sourceType, callbackParameters);
+      visitedParameters.addAll(group.getParameterModels());
+    }
   }
+
 }

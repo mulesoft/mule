@@ -27,6 +27,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.NestedProcessor;
@@ -89,6 +90,14 @@ abstract class ExecutableTypeSchemaDelegate {
 
     this.builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(complexType);
     return complexContentExtension;
+  }
+
+  protected void registerParameterGroup(ExtensionType type, ParameterGroupModel group) {
+    if (group.isShowInDsl()) {
+      builder.addInlineParameterGroup(group, type.getSequence());
+    } else {
+      registerParameters(type, group.getParameterModels());
+    }
   }
 
   protected ExtensionType registerParameters(ExtensionType type, List<ParameterModel> parameterModels) {

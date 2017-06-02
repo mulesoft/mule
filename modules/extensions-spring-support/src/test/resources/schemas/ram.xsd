@@ -108,9 +108,19 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
                 <xs:sequence minOccurs="0" maxOccurs="1">
-                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="headers"></xs:element>
-                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="request"></xs:element>
-                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="attachments"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="message">
+                      <xs:complexType>
+                        <xs:complexContent>
+                          <xs:extension base="mule:abstractExtensionType">
+                            <xs:sequence>
+                              <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="body"></xs:element>
+                              <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="headers"></xs:element>
+                              <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="attachments"></xs:element>
+                            </xs:sequence>
+                          </xs:extension>
+                        </xs:complexContent>
+                      </xs:complexType>
+                    </xs:element>
                     <xs:element minOccurs="0" maxOccurs="1" name="transport-headers">
                         <xs:complexType>
                             <xs:sequence>
