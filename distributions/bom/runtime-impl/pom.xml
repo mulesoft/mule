@@ -46,11 +46,6 @@
             <artifactId>mule-service-oauth-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- boot packages included by the runtime -->
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-        </dependency>
     </dependencies>
 
 </project>
