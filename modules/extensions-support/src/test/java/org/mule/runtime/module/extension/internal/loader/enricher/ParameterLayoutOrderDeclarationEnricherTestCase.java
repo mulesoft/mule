@@ -65,12 +65,9 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     objects.add(new Object[] {extensionModel.getConfigurationModel("ExplicitOrderConfig").get(), "Config - Explicit Order"});
     objects.add(new Object[] {extensionModel.getConfigurationModel("MixedOrderConfig").get(), "Config - Mixed Order"});
     objects.add(new Object[] {extensionModel.getConfigurationModel("InheritsOrderConfig").get(), "Config - Inherited Order"});
-    objects.add(new Object[] {extensionModel.getConnectionProviderModel("implicit-connection").get(),
-        "Conn Provider - Implicit Order"});
-    objects.add(new Object[] {extensionModel.getConnectionProviderModel("explicit-connection").get(),
-        "Conn Provider - Explicit Order"});
-    objects
-        .add(new Object[] {extensionModel.getConnectionProviderModel("mixed-connection").get(), "Conn Provider - Mixed Order"});
+    objects.add(new Object[] {extensionModel.getConnectionProviderModel("implicit").get(), "Conn Provider - Implicit Order"});
+    objects.add(new Object[] {extensionModel.getConnectionProviderModel("explicit").get(), "Conn Provider - Explicit Order"});
+    objects.add(new Object[] {extensionModel.getConnectionProviderModel("mixed").get(), "Conn Provider - Mixed Order"});
     objects.add(new Object[] {extensionModel.getSourceModel("ImplicitSourceOrder").get(), "Source - Implicit Order"});
     objects.add(new Object[] {extensionModel.getSourceModel("ExplicitSourceOrder").get(), "Source - Explicit Order"});
     objects.add(new Object[] {extensionModel.getSourceModel("MixedSourceOrder").get(), "Source - Mixed Order"});

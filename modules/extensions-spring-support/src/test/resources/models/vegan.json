@@ -1071,7 +1071,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "apple-connection",
+          "name": "apple",
           "description": "",
           "modelProperties": {}
         }
@@ -3239,7 +3239,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "BananaPlantain-connection",
+          "name": "BananaPlantain",
           "description": "",
           "modelProperties": {}
         }
@@ -3865,13 +3865,13 @@
               "modelProperties": {}
             }
           ],
-          "name": "grape-connection-connection",
+          "name": "grape-connection",
           "description": "",
           "modelProperties": {}
         }
       ],
       "messageSources": [],
-      "name": "grape-config",
+      "name": "grape",
       "description": "",
       "modelProperties": {}
     },
@@ -4128,7 +4128,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "kiwi-connection",
+          "name": "kiwi",
           "description": "",
           "modelProperties": {}
         }

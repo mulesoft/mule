@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension-documentation>
-    <elements name="anotherConfig">
+    <elements name="another">
         <description><![CDATA[This is some Another Config documentation.]]></description>
         <parameters>
             <parameter name="magicParam">
@@ -8,7 +8,7 @@
             </parameter>
         </parameters>
     </elements>
-    <elements name="aliased-connection">
+    <elements name="aliased">
         <description><![CDATA[Another Provider Documentation]]></description>
         <parameters>
             <parameter name="reconnectionStrategy">
@@ -41,7 +41,7 @@
             </parameter>
         </parameters>
     </elements>
-    <elements name="aliased-connection">
+    <elements name="aliased">
         <description><![CDATA[Another Provider Documentation]]></description>
         <parameters>
             <parameter name="reconnectionStrategy">

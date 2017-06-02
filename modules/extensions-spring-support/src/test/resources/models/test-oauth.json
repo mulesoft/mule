@@ -1587,7 +1587,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "scopeless-connection",
+          "name": "scopeless",
           "description": "",
           "modelProperties": {
             "OAuth": {
@@ -2806,7 +2806,7 @@
           "modelProperties": {}
         }
       ],
-      "name": "scopeless-connection",
+      "name": "scopeless",
       "description": "",
       "modelProperties": {
         "OAuth": {

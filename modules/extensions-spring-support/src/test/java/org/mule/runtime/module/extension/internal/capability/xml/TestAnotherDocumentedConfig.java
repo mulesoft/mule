@@ -14,7 +14,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 /**
  * This is some Another Config documentation.
  */
-@Configuration(name = "anotherConfig")
+@Configuration(name = "another")
 @ConnectionProviders(TestAnotherDocumentedProvider.class)
 @Operations({TestDocumentedExtensionOperations.class})
 public class TestAnotherDocumentedConfig {

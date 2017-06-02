@@ -21,6 +21,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
@@ -51,6 +52,10 @@ import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import com.google.common.collect.ImmutableList;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,9 +63,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -72,8 +74,10 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   private static final String OPERATION_NAME = "operation";
   private static final String TOP_LEVEL_OPERATION_PARAM_NAME = "topLevelOperationParam";
   private static final String CONFIG_NAME = "config";
+  private static final String CONFIG_SUFFIX = "Config";
   private static final String SOURCE_NAME = "source";
-  private static final String CONNECTION_PROVIDER_NAME = "connectionProvider";
+  private static final String CONNECTION_PROVIDER_NAME = "connectionProviderConnection";
+  private static final String CONNECTION_PROVIDER_SUFFIX = "Connection";
   private static final String SIMPLE_PARAM_NAME = "simple";
 
   private static final String TOP_LEVEL_PLURAL_PARAM_NAME = "topLevelTests";
@@ -180,15 +184,10 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void operationClashingWithConfig() {
+    String clashingName = OPERATION_NAME + CONFIG_SUFFIX;
+    when(operationModel.getName()).thenReturn(clashingName);
     exception.expect(IllegalModelDefinitionException.class);
-    when(configurationModel.getName()).thenReturn(OPERATION_NAME);
-    validate();
-  }
-
-  @Test
-  public void connectionProviderClashesWithConfig() {
-    exception.expect(IllegalModelDefinitionException.class);
-    when(connectionProviderModel.getName()).thenReturn(CONFIG_NAME);
+    when(configurationModel.getName()).thenReturn(clashingName);
     validate();
   }
 
@@ -203,8 +202,8 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void configNameClashesWithOperationParameterType() {
     exception.expect(IllegalModelDefinitionException.class);
-    ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, TopLevelTest.class);
-    when(configurationModel.getName()).thenReturn(TopLevelTest.class.getName());
+    ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, TopLevelConfig.class);
+    when(configurationModel.getName()).thenReturn(TopLevelConfig.class.getName());
     mockParameters(operationModel, topLevelConfigParam, offending);
     validate();
   }
@@ -212,6 +211,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void connectionProviderTopLevelParameterCrashesWithOperationName() {
     exception.expect(IllegalModelDefinitionException.class);
+    exception.expectMessage("contains 2 components 'operation' which it's transformed DSL name is 'operation'.");
     ParameterModel offending = getParameter(OPERATION_NAME, TopLevelTest.class);
     mockParameters(connectionProviderModel, simpleConnectionProviderParam, topLevelConnectionProviderParam, offending);
     validate();
@@ -219,12 +219,13 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void connectionProviderNameClashesWithOperationParameterName() {
+    String clashingName = SIMPLE_PARAM_NAME + CONNECTION_PROVIDER_SUFFIX;
     exception.expect(IllegalModelDefinitionException.class);
-    exception
-        .expectMessage(format("Extension '%s' has a connection provider named '%s' and an operation named operation with an argument type named equally.",
-                              extensionModel.getName(), SIMPLE_PARAM_NAME));
-    ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, ChildTest.class);
-    when(connectionProviderModel.getName()).thenReturn(SIMPLE_PARAM_NAME);
+    exception.expectMessage(format(
+                                   "Extension '%s' has a connection provider named '%s' and an operation named operation with an argument type named equally.",
+                                   extensionModel.getName(), hyphenize(clashingName)));
+    ParameterModel offending = getParameter(clashingName, ChildTest.class);
+    when(connectionProviderModel.getName()).thenReturn(clashingName);
     when(operationModel.getAllParameterModels()).thenReturn(asList(topLevelOperationParam, offending));
     validate();
   }
@@ -232,8 +233,9 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void connectionProviderNameClashesWithOperationParameterType() {
     exception.expect(IllegalModelDefinitionException.class);
-    when(connectionProviderModel.getName()).thenReturn(SIMPLE_PARAM_NAME);
-    ParameterModel offending = getParameter(connectionProviderModel.getName(), TopLevelTest.class);
+    String clashingName = SIMPLE_PARAM_NAME + CONNECTION_PROVIDER_SUFFIX;
+    when(connectionProviderModel.getName()).thenReturn(clashingName);
+    ParameterModel offending = getParameter(clashingName, TopLevelTest.class);
     when(operationModel.getAllParameterModels()).thenReturn(asList(topLevelOperationParam, offending));
     validate();
   }
@@ -375,12 +377,12 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void mapSingularizeClashOnConnectionProvider() {
     exception.expect(IllegalModelDefinitionException.class);
-    when(connectionProviderModel.getName()).thenReturn(CHILD_SINGULAR_PARAM_NAME);
-    ParameterModel offending = getParameter(CHILD_PLURAL_PARAM_NAME, childTestMap);
+    String clashingName = CHILD_PLURAL_PARAM_NAME + CONNECTION_PROVIDER_SUFFIX;
+    when(connectionProviderModel.getName()).thenReturn(clashingName);
+    ParameterModel offending = getParameter(clashingName, childTestMap);
     when(operationModel.getAllParameterModels()).thenReturn(asList(offending));
     validate();
   }
-
 
   @Test
   public void mapSingularizeClashOnParameterSameType() {
@@ -418,9 +420,10 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void listSingularizeClashOnConnectionProvider() {
+    String clashingName = CHILD_PLURAL_PARAM_NAME + CONNECTION_PROVIDER_SUFFIX;
     exception.expect(IllegalModelDefinitionException.class);
-    when(connectionProviderModel.getName()).thenReturn(CHILD_SINGULAR_PARAM_NAME);
-    ParameterModel offending = getParameter(CHILD_PLURAL_PARAM_NAME, childTestList);
+    when(connectionProviderModel.getName()).thenReturn(clashingName);
+    ParameterModel offending = getParameter(clashingName, childTestList);
     when(operationModel.getAllParameterModels()).thenReturn(asList(offending));
     validate();
   }
@@ -495,6 +498,20 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   private static class TopLevelTest {
 
     public TopLevelTest() {
+
+    }
+
+    private String id;
+
+    public String getId() {
+      return id;
+    }
+  }
+
+  @XmlHints(allowTopLevelDefinition = true)
+  private static class TopLevelConfig {
+
+    public TopLevelConfig() {
 
     }
 

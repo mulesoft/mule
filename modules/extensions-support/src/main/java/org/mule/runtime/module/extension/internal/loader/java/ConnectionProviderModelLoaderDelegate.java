@@ -61,7 +61,7 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
       return;
     }
 
-    String name = providerType.getAlias() + CUSTOM_CONNECTION_PROVIDER_SUFFIX;
+    String name = providerType.getAlias();
     String description = providerType.getDescription();
 
     if (providerType.getName().equals(providerType.getAlias())) {

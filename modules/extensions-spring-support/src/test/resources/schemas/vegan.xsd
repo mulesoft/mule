@@ -492,7 +492,7 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="grape-connection-connection">
+    <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="grape-connection">
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="extension:abstractConnectionProviderType">

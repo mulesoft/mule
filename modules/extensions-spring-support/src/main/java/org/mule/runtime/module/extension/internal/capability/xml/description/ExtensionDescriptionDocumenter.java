@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
+import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
@@ -79,8 +80,8 @@ final class ExtensionDescriptionDocumenter extends AbstractDescriptionDocumenter
           Configuration configurationAnnotation = element.getAnnotation(Configuration.class);
           String name = config.getName();
           String annotationName = configurationAnnotation != null ? configurationAnnotation.name() : "";
-          String defaultNaming = hyphenize(element.getSimpleName().toString().replace("Configuration", ""));
-          return name.equals(defaultNaming) || name.equals(annotationName);
+          String defaultNaming = hyphenize(element.getSimpleName().toString());
+          return name.equals(defaultNaming) || name.equals(annotationName) || name.equals(DEFAULT_CONFIG_NAME);
         })
         .findAny();
   }
