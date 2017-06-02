@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.util.store;
 
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 
 import java.io.Serializable;
 import java.util.List;
-
-import org.apache.commons.collections.Factory;
+import java.util.function.Supplier;
 
 /**
  * Will wrap a provided object store or a newly created one with the provided factory, with the provided having precedence if
@@ -25,13 +25,14 @@ public class ProvidedPartitionableObjectStoreWrapper<T extends Serializable> ext
     implements PartitionableObjectStore<T> {
 
   /**
-   * Wraps the {@code providedObjectStore} if given, or uses the {@code objectStoreFactory} to create one.
+   * Wraps the {@code providedObjectStore} if given, or uses the {@code objectStoreSupplier} to create one.
    * 
    * @param providedObjectStore the objectStroe provided through config to use. May be null.
-   * @param objectStoreFactory the factory to use to build an object store if {@code providedObjectStore} is null.
+   * @param objectStoreSupplier provides the object store to use if {@code providedObjectStore} is null.
    */
-  public ProvidedPartitionableObjectStoreWrapper(PartitionableObjectStore<T> providedObjectStore, Factory objectStoreFactory) {
-    super(providedObjectStore, objectStoreFactory);
+  public ProvidedPartitionableObjectStoreWrapper(PartitionableObjectStore<T> providedObjectStore,
+                                                 Supplier<ObjectStore> objectStoreSupplier) {
+    super(providedObjectStore, objectStoreSupplier);
   }
 
   @Override

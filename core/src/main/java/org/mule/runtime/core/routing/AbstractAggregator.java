@@ -15,7 +15,6 @@ import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.util.rx.Operators.echoOnNullMap;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -38,7 +37,8 @@ import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import org.mule.runtime.core.util.store.ProvidedObjectStoreWrapper;
 import org.mule.runtime.core.util.store.ProvidedPartitionableObjectStoreWrapper;
 
-import org.apache.commons.collections.Factory;
+import java.util.function.Supplier;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -92,7 +92,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
     }
   }
 
-  private Factory internalProcessedGroupsObjectStoreFactory() {
+  private Supplier<ObjectStore> internalProcessedGroupsObjectStoreFactory() {
     return () -> {
       ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(OBJECT_STORE_MANAGER);
       return objectStoreManager.getObjectStore(storePrefix + ".processedGroups", persistentStores, MAX_PROCESSED_GROUPS, -1,
@@ -103,7 +103,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   protected void initEventGroupsObjectStore() throws InitialisationException {
     try {
       if (eventGroupsObjectStore == null) {
-        eventGroupsObjectStore = new ProvidedPartitionableObjectStoreWrapper<>(null, internalEventsGroupsObjectStoreFactory());
+        eventGroupsObjectStore = new ProvidedPartitionableObjectStoreWrapper<>(null, internalEventsGroupsObjectStoreSupplier());
       }
       eventGroupsObjectStore.open(storePrefix + ".expiredAndDispatchedGroups");
       eventGroupsObjectStore.open(storePrefix + ".eventGroups");
@@ -112,7 +112,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
     }
   }
 
-  private Factory internalEventsGroupsObjectStoreFactory() {
+  private Supplier<ObjectStore> internalEventsGroupsObjectStoreSupplier() {
     return () -> {
       ObjectStore objectStore;
       if (persistentStores) {
@@ -192,7 +192,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
   public void setEventGroupsObjectStore(PartitionableObjectStore<Event> eventGroupsObjectStore) {
     this.eventGroupsObjectStore =
-        new ProvidedPartitionableObjectStoreWrapper<>(eventGroupsObjectStore, internalEventsGroupsObjectStoreFactory());
+        new ProvidedPartitionableObjectStoreWrapper<>(eventGroupsObjectStore, internalEventsGroupsObjectStoreSupplier());
   }
 
   public boolean isPersistentStores() {

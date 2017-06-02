@@ -11,8 +11,7 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 
 import java.io.Serializable;
-
-import org.apache.commons.collections.Factory;
+import java.util.function.Supplier;
 
 /**
  * Will wrap a provided object store or a newly created one with the provided factory, with the provided having precedence if
@@ -27,16 +26,15 @@ public class ProvidedObjectStoreWrapper<T extends Serializable> implements Objec
   private final boolean provided;
 
   /**
-   * Wraps the {@code providedObjectStore} if given, or uses the {@code objectStoreFactory} to create one.
+   * Wraps the {@code providedObjectStore} if given, or uses the {@code objectStoreSupplier} to create one.
    * 
    * @param providedObjectStore the objectStroe provided through config to use. May be null.
-   * @param objectStoreFactory the factory to use to build an object store if {@code providedObjectStore} is null.
+   * @param objectStoreSupplier provides the object store to use if {@code providedObjectStore} is null.
    */
-  // TODO(pablo.kraan): MULE-12606: remove Factory from the API
-  public ProvidedObjectStoreWrapper(ObjectStore<T> providedObjectStore, Factory objectStoreFactory) {
+  public ProvidedObjectStoreWrapper(ObjectStore<T> providedObjectStore, Supplier<ObjectStore> objectStoreSupplier) {
     if (providedObjectStore == null) {
       provided = false;
-      wrapped = (ObjectStore<T>) objectStoreFactory.create();
+      wrapped = objectStoreSupplier.get();
     } else {
       provided = true;
       wrapped = providedObjectStore;

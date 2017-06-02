@@ -7,15 +7,14 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessageRedeliveredException;
@@ -29,8 +28,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
+import java.util.function.Supplier;
 
-import org.apache.commons.collections.Factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,13 +87,13 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     idrId = String.format("%s-%s-%s", appName, flowName, "idr");
     lockFactory = muleContext.getLockFactory();
     if (store == null) {
-      store = new ProvidedObjectStoreWrapper<>(null, internalObjectStoreFactory());
+      store = new ProvidedObjectStoreWrapper<>(null, internalObjectStoreSupplier());
     }
     initialiseIfNeeded(objectToByteArray, muleContext);
     initialiseIfNeeded(byteArrayToHexString, muleContext);
   }
 
-  private Factory internalObjectStoreFactory() {
+  private Supplier<ObjectStore> internalObjectStoreSupplier() {
     return () -> {
       ObjectStoreManager objectStoreManager = muleContext.getObjectStoreManager();
       return objectStoreManager.getObjectStore(flowConstruct.getName() + "." + getClass().getName(), false, -1, 60 * 5 * 1000,
@@ -239,7 +238,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   }
 
   public void setObjectStore(ObjectStore<AtomicInteger> store) {
-    this.store = new ProvidedObjectStoreWrapper<>(store, internalObjectStoreFactory());
+    this.store = new ProvidedObjectStoreWrapper<>(store, internalObjectStoreSupplier());
   }
 }
 
