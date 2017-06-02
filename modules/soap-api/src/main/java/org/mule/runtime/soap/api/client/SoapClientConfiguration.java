@@ -27,6 +27,7 @@ public final class SoapClientConfiguration {
   private final boolean mtomEnabled;
   private final List<SecurityStrategy> securities;
   private final MessageDispatcher dispatcher;
+  private final String encoding;
 
   SoapClientConfiguration(String wsdlLocation,
                           String address,
@@ -35,7 +36,8 @@ public final class SoapClientConfiguration {
                           SoapVersion version,
                           boolean mtomEnabled,
                           List<SecurityStrategy> securities,
-                          MessageDispatcher dispatcher) {
+                          MessageDispatcher dispatcher,
+                          String encoding) {
     this.wsdlLocation = wsdlLocation;
     this.address = address;
     this.service = service;
@@ -44,6 +46,7 @@ public final class SoapClientConfiguration {
     this.mtomEnabled = mtomEnabled;
     this.securities = securities;
     this.dispatcher = dispatcher;
+    this.encoding = encoding;
   }
 
   public static SoapClientConfigurationBuilder builder() {
@@ -80,5 +83,9 @@ public final class SoapClientConfiguration {
 
   public MessageDispatcher getDispatcher() {
     return dispatcher;
+  }
+
+  public String getEncoding() {
+    return encoding;
   }
 }

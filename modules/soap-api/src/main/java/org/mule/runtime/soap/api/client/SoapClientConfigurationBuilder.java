@@ -38,6 +38,7 @@ public class SoapClientConfigurationBuilder {
   private boolean mtomEnabled;
   private List<SecurityStrategy> securities = new ArrayList<>();
   private MessageDispatcher dispatcher;
+  private String encoding;
 
   SoapClientConfigurationBuilder() {}
 
@@ -79,6 +80,16 @@ public class SoapClientConfigurationBuilder {
    */
   public SoapClientConfigurationBuilder withPort(String port) {
     this.port = port;
+    return this;
+  }
+
+  /**
+   * Sets the encoding of the messages send and retrieved by the .
+   *
+   * @return this builder.
+   */
+  public SoapClientConfigurationBuilder withEncoding(String encoding) {
+    this.encoding = encoding;
     return this;
   }
 
@@ -136,6 +147,7 @@ public class SoapClientConfigurationBuilder {
     checkNotNull(service, "Service cannot be null");
     checkNotNull(port, "Port cannot be null");
     checkNotNull(dispatcher, "Message Dispatcher cannot be null");
-    return new SoapClientConfiguration(wsdlLocation, address, service, port, version, mtomEnabled, securities, dispatcher);
+    return new SoapClientConfiguration(wsdlLocation, address, service, port, version,
+                                       mtomEnabled, securities, dispatcher, encoding);
   }
 }
