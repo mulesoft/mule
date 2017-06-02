@@ -53,7 +53,7 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
     if (resource != null) {
       try {
         XmlExtensionDocumentation documenter = serializer.deserialize(IOUtils.toString(resource.openStream()));
-        document(loadingContext.getExtensionDeclarer().getDeclaration(), documenter.getElements());
+        document(loadingContext.getExtensionDeclarer().getDeclaration(), documenter);
       } catch (IOException e) {
         throw new RuntimeException("Cannot get descriptions persisted in the extensions-descriptions.xml file", e);
       }
@@ -64,33 +64,33 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
    * Fills all the descriptions in the provided {@link ExtensionDeclaration} based on the
    * <strong>extensions-descriptions.xml</strong> file.
    *
-   * @param declaration the declaration to describe.
-   * @param elements    the extension elements with its corresponding description.
+   * @param declaration   the declaration to describe.
+   * @param documentation the extension documentation with its corresponding description.
    */
-  private void document(ExtensionDeclaration declaration, List<XmlExtensionElementDocumentation> elements) {
+  private void document(ExtensionDeclaration declaration, XmlExtensionDocumentation documentation) {
     new DeclarationWalker() {
 
       @Override
       protected void onConfiguration(ConfigurationDeclaration declaration) {
-        document(declaration);
+        document(declaration, documentation.getConfigs());
       }
 
       @Override
       protected void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration) {
-        document(declaration);
+        document(declaration, documentation.getOperations());
       }
 
       @Override
       protected void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration declaration) {
-        document(declaration);
+        document(declaration, documentation.getConnections());
       }
 
       @Override
       protected void onSource(WithSourcesDeclaration owner, SourceDeclaration declaration) {
-        document(declaration);
+        document(declaration, documentation.getSources());
       }
 
-      private void document(ParameterizedDeclaration<?> declaration) {
+      private void document(ParameterizedDeclaration<?> declaration, List<XmlExtensionElementDocumentation> elements) {
         elements.stream().filter(e -> e.getName().equals(declaration.getName())).findAny()
             .ifPresent(e -> {
               declaration.setDescription(e.getDescription());

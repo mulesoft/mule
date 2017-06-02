@@ -1,113 +1,120 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension-documentation>
-    <elements name="another">
-        <description><![CDATA[This is some Another Config documentation.]]></description>
-        <parameters>
-            <parameter name="magicParam">
-                <description><![CDATA[Connection parameter]]></description>
-            </parameter>
-        </parameters>
-    </elements>
-    <elements name="aliased">
-        <description><![CDATA[Another Provider Documentation]]></description>
-        <parameters>
-            <parameter name="reconnectionStrategy">
-                <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
-            </parameter>
-        </parameters>
-    </elements>
-    <elements name="operationWithBlankParameterDescription">
-        <description><![CDATA[Test Operation with blank parameter description]]></description>
-        <parameters>
-            <parameter name="value">
-                <description><![CDATA[]]></description>
-            </parameter>
-        </parameters>
-    </elements>
-    <elements name="config">
-        <description><![CDATA[This is some Config documentation.]]></description>
-        <parameters>
-            <parameter name="configParameter">
-                <description><![CDATA[Config parameter]]></description>
-            </parameter>
-            <parameter name="configParameterWithComplexJavadoc">
-                <description><![CDATA[Config Parameter with an Optional value]]></description>
-            </parameter>
-            <parameter name="value1">
-                <description><![CDATA[Group parameter 1]]></description>
-            </parameter>
-            <parameter name="value2">
-                <description><![CDATA[Group parameter 2]]></description>
-            </parameter>
-        </parameters>
-    </elements>
-    <elements name="aliased">
-        <description><![CDATA[Another Provider Documentation]]></description>
-        <parameters>
-            <parameter name="reconnectionStrategy">
-                <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
-            </parameter>
-        </parameters>
-    </elements>
-    <elements name="connection">
-        <description><![CDATA[Provider Documentation]]></description>
-        <parameters>
-            <parameter name="reconnectionStrategy">
-                <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
-            </parameter>
-        </parameters>
-    </elements>
-    <elements name="operationWithBlankParameterDescription">
-        <description><![CDATA[Test Operation with blank parameter description]]></description>
-        <parameters>
-            <parameter name="value">
-                <description><![CDATA[]]></description>
-            </parameter>
-        </parameters>
-    </elements>
-    <elements name="greetFriend">
-        <description><![CDATA[This method greets a friend]]></description>
-        <parameters>
-            <parameter name="friend">
-                <description><![CDATA[This is one of my friends]]></description>
-            </parameter>
-            <parameter name="otherFriend">
-                <description><![CDATA[Some other friend]]></description>
-            </parameter>
-        </parameters>
-    </elements>
-    <elements name="inheritedOperation">
-        <description><![CDATA[Inherited Operation Documentation]]></description>
-        <parameters>
-            <parameter name="value">
-                <description><![CDATA[parameter documentation for an inherited operation.]]></description>
-            </parameter>
-        </parameters>
-    </elements>
-    <elements name="operation">
-        <description><![CDATA[Test Operation]]></description>
-        <parameters>
-            <parameter name="value">
-                <description><![CDATA[test value]]></description>
-            </parameter>
-            <parameter name="value1">
-                <description><![CDATA[Group parameter 1]]></description>
-            </parameter>
-            <parameter name="value2">
-                <description><![CDATA[Group parameter 2]]></description>
-            </parameter>
-        </parameters>
-    </elements>
-    <elements name="operationWithJavadocLinkReferences">
-        <description><![CDATA[Operation that returns a String value]]></description>
-        <parameters>
-            <parameter name="value">
-                <description><![CDATA[this is the String to be returned]]></description>
-            </parameter>
-        </parameters>
-    </elements>
-    <elements name="documentation">
+    <configs>
+        <config name="another">
+            <description><![CDATA[This is some Another Config documentation.]]></description>
+            <parameters>
+                <parameter name="magicParam">
+                    <description><![CDATA[Connection parameter]]></description>
+                </parameter>
+            </parameters>
+        </config>
+        <config name="config">
+            <description><![CDATA[This is some Config documentation.]]></description>
+            <parameters>
+                <parameter name="configParameter">
+                    <description><![CDATA[Config parameter]]></description>
+                </parameter>
+                <parameter name="configParameterWithComplexJavadoc">
+                    <description><![CDATA[Config Parameter with an Optional value]]></description>
+                </parameter>
+                <parameter name="value1">
+                    <description><![CDATA[Group parameter 1]]></description>
+                </parameter>
+                <parameter name="value2">
+                    <description><![CDATA[Group parameter 2]]></description>
+                </parameter>
+            </parameters>
+        </config>
+    </configs>
+    <connections>
+        <connection name="another">
+            <description><![CDATA[Another Provider Documentation]]></description>
+            <parameters>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="another">
+            <description><![CDATA[Another Provider Documentation]]></description>
+            <parameters>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="connection">
+            <description><![CDATA[Provider Documentation]]></description>
+            <parameters>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+    </connections>
+    <extension name="documentation">
         <description><![CDATA[Test Extension Description]]></description>
         <parameters/>
-    </elements>
+    </extension>
+    <operations>
+        <operation name="operationWithBlankParameterDescription">
+            <description><![CDATA[Test Operation with blank parameter description]]></description>
+            <parameters>
+                <parameter name="value">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="operationWithBlankParameterDescription">
+            <description><![CDATA[Test Operation with blank parameter description]]></description>
+            <parameters>
+                <parameter name="value">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="greetFriend">
+            <description><![CDATA[This method greets a friend]]></description>
+            <parameters>
+                <parameter name="friend">
+                    <description><![CDATA[This is one of my friends]]></description>
+                </parameter>
+                <parameter name="otherFriend">
+                    <description><![CDATA[Some other friend]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="inheritedOperation">
+            <description><![CDATA[Inherited Operation Documentation]]></description>
+            <parameters>
+                <parameter name="value">
+                    <description><![CDATA[parameter documentation for an inherited operation.]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="operation">
+            <description><![CDATA[Test Operation]]></description>
+            <parameters>
+                <parameter name="value">
+                    <description><![CDATA[test value]]></description>
+                </parameter>
+                <parameter name="value1">
+                    <description><![CDATA[Group parameter 1]]></description>
+                </parameter>
+                <parameter name="value2">
+                    <description><![CDATA[Group parameter 2]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="operationWithJavadocLinkReferences">
+            <description><![CDATA[Operation that returns a String value]]></description>
+            <parameters>
+                <parameter name="value">
+                    <description><![CDATA[this is the String to be returned]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+    </operations>
+    <sources/>
 </extension-documentation>

@@ -23,6 +23,8 @@ import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 
 import com.google.common.collect.ImmutableList;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -45,36 +47,41 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
 
   private class ExtensionDocumenterWalker extends ExtensionWalker {
 
-    ImmutableList.Builder<XmlExtensionElementDocumentation> elements = ImmutableList.builder();
+    List<XmlExtensionElementDocumentation> configs = new ArrayList<>();
+    List<XmlExtensionElementDocumentation> connections = new ArrayList<>();
+    List<XmlExtensionElementDocumentation> operations = new ArrayList<>();
+    List<XmlExtensionElementDocumentation> sources = new ArrayList<>();
 
     @Override
     protected void onConfiguration(ConfigurationModel model) {
-      createParameterizedElement(model);
+      configs.addAll(createParameterizedElement(model));
     }
 
     @Override
     protected void onOperation(HasOperationModels owner, OperationModel model) {
-      createParameterizedElement(model);
+      operations.addAll(createParameterizedElement(model));
     }
 
     @Override
     protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
-      createParameterizedElement(model);
+      connections.addAll(createParameterizedElement(model));
     }
 
     @Override
     protected void onSource(HasSourceModels owner, SourceModel model) {
-      createParameterizedElement(model);
+      sources.addAll(createParameterizedElement(model));
     }
 
-    private void createParameterizedElement(ParameterizedModel model) {
+    private List<XmlExtensionElementDocumentation> createParameterizedElement(ParameterizedModel model) {
+      ImmutableList.Builder<XmlExtensionElementDocumentation> builder = ImmutableList.builder();
       XmlExtensionElementDocumentation element = new XmlExtensionElementDocumentation();
       element.setName(model.getName());
       element.setDescription(model.getDescription());
       element.setParameters(model.getAllParameterModels().stream()
           .map(p -> new XmlExtensionParameterDocumentation(p.getName(), p.getDescription()))
           .collect(toList()));
-      elements.add(element);
+      builder.add(element);
+      return builder.build();
     }
 
     private XmlExtensionDocumentation getDocumenter(ExtensionModel model) {
@@ -83,8 +90,11 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
       element.setName(model.getName());
       element.setDescription(model.getDescription());
       element.setParameters(emptyList());
-      elements.add(element);
-      documenter.setElements(elements.build());
+      documenter.setExtension(element);
+      documenter.setConfigs(configs);
+      documenter.setConnections(connections);
+      documenter.setOperation(operations);
+      documenter.setSources(sources);
       return documenter;
     }
   }
