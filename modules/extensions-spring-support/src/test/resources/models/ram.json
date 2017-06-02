@@ -365,6 +365,56 @@
                     },
                     {
                       "key": {
+                        "name": "namedParts"
+                      },
+                      "model": {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.util.Map",
+                          "classInformation": {
+                            "hasDefaultConstructor": false,
+                            "isInterface": true,
+                            "isInstantiable": false,
+                            "isAbstract": true,
+                            "isFinal": false,
+                            "implementedInterfaces": [],
+                            "parent": "",
+                            "genericTypes": [
+                              "java.lang.String",
+                              "org.mule.runtime.api.message.Message"
+                            ]
+                          }
+                        },
+                        "open": {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "org.mule.runtime.api.message.Message",
+                            "classInformation": {
+                              "hasDefaultConstructor": false,
+                              "isInterface": true,
+                              "isInstantiable": false,
+                              "isAbstract": true,
+                              "isFinal": false,
+                              "implementedInterfaces": [
+                                "java.io.Serializable"
+                              ],
+                              "parent": "",
+                              "genericTypes": []
+                            },
+                            "typeAlias": {
+                              "value": "Message"
+                            }
+                          },
+                          "fields": []
+                        },
+                        "fields": []
+                      },
+                      "annotations": {
+                        "visibility": "READ_ONLY"
+                      }
+                    },
+                    {
+                      "key": {
                         "name": "nonBodyParts"
                       },
                       "model": {
@@ -1703,6 +1753,56 @@
                       "typeAlias": {
                         "value": "Message"
                       }
+                    },
+                    "fields": []
+                  },
+                  "annotations": {
+                    "visibility": "READ_ONLY"
+                  }
+                },
+                {
+                  "key": {
+                    "name": "namedParts"
+                  },
+                  "model": {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "java.util.Map",
+                      "classInformation": {
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "org.mule.runtime.api.message.Message"
+                        ]
+                      }
+                    },
+                    "open": {
+                      "type": "Object",
+                      "annotations": {
+                        "typeId": "org.mule.runtime.api.message.Message",
+                        "classInformation": {
+                          "hasDefaultConstructor": false,
+                          "isInterface": true,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable"
+                          ],
+                          "parent": "",
+                          "genericTypes": []
+                        },
+                        "typeAlias": {
+                          "value": "Message"
+                        }
+                      },
+                      "fields": []
                     },
                     "fields": []
                   },
