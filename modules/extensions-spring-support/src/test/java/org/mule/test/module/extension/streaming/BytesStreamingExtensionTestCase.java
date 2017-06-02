@@ -203,7 +203,7 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
 
   private ConfigurationModel getConfigurationModel() {
     return getExtensionModel("Marvel")
-        .map(extension -> extension.getConfigurationModel("dr-strange-config").get())
+        .map(extension -> extension.getConfigurationModel("dr-strange").get())
         .get();
   }
 

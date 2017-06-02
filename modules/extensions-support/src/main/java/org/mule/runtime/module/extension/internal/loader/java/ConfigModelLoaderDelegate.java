@@ -55,11 +55,7 @@ final class ConfigModelLoaderDelegate extends AbstractModelLoaderDelegate {
     Optional<Configuration> configurationAnnotation = configType.getAnnotation(Configuration.class);
     if (configurationAnnotation.isPresent()) {
       final Configuration configuration = configurationAnnotation.get();
-      String name = configuration.name();
-      if (!configuration.name().toLowerCase().endsWith(DEFAULT_CONFIG_NAME)) {
-        name = name.concat(CUSTOM_CONFIG_SUFFIX);
-      }
-      configurationDeclarer = declarer.withConfig(name).describedAs(configuration.description());
+      configurationDeclarer = declarer.withConfig(configuration.name()).describedAs(configuration.description());
     } else {
       configurationDeclarer =
           declarer.withConfig(DEFAULT_CONFIG_NAME).describedAs(DEFAULT_CONFIG_DESCRIPTION);

@@ -2713,7 +2713,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "invalid-connection",
+          "name": "invalid",
           "description": "",
           "modelProperties": {}
         },
@@ -3577,7 +3577,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "pooled-connection",
+          "name": "pooled",
           "description": "",
           "modelProperties": {}
         },
@@ -4212,7 +4212,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "transactional-connection",
+          "name": "transactional",
           "description": "",
           "modelProperties": {}
         },
@@ -4847,7 +4847,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "valid-connection",
+          "name": "valid",
           "description": "",
           "modelProperties": {}
         }
@@ -7716,7 +7716,7 @@
           "modelProperties": {}
         }
       ],
-      "name": "invalid-connection",
+      "name": "invalid",
       "description": "",
       "modelProperties": {}
     },
@@ -8580,7 +8580,7 @@
           "modelProperties": {}
         }
       ],
-      "name": "pooled-connection",
+      "name": "pooled",
       "description": "",
       "modelProperties": {}
     },
@@ -9215,7 +9215,7 @@
           "modelProperties": {}
         }
       ],
-      "name": "transactional-connection",
+      "name": "transactional",
       "description": "",
       "modelProperties": {}
     },
@@ -9850,7 +9850,7 @@
           "modelProperties": {}
         }
       ],
-      "name": "valid-connection",
+      "name": "valid",
       "description": "",
       "modelProperties": {}
     }

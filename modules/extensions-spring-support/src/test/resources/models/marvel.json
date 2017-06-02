@@ -1144,7 +1144,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "mystic-connection",
+          "name": "mystic",
           "description": "",
           "modelProperties": {}
         }
@@ -1770,7 +1770,7 @@
           "modelProperties": {}
         }
       ],
-      "name": "dr-strange-config",
+      "name": "dr-strange",
       "description": "",
       "modelProperties": {}
     },
@@ -2134,7 +2134,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "missile-connection",
+          "name": "missile",
           "description": "",
           "modelProperties": {}
         },
@@ -2287,13 +2287,13 @@
               "modelProperties": {}
             }
           ],
-          "name": "odd-missile-connection",
+          "name": "odd-missile",
           "description": "",
           "modelProperties": {}
         }
       ],
       "messageSources": [],
-      "name": "iron-man-config",
+      "name": "iron-man",
       "description": "",
       "modelProperties": {}
     }

@@ -1475,7 +1475,7 @@
               "modelProperties": {}
             }
           ],
-          "name": "non-pooling-connection",
+          "name": "non-pooling",
           "description": "",
           "modelProperties": {}
         }
@@ -3247,7 +3247,7 @@
           "modelProperties": {}
         }
       ],
-      "name": "non-pooling-connection",
+      "name": "non-pooling",
       "description": "",
       "modelProperties": {}
     }

@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.capability.xml.description;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -62,11 +63,11 @@ final class ConfigurationDescriptionDocumenter extends AbstractDescriptionDocume
     String defaultNaming = hyphenize(element.getSimpleName().toString().replace("Provider", ""));
     return declaration.getConnectionProviders().stream()
         .filter(provider -> {
-          String name = provider.getName().replace("-connection", "");
+          String name = provider.getName();
           if (isNotBlank(alias)) {
             return name.equals(alias);
           } else {
-            return name.equals(defaultNaming) || name.equals("connection");
+            return name.equals(defaultNaming) || name.equals(DEFAULT_CONNECTION_PROVIDER_NAME);
           }
         })
         .findAny();
