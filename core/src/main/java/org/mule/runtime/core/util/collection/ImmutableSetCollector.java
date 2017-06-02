@@ -21,20 +21,20 @@ import java.util.stream.Collector;
  * @param <T> the generic type of the elements in the {@link Set}
  * @since 4.0
  */
-public class ImmutableSetCollector<T> implements Collector<T, ImmutableSet.Builder<T>, Set<T>> {
+public class ImmutableSetCollector<T> implements Collector<T, ImmutableSetBuilder<T>, Set<T>> {
 
   @Override
-  public Supplier<ImmutableSet.Builder<T>> supplier() {
-    return ImmutableSet::builder;
+  public Supplier<ImmutableSetBuilder<T>> supplier() {
+    return ImmutableSetBuilder::new;
   }
 
   @Override
-  public BiConsumer<ImmutableSet.Builder<T>, T> accumulator() {
+  public BiConsumer<ImmutableSetBuilder<T>, T> accumulator() {
     return (builder, value) -> builder.add(value);
   }
 
   @Override
-  public BinaryOperator<ImmutableSet.Builder<T>> combiner() {
+  public BinaryOperator<ImmutableSetBuilder<T>> combiner() {
     return (left, right) -> {
       left.addAll(right.build());
       return left;
@@ -42,8 +42,8 @@ public class ImmutableSetCollector<T> implements Collector<T, ImmutableSet.Build
   }
 
   @Override
-  public Function<ImmutableSet.Builder<T>, Set<T>> finisher() {
-    return ImmutableSet.Builder::build;
+  public Function<ImmutableSetBuilder<T>, Set<T>> finisher() {
+    return ImmutableSetBuilder::build;
   }
 
   @Override
