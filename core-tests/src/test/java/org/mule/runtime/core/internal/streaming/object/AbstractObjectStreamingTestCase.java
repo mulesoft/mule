@@ -12,10 +12,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.core.internal.streaming.object.iterator.Consumer;
-import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
 import org.mule.runtime.core.internal.streaming.object.iterator.ConsumerStreamingIterator;
-
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public abstract class AbstractObjectStreamingTestCase extends AbstractMuleTestCase {
+public abstract class AbstractObjectStreamingTestCase extends AbstractMuleContextTestCase {
 
   protected final List<Object> data;
 
