@@ -145,14 +145,14 @@ public class SoapInvokeOperationDeclarer {
     message.withOptionalParameter(BODY_PARAM).ofDynamicType(binaryType)
         .withRole(PRIMARY_CONTENT)
         .withLayout(getLayout(3))
-        .withDisplay(DisplayModel.builder()
+        .withDisplayModel(DisplayModel.builder()
             .summary("The XML body to include in the SOAP message, with all the required parameters.")
             .build());
 
     message.withOptionalParameter(HEADERS_PARAM).ofDynamicType(binaryType)
         .withRole(CONTENT)
         .withLayout(getLayout(4))
-        .withDisplay(DisplayModel.builder()
+        .withDisplayModel(DisplayModel.builder()
             .displayName(HEADERS_DISPLAY_NAME)
             .summary("The XML headers to include in the SOAP message.")
             .build());
@@ -160,7 +160,7 @@ public class SoapInvokeOperationDeclarer {
     message.withOptionalParameter(ATTACHMENTS_PARAM).ofDynamicType(attachments)
         .withRole(CONTENT)
         .withLayout(getLayout(5))
-        .withDisplay(DisplayModel.builder()
+        .withDisplayModel(DisplayModel.builder()
             .summary("The attachments to include in the SOAP request.")
             .build());
 
@@ -172,7 +172,7 @@ public class SoapInvokeOperationDeclarer {
             .build())
         .withDsl(ParameterDslConfiguration.getDefaultInstance())
         .withLayout(LayoutModel.builder().order(2).build())
-        .withDisplay(DisplayModel.builder()
+        .withDisplayModel(DisplayModel.builder()
             .displayName(HEADERS_DISPLAY_NAME)
             .summary("The headers to set in the transport configuration.")
             .build());
