@@ -14,12 +14,12 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.UUID;
 
@@ -213,7 +213,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable>
     }
   }
 
-  protected static class StoredObject<T> implements Serializable, DeserializationPostInitialisable {
+  public static class StoredObject<T> implements Serializable, DeserializationPostInitialisable {
 
     private static final long serialVersionUID = 8656763235928199259L;
     final private T item;

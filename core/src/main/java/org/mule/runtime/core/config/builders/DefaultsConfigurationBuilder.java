@@ -34,16 +34,14 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAU
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
-import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME;
-import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.core.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.runtime.core.el.DefaultExpressionManager;
@@ -62,8 +60,8 @@ import org.mule.runtime.core.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.core.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.util.DefaultStreamCloserService;
-import org.mule.runtime.core.util.queue.DelegateQueueManager;
 import org.mule.runtime.core.util.queue.QueueManager;
+import org.mule.runtime.core.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 
@@ -100,10 +98,6 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
 
     registerLocalObjectStoreManager(muleContext, registry);
 
-    registerObject(QUEUE_STORE_DEFAULT_IN_MEMORY_NAME, DefaultObjectStoreFactoryBean.createDefaultInMemoryQueueStore(),
-                   muleContext);
-    registerObject(QUEUE_STORE_DEFAULT_PERSISTENT_NAME, DefaultObjectStoreFactoryBean.createDefaultPersistentQueueStore(),
-                   muleContext);
     registerObject(DEFAULT_USER_OBJECT_STORE_NAME, DefaultObjectStoreFactoryBean.createDefaultUserObjectStore(), muleContext);
     registerObject(DEFAULT_USER_TRANSIENT_OBJECT_STORE_NAME,
                    DefaultObjectStoreFactoryBean.createDefaultUserTransientObjectStore(), muleContext);
@@ -151,7 +145,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
   }
 
   protected void configureQueueManager(MuleContext muleContext) throws RegistrationException {
-    QueueManager queueManager = new DelegateQueueManager();
+    QueueManager queueManager = new TransactionalQueueManager();
     registerObject(OBJECT_QUEUE_MANAGER, queueManager, muleContext);
     registerObject(LOCAL_QUEUE_MANAGER_KEY, queueManager, muleContext);
   }

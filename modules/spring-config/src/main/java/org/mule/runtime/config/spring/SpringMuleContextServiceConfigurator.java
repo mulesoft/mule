@@ -51,11 +51,10 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_M
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
-import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME;
-import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+
 import org.mule.runtime.api.artifact.ArtifactProperties;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -112,7 +111,7 @@ import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.core.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.core.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.util.DefaultStreamCloserService;
-import org.mule.runtime.core.util.queue.DelegateQueueManager;
+import org.mule.runtime.core.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 
@@ -203,14 +202,10 @@ class SpringMuleContextServiceConfigurator {
       .put(DEFAULT_LOCAL_TRANSIENT_USER_OBJECT_STORE_NAME,
            getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultUserTransientObjectStore"))
       .put(OBJECT_STORE_MANAGER, getBeanDefinition(MuleObjectStoreManager.class))
-      .put(QUEUE_STORE_DEFAULT_PERSISTENT_NAME,
-           getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultPersistentQueueStore"))
-      .put(QUEUE_STORE_DEFAULT_IN_MEMORY_NAME,
-           getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultInMemoryQueueStore"))
       .put(OBJECT_QUEUE_MANAGER,
            getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_QUEUE_MANAGER)
                .getBeanDefinition())
-      .put(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinition(DelegateQueueManager.class))
+      .put(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinition(TransactionalQueueManager.class))
       .put("_muleParentContextPropertyPlaceholderProcessor", getBeanDefinition(ParentContextPropertyPlaceholderProcessor.class))
       .put("_mulePropertyPlaceholderProcessor", createMulePropertyPlaceholderBeanDefinition())
       .put(OBJECT_SECURITY_MANAGER, getBeanDefinition(DefaultMuleSecurityManager.class))
@@ -260,7 +255,6 @@ class SpringMuleContextServiceConfigurator {
 
     createBootstrapBeanDefinitions();
     createLocalObjectStoreBeanDefinitions();
-    createQueueStoreBeanDefinitions();
     createQueueManagerBeanDefinitions();
     createCustomServices();
   }
@@ -314,12 +308,6 @@ class SpringMuleContextServiceConfigurator {
     return beanDefinition;
   }
 
-
-  private void createQueueStoreBeanDefinitions() {
-    beanDefinitionRegistry.registerAlias(QUEUE_STORE_DEFAULT_PERSISTENT_NAME, "_fileQueueStore");
-    beanDefinitionRegistry.registerAlias(QUEUE_STORE_DEFAULT_IN_MEMORY_NAME, "_simpleMemoryQueueStore");
-  }
-
   private static BeanDefinition createMulePropertyPlaceholderBeanDefinition() {
     HashMap<Object, Object> factories = new HashMap<>();
     factories.put("hostname", new HostNameFactory());
@@ -333,7 +321,7 @@ class SpringMuleContextServiceConfigurator {
       registerBeanDefinition(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinitionBuilder(ConstantFactoryBean.class)
           .addConstructorArgReference(OBJECT_LOCAL_QUEUE_MANAGER).getBeanDefinition());
     } else {
-      registerBeanDefinition(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinition(DelegateQueueManager.class));
+      registerBeanDefinition(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinition(TransactionalQueueManager.class));
     }
   }
 

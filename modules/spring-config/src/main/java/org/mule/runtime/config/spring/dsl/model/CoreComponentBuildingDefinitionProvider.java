@@ -31,7 +31,6 @@ import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RET
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedReference;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
@@ -59,6 +58,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.DataUnit;
@@ -87,7 +87,6 @@ import org.mule.runtime.config.spring.factories.FlowRefFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.runtime.config.spring.factories.ModuleOperationMessageProcessorChainFactoryBean;
-import org.mule.runtime.config.spring.factories.QueueProfileFactoryBean;
 import org.mule.runtime.config.spring.factories.ResponseMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SchedulingMessageSourceFactoryBean;
@@ -102,7 +101,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.model.EntryPointResolver;
@@ -125,15 +123,14 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
-import org.mule.runtime.core.api.store.QueueStoreObjectFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.component.PooledJavaComponent;
 import org.mule.runtime.core.component.simple.EchoComponent;
 import org.mule.runtime.core.component.simple.LogComponent;
 import org.mule.runtime.core.component.simple.NullComponent;
 import org.mule.runtime.core.component.simple.StaticComponent;
-import org.mule.runtime.core.config.QueueProfile;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.el.ExpressionLanguageComponent;
 import org.mule.runtime.core.enricher.MessageEnricher;
@@ -227,8 +224,6 @@ import org.mule.runtime.core.transformer.simple.MapToBean;
 import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
-import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.util.queue.QueueStore;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
@@ -694,13 +689,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIgnoredConfigurationParameter(NAME)
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("queue-profile")
-        .withTypeDefinition(fromType(QueueProfile.class))
-        .withObjectFactoryType(QueueProfileFactoryBean.class)
-        .withSetterParameterDefinition("maxOutstandingMessages", fromSimpleParameter("maxOutstandingMessages").build())
-        .withSetterParameterDefinition("queueStore", fromChildConfiguration(QueueStore.class).build())
-        .build());
-
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("redelivery-policy")
         .withTypeDefinition(fromType(IdempotentRedeliveryPolicy.class))
         .withSetterParameterDefinition("maxRedeliveryCount", fromSimpleParameter("maxRedeliveryCount").build())
@@ -740,11 +728,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("initialisationPolicy", fromSimpleParameter("initialisationPolicy",
                                                                                    PoolingProfile.POOL_INITIALISATION_POLICIES::get)
                                                                                        .build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("custom-queue-store")
-        .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
-        .withIgnoredConfigurationParameter(NAME)
         .build());
 
     componentBuildingDefinitions.add(
@@ -789,7 +772,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.addAll(getFiltersDefinitions());
     componentBuildingDefinitions.addAll(getReconnectionDefinitions());
     componentBuildingDefinitions.addAll(getTransactionDefinitions());
-    componentBuildingDefinitions.addAll(getQueueStoreDefinitions());
     return componentBuildingDefinitions;
   }
 
@@ -1625,24 +1607,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIdentifier("custom-transaction-manager")
         .withTypeDefinition(fromConfigurationAttribute(CLASS_ATTRIBUTE))
         .withSetterParameterDefinition("environment", fromChildConfiguration(Map.class).build())
-        .build());
-
-    return buildingDefinitions;
-  }
-
-  public List<ComponentBuildingDefinition> getQueueStoreDefinitions() {
-    List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
-
-    buildingDefinitions.add(baseDefinition.copy().withIdentifier("default-persistent-queue-store")
-        .withTypeDefinition(fromType(org.mule.runtime.core.api.store.QueueStore.class))
-        .withObjectFactoryType(QueueStoreObjectFactory.class)
-        .withConstructorParameterDefinition(fromFixedReference(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME).build())
-        .build());
-
-    buildingDefinitions.add(baseDefinition.copy().withIdentifier("default-in-memory-queue-store")
-        .withTypeDefinition(fromType(org.mule.runtime.core.api.store.QueueStore.class))
-        .withObjectFactoryType(QueueStoreObjectFactory.class)
-        .withConstructorParameterDefinition(fromFixedReference(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME).build())
         .build());
 
     return buildingDefinitions;

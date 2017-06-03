@@ -7,21 +7,23 @@
 package org.mule.runtime.core.config.bootstrap;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.registry.ObjectProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StreamCloser;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SimpleRegistry;
-import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.util.Map;
 
@@ -86,6 +88,7 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap {
     } else if (value instanceof StreamCloser) {
       meta = StreamCloser.class;
     } else if (value instanceof BootstrapObjectFactory) {
+      setMuleContextIfNeeded(value, muleContext);
       value = ((BootstrapObjectFactory) value).create();
     }
     muleContext.getRegistry().registerObject(bootstrapProperty.getKey(), value, meta);

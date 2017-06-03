@@ -7,7 +7,6 @@
 package org.mule.runtime.core.util.store;
 
 import org.mule.runtime.api.store.ObjectStore;
-import org.mule.runtime.core.api.store.QueueStore;
 
 import java.io.Serializable;
 
@@ -29,20 +28,6 @@ public interface DefaultObjectStoreFactory {
    * @return persistent object store
    */
   ObjectStore<Serializable> createDefaultPersistentObjectStore();
-
-  /**
-   * Creates an in memory object store for storing queue events
-   *
-   * @return in memory queue store
-   */
-  QueueStore<Serializable> createDefaultInMemoryQueueStore();
-
-  /**
-   * Creates a persistent object store for storing queue events
-   *
-   * @return persistent queue store
-   */
-  QueueStore<Serializable> createDefaultPersistentQueueStore();
 
   /**
    * Creates a persistent object store for custom components

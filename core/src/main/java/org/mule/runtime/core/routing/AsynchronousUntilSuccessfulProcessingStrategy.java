@@ -11,11 +11,10 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
+import static org.mule.runtime.core.api.util.StringUtils.DASH;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STARTED;
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
-import static org.mule.runtime.core.api.util.StringUtils.DASH;
-import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -57,6 +56,11 @@ import org.slf4j.LoggerFactory;
  */
 public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilSuccessfulProcessingStrategy
     implements Initialisable, Disposable, Startable, Stoppable, MessagingExceptionHandlerAware {
+
+  /**
+   * The default queueStore directory for persistence
+   */
+  public static final String DEFAULT_QUEUE_STORE = "queuestore";
 
   private static final String UNTIL_SUCCESSFUL_MSG_PREFIX = "until-successful retries exhausted. Last exception message was: %s";
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
