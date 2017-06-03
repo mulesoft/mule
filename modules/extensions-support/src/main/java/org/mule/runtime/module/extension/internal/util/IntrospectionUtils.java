@@ -83,6 +83,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.loader.java.property.TypedValueTypeModelProperty;
 
 import com.google.common.collect.ImmutableList;
+import org.springframework.core.ResolvableType;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -107,8 +108,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import org.springframework.core.ResolvableType;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -171,7 +170,12 @@ public final class IntrospectionUtils {
           dataType.set(DataType.builder().mapType((Class<? extends Map>) type)
               .keyType(String.class)
               .valueType(objectType.getOpenRestriction()
-                  .map(JavaTypeUtils::getType)
+                  .map(restrinction -> {
+                    if (restrinction.getAnnotation(TypedValueTypeAnnotation.class).isPresent()) {
+                      return TypedValue.class;
+                    }
+                    return JavaTypeUtils.getType(restrinction);
+                  })
                   .orElse(Object.class))
               .build());
         } else {
@@ -257,6 +261,11 @@ public final class IntrospectionUtils {
   private static MetadataType returnListOfMessagesType(ResolvableType returnType, ClassTypeLoader typeLoader,
                                                        ResolvableType itemType) {
     ResolvableType genericType = itemType.getGenerics()[0];
+
+    if (TypedValue.class.isAssignableFrom(genericType.getRawClass())) {
+      genericType = genericType.getGenerics()[0];
+    }
+
     MetadataType outputType = genericType.getRawClass() != null
         ? typeLoader.load(genericType.getType())
         : typeBuilder().anyType().build();

@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -58,7 +59,7 @@ public final class MessageUtils {
                                   Event event) {
     return Message.builder()
         .payload(StreamingUtils.streamingContent(result.getOutput(), cursorProviderFactory, event))
-        .mediaType(mediaType)
+        .mediaType(((Optional<MediaType>)result.getMediaType()).orElse(mediaType))
         .attributes(result.getAttributes().orElse(NULL_ATTRIBUTES))
         .build();
   }
