@@ -261,11 +261,10 @@ public class DependencyResolver {
   }
 
   private RemoteRepository setAuthentication(RemoteRepository remoteRepository) {
-    return new RemoteRepository.Builder(remoteRepository)
-        .setAuthentication(this.resolutionContext
-            .getAuthenticatorSelector()
-            .getAuthentication(remoteRepository))
-        .build();
+    RemoteRepository.Builder authenticated = new RemoteRepository.Builder(remoteRepository);
+    this.resolutionContext.getAuthenticatorSelector()
+        .ifPresent(authSelector -> authenticated.setAuthentication(authSelector.getAuthentication(remoteRepository)));
+    return authenticated.build();
   }
 
   private void logDependencyGraph(DependencyNode node, Object request) {
