@@ -8,7 +8,6 @@ package org.mule.runtime.core.util.message;
 
 import static org.mule.runtime.core.util.message.MessageUtils.toMessage;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -28,16 +27,13 @@ import java.util.function.Consumer;
 final class ResultToMessageIterator implements Iterator<Message> {
 
   private final Iterator<Result> delegate;
-  private final MediaType mediaType;
   private final CursorProviderFactory cursorProviderFactory;
   private final Event event;
 
   ResultToMessageIterator(Iterator<Result> delegate,
-                          MediaType mediaType,
                           CursorProviderFactory cursorProviderFactory,
                           Event event) {
     this.delegate = delegate;
-    this.mediaType = mediaType;
     this.cursorProviderFactory = cursorProviderFactory;
     this.event = event;
   }
@@ -50,7 +46,7 @@ final class ResultToMessageIterator implements Iterator<Message> {
 
   @Override
   public Message next() {
-    return toMessage(delegate.next(), mediaType, cursorProviderFactory, event);
+    return toMessage(delegate.next(), cursorProviderFactory, event);
   }
 
   @Override
@@ -60,6 +56,6 @@ final class ResultToMessageIterator implements Iterator<Message> {
 
   @Override
   public void forEachRemaining(Consumer<? super Message> action) {
-    delegate.forEachRemaining(result -> action.accept(toMessage(result, mediaType, cursorProviderFactory, event)));
+    delegate.forEachRemaining(result -> action.accept(toMessage(result, cursorProviderFactory, event)));
   }
 }

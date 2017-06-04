@@ -14,6 +14,7 @@ import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.Event.builder;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.core.api.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
@@ -22,13 +23,11 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_GENERATE;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
-import static org.mule.runtime.core.api.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollection;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -55,16 +54,15 @@ import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.util.func.CheckedConsumer;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import reactor.core.publisher.MonoProcessor;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import reactor.core.publisher.MonoProcessor;
 
 /**
  * This phase routes the message through the flow.
@@ -244,8 +242,7 @@ public class ModuleFlowProcessingPhase
 
       if (resultValue instanceof Collection && adapter.isCollection()) {
         message = toMessage(Result.<Collection<Message>, Attributes>builder()
-            .output(toMessageCollection((Collection<Result>) resultValue, result.getMediaType().orElse(ANY),
-                                        adapter.getCursorProviderFactory(), templateEvent))
+            .output(toMessageCollection((Collection<Result>) resultValue, adapter.getCursorProviderFactory(), templateEvent))
             .attributes(NULL_ATTRIBUTES)
             .mediaType(result.getMediaType().orElse(ANY))
             .build());
