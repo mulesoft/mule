@@ -37,7 +37,6 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.metadata.message.MessageMetadataTypeBuilder;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -170,11 +169,11 @@ public final class IntrospectionUtils {
           dataType.set(DataType.builder().mapType((Class<? extends Map>) type)
               .keyType(String.class)
               .valueType(objectType.getOpenRestriction()
-                  .map(restrinction -> {
-                    if (restrinction.getAnnotation(TypedValueTypeAnnotation.class).isPresent()) {
+                  .map(restriction -> {
+                    if (restriction.getAnnotation(TypedValueTypeAnnotation.class).isPresent()) {
                       return TypedValue.class;
                     }
-                    return JavaTypeUtils.getType(restrinction);
+                    return getType(restriction);
                   })
                   .orElse(Object.class))
               .build());
@@ -262,16 +261,18 @@ public final class IntrospectionUtils {
                                                        ResolvableType itemType) {
     ResolvableType genericType = itemType.getGenerics()[0];
 
-    if (TypedValue.class.isAssignableFrom(genericType.getRawClass())) {
+    Class<?> rawClass = genericType.getRawClass();
+
+    if (rawClass != null && TypedValue.class.isAssignableFrom(rawClass)) {
       genericType = genericType.getGenerics()[0];
     }
 
-    MetadataType outputType = genericType.getRawClass() != null
+    MetadataType outputType = rawClass != null
         ? typeLoader.load(genericType.getType())
         : typeBuilder().anyType().build();
 
     genericType = itemType.getGenerics()[1];
-    MetadataType attributesType = genericType.getRawClass() != null
+    MetadataType attributesType = rawClass != null
         ? typeLoader.load(genericType.getType())
         : typeBuilder().voidType().build();
 

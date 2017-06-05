@@ -11,9 +11,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.TransformationService;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.transformer.Transformer;
 
 import javax.inject.Inject;
@@ -28,7 +26,7 @@ import javax.inject.Inject;
  * @param <T>
  * @since 4.0
  */
-public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initialisable, MuleContextAware {
+public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initialisable {
 
   private final Class<T> expectedType;
   private ValueResolver valueResolverDelegate;
@@ -36,8 +34,6 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
 
   @Inject
   private TransformationService transformationService;
-
-  private MuleContext muleContext;
 
   public TypeSafeValueResolverWrapper(ValueResolver valueResolverDelegate, Class<T> expectedType) {
     this.expectedType = expectedType;
@@ -56,9 +52,6 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
 
   @Override
   public void initialise() throws InitialisationException {
-    if (transformationService == null) {
-      transformationService = muleContext.getTransformationService();
-    }
     TypeSafeTransformer typeSafeTransformer = new TypeSafeTransformer(transformationService);
     resolver = context -> {
       Object resolvedValue = valueResolverDelegate.resolve(context);
@@ -74,11 +67,6 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
 
   public void setTransformationService(TransformationService transformationService) {
     this.transformationService = transformationService;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
   }
 
   @FunctionalInterface

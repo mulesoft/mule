@@ -60,7 +60,7 @@ public final class TypedValueValueResolverWrapper<T> implements ValueResolver<Ty
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(resolver, muleContext);
+    initialiseIfNeeded(resolver, true, muleContext);
   }
 
   @Override
