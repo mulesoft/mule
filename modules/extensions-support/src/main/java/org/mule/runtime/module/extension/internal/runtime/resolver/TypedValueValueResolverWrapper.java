@@ -6,10 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 
 /**
  * {@link ValueResolver} implementation for {@link TypedValue} that are not resolved from an
@@ -21,9 +26,11 @@ import org.mule.runtime.core.api.Event;
  * @since 4.0
  * @see TypedValue
  */
-public final class TypedValueValueResolverWrapper<T> implements ValueResolver<TypedValue<T>> {
+public final class TypedValueValueResolverWrapper<T> implements ValueResolver<TypedValue<T>>, Initialisable, MuleContextAware {
 
   private ValueResolver resolver;
+
+  MuleContext muleContext;
 
   public TypedValueValueResolverWrapper(ValueResolver resolver) {
     this.resolver = resolver;
@@ -49,5 +56,15 @@ public final class TypedValueValueResolverWrapper<T> implements ValueResolver<Ty
   @Override
   public boolean isDynamic() {
     return resolver.isDynamic();
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(resolver, true, muleContext);
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
   }
 }

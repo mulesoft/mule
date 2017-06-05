@@ -10,13 +10,13 @@ package org.mule.tck.junit4.matcher;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 
-import java.nio.charset.Charset;
-import java.util.Optional;
-
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+
+import java.nio.charset.Charset;
+import java.util.Optional;
 
 /**
  * Verifies a given {@link DataType}'s type, mime type and encoding.
@@ -63,6 +63,11 @@ public class DataTypeMatcher extends TypeSafeMatcher<DataType> {
   @Factory
   public static Matcher<DataType> like(Class type, MediaType mimeType, Charset encoding) {
     return new DataTypeMatcher(type, mimeType, encoding);
+  }
+
+  @Factory
+  public static Matcher<DataType> like(Class type, MediaType mimeType) {
+    return new DataTypeMatcher(type, mimeType, mimeType.getCharset().orElse(null));
   }
 
   @Factory
