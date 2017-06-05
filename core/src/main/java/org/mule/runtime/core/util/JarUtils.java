@@ -112,12 +112,13 @@ public final class JarUtils {
    */
   public static List<URL> getUrlsWithinJar(File file, String directory) throws IOException {
     List<URL> urls = new ArrayList<>();
-    JarFile jarFile = new JarFile(file);
-    Enumeration<JarEntry> entries = jarFile.entries();
-    while (entries.hasMoreElements()) {
-      JarEntry jarEntry = entries.nextElement();
-      if (!jarEntry.isDirectory() && jarEntry.getName().startsWith(directory + "/")) {
-        urls.add(getUrlWithinJar(file, jarEntry.getName()));
+    try (JarFile jarFile = new JarFile(file)) {
+      Enumeration<JarEntry> entries = jarFile.entries();
+      while (entries.hasMoreElements()) {
+        JarEntry jarEntry = entries.nextElement();
+        if (!jarEntry.isDirectory() && jarEntry.getName().startsWith(directory + "/")) {
+          urls.add(getUrlWithinJar(file, jarEntry.getName()));
+        }
       }
     }
     return urls;
