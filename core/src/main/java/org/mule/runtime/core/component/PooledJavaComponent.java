@@ -15,9 +15,9 @@ import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.api.object.ObjectFactory;
-import org.mule.runtime.core.util.pool.DefaultLifecycleEnabledObjectPool;
-import org.mule.runtime.core.util.pool.LifecyleEnabledObjectPool;
-import org.mule.runtime.core.util.pool.ObjectPool;
+import org.mule.runtime.core.internal.pool.DefaultLifecycleEnabledObjectPool;
+import org.mule.runtime.core.api.util.pool.LifecyleEnabledObjectPool;
+import org.mule.runtime.core.api.util.pool.ObjectPool;
 
 /**
  * <code>PooledJavaComponent</code> implements pooling.

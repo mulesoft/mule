@@ -4,11 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.pool;
+package org.mule.runtime.core.internal.util.pool;
 
 import static org.junit.Assert.assertEquals;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.internal.pool.DefaultLifecycleEnabledObjectPool;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 

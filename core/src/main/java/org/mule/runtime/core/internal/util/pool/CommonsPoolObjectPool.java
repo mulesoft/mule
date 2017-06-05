@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.pool;
+package org.mule.runtime.core.internal.util.pool;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.core.api.MuleContext;
@@ -12,6 +12,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.core.api.util.pool.ObjectPool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,6 @@ import org.slf4j.LoggerFactory;
  * <code>CommonsPoolProxyPool</code> is an implementation of {@link ObjectPool} that internally uses the commons-pool
  * {@link GenericObjectPool} and uses a {@link ObjectFactory} for creating new pooled instances.
  */
-// TODO(pablo.kraan): MULE-12606 - remove this class from the API or avoid exposing apache classes
 public class CommonsPoolObjectPool implements ObjectPool {
 
   /**

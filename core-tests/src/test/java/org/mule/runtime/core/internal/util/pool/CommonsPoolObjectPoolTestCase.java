@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.pool;
+package org.mule.runtime.core.internal.util.pool;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.object.ObjectFactory;
-import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.core.api.util.pool.ObjectPool;
 import org.mule.tck.testmodels.fruit.BananaFactory;
 
 import java.util.NoSuchElementException;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class CommonsPoolObjectPoolTestCase extends AbstractPoolingTestCase {
 
