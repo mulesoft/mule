@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.util.collection.ImmutableMapCollector;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.runtime.extension.internal.property.QNameModelProperty;
@@ -61,7 +61,7 @@ public final class InfrastructureTypeMapping {
           .build();
 
   private static Map<String, String> nameMap = MAPPING.entrySet().stream()
-      .collect(new ImmutableMapCollector<>(e -> e.getKey().getName(), Map.Entry::getValue));
+      .collect(toImmutableMap(e -> e.getKey().getName(), Map.Entry::getValue));
 
   public static Map<Class<?>, String> getMap() {
     return MAPPING;

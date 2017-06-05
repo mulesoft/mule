@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.loader.java.type.ConfigurationElement;
@@ -30,7 +30,7 @@ class ConfigurationWrapper extends ComponentWrapper implements ConfigurationElem
     this.parameters = Stream.concat(getAnnotatedFields(Parameter.class).stream(),
                                     getAnnotatedFields(ParameterGroup.class).stream())
         .distinct()
-        .collect(new ImmutableListCollector<>());
+        .collect(toImmutableList());
   }
 
   /**

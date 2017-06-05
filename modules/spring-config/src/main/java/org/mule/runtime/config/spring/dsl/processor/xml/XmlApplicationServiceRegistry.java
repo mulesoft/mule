@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.config.spring.dsl.processor.xml;
 
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfo;
 import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfoProvider;
 import org.mule.runtime.core.api.registry.AbstractServiceRegistry;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 
@@ -40,7 +40,7 @@ public class XmlApplicationServiceRegistry extends AbstractServiceRegistry {
     if (context != null) {
       extensionNamespaces = context.getExtensions().stream()
           .map(ext -> new StaticXmlNamespaceInfo(ext.getXmlDslModel().getNamespace(), ext.getXmlDslModel().getPrefix()))
-          .collect(new ImmutableListCollector<>());
+          .collect(toImmutableList());
     } else {
       extensionNamespaces = ImmutableList.of();
     }

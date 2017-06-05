@@ -21,6 +21,7 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.isObjectType;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllSuperTypes;
 import static org.reflections.ReflectionUtils.withName;
@@ -59,7 +60,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Ignore;
@@ -631,15 +631,13 @@ public final class IntrospectionUtils {
 
   public static List<Field> getAnnotatedFields(Class<?> clazz, Class<? extends Annotation> annotationType) {
     return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields()))
-        .filter(field -> field.getAnnotation(annotationType) != null).collect(new ImmutableListCollector<>());
+        .filter(field -> field.getAnnotation(annotationType) != null).collect(toImmutableList());
   }
 
   public static List<Field> getFields(Class<?> clazz) {
     try {
-      return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields()))
-          .collect(new ImmutableListCollector<>());
+      return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields())).collect(toImmutableList());
     } catch (Throwable e) {
-      System.out.println("MONCHO class: " + clazz.getName());
       throw new RuntimeException(e);
     }
   }

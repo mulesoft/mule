@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class NestedProcessorListValueResolver extends AbstractNestedProcessorVal
   @Override
   public List<NestedProcessor> resolve(ValueResolvingContext context) throws MuleException {
     return messageProcessors.stream().map(mp -> toNestedProcessor(mp, context.getEvent(), muleContext))
-        .collect(new ImmutableListCollector<>());
+        .collect(toImmutableList());
   }
 
   @Override

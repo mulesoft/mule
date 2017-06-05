@@ -7,11 +7,11 @@
 package org.mule.test.runner.infrastructure;
 
 import static java.util.Collections.emptyList;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.api.resources.GeneratedResource;
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
 import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
+import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.module.extension.internal.resources.AbstractResourcesGenerator;
 
 import com.google.common.collect.ImmutableList;
@@ -44,7 +44,7 @@ class ExtensionsTestDslResourcesGenerator extends ExtensionsTestLoaderResourcesG
   public List<GeneratedResource> generateFor(ExtensionModel extensionModel) {
     List<GeneratedResource> resources =
         resourceFactories.stream().map(factory -> factory.generateResource(extensionModel, context))
-            .filter(Optional::isPresent).map(Optional::get).collect(new ImmutableListCollector<>());
+            .filter(Optional::isPresent).map(Optional::get).collect(toImmutableList());
 
     resources.forEach(this::write);
     return resources;

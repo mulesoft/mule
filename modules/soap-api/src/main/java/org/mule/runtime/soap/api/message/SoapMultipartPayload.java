@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.soap.api.message;
 
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableMap;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
-import org.mule.runtime.core.util.collection.ImmutableMapCollector;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +42,7 @@ public class SoapMultipartPayload extends DefaultMultiPartPayload {
   public Map<String, Object> getAttachments() {
     return getParts().stream()
         .filter(part -> !getPartName(part).equals(BODY_ATTRIBUTES.getName()))
-        .collect(new ImmutableMapCollector<>(this::getPartName, part -> part.getPayload().getValue()));
+        .collect(toImmutableMap(this::getPartName, part -> part.getPayload().getValue()));
   }
 
   private String getPartName(Message part) {

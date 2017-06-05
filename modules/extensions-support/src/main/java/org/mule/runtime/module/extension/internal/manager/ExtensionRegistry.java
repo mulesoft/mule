@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.manager;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.runtime.api.exception.MuleException;
@@ -18,7 +19,6 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.transformer.simple.StringToEnum;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.ExpirableConfigurationProvider;
@@ -58,7 +58,7 @@ final class ExtensionRegistry {
         @Override
         public Multimap<ConfigurationModel, ConfigurationProvider> load(ExtensionModel key) throws Exception {
           List<ConfigurationProvider> providers = registry.lookupObjects(ConfigurationProvider.class).stream()
-              .filter(provider -> provider.getExtensionModel() == key).collect(new ImmutableListCollector<>());
+              .filter(provider -> provider.getExtensionModel() == key).collect(toImmutableList());
           Multimap multimap = HashMultimap.create();
           providers.forEach(p -> multimap.put(p.getConfigurationModel(), p));
           return multimap;

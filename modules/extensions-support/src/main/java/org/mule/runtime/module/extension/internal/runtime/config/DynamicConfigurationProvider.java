@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -27,7 +28,6 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.Pair;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.ConfigurationStats;
@@ -207,7 +207,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
       return cache.entrySet().stream().filter(entry -> isExpired(entry.getValue())).map(entry -> {
         cache.remove(entry.getKey());
         return entry.getValue();
-      }).collect(new ImmutableListCollector<>());
+      }).collect(toImmutableList());
     } finally {
       cacheWriteLock.unlock();
     }
