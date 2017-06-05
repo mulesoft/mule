@@ -25,6 +25,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Generates the minimal required component set to create a configuration component (i.e.: file:config, ftp:connection, a flow
  * MP). This set is defined by the component dependencies.
@@ -39,6 +42,7 @@ import java.util.Set;
 // TODO MULE-9688 - refactor this class when the ComponentModel becomes immutable
 public class MinimalApplicationModelGenerator {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(MinimalApplicationModelGenerator.class);
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
   private final ApplicationModel applicationModel;
 
@@ -212,7 +216,14 @@ public class MinimalApplicationModelGenerator {
 
     for (String parametersReferencingDependency : parametersReferencingDependencies) {
       if (requestedComponentModel.getParameters().containsKey(parametersReferencingDependency)) {
-        otherDependencies.add(requestedComponentModel.getParameters().get(parametersReferencingDependency));
+        String dependencyName = requestedComponentModel.getParameters().get(parametersReferencingDependency);
+        if (applicationModel.findTopLevelNamedElement(dependencyName).isPresent()) {
+          otherDependencies.add(dependencyName);
+        } else {
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("Ignoring dependency %s because it does not exists", dependencyName));
+          }
+        }
       }
     }
     return otherDependencies;
