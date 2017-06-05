@@ -184,6 +184,15 @@ public interface AllureConstants {
 
   }
 
+  interface ObjectStoreFeature {
+
+    String OS_EXTENSION = "ObjectStore Extension";
+
+    interface ObjectStoreStory {
+    }
+
+  }
+
   interface ProcessingStrategiesFeature {
 
     String PROCESSING_STRATEGIES = "Processing Strategies";
