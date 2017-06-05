@@ -12,8 +12,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
@@ -106,7 +106,7 @@ public final class ExtensionAnnotationProcessor {
     }
     return Stream.of(valueClasses)
         .map(c -> (TypeElement) getElementForClass(annotationValues, c))
-        .collect(new ImmutableListCollector<>());
+        .collect(toImmutableList());
   }
 
   public <T> T getAnnotationFromType(ProcessingEnvironment processingEnvironment, TypeElement rootElement,

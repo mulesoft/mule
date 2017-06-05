@@ -6,7 +6,7 @@
  */
 package org.mule.test.runner.infrastructure;
 
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.internal.resources.AbstractResourcesGenerator;
@@ -55,7 +55,7 @@ class ExtensionsTestLoaderResourcesGenerator extends AbstractResourcesGenerator 
   List<GeneratedResource> dumpAll() {
     List<GeneratedResource> allResources =
         contents.entrySet().stream().map(entry -> new GeneratedResource(entry.getKey(), entry.getValue().toString().getBytes()))
-            .collect(new ImmutableListCollector<>());
+            .collect(toImmutableList());
 
     allResources.forEach(resource -> {
       File targetFile = new File(resource.getPath());

@@ -8,18 +8,18 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.extension.api.annotation.SubTypeMapping;
-import org.mule.runtime.extension.api.annotation.SubTypesMapping;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.extension.api.annotation.SubTypeMapping;
+import org.mule.runtime.extension.api.annotation.SubTypesMapping;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.api.meta.model.ImportedTypeModel;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 
 import java.util.List;
@@ -63,7 +63,7 @@ public final class SubTypesDeclarationEnricher extends AbstractAnnotatedDeclarat
     typeMappings.forEach(mapping -> declarer.withSubTypes(getMetadataType(mapping.baseType(), typeLoader),
                                                           stream(mapping.subTypes())
                                                               .map(subType -> getMetadataType(subType, typeLoader))
-                                                              .collect(new ImmutableListCollector<>())));
+                                                              .collect(toImmutableList())));
   }
 
 }

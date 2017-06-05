@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -27,14 +28,14 @@ public class ImmutableListCollectorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void collect() {
-    List<String> collected = Arrays.asList(items).stream().collect(new ImmutableListCollector<>());
+    List<String> collected = Arrays.asList(items).stream().collect(toImmutableList());
     assertThat(collected, hasSize(items.length));
     assertThat(collected, contains(items));
   }
 
   @Test
   public void emptyList() {
-    List<String> collected = new ArrayList<String>().stream().collect(new ImmutableListCollector<>());
+    List<String> collected = new ArrayList<String>().stream().collect(toImmutableList());
     assertThat(collected, is(notNullValue()));
     assertThat(collected, hasSize(0));
   }

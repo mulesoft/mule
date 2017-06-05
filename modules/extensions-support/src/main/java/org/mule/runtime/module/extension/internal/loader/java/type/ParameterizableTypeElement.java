@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -34,7 +34,7 @@ public interface ParameterizableTypeElement extends Type, WithParameters {
                               Config.class)
                                   .stream()
                                   .distinct()
-                                  .collect(new ImmutableListCollector<>());
+                                  .collect(toImmutableList());
   }
 
   /**
@@ -44,7 +44,7 @@ public interface ParameterizableTypeElement extends Type, WithParameters {
     return getAnnotatedFields(ParameterGroup.class)
         .stream()
         .distinct()
-        .collect(new ImmutableListCollector<>());
+        .collect(toImmutableList());
   }
 
   /**
@@ -54,6 +54,6 @@ public interface ParameterizableTypeElement extends Type, WithParameters {
     return getParameters().stream()
         .filter(field -> field.getAnnotation(annotationClass).isPresent())
         .distinct()
-        .collect(new ImmutableListCollector<>());
+        .collect(toImmutableList());
   }
 }

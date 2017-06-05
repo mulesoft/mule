@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static org.apache.commons.lang.ArrayUtils.isEmpty;
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.toMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
@@ -17,8 +18,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.util.collection.ImmutableMapCollector;
-import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -28,6 +27,7 @@ import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
@@ -40,11 +40,11 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ErrorArgument
 import org.mule.runtime.module.extension.internal.runtime.resolver.FlowListenerArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.LiteralArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MediaTypeArgumentResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.SourceResultArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SecurityContextHandlerArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SourceCallbackContextArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.SourceResultArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelperArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueArgumentResolver;
 
@@ -217,6 +217,6 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         .map(group -> group.getModelProperty(ParameterGroupModelProperty.class)
             .map(ParameterGroupModelProperty::getDescriptor).orElse(null))
         .filter(group -> group != null && group.getContainer() instanceof Parameter)
-        .collect(new ImmutableMapCollector<>(group -> (Parameter) group.getContainer(), ParameterGroupArgumentResolver::new));
+        .collect(toImmutableMap(group -> (Parameter) group.getContainer(), ParameterGroupArgumentResolver::new));
   }
 }

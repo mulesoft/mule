@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -14,7 +15,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -85,7 +85,7 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
     return resolverSet.getResolvers().keySet().stream().map(parameterName -> {
       // if no field, then it means this is a group attribute
       return getField(prototypeClass, parameterName).map(f -> new SingleValueSetter(parameterName, f));
-    }).filter(Optional::isPresent).map(Optional::get).collect(new ImmutableListCollector<>());
+    }).filter(Optional::isPresent).map(Optional::get).collect(toImmutableList());
   }
 
   private void setValues(Object target, ResolverSetResult result, List<ValueSetter> setters) throws MuleException {
