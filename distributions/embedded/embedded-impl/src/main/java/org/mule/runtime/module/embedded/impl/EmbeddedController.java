@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.module.embedded.impl;
 
-import static java.io.File.separator;
-import static java.lang.String.format;
 import static java.lang.System.setProperty;
+import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
@@ -21,9 +20,9 @@ import static org.mule.runtime.module.embedded.internal.MavenUtils.createModelFr
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.container.api.MuleFoldersUtil;
-import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
@@ -31,14 +30,12 @@ import org.mule.runtime.module.embedded.api.ContainerInfo;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
+import net.lingala.zip4j.core.ZipFile;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.maven.model.Model;
+import org.apache.logging.log4j.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +54,7 @@ public class EmbeddedController {
   private ContainerInfo containerInfo;
   private Application application;
   private ArtifactClassLoader containerClassLoader;
+  private MuleArtifactResourcesRegistry artifactResourcesRegistry;
 
   public EmbeddedController(byte[] serializedContainerInfo, byte[] serializedAppConfiguration)
       throws IOException, ClassNotFoundException {
@@ -90,10 +88,13 @@ public class EmbeddedController {
       setProperty(ADD_TEST_DEPENDENCIES_KEY, "true");
     }
 
-    List<String> configResources = new ArrayList<>();
-    org.mule.runtime.module.embedded.api.Application application = applicationConfiguration.getApplication();
-    for (URI uri : application.getConfigs()) {
-      configResources.add(uri.toURL().toString());
+    File applicationLocation = applicationConfiguration.getApplicationLocation();
+    File appsFolder = new File(MuleFoldersUtil.getAppsFolder().getAbsolutePath());
+    File deploymentApplicationLocation = new File(appsFolder, applicationLocation.getName().replace(".jar", ""));
+    if (applicationLocation.getName().endsWith(".jar")) {
+      new ZipFile(applicationLocation).extractAll(appsFolder.getAbsolutePath());
+    } else {
+      copyDirectory(applicationLocation, deploymentApplicationLocation);
     }
 
     File containerFolder = new File(containerInfo.getContainerBaseFolder().getPath());
@@ -104,15 +105,11 @@ public class EmbeddedController {
       copyFile(originalFile, destinationFile);
     }
 
-    File applicationFolder = createApplicationStructure();
-
-    containerClassLoader =
-        new ContainerClassLoaderFactory().createContainerClassLoader(Thread.currentThread().getContextClassLoader());
+    artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
+    containerClassLoader = this.artifactResourcesRegistry.getContainerClassLoader();
 
     executeWithinContainerClassLoader(() -> {
       try {
-        MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
-
         try {
           artifactResourcesRegistry.getServiceManager().start();
           artifactResourcesRegistry.getExtensionModelLoaderManager().start();
@@ -121,10 +118,7 @@ public class EmbeddedController {
         }
 
         ApplicationDescriptor applicationDescriptor =
-            artifactResourcesRegistry.getApplicationDescriptorFactory().create(applicationFolder);
-        applicationDescriptor.setConfigResources(configResources);
-        applicationDescriptor.setAbsoluteResourcePaths(configResources.toArray(new String[0]));
-
+            artifactResourcesRegistry.getApplicationDescriptorFactory().create(deploymentApplicationLocation);
         artifactResourcesRegistry.getDomainFactory().createArtifact(createDefaultDomainDir());
 
         this.application = artifactResourcesRegistry.getApplicationFactory().createAppFrom(applicationDescriptor);
@@ -146,29 +140,13 @@ public class EmbeddedController {
     }
   }
 
-  private File createApplicationStructure() throws IOException {
-    File applicationFolder = new File(MuleFoldersUtil.getAppsFolder(), "app");
-    applicationFolder.mkdirs();
-    File muleArtifactFolder = new File(applicationFolder, "META-INF/mule-artifact");
-    muleArtifactFolder.mkdirs();
-    File descriptorFile = new File(muleArtifactFolder, "mule-application.json");
-
-    File pomFile = toFile(applicationConfiguration.getApplication().getPomFile());
-    Model pomModel = createModelFromPom(pomFile);
-    String pomLocation = format("META-INF%smaven%s%s%s%s%spom.xml", separator, separator, pomModel.getGroupId(), separator,
-                                pomModel.getArtifactId(), separator);
-    File appPomFileLocation = new File(applicationFolder, pomLocation);
-    copyFile(toFile(applicationConfiguration.getApplication().getDescriptorFile()), descriptorFile);
-    copyFile(pomFile, appPomFileLocation);
-    return applicationFolder;
-  }
-
   /**
    * Invoked by reflection
    */
   public void stop() {
     executeWithinContainerClassLoader(() -> {
       deleteTree(new File(containerInfo.getContainerBaseFolder().getPath()));
+      Domain domain = application.getDomain();
       try {
         application.stop();
       } catch (Exception e) {
@@ -182,6 +160,9 @@ public class EmbeddedController {
         LOGGER.debug("failure disposing application", e);
       }
     });
+    LogManager.shutdown();
+    org.apache.log4j.LogManager.shutdown();
+    artifactResourcesRegistry = null;
   }
 
   private void setUpEnvironment() {
