@@ -18,6 +18,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
@@ -186,8 +187,8 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
     }
 
     @Override
-    public void onTerminate(Either<Event, MessagingException> exception) throws Exception {
-      Event event = exception.isLeft() ? exception.getLeft() : exception.getRight().getEvent();
+    public void onTerminate(Either<MessagingException, Event> result) throws Exception {
+      Event event = result.isRight() ? result.getRight() : result.getLeft().getEvent();
       onTerminateExecutor.execute(event, emptyMap(), context);
     }
 
