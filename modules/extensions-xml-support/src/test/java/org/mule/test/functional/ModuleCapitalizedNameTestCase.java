@@ -24,7 +24,7 @@ public class ModuleCapitalizedNameTestCase extends AbstractXmlExtensionMuleArtif
   }
 
   @Test
-  public void testSetPayloadUsingContent() throws Exception {
+  public void testSetPayloadHardcoded() throws Exception {
     final Event muleEvent = flowRunner("testSetPayloadHardcodedFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("hardcoded value"));
   }

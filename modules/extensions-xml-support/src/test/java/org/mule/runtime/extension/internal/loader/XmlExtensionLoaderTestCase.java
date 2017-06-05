@@ -140,7 +140,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getMinMuleVersion(), is(DEFAULT_MIN_MULE_VERSION));
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
-    assertThat(extensionModel.getOperationModels().size(), is(1));
+    assertThat(extensionModel.getOperationModels().size(), is(3));
 
     Optional<OperationModel> operationModel = extensionModel.getOperationModel("operation-with-custom-types");
     assertThat(operationModel.isPresent(), is(true));
@@ -172,7 +172,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getMinMuleVersion(), is(DEFAULT_MIN_MULE_VERSION));
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
-    assertThat(extensionModel.getOperationModels().size(), is(1));
+    assertThat(extensionModel.getOperationModels().size(), is(2));
 
     Optional<OperationModel> operationModel = extensionModel.getOperationModel("operation-with-custom-types");
     assertThat(operationModel.isPresent(), is(true));

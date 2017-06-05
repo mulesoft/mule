@@ -10,9 +10,9 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
+import static org.mule.runtime.core.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
@@ -52,11 +52,11 @@ import java.util.stream.Collectors;
  */
 public class MacroExpansionModuleModel {
 
-  /**
-   * literal that represents the name of the global element for any given module. If the module's name is math, then the value of
-   * this field will name the global element as <math:config ../>
-   */
-  private static final String MODULE_CONFIG_GLOBAL_ELEMENT_NAME = "config";
+  //  /**
+  //   * literal that represents the name of the global element for any given module. If the module's name is math, then the value of
+  //   * this field will name the global element as <math:config ../>
+  //   */
+  //  private static final String MODULE_CONFIG_GLOBAL_ELEMENT_NAME = "config";
   private static final String MODULE_OPERATION_CONFIG_REF = "config-ref";
   /**
    * Used to obtain the {@link ComponentIdentifier} element from the <module/>'s original {@ink ComponentModel} to be later added
@@ -239,7 +239,8 @@ public class MacroExpansionModuleModel {
     processorChainBuilder
         .setIdentifier(builder().withNamespace(CORE_PREFIX).withName("module-operation-chain").build());
 
-    processorChainBuilder.addParameter("returnsVoid", String.valueOf(isVoid(operationModel.getOutput().getType())), false);
+    processorChainBuilder.addParameter("moduleName", extensionModel.getXmlDslModel().getPrefix(), false);
+    processorChainBuilder.addParameter("moduleOperation", operationModel.getName(), false);
     Map<String, String> propertiesMap = extractProperties(operationRefModel, extensionModel);
     Map<String, String> parametersMap = extractParameters(operationRefModel, operationModel.getAllParameterModels());
     ComponentModel propertiesComponentModel =

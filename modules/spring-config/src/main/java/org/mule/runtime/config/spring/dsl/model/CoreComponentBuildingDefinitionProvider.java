@@ -1681,7 +1681,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withWrapperIdentifier("module-operation-properties").build())
         .withSetterParameterDefinition("parameters", fromChildMapConfiguration(String.class, String.class)
             .withWrapperIdentifier("module-operation-parameters").build())
-        .withSetterParameterDefinition("returnsVoid", fromSimpleParameter("returnsVoid").build())
+        .withSetterParameterDefinition("moduleName", fromSimpleParameter("moduleName").build())
+        .withSetterParameterDefinition("moduleOperation", fromSimpleParameter("moduleOperation").build())
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asPrototype().build());
 

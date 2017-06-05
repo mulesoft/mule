@@ -12,13 +12,25 @@ import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+import org.mule.metadata.api.model.MetadataFormat;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.utils.MetadataTypeUtils;
+import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.util.Pair;
 import org.reactivestreams.Publisher;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,11 +49,11 @@ import java.util.stream.Collectors;
  * variable under "person" with a value of "stranger!", the result of executing the above processor will be "howdy stranger!":
  * 
  * <pre>
- *  <module-operation-chain returnsVoid="false">
+ *  <module-operation-chain moduleName="a-module-name" moduleOperation="an-operation-name">
  *    <module-operation-properties/>
  *    <module-operation-parameters>
  *      <module-operation-parameter-entry value="howdy" key="value1"/>
- *      <module-operation-parameter-entry value="#[mel:flowVars.person]" key="value2"/>
+ *      <module-operation-parameter-entry value="#[variables.person]" key="value2"/>
  *    </module-operation-parameters>
  *    <set-payload value="#[param.value1 ++ param.value2]"/>
  * </module-operation-chain>
@@ -49,17 +61,26 @@ import java.util.stream.Collectors;
  */
 public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessageProcessorChainBuilder {
 
+  /**
+   * literal that represents the name of the global element for any given module. If the module's name is math, then the value of
+   * this field will name the global element as <math:config ../>
+   */
+  public static final String MODULE_CONFIG_GLOBAL_ELEMENT_NAME = "config";
+
   private Map<String, String> properties;
   private Map<String, String> parameters;
-  private boolean returnsVoid;
+  private ExtensionModel extensionModel;
+  private OperationModel operationModel;
   private ExpressionManager expressionManager;
 
   public ModuleOperationMessageProcessorChainBuilder(Map<String, String> properties,
-                                                     Map<String, String> parameters, boolean returnsVoid,
+                                                     Map<String, String> parameters,
+                                                     ExtensionModel extensionModel, OperationModel operationModel,
                                                      ExpressionManager expressionManager) {
     this.properties = properties;
     this.parameters = parameters;
-    this.returnsVoid = returnsVoid;
+    this.extensionModel = extensionModel;
+    this.operationModel = operationModel;
     this.expressionManager = expressionManager;
   }
 
@@ -67,7 +88,8 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
   protected MessageProcessorChain createInterceptingChain(Processor head, List<Processor> processors,
                                                           List<Processor> processorForLifecycle) {
     return new ModuleOperationProcessorChain("wrapping-operation-module-chain", head, processors, processorForLifecycle,
-                                             properties, parameters, returnsVoid,
+                                             properties, parameters,
+                                             extensionModel, operationModel,
                                              expressionManager);
   }
 
@@ -77,8 +99,8 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
   static class ModuleOperationProcessorChain extends ExplicitMessageProcessorChain
       implements Processor {
 
-    private Map<String, String> properties;
-    private Map<String, String> parameters;
+    private Map<String, Pair<String, MetadataType>> properties;
+    private Map<String, Pair<String, MetadataType>> parameters;
     private boolean returnsVoid;
     private ExpressionManager expressionManager;
     private Optional<String> target;
@@ -86,14 +108,39 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
     ModuleOperationProcessorChain(String name, Processor head, List<Processor> processors,
                                   List<Processor> processorsForLifecycle,
                                   Map<String, String> properties, Map<String, String> parameters,
-                                  boolean returnsVoid,
+                                  ExtensionModel extensionModel, OperationModel operationModel,
                                   ExpressionManager expressionManager) {
       super(name, head, processors, processorsForLifecycle);
-      this.properties = properties;
+      final List<ParameterModel> propertiesModels =
+          extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()
+              ? extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).get().getAllParameterModels()
+              : Collections.EMPTY_LIST;
+      this.properties = parseParameters(properties, propertiesModels);
       this.target = parameters.containsKey(TARGET_PARAMETER_NAME) ? of(parameters.remove(TARGET_PARAMETER_NAME)) : empty();
-      this.parameters = parameters;
-      this.returnsVoid = returnsVoid;
+      this.parameters = parseParameters(parameters, operationModel.getAllParameterModels());
+      this.returnsVoid = MetadataTypeUtils.isVoid(operationModel.getOutput().getType());
       this.expressionManager = expressionManager;
+    }
+
+    /**
+     * To properly feed the {@link ExpressionManager#evaluate(String, DataType, BindingContext, Event)} we need to store the {@link MetadataType}
+     * per parameter, so that the {@link DataType} can be generated.
+     * @param parameters list of parameters taken from the XML
+     * @param parameterModels collection of elements taken from the matching {@link ExtensionModel}
+     * @return a collection of parameters to be later consumed in {@link #getEvaluatedValue(Event, String, MetadataType)}
+     */
+    private Map<String, Pair<String, MetadataType>> parseParameters(Map<String, String> parameters,
+                                                                    List<ParameterModel> parameterModels) {
+      final HashMap<String, Pair<String, MetadataType>> result = new HashMap<>();
+
+      for (ParameterModel parameterModel : parameterModels) {
+        final String parameterName = parameterModel.getName();
+        if (parameters.containsKey(parameterName)) {
+          final String xmlValue = parameters.get(parameterName);
+          result.put(parameterName, new Pair<>(xmlValue, parameterModel.getType()));
+        }
+      }
+      return result;
     }
 
     /**
@@ -144,16 +191,30 @@ public class ModuleOperationMessageProcessorChainBuilder extends ExplicitMessage
       return builder.build();
     }
 
-    private Map<String, Object> evaluateParameters(Event event, Map<String, String> unevaluatedMap) {
+    private Map<String, Object> evaluateParameters(Event event, Map<String, Pair<String, MetadataType>> unevaluatedMap) {
       return unevaluatedMap.entrySet().stream()
           .collect(Collectors.toMap(Map.Entry::getKey,
-                                    entry -> getEvaluatedValue(event, entry.getValue())));
+                                    entry -> expressionManager.isExpression(entry.getValue().getFirst())
+                                        ? getEvaluatedValue(event, entry.getValue().getFirst(), entry.getValue().getSecond())
+                                        : entry.getValue().getFirst()));
     }
 
-    private Object getEvaluatedValue(Event event, String value) {
-      return expressionManager.isExpression(value)
-          ? expressionManager.evaluate(value, event, flowConstruct).getValue()
-          : value;
+    private Object getEvaluatedValue(Event event, String value, MetadataType metadataType) {
+      Object evaluatedResult;
+      if (metadataType.getMetadataFormat().getValidMimeTypes().contains(MetadataFormat.JAVA)) {
+        evaluatedResult = expressionManager.evaluate(value, event, flowConstruct).getValue();
+      } else {
+        final String mediaType = metadataType.getMetadataFormat().getValidMimeTypes().iterator().next();
+        final DataType expectedOutputType =
+            DataType.builder()
+                .type(String.class)
+                .mediaType(mediaType)
+                .charset(StandardCharsets.UTF_8)
+                .build();
+        evaluatedResult = expressionManager
+            .evaluate(value, expectedOutputType, BindingContext.builder().build(), event, flowConstruct, false).getValue();
+      }
+      return evaluatedResult;
     }
   }
 }

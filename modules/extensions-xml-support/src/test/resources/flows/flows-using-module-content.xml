@@ -8,26 +8,26 @@
 
     <flow name="testSetPayloadUsingContent">
         <module-content:set-payload-using-content-parameter>
-            <module-content:content>#[{ "smart" : "connector" }]</module-content:content>
+            <module-content:content>#['smart' ++ ' connector content']</module-content:content>
         </module-content:set-payload-using-content-parameter>
     </flow>
 
     <flow name="testSetPayloadUsingContentAndSimpleParameter">
         <module-content:set-payload-using-content-and-simple-parameter parameter1="value from attribute">
-            <module-content:content>#[{ "smart" : "connector" }]</module-content:content>
+            <module-content:content>#['smart' ++ ' connector content']</module-content:content>
         </module-content:set-payload-using-content-and-simple-parameter>
     </flow>
 
     <flow name="testSetPayloadUsingPrimary">
         <module-content:set-payload-using-primary-parameter>
-            <module-content:primary>#[{ "smart2" : "connector2" }]</module-content:primary>
+            <module-content:primary>#['smart' ++ ' connector primary']</module-content:primary>
         </module-content:set-payload-using-primary-parameter>
     </flow>
 
     <flow name="testSetPayloadUsingContentAndPrimaryAndSimpleParameter">
         <module-content:set-payload-using-content-and-primary-and-simple-parameter parameter1="value from attribute">
-            <module-content:content>#[{ "smart" : "connector" }]</module-content:content>
-            <module-content:primary>#[{ "smart2" : "connector2" }]</module-content:primary>
+            <module-content:content>#['smart' ++ ' connector content']</module-content:content>
+            <module-content:primary>#['smart' ++ ' connector primary']</module-content:primary>
         </module-content:set-payload-using-content-and-primary-and-simple-parameter>
     </flow>
 </mule>

@@ -18,4 +18,23 @@
         <output type="Type2"/>
     </operation>
 
+    <operation name="is-jsontype1">
+        <parameters>
+            <parameter name="aParameter" type="Type1"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[parameters.aParameter as String]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="is-jsontype2">
+        <parameters>
+            <parameter name="aParameter" type="Type2"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[parameters.aParameter as String]"/>
+        </body>
+        <output type="string"/>
+    </operation>
 </module>
