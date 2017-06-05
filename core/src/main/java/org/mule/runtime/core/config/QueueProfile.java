@@ -7,18 +7,11 @@
 
 package org.mule.runtime.core.config;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.api.store.QueueStore;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.queue.DefaultQueueConfiguration;
-import org.mule.runtime.core.util.queue.DelegateQueueManager;
 import org.mule.runtime.core.util.queue.QueueConfiguration;
 import org.mule.runtime.core.util.queue.QueueManager;
-
-import java.io.Serializable;
 
 /**
  * <code>QueueProfile</code> determines how an internal queue for a service will behave
@@ -26,34 +19,23 @@ import java.io.Serializable;
 public class QueueProfile {
 
   private int maxOutstandingMessages = 0;
-  private QueueStore<Serializable> objectStore;
+  private boolean persistent;
 
   public static QueueProfile newInstancePersistingToDefaultMemoryQueueStore(MuleContext muleContext) {
-    return newInstance(MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME, muleContext);
+    return new QueueProfile(false);
   }
 
   public static QueueProfile newInstanceWithPersistentQueueStore(MuleContext muleContext) {
-    return newInstance(MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME, muleContext);
+    return new QueueProfile(true);
   }
 
-  private static QueueProfile newInstance(String objectStoreKey, MuleContext muleContext) {
-    QueueStore<Serializable> objectStore = muleContext.getRegistry().lookupObject(objectStoreKey);
-    return new QueueProfile(objectStore);
+  public QueueProfile(boolean persistent) {
+    this.persistent = persistent;
   }
 
-  public QueueProfile(QueueStore<Serializable> objectStore) {
-    this.objectStore = objectStore;
-  }
-
-  // TODO DO: is this ctor required at all? It's not used anywhere in the code base
-  public QueueProfile(QueueProfile queueProfile) {
-    this.maxOutstandingMessages = queueProfile.getMaxOutstandingMessages();
-    this.objectStore = queueProfile.objectStore;
-  }
-
-  public QueueProfile(int maxOutstandingMessages, QueueStore<Serializable> objectStore) {
+  public QueueProfile(int maxOutstandingMessages, boolean persistent) {
     this.maxOutstandingMessages = maxOutstandingMessages;
-    this.objectStore = objectStore;
+    this.persistent = persistent;
   }
 
   /**
@@ -76,35 +58,13 @@ public class QueueProfile {
 
   public QueueConfiguration configureQueue(MuleContext context, String component, QueueManager queueManager)
       throws InitialisationException {
-    QueueConfiguration qc = toQueueConfiguration(context);
+    QueueConfiguration qc = new DefaultQueueConfiguration(maxOutstandingMessages, persistent);
     queueManager.setQueueConfiguration(component, qc);
     return qc;
   }
 
-  public QueueConfiguration toQueueConfiguration(MuleContext context) {
-    if (objectStore instanceof MuleContextAware) {
-      ((MuleContextAware) objectStore).setMuleContext(context);
-    }
-    if (DelegateQueueManager.isOldModeEnabled()) {
-      return new org.mule.runtime.core.util.queue.objectstore.QueueConfiguration(context, maxOutstandingMessages, objectStore);
-    }
-    return new DefaultQueueConfiguration(maxOutstandingMessages, objectStore.isPersistent());
-  }
-
-  public ListableObjectStore<Serializable> getObjectStore() {
-    return objectStore;
-  }
-
-  public void setQueueStore(QueueStore<Serializable> objectStore) {
-    this.objectStore = objectStore;
-  }
-
-  public void addQueueStore(QueueStore<Serializable> objectStore) {
-    this.objectStore = objectStore;
-  }
-
   @Override
   public String toString() {
-    return "QueueProfile{maxOutstandingMessage=" + maxOutstandingMessages + ", storeType=" + objectStore.getClass() + "}";
+    return "QueueProfile{maxOutstandingMessage=" + maxOutstandingMessages + ", persistent=" + persistent + "}";
   }
 }

@@ -47,6 +47,9 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -62,9 +65,6 @@ import java.util.function.Consumer;
 
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.w3c.dom.Node;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -107,7 +107,6 @@ public class ApplicationModel {
   public static final String FILTER_ELEMENT_SUFFIX = "-filter";
   public static final String PROCESSING_STRATEGY_ATTRIBUTE = "processingStrategy";
   public static final String PROCESSING_STRATEGY_FACTORY_ATTRIBUTE = "processingStrategyFactory";
-  public static final String QUEUE_STORE = "queue-store";
   public static final String CONFIGURATION_ELEMENT = "configuration";
   public static final String DATA_WEAVE = "weave";
   public static final String CUSTOM_TRANSFORMER = "custom-transformer";
@@ -172,8 +171,6 @@ public class ApplicationModel {
       builder().withNamespace(CORE_PREFIX).withName(PROCESSOR_REFERENCE_ELEMENT).build();
   public static final ComponentIdentifier TRANSFORMER_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(TRANSFORMER_REFERENCE_ELEMENT).build();
-  public static final ComponentIdentifier QUEUE_STORE_IDENTIFIER =
-      builder().withNamespace(CORE_PREFIX).withName(QUEUE_STORE).build();
   public static final ComponentIdentifier CONFIGURATION_IDENTIFIER =
       builder().withNamespace(CORE_PREFIX).withName(CONFIGURATION_ELEMENT).build();
   public static final ComponentIdentifier CUSTOM_TRANSFORMER_IDENTIFIER =

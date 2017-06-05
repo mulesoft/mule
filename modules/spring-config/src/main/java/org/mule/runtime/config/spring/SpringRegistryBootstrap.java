@@ -7,14 +7,16 @@
 package org.mule.runtime.config.spring;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.config.spring.factories.BootstrapObjectFactoryBean;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.registry.RegistryProvider;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -137,6 +139,7 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
 
     if (BootstrapObjectFactory.class.isAssignableFrom(clazz)) {
       final Object value = bootstrapProperty.getService().instantiateClass(bootstrapProperty.getClassName());
+      setMuleContextIfNeeded(value, muleContext);
       builder = BeanDefinitionBuilder.rootBeanDefinition(BootstrapObjectFactoryBean.class);
       builder.addConstructorArgValue(value);
     } else {

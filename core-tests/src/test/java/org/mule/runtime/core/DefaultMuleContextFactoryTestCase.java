@@ -22,7 +22,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_SIMPLE
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME;
-import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -199,7 +198,6 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     assertNotNull(context.getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
     assertNotNull(context.getRegistry().lookupObject(OBJECT_SECURITY_MANAGER));
     assertNotNull(context.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
-    assertNotNull(context.getRegistry().lookupObject(QUEUE_STORE_DEFAULT_IN_MEMORY_NAME));
   }
 
   private void assertNoDefaults(MuleContext context) {
@@ -207,7 +205,6 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     assertNull(context.getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
     assertNull(context.getRegistry().lookupObject(OBJECT_SECURITY_MANAGER));
     assertNull(context.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
-    assertNull(context.getRegistry().lookupObject(QUEUE_STORE_DEFAULT_IN_MEMORY_NAME));
     assertNull(context.getRegistry().lookupObject(OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
   }
 

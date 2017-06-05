@@ -9,10 +9,7 @@ package org.mule.runtime.config.spring.handlers;
 import org.mule.runtime.config.spring.factories.AggregationStrategyDefinitionParser;
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.CompositeMessageSourceFactoryBean;
-import org.mule.runtime.config.spring.factories.DefaultMemoryQueueStoreFactoryBean;
-import org.mule.runtime.config.spring.factories.DefaultPersistentQueueStoreFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
-import org.mule.runtime.config.spring.factories.QueueProfileFactoryBean;
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SchedulingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
@@ -62,7 +59,6 @@ import org.mule.runtime.config.spring.parsers.specific.NotificationDefinitionPar
 import org.mule.runtime.config.spring.parsers.specific.NotificationDisableDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.PoolingProfileDefinitionParser;
-import org.mule.runtime.config.spring.parsers.specific.QueueStoreDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ReferenceExceptionStrategyDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.RegExFilterDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.ResponseDefinitionParser;
@@ -123,7 +119,6 @@ import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
 import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
 import org.mule.runtime.core.retry.policies.RetryForeverPolicyTemplate;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
-import org.mule.runtime.core.routing.Splitter;
 import org.mule.runtime.core.routing.FirstSuccessful;
 import org.mule.runtime.core.routing.Foreach;
 import org.mule.runtime.core.routing.IdempotentMessageValidator;
@@ -133,6 +128,7 @@ import org.mule.runtime.core.routing.MessageChunkSplitter;
 import org.mule.runtime.core.routing.Resequencer;
 import org.mule.runtime.core.routing.RoundRobin;
 import org.mule.runtime.core.routing.SimpleCollectionAggregator;
+import org.mule.runtime.core.routing.Splitter;
 import org.mule.runtime.core.routing.UntilSuccessful;
 import org.mule.runtime.core.routing.WireTap;
 import org.mule.runtime.core.routing.filters.EqualsFilter;
@@ -222,16 +218,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerBeanDefinitionParser("reconnect-custom-notifier", new RetryNotifierDefinitionParser());
 
     // Queue Store
-    registerMuleBeanDefinitionParser("queue-store", new ParentDefinitionParser())
-        .addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "queue-store");
-    registerMuleBeanDefinitionParser("custom-queue-store", new QueueStoreDefinitionParser()).addIgnored("name");
-    registerBeanDefinitionParser("default-in-memory-queue-store",
-                                 new QueueStoreDefinitionParser(DefaultMemoryQueueStoreFactoryBean.class));
-    registerBeanDefinitionParser("default-persistent-queue-store",
-                                 new QueueStoreDefinitionParser(DefaultPersistentQueueStoreFactoryBean.class));
-
     registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());
-    registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfileFactoryBean.class));
     registerMuleBeanDefinitionParser("notifications", new NamedDefinitionParser(MuleProperties.OBJECT_NOTIFICATION_MANAGER))
         .addAlias("dynamic", "notificationDynamic");
     registerBeanDefinitionParser("notification", new NotificationDefinitionParser());

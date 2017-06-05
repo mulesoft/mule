@@ -141,7 +141,6 @@
             <xsd:element ref="invoke"/>
             <xsd:element ref="set-payload"/>
             <xsd:element ref="abstract-global-intercepting-message-processor"/>
-            <xsd:element ref="custom-queue-store" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="abstract-processing-strategy" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
     </xsd:group>
@@ -302,80 +301,6 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:element name="abstract-queue-store" abstract="true" type="abstractQueueStoreType">
-        <xsd:annotation>
-            <xsd:documentation>
-                A placeholder for queue store elements.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="abstractQueueStoreType" abstract="true">
-        <xsd:complexContent>
-            <xsd:extension base="annotatedType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-    <xsd:complexType name="defaultQueueStoreType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractQueueStoreType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="queue-store" type="refQueueStoreType" substitutionGroup="abstract-queue-store">
-        <xsd:annotation>
-            <xsd:documentation>
-                A reference to a queue store defined elsewhere.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="refQueueStoreType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractQueueStoreType">
-                <xsd:attribute name="ref" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name of the queue store to use.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="custom-queue-store" type="customQueueStoreType" substitutionGroup="abstract-queue-store"/>
-    <xsd:complexType name="customQueueStoreType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractQueueStoreType">
-                <xsd:sequence>
-                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-                <xsd:attribute name="class" type="substitutableClass" use="required"/>
-                <xsd:attribute name="name" type="substitutableName" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the store in the registry.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="default-in-memory-queue-store" type="defaultQueueStoreType" substitutionGroup="abstract-queue-store">
-        <xsd:annotation>
-            <xsd:documentation>
-                The default in-memory queue store for the application.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="default-persistent-queue-store" type="defaultQueueStoreType" substitutionGroup="abstract-queue-store">
-        <xsd:annotation>
-            <xsd:documentation>
-                The default persistent queue store for the application.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
 
     <!-- Message Processors -->
     <xsd:element name="abstract-message-processor" abstract="true" type="abstractMessageProcessorType">
@@ -1295,15 +1220,6 @@
             <xsd:enumeration value="ROUTING"/>
         </xsd:restriction>
     </xsd:simpleType>
-
-    <xsd:element name="abstract-queue-profile" abstract="true" type="abstractQueueProfileType">
-        <xsd:annotation>
-            <xsd:documentation>
-                A placeholder for a queue profile, which controls how messages are queued.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="abstractQueueProfileType"/>
 
     <!-- to give a cleaner config we allow either a set or an individual entry (but not both).-->
     <xsd:group name="entryPointResolvers">
@@ -3604,36 +3520,6 @@
     <!--==============================================================-->
     <!--   Shared elements                                             -->
     <!--==============================================================-->
-
-    <xsd:element name="queue-profile" type="queueProfileType" substitutionGroup="abstract-queue-profile">
-        <xsd:annotation>
-            <xsd:documentation>
-                Specifies the properties of an internal Mule queue. Internal queues are used to queue messages for each component managed by Mule.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="queueProfileType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractQueueProfileType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-queue-store" minOccurs="0">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The queue store that stortes the queue's elements.  If not specified, this will be the default-in-memory-queue-store.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attribute name="maxOutstandingMessages" type="substitutableInt">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Defines the maximum number of messages that can be queued.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:element name="abstract-security-manager" type="abstractSecurityManagerType" abstract="true">
         <xsd:annotation>

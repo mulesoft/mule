@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.util;
 
 import static java.lang.String.format;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -16,7 +17,9 @@ import java.util.Objects;
  * @param <K> the type of the first element.
  * @param <V> the type of the second element.
  */
-public final class Pair<K, V> {
+public final class Pair<K, V> implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   /**
    * Key of this {@link Pair}.
@@ -31,7 +34,7 @@ public final class Pair<K, V> {
   /**
    * Creates a new pair
    *
-   * @param first  The first element of this pair
+   * @param first The first element of this pair
    * @param second The second element of this pair
    */
   public Pair(K first, V second) {

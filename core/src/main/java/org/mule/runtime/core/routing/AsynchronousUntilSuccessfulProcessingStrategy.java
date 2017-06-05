@@ -11,11 +11,10 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
+import static org.mule.runtime.core.api.util.StringUtils.DASH;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STARTED;
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
-import static org.mule.runtime.core.api.util.StringUtils.DASH;
-import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -39,7 +38,6 @@ import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
-import org.mule.runtime.core.util.queue.objectstore.QueueKey;
 
 import java.io.Serializable;
 
@@ -211,7 +209,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     keyBuilder.append(muleContext.getClusterId());
     keyBuilder.append(DASH);
     keyBuilder.append(flow);
-    return new QueueKey(DEFAULT_QUEUE_STORE, keyBuilder.toString());
+    return keyBuilder.toString();
   }
 
   private void abandonRetries(final Event event, final Event mutableEvent, final Exception lastException) {

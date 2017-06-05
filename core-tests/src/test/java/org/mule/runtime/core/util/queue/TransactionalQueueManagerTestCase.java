@@ -42,8 +42,7 @@ public class TransactionalQueueManagerTestCase extends AbstractMuleContextTestCa
 
   @Test
   public void doNotCreateTwiceTheSameRecoveryQueue() {
-    TransactionalQueueManager queueManager =
-        (TransactionalQueueManager) ((DelegateQueueManager) muleContext.getQueueManager()).getDelegate();
+    TransactionalQueueManager queueManager = (TransactionalQueueManager) muleContext.getQueueManager();
     final RecoverableQueueStore recoryQueue = queueManager.getRecoveryQueue(TEST_QUEUE_NAME);
     assertThat(recoryQueue, is(queueManager.getRecoveryQueue(TEST_QUEUE_NAME)));
   }

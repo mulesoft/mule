@@ -17,14 +17,14 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAU
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -72,23 +72,6 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase {
 
     partition1.clear();
     assertEquals("value2", partition2.retrieve("key2"));
-  }
-
-  @Test
-  public void testPersistentStore() throws ObjectStoreException, InterruptedException, RegistrationException {
-    QueuePersistenceObjectStore<String> queueStore = new QueuePersistenceObjectStore<String>(muleContext);
-    queueStore.open();
-    muleContext.getRegistry().registerObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME, queueStore);
-    ObjectStoreManager manager = muleContext.getRegistry().lookupObject(OBJECT_STORE_MANAGER);
-    ListableObjectStore<String> store = manager.getObjectStore("persistencePart1", true);
-    assertTrue(store instanceof PartitionedObjectStoreWrapper);
-    ObjectStore<String> baseStore = ((PartitionedObjectStoreWrapper<String>) store).getBaseStore();
-    assertTrue(baseStore instanceof QueuePersistenceObjectStore);
-    assertSame(baseStore, muleContext.getRegistry().lookupObject(OBJECT_STORE_DEFAULT_PERSISTENT_NAME));
-    testObjectStore(store);
-    testObjectStoreExpiry(manager, manager.<ObjectStore<String>>getObjectStore("persistenceExpPart1", true, -1, 500, 200));
-    testObjectStoreMaxEntries(manager,
-                              manager.<ListableObjectStore<String>>getObjectStore("persistenceMaxPart1", true, 10, 10000, 200));
   }
 
   @Test
