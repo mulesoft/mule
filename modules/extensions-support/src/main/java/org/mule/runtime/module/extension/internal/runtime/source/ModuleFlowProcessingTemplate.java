@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.core.api.functional.Either.left;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
@@ -21,10 +22,10 @@ import org.mule.runtime.core.util.func.CheckedConsumer;
 import org.mule.runtime.core.util.func.CheckedFunction;
 import org.mule.runtime.core.util.func.CheckedRunnable;
 
-import org.reactivestreams.Publisher;
-
 import java.util.Map;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTemplate {
 
@@ -82,10 +83,10 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   }
 
   @Override
-  public void sendAfterTerminateResponseToClient(Either<Event, MessagingException> either) {
-    either.apply((CheckedConsumer<Event>) event -> completionHandler.onTerminate(either),
-                 (CheckedConsumer<MessagingException>) messagingException -> completionHandler
-                     .onTerminate(right(messagingException)));
+  public void sendAfterTerminateResponseToClient(Either<MessagingException, Event> either) {
+    either.apply((CheckedConsumer<MessagingException>) messagingException -> completionHandler
+                     .onTerminate(left(messagingException)),
+                 (CheckedConsumer<Event>) event -> completionHandler.onTerminate(either));
   }
 
   private void runAndNotify(CheckedRunnable runnable, Event event, ResponseCompletionCallback responseCompletionCallback) {

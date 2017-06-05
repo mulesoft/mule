@@ -27,12 +27,10 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.context.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -111,15 +109,11 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
         @Override
         public Publisher<Event> apply(Publisher<Event> publisher) {
-          if (flowConstruct instanceof Pipeline
-              && ((Pipeline) flowConstruct).getMessageSource() instanceof LegacyInboundEndpoint) {
-            // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
-            // Use child context if HandleExceptionInterceptor is being used to avoid response being completed twice..
-            return Mono.from(publisher).flatMapMany(event -> processWithChildContext(event, p -> from(p)
-                .flatMapMany(childEvent -> Mono.from(routeAsync(childEvent, exception)))));
-          } else {
-            return from(publisher).then(event -> from(routeAsync(event, exception)));
-          }
+          // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
+          // Use child context if HandleExceptionInterceptor is being used to avoid response being completed twice,
+          // and nested outer "try" blocks being skipped.
+          return Mono.from(publisher).flatMapMany(event -> processWithChildContext(event, p -> from(p)
+              .flatMapMany(childEvent -> Mono.from(routeAsync(childEvent, exception)))));
         }
       };
 
@@ -128,7 +122,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     @Override
     protected Event processRequest(Event request) throws MuleException {
       muleContext.getNotificationManager()
-          .fireNotification(new ErrorHandlerNotification(createInfo(request, exception, null),
+          .fireNotification(new ErrorHandlerNotification(createInfo(request, exception, configuredMessageProcessors),
                                                          flowConstruct, PROCESS_START));
       fireNotification(exception, request);
       logException(exception, request);
@@ -152,6 +146,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     @Override
     protected Event processCatch(Event event, MessagingException exception) throws MessagingException {
       try {
+        exception.setInErrorHandler(true);
         logger.error("Exception during exception strategy execution");
         doLogException(exception);
         TransactionCoordination.getInstance().rollbackCurrentTransaction();
@@ -166,7 +161,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     @Override
     protected void processFinally(Event event, MessagingException exception) {
       muleContext.getNotificationManager()
-          .fireNotification(new ErrorHandlerNotification(createInfo(event, exception, null),
+          .fireNotification(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
                                                          flowConstruct, PROCESS_END));
     }
 

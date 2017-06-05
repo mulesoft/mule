@@ -122,7 +122,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   /**
    * Default timeout for waiting for responses
    */
-  public static final int RECEIVE_TIMEOUT = 5000;
+  public static final int RECEIVE_TIMEOUT = 50000;
 
   /**
    * Default timeout used when blocking on {@link org.reactivestreams.Publisher} completion.

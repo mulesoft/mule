@@ -10,7 +10,7 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.of;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SOURCE_RESPONSE_GENERATE;
-import static org.mule.runtime.extension.api.runtime.source.SourceResult.parameterError;
+import static org.mule.runtime.extension.api.runtime.source.SourceResult.invocationError;
 import static org.mule.runtime.extension.api.runtime.source.SourceResult.responseError;
 import static org.mule.runtime.extension.api.runtime.source.SourceResult.success;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -31,8 +31,8 @@ public class SourceResultArgumentResolver implements ArgumentResolver<SourceResu
   private ArgumentResolver<Error> errorArgumentResolver;
   private ArgumentResolver<SourceCallbackContext> callbackContextArgumentResolver;
 
-  private static final Set<String> PARAMETERS_ERRORS = of(SOURCE_RESPONSE_GENERATE,
-                                                          SOURCE_ERROR_RESPONSE_GENERATE)
+  private static final Set<String> GENERATE_ERRORS = of(SOURCE_RESPONSE_GENERATE,
+                                                        SOURCE_ERROR_RESPONSE_GENERATE)
                                                               .map(ComponentIdentifier::getName)
                                                               .collect(toSet());
 
@@ -51,13 +51,13 @@ public class SourceResultArgumentResolver implements ArgumentResolver<SourceResu
       return success(callbackContext);
     } else {
       String errorIdentifier = error.getErrorType().getIdentifier();
-      return isErrorGeneratingCallbackParameters(errorIdentifier)
-          ? parameterError(error, callbackContext)
+      return isErrorGeneratingErrorResponse(errorIdentifier)
+          ? invocationError(error, callbackContext)
           : responseError(error, callbackContext);
     }
   }
 
-  private boolean isErrorGeneratingCallbackParameters(String identifier) {
-    return PARAMETERS_ERRORS.contains(identifier);
+  private boolean isErrorGeneratingErrorResponse(String identifier) {
+    return GENERATE_ERRORS.contains(identifier);
   }
 }

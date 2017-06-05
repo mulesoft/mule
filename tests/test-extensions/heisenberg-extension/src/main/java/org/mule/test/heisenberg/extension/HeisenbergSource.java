@@ -145,7 +145,7 @@ public class HeisenbergSource extends Source<String, Attributes> {
     if (sourceResult.isSuccess()) {
       terminateStatus = SUCCESS;
     } else {
-      sourceResult.getParameterGenerationError().ifPresent(parameterError -> {
+      sourceResult.getInvocationError().ifPresent(parameterError -> {
         terminateStatus = ERROR_PARAMETER;
         error = of(parameterError);
       });
