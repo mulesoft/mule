@@ -9,7 +9,8 @@ package org.mule.module.db.internal.domain.connection;
 
 import static org.mule.api.util.CredentialsMaskUtil.PASSWORD_PATTERN_NO_QUOTES;
 import static org.mule.api.util.CredentialsMaskUtil.USER_PATTERN_NO_QUOTES;
-import static org.mule.api.util.CredentialsMaskUtil.maskUrlUserAndPassword;
+import static org.mule.api.util.CredentialsMaskUtil.maskUserAndPassword;
+import static org.mule.module.db.internal.util.DbCredentialsMaskUtil.maskUrlCredentialsPrefixed;
 
 import java.sql.Connection;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class SimpleConnectionFactory extends AbstractConnectionFactory
         {
             if (e.getMessage() != null)
             {
-                throw new ConnectionCreationException(e, maskUrlUserAndPassword(e.getMessage(), PASSWORD_PATTERN_NO_QUOTES, USER_PATTERN_NO_QUOTES));
+                throw new ConnectionCreationException(e, maskUrlCredentialsPrefixed(maskUserAndPassword(e.getMessage(), PASSWORD_PATTERN_NO_QUOTES, USER_PATTERN_NO_QUOTES)));
             }
             else
             {
