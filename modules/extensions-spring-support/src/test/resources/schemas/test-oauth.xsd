@@ -56,7 +56,7 @@
                                                 <xs:documentation>The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation</xs:documentation>
                                             </xs:annotation>
                                         </xs:attribute>
-                                        <xs:attribute type="mule:expressionString" use="required" name="resourceOwnerId">
+                                        <xs:attribute type="mule:expressionString" use="optional" name="resourceOwnerId">
                                             <xs:annotation>
                                                 <xs:documentation>The resourceOwnerId which each component should use if it doesn't reference otherwise.</xs:documentation>
                                             </xs:annotation>
@@ -163,7 +163,7 @@
                                                 <xs:documentation>The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation</xs:documentation>
                                             </xs:annotation>
                                         </xs:attribute>
-                                        <xs:attribute type="mule:expressionString" use="required" name="resourceOwnerId">
+                                        <xs:attribute type="mule:expressionString" use="optional" name="resourceOwnerId">
                                             <xs:annotation>
                                                 <xs:documentation>The resourceOwnerId which each component should use if it doesn't reference otherwise.</xs:documentation>
                                             </xs:annotation>
@@ -294,7 +294,7 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="resourceOwnerId">
+                <xs:attribute type="mule:expressionString" use="optional" name="resourceOwnerId">
                     <xs:annotation>
                         <xs:documentation>The id of the resource owner which access should be invalidated</xs:documentation>
                     </xs:annotation>
