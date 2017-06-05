@@ -33,6 +33,11 @@ import org.apache.commons.collections.map.AbstractHashedMap;
  */
 public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
 
+  /**
+   * Serialisation version
+   */
+  private static final long serialVersionUID = -7074633917369299456L;
+
   private final InternalCaseInsensitiveHashMap delegate;
 
   /**
@@ -128,11 +133,6 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
   }
 
   private static class InternalCaseInsensitiveHashMap extends AbstractHashedMap implements Serializable {
-
-    /**
-     * Serialisation version
-     */
-    private static final long serialVersionUID = -7074633917369299456L;
 
     /**
      * Constructs a new empty map with default size and load factor.
