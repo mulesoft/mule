@@ -87,7 +87,7 @@ public final class DefaultResourceOwnerOAuthContext implements ResourceOwnerOAut
 
   @Override
   public String getResourceOwnerId() {
-    return resourceOwnerId;
+    return resourceOwnerId == null ? DEFAULT_RESOURCE_OWNER_ID : resourceOwnerId;
   }
 
   public void setRefreshUserOAuthContextLock(Lock refreshUserOAuthContextLock) {
