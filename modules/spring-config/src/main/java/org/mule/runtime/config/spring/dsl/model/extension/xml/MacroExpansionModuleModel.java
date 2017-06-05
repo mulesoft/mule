@@ -52,11 +52,6 @@ import java.util.stream.Collectors;
  */
 public class MacroExpansionModuleModel {
 
-  //  /**
-  //   * literal that represents the name of the global element for any given module. If the module's name is math, then the value of
-  //   * this field will name the global element as <math:config ../>
-  //   */
-  //  private static final String MODULE_CONFIG_GLOBAL_ELEMENT_NAME = "config";
   private static final String MODULE_OPERATION_CONFIG_REF = "config-ref";
   /**
    * Used to obtain the {@link ComponentIdentifier} element from the <module/>'s original {@ink ComponentModel} to be later added
