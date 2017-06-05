@@ -160,7 +160,7 @@ public class JavaOAuthDeclarationEnricher extends AbstractAnnotatedDeclarationEn
     parameter.setDescription("The id of the resource owner which access should be invalidated");
     parameter.setExpressionSupport(SUPPORTED);
     parameter.setLayoutModel(LayoutModel.builder().build());
-    parameter.setRequired(true);
+    parameter.setRequired(false);
     parameter.setParameterRole(BEHAVIOUR);
     parameter.setType(stringType, false);
     group.addParameter(parameter);

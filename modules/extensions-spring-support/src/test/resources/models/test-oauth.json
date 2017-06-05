@@ -359,7 +359,7 @@
                     }
                   },
                   "hasDynamicType": false,
-                  "required": true,
+                  "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -789,7 +789,7 @@
                     }
                   },
                   "hasDynamicType": false,
-                  "required": true,
+                  "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -1394,7 +1394,7 @@
                     }
                   },
                   "hasDynamicType": false,
-                  "required": true,
+                  "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -2008,7 +2008,7 @@
                 }
               },
               "hasDynamicType": false,
-              "required": true,
+              "required": false,
               "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -2613,7 +2613,7 @@
                 }
               },
               "hasDynamicType": false,
-              "required": true,
+              "required": false,
               "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
