@@ -11,14 +11,19 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 @ExternalLib(name = HeisenbergExtension.HEISENBERG_LIB_NAME, description = HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION,
     fileName = HeisenbergExtension.HEISENBERG_LIB_FILE_NAME, requiredClassName = HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME)
 public class HeisenbergConnectionProvider implements ConnectionProvider<HeisenbergConnection> {
 
   public static final String SAUL_OFFICE_NUMBER = "505-503-4455";
+
+  private static final AtomicInteger connects = new AtomicInteger();
+  private static final AtomicInteger disconnects = new AtomicInteger();
 
   @Parameter
   @Optional(defaultValue = SAUL_OFFICE_NUMBER)
@@ -30,16 +35,25 @@ public class HeisenbergConnectionProvider implements ConnectionProvider<Heisenbe
 
   @Override
   public HeisenbergConnection connect() throws ConnectionException {
+    connects.incrementAndGet();
     return new HeisenbergConnection(saulPhoneNumber);
   }
 
   @Override
   public void disconnect(HeisenbergConnection heisenbergConnection) {
-
+    disconnects.incrementAndGet();
   }
 
   @Override
   public ConnectionValidationResult validate(HeisenbergConnection heisenbergConnection) {
     return ConnectionValidationResult.success();
+  }
+
+  public static int getConnects() {
+    return connects.get();
+  }
+
+  public static int getDisconnects() {
+    return disconnects.get();
   }
 }

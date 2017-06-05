@@ -13,16 +13,17 @@ import static java.util.Optional.of;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+import static org.mule.runtime.core.api.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
-import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
@@ -35,7 +36,6 @@ import static reactor.core.publisher.Mono.fromCallable;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -59,6 +59,8 @@ import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
@@ -71,6 +73,7 @@ import org.mule.runtime.module.extension.internal.runtime.ParameterValueResolver
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -146,40 +149,66 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   public Publisher<Event> apply(Publisher<Event> publisher) {
     if (operationModel.isBlocking()) {
       return from(publisher).map(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
-        Optional<ConfigurationInstance> configuration = getConfiguration(event);
-        Map<String, Object> operationParameters = getResolutionResult(event, configuration);
+        Optional<ConfigurationInstance> configuration;
+        OperationExecutionFunction operationExecutionFunction;
 
-        OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent) -> {
-          ExecutionContextAdapter<OperationModel> operationContext =
-              createExecutionContext(configuration, parameters, operationEvent);
-          return doProcess(operationEvent, operationContext).block();
-        };
+        if (event.getParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+          // If the event already contains an execution context, use that one.
+          ExecutionContextAdapter<OperationModel> operationContext = getPrecalculatedContext(event);
+          configuration = operationContext.getConfiguration();
 
-        OperationPolicy policy =
-            policyManager.createOperationPolicy(getLocation(), event,
-                                                operationParameters,
-                                                operationExecutionFunction);
+          operationExecutionFunction = (parameters, operationEvent) -> doProcess(operationEvent, operationContext).block();
+        } else {
+          // Otherwise, generate the context as usual.
+          configuration = getConfiguration(event);
+
+          operationExecutionFunction =
+              (parameters,
+               operationEvent) -> {
+                final ExecutionContextAdapter<OperationModel> operationContext =
+                    createExecutionContext(configuration, parameters, operationEvent);
+                return doProcess(operationEvent, operationContext)
+                    .block();
+              };
+        }
+
+        OperationPolicy policy = policyManager.createOperationPolicy(getLocation(), event,
+                                                                     getResolutionResult(event, configuration),
+                                                                     operationExecutionFunction);
         return policy.process(event);
+      }, MuleException.class, e -> {
+        throw new DefaultMuleException(e);
+      })));
+    } else {
+      return from(publisher).flatMap(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
+        ExecutionContextAdapter<OperationModel> operationContext;
+        if (event.getParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+          // If the event already contains an execution context, use that one.
+          operationContext = getPrecalculatedContext(event);
+        } else {
+          // Otherwise, generate the context as usual.
+          operationContext = createExecutionContext(event);
+        }
+
+        // While a hook in reactor is used to map Throwable to MessagingException when an error occurs this does not cover the
+        // case
+        // where an error is explicitly triggered via a Sink such as such as when using Mono.create in ReactorCompletionCallback
+        // rather than being thrown by a reactor operator. Although changes could be made to Mule to cater for this in
+        // AbstractMessageProcessorChain, this is not trivial given processor interceptors and a potent performance overhead
+        // associated with the addition of many additional flatMaps. It would be slightly clearer to create the
+        // MessagingException in ReactorCompletionCallback where Mono.error is used but we don't have a reference to the
+        // processor there.
+        return doProcess(event, operationContext).onErrorMap(e -> !(e instanceof MessagingException),
+                                                             e -> new MessagingException(event, e, this));
       }, MuleException.class, e -> {
         throw new DefaultMuleException(e);
       })));
     }
 
-    return from(publisher).flatMap(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
-      ExecutionContextAdapter<OperationModel> operationContext = createExecutionContext(event);
+  }
 
-      // While a hook in reactor is used to map Throwable to MessagingException when an error occurs this does not cover the case
-      // where an error is explicitly triggered via a Sink such as such as when using Mono.create in ReactorCompletionCallback
-      // rather than being thrown by a reactor operator. Although changes could be made to Mule to cater for this in
-      // AbstractMessageProcessorChain, this is not trivial given processor interceptors and a potent performance overhead
-      // associated with the addition of many additional flatMaps. It would be slightly clearer to create the
-      // MessagingException in ReactorCompletionCallback where Mono.error is used but we don't have a reference to the
-      // processor there.
-      return doProcess(event, operationContext).onErrorMap(e -> !(e instanceof MessagingException),
-                                                           e -> new MessagingException(event, e, this));
-    }, MuleException.class, e -> {
-      throw new DefaultMuleException(e);
-    })));
+  private PrecalculatedExecutionContextAdapter getPrecalculatedContext(Event event) {
+    return (PrecalculatedExecutionContextAdapter) (event.getParameters().get(INTERCEPTION_RESOLVED_CONTEXT).getValue());
   }
 
   protected Mono<Event> doProcess(Event event, ExecutionContextAdapter<OperationModel> operationContext) {
@@ -309,8 +338,8 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   public ProcessingType getProcessingType() {
     ProcessingType processingType = asProcessingType(operationModel.getExecutionType());
     if (processingType == CPU_LITE && !operationModel.isBlocking()) {
-      // If processing type is CPU_LITE and operation is non-blocking then use CPU_LITE_ASYNC processing type so that the Flow can return
-      // processing to a Flow thread.
+      // If processing type is CPU_LITE and operation is non-blocking then use CPU_LITE_ASYNC processing type so that the Flow can
+      // return processing to a Flow thread.
       return CPU_LITE_ASYNC;
     } else {
       return processingType;
@@ -318,18 +347,47 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   }
 
   @Override
-  public Map<String, Object> resolveParameters(Event event) {
-    // TODO MULE-11527 avoid doing unnecesary evaluations
+  public ParametersResolverProcessorResult resolveParameters(Event event) throws MuleException {
     if (operationExecutor instanceof OperationArgumentResolverFactory) {
-      try {
-        return ((OperationArgumentResolverFactory) operationExecutor).createArgumentResolver(operationModel)
-            .apply(createExecutionContext(event));
-      } catch (MuleException e) {
-        throw new MuleRuntimeException(e);
+      PrecalculatedExecutionContextAdapter executionContext =
+          new PrecalculatedExecutionContextAdapter(createExecutionContext(event), operationExecutor);
+
+      final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
+
+      List<Interceptor> interceptors =
+          mediator.collectInterceptors(executionContext.getConfiguration(), executionContext.getOperationExecutor());
+      InterceptorsExecutionResult beforeExecutionResult = mediator.before(executionContext, interceptors);
+
+      if (beforeExecutionResult.isOk()) {
+        final Map<String, Object> resolvedArguments = ((OperationArgumentResolverFactory) operationExecutor)
+            .createArgumentResolver(operationModel).apply(executionContext);
+
+        return new ParametersResolverProcessorResult(resolvedArguments, executionContext);
+      } else {
+        disposeResolvedParameters(executionContext, interceptors);
+        throw new DefaultMuleException("Interception execution for operation not ok", beforeExecutionResult.getThrowable());
       }
     } else {
-      return emptyMap();
+      return new ParametersResolverProcessorResult(emptyMap(), null);
     }
+  }
+
+  @Override
+  public void disposeResolvedParameters(ExecutionContext<OperationModel> executionContext) {
+    final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
+    List<Interceptor> interceptors = mediator.collectInterceptors(executionContext.getConfiguration(),
+                                                                  executionContext instanceof PrecalculatedExecutionContextAdapter
+                                                                      ? ((PrecalculatedExecutionContextAdapter) executionContext)
+                                                                          .getOperationExecutor()
+                                                                      : operationExecutor);
+
+    disposeResolvedParameters(executionContext, interceptors);
+  }
+
+  private void disposeResolvedParameters(ExecutionContext<OperationModel> executionContext, List<Interceptor> interceptors) {
+    final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
+
+    mediator.after(executionContext, null, interceptors);
   }
 
   private ExecutionContextAdapter<OperationModel> createExecutionContext(Event event) throws MuleException {

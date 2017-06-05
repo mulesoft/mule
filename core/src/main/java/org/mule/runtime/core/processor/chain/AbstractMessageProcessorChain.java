@@ -13,15 +13,16 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
-import static org.mule.runtime.core.api.util.ExceptionUtils.updateMessagingExceptionWithError;
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.publisher.Mono.empty;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -41,11 +42,11 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
+import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
-import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.streaming.StreamingManager;
 
@@ -59,6 +60,7 @@ import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -225,7 +227,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
       };
     } else {
       return messagingException -> Mono.from(getMessagingExceptionHandler().apply(messagingException))
-          .flatMap(handled -> {
+          .flatMapMany(handled -> {
             eventContext.success(handled);
             return Mono.<Event>empty();
           })

@@ -234,7 +234,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         .transform(processingStrategy.onPipeline(pipeline))
         .doOnNext(response -> response.getContext().success(response))
         .doOnError(UNEXPECTED_EXCEPTION_PREDICATE,
-                   throwable -> LOGGER.error("Unhandled exception in async processing " + throwable));
+                   throwable -> LOGGER.error("Unhandled exception in async processing ", throwable));
   }
 
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {

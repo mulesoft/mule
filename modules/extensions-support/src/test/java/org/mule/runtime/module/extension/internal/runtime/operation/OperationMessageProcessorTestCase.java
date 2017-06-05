@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -23,6 +24,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.NullAttributes.NULL_ATTRIBUTES;
@@ -31,8 +33,9 @@ import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.meta.model.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
-import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
+import static org.mule.runtime.core.api.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.extension.api.runtime.operation.Result.builder;
 import static org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor.INVALID_TARGET_MESSAGE;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
@@ -42,6 +45,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.T
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
@@ -58,6 +62,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.processor.ParametersResolverProcessor.ParametersResolverProcessorResult;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.el.DefaultExpressionManager;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
@@ -71,7 +76,6 @@ import org.mule.runtime.module.extension.internal.runtime.ValueResolvingExceptio
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.tck.size.SmallTest;
-
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
 import java.util.Map;
@@ -350,6 +354,23 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     assertProcessingType(CPU_INTENSIVE, ProcessingType.CPU_INTENSIVE);
     assertProcessingType(CPU_LITE, ProcessingType.CPU_LITE);
     assertProcessingType(BLOCKING, ProcessingType.BLOCKING);
+  }
+
+  @Test
+  public void precalculateExecutionContext() throws MuleException {
+    ParametersResolverProcessorResult resolveParameters = messageProcessor.resolveParameters(event);
+
+    assertThat(resolveParameters.getContext(), instanceOf(PrecalculatedExecutionContextAdapter.class));
+    final PrecalculatedExecutionContextAdapter context =
+        (PrecalculatedExecutionContextAdapter) spy(resolveParameters.getContext());
+    resolveParameters = new ParametersResolverProcessorResult(resolveParameters.getParameters(), context);
+
+    messageProcessor.process(Event.builder(event)
+        .parameters(singletonMap(INTERCEPTION_RESOLVED_CONTEXT, context))
+        .build());
+
+    verify(operationExecutor).execute(any(ExecutionContext.class));
+    messageProcessor.disposeResolvedParameters(context);
   }
 
   private void assertProcessingType(ExecutionType executionType, ProcessingType expectedProcessingType) {

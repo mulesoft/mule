@@ -28,6 +28,9 @@ import java.util.Set;
  */
 public class DefaultInterceptionEvent implements InterceptionEvent {
 
+  public static final String INTERCEPTION_RESOLVED_PARAMS = "core:interceptionResolvedParams";
+  public static final String INTERCEPTION_RESOLVED_CONTEXT = "core:interceptionResolvedContext";
+
   private Event interceptedInput;
   private Event.Builder interceptedOutput;
 
@@ -102,14 +105,17 @@ public class DefaultInterceptionEvent implements InterceptionEvent {
   }
 
   /**
-   * Updates the state of this object, overriding the {@code interceptedInput} with the result built from
+   * Updates the state of this object if needed, overriding the {@code interceptedInput} with the result built from
    * {@code interceptedOutput} and resetting {@codeinterceptedOutput}.
    *
    * @return {@link Event} with the result.
    */
   public Event resolve() {
-    interceptedInput = interceptedOutput.build();
-    interceptedOutput = Event.builder(interceptedInput);
+    final Event newEvent = interceptedOutput.build();
+    if (interceptedInput != newEvent) {
+      interceptedInput = newEvent;
+      interceptedOutput = Event.builder(interceptedInput).removeParameter(INTERCEPTION_RESOLVED_PARAMS);
+    }
     return interceptedInput;
   }
 

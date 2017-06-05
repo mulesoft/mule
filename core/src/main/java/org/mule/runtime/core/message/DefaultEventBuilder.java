@@ -131,8 +131,7 @@ public class DefaultEventBuilder implements Event.Builder {
 
   @Override
   public Event.Builder removeVariable(String key) {
-    flowVariables.remove(key);
-    this.modified = true;
+    this.modified = flowVariables.remove(key) != null;
     return this;
   }
 
@@ -145,6 +144,12 @@ public class DefaultEventBuilder implements Event.Builder {
   @Override
   public Builder parameters(Map<String, Object> parameters) {
     copyFromTo(parameters, this.moduleParameters);
+    return this;
+  }
+
+  @Override
+  public Event.Builder removeParameter(String key) {
+    this.modified = moduleParameters.remove(key) != null;
     return this;
   }
 
