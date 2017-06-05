@@ -417,12 +417,6 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       public void before(ComponentLocation location, Map<String, Object> parameters, InterceptionEvent event) {
         throw expectedException;
       }
-
-      @Override
-      public void after(ComponentLocation location, InterceptionEvent event, Optional<Throwable> thrown) {
-        // TODO Auto-generated method stub
-        ProcessorInterceptor.super.after(location, event, thrown);
-      }
     });
     startFlowWithInterceptors(interceptor);
 
