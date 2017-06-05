@@ -19,7 +19,6 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
-
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
@@ -106,6 +105,14 @@ public class MinimalApplicationModelGeneratorTestCase extends AbstractMuleTestCa
 
     assertThat(componentModelList.get(0).getNameAttribute(), equalTo("flowOne"));
     assertThat(componentModelList.get(1).getNameAttribute(), equalTo("flowTwo"));
+  }
+
+  @Test
+  public void resolveDependenciesDoesNotFailIfAReferenceIsInvalid() throws Exception {
+    MinimalApplicationModelGenerator generator = createGeneratorForConfig("bad-reference-config.xml");
+    ApplicationModel minimalModel =
+        generator.getMinimalModel(builder().globalName("myFlow").addProcessorsPart().addIndexPart(0).build());
+    assertThat(minimalModel.findTopLevelNamedComponent("myFlow").isPresent(), is(true));;
   }
 
   @Test
