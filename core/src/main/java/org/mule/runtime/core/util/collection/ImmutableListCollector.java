@@ -23,6 +23,7 @@ import java.util.stream.Collector;
  * @param <T> the generic type of the elements in the list
  * @since 4.0
  */
+// TODO(pablo.kraan): MULE-12608 - Add a ImmutableCollectors utility class to replace all the ImmutableXCollector classes.
 public class ImmutableListCollector<T> implements Collector<T, ImmutableListBuilder<T>, List<T>> {
 
   @Override
