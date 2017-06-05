@@ -15,6 +15,8 @@ import java.util.stream.Collector;
 
 /**
  * Provides different implementations of {@link Collector}
+ *
+ * @since 4.0
  */
 public class Collectors {
 
