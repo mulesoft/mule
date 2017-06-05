@@ -38,7 +38,6 @@ import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
-import org.mule.runtime.core.util.queue.objectstore.QueueKey;
 
 import java.io.Serializable;
 
@@ -56,11 +55,6 @@ import org.slf4j.LoggerFactory;
  */
 public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilSuccessfulProcessingStrategy
     implements Initialisable, Disposable, Startable, Stoppable, MessagingExceptionHandlerAware {
-
-  /**
-   * The default queueStore directory for persistence
-   */
-  public static final String DEFAULT_QUEUE_STORE = "queuestore";
 
   private static final String UNTIL_SUCCESSFUL_MSG_PREFIX = "until-successful retries exhausted. Last exception message was: %s";
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
@@ -215,7 +209,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     keyBuilder.append(muleContext.getClusterId());
     keyBuilder.append(DASH);
     keyBuilder.append(flow);
-    return new QueueKey(DEFAULT_QUEUE_STORE, keyBuilder.toString());
+    return keyBuilder.toString();
   }
 
   private void abandonRetries(final Event event, final Event mutableEvent, final Exception lastException) {

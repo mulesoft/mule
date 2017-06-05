@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.util.store;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.util.queue.objectstore.QueueKey;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.util.Pair;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,14 +30,14 @@ public class PartitionedObjectStoreWrapper<T extends Serializable> implements Li
 
   @Override
   public boolean contains(Serializable key) throws ObjectStoreException {
-    return getStore().contains(new QueueKey(partitionName, key));
+    return getStore().contains(new Pair<String, Serializable>(partitionName, key));
   }
 
   @Override
   public void store(Serializable key, T value) throws ObjectStoreException {
     // This required because QueuePersistenceObject store will NOT complain in
     // cases where object already exists!
-    QueueKey qKey = new QueueKey(partitionName, key);
+    Pair<String, Serializable> qKey = new Pair<>(partitionName, key);
     synchronized (this) {
       if (getStore().contains(qKey)) {
         throw new ObjectAlreadyExistsException();
@@ -48,7 +48,7 @@ public class PartitionedObjectStoreWrapper<T extends Serializable> implements Li
 
   @Override
   public T retrieve(Serializable key) throws ObjectStoreException {
-    return getStore().retrieve(new QueueKey(partitionName, key));
+    return getStore().retrieve(new Pair<String, Serializable>(partitionName, key));
   }
 
   @Override
@@ -60,7 +60,7 @@ public class PartitionedObjectStoreWrapper<T extends Serializable> implements Li
 
   @Override
   public T remove(Serializable key) throws ObjectStoreException {
-    return getStore().remove(new QueueKey(partitionName, key));
+    return getStore().remove(new Pair<String, Serializable>(partitionName, key));
   }
 
   @Override
@@ -84,9 +84,9 @@ public class PartitionedObjectStoreWrapper<T extends Serializable> implements Li
     List<Serializable> results = new ArrayList<Serializable>();
     List<Serializable> keys = getStore().allKeys();
     for (Serializable key : keys) {
-      QueueKey qKey = (QueueKey) key;
-      if (qKey.queueName.equals(partitionName)) {
-        results.add(qKey.id);
+      Pair<String, Serializable> qKey = (Pair<String, Serializable>) key;
+      if (qKey.getFirst().equals(partitionName)) {
+        results.add(qKey.getSecond());
       }
     }
     return results;

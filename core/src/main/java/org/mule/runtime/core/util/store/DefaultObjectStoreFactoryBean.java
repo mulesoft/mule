@@ -31,7 +31,7 @@ public class DefaultObjectStoreFactoryBean {
   }
 
   public static ObjectStore<Serializable> createDefaultUserObjectStore() {
-    // TODO is this used/documented anywhere?
+    // TODO MULE-12685 is this used/documented anywhere?
     if ("true".equals(System.getProperty("mule.objectstore.user.transient"))) {
       return delegate.createDefaultUserTransientObjectStore();
     }
