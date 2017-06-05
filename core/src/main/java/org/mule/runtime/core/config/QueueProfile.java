@@ -9,9 +9,9 @@ package org.mule.runtime.core.config;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.queue.QueueConfiguration;
+import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.util.queue.DefaultQueueConfiguration;
-import org.mule.runtime.core.util.queue.QueueConfiguration;
-import org.mule.runtime.core.util.queue.QueueManager;
 
 /**
  * <code>QueueProfile</code> determines how an internal queue for a service will behave

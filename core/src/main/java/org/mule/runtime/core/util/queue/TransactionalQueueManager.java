@@ -12,10 +12,13 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionJournal;
-import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionRecoverer;
-import org.mule.runtime.core.util.journal.queue.XaTxQueueTransactionJournal;
-import org.mule.runtime.core.util.xa.XaTransactionRecoverer;
+import org.mule.runtime.core.api.util.queue.QueueConfiguration;
+import org.mule.runtime.core.api.util.queue.QueueSession;
+import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
+import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionRecoverer;
+import org.mule.runtime.core.internal.util.journal.queue.XaTxQueueTransactionJournal;
+import org.mule.runtime.core.internal.util.queue.TransactionalQueueSession;
+import org.mule.runtime.core.internal.util.xa.XaTransactionRecoverer;
 
 import java.io.File;
 import java.util.HashMap;

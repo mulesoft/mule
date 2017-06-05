@@ -11,7 +11,7 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 
 import org.mule.runtime.core.internal.streaming.object.iterator.QueueProducer;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.core.util.queue.Queue;
+import org.mule.runtime.core.api.util.queue.Queue;
 
 import java.io.Serializable;
 import java.util.HashSet;

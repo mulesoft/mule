@@ -7,7 +7,7 @@
 package org.mule.runtime.core.util.queue;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionJournal;
+import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
 
 public class TestTransactionLogger extends LocalTxQueueTransactionJournal {
 

@@ -25,7 +25,7 @@ import java.util.stream.Collector;
  * @param <V> the output map's values type
  * @since 4.0
  */
-public class ImmutableMapCollector<T, K, V> implements Collector<T, ImmutableMap.Builder<K, V>, Map<K, V>> {
+public class ImmutableMapCollector<T, K, V> implements Collector<T, ImmutableMapBuilder<K, V>, Map<K, V>> {
 
   private final Function<T, K> keyMapper;
   private final Function<T, V> valueMapper;
@@ -42,23 +42,23 @@ public class ImmutableMapCollector<T, K, V> implements Collector<T, ImmutableMap
   }
 
   @Override
-  public Supplier<ImmutableMap.Builder<K, V>> supplier() {
-    return ImmutableMap::builder;
+  public Supplier<ImmutableMapBuilder<K, V>> supplier() {
+    return ImmutableMapBuilder::new;
   }
 
   @Override
-  public BiConsumer<ImmutableMap.Builder<K, V>, T> accumulator() {
+  public BiConsumer<ImmutableMapBuilder<K, V>, T> accumulator() {
     return (builder, value) -> builder.put(keyMapper.apply(value), valueMapper.apply(value));
   }
 
   @Override
-  public BinaryOperator<ImmutableMap.Builder<K, V>> combiner() {
+  public BinaryOperator<ImmutableMapBuilder<K, V>> combiner() {
     return (left, right) -> left.putAll(right.build());
   }
 
   @Override
-  public Function<ImmutableMap.Builder<K, V>, Map<K, V>> finisher() {
-    return ImmutableMap.Builder::build;
+  public Function<ImmutableMapBuilder<K, V>, Map<K, V>> finisher() {
+    return ImmutableMapBuilder::build;
   }
 
   @Override

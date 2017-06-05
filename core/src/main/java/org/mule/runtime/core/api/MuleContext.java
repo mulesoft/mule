@@ -44,7 +44,7 @@ import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
-import org.mule.runtime.core.util.queue.QueueManager;
+import org.mule.runtime.core.api.util.queue.QueueManager;
 
 import java.io.Serializable;
 import java.util.Collection;

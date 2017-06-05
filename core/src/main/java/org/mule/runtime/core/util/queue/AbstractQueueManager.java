@@ -11,6 +11,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.util.queue.QueueConfiguration;
+import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.util.HashMap;

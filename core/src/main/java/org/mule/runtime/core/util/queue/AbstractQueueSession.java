@@ -7,6 +7,8 @@
 package org.mule.runtime.core.util.queue;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.queue.Queue;
+import org.mule.runtime.core.api.util.queue.QueueSession;
 
 public abstract class AbstractQueueSession implements QueueSession {
 

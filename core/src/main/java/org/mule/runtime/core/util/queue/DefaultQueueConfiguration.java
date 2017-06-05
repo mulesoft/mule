@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.util.queue;
 
+import org.mule.runtime.core.api.util.queue.QueueConfiguration;
+
 public class DefaultQueueConfiguration implements QueueConfiguration {
 
   private final boolean persistent;

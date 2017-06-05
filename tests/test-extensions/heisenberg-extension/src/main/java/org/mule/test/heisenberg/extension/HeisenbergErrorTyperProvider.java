@@ -6,9 +6,10 @@
  */
 package org.mule.test.heisenberg.extension;
 
-import com.google.common.collect.ImmutableSet;
-import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
+import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
+
+import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
 

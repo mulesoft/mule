@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.lifecycle.LifecycleObject;
 import org.mule.runtime.core.lifecycle.NotificationLifecycleObject;
-import org.mule.runtime.core.util.queue.QueueManager;
+import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
 import java.util.LinkedHashSet;

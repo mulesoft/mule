@@ -32,7 +32,7 @@ public abstract class AbstractConnectorMessageProcessorProvider
   protected static final int CACHE_SIZE = 1000;
   protected static final int EXPIRATION_TIME_IN_MINUTES = 10;
 
-  protected final LoadingCache<RequestCacheKey, Processor> cachedMessageProcessors;
+  private final LoadingCache<RequestCacheKey, Processor> cachedMessageProcessors;
   protected MuleContext muleContext;
 
 

@@ -43,7 +43,7 @@ public class MVELExpressionExecutor implements ExpressionExecutor<MVELExpression
 
   protected ParserConfiguration parserConfiguration;
 
-  protected LoadingCache<String, Serializable> compiledExpressionsCache;
+  private LoadingCache<String, Serializable> compiledExpressionsCache;
 
   public MVELExpressionExecutor(final ParserConfiguration parserConfiguration) {
     this.parserConfiguration = parserConfiguration;

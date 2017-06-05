@@ -23,20 +23,21 @@ import java.util.stream.Collector;
  * @param <T> the generic type of the elements in the list
  * @since 4.0
  */
-public class ImmutableListCollector<T> implements Collector<T, ImmutableList.Builder<T>, List<T>> {
+// TODO(pablo.kraan): MULE-12608 - Add a ImmutableCollectors utility class to replace all the ImmutableXCollector classes.
+public class ImmutableListCollector<T> implements Collector<T, ImmutableListBuilder<T>, List<T>> {
 
   @Override
-  public Supplier<ImmutableList.Builder<T>> supplier() {
-    return ImmutableList::builder;
+  public Supplier<ImmutableListBuilder<T>> supplier() {
+    return ImmutableListBuilder::new;
   }
 
   @Override
-  public BiConsumer<ImmutableList.Builder<T>, T> accumulator() {
+  public BiConsumer<ImmutableListBuilder<T>, T> accumulator() {
     return (builder, value) -> builder.add(value);
   }
 
   @Override
-  public BinaryOperator<ImmutableList.Builder<T>> combiner() {
+  public BinaryOperator<ImmutableListBuilder<T>> combiner() {
     return (left, right) -> {
       left.addAll(right.build());
       return left;
@@ -44,8 +45,8 @@ public class ImmutableListCollector<T> implements Collector<T, ImmutableList.Bui
   }
 
   @Override
-  public Function<ImmutableList.Builder<T>, List<T>> finisher() {
-    return ImmutableList.Builder::build;
+  public Function<ImmutableListBuilder<T>, List<T>> finisher() {
+    return ImmutableListBuilder::build;
   }
 
   @Override
