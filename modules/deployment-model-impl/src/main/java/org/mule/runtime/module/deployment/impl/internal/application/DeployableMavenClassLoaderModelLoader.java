@@ -104,7 +104,7 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
                           && bundleDependency.getDescriptor().getGroupId().equals(groupId))
                       .findFirst();
                   bundleDependencyOptional.map(bundleDependency -> {
-                    JarInfo jarInfo = fileJarExplorer.explore(bundleDependency.getBundleUrl());
+                    JarInfo jarInfo = fileJarExplorer.explore(bundleDependency.getBundleUri());
                     classLoaderModelBuilder.exportingPackages(jarInfo.getPackages());
                     classLoaderModelBuilder.exportingResources(jarInfo.getResources());
                     return bundleDependency;

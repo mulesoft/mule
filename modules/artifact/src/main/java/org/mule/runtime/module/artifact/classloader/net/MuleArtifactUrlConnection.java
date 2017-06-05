@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.classloader.net;
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.util.Arrays.asList;
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 
 import java.io.IOException;
@@ -16,8 +17,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
@@ -32,28 +31,40 @@ import sun.net.www.ParseUtil;
 /**
  * A URL Connection to a Mule Artifact file or an entry in a Mule Artifact file.
  *
- * <p>The syntax of a Mule Artifact URL is (current support for protocols under URL are described in {@link #SUPPORTED_PROTOCOLS}):
+ * <p>
+ * The syntax of a Mule Artifact URL is (current support for protocols under URL are described in {@link #SUPPORTED_PROTOCOLS}):
+ * 
  * <pre>
  * muleartifact:&lt;url&gt;!/{entry}
  * </pre>
  *
- * <p>Where "url" is targeting a ZIP type of file to be decompressed, and the subsequent N-1 elements in "{entry}" are zips
- * as well and the N element is the file to look for. That means the {@link #getInputStream()} will open as many zips as
- * needed to look for the file.
+ * <p>
+ * Where "url" is targeting a ZIP type of file to be decompressed, and the subsequent N-1 elements in "{entry}" are zips as well
+ * and the N element is the file to look for. That means the {@link #getInputStream()} will open as many zips as needed to look
+ * for the file.
  *
- * <p>valid samples:
- * <p>{@code muleartifact:file:/folder/mule-plugin.zip!/classes!/org/foo/echo/aResource.txt}
- * <p>{@code muleartifact:file:/folder/mule-plugin.zip!/lib/test-jar-with-resources.jar!/test-resource-2.txt}
+ * <p>
+ * valid samples:
+ * <p>
+ * {@code muleartifact:file:/folder/mule-plugin.zip!/classes!/org/foo/echo/aResource.txt}
+ * <p>
+ * {@code muleartifact:file:/folder/mule-plugin.zip!/lib/test-jar-with-resources.jar!/test-resource-2.txt}
  *
- * <p> invalid samples:
- * <p>{@code muleartifact:file:/folder/mule-plugin.zip}
- * <p>{@code muleartifact:file:/folder/mule-plugin.zip!/}
- * <p>{@code muleartifact:http:/folder/mule-plugin.zip!/classes/org/foo/echo/aResource.txt} (protocol is 'http')
+ * <p>
+ * invalid samples:
+ * <p>
+ * {@code muleartifact:file:/folder/mule-plugin.zip}
+ * <p>
+ * {@code muleartifact:file:/folder/mule-plugin.zip!/}
+ * <p>
+ * {@code muleartifact:http:/folder/mule-plugin.zip!/classes/org/foo/echo/aResource.txt} (protocol is 'http')
  *
- * <p>Notice that after the URL targeting the ZIP file, there must be several separators '!/' elements, due to the fact
- * that this class is meant to open every ZIP until it finds out the expected file.
+ * <p>
+ * Notice that after the URL targeting the ZIP file, there must be several separators '!/' elements, due to the fact that this
+ * class is meant to open every ZIP until it finds out the expected file.
  *
  * TODO(fernandezlautaro): MULE-10892 at some moment this class should be strong enough to support any type of artifact.
+ * 
  * @since 4.0
  */
 public class MuleArtifactUrlConnection extends URLConnection {
@@ -68,23 +79,23 @@ public class MuleArtifactUrlConnection extends URLConnection {
   private List<String> files;
 
   /**
-   * Takes an {@link URL} to validate its format in the {@link #connect()} ()} method, if there aren't any problem, it
-   * will store the ZIP file in {@code artifactZip} and all the files that are accessible from that starting point.
+   * Takes an {@link URL} to validate its format in the {@link #connect()} ()} method, if there aren't any problem, it will store
+   * the ZIP file in {@code artifactZip} and all the files that are accessible from that starting point.
    */
   public MuleArtifactUrlConnection(URL url) {
     super(url);
   }
 
   /**
-   * Given the {@link URL} that was feed in the {@link #MuleArtifactUrlConnection(URL)} constructor, it will validate
-   * its format through the {@link #parseSpecs()} method.
+   * Given the {@link URL} that was feed in the {@link #MuleArtifactUrlConnection(URL)} constructor, it will validate its format
+   * through the {@link #parseSpecs()} method.
    * <p>
-   * If there aren't any problem during validation, it will store a ZIP file in {@code artifactZip} and all the
-   * subsequent files that are accessible from that starting point.
+   * If there aren't any problem during validation, it will store a ZIP file in {@code artifactZip} and all the subsequent files
+   * that are accessible from that starting point.
    *
-   * @throws IOException if the first element is not a ZIP file, or if the protocol is not supported, or if it's
-   * impossible to create a {@link ZipFile} from the parsed {@code url}, or if there's not at least a {@link #SEPARATOR}
-   * in the {@code url}.
+   * @throws IOException if the first element is not a ZIP file, or if the protocol is not supported, or if it's impossible to
+   *         create a {@link ZipFile} from the parsed {@code url}, or if there's not at least a {@link #SEPARATOR} in the
+   *         {@code url}.
    */
   @Override
   public void connect() throws IOException {
@@ -95,13 +106,14 @@ public class MuleArtifactUrlConnection extends URLConnection {
   }
 
   /**
-   * Returns an input stream that represents the element in the {@code url} from the farthest {@link #SEPARATOR} mark.
-   * For the following {@link URL} samples:
-   * <p>{@code muleartifact:file:/folder/mule-plugin.zip!/classes!/org/foo/echo/aResource.txt}
-   * <p>{@code muleartifact:file:/folder/mule-plugin.zip!/lib/test-jar-with-resources.jar!/test-resource-2.txt}
+   * Returns an input stream that represents the element in the {@code url} from the farthest {@link #SEPARATOR} mark. For the
+   * following {@link URL} samples:
+   * <p>
+   * {@code muleartifact:file:/folder/mule-plugin.zip!/classes!/org/foo/echo/aResource.txt}
+   * <p>
+   * {@code muleartifact:file:/folder/mule-plugin.zip!/lib/test-jar-with-resources.jar!/test-resource-2.txt}
    *
-   * The expected input streams will be the content of "org/foo/echo/aResource.txt" and "test-resource-2.txt"
-   * respectively.
+   * The expected input streams will be the content of "org/foo/echo/aResource.txt" and "test-resource-2.txt" respectively.
    *
    * @return an input stream that represents the element in the {@code url} from the farthest {@link #SEPARATOR} mark.
    * @throws IOException
@@ -117,7 +129,8 @@ public class MuleArtifactUrlConnection extends URLConnection {
     }
     InputStream is = artifactZip.getInputStream(entry);
     if (!queue.isEmpty()) {
-      //there are more files to look for, will work them recursively assuming each entry is either a ZIP until we get up to the file
+      // there are more files to look for, will work them recursively assuming each entry is either a ZIP until we get up to the
+      // file
       is = getInputStream(is, queue);
     }
     return is;
@@ -135,7 +148,7 @@ public class MuleArtifactUrlConnection extends URLConnection {
                                              url.toString()));
     }
     try {
-      artifactZip = new ZipFile(URLDecoder.decode(muleArtifactLocation.getFile(), StandardCharsets.UTF_8.name()));
+      artifactZip = new ZipFile(toFile(muleArtifactLocation));
     } catch (IOException e) {
       throw new MalformedURLException(format("There was a problem opening a zip for '%s'", muleArtifactLocation));
     }
@@ -151,11 +164,10 @@ public class MuleArtifactUrlConnection extends URLConnection {
   }
 
   /**
-   * Recursively iterates the {@code files} queue to lookup for the element, ends successfully when it gets to the
-   * bottom of it.
+   * Recursively iterates the {@code files} queue to lookup for the element, ends successfully when it gets to the bottom of it.
    *
-   * @param currentStream position to the current element of the zip file (it moves in the recursion targeting the
-   *                      contents of a ZIP file)
+   * @param currentStream position to the current element of the zip file (it moves in the recursion targeting the contents of a
+   *        ZIP file)
    * @param files the queue with the files that has to be introspected
    * @return the input stream of the file that has been looked for
    * @throws IOException if the file is not present
@@ -177,9 +189,8 @@ public class MuleArtifactUrlConnection extends URLConnection {
   }
 
   /**
-   * As this class is meant to help a {@link ClassLoader}, it will look for resources within zips, the "classes"
-   * is a particular scenario
-   * where it will collapse with the subsequent element of the split file, as /classes in a mule module is never
+   * As this class is meant to help a {@link ClassLoader}, it will look for resources within zips, the "classes" is a particular
+   * scenario where it will collapse with the subsequent element of the split file, as /classes in a mule module is never
    * compressed, different scenario for /lib folder, where every element there is a compressed jar.
    *
    * @param files to split by {@link #SEPARATOR}

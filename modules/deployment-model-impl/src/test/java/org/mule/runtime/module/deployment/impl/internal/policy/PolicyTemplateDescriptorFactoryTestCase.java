@@ -11,6 +11,7 @@ import static java.io.File.createTempFile;
 import static java.io.File.separator;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
@@ -19,8 +20,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
-import static org.mule.runtime.core.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.CLASSES_DIR;
@@ -35,6 +36,7 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.TYPE;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
+
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
@@ -87,7 +89,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
 
 
   private static File getResourceFile(String resource) {
-    return new File(PolicyTemplateDescriptorFactoryTestCase.class.getResource(resource).getFile());
+    return toFile(PolicyTemplateDescriptorFactoryTestCase.class.getResource(resource));
   }
 
   @Rule
@@ -147,8 +149,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     PolicyTemplateDescriptor desc = descriptorFactory.create(tempFolder);
 
     assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
-    assertThat(desc.getClassLoaderModel().getUrls()[0].getFile(), equalTo(new File(tempFolder, CLASSES_DIR).toString()));
-    assertThat(desc.getClassLoaderModel().getUrls()[1].getFile(),
+    assertThat(toFile(desc.getClassLoaderModel().getUrls()[0]).getPath(), equalTo(new File(tempFolder, CLASSES_DIR).toString()));
+    assertThat(toFile(desc.getClassLoaderModel().getUrls()[1]).getPath(),
                equalTo(new File(tempFolder, LIB_DIR + separator + JAR_FILE_NAME).toString()));
   }
 

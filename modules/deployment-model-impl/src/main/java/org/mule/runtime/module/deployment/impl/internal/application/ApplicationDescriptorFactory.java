@@ -11,11 +11,10 @@ import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.listFiles;
-import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
+import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_APPLICATION_JSON;
@@ -23,9 +22,11 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.getDeploymentFile;
+
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.util.PropertiesUtils;
@@ -54,9 +55,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -96,6 +97,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     this.descriptorLoaderRepository = descriptorLoaderRepository;
   }
 
+  @Override
   public ApplicationDescriptor create(File artifactFolder) throws ArtifactDescriptorCreateException {
     ApplicationDescriptor applicationDescriptor;
     final File mulePluginJsonFile = new File(artifactFolder, MULE_ARTIFACT_FOLDER + separator + MULE_APPLICATION_JSON);
@@ -284,7 +286,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
           new BundleDescriptor.Builder().setArtifactId(UNKNOWN).setGroupId(UNKNOWN).setVersion(UNKNOWN)
               .setClassifier(MULE_PLUGIN_CLASSIFIER).build();
       for (File file : files) {
-        plugins.add(new BundleDependency.Builder().setBundleUrl(file.toURL()).setScope(COMPILE)
+        plugins.add(new BundleDependency.Builder().setBundleUri(file.toURI()).setScope(COMPILE)
             .setDescriptor(bundleDescriptor)
             .build());
       }
@@ -297,7 +299,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     Set<ArtifactPluginDescriptor> pluginDescriptors = new HashSet<>();
     for (BundleDependency bundleDependency : classLoaderModel.getDependencies()) {
       if (bundleDependency.getDescriptor().isPlugin()) {
-        File pluginFile = toFile(bundleDependency.getBundleUrl());
+        File pluginFile = new File(bundleDependency.getBundleUri());
         pluginDescriptors.add(artifactPluginDescriptorLoader.load(pluginFile));
       }
     }
@@ -349,9 +351,13 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     final JarExplorer jarExplorer = new FileJarExplorer();
 
     for (URL library : libraries) {
-      final JarInfo jarInfo = jarExplorer.explore(library);
-      packages.addAll(jarInfo.getPackages());
-      resources.addAll(jarInfo.getResources());
+      try {
+        JarInfo jarInfo = jarExplorer.explore(library.toURI());
+        packages.addAll(jarInfo.getPackages());
+        resources.addAll(jarInfo.getResources());
+      } catch (URISyntaxException e) {
+        throw new MuleRuntimeException(e);
+      }
     }
 
     return new JarInfo(packages, resources);
@@ -378,13 +384,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     result.addAll(plugins);
 
     // Sorts plugins by name to ensure consistent deployment
-    result.sort(new Comparator<ArtifactPluginDescriptor>() {
-
-      @Override
-      public int compare(ArtifactPluginDescriptor descriptor1, ArtifactPluginDescriptor descriptor2) {
-        return descriptor1.getName().compareTo(descriptor2.getName());
-      }
-    });
+    result.sort((descriptor1, descriptor2) -> descriptor1.getName().compareTo(descriptor2.getName()));
 
     return result;
   }

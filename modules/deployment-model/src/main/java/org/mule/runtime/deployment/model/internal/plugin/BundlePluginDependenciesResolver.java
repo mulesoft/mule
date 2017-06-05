@@ -10,6 +10,7 @@ package org.mule.runtime.deployment.model.internal.plugin;
 import static java.lang.String.format;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.descriptor.BundleDescriptorUtils.isCompatibleVersion;
+
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
@@ -142,8 +143,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
               .forEach(dependency -> {
                 if (isPlugin(dependency) && !isResolvedDependency(visited, dependency.getDescriptor())) {
                   File mulePluginLocation;
-                  if (dependency.getBundleUrl() != null) {
-                    mulePluginLocation = new File(dependency.getBundleUrl().getFile());
+                  if (dependency.getBundleUri() != null) {
+                    mulePluginLocation = new File(dependency.getBundleUri());
                   } else {
                     throw new PluginResolutionError(format("Bundle URL should have been resolved for %s.",
                                                            dependency.getDescriptor()));

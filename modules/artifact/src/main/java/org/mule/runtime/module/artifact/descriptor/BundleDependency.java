@@ -9,7 +9,7 @@ package org.mule.runtime.module.artifact.descriptor;
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
 
-import java.net.URL;
+import java.net.URI;
 
 /**
  * Describes a dependency on a bundle.
@@ -20,7 +20,7 @@ public class BundleDependency {
 
   private BundleDescriptor descriptor;
   private BundleScope scope;
-  private URL bundleUrl;
+  private URI bundleUri;
 
   private BundleDependency() {}
 
@@ -32,8 +32,8 @@ public class BundleDependency {
     return descriptor;
   }
 
-  public URL getBundleUrl() {
-    return bundleUrl;
+  public URI getBundleUri() {
+    return bundleUri;
   }
 
   @Override
@@ -41,7 +41,7 @@ public class BundleDependency {
     return "BundleDependency{" +
         "descriptor=" + descriptor +
         ", scope=" + scope +
-        ", bundleUrl=" + bundleUrl +
+        ", bundleUri=" + bundleUri +
         '}';
   }
 
@@ -96,9 +96,9 @@ public class BundleDependency {
       return this;
     }
 
-    public Builder setBundleUrl(URL bundleUrl) {
-      validateIsNotNull(bundleUrl, "Bundle URL cannot be null");
-      this.bundleDependency.bundleUrl = bundleUrl;
+    public Builder setBundleUri(URI bundleUri) {
+      validateIsNotNull(bundleUri, "Bundle URI cannot be null");
+      this.bundleDependency.bundleUri = bundleUri;
       return this;
     }
 

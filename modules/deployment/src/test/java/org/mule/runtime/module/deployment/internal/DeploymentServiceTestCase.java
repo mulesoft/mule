@@ -19,10 +19,10 @@ import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
-import static org.apache.commons.io.FileUtils.copyURLToFile;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.moveDirectory;
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.io.FileUtils.touch;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
@@ -65,8 +65,8 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
@@ -93,6 +93,7 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
@@ -109,13 +110,13 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.util.FileUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.core.policy.PolicyPointcut;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.core.api.util.FileUtils;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
@@ -153,16 +154,17 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.probe.file.FileDoesNotExists;
 import org.mule.tck.probe.file.FileExists;
-import org.mule.tck.util.CompilerUtils;
+import org.mule.tck.util.CompilerUtils.ExtensionCompiler;
+import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
@@ -173,6 +175,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -224,67 +227,84 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   // Dynamically compiled classes and jars
-  private static final File barUtils1_0JarFile =
-      new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/bar1/BarUtils.java")).compile("bar-1.0.jar");
+  private static File barUtils1_0JarFile;
 
-  private static final File barUtils2_0JarFile =
-      new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/bar2/BarUtils.java")).compile("bar-2.0.jar");
+  private static File barUtils2_0JarFile;
 
-  private static final File echoTestJarFile =
-      new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
+  private static File echoTestJarFile;
 
-  private static final File defaulServiceEchoJarFile = new CompilerUtils.JarCompiler()
-      .compiling(getResourceFile("/org/mule/echo/DefaultEchoService.java"),
-                 getResourceFile("/org/mule/echo/EchoServiceProvider.java"))
-      .compile("mule-module-service-echo-default-4.0-SNAPSHOT.jar");
+  private static File defaulServiceEchoJarFile;
 
-  private static final File defaultFooServiceJarFile =
-      new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/mule/service/foo/DefaultFooService.java"),
-                                                getResourceFile("/org/mule/service/foo/FooServiceProvider.java"))
-          .dependingOn(defaulServiceEchoJarFile.getAbsoluteFile())
-          .compile("mule-module-service-foo-default-4.0-SNAPSHOT.jar");
+  private static File defaultFooServiceJarFile;
 
-  private static final File helloExtensionV1JarFile = new CompilerUtils.ExtensionCompiler()
-      .compiling(
-                 getResourceFile("/org/foo/hello/HelloExtension.java"),
-                 getResourceFile("/org/foo/hello/HelloOperation.java"))
-      .compile("mule-module-hello-1.0.jar", "1.0");
+  private static File helloExtensionV1JarFile;
 
-  private static final File helloExtensionV2JarFile = new CompilerUtils.ExtensionCompiler()
-      .compiling(
-                 getResourceFile("/org/foo/hello/HelloExtension.java"),
-                 getResourceFile("/org/foo/hello/HelloOperation.java"))
-      .compile("mule-module-hello-2.0.jar", "2.0");
+  private static File helloExtensionV2JarFile;
 
-  private static final File simpleExtensionJarFile = new CompilerUtils.ExtensionCompiler()
-      .compiling(
-                 getResourceFile("/org/foo/simple/SimpleExtension.java"),
-                 getResourceFile("/org/foo/simple/SimpleOperation.java"))
-      .compile("mule-module-simple-4.0-SNAPSHOT.jar", "1.0");
+  private static File simpleExtensionJarFile;
 
-  private static final File privilegedExtensionV1JarFile = new CompilerUtils.ExtensionCompiler()
-      .compiling(
-                 getResourceFile("/org/foo/privileged/PrivilegedExtension.java"),
-                 getResourceFile("/org/foo/privileged/PrivilegedOperation.java"))
-      .compile("mule-module-privileged-1.0.jar", "1.0");
+  private static File privilegedExtensionV1JarFile;
 
-  private static final File echoTestClassFile = new SingleClassCompiler()
-      .compile(getResourceFile("/org/foo/EchoTest.java"));
+  private static File echoTestClassFile;
 
-  private static final File pluginEcho1TestClassFile = new SingleClassCompiler()
-      .dependingOn(barUtils1_0JarFile).compile(getResourceFile("/org/foo/Plugin1Echo.java"));
+  private static File pluginEcho1TestClassFile;
 
-  private static final File pluginEcho2TestClassFile = new SingleClassCompiler()
-      .dependingOn(barUtils2_0JarFile).compile(getResourceFile("/org/foo/echo/Plugin2Echo.java"));
+  private static File pluginEcho2TestClassFile;
 
-  private static final File pluginEcho3TestClassFile = new SingleClassCompiler()
-      .compile(getResourceFile("/org/foo/echo/Plugin3Echo.java"));
+  private static File pluginEcho3TestClassFile;
 
-  private static final File resourceConsumerClassFile = new SingleClassCompiler()
-      .compile(getResourceFile("/org/foo/resource/ResourceConsumer.java"));
+  private static File resourceConsumerClassFile;
 
-  private static File getResourceFile(String resource) {
-    return new File(DeploymentServiceTestCase.class.getResource(resource).getFile());
+  @BeforeClass
+  public static void beforeClass() throws URISyntaxException {
+    barUtils1_0JarFile = new JarCompiler().compiling(getResourceFile("/org/bar1/BarUtils.java")).compile("bar-1.0.jar");
+
+    barUtils2_0JarFile = new JarCompiler().compiling(getResourceFile("/org/bar2/BarUtils.java")).compile("bar-2.0.jar");
+
+    echoTestJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
+
+    defaulServiceEchoJarFile = new JarCompiler()
+        .compiling(getResourceFile("/org/mule/echo/DefaultEchoService.java"),
+                   getResourceFile("/org/mule/echo/EchoServiceProvider.java"))
+        .compile("mule-module-service-echo-default-4.0-SNAPSHOT.jar");
+
+    defaultFooServiceJarFile = new JarCompiler().compiling(getResourceFile("/org/mule/service/foo/DefaultFooService.java"),
+                                                           getResourceFile("/org/mule/service/foo/FooServiceProvider.java"))
+        .dependingOn(defaulServiceEchoJarFile.getAbsoluteFile())
+        .compile("mule-module-service-foo-default-4.0-SNAPSHOT.jar");
+
+    helloExtensionV1JarFile = new ExtensionCompiler().compiling(getResourceFile("/org/foo/hello/HelloExtension.java"),
+                                                                getResourceFile("/org/foo/hello/HelloOperation.java"))
+        .compile("mule-module-hello-1.0.jar", "1.0");
+
+    helloExtensionV2JarFile = new ExtensionCompiler().compiling(getResourceFile("/org/foo/hello/HelloExtension.java"),
+                                                                getResourceFile("/org/foo/hello/HelloOperation.java"))
+        .compile("mule-module-hello-2.0.jar", "2.0");
+
+    simpleExtensionJarFile = new ExtensionCompiler().compiling(getResourceFile("/org/foo/simple/SimpleExtension.java"),
+                                                               getResourceFile("/org/foo/simple/SimpleOperation.java"))
+        .compile("mule-module-simple-4.0-SNAPSHOT.jar", "1.0");
+
+    privilegedExtensionV1JarFile =
+        new ExtensionCompiler().compiling(getResourceFile("/org/foo/privileged/PrivilegedExtension.java"),
+                                          getResourceFile("/org/foo/privileged/PrivilegedOperation.java"))
+            .compile("mule-module-privileged-1.0.jar", "1.0");
+
+    echoTestClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/EchoTest.java"));
+
+    pluginEcho1TestClassFile =
+        new SingleClassCompiler().dependingOn(barUtils1_0JarFile).compile(getResourceFile("/org/foo/Plugin1Echo.java"));
+
+    pluginEcho2TestClassFile =
+        new SingleClassCompiler().dependingOn(barUtils2_0JarFile).compile(getResourceFile("/org/foo/echo/Plugin2Echo.java"));
+
+    pluginEcho3TestClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/echo/Plugin3Echo.java"));
+
+    resourceConsumerClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/resource/ResourceConsumer.java"));
+  }
+
+  private static File getResourceFile(String resource) throws URISyntaxException {
+    return new File(DeploymentServiceTestCase.class.getResource(resource).toURI());
   }
 
   // Application plugin file builders
@@ -616,11 +636,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertApplicationAnchorFileDoesNotExists(brokenAppFileBuilder.getId());
 
-    final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
+    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
     assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
     assertEquals("Wrong URL tagged as zombie.", brokenAppFileBuilder.getDeployedPath(),
-                 new File(zombie.getKey().getFile()).getName());
+                 new File(zombie.getKey()).getName());
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
 
@@ -638,11 +658,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertAppsDir(new String[] {brokenAppWithFunkyNameAppFileBuilder.getDeployedPath()}, NONE, true);
     assertApplicationAnchorFileDoesNotExists(brokenAppWithFunkyNameAppFileBuilder.getId());
 
-    final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
+    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
     assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
     assertEquals("Wrong URL tagged as zombie.", brokenAppWithFunkyNameAppFileBuilder.getDeployedPath(),
-                 new File(zombie.getKey().getFile()).getName());
+                 new File(zombie.getKey()).getName());
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
 
     reset(applicationDeploymentListener);
@@ -669,10 +689,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertApplicationAnchorFileDoesNotExists(brokenAppFileBuilder.getId());
 
-    final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
+    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
     assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", "broken-app.jar", new File(zombie.getKey().getFile()).getName());
+    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
+    assertEquals("Wrong URL tagged as zombie.", "broken-app.jar", new File(zombie.getKey()).getName());
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
 
@@ -767,11 +787,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertAppsDir(NONE, new String[] {"app with spaces"}, true);
-    final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
+    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
     assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
-    // Spaces are converted to %20 is returned by java file api :/
-    String appName = URLDecoder.decode(new File(zombie.getKey().getFile()).getName(), "UTF-8");
+    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
+    String appName = new File(zombie.getKey()).getName();
     assertEquals("Wrong URL tagged as zombie.", "app with spaces", appName);
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
@@ -786,11 +805,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertAppsDir(NONE, new String[] {"app with spaces"}, true);
-    final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
+    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
     assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
-    // Spaces are converted to %20 is returned by java file api :/
-    String appName = URLDecoder.decode(new File(zombie.getKey().getFile()).getName(), "UTF-8");
+    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
+    String appName = new File(zombie.getKey()).getName();
     assertEquals("Wrong URL tagged as zombie.", "app with spaces", appName);
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
@@ -1085,7 +1103,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertDeploymentFailure(applicationDeploymentListener, appName);
     assertAppsDir(new String[] {}, new String[] {appName}, true);
 
-    final Map<URL, Long> startZombieMap = deploymentService.getZombieApplications();
+    final Map<URI, Long> startZombieMap = deploymentService.getZombieApplications();
     assertEquals("Should be a zombie file for the app's broken XML config", 1, startZombieMap.size());
 
     final Application app = findApp(badConfigAppFileBuilder.getId(), 1);
@@ -1097,7 +1115,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertAppFolderIsDeleted(appName);
     assertAtLeastOneUndeploymentSuccess(applicationDeploymentListener, appName);
 
-    final Map<URL, Long> endZombieMap = deploymentService.getZombieApplications();
+    final Map<URI, Long> endZombieMap = deploymentService.getZombieApplications();
     assertEquals("Should not be any more zombie files present", 0, endZombieMap.size());
   }
 
@@ -1124,11 +1142,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // zip stays intact, no app dir created
     assertAppsDir(new String[] {"app with spaces.jar"}, NONE, true);
-    final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
+    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
     assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
-    // Spaces are converted to %20 is returned by java file api :/
-    String appName = URLDecoder.decode(new File(zombie.getKey().getFile()).getName(), "UTF-8");
+    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
+    String appName = new File(zombie.getKey()).getName();
     assertEquals("Wrong URL tagged as zombie.", "app with spaces.jar", appName);
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
@@ -1143,11 +1160,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // zip stays intact, no app dir created
     assertAppsDir(new String[] {"app with spaces.jar"}, NONE, true);
-    final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
+    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
     assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
-    // Spaces are converted to %20 is returned by java file api :/
-    String appName = URLDecoder.decode(new File(zombie.getKey().getFile()).getName(), "UTF-8");
+    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
+    String appName = new File(zombie.getKey()).getName();
     assertEquals("Wrong URL tagged as zombie.", "app with spaces.jar", appName);
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
@@ -1917,7 +1933,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void synchronizesAppDeployFromClient() throws Exception {
-    final Action action = () -> deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI().toURL());
+    final Action action = () -> deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
 
     final Action assertAction =
         () -> verify(applicationDeploymentListener, never()).onDeploymentStart(dummyAppDescriptorFileBuilder.getId());
@@ -2336,11 +2352,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDomainAnchorFileDoesNotExists(brokenDomainFileBuilder.getId());
 
-    final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
+    final Map<URI, Long> zombieMap = deploymentService.getZombieDomains();
     assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
-    final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
     assertEquals("Wrong URL tagged as domain", brokenDomainFileBuilder.getDeployedPath(),
-                 new File(zombie.getKey().getFile()).getName());
+                 new File(zombie.getKey()).getName());
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
 
@@ -2356,11 +2372,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDomainAnchorFileDoesNotExists(brokenDomainFileBuilder.getId());
 
-    final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
+    final Map<URI, Long> zombieMap = deploymentService.getZombieDomains();
     assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
-    final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
     assertEquals("Wrong URL tagged as domain.", brokenDomainFileBuilder.getDeployedPath(),
-                 new File(zombie.getKey().getFile()).getName());
+                 new File(zombie.getKey()).getName());
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
 
@@ -2523,11 +2539,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, "domain with spaces"}, true);
-    final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
+    final Map<URI, Long> zombieMap = deploymentService.getZombieDomains();
     assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
-    final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
-    // Spaces are converted to %20 is returned by java file api :/
-    String domainName = URLDecoder.decode(new File(zombie.getKey().getFile()).getName(), "UTF-8");
+    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
+    String domainName = new File(zombie.getKey()).getName();
     assertEquals("Wrong URL tagged as zombie.", "domain with spaces", domainName);
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
@@ -2542,11 +2557,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, "domain with spaces"}, true);
-    final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
+    final Map<URI, Long> zombieMap = deploymentService.getZombieDomains();
     assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
-    final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
     // Spaces are converted to %20 is returned by java file api :/
-    String appName = URLDecoder.decode(new File(zombie.getKey().getFile()).getName(), "UTF-8");
+    String appName = new File(zombie.getKey()).getName();
     assertEquals("Wrong URL tagged as zombie.", "domain with spaces", appName);
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
@@ -2578,11 +2593,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, incompleteDomainFileBuilder.getId()}, true);
-    final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
+    final Map<URI, Long> zombieMap = deploymentService.getZombieDomains();
     assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
-    final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
     assertEquals("Wrong URL tagged as zombie.", incompleteDomainFileBuilder.getId(),
-                 new File(zombie.getKey().getFile()).getParentFile().getParentFile().getName());
+                 new File(zombie.getKey()).getParentFile().getParentFile().getName());
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
 
@@ -2596,11 +2611,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, incompleteDomainFileBuilder.getId()}, true);
-    final Map<URL, Long> zombieMap = deploymentService.getZombieDomains();
+    final Map<URI, Long> zombieMap = deploymentService.getZombieDomains();
     assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
     assertEquals("Wrong URL tagged as zombie.", incompleteDomainFileBuilder.getId(),
-                 new File(zombie.getKey().getFile()).getParentFile().getParentFile().getName());
+                 new File(zombie.getKey()).getParentFile().getParentFile().getName());
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
 
@@ -2737,9 +2752,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Check that the failed application folder is still there
     assertDomainFolderIsMaintained(incompleteDomainFileBuilder.getId());
-    final Map.Entry<URL, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
+    final Map.Entry<URI, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
     assertEquals("Wrong URL tagged as zombie.", incompleteDomainFileBuilder.getId(),
-                 new File(zombie.getKey().getFile()).getParentFile().getParentFile().getName());
+                 new File(zombie.getKey()).getParentFile().getParentFile().getName());
   }
 
   @Test
@@ -2757,9 +2772,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Check that the failed application folder is still there
     assertDomainFolderIsMaintained(incompleteDomainFileBuilder.getId());
-    final Map.Entry<URL, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
+    final Map.Entry<URI, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
     assertEquals("Wrong URL tagged as zombie.", incompleteDomainFileBuilder.getId(),
-                 new File(zombie.getKey().getFile()).getParentFile().getParentFile().getName());
+                 new File(zombie.getKey()).getParentFile().getParentFile().getName());
   }
 
   @Test
@@ -2777,9 +2792,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Check that the failed application folder is still there
     assertDomainFolderIsMaintained(incompleteDomainFileBuilder.getId());
-    final Map.Entry<URL, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
+    final Map.Entry<URI, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
     assertEquals("Wrong URL tagged as zombie.", incompleteDomainFileBuilder.getId(),
-                 new File(zombie.getKey().getFile()).getParentFile().getParentFile().getName());
+                 new File(zombie.getKey()).getParentFile().getParentFile().getName());
   }
 
   @Test
@@ -2888,9 +2903,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDeploymentFailure(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
-    final Map.Entry<URL, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
+    final Map.Entry<URI, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
     assertEquals("Wrong URL tagged as zombie.", emptyDomainFileBuilder.getId(),
-                 new File(zombie.getKey().getFile()).getParentFile().getParentFile().getName());
+                 new File(zombie.getKey()).getParentFile().getParentFile().getName());
   }
 
   @Test
@@ -2903,9 +2918,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedDomainFromBuilder(incompleteDomainFileBuilder, emptyDomainFileBuilder.getZipPath());
     assertDeploymentFailure(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
-    final Map.Entry<URL, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
+    final Map.Entry<URI, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
     assertEquals("Wrong URL tagged as zombie.", emptyDomainFileBuilder.getId(),
-                 new File(zombie.getKey().getFile()).getParentFile().getParentFile().getName());
+                 new File(zombie.getKey()).getParentFile().getParentFile().getName());
   }
 
   @Test
@@ -2922,9 +2937,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
-    final Map.Entry<URL, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
+    final Map.Entry<URI, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
     assertEquals("Wrong URL tagged as zombie.", incompleteDomainFileBuilder.getId(),
-                 new File(zombie.getKey().getFile()).getParentFile().getParentFile().getName());
+                 new File(zombie.getKey()).getParentFile().getParentFile().getName());
   }
 
   @Test
@@ -2939,9 +2954,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedDomainFromBuilder(incompleteDomainFileBuilder);
     assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
-    final Map.Entry<URL, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
+    final Map.Entry<URI, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
     assertEquals("Wrong URL tagged as zombie.", incompleteDomainFileBuilder.getId(),
-                 new File(zombie.getKey().getFile()).getParentFile().getParentFile().getName());
+                 new File(zombie.getKey()).getParentFile().getParentFile().getName());
   }
 
   @Test
@@ -3185,7 +3200,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void synchronizesDomainDeployFromClient() throws Exception {
-    final Action action = () -> deploymentService.deployDomain(dummyDomainFileBuilder.getArtifactFile().toURI().toURL());
+    final Action action = () -> deploymentService.deployDomain(dummyDomainFileBuilder.getArtifactFile().toURI());
 
     final Action assertAction = () -> verify(domainDeploymentListener, never()).onDeploymentStart(dummyDomainFileBuilder.getId());
     doSynchronizedDomainDeploymentActionTest(action, assertAction);
@@ -3543,11 +3558,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     // don't assert dir contents, we want to check internal deployer state next
     assertAppsDir(NONE, new String[] {brokenAppFileBuilder.getId()}, false);
     assertEquals("No apps should have been registered with Mule.", 0, deploymentService.getApplications().size());
-    final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
+    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
     assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
     assertEquals("Wrong URL tagged as zombie.", brokenAppFileBuilder.getDeployedPath(),
-                 new File(zombie.getKey().getFile()).getName());
+                 new File(zombie.getKey()).getName());
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
 
     // Checks that the invalid zip was not deployed again
@@ -3875,25 +3890,25 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   private void addPackedDomainFromBuilder(TestArtifactDescriptor artifactFileBuilder, String targetName) throws Exception {
-    addArchive(domainsDir, artifactFileBuilder.getArtifactFile().toURI().toURL(), targetName);
+    addArchive(domainsDir, artifactFileBuilder.getArtifactFile().toURI(), targetName);
   }
 
   /**
    * Copies a given app archive with a given target name to the apps folder for deployment
    */
   private void addPackedAppArchive(TestArtifactDescriptor artifactFileBuilder, String targetFile) throws Exception {
-    addArchive(appsDir, artifactFileBuilder.getArtifactFile().toURI().toURL(), targetFile);
+    addArchive(appsDir, artifactFileBuilder.getArtifactFile().toURI(), targetFile);
   }
 
-  private void addArchive(File outputDir, URL url, String targetFile) throws Exception {
+  private void addArchive(File outputDir, URI uri, String targetFile) throws Exception {
     ReentrantLock lock = deploymentService.getLock();
 
     lock.lock();
     try {
       // copy is not atomic, copy to a temp file and rename instead (rename is atomic)
-      final String tempFileName = new File((targetFile == null ? url.getFile() : targetFile) + ".part").getName();
+      final String tempFileName = (targetFile == null ? new File(uri) : new File(targetFile)).getName() + ".part";
       final File tempFile = new File(outputDir, tempFileName);
-      copyURLToFile(url, tempFile);
+      copyFile(new File(uri), tempFile);
       final File destFile = new File(removeEnd(tempFile.getAbsolutePath(), ".part"));
       File deployFolder = new File(destFile.getAbsolutePath().replace(JAR_FILE_SUFFIX, ""));
       if (deployFolder.exists()) {
@@ -3936,7 +3951,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     String artifactFolder = artifactName;
     if (artifactFolder == null) {
-      File file = new File(resource.getFile());
+      File file = toFile(resource);
       int index = file.getName().lastIndexOf(".");
 
       if (index > 0) {
@@ -4054,11 +4069,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   private void assertZombieApplication(String appId) {
-    final Map<URL, Long> zombieMap = deploymentService.getZombieApplications();
+    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
     assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", appId,
-                 new File(zombie.getKey().getFile()).getParentFile().getParentFile().getName());
+    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
+    assertEquals("Wrong URL tagged as zombie.", appId, new File(zombie.getKey()).getParentFile().getParentFile().getName());
     assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
   }
 

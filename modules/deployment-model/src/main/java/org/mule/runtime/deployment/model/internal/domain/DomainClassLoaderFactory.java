@@ -9,6 +9,7 @@ package org.mule.runtime.deployment.model.internal.domain;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
@@ -18,6 +19,8 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainLibFolder;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleDomainsDir;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -33,6 +36,7 @@ import org.mule.runtime.module.artifact.util.JarExplorer;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -108,19 +112,26 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
 
   private ArtifactClassLoader getCustomDomainClassLoader(ClassLoaderLookupPolicy containerLookupPolicy, DomainDescriptor domain) {
     validateDomain(domain.getName());
-    final List<URL> urls = getDomainUrls(domain.getName());
-    final Map<String, LookupStrategy> domainLookStrategies = getLookStrategiesFrom(urls);
+    final List<URI> uris = getDomainUrls(domain.getName());
+    final Map<String, LookupStrategy> domainLookStrategies = getLookStrategiesFrom(uris);
     final ClassLoaderLookupPolicy domainLookupPolicy = containerLookupPolicy.extend(domainLookStrategies);
 
-    ArtifactClassLoader classLoader = new MuleSharedDomainClassLoader(domain, parentClassLoader, domainLookupPolicy, urls);
+    ArtifactClassLoader classLoader =
+        new MuleSharedDomainClassLoader(domain, parentClassLoader, domainLookupPolicy, uris.stream().map(uri -> {
+          try {
+            return uri.toURL();
+          } catch (MalformedURLException e) {
+            throw new MuleRuntimeException(e);
+          }
+        }).collect(toList()));
 
     return createClassLoaderUnregisterWrapper(classLoader);
   }
 
-  private Map<String, LookupStrategy> getLookStrategiesFrom(List<URL> libraries) {
+  private Map<String, LookupStrategy> getLookStrategiesFrom(List<URI> libraries) {
     final Map<String, LookupStrategy> result = new HashMap<>();
 
-    for (URL library : libraries) {
+    for (URI library : libraries) {
       Set<String> packages = jarExplorer.explore(library).getPackages();
       for (String packageName : packages) {
         result.put(packageName, PARENT_FIRST);
@@ -130,38 +141,34 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
     return result;
   }
 
-  private List<URL> getDomainUrls(String domain) throws DeploymentException {
-    try {
-      List<URL> urls = new LinkedList<>();
-      urls.add(MuleFoldersUtil.getDomainFolder(domain).toURI().toURL());
-      File domainLibraryFolder = getDomainLibFolder(domain);
+  private List<URI> getDomainUrls(String domain) throws DeploymentException {
+    List<URI> urls = new LinkedList<>();
+    urls.add(MuleFoldersUtil.getDomainFolder(domain).toURI());
+    File domainLibraryFolder = getDomainLibFolder(domain);
 
-      if (domainLibraryFolder.exists()) {
-        Collection<File> jars = listFiles(domainLibraryFolder, new String[] {"jar"}, false);
+    if (domainLibraryFolder.exists()) {
+      Collection<File> jars = listFiles(domainLibraryFolder, new String[] {"jar"}, false);
 
-        if (logger.isDebugEnabled()) {
-          StringBuilder sb = new StringBuilder();
-          sb.append("Loading Shared ClassLoader Domain: ").append(domain).append(LINE_SEPARATOR);
-          sb.append("=============================").append(LINE_SEPARATOR);
-
-          for (File jar : jars) {
-            sb.append(jar.toURI().toURL()).append(LINE_SEPARATOR);
-          }
-
-          sb.append("=============================").append(LINE_SEPARATOR);
-
-          logger.debug(sb.toString());
-        }
+      if (logger.isDebugEnabled()) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Loading Shared ClassLoader Domain: ").append(domain).append(LINE_SEPARATOR);
+        sb.append("=============================").append(LINE_SEPARATOR);
 
         for (File jar : jars) {
-          urls.add(jar.toURI().toURL());
+          sb.append(jar.getPath()).append(LINE_SEPARATOR);
         }
+
+        sb.append("=============================").append(LINE_SEPARATOR);
+
+        logger.debug(sb.toString());
       }
 
-      return urls;
-    } catch (MalformedURLException e) {
-      throw new DeploymentException(createStaticMessage(format("Cannot read domain '%s' libraries", domain)), e);
+      for (File jar : jars) {
+        urls.add(jar.toURI());
+      }
     }
+
+    return urls;
   }
 
   private ArtifactClassLoader getDefaultDomainClassLoader(ClassLoaderLookupPolicy containerLookupPolicy) {

@@ -14,10 +14,13 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.container.internal.ContainerClassLoaderFactory.SYSTEM_PACKAGES;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
@@ -50,6 +53,8 @@ import org.mule.test.runner.api.PluginUrlClassification;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -246,7 +251,7 @@ public class IsolatedClassLoaderFactory {
   private JarInfo getTestJarInfo(ArtifactsUrlClassification artifactsUrlClassification) {
     URL testCodeUrl = artifactsUrlClassification.getApplicationUrls().get(0);
     // sometimes the test-classes URL is the second one.
-    if (!testCodeUrl.getFile().contains("test-classes") && artifactsUrlClassification.getApplicationUrls().size() > 1) {
+    if (!toFile(testCodeUrl).getPath().contains("test-classes") && artifactsUrlClassification.getApplicationUrls().size() > 1) {
       testCodeUrl = artifactsUrlClassification.getApplicationUrls().get(1);
     }
     Set<String> productionPackages = getProductionCodePackages(testCodeUrl);
@@ -289,9 +294,13 @@ public class IsolatedClassLoaderFactory {
     final JarExplorer jarExplorer = new FileJarExplorer();
 
     for (URL library : libraries) {
-      JarInfo jarInfo = jarExplorer.explore(library);
-      packages.addAll(jarInfo.getPackages());
-      resources.addAll(jarInfo.getResources());
+      try {
+        JarInfo jarInfo = jarExplorer.explore(library.toURI());
+        packages.addAll(jarInfo.getPackages());
+        resources.addAll(jarInfo.getResources());
+      } catch (URISyntaxException e) {
+        throw new MuleRuntimeException(e);
+      }
     }
 
     return new JarInfo(packages, resources);
@@ -300,15 +309,15 @@ public class IsolatedClassLoaderFactory {
   private Set<String> getProductionCodePackages(URL testCodeUrl) {
     int index = testCodeUrl.toString().lastIndexOf("test-classes");
     try {
-      URL productionCodeUrl = new URL(testCodeUrl.toString().substring(0, index) + "classes");
-      if (new File(productionCodeUrl.getFile()).exists()) {
+      final URI productionCodeUri = new URL(testCodeUrl.toString().substring(0, index) + "classes").toURI();
+      if (new File(productionCodeUri).exists()) {
         final JarExplorer jarExplorer = new FileJarExplorer();
 
-        return jarExplorer.explore(productionCodeUrl).getPackages();
+        return jarExplorer.explore(productionCodeUri).getPackages();
       } else {
         return emptySet();
       }
-    } catch (MalformedURLException e) {
+    } catch (MalformedURLException | URISyntaxException e) {
       throw new IllegalArgumentException(e);
     }
   }

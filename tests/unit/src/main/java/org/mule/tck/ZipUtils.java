@@ -7,6 +7,7 @@
 
 package org.mule.tck;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.io.File;
@@ -14,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -54,7 +56,7 @@ public class ZipUtils {
           resourceUrl = new File(zipResource.file).toURI().toURL();
         }
 
-        try (FileInputStream in = new FileInputStream(resourceUrl.getFile())) {
+        try (FileInputStream in = new FileInputStream(new File(resourceUrl.toURI()))) {
           out.putNextEntry(new ZipEntry(zipResource.alias == null ? zipResource.file : zipResource.alias));
 
           byte[] buffer = new byte[1024];
@@ -63,6 +65,8 @@ public class ZipUtils {
           while ((count = in.read(buffer)) > 0) {
             out.write(buffer, 0, count);
           }
+        } catch (URISyntaxException e) {
+          throw new MuleRuntimeException(e);
         }
       }
     } catch (IOException e) {

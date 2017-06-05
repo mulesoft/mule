@@ -16,6 +16,7 @@ import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlCo
 import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler.PROTOCOL;
 import static org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler.register;
 import static org.mule.runtime.module.artifact.classloader.net.MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory;
+
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -25,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.FileVisitResult;
@@ -69,13 +71,12 @@ public class MuleArtifactUrlStreamHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Before
-  public void setUp() throws IOException {
+  public void setUp() throws IOException, URISyntaxException {
     installUrlStreamHandlerFactory();
     register();
-    String pluginPath = getClass().getClassLoader().getResource(new File(MULE_MODULE_ARTIFACT_PLUGIN).getPath()).getFile();
 
     File zipFile = folder.newFile(pluginFolder.concat(".zip"));
-    compressFolder(new File(pluginPath).toPath(), zipFile);
+    compressFolder(new File(getClass().getClassLoader().getResource(MULE_MODULE_ARTIFACT_PLUGIN).toURI()).toPath(), zipFile);
 
     zipLocation = zipFile.toURI().toURL();
   }
@@ -89,9 +90,7 @@ public class MuleArtifactUrlStreamHandlerTestCase extends AbstractMuleTestCase {
     assertThat(actualInputStream, notNullValue());
 
     String expectedRootResourceContent = org.apache.commons.io.IOUtils.toString(getClass().getClassLoader()
-        .getResource(
-                     new File(MULE_MODULE_ARTIFACT_PLUGIN + separator + rootResource)
-                         .getPath()));
+        .getResource(new File(MULE_MODULE_ARTIFACT_PLUGIN + separator + rootResource).getPath()));
     assertThat(IOUtils.toString(actualInputStream), is(expectedRootResourceContent));
   }
 
@@ -152,12 +151,12 @@ public class MuleArtifactUrlStreamHandlerTestCase extends AbstractMuleTestCase {
 
     URLClassLoader urlClassLoader = new URLClassLoader(new URL[] {classesURL, jarURL});
 
-    //looking for resource that's located in the classesURL
+    // looking for resource that's located in the classesURL
     InputStream actualSomeClassInputStream = urlClassLoader.getResourceAsStream("org/foo/echo/aResource.txt");
     assertThat(actualSomeClassInputStream, notNullValue());
     assertThat(IOUtils.toString(actualSomeClassInputStream), is("content of some resource"));
 
-    //looking for resource that's located in the jarURL (zip within zip scenario)
+    // looking for resource that's located in the jarURL (zip within zip scenario)
     InputStream testResourceWithinZipInputStream = urlClassLoader.getResourceAsStream("test-resource-2.txt");
     assertThat(testResourceWithinZipInputStream, notNullValue());
     assertThat(IOUtils.toString(testResourceWithinZipInputStream), is("Just some text"));
@@ -168,11 +167,11 @@ public class MuleArtifactUrlStreamHandlerTestCase extends AbstractMuleTestCase {
   }
 
   /**
-   * Helper method that takes a {@code folderToCompress} path, targeting a directory, and compress every folder and
-   * file in it into the desired {@code compressedFile} location.
+   * Helper method that takes a {@code folderToCompress} path, targeting a directory, and compress every folder and file in it
+   * into the desired {@code compressedFile} location.
    *
    * @param folderToCompress directory to compress
-   * @param compressedFile   expected file to be write while compressing the folder
+   * @param compressedFile expected file to be write while compressing the folder
    * @throws IOException if there was an error writing the ZIP
    */
   private void compressFolder(final Path folderToCompress, final File compressedFile) throws IOException {
@@ -181,6 +180,7 @@ public class MuleArtifactUrlStreamHandlerTestCase extends AbstractMuleTestCase {
         ZipOutputStream zos = new ZipOutputStream(fos)) {
       Files.walkFileTree(folderToCompress, new SimpleFileVisitor<Path>() {
 
+        @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
           zos.putNextEntry(new ZipEntry(folderToCompress.relativize(file).toString()));
           Files.copy(file, zos);
@@ -188,6 +188,7 @@ public class MuleArtifactUrlStreamHandlerTestCase extends AbstractMuleTestCase {
           return FileVisitResult.CONTINUE;
         }
 
+        @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
           zos.putNextEntry(new ZipEntry(folderToCompress.relativize(dir).toString() + "/"));
           zos.closeEntry();

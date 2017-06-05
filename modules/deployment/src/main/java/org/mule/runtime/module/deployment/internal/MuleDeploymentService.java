@@ -32,7 +32,7 @@ import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.mule.runtime.module.service.ServiceManager;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -176,11 +176,11 @@ public class MuleDeploymentService implements DeploymentService {
   /**
    * @return URL/lastModified of apps which previously failed to deploy
    */
-  Map<URL, Long> getZombieApplications() {
+  Map<URI, Long> getZombieApplications() {
     return applicationDeployer.getArtifactsZombieMap();
   }
 
-  Map<URL, Long> getZombieDomains() {
+  Map<URI, Long> getZombieDomains() {
     return domainDeployer.getArtifactsZombieMap();
   }
 
@@ -199,8 +199,8 @@ public class MuleDeploymentService implements DeploymentService {
   }
 
   @Override
-  public void deploy(URL appArchiveUrl) throws IOException {
-    executeSynchronized(() -> applicationDeployer.deployPackagedArtifact(appArchiveUrl));
+  public void deploy(URI appArchiveUri) throws IOException {
+    executeSynchronized(() -> applicationDeployer.deployPackagedArtifact(appArchiveUri));
   }
 
   @Override
@@ -222,8 +222,8 @@ public class MuleDeploymentService implements DeploymentService {
   }
 
   @Override
-  public void deployDomain(URL domainArchiveUrl) throws IOException {
-    executeSynchronized(() -> domainDeployer.deployPackagedArtifact(domainArchiveUrl));
+  public void deployDomain(URI domainArchiveUri) throws IOException {
+    executeSynchronized(() -> domainDeployer.deployPackagedArtifact(domainArchiveUri));
   }
 
   @Override

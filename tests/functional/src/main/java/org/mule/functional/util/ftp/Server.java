@@ -6,10 +6,11 @@
  */
 package org.mule.functional.util.ftp;
 
-import org.mule.runtime.core.api.util.IOUtils;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 
@@ -60,18 +61,18 @@ public class Server {
     serverFactory.addListener("default", listenerFactory.createListener());
   }
 
-  private void setupUserManagerFactory(FtpServerFactory serverFactory) throws IOException {
+  private void setupUserManagerFactory(FtpServerFactory serverFactory) throws IOException, URISyntaxException {
     UserManager userManager = createUserManager();
     serverFactory.setUserManager(userManager);
   }
 
-  protected UserManager createUserManager() throws IOException {
+  protected UserManager createUserManager() throws IOException, URISyntaxException {
     PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
-    URL usersFile = IOUtils.getResourceAsUrl("users.properties", getClass());
+    URL usersFile = getResourceAsUrl("users.properties", getClass());
     if (usersFile == null) {
       throw new IOException("users.properties file not found in the classpath");
     }
-    userManagerFactory.setFile(new File(usersFile.getFile()));
+    userManagerFactory.setFile(new File(usersFile.toURI()));
 
     return userManagerFactory.createUserManager();
   }

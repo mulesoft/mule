@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -35,9 +37,8 @@ import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.Scanner;
 
 import org.slf4j.Logger;
@@ -69,9 +70,9 @@ public class DefaultMuleDomain implements Domain {
     URL resource = deploymentClassLoader.findLocalResource(DOMAIN_CONFIG_FILE_LOCATION);
     if (resource != null) {
       try {
-        this.configResourceFile = new File(URLDecoder.decode(resource.getFile(), "UTF-8"));
-      } catch (UnsupportedEncodingException e) {
-        throw new RuntimeException("Unable to find config resource file: " + resource.getFile());
+        this.configResourceFile = new File(resource.toURI());
+      } catch (URISyntaxException e) {
+        throw new MuleRuntimeException(e);
       }
     }
   }

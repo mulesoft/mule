@@ -9,11 +9,13 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_ARTIFACT;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.MULE_POLICY_JSON;
+
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.MulePolicyModelJsonSerializer;
@@ -40,7 +42,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 
@@ -145,15 +146,15 @@ public class PolicyTemplateDescriptorFactory implements ArtifactDescriptorFactor
 
   private Set<ArtifactPluginDescriptor> parseArtifactPluginDescriptors(PolicyTemplateDescriptor descriptor) {
     Set<BundleDependency> pluginDependencies = descriptor.getClassLoaderModel().getDependencies().stream()
-        .filter(dependency -> dependency.getDescriptor().isPlugin()).collect(Collectors.toSet());
+        .filter(dependency -> dependency.getDescriptor().isPlugin()).collect(toSet());
 
     return pluginDependencies.stream().map(dependency -> {
       try {
-        return artifactPluginDescriptorLoader.load(new File(dependency.getBundleUrl().getFile()));
+        return artifactPluginDescriptorLoader.load(new File(dependency.getBundleUri()));
       } catch (IOException e) {
         throw new MuleRuntimeException(e);
       }
-    }).collect(Collectors.toSet());
+    }).collect(toSet());
   }
 
   private MulePolicyModel getMulePolicyJsonDescriber(File jsonFile) {

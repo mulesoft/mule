@@ -13,8 +13,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mule.tck.ZipUtils.compress;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
+import static org.mule.tck.ZipUtils.compress;
+
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.ZipUtils.ZipResource;
@@ -333,7 +334,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void testUnzipFileToSameFolderTwice() throws Exception {
     URL resourceAsUrl = IOUtils.getResourceAsUrl("testFolder.zip", getClass());
-    File zipFile = new File(resourceAsUrl.getFile());
+    File zipFile = new File(resourceAsUrl.toURI());
     File outputDir = FileUtils.newFile(TEST_DIRECTORY);
 
     for (int i = 0; i < 2; i++) {

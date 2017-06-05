@@ -6,11 +6,13 @@
  */
 package org.mule.functional.util.ftp;
 
-import org.mule.runtime.core.api.util.IOUtils;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -98,11 +100,12 @@ public class FtpClient {
    * @param fileName The file to upload
    * @return true if successful, false if not
    * @throws java.io.IOException
+   * @throws URISyntaxException
    */
-  public boolean putFile(String fileName, String targetDir) throws IOException {
+  public boolean putFile(String fileName, String targetDir) throws IOException, URISyntaxException {
     connect();
-    File file = new File(IOUtils.getResourceAsUrl(fileName, getClass()).getFile()); // hacky way to get the file shortname
-    return ftpClient.storeFile(targetDir + "/" + file.getName(), IOUtils.getResourceAsStream(fileName, getClass()));
+    File file = new File(getResourceAsUrl(fileName, getClass()).toURI()); // hacky way to get the file shortname
+    return ftpClient.storeFile(targetDir + "/" + file.getName(), getResourceAsStream(fileName, getClass()));
   }
 
   /**
@@ -145,17 +148,17 @@ public class FtpClient {
     System.out.println("Changed CWD: " + path);
 
     FTPFile[] fileObjs = ftpClient.listFiles();
-    for (int i = 0; i < fileObjs.length; i++) {
-      if (fileObjs[i].isFile()) // delete the file
+    for (FTPFile fileObj : fileObjs) {
+      if (fileObj.isFile()) // delete the file
       {
-        ftpClient.deleteFile(fileObjs[i].getName());
-      } else if (fileObjs[i].isDirectory()
-          && (getFileList(ftpClient.printWorkingDirectory() + "/" + fileObjs[i].getName()).length > 0)) {
-        recursiveDelete(ftpClient.printWorkingDirectory() + "/" + fileObjs[i].getName());
-        deleteDir(ftpClient.printWorkingDirectory() + "/" + fileObjs[i].getName()); // safe to delete dir now that it's empty
-      } else if (fileObjs[i].isDirectory()) // delete the empty directory
+        ftpClient.deleteFile(fileObj.getName());
+      } else if (fileObj.isDirectory()
+          && (getFileList(ftpClient.printWorkingDirectory() + "/" + fileObj.getName()).length > 0)) {
+        recursiveDelete(ftpClient.printWorkingDirectory() + "/" + fileObj.getName());
+        deleteDir(ftpClient.printWorkingDirectory() + "/" + fileObj.getName()); // safe to delete dir now that it's empty
+      } else if (fileObj.isDirectory()) // delete the empty directory
       {
-        deleteDir(ftpClient.printWorkingDirectory() + "/" + fileObjs[i].getName());
+        deleteDir(ftpClient.printWorkingDirectory() + "/" + fileObj.getName());
       }
       // ignore file if not a file or a dir
     }

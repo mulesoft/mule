@@ -10,6 +10,7 @@ import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.apache.ftpserver.FtpServerFactory;
@@ -51,13 +52,13 @@ public class EmbeddedFtpServer {
     return listenerFactory;
   }
 
-  private void setupUserManagerFactory(FtpServerFactory serverFactory) throws IOException {
+  private void setupUserManagerFactory(FtpServerFactory serverFactory) throws IOException, URISyntaxException {
     PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
     URL usersFile = IOUtils.getResourceAsUrl("users.properties", getClass());
     if (usersFile == null) {
       throw new IOException("users.properties file not found in the classpath");
     }
-    userManagerFactory.setFile(new File(usersFile.getFile()));
+    userManagerFactory.setFile(new File(usersFile.toURI()));
     serverFactory.setUserManager(userManagerFactory.createUserManager());
   }
 

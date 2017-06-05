@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.lang.String.format;
 import static org.apache.commons.collections.CollectionUtils.collect;
 import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.lang.StringUtils.removeEndIgnoreCase;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleAppsDir;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.module.artifact.Artifact;
@@ -22,8 +23,7 @@ import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,17 +66,17 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public T deployPackagedArtifact(String zip) throws DeploymentException {
-    URL url;
+    URI uri;
     File artifactZip;
     try {
       final String artifactName = removeEndIgnoreCase(zip, JAR_FILE_SUFFIX);
       artifactZip = new File(artifactDir, zip);
-      url = artifactZip.toURI().toURL();
-      return deployPackagedArtifact(url, artifactName);
+      uri = artifactZip.toURI();
+      return deployPackagedArtifact(uri, artifactName);
     } catch (DeploymentException e) {
       throw e;
     } catch (Exception e) {
-      throw new DeploymentException(CoreMessages.createStaticMessage("Failed to deploy from zip: " + zip), e);
+      throw new DeploymentException(createStaticMessage("Failed to deploy from zip: " + zip), e);
     }
   }
 
@@ -129,16 +129,16 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   @Override
-  public T deployPackagedArtifact(URL artifactAchivedUrl) throws DeploymentException {
+  public T deployPackagedArtifact(URI artifactAchivedUri) throws DeploymentException {
     T artifact;
 
     try {
       try {
 
-        artifact = installFrom(artifactAchivedUrl);
+        artifact = installFrom(artifactAchivedUri);
         trackArtifact(artifact);
       } catch (Throwable t) {
-        File artifactArchive = new File(artifactAchivedUrl.toURI());
+        File artifactArchive = new File(artifactAchivedUri);
         String artifactName = removeEndIgnoreCase(artifactArchive.getName(), JAR_FILE_SUFFIX);
 
         // error text has been created by the deployer already
@@ -159,23 +159,23 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
         throw ((DeploymentException) t);
       }
 
-      final String msg = "Failed to deploy from URL: " + artifactAchivedUrl;
-      throw new DeploymentException(I18nMessageFactory.createStaticMessage(msg), t);
+      final String msg = "Failed to deploy from URI: " + artifactAchivedUri;
+      throw new DeploymentException(createStaticMessage(msg), t);
     }
   }
 
   private void logDeploymentFailure(Throwable t, String artifactName) {
-    final String msg = miniSplash(String.format("Failed to deploy artifact '%s', see below", artifactName));
+    final String msg = miniSplash(format("Failed to deploy artifact '%s', see below", artifactName));
     logger.error(msg, t);
   }
 
   @Override
-  public Map<URL, Long> getArtifactsZombieMap() {
-    Map<URL, Long> result = new HashMap<URL, Long>();
+  public Map<URI, Long> getArtifactsZombieMap() {
+    Map<URI, Long> result = new HashMap<URI, Long>();
 
     for (String artifact : artifactZombieMap.keySet()) {
       ZombieFile file = artifactZombieMap.get(artifact);
-      result.put(file.url, file.originalTimestamp);
+      result.put(file.uri, file.originalTimestamp);
     }
     return result;
   }
@@ -207,10 +207,10 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     this.deploymentListener = deploymentListener;
   }
 
-  private T deployPackagedArtifact(final URL artifactUrl, String artifactName) throws IOException {
+  private T deployPackagedArtifact(final URI artifactUri, String artifactName) throws IOException {
     ZombieFile zombieFile = artifactZombieMap.get(artifactName);
     if (zombieFile != null) {
-      if (zombieFile.isFor(artifactUrl) && !zombieFile.updatedZombieApp()) {
+      if (zombieFile.isFor(artifactUri) && !zombieFile.updatedZombieApp()) {
         // Skips the file because it was already deployed with failure
         return null;
       }
@@ -223,7 +223,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       undeployArtifact(artifactName);
     }
 
-    T deployedAtifact = deployPackagedArtifact(artifactUrl);
+    T deployedAtifact = deployPackagedArtifact(artifactUri);
     deploymentTemplate.postRedeploy(deployedAtifact);
     return deployedAtifact;
   }
@@ -245,7 +245,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
       addZombieFile(addedApp, artifactDir);
 
-      String msg = miniSplash(String.format("Failed to deploy exploded artifact: '%s', see below", addedApp));
+      String msg = miniSplash(format("Failed to deploy exploded artifact: '%s', see below", addedApp));
       logger.error(msg, t);
 
       deploymentListener.onDeploymentFailure(addedApp, t);
@@ -254,7 +254,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
         throw (DeploymentException) t;
       } else {
         msg = "Failed to deploy artifact: " + addedApp;
-        throw new DeploymentException(I18nMessageFactory.createStaticMessage(msg), t);
+        throw new DeploymentException(createStaticMessage(msg), t);
       }
     }
 
@@ -276,7 +276,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       artifactZombieMap.remove(artifact.getArtifactName());
     } catch (Throwable t) {
       // error text has been created by the deployer already
-      String msg = miniSplash(String.format("Failed to deploy artifact '%s', see below", artifact.getArtifactName()));
+      String msg = miniSplash(format("Failed to deploy artifact '%s', see below", artifact.getArtifactName()));
       logger.error(msg, t);
 
       addZombieApp(artifact);
@@ -286,7 +286,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
         throw (DeploymentException) t;
       } else {
         msg = "Failed to deploy artifact: " + artifact.getArtifactName();
-        throw new DeploymentException(I18nMessageFactory.createStaticMessage(msg), t);
+        throw new DeploymentException(createStaticMessage(msg), t);
       }
     }
   }
@@ -316,7 +316,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     try {
       artifactZombieMap.put(artifactName, new ZombieFile(marker));
     } catch (Exception e) {
-      logger.debug(String.format("Failed to mark an exploded artifact [%s] as a zombie", marker.getName()), e);
+      logger.debug(format("Failed to mark an exploded artifact [%s] as a zombie", marker.getName()), e);
     }
   }
 
@@ -361,19 +361,19 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   private void logArtifactUndeployed(T artifact) {
     if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(String.format("Undeployed artifact '%s'", artifact.getArtifactName())));
+      logger.info(miniSplash(format("Undeployed artifact '%s'", artifact.getArtifactName())));
     }
   }
 
-  private T installFrom(URL url) throws IOException {
-    File artifactLocation = artifactArchiveInstaller.installArtifact(url);
+  private T installFrom(URI uri) throws IOException {
+    File artifactLocation = artifactArchiveInstaller.installArtifact(uri);
     return artifactFactory.createArtifact(artifactLocation);
   }
 
   @Override
   public void redeploy(T artifact) throws DeploymentException {
     if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(String.format("Redeploying artifact '%s'", artifact.getArtifactName())));
+      logger.info(miniSplash(format("Redeploying artifact '%s'", artifact.getArtifactName())));
     }
 
     deploymentListener.onUndeploymentStart(artifact.getArtifactName());
@@ -401,7 +401,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
           throw (DeploymentException) t;
         }
         String msg = "Failed to deploy artifact: " + artifact.getArtifactName();
-        throw new DeploymentException(I18nMessageFactory.createStaticMessage(msg), t);
+        throw new DeploymentException(createStaticMessage(msg), t);
       } finally {
         deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
       }
@@ -412,22 +412,18 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   private static class ZombieFile {
 
-    URL url;
+    URI uri;
     Long originalTimestamp;
     File file;
 
     private ZombieFile(File file) {
       this.file = file;
       originalTimestamp = file.lastModified();
-      try {
-        url = file.toURI().toURL();
-      } catch (MalformedURLException e) {
-        throw new IllegalArgumentException(e);
-      }
+      uri = file.toURI();
     }
 
-    public boolean isFor(URL url) {
-      return this.url.equals(url);
+    public boolean isFor(URI uri) {
+      return this.uri.equals(uri);
     }
 
     public boolean updatedZombieApp() {

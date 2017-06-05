@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
+
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -17,7 +18,7 @@ import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 
@@ -68,7 +69,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
   }
 
   @Override
-  public Domain deployPackagedArtifact(URL artifactAchivedUrl) {
+  public Domain deployPackagedArtifact(URI artifactAchivedUrl) {
     Domain domain = domainDeployer.deployPackagedArtifact(artifactAchivedUrl);
     deployBundledAppsIfDomainWasCreated(domain);
     return domain;
@@ -135,7 +136,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
   }
 
   @Override
-  public Map<URL, Long> getArtifactsZombieMap() {
+  public Map<URI, Long> getArtifactsZombieMap() {
     return domainDeployer.getArtifactsZombieMap();
   }
 

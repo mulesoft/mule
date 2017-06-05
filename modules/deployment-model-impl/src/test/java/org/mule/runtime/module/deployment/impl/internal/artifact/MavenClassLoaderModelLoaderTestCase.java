@@ -19,11 +19,12 @@ import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperties;
+
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class MavenClassLoaderModelLoaderTestCase {
   public static final String MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION = "muleRuntimeConfig.maven.repositoryLocation";
   private MavenClassLoaderModelLoader mavenClassLoaderModelLoader;
 
-  private File artifactFile = getApplicationFolder("apps/single-dependency");
+  private File artifactFile;
 
   @Rule
   public SystemProperty repositoryLocation = new SystemProperty(MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION,
@@ -51,8 +52,9 @@ public class MavenClassLoaderModelLoaderTestCase {
   public ExpectedException expectedException = none();
 
   @Before
-  public void before() {
+  public void before() throws URISyntaxException {
     mavenClassLoaderModelLoader = new MavenClassLoaderModelLoader();
+    artifactFile = getApplicationFolder("apps/single-dependency");
   }
 
   @Test
@@ -92,9 +94,8 @@ public class MavenClassLoaderModelLoaderTestCase {
                              });
   }
 
-  private File getApplicationFolder(String appPath) {
-    URL noDependenciesFolderUrl = getClass().getClassLoader().getResource(appPath);
-    return new File(noDependenciesFolderUrl.getFile());
+  private File getApplicationFolder(String appPath) throws URISyntaxException {
+    return new File(getClass().getClassLoader().getResource(appPath).toURI());
   }
 
 }

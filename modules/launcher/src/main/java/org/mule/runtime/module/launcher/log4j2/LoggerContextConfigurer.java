@@ -7,13 +7,13 @@
 package org.mule.runtime.module.launcher.log4j2;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ShutdownListener;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
-import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.api.util.FileUtils;
 
 import java.io.File;
 import java.io.Serializable;
@@ -231,8 +231,8 @@ final class LoggerContextConfigurer {
     }
 
     if (directory != null && FileUtils.isFile(url)) {
-      File urlFile = new File(url.getFile());
-      return directory.equals(urlFile.getParentFile());
+      File uriFile = new File(uri);
+      return directory.equals(uriFile.getParentFile());
     }
 
     return false;

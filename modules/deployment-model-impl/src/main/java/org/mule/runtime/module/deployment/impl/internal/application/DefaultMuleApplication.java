@@ -109,8 +109,8 @@ public class DefaultMuleApplication implements Application {
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
 
     try {
-      for (String configResourceAbsolutePatch : this.descriptor.getAbsoluteResourcePaths()) {
-        File configResource = new File(configResourceAbsolutePatch);
+      for (String configResourceAbsolutePath : this.descriptor.getAbsoluteResourcePaths()) {
+        File configResource = new File(configResourceAbsolutePath);
         if (!configResource.exists()) {
           String message = format("Config for app '%s' not found: %s", getArtifactName(), configResource);
           throw new InstallException(createStaticMessage(message));
