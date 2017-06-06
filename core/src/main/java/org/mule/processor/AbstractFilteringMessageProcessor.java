@@ -7,6 +7,7 @@
 package org.mule.processor;
 
 import static java.lang.System.getProperty;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -25,7 +26,7 @@ import org.mule.config.i18n.CoreMessages;
 public abstract class AbstractFilteringMessageProcessor extends AbstractInterceptingMessageProcessor  implements NonBlockingSupported
 {
 
-    public static final String FILTERS_STOP_ALL_FLOW_CALLERS = "filter.stop.all.flow.callers";
+    public static final String FILTERS_STOP_ALL_FLOW_CALLERS = SYSTEM_PROPERTY_PREFIX + "filter.stop.all.flow.callers";
 
     /** 
      * Throw a FilterUnacceptedException when a message is rejected by the filter? 
