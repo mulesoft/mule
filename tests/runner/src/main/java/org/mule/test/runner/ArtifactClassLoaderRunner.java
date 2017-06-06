@@ -112,6 +112,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
   private static Exception errorCreatingClassLoaderTestRunner;
   private static boolean staticFieldsInjected = false;
+  private static Throwable errorWhileSettingClassLoaders;
 
   private final Runner delegate;
 
@@ -148,16 +149,21 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
         .buildRunner(AnnotationUtils.getAnnotationAttributeFrom(isolatedTestClass, runnerDelegateToClass, "value"),
                      isolatedTestClass);
 
+    if (staticFieldsInjected && errorWhileSettingClassLoaders != null) {
+      throw Throwables.propagate(errorWhileSettingClassLoaders);
+    }
     withContextClassLoader(artifactClassLoaderHolder.getApplicationClassLoader().getClassLoader(), () -> {
       try {
         if (!staticFieldsInjected) {
           injectPluginsClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
           injectServicesClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
           injectContainerClassLoader(artifactClassLoaderHolder, isolatedTestClass);
-          staticFieldsInjected = true;
         }
       } catch (Throwable t) {
+        errorWhileSettingClassLoaders = t;
         throw Throwables.propagate(t);
+      } finally {
+        staticFieldsInjected = true;
       }
     });
   }
