@@ -10,6 +10,7 @@ import static java.io.File.separator;
 import static java.lang.String.format;
 import static java.lang.System.setProperty;
 import static org.apache.commons.io.FileUtils.copyFile;
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
@@ -17,6 +18,7 @@ import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader.ADD_TEST_DEPENDENCIES_KEY;
 import static org.mule.runtime.module.embedded.impl.SerializationUtils.deserialize;
 import static org.mule.runtime.module.embedded.internal.MavenUtils.createModelFromPom;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
@@ -97,8 +99,8 @@ public class EmbeddedController {
     File containerFolder = new File(containerInfo.getContainerBaseFolder().getPath());
     File servicesFolder = new File(containerFolder, "services");
     for (URL url : containerInfo.getServices()) {
-      File originalFile = new File(url.getFile());
-      File destinationFile = new File(servicesFolder, FilenameUtils.getName(url.getFile()));
+      File originalFile = toFile(url);
+      File destinationFile = new File(servicesFolder, FilenameUtils.getName(originalFile.getPath()));
       copyFile(originalFile, destinationFile);
     }
 
@@ -151,12 +153,12 @@ public class EmbeddedController {
     muleArtifactFolder.mkdirs();
     File descriptorFile = new File(muleArtifactFolder, "mule-application.json");
 
-    File pomFile = new File(applicationConfiguration.getApplication().getPomFile().getFile());
+    File pomFile = toFile(applicationConfiguration.getApplication().getPomFile());
     Model pomModel = createModelFromPom(pomFile);
     String pomLocation = format("META-INF%smaven%s%s%s%s%spom.xml", separator, separator, pomModel.getGroupId(), separator,
                                 pomModel.getArtifactId(), separator);
     File appPomFileLocation = new File(applicationFolder, pomLocation);
-    copyFile(new File(applicationConfiguration.getApplication().getDescriptorFile().getFile()), descriptorFile);
+    copyFile(toFile(applicationConfiguration.getApplication().getDescriptorFile()), descriptorFile);
     copyFile(pomFile, appPomFileLocation);
     return applicationFolder;
   }

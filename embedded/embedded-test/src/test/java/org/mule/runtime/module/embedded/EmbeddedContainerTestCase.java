@@ -8,6 +8,7 @@
 package org.mule.runtime.module.embedded;
 
 import static com.mashape.unirest.http.Unirest.post;
+import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
@@ -30,6 +31,7 @@ import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.Deploym
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EMBEDDED_API;
 import static org.mule.test.allure.AllureConstants.EmbeddedApiFeature.EmbeddedApiStory.CONFIGURATION;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.module.embedded.api.Application;
 import org.mule.runtime.module.embedded.api.ApplicationConfiguration;
 import org.mule.runtime.module.embedded.api.DeploymentConfiguration;
@@ -38,9 +40,6 @@ import org.mule.runtime.module.embedded.internal.classloading.FilteringClassLoad
 import org.mule.runtime.module.embedded.internal.classloading.JdkOnlyClassLoaderFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.FreePortFinder;
-
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.exceptions.UnirestException;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +57,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -82,7 +85,7 @@ public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
     doWithinApplication("http-echo", port -> {
       try {
         String httpBody = "test-message";
-        HttpResponse<String> response = post(String.format("http://localhost:%s/", port)).body(httpBody).asString();
+        HttpResponse<String> response = post(format("http://localhost:%s/", port)).body(httpBody).asString();
         assertThat(response.getBody(), is(httpBody));
       } catch (UnirestException e) {
         throw new RuntimeException(e);
@@ -96,7 +99,7 @@ public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
     doWithinApplication("http-test-dependency", port -> {
       try {
         String httpBody = "org.mobicents.xcap.client.impl.XcapClientImpl";
-        HttpResponse<String> response = post(String.format("http://localhost:%s/", port)).body(httpBody).asString();
+        HttpResponse<String> response = post(format("http://localhost:%s/", port)).body(httpBody).asString();
         assertThat(response.getBody(), is(httpBody));
       } catch (UnirestException e) {
         throw new RuntimeException(e);
@@ -147,12 +150,12 @@ public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
     doWithinApplication("http-echo", port -> {
       try {
         String httpBody = "test-message";
-        HttpResponse<String> response = post(String.format("http://localhost:%s/", port)).body(httpBody).asString();
+        HttpResponse<String> response = post(format("http://localhost:%s/", port)).body(httpBody).asString();
         assertThat(response.getBody(), is(httpBody));
       } catch (UnirestException e) {
         throw new RuntimeException(e);
       }
-    }, false, emptyMap(), of(getClass().getClassLoader().getResource("log4j2-custom-file.xml").getFile()));
+    }, false, emptyMap(), of(getClass().getClassLoader().getResource("log4j2-custom-file.xml").toURI()));
     try {
       File expectedLoggingFile = new File(LOGGING_FILE);
       assertThat(expectedLoggingFile.exists(), is(true));
@@ -177,7 +180,7 @@ public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
   }
 
   private void doWithinApplication(String applicationFolder, Consumer<Integer> portConsumer, boolean enableTestDependencies,
-                                   Map<String, String> applicationProperties, Optional<String> log4JConfigurationFileOptional)
+                                   Map<String, String> applicationProperties, Optional<URI> log4JConfigurationFileOptional)
       throws URISyntaxException, IOException {
     ClassLoader contextClassLoader = currentThread().getContextClassLoader();
     try {
@@ -189,10 +192,9 @@ public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
       Integer httpListenerPort = new FreePortFinder(6000, 9000).find();
       customizedApplicationProperties.put("httpPort", valueOf(httpListenerPort));
       Application application =
-          new Application(
-                          singletonList(getClasspathResourceAsUri(applicationFolder + File.separator + "mule-config.xml")), null,
-                          getClasspathResourceAsUri(applicationFolder + File.separator + "pom.xml").toURL(),
-                          getClasspathResourceAsUri(applicationFolder + File.separator + "mule-application.json").toURL());
+          new Application(singletonList(getClasspathResourceAsUri(applicationFolder + "/mule-config.xml")), null,
+                          getClasspathResourceAsUri(applicationFolder + "/pom.xml").toURL(),
+                          getClasspathResourceAsUri(applicationFolder + "/mule-application.json").toURL());
 
       File localRepositoryLocation = localRepositoryFolder.getRoot();
       LOGGER.info("Using folder as local repository: " + localRepositoryLocation.getAbsolutePath());
@@ -203,12 +205,11 @@ public class EmbeddedContainerTestCase extends AbstractMuleTestCase {
           .withMavenConfiguration(newMavenConfigurationBuilder()
               .withLocalMavenRepositoryLocation(localRepositoryLocation)
               .withRemoteRepository(newRemoteRepositoryBuilder().withId("mulesoft-public")
-                  .withUrl(new URL(
-                                   "https://repository.mulesoft.org/nexus/content/repositories/public"))
+                  .withUrl(new URL("https://repository.mulesoft.org/nexus/content/repositories/public"))
                   .build())
               .build())
           .withLog4jConfigurationFile(log4JConfigurationFileOptional
-              .orElse(getClass().getClassLoader().getResource("log4j2-default.xml").getFile()))
+              .orElse(getClass().getClassLoader().getResource("log4j2-default.xml").toURI()))
           .withApplicationConfiguration(ApplicationConfiguration.builder()
               .withApplication(application)
               .withDeploymentConfiguration(DeploymentConfiguration.builder()
