@@ -31,6 +31,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -173,6 +174,18 @@ public class IOUtils {
   public static String toString(InputStream input) {
     try {
       return org.apache.commons.io.IOUtils.toString(input);
+    } catch (IOException iox) {
+      throw new RuntimeException(iox);
+    }
+  }
+
+  /**
+   * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toString(InputStream, Charset)</code> method but catches any
+   * {@link IOException} and wraps it into a {@link RuntimeException}.
+   */
+  public static String toString(InputStream input, Charset encoding) {
+    try {
+      return org.apache.commons.io.IOUtils.toString(input, encoding);
     } catch (IOException iox) {
       throw new RuntimeException(iox);
     }
