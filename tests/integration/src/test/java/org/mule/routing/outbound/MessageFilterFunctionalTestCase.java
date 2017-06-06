@@ -7,7 +7,7 @@
 
 package org.mule.routing.outbound;
 
-import static org.mule.processor.AbstractFilteringMessageProcessor.FILTERS_STOP_ALL_FLOW_CALLERS;
+import static org.mule.processor.AbstractFilteringMessageProcessor.FILTER_ON_UNACCEPTED_STOPS_PARENT_FLOW;
 import static org.mule.tck.functional.FlowAssert.verify;
 
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -20,7 +20,7 @@ public class MessageFilterFunctionalTestCase extends FunctionalTestCase
 {
 
     @Rule
-    public SystemProperty filterStopAllFlowCallersSystemProperty = new SystemProperty(FILTERS_STOP_ALL_FLOW_CALLERS, "true");
+    public SystemProperty filterStopAllFlowCallersSystemProperty = new SystemProperty(FILTER_ON_UNACCEPTED_STOPS_PARENT_FLOW, "true");
 
     @Override
     protected String getConfigFile()

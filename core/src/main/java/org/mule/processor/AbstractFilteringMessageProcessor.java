@@ -27,7 +27,7 @@ import org.mule.config.i18n.CoreMessages;
 public abstract class AbstractFilteringMessageProcessor extends AbstractInterceptingMessageProcessor  implements NonBlockingSupported
 {
 
-    public static final String FILTERS_STOP_ALL_FLOW_CALLERS = SYSTEM_PROPERTY_PREFIX + "filterOnUnacceptedStopsParentFlow";
+    public static final String FILTER_ON_UNACCEPTED_STOPS_PARENT_FLOW = SYSTEM_PROPERTY_PREFIX + "filterOnUnacceptedStopsParentFlow";
 
     /** 
      * Throw a FilterUnacceptedException when a message is rejected by the filter? 
@@ -125,6 +125,6 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
 
     private boolean shouldFiltersStopAllFlowCallers()
     {
-        return getBoolean(FILTERS_STOP_ALL_FLOW_CALLERS)? true : false;
+        return getBoolean(FILTER_ON_UNACCEPTED_STOPS_PARENT_FLOW);
     }
 }
