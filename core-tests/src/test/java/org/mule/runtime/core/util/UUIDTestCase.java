@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
+import org.mule.runtime.core.api.util.UUID;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;

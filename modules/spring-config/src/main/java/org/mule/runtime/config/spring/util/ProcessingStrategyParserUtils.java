@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.util;
 
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_FACTORY_ATTRIBUTE;
-import static org.mule.runtime.core.util.ProcessingStrategyUtils.parseProcessingStrategy;
+import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.parseProcessingStrategy;
 
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 

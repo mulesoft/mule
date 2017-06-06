@@ -14,7 +14,7 @@ import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.util.Base64;
+import org.mule.runtime.core.api.util.Base64;
 import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 
 import org.junit.Test;

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.security.tls;
 
 
-import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
+import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 

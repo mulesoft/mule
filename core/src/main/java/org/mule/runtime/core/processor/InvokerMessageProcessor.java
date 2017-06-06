@@ -34,8 +34,8 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transformer.TransformerTemplate;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.util.TemplateParser;
-import org.mule.runtime.core.util.TemplateParser.PatternInfo;
+import org.mule.runtime.core.api.util.TemplateParser;
+import org.mule.runtime.core.api.util.TemplateParser.PatternInfo;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

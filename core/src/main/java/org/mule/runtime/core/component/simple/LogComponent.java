@@ -10,7 +10,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.component.simple.LogService;
 import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.api.util.StringMessageUtils;
 
 import javax.inject.Inject;
 

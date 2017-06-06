@@ -8,7 +8,7 @@ package org.mule.runtime.core.config.builders;
 
 import static org.apache.commons.lang.StringUtils.substringAfterLast;
 import static org.mule.runtime.core.api.util.ClassUtils.getResource;
-import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
+import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;

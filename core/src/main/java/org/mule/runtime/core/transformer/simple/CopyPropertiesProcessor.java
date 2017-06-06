@@ -17,8 +17,8 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.message.InternalMessage.Builder;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.util.AttributeEvaluator;
-import org.mule.runtime.core.util.WildcardAttributeEvaluator;
+import org.mule.runtime.core.api.util.AttributeEvaluator;
+import org.mule.runtime.core.api.util.WildcardAttributeEvaluator;
 
 import java.io.Serializable;
 

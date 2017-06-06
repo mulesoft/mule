@@ -9,8 +9,7 @@ package org.mule.runtime.core.internal.util.splash;
 import static java.lang.Boolean.TRUE;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.util.PropertyChecker;
-import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.api.util.StringMessageUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;

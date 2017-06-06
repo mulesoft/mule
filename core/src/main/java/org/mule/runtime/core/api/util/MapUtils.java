@@ -8,8 +8,6 @@ package org.mule.runtime.core.api.util;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 
-import org.mule.runtime.core.util.PropertiesUtils;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;

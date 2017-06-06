@@ -8,7 +8,7 @@ package org.mule.functional.testmodels.services;
 
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 
-import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.api.util.StringMessageUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

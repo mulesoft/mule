@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.api.util.StringMessageUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

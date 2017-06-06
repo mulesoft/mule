@@ -8,7 +8,7 @@ package org.mule.runtime.deployment.model.internal.tooling;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.util.UUID.getUUID;
+import static org.mule.runtime.core.api.util.UUID.getUUID;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;

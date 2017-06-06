@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
-import org.mule.runtime.core.logging.LogConfigChangeSubject;
+import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 

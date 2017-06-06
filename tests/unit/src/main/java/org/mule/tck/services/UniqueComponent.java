@@ -8,7 +8,7 @@ package org.mule.tck.services;
 
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.api.util.UUID;
 
 /**
  * Each instance of this service should contain a unique ID. Useful for testing object pools.

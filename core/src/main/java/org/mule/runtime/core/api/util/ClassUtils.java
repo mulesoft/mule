@@ -13,7 +13,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ExceptionUtils.tryExpecting;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
-import org.mule.runtime.core.util.ExceptionHandler;
 
 import com.google.common.primitives.Primitives;
 

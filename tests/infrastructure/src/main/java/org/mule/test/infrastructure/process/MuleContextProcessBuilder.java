@@ -7,7 +7,7 @@
 package org.mule.test.infrastructure.process;
 
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.api.util.UUID;
 import org.mule.tck.junit4.rule.FreePortFinder;
 import org.mule.test.infrastructure.deployment.FakeMuleServer;
 

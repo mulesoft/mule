@@ -9,8 +9,8 @@ package org.mule.runtime.container.api;
 
 import static java.io.File.separator;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleBase;
-import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleHome;
+import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleBase;
+import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
 import org.mule.runtime.core.api.util.StringUtils;
 
 import java.io.File;

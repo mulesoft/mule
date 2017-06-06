@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.el.datetime.DateTime;
-import org.mule.runtime.core.util.NetworkUtils;
+import org.mule.runtime.core.api.util.NetworkUtils;
 
 import java.net.UnknownHostException;
 import java.util.Calendar;

@@ -29,7 +29,7 @@ import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSeria
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.container.api.MuleFoldersUtil;
-import org.mule.runtime.core.util.PropertiesUtils;
+import org.mule.runtime.core.api.util.PropertiesUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;

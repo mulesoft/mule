@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.editors;
 
-import static org.mule.runtime.core.util.ProcessingStrategyUtils.parseProcessingStrategy;
+import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.parseProcessingStrategy;
 
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 

@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
-import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

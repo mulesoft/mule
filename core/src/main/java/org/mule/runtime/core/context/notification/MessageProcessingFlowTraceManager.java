@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.logging.LogConfigChangeSubject;
+import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
 
 import java.beans.PropertyChangeListener;
 import java.util.Collections;

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.util;
 
 import static org.junit.Assert.assertThat;
+import org.mule.runtime.core.api.util.WildcardAttributeEvaluator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import java.util.ArrayList;

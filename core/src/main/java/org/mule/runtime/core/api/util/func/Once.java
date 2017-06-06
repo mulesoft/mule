@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.util.func;
 
-import org.mule.runtime.core.util.ConcurrencyUtils;
+import org.mule.runtime.core.internal.util.ConcurrencyUtils;
 
 import java.util.concurrent.locks.ReentrantLock;
 

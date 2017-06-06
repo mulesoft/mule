@@ -11,7 +11,7 @@ import static java.io.File.createTempFile;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.write;
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.runtime.core.util.PropertiesUtils.discoverProperties;
+import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
 import org.mule.runtime.module.artifact.classloader.ExportedService;
 import org.mule.runtime.container.api.MuleModule;
 
