@@ -2,14 +2,16 @@
 
 <mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <flow name="MainFlow">
         <set-variable variableName="flag" value="false"/>
         <flow-ref name="SubFlow_Level1"/>
-        <component class="org.mule.routing.outbound.MessageFilterFunctionalTestCase$TestJavaComponent" />
+        <test:assert count="0"/>
     </flow>
 
     <sub-flow name="SubFlow_Level1" >
@@ -19,7 +21,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
     </sub-flow>
 
     <sub-flow name="SubFlow_level2">
-        <echo-component/>
+        <test:assert count="1"/>
     </sub-flow>
 
 </mule>
