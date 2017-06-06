@@ -36,11 +36,12 @@ import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
 import static org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.container.api.MuleFoldersUtil;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
+import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
@@ -53,21 +54,20 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import org.mule.tck.util.CompilerUtils;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Set;
+
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
@@ -97,6 +97,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws Exception {
+    GlobalConfigLoader.reset();
     applicationPluginRepository = mock(ArtifactPluginRepository.class);
     when(applicationPluginRepository.getContainerArtifactPluginDescriptors()).thenReturn(emptyList());
   }
@@ -227,7 +228,6 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     assertThat(desc.getConfigResources(), contains("mule/file1.xml", "mule/file2.xml"));
   }
 
-  @Ignore
   @Test
   public void classLoaderModelWithSingleDependency() throws Exception {
     ApplicationDescriptor desc = createApplicationDescriptor("apps/single-dependency");
@@ -242,7 +242,6 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     assertThat(asList(classLoaderModel.getUrls()), hasItem(commonsCollectionDependency.getBundleUrl()));
   }
 
-  @Ignore
   @Test
   public void classLoaderModelWithPluginDependency() throws Exception {
     ApplicationDescriptor desc = createApplicationDescriptor("apps/plugin-dependency");
@@ -256,15 +255,14 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     assertThat(asList(classLoaderModel.getUrls()), not(hasItem(classLoaderModel.getDependencies().iterator().next())));
   }
 
-  @Ignore
   @Test
   public void classLoaderModelWithPluginDependencyWithAnotherPlugin() throws Exception {
     ApplicationDescriptor desc = createApplicationDescriptor("apps/plugin-dependency-with-another-plugin");
 
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
 
-    assertThat(classLoaderModel.getDependencies().size(), is(1));
-    assertThat(classLoaderModel.getDependencies(), hasItems(httpPluginDependencyMatcher()));
+    assertThat(classLoaderModel.getDependencies().size(), is(2));
+    assertThat(classLoaderModel.getDependencies(), hasItems(httpPluginDependencyMatcher(), httpSocketsDependencyMatcher()));
 
     assertThat(classLoaderModel.getUrls().length, is(1));
     classLoaderModel.getDependencies().stream()
@@ -323,6 +321,14 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
   }
 
   private Matcher<BundleDependency> httpPluginDependencyMatcher() {
+    return createConnectorMatcher("mule-http-connector");
+  }
+
+  private Matcher<BundleDependency> httpSocketsDependencyMatcher() {
+    return createConnectorMatcher("mule-sockets-connector");
+  }
+
+  private Matcher<BundleDependency> createConnectorMatcher(String artifactId) {
     return new BaseMatcher<BundleDependency>() {
 
       @Override
@@ -340,9 +346,9 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
         return bundleDependency.getScope().equals(COMPILE) &&
             bundleDependency.getDescriptor().getClassifier().isPresent() &&
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
-            bundleDependency.getDescriptor().getArtifactId().equals("mule-http-connector") &&
+            bundleDependency.getDescriptor().getArtifactId().equals(artifactId) &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.connectors") &&
-            bundleDependency.getDescriptor().getVersion().equals("4.0.0-SNAPSHOT");
+            bundleDependency.getDescriptor().getVersion().equals("1.0.0-SNAPSHOT");
       }
     };
   }
