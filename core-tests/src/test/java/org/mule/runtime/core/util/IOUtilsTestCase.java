@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.core.util;
 
+import static java.nio.charset.Charset.forName;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -25,6 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 
 import org.junit.Test;
 
@@ -71,4 +75,15 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
     });
   }
 
+  @Test
+  public void convertsToStringWithEncoding() throws Exception {
+
+    final Charset encoding = forName("EUC-JP");
+    final String encodedText = "\u3053";
+    InputStream in = new ByteArrayInputStream(encodedText.getBytes(encoding));
+
+    String converted = IOUtils.toString(in, encoding);
+
+    assertThat(converted, equalTo(encodedText));
+  }
 }
