@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.core.util.SimpleLoggingTable;
+import org.mule.runtime.core.internal.util.splash.SimpleLoggingTable;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.StartupListener;
 import org.mule.runtime.deployment.model.api.application.Application;

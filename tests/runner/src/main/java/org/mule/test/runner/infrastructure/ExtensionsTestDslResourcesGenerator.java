@@ -7,7 +7,7 @@
 package org.mule.test.runner.infrastructure;
 
 import static java.util.Collections.emptyList;
-import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;

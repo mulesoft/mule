@@ -11,8 +11,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
-import org.mule.runtime.core.util.collection.EventToMessageSequenceSplittingStrategy;
-import org.mule.runtime.core.util.collection.SplittingStrategy;
+import org.mule.runtime.core.api.util.collection.EventToMessageSequenceSplittingStrategy;
+import org.mule.runtime.core.api.util.collection.SplittingStrategy;
 
 /**
  * Splits a message that has a Collection, Iterable, MessageSequence or Iterator payload or an expression that resolves to some of

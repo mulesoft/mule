@@ -115,12 +115,12 @@ import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
-import org.mule.runtime.core.util.ApplicationShutdownSplashScreen;
-import org.mule.runtime.core.util.ApplicationStartupSplashScreen;
+import org.mule.runtime.core.internal.util.splash.ApplicationShutdownSplashScreen;
+import org.mule.runtime.core.internal.util.splash.ApplicationStartupSplashScreen;
 import org.mule.runtime.core.internal.util.JdkVersionUtils;
-import org.mule.runtime.core.util.ServerShutdownSplashScreen;
-import org.mule.runtime.core.util.ServerStartupSplashScreen;
-import org.mule.runtime.core.util.SplashScreen;
+import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
+import org.mule.runtime.core.internal.util.splash.ServerStartupSplashScreen;
+import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.api.util.queue.QueueManager;
@@ -802,7 +802,7 @@ public class DefaultMuleContext implements MuleContext {
     registryBroker.removeRegistry(registry);
   }
 
-  protected SplashScreen buildStartupSplash() {
+  private SplashScreen buildStartupSplash() {
     SplashScreen startupScreen =
         config.isContainerMode() ? new ApplicationStartupSplashScreen() : new ServerStartupSplashScreen();
     startupScreen.setHeader(this);
@@ -810,7 +810,7 @@ public class DefaultMuleContext implements MuleContext {
     return startupScreen;
   }
 
-  protected SplashScreen buildShutdownSplash() {
+  private SplashScreen buildShutdownSplash() {
     SplashScreen shutdownScreen =
         config.isContainerMode() ? new ApplicationShutdownSplashScreen() : new ServerShutdownSplashScreen();
     shutdownScreen.setHeader(this);

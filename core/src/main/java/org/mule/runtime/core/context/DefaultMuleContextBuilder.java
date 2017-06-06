@@ -8,7 +8,6 @@ package org.mule.runtime.core.context;
 
 import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -34,6 +33,7 @@ import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.config.bootstrap.PropertiesBootstrapServiceDiscoverer;
@@ -59,8 +59,6 @@ import org.mule.runtime.core.processor.interceptor.DefaultProcessorInterceptorMa
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.RegistryDelegatingInjector;
-import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.util.SplashScreen;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,17 +71,12 @@ import org.slf4j.LoggerFactory;
 public class DefaultMuleContextBuilder implements MuleContextBuilder {
 
   protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleContextBuilder.class);
-  public static final String MULE_CONTEXT_WORKMANAGER_MAXTHREADSACTIVE = "mule.context.workmanager.maxthreadsactive";
 
   protected MuleConfiguration config;
 
   protected MuleContextLifecycleManager lifecycleManager;
 
   protected ServerNotificationManager notificationManager;
-
-  protected SplashScreen startupScreen;
-
-  protected SplashScreen shutdownScreen;
 
   protected BootstrapServiceDiscoverer bootstrapDiscoverer;
 
@@ -216,22 +209,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     } else {
       return createNotificationManager();
     }
-  }
-
-  public SplashScreen getStartupScreen() {
-    return startupScreen;
-  }
-
-  public void setStartupScreen(SplashScreen startupScreen) {
-    this.startupScreen = startupScreen;
-  }
-
-  public SplashScreen getShutdownScreen() {
-    return shutdownScreen;
-  }
-
-  public void setShutdownScreen(SplashScreen shutdownScreen) {
-    this.shutdownScreen = shutdownScreen;
   }
 
   public void setBootstrapPropertiesServiceDiscoverer(BootstrapServiceDiscoverer bootstrapDiscoverer) {

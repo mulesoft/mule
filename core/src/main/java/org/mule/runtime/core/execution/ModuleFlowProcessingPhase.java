@@ -51,7 +51,7 @@ import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.policy.SourcePolicy;
 import org.mule.runtime.core.policy.SuccessSourcePolicyResult;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.util.func.CheckedConsumer;
+import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import org.reactivestreams.Publisher;

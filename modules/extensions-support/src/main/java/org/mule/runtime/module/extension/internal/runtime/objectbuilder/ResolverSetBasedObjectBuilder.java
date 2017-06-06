@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;

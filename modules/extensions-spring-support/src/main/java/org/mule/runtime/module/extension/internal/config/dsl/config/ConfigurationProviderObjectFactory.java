@@ -14,7 +14,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.time.TimeSupplier;
-import org.mule.runtime.core.util.func.CheckedConsumer;
+import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;

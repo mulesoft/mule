@@ -17,9 +17,9 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.ModuleFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
-import org.mule.runtime.core.util.func.CheckedConsumer;
-import org.mule.runtime.core.util.func.CheckedFunction;
-import org.mule.runtime.core.util.func.CheckedRunnable;
+import org.mule.runtime.core.api.util.func.CheckedConsumer;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 
 import org.reactivestreams.Publisher;
 

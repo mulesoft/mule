@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
-import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.loader.java.type.ConfigurationElement;

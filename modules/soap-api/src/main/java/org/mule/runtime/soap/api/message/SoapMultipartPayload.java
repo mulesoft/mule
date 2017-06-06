@@ -7,7 +7,7 @@
 package org.mule.runtime.soap.api.message;
 
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
-import static org.mule.runtime.core.util.collection.Collectors.toImmutableMap;
+import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableMap;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;

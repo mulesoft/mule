@@ -27,7 +27,7 @@ import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCrea
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
-import static org.mule.runtime.core.util.XMLUtils.isLocalName;
+import static org.mule.runtime.config.spring.util.SpringXMLUtils.isLocalName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_NAMESPACE;
