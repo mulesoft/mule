@@ -12,6 +12,7 @@ import static java.util.stream.Stream.of;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_SCHEMA_LOCATION;
 import static org.mule.runtime.config.spring.dsl.declaration.DefaultXmlArtifactDeclarationLoader.TRANSFORM_IDENTIFIER;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.DECLARED_PREFIX;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.IS_CDATA;
@@ -197,6 +198,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
     } else {
       doc.getDocumentElement().setAttributeNS("http://www.w3.org/2000/xmlns/",
                                               "xmlns", CORE_NAMESPACE);
+      addSchemaLocationIfNeeded(namespace, MULE_SCHEMA_LOCATION);
       return doc.createElementNS(CORE_NAMESPACE, name);
     }
   }

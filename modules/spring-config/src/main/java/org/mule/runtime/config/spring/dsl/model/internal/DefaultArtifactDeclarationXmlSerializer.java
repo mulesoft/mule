@@ -8,11 +8,9 @@ package org.mule.runtime.config.spring.dsl.model.internal;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.join;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
@@ -25,7 +23,6 @@ import org.mule.runtime.api.app.declaration.TopLevelParameterDeclaration;
 import org.mule.runtime.api.app.declaration.fluent.ParameterSimpleValue;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.config.spring.dsl.api.ArtifactDeclarationXmlSerializer;
 import org.mule.runtime.config.spring.dsl.model.DslElementModelFactory;
 import org.mule.runtime.config.spring.dsl.model.XmlArtifactDeclarationLoader;
@@ -156,24 +153,7 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
     doc.appendChild(mule);
 
     artifact.getCustomConfigurationParameters().forEach(p -> mule.setAttribute(p.getName(), p.getValue().toString()));
-
-    if (isBlank(mule.getAttribute(XSI_SCHEMA_LOCATION))) {
-      StringBuilder schemaLocation = new StringBuilder();
-      context.getExtensions().forEach(extension -> {
-        XmlDslModel xml = extension.getXmlDslModel();
-        schemaLocation.append(xml.getNamespace())
-            .append(" ")
-            .append(xml.getSchemaLocation())
-            .append(" ");
-
-        String prefix = xml.getNamespace().equals(CORE_NAMESPACE) ? "" : ":" + xml.getPrefix();
-        mule.setAttributeNS(XMLNS_W3_URL, XMLNS + prefix, xml.getNamespace());
-      });
-
-      mule.setAttributeNS(XSI_W3_URL,
-                          XSI_SCHEMA_LOCATION, schemaLocation.toString().trim());
-    }
-
+    mule.setAttributeNS(XSI_W3_URL, XSI_SCHEMA_LOCATION, "");
     return doc;
   }
 
