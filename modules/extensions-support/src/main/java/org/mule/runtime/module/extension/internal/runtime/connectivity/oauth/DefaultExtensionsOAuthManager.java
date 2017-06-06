@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
+import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -199,7 +200,10 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
         .tokenUrl(authCodeConfig.getAccessTokenUrl())
         .responseExpiresInExpr(grantType.getExpirationRegex())
         .responseRefreshTokenExpr(grantType.getRefreshTokenExpr())
-        .responseAccessTokenExpr(grantType.getAccessTokenExpr());
+        .responseAccessTokenExpr(grantType.getAccessTokenExpr())
+        .resourceOwnerIdTransformer(ownerId -> DEFAULT_RESOURCE_OWNER_ID.equals(ownerId)
+            ? buildOwnerId(config, ownerId)
+            : ownerId);
 
     String scopes = authCodeConfig.getScope()
         .orElseGet(() -> grantType.getDefaultScope().orElse(null));
@@ -241,6 +245,10 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
     }
 
     return dancer;
+  }
+
+  private String buildOwnerId(OAuthConfig oauthConfig, String ownerId) {
+    return ownerId + "-" + oauthConfig.getOwnerConfigName();
   }
 
   private String getExternalCallback(HttpServer httpServer, OAuthCallbackConfig callbackConfig) {
