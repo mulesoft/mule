@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.io.FileUtils.copyFile;
+import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.io.IOUtils.copy;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.contains;
@@ -34,6 +35,7 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationDescr
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.descriptor.BundleScope.COMPILE;
 import static org.mule.runtime.module.artifact.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
+
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -58,31 +60,36 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.util.Set;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
 
-  private static final File echoTestJarFile =
-      new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java"))
-          .including(getResourceFile("/test-resource.txt"), "META-INF/MANIFEST.MF")
-          .including(getResourceFile("/test-resource.txt"), "README.txt")
-          .compile("echo.jar");
+  private static File echoTestJarFile;
 
-  private static File getResourceFile(String resource) {
-    return new File(ApplicationDescriptorFactoryTestCase.class.getResource(resource).getFile());
+  private static File getResourceFile(String resource) throws URISyntaxException {
+    return new File(ApplicationDescriptorFactoryTestCase.class.getResource(resource).toURI());
   }
 
   public static final String APP_NAME = "testApp";
   public static final String JAR_FILE_NAME = "test.jar";
+
+  @BeforeClass
+  public static void beforeClass() throws URISyntaxException {
+    echoTestJarFile = new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java"))
+        .including(getResourceFile("/test-resource.txt"), "META-INF/MANIFEST.MF")
+        .including(getResourceFile("/test-resource.txt"), "README.txt")
+        .compile("echo.jar");
+  }
 
   @Rule
   public SystemProperty repositoryLocation = new SystemProperty("muleRuntimeConfig.maven.repositoryLocation",
@@ -170,9 +177,9 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     ApplicationDescriptor desc = applicationDescriptorFactory.create(getAppFolder(APP_NAME));
 
     assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
-    assertThat(desc.getClassLoaderModel().getUrls()[0].getFile(),
+    assertThat(toFile(desc.getClassLoaderModel().getUrls()[0]).getPath(),
                equalTo(getAppClassesFolder(APP_NAME).toString()));
-    assertThat(desc.getClassLoaderModel().getUrls()[1].getFile(), equalTo(sharedLibFile.toString()));
+    assertThat(toFile(desc.getClassLoaderModel().getUrls()[1]).getPath(), equalTo(sharedLibFile.toString()));
     assertThat(desc.getClassLoaderModel().getExportedPackages(), contains("org.foo"));
     assertThat(desc.getClassLoaderModel().getExportedResources(), containsInAnyOrder("META-INF/MANIFEST.MF",
                                                                                      "README.txt"));
@@ -192,8 +199,8 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     ApplicationDescriptor desc = applicationDescriptorFactory.create(getAppFolder(APP_NAME));
 
     assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
-    assertThat(desc.getClassLoaderModel().getUrls()[0].getFile(), equalTo(getAppClassesFolder(APP_NAME).toString()));
-    assertThat(desc.getClassLoaderModel().getUrls()[1].getFile(), equalTo(libFile.toString()));
+    assertThat(toFile(desc.getClassLoaderModel().getUrls()[0]).getPath(), equalTo(getAppClassesFolder(APP_NAME).toString()));
+    assertThat(toFile(desc.getClassLoaderModel().getUrls()[1]).getPath(), equalTo(libFile.toString()));
   }
 
   private void copyResourceAs(String resourceName, File destination) throws IOException {
@@ -213,7 +220,8 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
     assertThat(classLoaderModel.getDependencies().isEmpty(), is(true));
     assertThat(classLoaderModel.getUrls().length, is(1));
-    assertThat(classLoaderModel.getUrls()[0].getFile(), is(new File(getApplicationFolder(appPath), "classes").getAbsolutePath()));
+    assertThat(toFile(classLoaderModel.getUrls()[0]).getPath(),
+               is(new File(getApplicationFolder(appPath), "classes").getAbsolutePath()));
 
     assertThat(classLoaderModel.getExportedPackages().isEmpty(), is(true));
     assertThat(classLoaderModel.getExportedResources().isEmpty(), is(true));
@@ -239,7 +247,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     assertThat(commonsCollectionDependency, commonsColecctionDependencyMatcher());
 
     assertThat(classLoaderModel.getUrls().length, is(2));
-    assertThat(asList(classLoaderModel.getUrls()), hasItem(commonsCollectionDependency.getBundleUrl()));
+    assertThat(asList(classLoaderModel.getUrls()), hasItem(commonsCollectionDependency.getBundleUri()));
   }
 
   @Test
@@ -267,7 +275,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     assertThat(classLoaderModel.getUrls().length, is(1));
     classLoaderModel.getDependencies().stream()
         .forEach(bundleDependency -> {
-          assertThat(asList(classLoaderModel.getUrls()), not(hasItem(bundleDependency.getBundleUrl())));
+          assertThat(asList(classLoaderModel.getUrls()), not(hasItem(bundleDependency.getBundleUri())));
         });
   }
 
@@ -353,19 +361,16 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     };
   }
 
-  private ApplicationDescriptor createApplicationDescriptor(String appPath) {
+  private ApplicationDescriptor createApplicationDescriptor(String appPath) throws URISyntaxException {
     final ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
                                          applicationPluginRepository, createDescriptorLoaderRepository());
 
-    File applicationFolder = getApplicationFolder(appPath);
-
-    return applicationDescriptorFactory.create(applicationFolder);
+    return applicationDescriptorFactory.create(getApplicationFolder(appPath));
   }
 
-  private File getApplicationFolder(String appPath) {
-    URL noDependenciesFolderUrl = getClass().getClassLoader().getResource(appPath);
-    return new File(noDependenciesFolderUrl.getFile());
+  private File getApplicationFolder(String appPath) throws URISyntaxException {
+    return new File(getClass().getClassLoader().getResource(appPath).toURI());
   }
 
   @Test

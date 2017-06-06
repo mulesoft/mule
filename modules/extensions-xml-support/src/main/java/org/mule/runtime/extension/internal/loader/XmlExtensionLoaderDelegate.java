@@ -24,7 +24,7 @@ import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
-import com.google.common.collect.ImmutableMap;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -57,7 +57,8 @@ import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionE
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
 import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
-import org.w3c.dom.Document;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 import java.net.URL;
@@ -71,6 +72,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.w3c.dom.Document;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -193,7 +196,8 @@ final class XmlExtensionLoaderDelegate {
     }
     ComponentModelReader componentModelReader =
         new ComponentModelReader(new DefaultArtifactProperties(emptyMap(), emptyMap(), emptyMap()));
-    //TODO MULE-12291: we would, ideally, leave either the relative path (modulePath) or the URL to the current config file, rather than just the name of the file (which will be useless from a tooling POV)
+    // TODO MULE-12291: we would, ideally, leave either the relative path (modulePath) or the URL to the current config file,
+    // rather than just the name of the file (which will be useless from a tooling POV)
     final String configFileName = modulePath.substring(modulePath.lastIndexOf("/") + 1);
     ComponentModel componentModel = componentModelReader.extractComponentDefinitionModel(parseModule.get(), configFileName);
 
@@ -323,7 +327,7 @@ final class XmlExtensionLoaderDelegate {
     extractOutputType(operationDeclarer, operationModel);
   }
 
-  //TODO MULE-12619: until the internals of ExtensionModel doesn't validate or corrects the name, this is the custom validation
+  // TODO MULE-12619: until the internals of ExtensionModel doesn't validate or corrects the name, this is the custom validation
   private String assertValidName(String name) {
     if (!VALID_XML_NAME.matcher(name).matches()) {
       throw new IllegalModelDefinitionException(format("The name being used '%s' is not XML valid, it must start with a letter and can be followed by any letter, number or -, _. ",

@@ -23,6 +23,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTOR
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleCoreExtension;
@@ -46,6 +47,7 @@ import org.mule.tck.probe.Prober;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -249,12 +251,14 @@ public class FakeMuleServer {
 
   /**
    * Copies a given app archive to the apps folder for deployment.
+   * 
+   * @throws URISyntaxException
    */
-  public void addAppArchive(URL url) throws IOException {
+  public void addAppArchive(URL url) throws IOException, URISyntaxException {
     addAppArchive(url, null);
   }
 
-  public void deploy(String resource) throws IOException {
+  public void deploy(String resource) throws IOException, URISyntaxException {
     int lastSeparator = resource.lastIndexOf(File.separator);
     String appName = removeEndIgnoreCase(resource.substring(lastSeparator + 1), JAR_FILE_SUFFIX);
     deploy(resource, appName);
@@ -266,8 +270,9 @@ public class FakeMuleServer {
    * @param resource points to the resource to deploy. Non null.
    * @param targetAppName application name used to deploy the resource. Null to maintain the original resource name
    * @throws IOException if the resource cannot be accessed
+   * @throws URISyntaxException
    */
-  public void deploy(String resource, String targetAppName) throws IOException {
+  public void deploy(String resource, String targetAppName) throws IOException, URISyntaxException {
     URL url = getClass().getResource(resource);
     deploy(url, targetAppName);
   }
@@ -278,18 +283,21 @@ public class FakeMuleServer {
    * @param resource points to the resource to deploy. Non null.
    * @param targetAppName application name used to deploy the resource. Null to maintain the original resource name
    * @throws IOException if the URL cannot be accessed
+   * @throws URISyntaxException
    */
-  public void deploy(URL resource, String targetAppName) throws IOException {
+  public void deploy(URL resource, String targetAppName) throws IOException, URISyntaxException {
     addAppArchive(resource, targetAppName + JAR_FILE_SUFFIX);
     assertDeploymentSuccess(targetAppName);
   }
 
   /**
    * Copies a given app archive with a given target name to the apps folder for deployment
+   * 
+   * @throws URISyntaxException
    */
-  private void addAppArchive(URL url, String targetFile) throws IOException {
+  private void addAppArchive(URL url, String targetFile) throws IOException, URISyntaxException {
     // copy is not atomic, copy to a temp file and rename instead (rename is atomic)
-    final String tempFileName = new File((targetFile == null ? url.getFile() : targetFile) + ".part").getName();
+    final String tempFileName = (targetFile == null ? new File(url.toURI()) : new File(targetFile)).getPath() + ".part";
     final File tempFile = new File(appsDir, tempFileName);
     copyURLToFile(url, tempFile);
     boolean renamed = tempFile.renameTo(new File(removeEnd(tempFile.getAbsolutePath(), ".part")));
@@ -397,8 +405,9 @@ public class FakeMuleServer {
    *
    * @param domainFolder folder in which the domain is defined
    * @param domainName name of the domain to use as domain artifact name
+   * @throws URISyntaxException
    */
-  public void deployDomainFromClasspathFolder(String domainFolder, String domainName) {
+  public void deployDomainFromClasspathFolder(String domainFolder, String domainName) throws URISyntaxException {
     copyExplodedArtifactFromClasspathFolderToDeployFolder(domainFolder, getDomainsDir(), domainName);
   }
 
@@ -417,18 +426,20 @@ public class FakeMuleServer {
    *
    * @param appFolder folder in which the app is defined
    * @param appName name of the domain to use as app artifact name
+   * @throws URISyntaxException
    */
-  public void deployAppFromClasspathFolder(String appFolder, String appName) {
+  public void deployAppFromClasspathFolder(String appFolder, String appName) throws URISyntaxException {
     copyExplodedArtifactFromClasspathFolderToDeployFolder(appFolder, getAppsDir(), appName);
   }
 
   private void copyExplodedArtifactFromClasspathFolderToDeployFolder(String artifactFolderPath, File artifactDirectory,
-                                                                     String artifactName) {
+                                                                     String artifactName)
+      throws URISyntaxException {
     ReentrantLock lock = this.deploymentService.getLock();
     lock.lock();
     try {
       URL resource = getClass().getClassLoader().getResource(artifactFolderPath);
-      File artifactFolder = new File(resource.getFile());
+      File artifactFolder = new File(resource.toURI());
       copyExplodedArtifactFromFolderToDeployFolder(artifactFolder, artifactDirectory, artifactName);
     } finally {
       lock.unlock();

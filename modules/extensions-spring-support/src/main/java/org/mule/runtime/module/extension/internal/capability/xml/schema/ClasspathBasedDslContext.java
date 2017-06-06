@@ -15,6 +15,7 @@ import static org.mule.runtime.core.util.annotation.AnnotationUtils.getAnnotatio
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.loadExtension;
 import static org.reflections.util.ClasspathHelper.forClassLoader;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
@@ -81,7 +82,7 @@ class ClasspathBasedDslContext implements DslResolvingContext {
 
   private void findExtensionsInClasspath() {
     final Collection<URL> mulePluginsUrls = forClassLoader(classLoader).stream()
-        .filter(url -> url.getFile().contains(MULE_PLUGIN_CLASSIFIER))
+        .filter(url -> url.getPath().contains(MULE_PLUGIN_CLASSIFIER))
         .collect(toList());
     Set<Class<?>> annotated = getExtensionTypes(mulePluginsUrls);
 

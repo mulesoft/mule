@@ -27,6 +27,7 @@ import static org.mule.runtime.core.api.registry.ServiceType.EXCEPTION;
 import static org.mule.runtime.core.config.ExceptionHelper.RESOURCE_ROOT;
 import static org.mule.runtime.core.config.ExceptionHelper.getErrorMapping;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.DefaultMuleContext;
@@ -50,7 +51,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
 
 import org.junit.After;
 import org.junit.Before;
@@ -109,10 +109,8 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testClearExceptionHelperCacheForAppWhenDispose() throws Exception {
-    URL baseUrl = DefaultMuleContextTestCase.class.getClassLoader().getResource(".");
-    File file =
-        new File(baseUrl.getFile() + RESOURCE_ROOT + EXCEPTION.getPath() + "/" + TEST_PROTOCOL
-            + "-exception-mappings.properties");
+    File file = new File(DefaultMuleContextTestCase.class.getClassLoader()
+        .getResource(RESOURCE_ROOT + EXCEPTION.getPath() + "/" + TEST_PROTOCOL + "-exception-mappings.properties").toURI());
     createExceptionMappingFile(file, INITIAL_VALUE);
 
     createMuleContext();

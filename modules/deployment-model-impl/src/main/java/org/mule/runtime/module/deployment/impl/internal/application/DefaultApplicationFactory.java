@@ -9,11 +9,11 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
-import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder.getArtifactPluginId;
+
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -98,6 +98,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     this.muleContextListenerFactory = muleContextListenerFactory;
   }
 
+  @Override
   public Application createArtifact(File appDir) throws IOException {
     String appName = appDir.getName();
     if (appName.contains(" ")) {
@@ -174,7 +175,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     Set<ArtifactPluginDescriptor> pluginDescriptors = new HashSet<>();
     for (BundleDependency bundleDependency : descriptor.getClassLoaderModel().getDependencies()) {
       if (bundleDependency.getDescriptor().isPlugin()) {
-        File pluginZip = toFile(bundleDependency.getBundleUrl());
+        File pluginZip = new File(bundleDependency.getBundleUri());
         pluginDescriptors.add(pluginDescriptorLoader.load(pluginZip));
       }
     }

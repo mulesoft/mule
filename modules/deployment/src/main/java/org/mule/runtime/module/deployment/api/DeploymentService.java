@@ -10,7 +10,7 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -74,10 +74,10 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
   /**
    * Deploys and application bundled as a zip from the given URL to the mule container
    *
-   * @param appArchiveUrl location of the zip application file
+   * @param appArchiveUri location of the zip application file
    * @throws IOException
    */
-  void deploy(URL appArchiveUrl) throws IOException;
+  void deploy(URI appArchiveUri) throws IOException;
 
   /**
    * Undeploys and redeploys an application
@@ -96,10 +96,10 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
   /**
    * Deploys a domain bundled as a zip from the given URL to the mule container
    *
-   * @param domainArchiveUrl location of the zip domain file
+   * @param domainArchiveUri location of the zip domain file
    * @throws IOException
    */
-  void deployDomain(URL domainArchiveUrl) throws IOException;
+  void deployDomain(URI domainArchiveUri) throws IOException;
 
   /**
    * Undeploys and redeploys a domain

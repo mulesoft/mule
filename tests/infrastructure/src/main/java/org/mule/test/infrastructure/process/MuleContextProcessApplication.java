@@ -9,6 +9,8 @@ package org.mule.test.infrastructure.process;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.test.infrastructure.process.MuleContextProcessBuilder.MULE_CORE_EXTENSIONS_PROPERTY;
+import static org.mule.test.infrastructure.process.MuleContextProcessBuilder.TIMEOUT_IN_SECONDS;
+
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.test.infrastructure.deployment.FakeMuleServer;
@@ -47,7 +49,7 @@ public class MuleContextProcessApplication {
       System.out.println("Creating app config file");
       String applicationConfiguration = System.getProperty(MuleContextProcessBuilder.CONFIG_FILE_KEY);
       File applicationConfigurationFile =
-          new File(MuleContextProcessApplication.class.getClassLoader().getResource(applicationConfiguration).getFile());
+          new File(MuleContextProcessApplication.class.getClassLoader().getResource(applicationConfiguration).toURI());
       if (!applicationConfigurationFile.exists()) {
         throw new RuntimeException("Could not find file for application configuration " + applicationConfiguration);
       }
@@ -64,8 +66,7 @@ public class MuleContextProcessApplication {
       notifyMuleContextStarted();
 
       while (true) {
-        if (System.currentTimeMillis()
-            - initialTime > (Integer.valueOf(System.getProperty(MuleContextProcessBuilder.TIMEOUT_IN_SECONDS)) * 1000)) {
+        if (System.currentTimeMillis() - initialTime > (Integer.valueOf(System.getProperty(TIMEOUT_IN_SECONDS)) * 1000)) {
           System.exit(-1);
         }
         Thread.sleep(1000);

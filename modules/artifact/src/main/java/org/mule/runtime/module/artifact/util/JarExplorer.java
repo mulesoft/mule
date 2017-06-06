@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.artifact.util;
 
-import java.net.URL;
+import java.net.URI;
 
 /**
  * Explores jar files or exploded jar folders to find packages and resources.
@@ -20,5 +20,5 @@ public interface JarExplorer {
    * @param library folder or JAR file to explore. Non null
    * @return the {@link JarInfo} containing the found resources and packages. Non null.
    */
-  JarInfo explore(URL library);
+  JarInfo explore(URI library);
 }

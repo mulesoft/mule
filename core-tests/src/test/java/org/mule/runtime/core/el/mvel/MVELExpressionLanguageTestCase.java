@@ -24,6 +24,7 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.PropertyAccessException;
@@ -40,13 +41,13 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.function.RegexExpressionLanguageFuntion;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.File;
@@ -56,6 +57,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -506,8 +508,9 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
    * @return The classes
    * @throws ClassNotFoundException
    * @throws IOException
+   * @throws URISyntaxException
    */
-  private static Class[] getClasses(String packageName) throws ClassNotFoundException, IOException {
+  private static Class[] getClasses(String packageName) throws ClassNotFoundException, IOException, URISyntaxException {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     assert classLoader != null;
     String path = packageName.replace('.', '/');
@@ -515,7 +518,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     List<File> dirs = new ArrayList<>();
     while (resources.hasMoreElements()) {
       URL resource = resources.nextElement();
-      dirs.add(new File(resource.getFile()));
+      dirs.add(new File(resource.toURI()));
     }
     ArrayList<Class> classes = new ArrayList<>();
     for (File directory : dirs) {

@@ -13,8 +13,7 @@ import static org.apache.commons.lang.ClassUtils.getPackageName;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLDecoder;
+import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,12 +30,12 @@ public class FileJarExplorer implements JarExplorer {
   protected static final String CLASS_EXTENSION = ".class";
 
   @Override
-  public JarInfo explore(URL library) {
+  public JarInfo explore(URI library) {
     Set<String> packages = new HashSet<>();
     Set<String> resources = new HashSet<>();
 
     try {
-      final File libraryFile = new File(URLDecoder.decode(library.getFile(), "UTF-8"));
+      final File libraryFile = new File(library);
       if (!libraryFile.exists()) {
         throw new IllegalArgumentException("Library file does not exists: " + library);
       }

@@ -11,6 +11,7 @@ import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
+
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -19,8 +20,7 @@ import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import java.beans.Introspector;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.URI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ public class ArtifactArchiveInstaller {
   protected static final String ANCHOR_FILE_BLURB =
       "Delete this file while Mule is running to remove the artifact in a clean way.";
 
-  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(ArtifactArchiveInstaller.class);
 
   private final File artifactParentDir;
 
@@ -46,17 +46,18 @@ public class ArtifactArchiveInstaller {
    *
    * Created the artifact directory and the anchor file related.
    *
-   * @param artifactUrl URL of the artifact to install. It must be present in the artifact directory as a zip file.
+   * @param artifactUri URI of the artifact to install. It must be present in the artifact directory as a zip file.
    * @return the location of the installed artifact.
    * @throws IOException in case there was an error reading from the artifact or writing to the artifact folder.
    */
-  public File installArtifact(final URL artifactUrl) throws IOException {
-    if (!artifactUrl.toString().toLowerCase().endsWith(JAR_FILE_SUFFIX)) {
-      throw new IllegalArgumentException("Invalid Mule artifact archive: " + artifactUrl);
+  public File installArtifact(final URI artifactUri) throws IOException {
+    if (!artifactUri.toString().toLowerCase().endsWith(JAR_FILE_SUFFIX)) {
+      throw new IllegalArgumentException("Invalid Mule artifact archive: " + artifactUri);
     }
 
-    final String baseName = getBaseName(artifactUrl.toString());
-    if (baseName.contains("%20")) {
+    final File artifactFile = new File(artifactUri);
+    final String baseName = getBaseName(artifactFile.getName());
+    if (baseName.contains(" ")) {
       throw new DeploymentInitException(I18nMessageFactory
           .createStaticMessage("Mule artifact name may not contain spaces: " + baseName));
     }
@@ -65,7 +66,7 @@ public class ArtifactArchiveInstaller {
     boolean errorEncountered = false;
     String artifactName;
     try {
-      final String fullPath = artifactUrl.toURI().toString();
+      final String fullPath = artifactFile.getAbsolutePath();
 
       if (logger.isInfoEnabled()) {
         logger.info("Exploding a Mule artifact archive: " + fullPath);
@@ -74,23 +75,18 @@ public class ArtifactArchiveInstaller {
       artifactName = getBaseName(fullPath);
       artifactDir = new File(artifactParentDir, artifactName);
       // normalize the full path + protocol to make unzip happy
-      final File source = new File(artifactUrl.toURI());
+      final File source = artifactFile;
 
       FileUtils.unzip(source, artifactDir);
-      if ("file".equals(artifactUrl.getProtocol())) {
+      if ("file".equals(artifactUri.getScheme())) {
         deleteQuietly(source);
       }
-    } catch (URISyntaxException e) {
-      errorEncountered = true;
-      final IOException ex = new IOException(e.getMessage());
-      ex.fillInStackTrace();
-      throw ex;
     } catch (IOException e) {
       errorEncountered = true;
       throw e;
     } catch (Throwable t) {
       errorEncountered = true;
-      final String msg = "Failed to install artifact from URL: " + artifactUrl;
+      final String msg = "Failed to install artifact from URI: " + artifactUri;
       throw new DeploymentInitException(I18nMessageFactory.createStaticMessage(msg), t);
     } finally {
       // delete an artifact dir, as it's broken

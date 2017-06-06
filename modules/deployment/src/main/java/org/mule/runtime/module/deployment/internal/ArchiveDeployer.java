@@ -7,11 +7,11 @@
 package org.mule.runtime.module.deployment.internal;
 
 import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.artifact.Artifact;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 
 import java.io.File;
-import java.net.URL;
+import java.net.URI;
 import java.util.Map;
 
 /**
@@ -33,7 +33,7 @@ public interface ArchiveDeployer<T extends Artifact> {
    */
   boolean isUpdatedZombieArtifact(String artifactName);
 
-  T deployPackagedArtifact(URL artifactAchivedUrl);
+  T deployPackagedArtifact(URI artifactAchivedUri);
 
   void undeployArtifact(String artifactId);
 
@@ -43,7 +43,7 @@ public interface ArchiveDeployer<T extends Artifact> {
 
   void redeploy(T artifact) throws DeploymentException;
 
-  Map<URL, Long> getArtifactsZombieMap();
+  Map<URI, Long> getArtifactsZombieMap();
 
   void setArtifactFactory(ArtifactFactory<T> artifactFactory);
 

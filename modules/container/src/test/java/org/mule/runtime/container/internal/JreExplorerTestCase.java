@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mule.runtime.container.internal.ExportedServiceMatcher.like;
+
 import org.mule.runtime.module.artifact.classloader.ExportedService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -19,6 +20,7 @@ import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -49,21 +52,28 @@ public class JreExplorerTestCase extends AbstractMuleTestCase {
   private static final String RESOURCE_PATH = "/resource.txt";
 
 
-  private static final File fooJar = new CompilerUtils.JarCompiler()
-      .compiling(new File(JreExplorerTestCase.class.getResource("/org/foo/Foo.java").getFile()))
-      .including(new File(JreExplorerTestCase.class.getResource(RESOURCE_PATH).getFile()), FOO_RESOURCE)
-      .including(new File(JreExplorerTestCase.class.getResource(RESOURCE_PATH).getFile()), SERVICE_RESOURCE)
-      .including(new File(JreExplorerTestCase.class.getResource(RESOURCE_PATH).getFile()), FOO_SERVICE_PATH)
-      .compile(FOO_JAR_FILENAME);
+  private static File fooJar;
 
-  private static final File barJar = new CompilerUtils.JarCompiler()
-      .compiling(new File(JreExplorerTestCase.class.getResource("/org/bar/Bar.java").getFile()))
-      .including(new File(JreExplorerTestCase.class.getResource(RESOURCE_PATH).getFile()), BAR_RESOURCE)
-      .including(new File(JreExplorerTestCase.class.getResource(RESOURCE_PATH).getFile()), BAR_SERVICE_PATH)
-      .compile(BAR_JAR_FILENAMEß);
+  private static File barJar;
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+  @BeforeClass
+  public static void beforeClass() throws URISyntaxException {
+    fooJar = new CompilerUtils.JarCompiler()
+        .compiling(new File(JreExplorerTestCase.class.getResource("/org/foo/Foo.java").toURI()))
+        .including(new File(JreExplorerTestCase.class.getResource(RESOURCE_PATH).toURI()), FOO_RESOURCE)
+        .including(new File(JreExplorerTestCase.class.getResource(RESOURCE_PATH).toURI()), SERVICE_RESOURCE)
+        .including(new File(JreExplorerTestCase.class.getResource(RESOURCE_PATH).toURI()), FOO_SERVICE_PATH)
+        .compile(FOO_JAR_FILENAME);
+
+    barJar = new CompilerUtils.JarCompiler()
+        .compiling(new File(JreExplorerTestCase.class.getResource("/org/bar/Bar.java").toURI()))
+        .including(new File(JreExplorerTestCase.class.getResource(RESOURCE_PATH).toURI()), BAR_RESOURCE)
+        .including(new File(JreExplorerTestCase.class.getResource(RESOURCE_PATH).toURI()), BAR_SERVICE_PATH)
+        .compile(BAR_JAR_FILENAMEß);
+  }
 
   @Test
   public void readsJar() throws Exception {

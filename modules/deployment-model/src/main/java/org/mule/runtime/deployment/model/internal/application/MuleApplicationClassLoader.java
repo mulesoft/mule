@@ -9,6 +9,7 @@ package org.mule.runtime.deployment.model.internal.application;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.io.FileUtils.toFile;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.deployment.model.api.application.ApplicationClassLoader;
@@ -55,7 +56,7 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
   protected String[] getLocalResourceLocations() {
     // Always the first element corresponds to the application's classes folder
     ClassLoaderModel classLoaderModel = this.<ApplicationDescriptor>getArtifactDescriptor().getClassLoaderModel();
-    return new String[] {classLoaderModel.getUrls()[0].getFile()};
+    return new String[] {toFile(classLoaderModel.getUrls()[0]).getPath()};
   }
 
   /**

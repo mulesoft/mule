@@ -11,6 +11,7 @@ import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
+
 import org.mule.tck.ZipUtils;
 import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -34,7 +35,7 @@ public class FileJarExplorerTestCase extends AbstractMuleTestCase {
     jarFile.delete();
     ZipUtils.compress(jarFile, zipResources);
 
-    final Set<String> packages = packageExplorer.explore(jarFile.toURI().toURL()).getPackages();
+    final Set<String> packages = packageExplorer.explore(jarFile.toURI()).getPackages();
     assertThat(packages.size(), equalTo(2));
     assertThat(packages, hasItem("org.foo"));
     assertThat(packages, hasItem("org.bar"));
@@ -51,7 +52,7 @@ public class FileJarExplorerTestCase extends AbstractMuleTestCase {
     writeStringToFile(new File(orgFooFolder, "Foo.class"), "foo");
     writeStringToFile(new File(orgFooBarFolder, "Bar.class"), "bar");
 
-    final Set<String> packages = packageExplorer.explore(folder.toURI().toURL()).getPackages();
+    final Set<String> packages = packageExplorer.explore(folder.toURI()).getPackages();
     assertThat(packages.size(), equalTo(2));
     assertThat(packages, hasItem("org.foo"));
     assertThat(packages, hasItem("org.bar"));

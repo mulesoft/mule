@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -69,7 +70,7 @@ public class CustomJavaSerializationProtocolTestCase extends AbstractSerializerP
     final File compiledClasses = new File(temporaryFolder.getRoot(), "compiledClasses");
     compiledClasses.mkdirs();
 
-    final File sourceFile = new File(getClass().getResource("/org/foo/SerializableClass.java").getFile());
+    final File sourceFile = new File(getClass().getResource("/org/foo/SerializableClass.java").toURI());
 
     CompilerUtils.SingleClassCompiler compiler = new CompilerUtils.SingleClassCompiler();
     compiler.compile(sourceFile);

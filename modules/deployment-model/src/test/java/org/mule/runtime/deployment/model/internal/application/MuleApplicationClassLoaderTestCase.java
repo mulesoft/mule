@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.deployment.model.internal.application;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
@@ -16,8 +17,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+
 import org.mule.runtime.container.api.MuleFoldersUtil;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -29,6 +31,7 @@ import org.mule.tck.size.SmallTest;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,9 +64,9 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
   private File jarFile;
 
   @Before
-  public void createAppClassLoader() throws IOException {
+  public void createAppClassLoader() throws IOException, URISyntaxException {
     // Create directories structure
-    previousMuleHome = System.setProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, tempMuleHome.getRoot().getAbsolutePath());
+    previousMuleHome = System.setProperty(MULE_HOME_DIRECTORY_PROPERTY, tempMuleHome.getRoot().getAbsolutePath());
 
     final List<URL> urls = new LinkedList<>();
 
@@ -77,9 +80,9 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
     // Add jar file with resources in lib dir
     File libDir = getAppLibFolder(APP_NAME);
     assertThat(libDir.mkdirs(), is(true));
-    URL resourceSrcJarFile = Thread.currentThread().getContextClassLoader().getResource("test-jar-with-resources.jar");
+    URL resourceSrcJarFile = currentThread().getContextClassLoader().getResource("test-jar-with-resources.jar");
     assertNotNull(resourceSrcJarFile);
-    File srcJarFile = new File(resourceSrcJarFile.getFile());
+    File srcJarFile = new File(resourceSrcJarFile.toURI());
     jarFile = new File(libDir, "test-jar-with-resources.jar");
     FileUtils.copyFile(srcJarFile, jarFile, false);
     urls.add(jarFile.toURI().toURL());
@@ -91,7 +94,7 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
 
     // Create app class loader
     domainCL =
-        new MuleSharedDomainClassLoader(new DomainDescriptor(DOMAIN_NAME), Thread.currentThread().getContextClassLoader(),
+        new MuleSharedDomainClassLoader(new DomainDescriptor(DOMAIN_NAME), currentThread().getContextClassLoader(),
                                         mock(ClassLoaderLookupPolicy.class), emptyList());
 
     final ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(APP_NAME);
@@ -105,7 +108,7 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
   @After
   public void cleanUp() {
     if (previousMuleHome != null) {
-      System.setProperty(MuleProperties.MULE_HOME_DIRECTORY_PROPERTY, previousMuleHome);
+      System.setProperty(MULE_HOME_DIRECTORY_PROPERTY, previousMuleHome);
     }
     FileUtils.deleteTree(tempMuleHome.getRoot());
   }
@@ -126,22 +129,22 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
     assertNotLoaded(appCL.findLocalResource(RESOURCE_JUST_IN_DOMAIN));
   }
 
-  private void assertLoadedFromClassesDir(URL resource) {
+  private void assertLoadedFromClassesDir(URL resource) throws URISyntaxException {
     assertNotNull(resource);
     assertEquals("file", resource.getProtocol());
-    assertTrue(resource.getFile().contains(classesDir.getAbsolutePath()));
+    assertTrue(resource.toURI().toString().contains(classesDir.getAbsolutePath()));
   }
 
-  private void assertLoadedFromJarFile(URL resource) {
+  private void assertLoadedFromJarFile(URL resource) throws URISyntaxException {
     assertNotNull(resource);
     assertEquals("jar", resource.getProtocol());
-    assertTrue(resource.getFile().contains(jarFile.getAbsolutePath()));
+    assertTrue(resource.toURI().toString().contains(jarFile.getAbsolutePath()));
   }
 
-  private void assertLoadedFromDomainDir(URL resource) {
+  private void assertLoadedFromDomainDir(URL resource) throws URISyntaxException {
     assertNotNull(resource);
     assertEquals("file", resource.getProtocol());
-    assertTrue(resource.getFile().contains(domainDir.getAbsolutePath()));
+    assertTrue(resource.toURI().toString().contains(domainDir.getAbsolutePath()));
   }
 
   private void assertNotLoaded(URL resource) {

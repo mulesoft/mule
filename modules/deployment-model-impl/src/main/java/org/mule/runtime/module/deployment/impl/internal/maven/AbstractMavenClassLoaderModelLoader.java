@@ -19,6 +19,7 @@ import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConst
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.isStandalone;
+
 import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -36,7 +37,6 @@ import org.mule.runtime.module.artifact.descriptor.InvalidDescriptorLoaderExcept
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -137,7 +137,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   protected BundleDependency convertBundleDependency(org.mule.maven.client.api.model.BundleDependency mavenClientDependency) {
     BundleDependency.Builder builder = new BundleDependency.Builder()
         .setScope(BundleScope.valueOf(mavenClientDependency.getScope().name()))
-        .setBundleUrl(mavenClientDependency.getBundleUrl())
+        .setBundleUri(mavenClientDependency.getBundleUri())
         .setDescriptor(convertBundleDescriptor(mavenClientDependency.getDescriptor()));
     return builder.build();
   }
@@ -193,14 +193,10 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                               Set<BundleDependency> dependencies) {
     dependencies.stream()
         .filter(dependency -> !MULE_PLUGIN_CLASSIFIER.equals(dependency.getDescriptor().getClassifier().orElse(null)))
-        .filter(dependency -> dependency.getBundleUrl() != null)
+        .filter(dependency -> dependency.getBundleUri() != null)
         .forEach(dependency -> {
           try {
-            try {
-              classLoaderModelBuilder.containing(dependency.getBundleUrl().toURI().toURL());
-            } catch (URISyntaxException e) {
-              throw new MuleRuntimeException(e);
-            }
+            classLoaderModelBuilder.containing(dependency.getBundleUri().toURL());
           } catch (MalformedURLException e) {
             throw new MuleRuntimeException(e);
           }
