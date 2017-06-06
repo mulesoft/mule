@@ -23,7 +23,7 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.util.UUID.getUUID;
-import static org.mule.runtime.core.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.VERSION;

@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.util.func.CheckedSupplier;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;

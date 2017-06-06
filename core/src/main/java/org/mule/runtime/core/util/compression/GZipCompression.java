@@ -110,14 +110,7 @@ public class GZipCompression implements CompressionStrategy {
    * @see java.util.zip.GZIPInputStream
    */
   public byte[] uncompressByteArray(byte[] bytes) throws IOException {
-    // TODO add strict behaviour as option
     if (!isCompressed(bytes)) {
-      /*
-       * if (strict) { // throw a specific exception here to allow users of this method to // diffientiate between general
-       * IOExceptions and an invalid format logger.warn("Data is not of type GZIP compressed." + " The data may not have been
-       * compressed in the first place."); throw new CompressionException("Not in GZIP format"); }
-       */
-
       // nothing to uncompress
       if (logger.isDebugEnabled()) {
         logger.debug("Data already uncompressed; doing nothing");

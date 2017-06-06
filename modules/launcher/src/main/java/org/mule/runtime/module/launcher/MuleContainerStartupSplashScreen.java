@@ -18,7 +18,7 @@ import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.NetworkUtils;
 import org.mule.runtime.core.util.SecurityUtils;
-import org.mule.runtime.core.util.SplashScreen;
+import org.mule.runtime.core.internal.util.splash.SplashScreen;
 
 import java.io.File;
 import java.net.InetAddress;

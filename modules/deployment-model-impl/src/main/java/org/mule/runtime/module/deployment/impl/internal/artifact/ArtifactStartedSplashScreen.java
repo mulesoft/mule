@@ -7,7 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.util.Arrays.asList;
-import org.mule.runtime.core.util.SplashScreen;
+import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.module.artifact.Artifact;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 

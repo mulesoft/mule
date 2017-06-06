@@ -9,8 +9,8 @@ package org.mule.runtime.module.deployment.impl.internal;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.util.SplashScreen.RUNTIME_VERBOSE;
-import org.mule.runtime.core.util.SplashScreen;
+import static org.mule.runtime.core.internal.util.splash.SplashScreen.RUNTIME_VERBOSE;
+import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 

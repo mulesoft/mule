@@ -18,8 +18,8 @@ import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededExcep
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.streaming.object.InMemoryCursorIteratorConfig;
-import org.mule.runtime.core.util.func.CheckedConsumer;
-import org.mule.runtime.core.util.func.CheckedRunnable;
+import org.mule.runtime.core.api.util.func.CheckedConsumer;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;

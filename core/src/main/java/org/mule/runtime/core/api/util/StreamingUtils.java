@@ -17,7 +17,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.streaming.CursorProviderFactory;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
-import org.mule.runtime.core.util.func.CheckedFunction;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 
 /**
  * Utilities for handling {@link Cursor} instances

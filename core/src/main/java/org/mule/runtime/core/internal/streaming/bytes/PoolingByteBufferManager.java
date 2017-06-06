@@ -17,7 +17,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.internal.streaming.DefaultMemoryManager;
 import org.mule.runtime.core.streaming.MemoryManager;
-import org.mule.runtime.core.util.func.CheckedRunnable;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

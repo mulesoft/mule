@@ -20,8 +20,8 @@ import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
 import org.mule.runtime.core.streaming.bytes.InMemoryCursorStreamConfig;
-import org.mule.runtime.core.util.func.CheckedConsumer;
-import org.mule.runtime.core.util.func.CheckedRunnable;
+import org.mule.runtime.core.api.util.func.CheckedConsumer;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;

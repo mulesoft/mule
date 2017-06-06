@@ -10,7 +10,7 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.util.collection.SplittingStrategy;
+import org.mule.runtime.core.api.util.collection.SplittingStrategy;
 
 import java.util.Collections;
 import java.util.Iterator;

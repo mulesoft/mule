@@ -18,8 +18,8 @@ import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
 import org.mule.runtime.core.message.ds.InputStreamDataSource;
 import org.mule.runtime.core.message.ds.StringDataSource;
-import org.mule.runtime.core.util.func.CheckedConsumer;
-import org.mule.runtime.core.util.func.CheckedFunction;
+import org.mule.runtime.core.api.util.func.CheckedConsumer;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 
 import java.io.Closeable;
 import java.io.File;

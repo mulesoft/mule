@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.parsers;
 
 import static org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
+import static org.mule.runtime.config.spring.util.SpringXMLUtils.elementToString;
 import static org.mule.runtime.core.api.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromXml;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -23,7 +24,6 @@ import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.util.XMLUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -310,11 +310,10 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
       beanClass = getBeanClass(element);
     }
     if (null != beanClass && null != classConstraint && !classConstraint.isAssignableFrom(beanClass)) {
-      throw new IllegalStateException(beanClass + " not a subclass of " + classConstraint + " for "
-          + XMLUtils.elementToString(element));
+      throw new IllegalStateException(beanClass + " not a subclass of " + classConstraint + " for " + elementToString(element));
     }
     if (null == beanClass) {
-      throw new IllegalStateException("No class for element " + XMLUtils.elementToString(element));
+      throw new IllegalStateException("No class for element " + elementToString(element));
     }
     return beanClass;
   }

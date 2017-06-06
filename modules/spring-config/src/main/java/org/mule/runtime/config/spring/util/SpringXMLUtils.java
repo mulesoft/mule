@@ -8,22 +8,23 @@ package org.mule.runtime.config.spring.util;
 
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.util.XMLUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * These only depend on standard (JSE) XML classes and are used by Spring config code. For a more extensive (sub-)class, see the
  * XMLUtils class in the XML module.
  */
-public class SpringXMLUtils extends XMLUtils {
+public class SpringXMLUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(SpringXMLUtils.class);
 
-  public static final String MULE_DEFAULT_NAMESPACE = "http://www.mulesoft.org/schema/mule/core";
   public static final String MULE_NAMESPACE_PREFIX = "http://www.mulesoft.org/schema/mule/";
 
   public static boolean isMuleNamespace(Element element) {
@@ -53,4 +54,46 @@ public class SpringXMLUtils extends XMLUtils {
     }
   }
 
+  public static String elementToString(Element e) {
+    StringBuilder buf = new StringBuilder();
+    buf.append(e.getTagName()).append("{");
+    for (int i = 0; i < e.getAttributes().getLength(); i++) {
+      if (i > 0) {
+        buf.append(", ");
+      }
+      Node n = e.getAttributes().item(i);
+      buf.append(attributeName((Attr) n)).append("=").append(n.getNodeValue());
+    }
+    buf.append("}");
+    return buf.toString();
+  }
+
+  public static boolean isLocalName(Element element, String name) {
+    return element.getLocalName().equals(name);
+  }
+
+  public static String attributeName(Attr attribute) {
+    String name = attribute.getLocalName();
+    if (null == name) {
+      name = attribute.getName();
+    }
+    return name;
+  }
+
+  public static String getTextChild(Element element) {
+    NodeList children = element.getChildNodes();
+    String value = null;
+    for (int i = 0; i < children.getLength(); ++i) {
+      Node child = children.item(i);
+      if (child.getNodeType() == Node.TEXT_NODE) {
+        if (null != value) {
+          throw new IllegalStateException("Element " + SpringXMLUtils.elementToString(element)
+              + " has more than one text child.");
+        } else {
+          value = child.getNodeValue();
+        }
+      }
+    }
+    return value;
+  }
 }

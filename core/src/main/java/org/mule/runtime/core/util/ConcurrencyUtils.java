@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.util;
 
-import org.mule.runtime.core.util.func.CheckedRunnable;
-import org.mule.runtime.core.util.func.CheckedSupplier;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
 import java.util.concurrent.locks.Lock;
 

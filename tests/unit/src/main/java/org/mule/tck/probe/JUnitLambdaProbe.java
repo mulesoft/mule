@@ -6,7 +6,7 @@
  */
 package org.mule.tck.probe;
 
-import org.mule.runtime.core.util.func.CheckedSupplier;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
 /**
  * Implementation of {@link JUnitProbe} which makes it Java 8 Lambda friendly.

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.policy;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.util.func.CheckedFunction;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 
 import java.util.Map;
 

@@ -12,8 +12,8 @@ import static org.mule.runtime.core.util.ConcurrencyUtils.withLock;
 import static org.mule.runtime.core.util.FunctionalUtils.safely;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.streaming.Cursor;
-import org.mule.runtime.core.util.func.CheckedRunnable;
-import org.mule.runtime.core.util.func.CheckedSupplier;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;

@@ -15,7 +15,7 @@ import static org.apache.commons.collections.CollectionUtils.select;
 import static org.apache.commons.collections.CollectionUtils.subtract;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.lang.StringUtils.removeEnd;
-import static org.mule.runtime.core.util.SplashScreen.miniSplash;
+import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import org.mule.runtime.core.api.scheduler.SchedulerService;

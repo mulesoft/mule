@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
-import org.mule.runtime.core.util.func.CheckedRunnable;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 
 import java.util.Optional;
 import java.util.function.Consumer;

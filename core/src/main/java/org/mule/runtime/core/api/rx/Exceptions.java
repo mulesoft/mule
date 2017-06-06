@@ -15,12 +15,12 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.MuleFatalException;
-import org.mule.runtime.core.util.func.CheckedBiConsumer;
-import org.mule.runtime.core.util.func.CheckedBiFunction;
-import org.mule.runtime.core.util.func.CheckedBiPredicate;
-import org.mule.runtime.core.util.func.CheckedConsumer;
-import org.mule.runtime.core.util.func.CheckedFunction;
-import org.mule.runtime.core.util.func.CheckedPredicate;
+import org.mule.runtime.core.api.util.func.CheckedBiConsumer;
+import org.mule.runtime.core.api.util.func.CheckedBiFunction;
+import org.mule.runtime.core.api.util.func.CheckedBiPredicate;
+import org.mule.runtime.core.api.util.func.CheckedConsumer;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
+import org.mule.runtime.core.api.util.func.CheckedPredicate;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
