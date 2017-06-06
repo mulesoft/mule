@@ -7,11 +7,9 @@
 
 package org.mule.routing.outbound;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.processor.AbstractFilteringMessageProcessor.FILTERS_STOP_ALL_FLOW_CALLERS;
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
+import static org.mule.tck.functional.FlowAssert.verify;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -24,8 +22,6 @@ public class MessageFilterFunctionalTestCase extends FunctionalTestCase
     @Rule
     public SystemProperty filterStopAllFlowCallersSystemProperty = new SystemProperty(FILTERS_STOP_ALL_FLOW_CALLERS, "true");
 
-    private static boolean componentWasCalled = false;
-
     @Override
     protected String getConfigFile()
     {
@@ -36,16 +32,7 @@ public class MessageFilterFunctionalTestCase extends FunctionalTestCase
     public void testFlowCallerStopsAfterUnacceptedEvent() throws Exception
     {
         runFlow("MainFlow");
-        assertThat(componentWasCalled, is(false));
+        verify();
     }
 
-    public static class TestJavaComponent implements Callable {
-
-        @Override
-        public Object onCall(MuleEventContext eventContext) throws Exception
-        {
-            componentWasCalled = true;
-            return eventContext.getMessage();
-        }
-    }
 }
