@@ -68,7 +68,6 @@ public class MavenClassLoaderModelLoaderTestCase {
 
   @Test
   public void changeMavenConfiguration() throws Exception {
-
     Map<String, String> properties = getMuleFreeSystemProperties();
     properties.put(repositoryLocation.getName(), repositoryLocation.getValue());
     try {
