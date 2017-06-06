@@ -199,7 +199,8 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
         .tokenUrl(authCodeConfig.getAccessTokenUrl())
         .responseExpiresInExpr(grantType.getExpirationRegex())
         .responseRefreshTokenExpr(grantType.getRefreshTokenExpr())
-        .responseAccessTokenExpr(grantType.getAccessTokenExpr());
+        .responseAccessTokenExpr(grantType.getAccessTokenExpr())
+        .resourceOwnerIdTransformer(ownerId -> ownerId + "-" + config.getOwnerConfigName());
 
     String scopes = authCodeConfig.getScope()
         .orElseGet(() -> grantType.getDefaultScope().orElse(null));
