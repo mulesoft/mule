@@ -6,6 +6,7 @@
  */
 package org.mule.processor;
 
+import static java.lang.System.getProperty;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -23,6 +24,9 @@ import org.mule.config.i18n.CoreMessages;
  */
 public abstract class AbstractFilteringMessageProcessor extends AbstractInterceptingMessageProcessor  implements NonBlockingSupported
 {
+
+    public static final String FILTERS_STOP_ALL_FLOW_CALLERS = "filter.stop.all.flow.callers";
+
     /** 
      * Throw a FilterUnacceptedException when a message is rejected by the filter? 
      */
@@ -63,8 +67,14 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     {
         if (unacceptedMessageProcessor != null)
         {
-            unacceptedMessageProcessor.process(event);
-            return null;
+            if (shouldFiltersStopAllFlowCallers())
+            {
+                return null;
+            }
+            else
+            {
+                return unacceptedMessageProcessor.process(event);
+            }
         }
         else if (throwOnUnaccepted)
         {
@@ -108,5 +118,10 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     public void setThrowOnUnaccepted(boolean throwOnUnaccepted)
     {
         this.throwOnUnaccepted = throwOnUnaccepted;
+    }
+
+    private boolean shouldFiltersStopAllFlowCallers()
+    {
+        return "true".equals(getProperty(FILTERS_STOP_ALL_FLOW_CALLERS))? true : false;
     }
 }
