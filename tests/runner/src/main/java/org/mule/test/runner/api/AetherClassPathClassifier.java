@@ -161,7 +161,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     List<URL> containerUrls =
         buildContainerUrlClassification(context, directDependencies, serviceUrlClassifications, pluginUrlClassifications,
                                         rootArtifactType, remoteRepositories);
-    List<URL> applicationUrls = buildApplicationUrlClassification(context, directDependencies, rootArtifactType);
+    List<URL> applicationUrls =
+        buildApplicationUrlClassification(context, directDependencies, rootArtifactType, remoteRepositories);
 
     return new ArtifactsUrlClassification(containerUrls, serviceUrlClassifications, pluginSharedLibUrls, pluginUrlClassifications,
                                           applicationUrls);
@@ -761,14 +762,15 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * <p/>
    * If the application artifact has not been classified as plugin its going to be resolved as {@value #JAR_EXTENSION} in order to
    * include this its compiled classes classification.
-   *
    * @param context {@link ClassPathClassifierContext} with settings for the classification process
    * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
    * @param rootArtifactType {@link ArtifactClassificationType} for rootArtifact @return {@link URL}s for application class loader
+   * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
    */
   private List<URL> buildApplicationUrlClassification(ClassPathClassifierContext context,
                                                       List<Dependency> directDependencies,
-                                                      ArtifactClassificationType rootArtifactType) {
+                                                      ArtifactClassificationType rootArtifactType,
+                                                      List<RemoteRepository> rootArtifactRemoteRepositories) {
     logger.debug("Building application classification");
     Artifact rootArtifact = context.getRootArtifact();
 
@@ -834,7 +836,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       List<File> urls = dependencyResolver
           .resolveDependencies(rootTestDependency, directDependencies, managedDependencies,
                                orFilter(dependencyFilter, new PatternExclusionsDependencyFilter(exclusionsPatterns)),
-                               emptyList());
+                               rootArtifactRemoteRepositories);
       appFiles
           .addAll(urls);
     } catch (Exception e) {
