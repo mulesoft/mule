@@ -57,10 +57,11 @@ public class MavenClassLoaderModelLoaderTestCase {
   @Test
   public void noMavenConfiguration() throws Exception {
     Map<String, String> properties = getMuleFreeSystemProperties();
-    GlobalConfigLoader.reset(); //Change local repository path
+    properties.put(repositoryLocation.getName(), repositoryLocation.getValue());
     expectedException.expect(RuntimeException.class);
     expectedException.expectCause(instanceOf(DependencyCollectionException.class));
     testWithSystemProperties(properties, () -> {
+      GlobalConfigLoader.reset(); //Change local repository path
       mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP);
     });
   }
@@ -69,9 +70,10 @@ public class MavenClassLoaderModelLoaderTestCase {
   public void changeMavenConfiguration() throws Exception {
 
     Map<String, String> properties = getMuleFreeSystemProperties();
-    GlobalConfigLoader.reset(); //Change local repository path
+    properties.put(repositoryLocation.getName(), repositoryLocation.getValue());
     try {
       testWithSystemProperties(properties, () -> {
+        GlobalConfigLoader.reset(); //Change local repository path
         mavenClassLoaderModelLoader.load(artifactFile, emptyMap(), APP);
       });
       fail();
