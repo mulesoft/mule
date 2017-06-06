@@ -32,8 +32,8 @@ public class UnauthorizeOperationExecutor implements OperationExecutor {
   public Publisher<Object> execute(ExecutionContext<OperationModel> executionContext) {
     ConfigurationInstance config = executionContext.getConfiguration().get();
     String ownerId = executionContext.hasParameter(RESOURCE_OWNER_ID_PARAMETER_NAME)
-      ? executionContext.getParameter(RESOURCE_OWNER_ID_PARAMETER_NAME)
-      : DEFAULT_RESOURCE_OWNER_ID;
+        ? executionContext.getParameter(RESOURCE_OWNER_ID_PARAMETER_NAME)
+        : DEFAULT_RESOURCE_OWNER_ID;
     oauthManager.invalidate(config.getName(), ownerId);
 
     return Mono.empty();
