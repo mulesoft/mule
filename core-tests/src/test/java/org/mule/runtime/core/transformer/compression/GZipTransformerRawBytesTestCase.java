@@ -10,6 +10,8 @@ import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.internal.transformer.compression.GZipCompressTransformer;
+import org.mule.runtime.core.internal.transformer.compression.GZipUncompressTransformer;
 
 import java.io.UnsupportedEncodingException;
 

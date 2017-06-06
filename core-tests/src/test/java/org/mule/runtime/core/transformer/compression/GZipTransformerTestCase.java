@@ -12,7 +12,9 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.util.compression.GZipCompression;
+import org.mule.runtime.core.internal.transformer.compression.GZipCompressTransformer;
+import org.mule.runtime.core.internal.transformer.compression.GZipUncompressTransformer;
+import org.mule.runtime.core.api.util.compression.GZipCompression;
 import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 
 import org.junit.Test;

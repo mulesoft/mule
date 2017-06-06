@@ -4,10 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.compression;
+package org.mule.runtime.core.api.util.compression;
 
 import static org.apache.commons.io.IOUtils.copy;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+
+import org.mule.runtime.core.internal.transformer.compression.GZIPCompressorInputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -21,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * <code>GZipCompression</code> is a CompressionStrategy implementation using the GZip library included in the JDK java.util.zip.
- * This is the default CompressionStrategy used by the CompressionHelper discovery when no other implementation is discovered.
  */
 public class GZipCompression implements CompressionStrategy {
 

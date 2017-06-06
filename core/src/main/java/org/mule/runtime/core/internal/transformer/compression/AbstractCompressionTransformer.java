@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.transformer.compression;
+package org.mule.runtime.core.internal.transformer.compression;
 
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.util.compression.CompressionStrategy;
+import org.mule.runtime.core.api.util.compression.CompressionStrategy;
 
 /**
  * <code>AbstractCompressionTransformer</code> is a base class for all transformers that can compress or uncompress data when they

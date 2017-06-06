@@ -23,8 +23,8 @@ import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.lifecycle.LifecycleObject;
 import org.mule.runtime.core.lifecycle.NotificationLifecycleObject;
-import org.mule.runtime.core.util.annotation.AnnotationMetaData;
-import org.mule.runtime.core.util.annotation.AnnotationUtils;
+import org.mule.runtime.core.internal.util.annotation.AnnotationMetaData;
+import org.mule.runtime.core.internal.util.annotation.AnnotationUtils;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
 import java.lang.reflect.Method;

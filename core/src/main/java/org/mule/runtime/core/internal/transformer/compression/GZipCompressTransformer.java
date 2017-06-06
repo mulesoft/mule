@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.transformer.compression;
+package org.mule.runtime.core.internal.transformer.compression;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.util.compression.GZipCompression;
+import org.mule.runtime.core.api.util.compression.GZipCompression;
 
 import java.io.InputStream;
 import java.io.Serializable;
