@@ -197,7 +197,6 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
     } else {
       doc.getDocumentElement().setAttributeNS("http://www.w3.org/2000/xmlns/",
                                               "xmlns", CORE_NAMESPACE);
-      addNamespaceDeclarationIfNeeded(CORE_PREFIX, namespace, buildSchemaLocation(prefix, namespace));
       return doc.createElementNS(CORE_NAMESPACE, name);
     }
   }
