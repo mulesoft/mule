@@ -24,7 +24,7 @@
             <parameter name="content" type="string" role="CONTENT"/>
         </parameters>
         <body>
-            <mule:set-payload value="#['attribute value:[' ++ parameters.parameter1 ++ '], value of content (accessing map under key smart):[' ++ parameters.content.smart ++ ']']"/>
+            <mule:set-payload value="#['attribute value:[' ++ parameters.parameter1 ++ '], value of content (accessing map under key smart):[' ++ parameters.content ++ ']']"/>
         </body>
         <output type="string"/>
     </operation>
@@ -46,7 +46,7 @@
             <parameter name="primary" type="string" role="PRIMARY"/>
         </parameters>
         <body>
-            <mule:set-payload value="#['attribute value:[' ++ parameters.parameter1 ++ '], value of content (accessing map under key smart):[' ++ parameters.content.smart ++ '], value of primary (accessing map under key smart2):[' ++ parameters.primary.smart2 ++ ']']"/>
+            <mule:set-payload value="#['attribute value:[' ++ parameters.parameter1 ++ '], value of content:[' ++ parameters.content ++ '], value of primary:[' ++ parameters.primary ++ ']']"/>
         </body>
         <output type="string"/>
     </operation>

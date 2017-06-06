@@ -20,4 +20,13 @@
         <output type="XsdType2"/>
     </operation>
 
+    <operation name="is-xsdtype1">
+        <parameters>
+            <parameter name="aParameter" type="XsdType1"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[parameters.aParameter as String]"/>
+        </body>
+        <output type="string"/>
+    </operation>
 </module>

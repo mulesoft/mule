@@ -6,27 +6,47 @@
  */
 package org.mule.runtime.config.spring.factories;
 
-import org.mule.runtime.core.api.MuleContext;
+import static java.lang.String.format;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.inject.Inject;
+import java.util.Optional;
 
 public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProcessorChainFactoryBean {
 
   private Map<String, String> properties = new HashMap<>();
   private Map<String, String> parameters = new HashMap<>();
-  private boolean returnsVoid;
+  private String moduleName;
+  private String moduleOperation;
   @Inject
-  private MuleContext muleContext;
+  private ExtensionManager extensionManager;
 
   @Override
   protected MessageProcessorChainBuilder getBuilderInstance() {
+    final Optional<ExtensionModel> extensionModel = extensionManager.getExtensions().stream()
+        .filter(em -> em.getXmlDslModel().getPrefix().equals(moduleName))
+        .findFirst();
+    if (!extensionModel.isPresent()) {
+      throw new IllegalArgumentException(format("Could not find any extension under the name of [%s]", moduleName));
+    }
+
+    OperationSeeker operationSeeker = new OperationSeeker();
+    operationSeeker.walk(extensionModel.get());
+    if (!operationSeeker.operationModel.isPresent()) {
+      throw new IllegalArgumentException(format("Could not find any operation under the name of [%s] for the extension [%s]",
+                                                moduleOperation, moduleName));
+    }
     MessageProcessorChainBuilder builder =
-        new ModuleOperationMessageProcessorChainBuilder(properties, parameters, returnsVoid, muleContext.getExpressionManager());
+        new ModuleOperationMessageProcessorChainBuilder(properties, parameters, extensionModel.get(),
+                                                        operationSeeker.operationModel.get(),
+                                                        muleContext.getExpressionManager());
     return builder;
   }
 
@@ -38,7 +58,27 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
     this.parameters = parameters;
   }
 
-  public void setReturnsVoid(boolean returnsVoid) {
-    this.returnsVoid = returnsVoid;
+  public void setModuleName(String moduleName) {
+    this.moduleName = moduleName;
+  }
+
+  public void setModuleOperation(String moduleOperation) {
+    this.moduleOperation = moduleOperation;
+  }
+
+  /**
+   * Internal class used only as a helper to find the only occurrence of an operation under the same name.
+   */
+  private class OperationSeeker extends IdempotentExtensionWalker {
+
+    Optional<OperationModel> operationModel = Optional.empty();
+
+    @Override
+    protected void onOperation(OperationModel operationModel) {
+      if (operationModel.getName().equals(moduleOperation)) {
+        this.operationModel = Optional.of(operationModel);
+        stop();
+      }
+    }
   }
 }
