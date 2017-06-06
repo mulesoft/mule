@@ -287,6 +287,11 @@ public interface AllureConstants {
 
       String SCATTER_GATHER = "Scatter Gather";
     }
+
+    interface RoundRobinStory {
+
+      String ROUND_ROBIN = "Round Robin";
+    }
   }
 
   interface TransformMessageFeature {
