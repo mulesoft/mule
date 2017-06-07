@@ -31,7 +31,7 @@ public class NullSourceCompletionHandler implements SourceCompletionHandler {
   }
 
   @Override
-  public void onTerminate(Either<Event, MessagingException> eventOrException) {
+  public void onTerminate(Either<MessagingException, Event> eventOrException) {
     // Nothing to do.
   }
 
