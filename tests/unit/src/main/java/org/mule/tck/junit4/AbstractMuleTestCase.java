@@ -13,7 +13,7 @@ import static java.util.Collections.sort;
 import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
-import static org.mule.runtime.core.util.StringMessageUtils.getBoilerPlate;
+import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.api.util.SystemUtils.parsePropertyDefinitions;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;

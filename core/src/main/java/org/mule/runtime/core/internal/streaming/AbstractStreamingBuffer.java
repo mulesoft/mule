@@ -7,9 +7,9 @@
 package org.mule.runtime.core.internal.streaming;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.util.ConcurrencyUtils.safeUnlock;
-import static org.mule.runtime.core.util.ConcurrencyUtils.withLock;
-import static org.mule.runtime.core.util.FunctionalUtils.safely;
+import static org.mule.runtime.core.internal.util.ConcurrencyUtils.safeUnlock;
+import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
+import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;

@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.api.util.StringMessageUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

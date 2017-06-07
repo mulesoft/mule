@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.registry.ServiceType;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
-import org.mule.runtime.core.util.PropertiesUtils;
+import org.mule.runtime.core.api.util.PropertiesUtils;
 
 import java.io.InputStream;
 import java.util.ArrayList;

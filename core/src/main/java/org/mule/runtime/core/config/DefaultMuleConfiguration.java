@@ -7,8 +7,8 @@
 package org.mule.runtime.core.config;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleBase;
-import static org.mule.runtime.core.util.StandaloneServerUtils.getMuleHome;
+import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleBase;
+import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -23,9 +23,9 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.FileUtils;
-import org.mule.runtime.core.util.NetworkUtils;
+import org.mule.runtime.core.api.util.NetworkUtils;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.File;

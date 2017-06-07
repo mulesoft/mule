@@ -7,7 +7,7 @@
 
 package org.mule.test.runner.utils;
 
-import static org.mule.runtime.core.util.PropertiesUtils.discoverProperties;
+import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
 
 import java.io.IOException;
 import java.util.Properties;

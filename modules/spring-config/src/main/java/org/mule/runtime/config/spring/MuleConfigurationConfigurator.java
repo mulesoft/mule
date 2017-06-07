@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DEFAULT_PROCESSING_STRATEGY;
-import static org.mule.runtime.core.util.ProcessingStrategyUtils.parseProcessingStrategy;
+import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.parseProcessingStrategy;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.DefaultMuleContext;

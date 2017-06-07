@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.ObjectFilter;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
-import org.mule.runtime.core.util.AttributeEvaluator;
+import org.mule.runtime.core.api.util.AttributeEvaluator;
 import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.util.regex.Pattern;

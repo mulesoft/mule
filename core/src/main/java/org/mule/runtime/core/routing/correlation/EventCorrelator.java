@@ -15,7 +15,7 @@ import static org.mule.runtime.core.context.notification.RoutingNotification.COR
 import static org.mule.runtime.core.context.notification.RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.core.message.GroupCorrelation.NOT_SET;
-import static org.mule.runtime.core.util.StringMessageUtils.truncate;
+import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -38,7 +38,7 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.RoutingNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.EventGroup;
-import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.util.monitor.Expirable;
 import org.mule.runtime.core.util.monitor.ExpiryMonitor;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;

@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.streaming.MemoryManager;
-import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

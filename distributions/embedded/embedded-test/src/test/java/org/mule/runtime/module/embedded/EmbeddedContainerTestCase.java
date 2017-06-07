@@ -24,7 +24,7 @@ import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigu
 import static org.mule.maven.client.api.model.RemoteRepository.newRemoteRepositoryBuilder;
 import static org.mule.runtime.api.deployment.management.ComponentInitialStateManager.DISABLE_SCHEDULER_SOURCES_PROPERTY;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
-import static org.mule.runtime.core.util.UUID.getUUID;
+import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.module.embedded.api.EmbeddedContainer.builder;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DEPLOYMENT_TYPE;

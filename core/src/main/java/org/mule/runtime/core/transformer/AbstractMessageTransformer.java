@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.api.util.StringMessageUtils;
 
 import java.nio.charset.Charset;
 

@@ -6,7 +6,7 @@
  */
 package org.mule.test.infrastructure.process;
 
-import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.api.util.concurrent.Latch;
 
 import java.io.BufferedReader;
 import java.io.IOException;

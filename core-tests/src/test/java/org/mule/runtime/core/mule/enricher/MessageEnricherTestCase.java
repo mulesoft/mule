@@ -22,8 +22,8 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.enricher.MessageEnricher;
-import org.mule.runtime.core.enricher.MessageEnricher.EnrichExpressionPair;
+import org.mule.runtime.core.internal.enricher.MessageEnricher;
+import org.mule.runtime.core.internal.enricher.MessageEnricher.EnrichExpressionPair;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 

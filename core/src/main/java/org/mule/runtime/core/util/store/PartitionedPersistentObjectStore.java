@@ -14,7 +14,7 @@ import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableExpirableObjectStore;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.FileUtils;
-import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.api.util.UUID;
 
 import java.io.File;
 import java.io.FileFilter;

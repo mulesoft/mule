@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
-import static org.mule.runtime.core.util.StringMessageUtils.getBoilerPlate;
+import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import org.mule.test.runner.api.WorkspaceLocationResolver;
 
 import java.io.File;

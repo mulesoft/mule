@@ -9,7 +9,7 @@ package org.mule.tck;
 import org.mule.runtime.core.execution.BlockingCompletionHandler;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.api.util.concurrent.Latch;
 
 public class SensingNullCompletionHandler extends BlockingCompletionHandler<Event, MessagingException> {
 

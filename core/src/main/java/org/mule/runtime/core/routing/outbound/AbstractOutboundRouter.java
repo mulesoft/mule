@@ -38,7 +38,7 @@ import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.management.stats.RouterStatistics;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
-import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.api.util.StringMessageUtils;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

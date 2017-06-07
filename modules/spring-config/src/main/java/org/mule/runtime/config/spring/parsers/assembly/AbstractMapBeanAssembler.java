@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring.parsers.assembly;
 
 import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
-import org.mule.runtime.core.util.MapCombiner;
+import org.mule.runtime.core.api.util.MapCombiner;
 
 import java.util.Iterator;
 import java.util.List;

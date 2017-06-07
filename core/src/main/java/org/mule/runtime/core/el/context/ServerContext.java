@@ -16,7 +16,7 @@ import static org.apache.commons.lang.SystemUtils.OS_VERSION;
 import static org.apache.commons.lang.SystemUtils.USER_DIR;
 import static org.apache.commons.lang.SystemUtils.USER_HOME;
 import static org.apache.commons.lang.SystemUtils.USER_NAME;
-import org.mule.runtime.core.util.NetworkUtils;
+import org.mule.runtime.core.api.util.NetworkUtils;
 
 import java.net.UnknownHostException;
 import java.util.Calendar;

@@ -16,7 +16,7 @@ import static org.mule.test.heisenberg.extension.DEARadioSource.MESSAGES_PER_POL
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 

@@ -7,7 +7,7 @@
 package org.mule;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.api.util.UUID;
 
 import org.openjdk.jmh.annotations.Benchmark;
 

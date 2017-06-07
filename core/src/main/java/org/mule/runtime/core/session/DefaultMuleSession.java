@@ -11,7 +11,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.CaseInsensitiveHashMap;
+import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

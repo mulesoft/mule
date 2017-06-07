@@ -11,9 +11,9 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.util.AttributeEvaluator;
+import org.mule.runtime.core.api.util.AttributeEvaluator;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.util.WildcardAttributeEvaluator;
+import org.mule.runtime.core.api.util.WildcardAttributeEvaluator;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;

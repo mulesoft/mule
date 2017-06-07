@@ -10,7 +10,7 @@ import static java.io.File.separator;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppConfigFolderPath;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
-import org.mule.runtime.core.util.PropertiesUtils;
+import org.mule.runtime.core.api.util.PropertiesUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;

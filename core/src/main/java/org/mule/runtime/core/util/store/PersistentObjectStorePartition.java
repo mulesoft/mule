@@ -26,6 +26,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.store.ExpirableObjectStore;
 import org.mule.runtime.core.api.store.ListableObjectStore;
+import org.mule.runtime.core.api.util.UUID;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -280,7 +281,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
   }
 
   protected File createFileToStoreObject() throws ObjectStoreException {
-    String filename = org.mule.runtime.core.util.UUID.getUUID() + OBJECT_FILE_EXTENSION;
+    String filename = UUID.getUUID() + OBJECT_FILE_EXTENSION;
     try {
       return newFile(partitionDirectory, filename);
     } catch (MuleRuntimeException mre) {

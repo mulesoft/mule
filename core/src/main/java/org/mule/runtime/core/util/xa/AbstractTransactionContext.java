@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util.xa;
 
-import org.mule.runtime.core.util.UUID;
+import org.mule.runtime.core.api.util.UUID;
 
 import javax.transaction.Status;
 

@@ -7,8 +7,8 @@
 package org.mule.tck.testmodels.mule;
 
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.compression.AbstractCompressionTransformer;
-import org.mule.runtime.core.util.compression.GZipCompression;
+import org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer;
+import org.mule.runtime.core.api.util.compression.GZipCompression;
 
 import java.nio.charset.Charset;
 

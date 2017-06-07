@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.util.StringMessageUtils;
+import org.mule.runtime.core.api.util.StringMessageUtils;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;

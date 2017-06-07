@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.processor.chain.NestedProcessorChain;
-import org.mule.runtime.core.util.ObjectNameHelper;
+import org.mule.runtime.core.api.util.ObjectNameHelper;
 
 /**
  * Base class for a {@link ValueResolver} which needs to create instances of {@link NestedProcessor}, regardless of it being the

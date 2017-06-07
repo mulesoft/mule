@@ -15,7 +15,7 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.util.ArrayUtils;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.util.SecurityUtils;
+import org.mule.runtime.core.internal.util.SecurityUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

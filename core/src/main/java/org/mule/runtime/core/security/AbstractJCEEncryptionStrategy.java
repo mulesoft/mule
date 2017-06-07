@@ -9,7 +9,7 @@ package org.mule.runtime.core.security;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.util.Base64;
+import org.mule.runtime.core.api.util.Base64;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

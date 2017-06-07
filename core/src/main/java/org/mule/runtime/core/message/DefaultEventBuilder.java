@@ -34,7 +34,7 @@ import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.message.DefaultMessageBuilder;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.session.DefaultMuleSession;
-import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
+import org.mule.runtime.core.internal.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.IOException;
