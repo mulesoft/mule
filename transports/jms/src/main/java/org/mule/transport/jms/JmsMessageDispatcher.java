@@ -605,11 +605,16 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                                                         connector.isNoLocal(), null, topic, endpoint);
     }
 
+    /**
+     * By default, no encoding is performed. In case an encoding is
+     * needed to create the replyTo, this method has to be
+     * overridden
+     * 
+     * @param jmsCorrelationID the correlation ID to encode
+     * @return the encoded correlation ID
+     */
     protected String encodeVendorSpecificID(String jmsCorrelationID)
     {
-        // By default, no encoding is performed. In case an encoding is
-        // needed to create the replyTo, this method has to be 
-        // overridden.
         return jmsCorrelationID;
     }
 
