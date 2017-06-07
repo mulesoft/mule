@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.core.internal.util;
 
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.security.tls.TlsConfiguration;
+import static java.lang.System.getProperty;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_SECURITY_SYSTEM_PROPERTY;
+import static org.mule.runtime.core.api.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
 
 public final class SecurityUtils {
 
   public static String getSecurityModel() {
-    return System.getProperty(MuleProperties.MULE_SECURITY_SYSTEM_PROPERTY, TlsConfiguration.DEFAULT_SECURITY_MODEL);
+    return getProperty(MULE_SECURITY_SYSTEM_PROPERTY, DEFAULT_SECURITY_MODEL);
   }
 
   public static boolean isDefaultSecurityModel() {
-    return getSecurityModel().equals(TlsConfiguration.DEFAULT_SECURITY_MODEL);
+    return getSecurityModel().equals(DEFAULT_SECURITY_MODEL);
   }
 }

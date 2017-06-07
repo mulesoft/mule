@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.util.annotation;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 import java.lang.annotation.Annotation;
@@ -25,6 +27,6 @@ public class AnnotationUtils {
   }
 
   public static <T extends Annotation> Optional<T> getAnnotation(Class<?> aClass, Class<T> annotationType) {
-    return aClass != null ? Optional.ofNullable(aClass.getAnnotation(annotationType)) : Optional.empty();
+    return aClass != null ? ofNullable(aClass.getAnnotation(annotationType)) : empty();
   }
 }
