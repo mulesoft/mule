@@ -63,17 +63,17 @@ import java.util.function.Supplier;
  */
 public class SoapInvokeOperationDeclarer {
 
-  private static final String KEYS_GROUP = "WebServiceConfiguration";
+  public static final String MESSAGE_GROUP = "Message";
+  private static final String KEYS_GROUP = "Web Service Configuration";
   private static final String TRANSPORT_GROUP = "Transport Configuration";
-  static final String OPERATION_NAME = "invoke";
   static final String OPERATION_DESCRIPTION = "invokes Web Service operations";
+  static final String OPERATION_NAME = "invoke";
 
   public static final String SERVICE_PARAM = "service";
   public static final String OPERATION_PARAM = "operation";
   public static final String HEADERS_PARAM = "headers";
   public static final String BODY_PARAM = "body";
   public static final String ATTACHMENTS_PARAM = "attachments";
-  public static final String MESSAGE_GROUP = "Message";
   public static final String HEADERS_DISPLAY_NAME = "Headers";
   public static final String TRANSPORT_HEADERS_PARAM = "transportHeaders";
 
@@ -99,8 +99,8 @@ public class SoapInvokeOperationDeclarer {
     soapErrors.forEach(operation::withErrorModel);
     declareMetadata(operation, loader);
     declareOutput(operation, loader);
-    declareRequestParameters(operation, loader);
     declareMetadataKeyParameters(operation);
+    declareRequestParameters(operation, loader);
     return operation;
   }
 
