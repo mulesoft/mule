@@ -54,7 +54,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMAT
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
-
 import org.mule.runtime.api.artifact.ArtifactProperties;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -123,6 +122,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -207,7 +207,6 @@ class SpringMuleContextServiceConfigurator {
                .getBeanDefinition())
       .put(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinition(TransactionalQueueManager.class))
       .put("_muleParentContextPropertyPlaceholderProcessor", getBeanDefinition(ParentContextPropertyPlaceholderProcessor.class))
-      .put("_mulePropertyPlaceholderProcessor", createMulePropertyPlaceholderBeanDefinition())
       .put(OBJECT_SECURITY_MANAGER, getBeanDefinition(DefaultMuleSecurityManager.class))
       .put(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER, getBeanDefinition(MuleMessageProcessingManager.class))
       .put(OBJECT_MULE_STREAM_CLOSER_SERVICE, getBeanDefinition(DefaultStreamCloserService.class))
@@ -245,6 +244,7 @@ class SpringMuleContextServiceConfigurator {
   }
 
   void createArtifactServices() {
+    registerPropertyPlaceholder();
     registerBeanDefinition(DEFAULT_ARTIFACT_PROPERTIES_RESOURCE, getConstantObjectBeanDefinition(artifactProperties));
     registerBeanDefinition(OBJECT_CONFIGURATION_COMPONENT_LOCATOR, getConstantObjectBeanDefinition(componentLocator));
     loadServiceConfigurators();
@@ -257,6 +257,10 @@ class SpringMuleContextServiceConfigurator {
     createLocalObjectStoreBeanDefinitions();
     createQueueManagerBeanDefinitions();
     createCustomServices();
+  }
+
+  private void registerPropertyPlaceholder() {
+    registerBeanDefinition("_mulePropertyPlaceholderProcessor", createMulePropertyPlaceholderBeanDefinition());
   }
 
   private void loadServiceConfigurators() {
@@ -308,11 +312,13 @@ class SpringMuleContextServiceConfigurator {
     return beanDefinition;
   }
 
-  private static BeanDefinition createMulePropertyPlaceholderBeanDefinition() {
+  private BeanDefinition createMulePropertyPlaceholderBeanDefinition() {
     HashMap<Object, Object> factories = new HashMap<>();
     factories.put("hostname", new HostNameFactory());
+    Properties properties = new Properties();
+    properties.putAll(artifactProperties.toImmutableMap());
     BeanDefinitionBuilder mulePropertyPlaceholderProcessor = getBeanDefinitionBuilder(PropertyPlaceholderProcessor.class);
-    return mulePropertyPlaceholderProcessor.addPropertyValue("factories", factories)
+    return mulePropertyPlaceholderProcessor.addPropertyValue("properties", properties).addPropertyValue("factories", factories)
         .addPropertyValue("ignoreUnresolvablePlaceholders", true).getBeanDefinition();
   }
 
