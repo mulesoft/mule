@@ -6,6 +6,8 @@
  */
 package org.mule.processor;
 
+import static java.lang.Boolean.getBoolean;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -23,6 +25,9 @@ import org.mule.config.i18n.CoreMessages;
  */
 public abstract class AbstractFilteringMessageProcessor extends AbstractInterceptingMessageProcessor  implements NonBlockingSupported
 {
+
+    public static final String FILTER_ON_UNACCEPTED_NOT_STOP_PARENT_FLOW = SYSTEM_PROPERTY_PREFIX + "filterOnUnacceptedNotStopParentFlow";
+
     /** 
      * Throw a FilterUnacceptedException when a message is rejected by the filter? 
      */
@@ -63,7 +68,13 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     {
         if (unacceptedMessageProcessor != null)
         {
-            unacceptedMessageProcessor.process(event);
+            MuleEvent result = unacceptedMessageProcessor.process(event);
+
+            if(shouldNotFilterStopParentFlow())
+            {
+                return result;
+            }
+
             return null;
         }
         else if (throwOnUnaccepted)
@@ -108,5 +119,10 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     public void setThrowOnUnaccepted(boolean throwOnUnaccepted)
     {
         this.throwOnUnaccepted = throwOnUnaccepted;
+    }
+
+    private boolean shouldNotFilterStopParentFlow()
+    {
+        return getBoolean(FILTER_ON_UNACCEPTED_NOT_STOP_PARENT_FLOW);
     }
 }
