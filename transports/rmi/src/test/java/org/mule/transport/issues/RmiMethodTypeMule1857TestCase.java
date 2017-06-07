@@ -31,4 +31,3 @@ public class RmiMethodTypeMule1857TestCase extends AbstractFunctionalTestCase
     }      
     
 }
-//
