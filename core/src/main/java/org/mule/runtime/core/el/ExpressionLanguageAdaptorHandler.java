@@ -10,6 +10,7 @@ import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
 import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.el.DefaultExpressionManager.MEL_PREFIX;
@@ -31,15 +32,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Implementation of an {@link ExtendedExpressionLanguageAdaptor} which adapts MVEL and DW together, deciding via a prefix whether one or
- * the other should be call. It will allow MVEL and DW to be used together in compatibility mode.
+ * Implementation of an {@link ExtendedExpressionLanguageAdaptor} which adapts MVEL and DW together, deciding via a prefix whether
+ * one or the other should be call. It will allow MVEL and DW to be used together in compatibility mode.
  *
  * @since 4.0
  */
 public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLanguageAdaptor {
 
-  private final Pattern EXPR_PREFIX_PATTERN = compile("^\\s*(?:(?:#\\[)?\\s*(\\w+):|\\%(\\w+) \\d).*");
+  private static final String EXPR_PREFIX_LANGS_TOKEN = "LANGS";
+  private static final String EXPR_PREFIX_PATTERN_TEMPLATE =
+      "^\\s*(?:(?:#\\[)?\\s*(" + EXPR_PREFIX_LANGS_TOKEN + "):|\\%(" + EXPR_PREFIX_LANGS_TOKEN + ") \\d).*";
 
+  private final Pattern exprPrefixPattern;
   private Map<String, ExtendedExpressionLanguageAdaptor> expressionLanguages;
 
   private boolean melDefault = false;
@@ -49,6 +53,9 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
     expressionLanguages = new HashMap<>();
     expressionLanguages.put(DW_PREFIX, defaultExtendedExpressionLanguage);
     expressionLanguages.put(MEL_PREFIX, mvelExpressionLanguage);
+
+    exprPrefixPattern = compile(EXPR_PREFIX_PATTERN_TEMPLATE.replaceAll("LANGS", join(expressionLanguages.keySet(), '|')));
+
     melDefault = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
   }
 
@@ -137,7 +144,7 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   }
 
   private String getLanguagePrefix(String expression) {
-    final Matcher matcher = EXPR_PREFIX_PATTERN.matcher(expression);
+    final Matcher matcher = exprPrefixPattern.matcher(expression);
     if (matcher.find()) {
       int i = 1;
       String currentGroup = null;

@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.el;
 
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
-import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
 import static org.mockito.Matchers.anyString;
@@ -15,10 +13,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.size.SmallTest;
 
 import java.util.Collection;
 
@@ -29,12 +30,14 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.verification.VerificationMode;
+
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features(EXPRESSION_LANGUAGE)
 @Stories("Support Mixing DW and MEL in a same application")
 @RunWith(Parameterized.class)
+@SmallTest
 public class ExpressionLanguagePrefixTestCase extends AbstractMuleTestCase {
 
   private ExpressionLanguageAdaptorHandler elAdapter;
@@ -112,6 +115,18 @@ public class ExpressionLanguagePrefixTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void singleLineInvalidPrefixNoMarker() {
+    elAdapter.validate("nolang:expr");
+    doVerify();
+  }
+
+  @Test
+  public void singleLineInvalidPrefixMarker() {
+    elAdapter.validate("#[nolang:expr]");
+    doVerify();
+  }
+
+  @Test
   public void multiLineNoPrefixNoMarker() {
     elAdapter.validate("expr" + lineSeparator() + "a:b");
     doVerify();
@@ -152,6 +167,18 @@ public class ExpressionLanguagePrefixTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void multiLineInvalidPrefixNoMarker() {
+    elAdapter.validate("nolang:expr" + lineSeparator() + "a:b");
+    doVerify();
+  }
+
+  @Test
+  public void multiLineInvalidPrefixMarker() {
+    elAdapter.validate("#[nolang:expr" + lineSeparator() + "a:b]");
+    doVerify();
+  }
+
+  @Test
   public void paddedNoPrefixNoMarker() {
     elAdapter.validate("    expr a:b");
     doVerify();
@@ -175,6 +202,18 @@ public class ExpressionLanguagePrefixTestCase extends AbstractMuleTestCase {
     elAdapter.validate("#[    mel:expr a:b]");
     verify(dwLanguage, never()).validate(anyString());
     verify(melLanguage, times(1)).validate(anyString());
+  }
+
+  @Test
+  public void paddedInvalidPrefixNoMarker() {
+    elAdapter.validate("    nolang:expr a:b");
+    doVerify();
+  }
+
+  @Test
+  public void paddedInvalidPrefixMarker() {
+    elAdapter.validate("#[    nolang:expr a:b]");
+    doVerify();
   }
 
   private void doVerify() {
