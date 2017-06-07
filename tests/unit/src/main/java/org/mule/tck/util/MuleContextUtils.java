@@ -7,17 +7,20 @@
 package org.mule.tck.util;
 
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.streaming.StreamingManager;
@@ -41,7 +44,8 @@ public class MuleContextUtils {
     when(muleContext.getDefaultErrorHandler()).thenReturn(new OnErrorPropagateHandler());
     StreamingManager streamingManager = mock(StreamingManager.class, RETURNS_DEEP_STUBS);
     try {
-      when(muleContext.getRegistry().lookupObject(StreamingManager.class)).thenReturn(streamingManager);
+      final MuleRegistry registry = muleContext.getRegistry();
+      doReturn(streamingManager).when(registry).lookupObject(StreamingManager.class);
     } catch (RegistrationException e) {
       throw new RuntimeException(e);
     }

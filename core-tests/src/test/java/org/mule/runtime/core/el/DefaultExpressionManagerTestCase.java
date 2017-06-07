@@ -17,6 +17,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,6 +30,7 @@ import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionFunction;
@@ -42,6 +44,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -57,6 +60,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -246,9 +250,9 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     final ExpressionLanguage expressionLanguage = mock(ExpressionLanguage.class, RETURNS_DEEP_STUBS);
     final CursorProvider cursorProvider = mock(CursorProvider.class);
 
-    when(mockMuleContext.getRegistry().lookupObject(DefaultExpressionLanguageFactoryService.class)).thenReturn(mockFactory);
-    when(mockMuleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE))
-        .thenReturn(mock(MVELExpressionLanguage.class, RETURNS_DEEP_STUBS));
+    final MuleRegistry registry = mockMuleContext.getRegistry();
+    doReturn(mockFactory).when(registry).lookupObject(DefaultExpressionLanguageFactoryService.class);
+    doReturn(mock(MVELExpressionLanguage.class, RETURNS_DEEP_STUBS)).when(registry).lookupObject(OBJECT_EXPRESSION_LANGUAGE);
 
     TypedValue value = new TypedValue(cursorProvider, BYTE_ARRAY);
     when(expressionLanguage.evaluate(anyString(), any())).thenReturn(value);

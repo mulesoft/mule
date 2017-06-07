@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.util.monitor;
 
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.config.i18n.CoreMessages.propertyHasInvalidValue;
 
@@ -13,7 +15,6 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -30,11 +31,11 @@ public class ExpiryMonitor implements Runnable, Disposable {
   /**
    * logger used by this class
    */
-  protected static final Logger logger = LoggerFactory.getLogger(ExpiryMonitor.class);
+  private static final Logger logger = LoggerFactory.getLogger(ExpiryMonitor.class);
 
-  protected Scheduler scheduler;
+  private Scheduler scheduler;
 
-  private Map monitors;
+  private Map<Expirable, ExpirableHolder> monitors;
 
   private long monitorFrequency;
 
@@ -61,7 +62,7 @@ public class ExpiryMonitor implements Runnable, Disposable {
       throw new IllegalArgumentException(propertyHasInvalidValue("monitorFrequency", Long.valueOf(monitorFrequency))
           .toString());
     }
-    monitors = new ConcurrentHashMap();
+    monitors = new ConcurrentHashMap<>();
     if (scheduler == null) {
       this.scheduler = muleContext.getSchedulerService()
           .customScheduler(muleContext.getSchedulerBaseConfig().withName(name + ".expiry.monitor").withMaxConcurrentTasks(1));
@@ -100,7 +101,7 @@ public class ExpiryMonitor implements Runnable, Disposable {
   }
 
   public void resetExpirable(Expirable expirable) {
-    ExpirableHolder eh = (ExpirableHolder) monitors.get(expirable);
+    ExpirableHolder eh = monitors.get(expirable);
     if (eh != null) {
       eh.reset();
       if (logger.isDebugEnabled()) {
@@ -114,11 +115,8 @@ public class ExpiryMonitor implements Runnable, Disposable {
    */
   @Override
   public void run() {
-    ExpirableHolder holder;
-
     if (!onPollingNodeOnly || muleContext == null || muleContext.isPrimaryPollingInstance()) {
-      for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();) {
-        holder = (ExpirableHolder) iterator.next();
+      for (ExpirableHolder holder : monitors.values()) {
         if (holder.isExpired()) {
           removeExpirable(holder.getExpirable());
           holder.getExpirable().expired();
@@ -132,8 +130,8 @@ public class ExpiryMonitor implements Runnable, Disposable {
     logger.info("disposing monitor");
     scheduler.stop();
     ExpirableHolder holder;
-    for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();) {
-      holder = (ExpirableHolder) iterator.next();
+    for (Object element : monitors.values()) {
+      holder = (ExpirableHolder) element;
       removeExpirable(holder.getExpirable());
       try {
         holder.getExpirable().expired();
@@ -142,6 +140,11 @@ public class ExpiryMonitor implements Runnable, Disposable {
         logger.debug(e.getMessage());
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    return format("ExpiryMonitor {monitorFrequency: %d, monitors: %s}", monitorFrequency, monitors.toString());
   }
 
   private static class ExpirableHolder {
@@ -153,7 +156,7 @@ public class ExpiryMonitor implements Runnable, Disposable {
     public ExpirableHolder(long milliseconds, Expirable expirable) {
       this.milliseconds = milliseconds;
       this.expirable = expirable;
-      created = System.currentTimeMillis();
+      created = currentTimeMillis();
     }
 
     public Expirable getExpirable() {
@@ -161,11 +164,17 @@ public class ExpiryMonitor implements Runnable, Disposable {
     }
 
     public boolean isExpired() {
-      return (System.currentTimeMillis() - milliseconds) > created;
+      return (currentTimeMillis() - milliseconds) > created;
     }
 
     public void reset() {
-      created = System.currentTimeMillis();
+      created = currentTimeMillis();
+    }
+
+    @Override
+    public String toString() {
+      return format("ExpirableHolder {expirable: %s, milliseconds: %d, created: %d}", expirable.toString(), milliseconds,
+                    created);
     }
   }
 }

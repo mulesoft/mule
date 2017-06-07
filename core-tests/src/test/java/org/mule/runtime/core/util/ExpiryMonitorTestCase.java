@@ -31,8 +31,8 @@ public class ExpiryMonitorTestCase extends AbstractMuleContextTestCase {
   private static final int EXPIRE_TIMEOUT = EXPIRE_TIME + EXPIRE_INTERVAL + 200;
   private static final long DELTA_TIME = 10;
 
-  private boolean expired = false;
-  private long expiredTime = -1;
+  private volatile boolean expired = false;
+  private volatile long expiredTime = -1;
 
   private ExpiryMonitor monitor;
 
@@ -56,7 +56,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleContextTestCase {
       assertThat(expired, is(true));
       assertThat(monitor.isRegistered(e), is(false));
       return true;
-    }));
+    }, () -> "" + currentTimeMillis() + " - " + monitor.toString()));
   }
 
   @Test
@@ -71,7 +71,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleContextTestCase {
       assertThat(expired, is(true));
       assertThat(monitor.isRegistered(e), is(false));
       return true;
-    }));
+    }, () -> "" + currentTimeMillis() + " - " + monitor.toString()));
     assertThat(expiredTime - startTime, greaterThanOrEqualTo(EXPIRE_TIME - DELTA_TIME));
   }
 
@@ -90,7 +90,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleContextTestCase {
       assertThat(expired, is(true));
       assertThat(monitor.isRegistered(e), is(false));
       return true;
-    }));
+    }, () -> "" + currentTimeMillis() + " - " + monitor.toString()));
     assertThat(expiredTime - startTime, greaterThanOrEqualTo(EXPIRE_TIME - DELTA_TIME));
   }
 
