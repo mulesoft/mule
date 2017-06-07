@@ -63,7 +63,7 @@ goto :eof
 
 :validate
 rem Find the requested command.
-for /F %%v in ('echo %1^|findstr "^console$ ^start$ ^pause$ ^resume$ ^stop$ ^restart$ ^install$ ^remove"') do call :exec set COMMAND=%%v
+for /F %%v in ('echo %1^|findstr "^console$ ^start$ ^pause$ ^resume$ ^stop$ ^restart$ ^install$ ^remove ^status$"') do call :exec set COMMAND=%%v
 
 if "%COMMAND%" == "" (
     rem ###############################################################
@@ -142,6 +142,19 @@ goto :eof
 
 :remove
 "%_WRAPPER_EXE%" -r %_WRAPPER_CONF% %MULE_OPTS%
+goto :eof
+
+:status
+if not defined JAVA_HOME (
+    echo Please, set the JAVA_HOME environment variable to run this command.
+    goto :eof
+)
+for /F "usebackq" %%i IN (`CALL "%JAVA_HOME%\bin\jps" ^| find "MuleContainerBootstrap"`) do (set PID=%%i)
+if defined PID (
+    echo %MULE_APP_LONG% is running (%PID%^).
+) else (
+    echo %MULE_APP_LONG% is not running.
+)
 goto :eof
 
 rem ###############################################################
