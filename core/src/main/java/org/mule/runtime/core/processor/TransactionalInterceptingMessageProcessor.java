@@ -6,22 +6,22 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.config.i18n.CoreMessages.errorInvokingMessageProcessorWithinTransaction;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createScopeExecutionTemplate;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
@@ -71,32 +71,22 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
     if (exceptionListener == null) {
       exceptionListener = muleContext.getDefaultErrorHandler();
     }
-    if (exceptionListener instanceof FlowConstructAware) {
-      ((FlowConstructAware) exceptionListener).setFlowConstruct(flowConstruct);
-    }
-    if (exceptionListener instanceof Initialisable) {
-      ((Initialisable) exceptionListener).initialise();
-    }
+    setFlowConstructIfNeeded(exceptionListener, flowConstruct);
+    initialiseIfNeeded(exceptionListener, true, muleContext);
   }
 
   @Override
   public void dispose() {
-    if (this.exceptionListener instanceof Disposable) {
-      ((Disposable) this.exceptionListener).dispose();
-    }
+    disposeIfNeeded(exceptionListener, logger);
   }
 
   @Override
   public void start() throws MuleException {
-    if (this.exceptionListener instanceof Startable) {
-      ((Startable) this.exceptionListener).start();
-    }
+    startIfNeeded(exceptionListener);
   }
 
   @Override
   public void stop() throws MuleException {
-    if (this.exceptionListener instanceof Stoppable) {
-      ((Stoppable) this.exceptionListener).stop();
-    }
+    stopIfNeeded(exceptionListener);
   }
 }

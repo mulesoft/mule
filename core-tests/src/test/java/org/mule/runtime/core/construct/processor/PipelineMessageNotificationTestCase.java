@@ -21,6 +21,7 @@ import static org.mule.runtime.core.context.notification.PipelineMessageNotifica
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
@@ -81,7 +82,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     muleContext = mockContextWithServices();
     when(muleContext.getStatistics()).thenReturn(new AllStatistics());
     when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
-    when(muleContext.getDefaultErrorHandler()).thenReturn(new ErrorHandlerFactory().createDefault(muleContext));
+    when(muleContext.getDefaultErrorHandler()).thenReturn(new ErrorHandlerFactory().createDefault());
     notificationManager = mock(ServerNotificationManager.class);
     when(muleContext.getNotificationManager()).thenReturn(notificationManager);
     ErrorTypeLocator errorTypeLocator = mock(ErrorTypeLocator.class);
@@ -117,7 +118,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   @Test
   public void requestResponseException() throws Exception {
-    pipeline.setExceptionListener(new ErrorHandlerFactory().createDefault(muleContext));
+    pipeline.setExceptionListener(new ErrorHandlerFactory().createDefault());
     List<Processor> processors = new ArrayList<>();
     processors.add(new ExceptionThrowingMessageProcessor());
     pipeline.setMessageProcessors(processors);

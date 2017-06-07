@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.SystemUtils.JAVA_VERSION;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_COMPONENT_LOCATOR;
@@ -29,6 +31,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.util.ExceptionUtils.getRootCauseException;
 import static org.mule.runtime.core.config.i18n.CoreMessages.invalidJdk;
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_DISPOSED;
@@ -39,9 +42,8 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STARTING;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPING;
-import static org.mule.runtime.core.api.util.ExceptionUtils.getRootCauseException;
-import static org.mule.runtime.core.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
+import static org.mule.runtime.core.util.FunctionalUtils.safely;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.unwrap;
 
@@ -93,6 +95,7 @@ import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.api.util.queue.Queue;
+import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.config.ClusterConfiguration;
 import org.mule.runtime.core.config.NullClusterConfiguration;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
@@ -110,20 +113,19 @@ import org.mule.runtime.core.internal.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.internal.config.DefaultCustomizationService;
 import org.mule.runtime.core.internal.connector.DefaultSchedulerController;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
+import org.mule.runtime.core.internal.util.JdkVersionUtils;
+import org.mule.runtime.core.internal.util.splash.ApplicationShutdownSplashScreen;
+import org.mule.runtime.core.internal.util.splash.ApplicationStartupSplashScreen;
+import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
+import org.mule.runtime.core.internal.util.splash.ServerStartupSplashScreen;
+import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
-import org.mule.runtime.core.internal.util.splash.ApplicationShutdownSplashScreen;
-import org.mule.runtime.core.internal.util.splash.ApplicationStartupSplashScreen;
-import org.mule.runtime.core.internal.util.JdkVersionUtils;
-import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
-import org.mule.runtime.core.internal.util.splash.ServerStartupSplashScreen;
-import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.core.api.util.queue.QueueManager;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -671,10 +673,9 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   /**
-   * When running in clustered mode, it returns a {@link QueueManager} that creates
-   * {@link Queue} instances which are only local to the current node. This is just a workaround
-   * until we introduce a solution for durable persistent queues in HA. This is not part of Mule's API and you should not use this
-   * in your apps or extensions
+   * When running in clustered mode, it returns a {@link QueueManager} that creates {@link Queue} instances which are only local
+   * to the current node. This is just a workaround until we introduce a solution for durable persistent queues in HA. This is not
+   * part of Mule's API and you should not use this in your apps or extensions
    *
    * @return a {@link QueueManager}
    * @since 3.5.0
@@ -883,11 +884,11 @@ public class DefaultMuleContext implements MuleContext {
     if (config.getDefaultErrorHandlerName() != null) {
       defaultErrorHandler = getRegistry().lookupObject(config.getDefaultErrorHandlerName());
       if (defaultErrorHandler == null) {
-        throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("No global error handler named %s",
-                                                                                      config.getDefaultErrorHandlerName())));
+        throw new MuleRuntimeException(createStaticMessage(format("No global error handler named %s",
+                                                                  config.getDefaultErrorHandlerName())));
       }
     } else {
-      defaultErrorHandler = new ErrorHandlerFactory().createDefault(this);
+      defaultErrorHandler = new ErrorHandlerFactory().createDefault();
     }
     return defaultErrorHandler;
   }
