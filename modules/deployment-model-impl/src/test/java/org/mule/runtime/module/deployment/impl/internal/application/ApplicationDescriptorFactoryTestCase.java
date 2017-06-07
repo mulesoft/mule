@@ -247,7 +247,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     assertThat(commonsCollectionDependency, commonsColecctionDependencyMatcher());
 
     assertThat(classLoaderModel.getUrls().length, is(2));
-    assertThat(asList(classLoaderModel.getUrls()), hasItem(commonsCollectionDependency.getBundleUri()));
+    assertThat(asList(classLoaderModel.getUrls()), hasItem(commonsCollectionDependency.getBundleUri().toURL()));
   }
 
   @Test
