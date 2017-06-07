@@ -69,7 +69,7 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     {
         if (unacceptedMessageProcessor != null)
         {
-            if (shouldFiltersStopAllFlowCallers())
+            if (shouldFiltersStopParentFlow())
             {
                 unacceptedMessageProcessor.process(event);
                 return null;
@@ -123,7 +123,7 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
         this.throwOnUnaccepted = throwOnUnaccepted;
     }
 
-    private boolean shouldFiltersStopAllFlowCallers()
+    private boolean shouldFiltersStopParentFlow()
     {
         return getBoolean(FILTER_ON_UNACCEPTED_STOPS_PARENT_FLOW);
     }
