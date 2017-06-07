@@ -7,7 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createScopeExecutionTemplate;
+import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
+import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
@@ -20,6 +24,8 @@ import org.mule.runtime.core.execution.ResponseCompletionCallback;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
+import org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate;
+import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 import org.reactivestreams.Publisher;
 
@@ -64,7 +70,23 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
 
   @Override
   public Publisher<Event> routeEventAsync(Event event) {
-    return just(event).transform(messageProcessor);
+    if (isTransactionActive()) {
+      try {
+        // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
+        // This is required to allow Extension API to bind start transactions, while continuing to use the blocking code path from
+        // Mule 3.x where errors are handled as part of the execution template.
+        TransactionalErrorHandlingExecutionTemplate transactionTemplate =
+            createScopeExecutionTemplate(messageProcessorContext.getFlowConstruct().getMuleContext(),
+                                         messageProcessorContext.getFlowConstruct(),
+                                         new MuleTransactionConfig(),
+                                         messageProcessorContext.getFlowConstruct().getExceptionListener());
+        return just(transactionTemplate.execute(() -> messageProcessor.process(event)));
+      } catch (Throwable throwable) {
+        return error(throwable);
+      }
+    } else {
+      return just(event).transform(messageProcessor);
+    }
   }
 
   @Override
