@@ -591,8 +591,7 @@
                     "open": {
                       "type": "Binary",
                       "annotations": {
-                        "typeId": "java.io.InputStream",
-                        "org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation": {}
+                        "typeId": "java.io.InputStream"
                       }
                     },
                     "fields": []
@@ -1816,8 +1815,7 @@
                 "open": {
                   "type": "Binary",
                   "annotations": {
-                    "typeId": "java.io.InputStream",
-                    "org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation": {}
+                    "typeId": "java.io.InputStream"
                   }
                 },
                 "fields": []

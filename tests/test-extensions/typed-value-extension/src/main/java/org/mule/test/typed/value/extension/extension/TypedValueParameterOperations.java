@@ -18,6 +18,7 @@ import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.vegan.extension.VeganProductInformation;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -78,5 +79,19 @@ public class TypedValueParameterOperations {
 
   public TypedValue<InputStream> typedValueForInputStream(@Content TypedValue<InputStream> inputStream) {
     return inputStream;
+  }
+
+  @OutputResolver(output = NullOutputResolver.class)
+  public List<Object> mixedTypedValues(@ParameterGroup(name = "SimplePojo") SimplePojo pojo,
+                                       @Optional String stringNotWrapped,
+                                       @Optional TypedValue<String> wrappedString,
+                                       @Optional @Content TypedValue<SimplePojo> complexTypedValue,
+                                       @Optional @Content SimplePojo complexNotWrapped,
+                                       @Optional @Content Map<String, Object> mapOfComplexValues,
+                                       @Optional @Content(
+                                           primary = true) Map<String, TypedValue<Object>> mapOfComplexTypedValues) {
+    return Arrays.asList(stringNotWrapped, wrappedString, complexTypedValue, complexNotWrapped,
+                         mapOfComplexValues, mapOfComplexTypedValues, pojo);
+
   }
 }
