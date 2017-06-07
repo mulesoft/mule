@@ -7,6 +7,7 @@
 package org.mule.runtime.core.exception;
 
 import static java.text.MessageFormat.format;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.StringUtils.defaultString;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.context.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
@@ -136,6 +137,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   }
 
   protected void doInitialise(MuleContext context) throws InitialisationException {
+    requireNonNull(muleContext);
     logger.info("Initialising exception listener: " + toString());
     super.setMessagingExceptionHandler(new MessagingExceptionHandlerToSystemAdapter(muleContext));
   }

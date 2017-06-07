@@ -7,6 +7,11 @@
 
 package org.mule.runtime.core.api.client;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -42,7 +47,14 @@ public class MuleClientFlowConstruct implements FlowConstruct {
 
   @Override
   public MessagingExceptionHandler getExceptionListener() {
-    return muleContext.getDefaultErrorHandler();
+    final MessagingExceptionHandler exceptionListener = muleContext.getDefaultErrorHandler();
+    setFlowConstructIfNeeded(exceptionListener, this);
+    try {
+      initialiseIfNeeded(exceptionListener, true, muleContext);
+    } catch (InitialisationException e) {
+      throw new MuleRuntimeException(e);
+    }
+    return exceptionListener;
   }
 
   @Override

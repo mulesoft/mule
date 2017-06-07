@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.core.exception;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static reactor.core.publisher.Mono.just;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   @Override
   protected void doInitialise(MuleContext muleContext) throws InitialisationException {
-    LifecycleUtils.initialiseIfNeeded(redeliveryExceeded);
+    initialiseIfNeeded(redeliveryExceeded);
     super.doInitialise(muleContext);
   }
 

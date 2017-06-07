@@ -7,6 +7,7 @@
 package org.mule.runtime.core.exception;
 
 import static java.util.Collections.singletonList;
+
 import org.mule.runtime.core.api.MuleContext;
 
 /**
@@ -18,9 +19,7 @@ public class ErrorHandlerFactory {
 
   public ErrorHandler createDefault(MuleContext muleContext) {
     ErrorHandler errorHandler = new ErrorHandler();
-    errorHandler.setMuleContext(muleContext);
     errorHandler.setExceptionListeners(singletonList(new OnErrorPropagateHandler()));
     return errorHandler;
   }
-
 }
