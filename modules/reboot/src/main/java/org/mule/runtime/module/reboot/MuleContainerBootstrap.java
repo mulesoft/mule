@@ -7,6 +7,8 @@
 package org.mule.runtime.module.reboot;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.reboot.internal.MuleContainerWrapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,10 +52,10 @@ public class MuleContainerBootstrap {
 
   private static void prepareBootstrapPhase(CommandLine commandLine) throws Exception {
     boolean production = commandLine.hasOption("production");
-    prepareBootstrapPhase(production);
+    prepareBootstrapPhase();
   }
 
-  private static void prepareBootstrapPhase(boolean production) throws Exception {
+  private static void prepareBootstrapPhase() throws Exception {
     File muleHome = lookupMuleHome();
     File muleBase = lookupMuleBase();
     if (muleBase == null) {

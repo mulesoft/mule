@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
-import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -32,7 +31,7 @@ import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
-import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;

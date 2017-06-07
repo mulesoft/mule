@@ -35,7 +35,7 @@ import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyInst
 import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyTemplateFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
