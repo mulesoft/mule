@@ -9,8 +9,6 @@ package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.io.File.separator;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.test.runner.api.MulePluginBasedLoaderFinder.META_INF_MULE_PLUGIN;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -144,16 +142,11 @@ class ExtensionPluginMetadataGenerator {
    * @return {@link Class} annotated with {@link Extension} or {@code null}
    */
   Class scanForExtensionAnnotatedClasses(Artifact plugin, List<URL> urls) {
-    logger.debug("Scanning plugin '{}' for annotated Extension class", plugin);
+    final URL firstURL = urls.stream().findFirst().get();
+    logger.debug("Scanning plugin '{}' for annotated Extension class from {}", plugin, firstURL);
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
     scanner.addIncludeFilter(new AnnotationTypeFilter(Extension.class));
-    try (URLClassLoader classLoader = new URLClassLoader(urls.stream()
-        .filter(url -> {
-          File urlFile = toFile(url);
-          return urlFile.isDirectory() || urlFile.getName().endsWith("-mule-plugin.jar");
-        })
-        .collect(toList())
-        .toArray(new URL[0]), null)) {
+    try (URLClassLoader classLoader = new URLClassLoader(new URL[] {firstURL}, null)) {
       scanner.setResourceLoader(new PathMatchingResourcePatternResolver(classLoader));
       Set<BeanDefinition> extensionsAnnotatedClasses = scanner.findCandidateComponents("");
       if (!extensionsAnnotatedClasses.isEmpty()) {

@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends AbstractConfigurationBuilder {
 
+  private static final String META_INF_MULE_ARTIFACT_MULE_PLUGIN = "META-INF/mule-artifact/mule-plugin.json";
   private static Logger LOGGER = LoggerFactory.getLogger(IsolatedClassLoaderExtensionsManagerConfigurationBuilder.class);
 
   private final ExtensionManagerFactory extensionManagerFactory;
@@ -104,6 +105,9 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
             (ClassLoader) pluginClassLoader.getClass().getMethod("getClassLoader").invoke(pluginClassLoader);
         Method findResource = classLoader.getClass().getMethod("findResource", String.class);
         URL json = ((URL) findResource.invoke(classLoader, META_INF_MULE_PLUGIN));
+        if (json == null) {
+          json = ((URL) findResource.invoke(classLoader, META_INF_MULE_ARTIFACT_MULE_PLUGIN));
+        }
         if (json != null) {
           LOGGER.debug("Discovered extension '{}'", artifactName);
           MulePluginBasedLoaderFinder finder = new MulePluginBasedLoaderFinder(json.openStream());
