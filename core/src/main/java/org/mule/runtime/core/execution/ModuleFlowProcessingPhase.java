@@ -143,17 +143,12 @@ public class ModuleFlowProcessingPhase
             .then(request -> from(template.routeEventAsync(request)).switchIfEmpty(fromCallable(() -> emptyEvent(templateEvent))))
             .then(onSuccess(messageSource, templateEvent, messageProcessContext, phaseResultNotifier, template,
                             terminateConsumer))
+            .onErrorMap(MessagingException.class, me -> me.getCause() instanceof SourceErrorException ? me.getCause() : me)
             .onErrorResume(SourceErrorException.class,
                            see -> onSourceException(exceptionHandler, errorHandler, terminateConsumer, see))
-            .onErrorResume(MessagingException.class, me -> {
-              if (me.getCause() instanceof SourceErrorException) {
-                return onSourceException(exceptionHandler, errorHandler, terminateConsumer, (SourceErrorException) me.getCause());
-              } else {
-                return from(errorHandler.apply(me))
-                    .doOnSuccess(v -> onTerminate(terminateConsumer, right(me)))
-                    .doOnError(e -> onTerminate(terminateConsumer, right(e)));
-              }
-            })
+            .onErrorResume(MessagingException.class, me -> from(errorHandler.apply(me))
+                .doOnSuccess(v -> onTerminate(terminateConsumer, right(me)))
+                .doOnError(e -> onTerminate(terminateConsumer, right(e))))
             .doAfterTerminate((event, throwable) -> responseCompletion.onComplete())
             .subscribe();
       } else {
@@ -221,10 +216,10 @@ public class ModuleFlowProcessingPhase
     }
   }
 
-  private Mono<? extends Void> onSourceException(MessagingExceptionHandler exceptionHandler,
-                                                 Function<MessagingException, Publisher<Void>> errorHandler,
-                                                 Consumer<Either<Event, MessagingException>> terminateConsumer,
-                                                 SourceErrorException see) {
+  private Mono<Void> onSourceException(MessagingExceptionHandler exceptionHandler,
+                                       Function<MessagingException, Publisher<Void>> errorHandler,
+                                       Consumer<Either<Event, MessagingException>> terminateConsumer,
+                                       SourceErrorException see) {
     if (sourceResponseErrorTypeMatcher.match(see.getErrorType())) {
       return from(handleSourceError(exceptionHandler, errorHandler, see))
           .doOnSuccess(v -> onTerminate(terminateConsumer, left(see.getEvent())))

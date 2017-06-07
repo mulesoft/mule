@@ -14,18 +14,16 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.util.func.CheckedConsumer;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ModuleFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
-import org.mule.runtime.core.api.util.func.CheckedConsumer;
-import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
 import java.util.Map;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTemplate {
 
@@ -70,15 +68,17 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   public Publisher<Void> sendResponseToClient(Event event, Map<String, Object> parameters,
                                               Function<Event, Map<String, Object>> errorResponseParametersFunction,
                                               ResponseCompletionCallback responseCompletionCallback) {
-    return runAndNotify(() -> completionHandler.onCompletion(event, parameters), event, responseCompletionCallback);
+    return from(completionHandler.onCompletion(event, parameters)).transform(notifyCompletion(event, responseCompletionCallback));
   }
 
   @Override
   public Publisher<Void> sendFailureResponseToClient(MessagingException messagingException,
                                                      Map<String, Object> parameters,
                                                      ResponseCompletionCallback responseCompletionCallback) {
-    return runAndNotify(() -> completionHandler.onFailure(messagingException, parameters), messagingException.getEvent(),
-                        responseCompletionCallback);
+    return from(completionHandler.onFailure(messagingException, parameters)).transform(notifyCompletion(
+                                                                                                        messagingException
+                                                                                                            .getEvent(),
+                                                                                                        responseCompletionCallback));
   }
 
   @Override
@@ -88,9 +88,9 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
                      .onTerminate(right(messagingException)));
   }
 
-  private Mono<Void> runAndNotify(CheckedSupplier<Publisher<Void>> supplier, Event event,
-                                  ResponseCompletionCallback responseCompletionCallback) {
-    return from(supplier.get())
+  private Function<Publisher<Void>, Publisher<Void>> notifyCompletion(Event event,
+                                                                      ResponseCompletionCallback responseCompletionCallback) {
+    return publisher -> from(publisher)
         .doOnSuccess(v -> responseCompletionCallback.responseSentSuccessfully())
         .doOnError(e -> responseCompletionCallback.responseSentWithFailure(new MessagingException(event, e), event));
   }
