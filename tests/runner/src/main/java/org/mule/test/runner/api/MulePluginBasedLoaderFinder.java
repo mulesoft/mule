@@ -45,6 +45,10 @@ public class MulePluginBasedLoaderFinder {
     return params;
   }
 
+  public boolean isExtensionModelLoaderDescriptorDefined() {
+    return mulePlugin.getExtensionModelLoaderDescriptor().isPresent();
+  }
+
   public ExtensionModelLoader getLoader() {
     return getLoaderById(mulePlugin.getExtensionModelLoaderDescriptor().get().getId());
   }

@@ -111,9 +111,13 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
         if (json != null) {
           LOGGER.debug("Discovered extension '{}'", artifactName);
           MulePluginBasedLoaderFinder finder = new MulePluginBasedLoaderFinder(json.openStream());
-          ExtensionModel extension =
-              finder.getLoader().loadExtensionModel(classLoader, getDefault(emptySet()), finder.getParams());
-          extensionModels.add(extension);
+          if (finder.isExtensionModelLoaderDescriptorDefined()) {
+            ExtensionModel extension =
+                finder.getLoader().loadExtensionModel(classLoader, getDefault(emptySet()), finder.getParams());
+            extensionModels.add(extension);
+          } else {
+            LOGGER.debug("Discarding plugin with artifactName '{}' as it doesn't have an ExtensionModelLoaderDescriptor defined");
+          }
         } else {
           LOGGER.debug("Discarding plugin with artifactName '{}' due to it doesn't have an mule-plugin.json", artifactName);
         }
