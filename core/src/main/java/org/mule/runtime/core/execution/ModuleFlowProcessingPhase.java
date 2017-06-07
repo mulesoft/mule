@@ -140,6 +140,7 @@ public class ModuleFlowProcessingPhase
             .doOnNext(request -> fireNotification(messageProcessContext.getMessageSource(), request,
                                                   messageProcessContext.getFlowConstruct(),
                                                   MESSAGE_RECEIVED))
+            // switchIfEmpty in case the flow was filtered
             .then(request -> from(template.routeEventAsync(request)).switchIfEmpty(fromCallable(() -> emptyEvent(templateEvent))))
             .then(onSuccess(messageSource, templateEvent, messageProcessContext, phaseResultNotifier, template,
                             terminateConsumer))
