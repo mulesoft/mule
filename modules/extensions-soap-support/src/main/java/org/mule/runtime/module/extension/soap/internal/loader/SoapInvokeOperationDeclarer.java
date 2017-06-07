@@ -27,13 +27,14 @@ import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.soap.SoapAttachment;
+import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
@@ -138,7 +139,9 @@ public class SoapInvokeOperationDeclarer {
 
     MetadataType binaryType = TYPE_LOADER.load(InputStream.class);
     ObjectType attachments = TYPE_BUILDER.objectType()
-        .openWith(loader.load(SoapAttachment.class))
+        .openWith(TYPE_BUILDER.binaryType()
+            .id(InputStream.class.getName())
+            .with(new TypedValueTypeAnnotation()))
         .with(new TypeIdAnnotation(Map.class.getName()))
         .build();
 

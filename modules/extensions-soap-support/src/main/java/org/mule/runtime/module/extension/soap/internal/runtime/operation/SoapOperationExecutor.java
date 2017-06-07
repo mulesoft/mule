@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.soap.internal.runtime.operation;
 
+import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.ATTACHMENTS_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.BODY_PARAM;
@@ -21,7 +22,11 @@ import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.soap.SoapAttachment;
@@ -33,13 +38,14 @@ import org.mule.runtime.soap.api.message.SoapRequestBuilder;
 import org.mule.runtime.soap.api.message.SoapResponse;
 import org.mule.runtime.soap.internal.exception.error.SoapExceptionEnricher;
 
+import org.reactivestreams.Publisher;
+
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
-
-import org.reactivestreams.Publisher;
 
 /**
  * {@link OperationExecutor} implementation that executes SOAP operations using a provided {@link SoapClient}.
@@ -50,6 +56,9 @@ public final class SoapOperationExecutor implements OperationExecutor {
 
   @Inject
   private MuleExpressionLanguage expressionExecutor;
+
+  @Inject
+  private TransformationService transformationService;
 
   private final ConnectionArgumentResolver connectionResolver = new ConnectionArgumentResolver();
   private final SoapExceptionEnricher soapExceptionEnricher = new SoapExceptionEnricher();
@@ -66,6 +75,8 @@ public final class SoapOperationExecutor implements OperationExecutor {
       SoapRequest request = getRequest(context, customHeaders);
       SoapResponse response = connection.getSoapClient(serviceId).consume(request);
       return justOrEmpty(response.getAsResult());
+    } catch (MessageTransformerException | TransformerException | MessagingException e) {
+      return error(e);
     } catch (Exception e) {
       return error(soapExceptionEnricher.enrich(e));
     } catch (Throwable t) {
@@ -76,31 +87,29 @@ public final class SoapOperationExecutor implements OperationExecutor {
   /**
    * Builds a Soap Request with the execution context to be sent using the {@link SoapClient}.
    */
-  private SoapRequest getRequest(ExecutionContext<OperationModel> context, Map<String, String> fixedHeaders) {
+  private SoapRequest getRequest(ExecutionContext<OperationModel> context, Map<String, String> fixedHeaders)
+      throws MessageTransformerException, MessagingException, TransformerException {
     SoapRequestBuilder builder = SoapRequest.builder().withOperation(getOperation(context));
     builder.withSoapHeaders(fixedHeaders);
 
-    getParam(context, MESSAGE_GROUP)
-        .map(m -> (Map<String, Object>) m)
-        .ifPresent(message -> {
-          InputStream body = (InputStream) message.get(BODY_PARAM);
-          if (body != null) {
-            builder.withContent(body);
-          }
+    Optional<Object> optionalMessageGroup = getParam(context, MESSAGE_GROUP);
+    if (optionalMessageGroup.isPresent()) {
+      Map<String, Object> message = (Map<String, Object>) optionalMessageGroup.get();
+      InputStream body = (InputStream) message.get(BODY_PARAM);
+      if (body != null) {
+        builder.withContent(body);
+      }
 
-          InputStream headers = (InputStream) message.get(HEADERS_PARAM);
-          if (headers != null) {
-            builder.withSoapHeaders((Map<String, String>) evaluateHeaders(headers));
-          }
+      InputStream headers = (InputStream) message.get(HEADERS_PARAM);
+      if (headers != null) {
+        builder.withSoapHeaders((Map<String, String>) evaluateHeaders(headers));
+      }
 
-          Map<String, SoapAttachment> attachments = (Map<String, SoapAttachment>) message.get(ATTACHMENTS_PARAM);
-          if (attachments != null) {
-            attachments.forEach((k, v) -> {
-              SoapAttachment attachment = new SoapAttachment(v.getContent(), v.getContentType());
-              builder.withAttachment(k, attachment);
-            });
-          }
-        });
+      Map<String, TypedValue<?>> attachments = (Map<String, TypedValue<?>>) message.get(ATTACHMENTS_PARAM);
+      if (attachments != null) {
+        toSoapAttachments(attachments).forEach(builder::withAttachment);
+      }
+    }
 
     getParam(context, TRANSPORT_HEADERS_PARAM)
         .ifPresent(th -> builder.withTransportHeaders((Map<String, String>) th));
@@ -125,5 +134,28 @@ public final class SoapOperationExecutor implements OperationExecutor {
         + "payload.headers mapObject (value, key) -> {\n"
         + "    '$key' : write((key): value, \"application/xml\")\n"
         + "}", context).getValue();
+  }
+
+  private Map<String, SoapAttachment> toSoapAttachments(Map<String, TypedValue<?>> attachments)
+      throws MessageTransformerException, MessagingException, TransformerException {
+    Map<String, SoapAttachment> soapAttachmentMap = new HashMap<>();
+
+    for (Map.Entry<String, TypedValue<?>> attachment : attachments.entrySet()) {
+      SoapAttachment soapAttachment =
+          new SoapAttachment(toInputStream(attachment.getValue()), attachment.getValue().getDataType().getMediaType());
+      soapAttachmentMap.put(attachment.getKey(), soapAttachment);
+    }
+
+    return soapAttachmentMap;
+  }
+
+  private InputStream toInputStream(TypedValue typedValue)
+      throws MessageTransformerException, MessagingException, TransformerException {
+
+    Object value = typedValue.getValue();
+    if (value instanceof InputStream) {
+      return (InputStream) value;
+    }
+    return (InputStream) transformationService.transform(value, DataType.fromObject(value), INPUT_STREAM);
   }
 }
