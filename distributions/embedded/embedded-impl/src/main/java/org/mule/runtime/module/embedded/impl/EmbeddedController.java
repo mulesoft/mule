@@ -146,7 +146,6 @@ public class EmbeddedController {
   public void stop() {
     executeWithinContainerClassLoader(() -> {
       deleteTree(new File(containerInfo.getContainerBaseFolder().getPath()));
-      Domain domain = application.getDomain();
       try {
         application.stop();
       } catch (Exception e) {
@@ -160,8 +159,6 @@ public class EmbeddedController {
         LOGGER.debug("failure disposing application", e);
       }
     });
-    LogManager.shutdown();
-    org.apache.log4j.LogManager.shutdown();
     artifactResourcesRegistry = null;
   }
 
