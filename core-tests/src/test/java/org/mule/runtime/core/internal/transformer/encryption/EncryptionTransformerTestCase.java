@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.transformer.encryption;
+package org.mule.runtime.core.internal.transformer.encryption;
 
 import static org.junit.Assert.fail;
 import org.mule.runtime.api.lifecycle.InitialisationException;

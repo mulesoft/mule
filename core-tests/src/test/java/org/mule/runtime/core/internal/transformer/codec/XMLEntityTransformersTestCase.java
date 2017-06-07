@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.transformer.codec;
+package org.mule.runtime.core.internal.transformer.codec;
 
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.core.transformer.AbstractTransformerTestCase;

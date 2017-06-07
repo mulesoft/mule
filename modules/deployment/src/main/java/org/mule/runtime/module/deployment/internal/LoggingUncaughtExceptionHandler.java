@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.concurrent;
+package org.mule.runtime.module.deployment.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

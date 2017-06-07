@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.util.concurrent;
+package org.mule.runtime.core.api.util.concurrent;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.concurrent.TimeUnit;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 @SmallTest
 public class NamedThreadFactoryTestCase extends AbstractMuleTestCase {
@@ -21,21 +21,16 @@ public class NamedThreadFactoryTestCase extends AbstractMuleTestCase {
   protected Latch latch = new Latch();
   protected String testThreadName = "myThread";
   protected ClassLoader testClassLoader = new ClassLoader() {};
-  protected Runnable nullRunnable = new Runnable() {
-
-    public void run() {}
+  protected Runnable nullRunnable = () -> {
   };
 
   @Test
   public void testNameContextClassloader() throws InterruptedException {
     NamedThreadFactory threadFactory = new NamedThreadFactory(testThreadName, testClassLoader);
-    Thread t = threadFactory.newThread(new Runnable() {
-
-      public void run() {
-        assertEquals(testThreadName + ".01", Thread.currentThread().getName());
-        assertEquals(testClassLoader, Thread.currentThread().getContextClassLoader());
-        latch.countDown();
-      }
+    Thread t = threadFactory.newThread(() -> {
+      assertEquals(testThreadName + ".01", Thread.currentThread().getName());
+      assertEquals(testClassLoader, Thread.currentThread().getContextClassLoader());
+      latch.countDown();
     });
     t.start();
     assertTrue(latch.await(200, TimeUnit.MILLISECONDS));

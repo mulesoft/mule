@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.util.queue.AbstractQueueManager;
 import org.mule.runtime.core.util.queue.DefaultQueueConfiguration;
 import org.mule.runtime.core.api.util.queue.Queue;

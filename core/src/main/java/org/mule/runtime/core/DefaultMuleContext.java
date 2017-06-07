@@ -125,7 +125,7 @@ import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.api.util.concurrent.Latch;
 
 import java.io.Serializable;
 import java.util.Collection;

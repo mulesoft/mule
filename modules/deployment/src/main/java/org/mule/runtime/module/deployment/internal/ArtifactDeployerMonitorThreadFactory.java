@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.core.util.concurrent.LoggingUncaughtExceptionHandler;
-
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 

@@ -19,7 +19,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerPoolsConfigFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
+import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 
 import java.util.ArrayList;
 import java.util.List;

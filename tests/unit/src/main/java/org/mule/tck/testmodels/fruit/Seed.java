@@ -8,7 +8,7 @@ package org.mule.tck.testmodels.fruit;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.api.util.concurrent.Latch;
 
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;

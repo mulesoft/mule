@@ -40,7 +40,7 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessorBase;
 import org.mule.runtime.core.api.util.ObjectUtils;
-import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;

@@ -8,7 +8,7 @@ package org.mule.runtime.core.retry.async;
 
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.api.util.concurrent.Latch;
 
 import java.util.concurrent.Executor;
 

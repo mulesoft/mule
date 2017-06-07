@@ -53,6 +53,7 @@ import org.reactivestreams.Publisher;
  * <p/>
  * <b>EIP Reference:</b> <a href="http://eaipatterns.com/DataEnricher.html">http://eaipatterns.com/DataEnricher.html<a/>
  */
+// TODO(pablo.kraan): API - remove org.mule.runtime.core.internal.enricher from exported packages
 public class MessageEnricher extends AbstractMessageProcessorOwner implements Processor {
 
   private List<EnrichExpressionPair> enrichExpressionPairs = new ArrayList<>();
