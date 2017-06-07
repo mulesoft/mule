@@ -26,6 +26,7 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NON
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createScopeExecutionTemplate;
 import static org.mule.runtime.core.transaction.TransactionTemplateTestUtils.getFailureTransactionCallbackStartsTransaction;
+
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
@@ -197,7 +198,7 @@ public class TransactionalErrorHandlingExecutionTemplateTestCase extends Transac
     when(mockMessagingException.getEvent()).thenReturn(mockEvent).thenReturn(mockResultEvent);
     when(mockEvent.getError()).thenReturn(empty());
     when(mockMessagingExceptionHandler.handleException(mockMessagingException, mockEvent)).thenAnswer(invocationOnMock -> {
-      ErrorHandler errorHandler = new ErrorHandlerFactory().createDefault(mockMuleContext);
+      ErrorHandler errorHandler = new ErrorHandlerFactory().createDefault();
       when(mockMuleContext.getNotificationManager()).thenReturn(mock(ServerNotificationManager.class));
       when(mockMuleContext.getRegistry()).thenReturn(mock(MuleRegistry.class));
       errorHandler.setMuleContext(mockMuleContext);
