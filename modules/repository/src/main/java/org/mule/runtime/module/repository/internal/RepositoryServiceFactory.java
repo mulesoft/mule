@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.repository.internal;
 
-import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.repository.api.RepositoryService;
 
 import java.io.File;

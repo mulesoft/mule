@@ -7,14 +7,13 @@
 package org.mule.runtime.module.reboot;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 
+import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
+
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +31,7 @@ public class MuleContainerBootstrapUtilsTestCase {
   }
 
   /**
-   * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#isStandalone()}.
+   * Test method for {@link MuleContainerBootstrapUtils#isStandalone()}.
    */
   @Test
   public void testIsStandaloneTrue() {
@@ -40,7 +39,7 @@ public class MuleContainerBootstrapUtilsTestCase {
   }
 
   /**
-   * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#getMuleHome()}.
+   * Test method for {@link MuleContainerBootstrapUtils#getMuleHome()}.
    */
   @Test
   public void testGetMuleHomeFile() {
@@ -49,7 +48,7 @@ public class MuleContainerBootstrapUtilsTestCase {
   }
 
   /**
-   * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#getMuleAppsDir()}.
+   * Test method for {@link MuleContainerBootstrapUtils#getMuleAppsDir()}.
    */
   @Test
   public void testGetMuleAppsFile() {
@@ -58,7 +57,7 @@ public class MuleContainerBootstrapUtilsTestCase {
   }
 
   /**
-   * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#getMuleLibDir()}.
+   * Test method for {@link MuleContainerBootstrapUtils#getMuleLibDir()}.
    */
   @Test
   public void testGetMuleLibDir() {
@@ -67,7 +66,7 @@ public class MuleContainerBootstrapUtilsTestCase {
   }
 
   /**
-   * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#getMuleLocalJarFile()}.
+   * Test method for {@link MuleContainerBootstrapUtils#getMuleLocalJarFile()}.
    */
   @Test
   public void testGetMuleLocalJarFile() {
@@ -77,7 +76,7 @@ public class MuleContainerBootstrapUtilsTestCase {
 
   /**
    * Test method for
-   * {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#getResource(java.lang.String, java.lang.Class)}.
+   * {@link MuleContainerBootstrapUtils#getResource(java.lang.String, java.lang.Class)}.
    * 
    * @throws IOException
    */
@@ -91,70 +90,8 @@ public class MuleContainerBootstrapUtilsTestCase {
     assertEquals("msg=Hello World", in.readLine());
   }
 
-  /**
-   * Test method for {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#renameFile(java.io.File, java.io.File)}.
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testRenameFile() throws IOException {
-    File source = File.createTempFile("foo", ".tmp");
-    File dest = new File(source.getParent() + File.separatorChar + "dest" + System.currentTimeMillis() + ".tmp");
-    assertFalse(dest.exists());
-    MuleContainerBootstrapUtils.renameFile(source, dest);
-    assertTrue(dest.exists());
-    assertFalse(source.exists());
-    source.delete();
-    dest.delete();
-  }
 
-  /**
-   * Test method for
-   * {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#renameFileHard(java.io.File, java.io.File)}.
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testRenameFileHard() throws IOException {
-    File source = File.createTempFile("foo2", ".tmp");
-    File dest = new File(source.getParent() + File.separatorChar + "dest2" + System.currentTimeMillis() + ".tmp");
-    assertFalse(dest.exists());
-    MuleContainerBootstrapUtils.renameFileHard(source, dest);
-    assertTrue(dest.exists());
-    assertFalse(source.exists());
-    source.delete();
-    dest.delete();
-  }
 
-  /**
-   * Test method for
-   * {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#copy(java.io.InputStream, java.io.OutputStream)}.
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testCopy() throws IOException {
-    byte[] b = {0, 1, 2};
-    ByteArrayInputStream input = new ByteArrayInputStream(b, 0, Integer.MAX_VALUE);
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
-    int i = MuleContainerBootstrapUtils.copy(input, output);
-    assertEquals(b.length, i);
-  }
-
-  /**
-   * Test method for
-   * {@link org.mule.runtime.module.reboot.MuleContainerBootstrapUtils#copyLarge(java.io.InputStream, java.io.OutputStream)}.
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testCopyLarge() throws IOException {
-    byte[] b = {0, 1, 2};
-    ByteArrayInputStream input = new ByteArrayInputStream(b, 0, Integer.MAX_VALUE);
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
-    long i = MuleContainerBootstrapUtils.copyLarge(input, output);
-    assertEquals(b.length, i);
-  }
 }
 
 

@@ -13,7 +13,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory.getDomainId;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.getDeploymentFile;
-import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleDomainsDir;
+import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleDomainsDir;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;

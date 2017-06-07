@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.reboot;
+package org.mule.runtime.module.reboot.internal;
+
+import org.mule.runtime.module.reboot.MuleContainerBootstrap;
 
 import java.io.File;
 import java.lang.reflect.Constructor;

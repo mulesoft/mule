@@ -29,7 +29,7 @@ import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.classloader.ShutdownListener;
-import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitProbe;

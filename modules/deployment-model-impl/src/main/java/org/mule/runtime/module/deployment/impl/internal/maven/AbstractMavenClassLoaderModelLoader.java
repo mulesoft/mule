@@ -18,7 +18,7 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
-import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.isStandalone;
+import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.isStandalone;
 
 import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
