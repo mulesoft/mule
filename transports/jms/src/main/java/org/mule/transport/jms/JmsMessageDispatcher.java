@@ -373,7 +373,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         //If we're not using
         if (!(replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic))
         {
-            String jmsCorrelationId = currentMessage.getJMSCorrelationID();
+            String jmsCorrelationId = encodeVendorSpecificID(currentMessage.getJMSCorrelationID());
             if (jmsCorrelationId == null)
             {
                 jmsCorrelationId = currentMessage.getJMSMessageID();
@@ -410,6 +410,19 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
         return connector.getJmsSupport().createConsumer(session, replyTo, selector,
                                                         connector.isNoLocal(), null, topic, endpoint);
+    }
+
+    /**
+     * By default, no encoding is performed. In case an encoding is
+     * needed to create the replyTo, this method has to be
+     * overridden
+     * 
+     * @param jmsCorrelationID the correlation ID to encode
+     * @return the encoded correlation ID
+     */
+    protected String encodeVendorSpecificID(String jmsCorrelationID)
+    {
+        return jmsCorrelationID;
     }
 
     protected Destination getReplyToDestination(Message message, Session session, MuleEvent event, boolean remoteSync, boolean topic) throws JMSException, EndpointException, InitialisationException
