@@ -106,7 +106,7 @@ public class SchedulerConfig {
   }
 
   /**
-   * whether the threads of the target custom {@link Scheduler} may block to wait when dispatching to a busy {@link Scheduler}.
+   * Whether the threads of the target custom {@link Scheduler} may block to wait when dispatching to a busy {@link Scheduler}.
    * <p>
    * This is only applicable for <b>custom</b> {@link Scheduler}s. This behaviour cannot be changed for the runtime managed
    * {@link Scheduler}.
