@@ -10,6 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 import org.mule.tck.core.util.queue.QueueStoreTestCase;
 
 import java.io.ObjectInputStream;

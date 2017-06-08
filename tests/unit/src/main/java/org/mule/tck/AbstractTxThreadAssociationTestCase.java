@@ -19,9 +19,9 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.runtime.core.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.transaction.XaTransaction;
-import org.mule.runtime.core.transaction.XaTransactionFactory;
+import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.api.transaction.xa.XaTransaction;
+import org.mule.runtime.core.api.transaction.xa.XaTransactionFactory;
 
 import javax.transaction.Status;
 import javax.transaction.Transaction;

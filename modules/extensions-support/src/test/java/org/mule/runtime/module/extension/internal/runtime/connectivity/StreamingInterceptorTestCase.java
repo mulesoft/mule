@@ -23,7 +23,7 @@ import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.cre
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;

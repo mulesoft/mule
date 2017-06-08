@@ -13,8 +13,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.util.monitor.Expirable;
-import org.mule.runtime.core.util.monitor.ExpiryMonitor;
+import org.mule.runtime.core.api.util.monitor.Expirable;
+import org.mule.runtime.core.api.util.monitor.ExpiryMonitor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;

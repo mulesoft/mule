@@ -14,7 +14,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.internal.streaming.object.iterator.Producer;
-import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;

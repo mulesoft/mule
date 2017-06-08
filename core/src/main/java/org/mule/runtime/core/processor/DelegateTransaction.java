@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.transaction.AbstractTransaction;
+import org.mule.runtime.core.api.transaction.xa.AbstractTransaction;
 
 /**
  * Transaction placeholder to replace with proper transaction once transactional resource is discovered by mule

@@ -28,7 +28,7 @@ import org.mule.runtime.config.spring.dsl.api.ArtifactDeclarationXmlSerializer;
 import org.mule.runtime.config.spring.dsl.model.DslElementModelFactory;
 import org.mule.runtime.config.spring.dsl.model.XmlArtifactDeclarationLoader;
 import org.mule.runtime.config.spring.dsl.model.XmlDslElementModelConverter;
-import org.mule.runtime.core.util.xmlsecurity.XMLSecureFactories;
+import org.mule.runtime.core.internal.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.InputStream;
 import java.io.StringWriter;

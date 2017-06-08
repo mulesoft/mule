@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 
 /**
  * Fire a notification, log exception, clean up transaction if any, and trigger reconnection strategy if this is a

@@ -148,7 +148,7 @@ import org.mule.runtime.core.security.UsernamePasswordAuthenticationFilter;
 import org.mule.runtime.core.security.filters.MuleEncryptionEndpointSecurityFilter;
 import org.mule.runtime.core.source.scheduler.schedule.CronScheduler;
 import org.mule.runtime.core.source.scheduler.schedule.FixedFrequencyScheduler;
-import org.mule.runtime.core.transaction.XaTransactionFactory;
+import org.mule.runtime.core.api.transaction.xa.XaTransactionFactory;
 import org.mule.runtime.core.transformer.codec.Base64Decoder;
 import org.mule.runtime.core.transformer.codec.Base64Encoder;
 import org.mule.runtime.core.internal.transformer.codec.XmlEntityDecoder;

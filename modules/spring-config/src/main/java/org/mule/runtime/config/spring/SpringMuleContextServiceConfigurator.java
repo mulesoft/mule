@@ -110,7 +110,7 @@ import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.core.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
-import org.mule.runtime.core.util.queue.TransactionalQueueManager;
+import org.mule.runtime.core.api.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 

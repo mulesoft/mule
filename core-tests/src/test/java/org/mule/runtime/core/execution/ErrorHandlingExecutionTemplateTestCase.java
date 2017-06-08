@@ -35,7 +35,7 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.exception.TemplateOnErrorHandler;
-import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.mule.TestTransaction;

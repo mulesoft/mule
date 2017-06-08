@@ -15,6 +15,7 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
 import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionRecoverer;

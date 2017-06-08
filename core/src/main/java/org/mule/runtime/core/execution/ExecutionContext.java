@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
-import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 
 /**
  * Provides information about the current execution of an {@link org.mule.runtime.core.api.execution.ExecutionTemplate}

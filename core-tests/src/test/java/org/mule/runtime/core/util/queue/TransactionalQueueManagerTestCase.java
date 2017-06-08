@@ -10,9 +10,11 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 import org.mule.runtime.core.api.util.queue.Queue;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.api.util.queue.QueueSession;
+import org.mule.runtime.core.api.util.queue.TransactionalQueueManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;

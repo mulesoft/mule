@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
+import org.mule.runtime.core.api.transaction.AbstractSingleResourceTransaction;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.context.notification.TransactionNotification;

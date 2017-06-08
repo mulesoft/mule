@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.xa.XaTransactionFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import javax.transaction.TransactionManager;

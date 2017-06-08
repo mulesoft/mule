@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.util.queue;
 
+import org.mule.runtime.core.api.util.queue.QueueStoreDelegate;
+
 import java.io.Serializable;
 
 /**

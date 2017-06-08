@@ -23,9 +23,9 @@ import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransaction
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.transaction.IllegalTransactionStateException;
-import org.mule.runtime.core.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.api.transaction.xa.IllegalTransactionStateException;
+import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.transaction.TransactionTemplateTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
