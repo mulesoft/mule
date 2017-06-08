@@ -8,9 +8,12 @@ package org.mule.runtime.core.api.scheduler;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -31,19 +34,19 @@ public class SchedulerConfig {
   private final Integer maxConcurrentTasks;
   private final String schedulerPrefix;
   private final String schedulerName;
-  private final Boolean waitAllowed;
+  private final Optional<Boolean> waitAllowed;
   private final Supplier<Long> shutdownTimeoutMillis;
 
   private SchedulerConfig() {
     this.maxConcurrentTasks = null;
     this.schedulerPrefix = null;
     this.schedulerName = null;
-    this.waitAllowed = null;
+    this.waitAllowed = empty();
     this.shutdownTimeoutMillis = () -> null;
   }
 
   private SchedulerConfig(Integer maxConcurrentTasks, String schedulerPrefix, String schedulerName,
-                          Boolean waitAllowed, Supplier<Long> shutdownTimeoutMillis) {
+                          Optional<Boolean> waitAllowed, Supplier<Long> shutdownTimeoutMillis) {
     this.maxConcurrentTasks = maxConcurrentTasks;
     this.schedulerPrefix = schedulerPrefix;
     this.schedulerName = schedulerName;
@@ -114,14 +117,14 @@ public class SchedulerConfig {
    * @return the updated configuration
    */
   public SchedulerConfig withWaitAllowed(boolean waitAllowed) {
-    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, waitAllowed, shutdownTimeoutMillis);
+    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, of(waitAllowed), shutdownTimeoutMillis);
   }
 
   /**
    * @return whether the threads of the target custom {@link Scheduler} may block to wait when dispatching to a busy
    *         {@link Scheduler}.
    */
-  public Boolean getWaitAllowed() {
+  public Optional<Boolean> getWaitAllowed() {
     return waitAllowed;
   }
 
