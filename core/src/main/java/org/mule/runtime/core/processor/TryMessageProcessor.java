@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.processor;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -14,6 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstruc
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.config.i18n.CoreMessages.errorInvokingMessageProcessorWithinTransaction;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createScopeExecutionTemplate;
@@ -76,7 +76,7 @@ public class TryMessageProcessor extends AbstractMessageProcessorOwner implement
     } else if (isTransactionActive() || transactionConfig.getAction() != ACTION_INDIFFERENT) {
       return Processor.super.apply(publisher);
     } else {
-      return from(publisher).transform(nestedChain);
+      return from(publisher).flatMap(event -> processWithChildContext(event, p -> from(p).transform(nestedChain)));
     }
   }
 

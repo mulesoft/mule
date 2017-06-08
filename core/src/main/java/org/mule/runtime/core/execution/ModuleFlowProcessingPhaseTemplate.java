@@ -76,5 +76,5 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
    *               <li>{@link MessagingException} if an error occurred during the execution</li>
    *               </ul>
    */
-  void sendAfterTerminateResponseToClient(Either<Event, MessagingException> either);
+  void sendAfterTerminateResponseToClient(Either<MessagingException, Event> either);
 }

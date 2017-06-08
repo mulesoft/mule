@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.core.api.functional.Either.left;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
@@ -82,10 +83,10 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   }
 
   @Override
-  public void sendAfterTerminateResponseToClient(Either<Event, MessagingException> either) {
-    either.apply((CheckedConsumer<Event>) event -> completionHandler.onTerminate(either),
-                 (CheckedConsumer<MessagingException>) messagingException -> completionHandler
-                     .onTerminate(right(messagingException)));
+  public void sendAfterTerminateResponseToClient(Either<MessagingException, Event> either) {
+    either.apply((CheckedConsumer<MessagingException>) messagingException -> completionHandler
+        .onTerminate(left(messagingException)),
+                 (CheckedConsumer<Event>) event -> completionHandler.onTerminate(either));
   }
 
   private Function<Publisher<Void>, Publisher<Void>> notifyCompletion(Event event,

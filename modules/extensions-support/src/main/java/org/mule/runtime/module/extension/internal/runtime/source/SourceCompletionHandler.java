@@ -39,7 +39,7 @@ public interface SourceCompletionHandler {
    */
   Publisher<Void> onFailure(MessagingException exception, Map<String, Object> parameters);
 
-  void onTerminate(Either<Event, MessagingException> eventOrException) throws Exception;
+  void onTerminate(Either<MessagingException, Event> eventOrException) throws Exception;
 
   /**
    * Resolves the set of parameters of the response function of the source against

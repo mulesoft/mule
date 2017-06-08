@@ -17,9 +17,10 @@ import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.sourceTimesStarted;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.CORE_POOL_SIZE_ERROR_MESSAGE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_BODY;
-import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_PARAMETER;
+import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_INVOKE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
+
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
@@ -136,7 +137,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
           () -> assertState(false, false, true));
 
-    assertThat(HeisenbergSource.terminateStatus, is(ERROR_PARAMETER));
+    assertThat(HeisenbergSource.terminateStatus, is(ERROR_INVOKE));
 
     Optional<Error> optionalError = HeisenbergSource.error;
     assertThat(optionalError, is(not(empty())));
@@ -168,7 +169,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     startFlow("failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> assertState(false, false, true));
 
-    assertThat(HeisenbergSource.terminateStatus, is(ERROR_PARAMETER));
+    assertThat(HeisenbergSource.terminateStatus, is(ERROR_INVOKE));
 
     Optional<Error> optionalError = HeisenbergSource.error;
     assertThat(optionalError, is(not(empty())));
