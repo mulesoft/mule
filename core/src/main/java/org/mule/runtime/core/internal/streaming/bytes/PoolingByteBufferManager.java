@@ -12,7 +12,7 @@ import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_MAX_STREAMING_MEMORY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_MAX_MEMORY;
 import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -111,7 +111,7 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
   }
 
   private long calculateMaxStreamingMemory(MemoryManager memoryManager) {
-    String maxMemoryProperty = getProperty(MULE_MAX_STREAMING_MEMORY);
+    String maxMemoryProperty = getProperty(MULE_STREAMING_MAX_MEMORY);
     if (maxMemoryProperty == null) {
       return round(memoryManager.getMaxMemory() * 0.5);
     } else {
@@ -120,7 +120,7 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
       } catch (Exception e) {
         throw new IllegalArgumentException(format("Invalid value for system property '%s'. A memory size (in bytes) was "
             + "expected, got '%s' instead",
-                                                  MULE_MAX_STREAMING_MEMORY, maxMemoryProperty));
+                                                  MULE_STREAMING_MAX_MEMORY, maxMemoryProperty));
       }
     }
   }

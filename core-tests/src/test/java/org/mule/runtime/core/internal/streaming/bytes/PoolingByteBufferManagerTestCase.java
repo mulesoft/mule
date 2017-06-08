@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_MAX_STREAMING_MEMORY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_MAX_MEMORY;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.util.concurrent.Latch;
@@ -113,24 +113,24 @@ public class PoolingByteBufferManagerTestCase extends AbstractMuleTestCase {
 
     MemoryManager memoryManager = mock(MemoryManager.class);
 
-    setProperty(MULE_MAX_STREAMING_MEMORY, String.valueOf(maxMemory / 2));
+    setProperty(MULE_STREAMING_MAX_MEMORY, String.valueOf(maxMemory / 2));
     try {
       bufferManager = new PoolingByteBufferManager(memoryManager, waitTimeoutMillis);
       assertMemoryLimit(bufferCapacity, waitTimeoutMillis);
       verify(memoryManager, never()).getMaxMemory();
     } finally {
-      clearProperty(MULE_MAX_STREAMING_MEMORY);
+      clearProperty(MULE_STREAMING_MAX_MEMORY);
     }
   }
 
   @Test
   public void invalidMemoryCapThroughSystemProperty() throws Exception {
-    setProperty(MULE_MAX_STREAMING_MEMORY, "don't spend that much memory please");
+    setProperty(MULE_STREAMING_MAX_MEMORY, "don't spend that much memory please");
     try {
       expectedException.expect(IllegalArgumentException.class);
       bufferManager = new PoolingByteBufferManager(mock(MemoryManager.class), 10);
     } finally {
-      clearProperty(MULE_MAX_STREAMING_MEMORY);
+      clearProperty(MULE_STREAMING_MAX_MEMORY);
     }
   }
 
