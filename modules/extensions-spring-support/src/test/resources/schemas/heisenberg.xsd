@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/heisenberg" attributeFormDefault="unqualified" elementFormDefault="qualified">
     <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
     <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
@@ -445,18 +443,29 @@
                                 <xs:complexContent>
                                     <xs:extension base="mule:abstractExtensionType">
                                         <xs:sequence></xs:sequence>
-                                        <xs:attribute type="mule:expressionBoolean" use="optional" name="fullyBald"></xs:attribute>
+                                        <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="fullyBald"></xs:attribute>
                                         <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KINDEnumType" use="optional" default="GOATIE" name="beardTrimming"></xs:attribute>
                                     </xs:extension>
                                 </xs:complexContent>
                             </xs:complexType>
                         </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="brotherinlaw">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence></xs:sequence>
+                    <xs:attribute type="mule:expressionBoolean" use="optional" default="true" name="worksAtDEA"></xs:attribute>
+                    <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="lovesMinerals"></xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="familyInformations"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="enemies"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="monthlyIncomes"></xs:attribute>
-                    <xs:attribute type="mule:expressionBoolean" use="required" name="cancer"></xs:attribute>
+          <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="cancer"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="recipe"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="deathsBySeasons"></xs:attribute>
                     <xs:attribute type="mule:expressionDecimal" use="required" name="money"></xs:attribute>
@@ -641,12 +650,12 @@
                 <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
                 <xs:attribute type="mule:expressionLong" use="optional" default="#[payload]" name="payment"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="sameNameParameter"></xs:attribute>
-                <xs:attribute type="mule:expressionBoolean" use="optional" name="fail"></xs:attribute>
+                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="fail"></xs:attribute>
                 <xs:attribute type="mule:expressionMap" use="optional" name="labeledRicin"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="nextDoor"></xs:attribute>
                 <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="methylamine"></xs:attribute>
-                <xs:attribute type="mule:expressionBoolean" use="optional" name="propagateError"></xs:attribute>
+                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="propagateError"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -768,12 +777,12 @@
                 <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="corePoolSize"></xs:attribute>
                 <xs:attribute type="mule:expressionLong" use="optional" default="#[payload]" name="payment"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="sameNameParameter"></xs:attribute>
-                <xs:attribute type="mule:expressionBoolean" use="optional" name="fail"></xs:attribute>
+                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="fail"></xs:attribute>
                 <xs:attribute type="mule:expressionMap" use="optional" name="labeledRicin"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="nextDoor"></xs:attribute>
                 <xs:attribute type="mule:expressionList" use="optional" name="ricinPacks"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="methylamine"></xs:attribute>
-                <xs:attribute type="mule:expressionBoolean" use="optional" name="propagateError"></xs:attribute>
+                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="propagateError"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -1160,7 +1169,7 @@
                             <xs:complexContent>
                                 <xs:extension base="mule:abstractExtensionType">
                                     <xs:sequence></xs:sequence>
-                                    <xs:attribute type="mule:expressionBoolean" use="optional" name="fullyBald"></xs:attribute>
+                                    <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="fullyBald"></xs:attribute>
                                     <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KINDEnumType" use="optional" default="GOATIE" name="beardTrimming"></xs:attribute>
                                 </xs:extension>
                             </xs:complexContent>

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
+import static java.lang.Boolean.TRUE;
+import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -216,7 +218,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     ConfigurationDeclaration configuration = extensionDeclaration.getConfigurations().get(1);
     assertThat(configuration, is(notNullValue()));
     assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
-    assertThat(configuration.getAllParameters(), hasSize(30));
+    assertThat(configuration.getAllParameters(), hasSize(32));
     assertParameter(configuration.getAllParameters(), "extendedProperty", "", toMetadataType(String.class), true, SUPPORTED,
                     null);
   }
@@ -375,7 +377,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
     List<ParameterDeclaration> parameters = conf.getAllParameters();
-    assertThat(parameters, hasSize(29));
+    assertThat(parameters, hasSize(31));
 
     assertParameter(parameters, "myName", "", toMetadataType(String.class), false, SUPPORTED, HEISENBERG);
     assertParameter(parameters, "age", "", toMetadataType(Integer.class), false, SUPPORTED, AGE);
@@ -414,6 +416,9 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertParameter(parameters, "wildCardWeapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), false, SUPPORTED,
                     null);
     assertParameter(parameters, "wildCards", "", arrayOf(List.class, objectTypeBuilder(Object.class)), false, SUPPORTED, null);
+    assertParameter(parameters, "worksAtDEA", "", toMetadataType(boolean.class), false, SUPPORTED, valueOf(TRUE));
+    // TODO:MULE-12736 change parameter optionality
+    assertParameter(parameters, "lovesMinerals", "", toMetadataType(boolean.class), false, SUPPORTED, null);
 
     assertParameter(parameters, "monthlyIncomes", "", arrayOf(List.class, TYPE_BUILDER.numberType().id(Long.class.getName())),
                     true, SUPPORTED, null);

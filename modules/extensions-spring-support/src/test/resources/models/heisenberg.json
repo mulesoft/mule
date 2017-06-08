@@ -165,9 +165,10 @@
                 }
               },
               "hasDynamicType": false,
-              "required": true,
+              "required": false,
               "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
+              "defaultValue": "false",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -1054,6 +1055,7 @@
               "required": false,
               "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
+              "defaultValue": "false",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -1115,6 +1117,78 @@
           },
           "showInDsl": true,
           "name": "Inline Barber Preferences",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Boolean",
+                "annotations": {
+                  "typeId": "boolean"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "true",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 28
+              },
+              "name": "worksAtDEA",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Boolean",
+                "annotations": {
+                  "typeId": "boolean"
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "false",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 29
+              },
+              "name": "lovesMinerals",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false
+          },
+          "showInDsl": true,
+          "name": "Brother in law",
           "description": "",
           "modelProperties": {}
         }
@@ -2769,6 +2843,7 @@
                     "required": false,
                     "isConfigOverride": false,
                     "expressionSupport": "SUPPORTED",
+                    "defaultValue": "false",
                     "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
@@ -3214,6 +3289,7 @@
                     "required": false,
                     "isConfigOverride": false,
                     "expressionSupport": "SUPPORTED",
+                    "defaultValue": "false",
                     "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
@@ -4317,6 +4393,7 @@
                     "required": false,
                     "isConfigOverride": false,
                     "expressionSupport": "SUPPORTED",
+                    "defaultValue": "false",
                     "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
@@ -4762,6 +4839,7 @@
                     "required": false,
                     "isConfigOverride": false,
                     "expressionSupport": "SUPPORTED",
+                    "defaultValue": "false",
                     "role": "BEHAVIOUR",
                     "dslConfiguration": {
                       "allowsInlineDefinition": true,
@@ -7343,6 +7421,7 @@
               "required": false,
               "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
+              "defaultValue": "false",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -13959,6 +14038,81 @@
                     "role": "BEHAVIOUR"
                   },
                   "default": "GOATIE",
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "flattened": {},
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "brotherInLaw",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.heisenberg.extension.model.HankSchrader",
+              "classInformation": {
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "typeAlias": {
+                "value": "HankSchrader"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "worksAtDEA"
+                },
+                "model": {
+                  "type": "Boolean",
+                  "annotations": {
+                    "typeId": "boolean"
+                  }
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "default": "true",
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "lovesMinerals"
+                },
+                "model": {
+                  "type": "Boolean",
+                  "annotations": {
+                    "typeId": "boolean"
+                  }
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
                   "expressionSupport": {
                     "value": "SUPPORTED"
                   }
