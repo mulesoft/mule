@@ -312,7 +312,7 @@ public class MuleContainer {
     @Override
     public void run() {
       try {
-        stop();
+        MuleContainer.this.stop();
       } catch (MuleException e) {
         logger.warn("Error stopping mule container", e);
       }
