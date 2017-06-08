@@ -47,7 +47,6 @@ public class TryMessageProcessor extends AbstractMessageProcessorOwner implement
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TryMessageProcessor.class);
 
-  protected List<Processor> processors = emptyList();
   protected MessageProcessorChain nestedChain;
   protected MuleTransactionConfig transactionConfig;
 
@@ -114,9 +113,8 @@ public class TryMessageProcessor extends AbstractMessageProcessorOwner implement
    * @param processors
    */
   public void setMessageProcessors(List<Processor> processors) {
-    this.processors = processors;
+    this.nestedChain = newChain(processors);
   }
-
 
   @Override
   public void initialise() throws InitialisationException {
@@ -125,7 +123,6 @@ public class TryMessageProcessor extends AbstractMessageProcessorOwner implement
     }
     setFlowConstructIfNeeded(messagingExceptionHandler, flowConstruct);
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
-    nestedChain = newChain(processors);
     super.initialise();
   }
 
