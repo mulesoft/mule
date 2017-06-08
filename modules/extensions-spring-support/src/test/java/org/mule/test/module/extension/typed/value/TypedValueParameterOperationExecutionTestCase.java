@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
+import org.mule.test.typed.value.extension.extension.SimplePojo;
 import org.mule.test.typed.value.extension.extension.TypedValueSource;
 import org.mule.test.vegan.extension.VeganProductInformation;
 
@@ -195,5 +196,26 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
   @Test
   public void typedValueOperationWithExplicitNullContent() throws Exception {
     runAndAssertTypedValue("typedValueOperationWithExplicitNullContent", null, APPLICATION_JSON, UTF8);
+  }
+
+  @Test
+  public void wrappedAndUnwrappedTypes() throws Exception {
+    List<Object> wrappedAndUnwrappedTypes = (List<Object>) flowRunner("wrappedAndUnwrappedTypes").run()
+        .getMessage().getPayload().getValue();
+    assertThat(wrappedAndUnwrappedTypes.get(0), is("stringNotWrapped"));
+    assertThat(((TypedValue) wrappedAndUnwrappedTypes.get(1)).getValue(), is("wrappedString"));
+    assertThat(((SimplePojo) ((TypedValue) wrappedAndUnwrappedTypes.get(2)).getValue()).getUser(), is("user"));
+    assertThat(((SimplePojo) wrappedAndUnwrappedTypes.get(3)).getUser(), is("user2"));
+
+    Map<String, Object> mapOfComplexValues = (Map<String, Object>) wrappedAndUnwrappedTypes.get(4);
+    Map<String, TypedValue<?>> mapOfComplexTypedValues = (Map<String, TypedValue<?>>) wrappedAndUnwrappedTypes.get(5);
+    assertThat(mapOfComplexValues.entrySet().size(), is(2));
+    assertThat(((Map) mapOfComplexValues.get("first")).get("pass"), is("pass"));
+    assertThat(mapOfComplexTypedValues.entrySet().size(), is(1));
+    assertThat(((Map) ((TypedValue) mapOfComplexTypedValues.get("third")).getValue()).get("pass"), is("pass3"));
+
+    SimplePojo group = (SimplePojo) wrappedAndUnwrappedTypes.get(6);
+    assertThat(group.getUser(), is("groupUser"));
+    assertThat(group.getPass(), is("groupPass"));
   }
 }
