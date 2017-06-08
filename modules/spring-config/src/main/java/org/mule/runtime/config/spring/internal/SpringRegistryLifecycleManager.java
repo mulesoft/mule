@@ -4,39 +4,41 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring;
+package org.mule.runtime.config.spring.internal;
 
 import static org.mule.runtime.config.spring.MuleArtifactContext.INNER_BEAN_PREFIX;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.service.Service;
+import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.config.spring.SpringRegistry;
+import org.mule.runtime.config.spring.SpringRegistryBootstrap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.agent.Agent;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
+import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
-import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.lifecycle.LifecycleObject;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.api.store.ObjectStoreManager;
-import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.LegacyConnector;
+import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.lifecycle.EmptyLifecycleCallback;
-import org.mule.runtime.core.lifecycle.LifecycleObject;
-import org.mule.runtime.core.lifecycle.NotificationLifecycleObject;
-import org.mule.runtime.core.lifecycle.RegistryLifecycleManager;
+import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
+import org.mule.runtime.core.internal.lifecycle.NotificationLifecycleObject;
+import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextDisposePhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextInitialisePhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
@@ -45,7 +47,7 @@ import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.registry.AbstractRegistryBroker;
 import org.mule.runtime.core.routing.requestreply.AbstractAsyncRequestReplyRequester;
-import org.mule.runtime.core.api.util.queue.QueueManager;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 
 import java.util.LinkedHashSet;

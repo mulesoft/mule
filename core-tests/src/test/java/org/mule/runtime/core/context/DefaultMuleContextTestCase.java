@@ -42,7 +42,7 @@ import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
-import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
+import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.util.store.MuleObjectStoreManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;

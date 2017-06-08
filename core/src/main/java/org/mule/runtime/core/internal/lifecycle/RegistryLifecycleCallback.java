@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.lifecycle;
+package org.mule.runtime.core.internal.lifecycle;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
@@ -16,6 +16,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.lifecycle.HasLifecycleInterceptor;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.LifecycleInterceptor;
+import org.mule.runtime.core.api.lifecycle.LifecycleObject;
 import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.internal.lifecycle.phases.ContainerManagedLifecyclePhase;

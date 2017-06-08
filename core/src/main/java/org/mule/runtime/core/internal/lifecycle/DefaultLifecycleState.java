@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.lifecycle;
+package org.mule.runtime.core.internal.lifecycle;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -20,7 +20,7 @@ public class DefaultLifecycleState implements LifecycleState {
 
   private LifecycleManager lifecycleManager;
 
-  DefaultLifecycleState(LifecycleManager lifecycleManager) {
+  public DefaultLifecycleState(LifecycleManager lifecycleManager) {
     this.lifecycleManager = lifecycleManager;
   }
 

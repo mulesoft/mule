@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.lifecycle;
+package org.mule.runtime.core.api.lifecycle;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ServerNotification;

@@ -54,7 +54,7 @@ import org.mule.runtime.core.context.notification.TransactionNotification;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.internal.client.DefaultLocalMuleClient;
-import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
+import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
@@ -74,7 +74,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
 
   protected MuleConfiguration config;
 
-  protected MuleContextLifecycleManager lifecycleManager;
+  private MuleContextLifecycleManager lifecycleManager;
 
   protected ServerNotificationManager notificationManager;
 
@@ -184,7 +184,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     return object;
   }
 
-  protected MuleContextLifecycleManager getLifecycleManager() {
+  protected LifecycleManager getLifecycleManager() {
     if (lifecycleManager != null) {
       return lifecycleManager;
     } else {
@@ -231,7 +231,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     return new DefaultMuleConfiguration();
   }
 
-  protected MuleContextLifecycleManager createLifecycleManager() {
+  private MuleContextLifecycleManager createLifecycleManager() {
     return new MuleContextLifecycleManager();
   }
 

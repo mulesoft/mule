@@ -29,7 +29,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.lifecycle.EmptyLifecycleCallback;
+import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.util.ClassUtils;
 

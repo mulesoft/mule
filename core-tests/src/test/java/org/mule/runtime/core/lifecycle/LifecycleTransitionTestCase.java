@@ -11,6 +11,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.AbstractLifecycleManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;

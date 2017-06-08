@@ -14,11 +14,12 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.lifecycle.RegistryLifecycleManager;
 import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;
 
 import java.util.Collection;
 
@@ -36,7 +37,7 @@ public abstract class AbstractRegistry implements Registry {
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
   protected MuleContext muleContext;
-  protected RegistryLifecycleManager lifecycleManager;
+  private RegistryLifecycleManager lifecycleManager;
 
   protected AbstractRegistry(String id, MuleContext muleContext) {
     if (id == null) {
@@ -44,7 +45,7 @@ public abstract class AbstractRegistry implements Registry {
     }
     this.id = id;
     this.muleContext = muleContext;
-    lifecycleManager = createLifecycleManager();
+    lifecycleManager = (RegistryLifecycleManager) createLifecycleManager();
   }
 
   @Override
@@ -71,7 +72,8 @@ public abstract class AbstractRegistry implements Registry {
     }
   }
 
-  protected RegistryLifecycleManager createLifecycleManager() {
+  protected LifecycleManager createLifecycleManager() {
+    // TODO(pablo.kraan): MULE-12609 - using LifecycleManager to avoid exposing RegistryLifecycleManager
     return new RegistryLifecycleManager(getRegistryId(), this, muleContext);
   }
 
@@ -108,7 +110,7 @@ public abstract class AbstractRegistry implements Registry {
     return getLifecycleManager().getState().isInitialised();
   }
 
-  public RegistryLifecycleManager getLifecycleManager() {
+  public LifecycleManager getLifecycleManager() {
     return lifecycleManager;
   }
 

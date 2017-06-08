@@ -9,20 +9,20 @@ package org.mule.runtime.config.spring;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
+import org.mule.runtime.config.spring.internal.SpringRegistryLifecycleManager;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.registry.LifecycleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.runtime.core.lifecycle.RegistryLifecycleManager;
-import org.mule.runtime.core.registry.AbstractRegistry;
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.registry.AbstractRegistry;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -150,7 +150,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
   }
 
   @Override
-  protected RegistryLifecycleManager createLifecycleManager() {
+  protected LifecycleManager createLifecycleManager() {
     return new SpringRegistryLifecycleManager(getRegistryId(), this, muleContext);
   }
 
@@ -333,11 +333,13 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
     }
   }
 
-  protected <T> Map<String, T> lookupEntriesForLifecycle(Class<T> type) {
+  // TODO(pablo.kraan): MULE-12609 - making public to be able to use it from a different package
+  public <T> Map<String, T> lookupEntriesForLifecycle(Class<T> type) {
     return internalLookupByTypeWithoutAncestors(type, false, false);
   }
 
-  protected Map<String, Object> getDependencies(String key) {
+  // TODO(pablo.kraan): MULE-12609 - making public to be able to use it from a different package
+  public Map<String, Object> getDependencies(String key) {
     if (!readOnly) {
       Map<String, Object> dependents = new HashMap<>();
       for (String dependentKey : ((ConfigurableApplicationContext) applicationContext).getBeanFactory()

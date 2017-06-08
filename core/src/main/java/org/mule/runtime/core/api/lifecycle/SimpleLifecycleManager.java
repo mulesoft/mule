@@ -4,14 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.lifecycle;
+package org.mule.runtime.core.api.lifecycle;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;

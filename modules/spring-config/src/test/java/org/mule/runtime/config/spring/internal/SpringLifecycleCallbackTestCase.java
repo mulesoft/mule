@@ -4,14 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring;
+package org.mule.runtime.config.spring.internal;
 
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.config.spring.SpringRegistry;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

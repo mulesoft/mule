@@ -4,12 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring;
+package org.mule.runtime.config.spring.internal;
 
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.lifecycle.LifecycleObject;
-import org.mule.runtime.core.lifecycle.RegistryLifecycleCallback;
-import org.mule.runtime.core.lifecycle.RegistryLifecycleManager;
+import org.mule.runtime.config.spring.SpringRegistry;
+import org.mule.runtime.core.api.lifecycle.LifecycleObject;
+import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleCallback;
+import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;
 
 import com.google.common.collect.TreeTraverser;
 

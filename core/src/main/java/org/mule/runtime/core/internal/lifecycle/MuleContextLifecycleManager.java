@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.lifecycle;
+package org.mule.runtime.core.internal.lifecycle;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.api.lifecycle.AbstractLifecycleManager;
 
 /**
  * This is a specialized class that extends {@link RegistryLifecycleManager} and will invoke lifecycle on the registry instance

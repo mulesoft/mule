@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.lifecycle;
+package org.mule.runtime.core.internal.lifecycle;
 
 import org.mule.runtime.core.api.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
