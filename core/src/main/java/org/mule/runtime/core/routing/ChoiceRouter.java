@@ -24,7 +24,7 @@ import java.util.Collection;
  * If a default route has been configured and no match has been found, the default route will be used. Otherwise it continues the
  * execution through the next MP in the chain.
  */
-public class ChoiceRouter extends AbstractSelectiveRouter implements Processor {
+public class ChoiceRouter extends AbstractSelectiveRouter {
 
   @Override
   protected Collection<Processor> selectProcessors(Event event, Event.Builder builder) {
