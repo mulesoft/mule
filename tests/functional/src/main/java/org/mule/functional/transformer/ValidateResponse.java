@@ -6,10 +6,11 @@
  */
 package org.mule.functional.transformer;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -31,7 +32,7 @@ public class ValidateResponse extends AbstractTransformer {
     if (response != null && response.contains("success")) {
       return response;
     } else {
-      throw new TransformerException(I18nMessageFactory.createStaticMessage("Invalid response from service: " + response));
+      throw new TransformerException(createStaticMessage("Invalid response from service: " + response));
     }
   }
 }

@@ -9,6 +9,7 @@ package org.mule.tck.junit4.matcher;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
@@ -23,37 +24,48 @@ import org.hamcrest.TypeSafeMatcher;
  */
 public class EventMatcher extends TypeSafeMatcher<Event> {
 
+  private Matcher<Message> messageMatcher;
   private Matcher<ErrorType> errorTypeMatcher;
 
-  public EventMatcher(Matcher<ErrorType> errorTypeMatcher) {
+  public EventMatcher(Matcher<Message> messageMatcher, Matcher<ErrorType> errorTypeMatcher) {
     this.errorTypeMatcher = errorTypeMatcher;
   }
 
   public static EventMatcher hasErrorTypeThat(Matcher<ErrorType> errorTypeMatcher) {
-    return new EventMatcher(errorTypeMatcher);
+    return new EventMatcher(null, errorTypeMatcher);
   }
 
   public static EventMatcher hasErrorType(ErrorTypeDefinition type) {
-    return new EventMatcher(errorType(type));
+    return new EventMatcher(null, errorType(type));
   }
 
   public static EventMatcher hasErrorType(String namespace, String type) {
-    return new EventMatcher(errorType(namespace, type));
+    return new EventMatcher(null, errorType(namespace, type));
   }
 
   public static EventMatcher hasErrorType(Matcher<String> namespace, Matcher<String> type) {
-    return new EventMatcher(errorType(namespace, type));
+    return new EventMatcher(null, errorType(namespace, type));
+  }
+
+  public static EventMatcher hasMessage(Matcher<Message> messageMatcher) {
+    return new EventMatcher(messageMatcher, null);
   }
 
   @Override
   protected boolean matchesSafely(Event item) {
-    return errorTypeMatcher.matches(item.getError().get().getErrorType());
+    return messageMatcher != null ? messageMatcher.matches(item.getMessage()) : true
+        && errorTypeMatcher != null ? errorTypeMatcher.matches(item.getError().get().getErrorType()) : true;
   }
 
   @Override
   public void describeTo(Description description) {
     description.appendText("an Event with ");
-    errorTypeMatcher.describeTo(description);
+    if (messageMatcher != null) {
+      messageMatcher.describeTo(description);
+    }
+    if (errorTypeMatcher != null) {
+      errorTypeMatcher.describeTo(description);
+    }
   }
 
 }

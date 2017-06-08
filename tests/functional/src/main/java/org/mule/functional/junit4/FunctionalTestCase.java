@@ -10,8 +10,7 @@ import static java.util.Collections.emptyMap;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 
-import org.mule.functional.functional.FlowAssert;
-import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.functional.api.component.FlowAssert;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
@@ -25,8 +24,8 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.component.AbstractJavaComponent;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.component.AbstractJavaComponent;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -134,18 +133,6 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
 
     throw new RegistrationException(I18nMessageFactory
         .createStaticMessage("Can't get component from flow construct " + flowConstruct.getName()));
-  }
-
-  /**
-   * A convenience method to get a type-safe reference to the FunctionTestComponent
-   * 
-   * @param serviceName service name as declared in the config
-   * @return test component
-   * @since 2.2
-   * @see FunctionalTestComponent
-   */
-  protected FunctionalTestComponent getFunctionalTestComponent(String serviceName) throws Exception {
-    return (FunctionalTestComponent) getComponent(serviceName);
   }
 
   protected FlowConstruct getFlowConstruct(String flowName) throws Exception {

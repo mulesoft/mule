@@ -99,6 +99,7 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-module-test-policy</artifactId>
             <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>

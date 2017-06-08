@@ -153,6 +153,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-component-plugin</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>

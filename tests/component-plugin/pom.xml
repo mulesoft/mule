@@ -1,17 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-module-test-policy</artifactId>
+    <artifactId>mule-tests-component-plugin</artifactId>
     <packaging>mule-plugin</packaging>
-    <name>Test Policies for Mule</name>
-    <description>Provides policies to use on tests</description>
+    <name>Mule Test Framework Components (TCK)</name>
+    <description>Mule test framework compoennts (TCK)</description>
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
@@ -20,7 +18,6 @@
     <build>
         <plugins>
             <plugin>
-                <!-- This is built this way because by building only the plugin, this is not usable from unit tests -->
                 <groupId>org.mule.runtime.plugins</groupId>
                 <artifactId>mule-app-plugins-maven-plugin</artifactId>
                 <extensions>true</extensions>
@@ -31,34 +28,28 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-dsl-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Needed for SpringXmlConfigurationBuilder -->
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-service</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-spring-support</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!--TODO: MULE-10837-->
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-service</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
+    
+        <!-- Unit tests -->
         <dependency>
             <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
+            <artifactId>mule-tests-unit</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
