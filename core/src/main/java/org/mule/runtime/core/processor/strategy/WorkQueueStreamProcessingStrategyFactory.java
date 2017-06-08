@@ -9,7 +9,6 @@ package org.mule.runtime.core.processor.strategy;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.WAIT;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -42,7 +41,7 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
     return new WorkQueueStreamProcessingStrategy(() -> muleContext.getSchedulerService()
         .customScheduler(muleContext.getSchedulerBaseConfig()
             .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
-            .withMaxConcurrentTasks(getSubscriberCount() + 1).withRejectionAction(WAIT)),
+            .withMaxConcurrentTasks(getSubscriberCount() + 1).withWaitAllowed(true)),
                                                  getBufferSize(),
                                                  getSubscriberCount(),
                                                  getWaitStrategy(),

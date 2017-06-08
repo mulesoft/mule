@@ -8,11 +8,12 @@ package org.mule.runtime.core.api.scheduler;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
-import static org.mule.runtime.core.api.scheduler.SchedulerConfig.RejectionAction.DEFAULT;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 
-import java.util.concurrent.RejectedExecutionHandler;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -24,26 +25,6 @@ import java.util.function.Supplier;
 public class SchedulerConfig {
 
   /**
-   * Different possible actions to handle the scenario where a task is dispatched to a busy {@link Scheduler}.
-   * <p>
-   * A {@link Scheduler} is considered busy when all of its threads are busy and it cannot accept a new task for execution.
-   */
-  public enum RejectionAction {
-    /**
-     * The actual {@link RejectedExecutionHandler} of the target {@link Scheduler} will depend on the type of scheduler the thread
-     * is from. For cpu-bound threads (cpuLight and cpuIntensive) it will be <b>abort</b>, and for the other cases it will be
-     * <b>wait</b>.
-     */
-    DEFAULT,
-
-    /**
-     * The {@link RejectedExecutionHandler} of the target {@link Scheduler} will cause the dispatcher thread to wait for the task
-     * to be taken by the target scheduler, effectively blocking until that happens.
-     */
-    WAIT;
-  }
-
-  /**
    * @return a default configuration, which can be further customized.
    */
   public static SchedulerConfig config() {
@@ -53,23 +34,23 @@ public class SchedulerConfig {
   private final Integer maxConcurrentTasks;
   private final String schedulerPrefix;
   private final String schedulerName;
-  private final RejectionAction rejectionAction;
+  private final Optional<Boolean> waitAllowed;
   private final Supplier<Long> shutdownTimeoutMillis;
 
   private SchedulerConfig() {
     this.maxConcurrentTasks = null;
     this.schedulerPrefix = null;
     this.schedulerName = null;
-    this.rejectionAction = DEFAULT;
+    this.waitAllowed = empty();
     this.shutdownTimeoutMillis = () -> null;
   }
 
   private SchedulerConfig(Integer maxConcurrentTasks, String schedulerPrefix, String schedulerName,
-                          RejectionAction rejectionAction, Supplier<Long> shutdownTimeoutMillis) {
+                          Optional<Boolean> waitAllowed, Supplier<Long> shutdownTimeoutMillis) {
     this.maxConcurrentTasks = maxConcurrentTasks;
     this.schedulerPrefix = schedulerPrefix;
     this.schedulerName = schedulerName;
-    this.rejectionAction = rejectionAction;
+    this.waitAllowed = waitAllowed;
     this.shutdownTimeoutMillis = shutdownTimeoutMillis;
   }
 
@@ -83,7 +64,7 @@ public class SchedulerConfig {
    * @return the updated configuration.
    */
   public SchedulerConfig withMaxConcurrentTasks(int maxConcurrentTasks) {
-    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, rejectionAction, shutdownTimeoutMillis);
+    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, waitAllowed, shutdownTimeoutMillis);
   }
 
   /**
@@ -100,7 +81,7 @@ public class SchedulerConfig {
    * @return the updated configuration.
    */
   public SchedulerConfig withPrefix(String schedulerPrefix) {
-    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, rejectionAction, shutdownTimeoutMillis);
+    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, waitAllowed, shutdownTimeoutMillis);
   }
 
   /**
@@ -110,7 +91,7 @@ public class SchedulerConfig {
    * @return the updated configuration.
    */
   public SchedulerConfig withName(String schedulerName) {
-    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, rejectionAction, shutdownTimeoutMillis);
+    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, waitAllowed, shutdownTimeoutMillis);
   }
 
   /**
@@ -128,25 +109,23 @@ public class SchedulerConfig {
   }
 
   /**
-   * Sets the rejection policy to use when dispatching to a busy {@link Scheduler}.
+   * Whether the threads of the target custom {@link Scheduler} may block to wait when dispatching to a busy {@link Scheduler}.
    * <p>
-   * This is only applicable for <b>custom</b> {@link Scheduler}s. The policy cannot be changed for the runtime managed
+   * This is only applicable for <b>custom</b> {@link Scheduler}s. This behaviour cannot be changed for the runtime managed
    * {@link Scheduler}.
-   * 
-   * @see SchedulerBusyException
    * 
    * @return the updated configuration
    */
-  public SchedulerConfig withRejectionAction(RejectionAction rejectionAction) {
-    requireNonNull(rejectionAction);
-    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, rejectionAction, shutdownTimeoutMillis);
+  public SchedulerConfig withWaitAllowed(boolean waitAllowed) {
+    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, of(waitAllowed), shutdownTimeoutMillis);
   }
 
   /**
-   * @return the {@link RejectionAction} for the target custom {@link Scheduler}.
+   * @return whether the threads of the target custom {@link Scheduler} may block to wait when dispatching to a busy
+   *         {@link Scheduler}.
    */
-  public RejectionAction getRejectionAction() {
-    return rejectionAction;
+  public Optional<Boolean> getWaitAllowed() {
+    return waitAllowed;
   }
 
   /**
@@ -160,7 +139,7 @@ public class SchedulerConfig {
   public SchedulerConfig withShutdownTimeout(Supplier<Long> shutdownTimeoutSupplier, TimeUnit shutdownTimeoutUnit) {
     requireNonNull(shutdownTimeoutUnit);
 
-    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, rejectionAction, () -> {
+    return new SchedulerConfig(maxConcurrentTasks, schedulerPrefix, schedulerName, waitAllowed, () -> {
       long shutdownTimeout = shutdownTimeoutSupplier.get();
       validateTimeoutValue(shutdownTimeout);
       return shutdownTimeoutUnit.toMillis(shutdownTimeout);
