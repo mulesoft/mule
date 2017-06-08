@@ -118,7 +118,7 @@ public class SftpClient
         {
             String message = "Error '" + e.getMessage() + "' occurred when trying to CDW to '" + wd + "'.";
             logger.error(message);
-            throw new IOException(message);
+            throw new IOException(message, e);
         }
     }
 
@@ -293,7 +293,7 @@ public class SftpClient
     private void logAndThrowLoginError(String user, Exception e) throws IOException
     {
         logger.error("Error during login to " + user + "@" + host, e);
-        throw new IOException("Error during login to " + user + "@" + host + ": " + e.getMessage());
+        throw new IOException("Error during login to " + user + "@" + host + ": " + e.getMessage(), e);
     }
 
     public void setPort(int port)
@@ -327,7 +327,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
             // throw new IOException("Error occured when renaming " +
             // currentDirectory + "/" + filename + " to " + absolutePath +
             // ". Error Message=" + e.getMessage());
@@ -337,7 +337,7 @@ public class SftpClient
     public void deleteFile(String fileName) throws IOException
     {
         // Notify sftp delete file action
-    	notifyAction(SFTP_DELETE_ACTION, fileName);
+        notifyAction(SFTP_DELETE_ACTION, fileName);
 
         try
         {
@@ -470,7 +470,7 @@ public class SftpClient
         {
 
             // Notify sftp put file action
-        	notifyAction(SFTP_PUT_ACTION, fileName);
+            notifyAction(SFTP_PUT_ACTION, fileName);
 
             if (logger.isDebugEnabled())
             {
@@ -481,13 +481,13 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
         }
     }
 
     public void storeFile(String fileName, MuleEvent event, OutputHandler outputHandler) throws IOException
     {
-    	storeFile(fileName, event, outputHandler, WriteMode.OVERWRITE);
+        storeFile(fileName, event, outputHandler, WriteMode.OVERWRITE);
     }
 
     public void storeFile(String fileName, MuleEvent event, OutputHandler outputHandler, WriteMode mode) throws IOException
@@ -509,7 +509,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
         }
         finally
         {
@@ -533,7 +533,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
         }
     }
 
@@ -553,7 +553,7 @@ public class SftpClient
         }
         catch (SftpException e)
         {
-            throw new IOException(e.getMessage() + " (" + currentDirectory + "/" + filename + ")");
+            throw new IOException(e.getMessage() + " (" + currentDirectory + "/" + filename + ")", e);
         }
     }
 
