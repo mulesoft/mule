@@ -56,6 +56,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.TypeRestr
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.type.WithAlias;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.FieldWrapper;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
@@ -205,7 +206,7 @@ public final class ParameterModelsLoaderDelegate {
     type.getAnnotation(ExclusiveOptionals.class).ifPresent(annotation -> {
       Set<String> optionalParamNames = annotatedParameters.stream()
           .filter(f -> !f.isRequired())
-          .map(f -> f.getName())
+          .map(WithAlias::getAlias)
           .collect(toSet());
 
       declarer.withExclusiveOptionals(optionalParamNames, annotation.isOneRequired());

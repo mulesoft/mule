@@ -6,25 +6,19 @@
  */
 package org.mule.test.module.extension.connector;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
 import org.mule.test.module.extension.InvalidExtensionConfigTestCase;
-import org.mule.test.petstore.extension.ExclusivePetBreeder;
 
-import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class PetStoreExclusiveParameterWithAliasTestCase extends InvalidExtensionConfigTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "petstore-exclusive-parameters-with-alias.xml";
+    return "petstore-exclusive-parameter-with-alias.xml";
   }
 
-  @Test
-  public void getBreederOperation() throws Exception {
-    ExclusivePetBreeder petBreeder = (ExclusivePetBreeder) runFlow("getBreederOperation").getMessage().getPayload().getValue();
-    assertThat(petBreeder.getunaliasedNammals(), is("Primate"));
-    assertThat(petBreeder.getBirds(), is(nullValue()));
+  @Override
+  protected void additionalExceptionAssertions(ExpectedException expectedException) {
+    expectedException.expectMessage("the following parameters cannot be set at the same time: [cash, debt]");
   }
 }

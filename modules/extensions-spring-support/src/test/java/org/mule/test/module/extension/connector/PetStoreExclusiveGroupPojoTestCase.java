@@ -8,10 +8,17 @@ package org.mule.test.module.extension.connector;
 
 import org.mule.test.module.extension.InvalidExtensionConfigTestCase;
 
+import org.junit.rules.ExpectedException;
+
 public class PetStoreExclusiveGroupPojoTestCase extends InvalidExtensionConfigTestCase {
 
   @Override
   protected String getConfigFile() {
     return "petstore-exclusive-group-pojo-config.xml";
+  }
+
+  @Override
+  protected void additionalExceptionAssertions(ExpectedException expectedException) {
+    expectedException.expectMessage("the following parameters cannot be set at the same time: [cash, debt]");
   }
 }
