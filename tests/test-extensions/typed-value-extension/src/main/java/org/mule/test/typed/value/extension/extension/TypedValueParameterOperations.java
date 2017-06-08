@@ -88,7 +88,8 @@ public class TypedValueParameterOperations {
                                        @Optional @Content TypedValue<SimplePojo> complexTypedValue,
                                        @Optional @Content SimplePojo complexNotWrapped,
                                        @Optional @Content Map<String, Object> mapOfComplexValues,
-                                       @Optional @Content(primary = true) Map<String, TypedValue<Object>> mapOfComplexTypedValues) {
+                                       @Optional @Content(
+                                           primary = true) Map<String, TypedValue<Object>> mapOfComplexTypedValues) {
     return Arrays.asList(stringNotWrapped, wrappedString, complexTypedValue, complexNotWrapped,
                          mapOfComplexValues, mapOfComplexTypedValues, pojo);
 
