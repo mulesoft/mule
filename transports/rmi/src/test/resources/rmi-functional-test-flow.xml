@@ -43,6 +43,7 @@
     <sub-flow name="Sender2SubFlow">
         <payload-type-filter expectedType="java.lang.String"/>
         <rmi:outbound-endpoint ref="Sender2"/>
+        <component class="org.mule.transport.AbstractFunctionalTestCase$TestJavaComponent"/>
     </sub-flow>
     
 </mule>
