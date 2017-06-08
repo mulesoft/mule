@@ -6,6 +6,10 @@
  */
 package org.mule.tck;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.scheduler.Scheduler;
 
 import java.util.Collection;
@@ -18,7 +22,11 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.slf4j.Logger;
+
 public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Scheduler {
+
+  private static final Logger LOGGER = getLogger(SimpleUnitTestSupportLifecycleSchedulerDecorator.class);
 
   private String name;
   private Scheduler decorated;
@@ -42,37 +50,97 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
 
   @Override
   public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
-    return decorated.schedule(command, delay, unit);
+    return decorated.schedule(wrap(command), delay, unit);
   }
 
   @Override
   public void execute(Runnable command) {
-    decorated.execute(command);
+    decorated.execute(wrap(command));
   }
 
   @Override
   public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
-    return decorated.schedule(callable, delay, unit);
+    return decorated.schedule(wrap(callable), delay, unit);
   }
 
   @Override
   public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
-    return decorated.scheduleAtFixedRate(command, initialDelay, period, unit);
+    return decorated.scheduleAtFixedRate(wrap(command), initialDelay, period, unit);
   }
 
   @Override
   public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
-    return decorated.scheduleWithFixedDelay(command, initialDelay, delay, unit);
+    return decorated.scheduleWithFixedDelay(wrap(command), initialDelay, delay, unit);
   }
 
   @Override
   public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression) {
-    return decorated.scheduleWithCronExpression(command, cronExpression);
+    return decorated.scheduleWithCronExpression(wrap(command), cronExpression);
   }
 
   @Override
   public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression, TimeZone timeZone) {
-    return decorated.scheduleWithCronExpression(command, cronExpression, timeZone);
+    return decorated.scheduleWithCronExpression(wrap(command), cronExpression, timeZone);
+  }
+
+  @Override
+  public <T> Future<T> submit(Callable<T> task) {
+    return decorated.submit(wrap(task));
+  }
+
+  @Override
+  public <T> Future<T> submit(Runnable task, T result) {
+    return decorated.submit(wrap(task), result);
+  }
+
+  @Override
+  public Future<?> submit(Runnable task) {
+    return decorated.submit(wrap(task));
+  }
+
+  @Override
+  public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
+    return decorated.invokeAll(tasks.stream().map(t -> wrap(t)).collect(toList()));
+  }
+
+  @Override
+  public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+      throws InterruptedException {
+    return decorated.invokeAll(tasks.stream().map(t -> wrap(t)).collect(toList()), timeout, unit);
+  }
+
+  @Override
+  public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
+    return decorated.invokeAny(tasks.stream().map(t -> wrap(t)).collect(toList()));
+  }
+
+  @Override
+  public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+      throws InterruptedException, ExecutionException, TimeoutException {
+    return decorated.invokeAny(tasks.stream().map(t -> wrap(t)).collect(toList()), timeout, unit);
+  }
+
+  private Runnable wrap(Runnable command) {
+    return () -> {
+      try {
+        command.run();
+      } catch (Throwable t) {
+        LOGGER.error(format("Task '%s' finished with exception in test scheduler '%s'", command.toString(), decorated.getName()),
+                     t);
+      }
+    };
+  }
+
+  private <V> Callable<V> wrap(Callable<V> callable) {
+    return () -> {
+      try {
+        return callable.call();
+      } catch (Throwable t) {
+        LOGGER.error(format("Task '%s' finished with exception in test scheduler '%s'", callable.toString(), decorated.getName()),
+                     t);
+        return null;
+      }
+    };
   }
 
   @Override
@@ -103,43 +171,6 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
   @Override
   public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
     return decorated.awaitTermination(timeout, unit);
-  }
-
-  @Override
-  public <T> Future<T> submit(Callable<T> task) {
-    return decorated.submit(task);
-  }
-
-  @Override
-  public <T> Future<T> submit(Runnable task, T result) {
-    return decorated.submit(task, result);
-  }
-
-  @Override
-  public Future<?> submit(Runnable task) {
-    return decorated.submit(task);
-  }
-
-  @Override
-  public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
-    return decorated.invokeAll(tasks);
-  }
-
-  @Override
-  public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
-      throws InterruptedException {
-    return decorated.invokeAll(tasks, timeout, unit);
-  }
-
-  @Override
-  public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
-    return decorated.invokeAny(tasks);
-  }
-
-  @Override
-  public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
-      throws InterruptedException, ExecutionException, TimeoutException {
-    return decorated.invokeAny(tasks, timeout, unit);
   }
 
   @Override
