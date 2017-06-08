@@ -8,7 +8,7 @@ package org.mule.test.module.extension.connector;
 
 import org.mule.test.module.extension.InvalidExtensionConfigTestCase;
 
-import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class PetStoreExclusiveParameterOperationTestCase extends InvalidExtensionConfigTestCase {
 
@@ -17,8 +17,9 @@ public class PetStoreExclusiveParameterOperationTestCase extends InvalidExtensio
     return "petstore-exclusive-parameters-operation.xml";
   }
 
-  @Test
-  public void getBreederOperation() throws Exception {
-    runFlow("getBreederOperation");
+  @Override
+  protected void additionalExceptionAssertions(ExpectedException expectedException) {
+    expectedException
+        .expectMessage("the following parameters cannot be set at the same time: [mammals, birds]");
   }
 }

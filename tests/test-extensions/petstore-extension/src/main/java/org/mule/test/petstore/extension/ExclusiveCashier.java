@@ -6,6 +6,7 @@
  */
 package org.mule.test.petstore.extension;
 
+import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -26,7 +27,8 @@ public class ExclusiveCashier {
 
   @Parameter
   @Optional
-  private Integer cash;
+  @Alias("cash")
+  private Integer money;
 
   @Parameter
   @Optional
@@ -44,8 +46,8 @@ public class ExclusiveCashier {
     return pensionPlan;
   }
 
-  public Integer getCash() {
-    return cash;
+  public Integer getMoney() {
+    return money;
   }
 
   public Integer getDebt() {

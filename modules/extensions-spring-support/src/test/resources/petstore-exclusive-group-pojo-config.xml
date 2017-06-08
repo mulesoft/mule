@@ -7,6 +7,9 @@
 
     <petstore:config name="invalidConfigWithExclusion" cashierName="Cashier name" cash="100" debt="100">
         <petstore:connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
     </petstore:config>
 
     <flow name="getCageInvalidConfig">

@@ -5471,7 +5471,7 @@
           "exclusiveParametersModels": [
             {
               "exclusiveParameterNames": [
-                "unaliasedNammals",
+                "mammals",
                 "birds"
               ],
               "isOneRequired": true
@@ -10100,7 +10100,7 @@
           "exclusiveParametersModels": [
             {
               "exclusiveParameterNames": [
-                "unaliasedNammals",
+                "mammals",
                 "birds"
               ],
               "isOneRequired": true

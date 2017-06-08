@@ -65,6 +65,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Contains behavior to obtain a ResolverSet for a set of parameters values and a {@link ParameterizedModel}.
@@ -164,8 +165,12 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   private ResolverSet getResolverSet(ParameterizedModel model, List<ParameterModel> parameterModels, MuleContext muleContext,
                                      ResolverSet resolverSet)
       throws ConfigurationException {
+    Map<String, String> aliasedParameterNames = new HashMap<>();
     parameterModels.forEach(p -> {
       final String parameterName = getMemberName(p, p.getName());
+      if (!parameterName.equals(p.getName())) {
+        aliasedParameterNames.put(parameterName, p.getName());
+      }
       ValueResolver<?> resolver;
       if (parameters.containsKey(parameterName)) {
         resolver = toValueResolver(parameters.get(parameterName), p.getModelProperties());
@@ -202,8 +207,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       }
     });
 
-    checkParameterGroupExclusiveness(model, parameters.keySet());
-
+    checkParameterGroupExclusiveness(model, parameters.keySet().stream().map(k -> aliasedParameterNames.getOrDefault(k, k))
+        .collect(Collectors.toSet()));
     return resolverSet;
   }
 

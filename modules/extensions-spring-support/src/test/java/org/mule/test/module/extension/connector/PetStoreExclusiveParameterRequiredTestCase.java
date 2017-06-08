@@ -8,10 +8,17 @@ package org.mule.test.module.extension.connector;
 
 import org.mule.test.module.extension.InvalidExtensionConfigTestCase;
 
+import org.junit.rules.ExpectedException;
+
 public class PetStoreExclusiveParameterRequiredTestCase extends InvalidExtensionConfigTestCase {
 
   @Override
   protected String getConfigFile() {
     return "petstore-exclusive-required-parameter.xml";
+  }
+
+  @Override
+  protected void additionalExceptionAssertions(ExpectedException expectedException) {
+    expectedException.expectMessage("One of the following should be set: [mammals, birds]");
   }
 }
