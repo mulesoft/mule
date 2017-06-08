@@ -38,8 +38,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * Default implementation of {@link SourceCallback}.
- * Instances are to be created through the {@link #builder()} method.
+ * Default implementation of {@link SourceCallback}. Instances are to be created through the {@link #builder()} method.
  *
  * @param <T> the generic type of the output values of the generated results
  * @param <A> the generic type of the attributes of the generated results
@@ -201,6 +200,7 @@ class DefaultSourceCallback<T, A> implements SourceCallback<T, A> {
                                                                                messageSource.getExtensionModel().getName(),
                                                                                "configuration"))));
 
+    // TODO MULE-11023 Migrate transaction execution template mechanism to use non-blocking API
     try {
       executionTemplate.execute(() -> {
         transactionSourceBinder.bindToTransaction(transactionConfig,
