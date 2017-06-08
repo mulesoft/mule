@@ -634,7 +634,7 @@
             "text": false,
             "query": false
           },
-          "showInDsl": false,
+          "showInDsl": true,
           "name": "SimplePojo",
           "description": "",
           "modelProperties": {}

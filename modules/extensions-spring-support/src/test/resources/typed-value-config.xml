@@ -168,8 +168,7 @@
 
     <flow name="wrappedAndUnwrappedTypes">
         <set-variable variableName="complexPojo" value="#[{ user: 'user3', pass: 'pass3' }]"/>
-        <typed-value:mixed-typed-values stringNotWrapped="#['stringNotWrapped']" wrappedString="#['wrappedString']"
-                                        user="groupUser" pass="groupPass">
+        <typed-value:mixed-typed-values stringNotWrapped="#['stringNotWrapped']" wrappedString="#['wrappedString']">
             <typed-value:complex-typed-value>#[{ user: 'user', pass: 'pass'}]</typed-value:complex-typed-value>
             <typed-value:complex-not-wrapped>#[{ user: 'user2', pass: 'pass2'}]</typed-value:complex-not-wrapped>
             <typed-value:map-of-complex-values>#[{
@@ -179,6 +178,7 @@
             <typed-value:map-of-complex-typed-values>#[{
                 third: variables.complexPojo
                 }]</typed-value:map-of-complex-typed-values>
+            <typed-value:simple-pojo user="groupUser" pass="groupPass"/>
         </typed-value:mixed-typed-values>
 
     </flow>

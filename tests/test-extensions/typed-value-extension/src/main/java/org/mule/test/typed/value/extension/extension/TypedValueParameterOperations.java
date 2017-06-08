@@ -82,14 +82,13 @@ public class TypedValueParameterOperations {
   }
 
   @OutputResolver(output = NullOutputResolver.class)
-  public List<Object> mixedTypedValues(@ParameterGroup(name = "SimplePojo") SimplePojo pojo,
+  public List<Object> mixedTypedValues(@ParameterGroup(name = "SimplePojo", showInDsl = true) SimplePojo pojo,
                                        @Optional String stringNotWrapped,
                                        @Optional TypedValue<String> wrappedString,
                                        @Optional @Content TypedValue<SimplePojo> complexTypedValue,
                                        @Optional @Content SimplePojo complexNotWrapped,
                                        @Optional @Content Map<String, Object> mapOfComplexValues,
-                                       @Optional @Content(
-                                           primary = true) Map<String, TypedValue<Object>> mapOfComplexTypedValues) {
+                                       @Optional @Content(primary = true) Map<String, TypedValue<Object>> mapOfComplexTypedValues) {
     return Arrays.asList(stringNotWrapped, wrappedString, complexTypedValue, complexNotWrapped,
                          mapOfComplexValues, mapOfComplexTypedValues, pojo);
 
