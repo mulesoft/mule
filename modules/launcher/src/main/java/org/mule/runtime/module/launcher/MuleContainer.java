@@ -227,7 +227,6 @@ public class MuleContainer {
     String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
     logger.error(shutdownMessage);
 
-    unregisterShutdownHook();
     doShutdown();
   }
 
@@ -237,11 +236,11 @@ public class MuleContainer {
   public void shutdown() throws MuleException {
     logger.info("Mule container shutting down due to normal shutdown request");
 
-    unregisterShutdownHook();
     doShutdown();
   }
 
   protected void doShutdown() throws MuleException {
+    unregisterShutdownHook();
     stop();
 
     System.exit(0);
@@ -313,9 +312,9 @@ public class MuleContainer {
     @Override
     public void run() {
       try {
-        doShutdown();
+        MuleContainer.this.stop();
       } catch (MuleException e) {
-        logger.warn("Error shutting down mule container", e);
+        logger.warn("Error stopping mule container", e);
       }
     }
   }
