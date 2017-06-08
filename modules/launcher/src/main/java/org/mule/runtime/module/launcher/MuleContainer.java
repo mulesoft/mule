@@ -313,7 +313,7 @@ public class MuleContainer {
     @Override
     public void run() {
       try {
-        doShutdown();
+        stop();
       } catch (MuleException e) {
         logger.warn("Error shutting down mule container", e);
       }
