@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
+<<<<<<< HEAD
 import org.mule.runtime.module.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ClassLoaderDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ConfigNameDeclarationEnricher;
@@ -43,9 +42,23 @@ import org.mule.runtime.module.extension.internal.loader.validation.OperationPar
 import org.mule.runtime.module.extension.internal.loader.validation.OperationReturnTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterGroupModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterTypeModelValidator;
+=======
+import org.mule.runtime.module.extension.internal.loader.enricher.*;
+import org.mule.runtime.module.extension.internal.loader.validation.*;
+>>>>>>> MULE-11803: Allow privileged extensions to enrich their ExtensionModel
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
+
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 
 public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
 
@@ -53,19 +66,20 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
   public static final String VERSION = "version";
 
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(
-                                                                                         new ConfigurationModelValidator(),
-                                                                                         new ConnectionProviderModelValidator(),
-                                                                                         new ExportedTypesModelValidator(),
-                                                                                         new JavaSubtypesModelValidator(),
-                                                                                         new MetadataComponentModelValidator(),
-                                                                                         new NullSafeModelValidator(),
-                                                                                         new OperationReturnTypeModelValidator(),
-                                                                                         new OperationParametersTypeModelValidator(),
-                                                                                         new ParameterGroupModelValidator(),
-                                                                                         new ParameterTypeModelValidator(),
-                                                                                         new OAuthConnectionProviderModelValidator()));
+    new ConfigurationModelValidator(),
+    new ConnectionProviderModelValidator(),
+    new ExportedTypesModelValidator(),
+    new JavaSubtypesModelValidator(),
+    new MetadataComponentModelValidator(),
+    new NullSafeModelValidator(),
+    new OperationReturnTypeModelValidator(),
+    new OperationParametersTypeModelValidator(),
+    new ParameterGroupModelValidator(),
+    new ParameterTypeModelValidator(),
+    new OAuthConnectionProviderModelValidator()));
 
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
+<<<<<<< HEAD
                                                                                                new ClassLoaderDeclarationEnricher(),
                                                                                                new JavaXmlDeclarationEnricher(),
                                                                                                new BooleanParameterDeclarationEnricher(),
@@ -83,6 +97,24 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new SubTypesDeclarationEnricher(),
                                                                                                new ExtensionDescriptionsEnricher(),
                                                                                                new ParameterLayoutOrderDeclarationEnricher()));
+=======
+    new ClassLoaderDeclarationEnricher(),
+    new JavaXmlDeclarationEnricher(),
+    new ConfigNameDeclarationEnricher(),
+    new ConnectionDeclarationEnricher(),
+    new ErrorsDeclarationEnricher(),
+    new ExtensionsErrorsDeclarationEnricher(),
+    new DataTypeDeclarationEnricher(),
+    new DisplayDeclarationEnricher(),
+    new DynamicMetadataDeclarationEnricher(),
+    new ImportedTypesDeclarationEnricher(),
+    new JavaConfigurationDeclarationEnricher(),
+    new JavaExportedTypesDeclarationEnricher(),
+    new JavaOAuthDeclarationEnricher(),
+    new SubTypesDeclarationEnricher(),
+    new ExtensionDescriptionsEnricher(),
+    new ParameterLayoutOrderDeclarationEnricher()));
+>>>>>>> MULE-11803: Allow privileged extensions to enrich their ExtensionModel
 
   private final String id;
   private final BiFunction<Class<?>, String, ModelLoaderDelegate> delegateFactory;
@@ -93,7 +125,6 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
   }
 
   /**
-  
    * {@inheritDoc}
    */
   @Override
@@ -108,6 +139,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
   protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
     context.addCustomValidators(customValidators);
     context.addCustomDeclarationEnrichers(customDeclarationEnrichers);
+    context.addCustomDeclarationEnrichers(getPrivilegedDeclarationEnrichers(context));
   }
 
   /**
@@ -117,8 +149,24 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
   protected void declareExtension(ExtensionLoadingContext context) {
     Class<?> extensionType = getExtensionType(context);
     String version =
-        context.<String>getParameter(VERSION).orElseThrow(() -> new IllegalArgumentException("version not specified"));
+      context.<String>getParameter(VERSION).orElseThrow(() -> new IllegalArgumentException("version not specified"));
     delegateFactory.apply(extensionType, version).declare(context);
+  }
+
+  private Collection<DeclarationEnricher> getPrivilegedDeclarationEnrichers(ExtensionLoadingContext context) {
+    Class<?> extensionType = getExtensionType(context);
+    String annotationName = DeclarationEnrichers.class.getName();
+    DeclarationEnrichers enrichers = extensionType.getAnnotation(DeclarationEnrichers.class);
+    if (enrichers != null) {
+      try {
+        // TODO: MULE-12744. If this call throws an exception it means that the extension cannot access the privileged API.
+        context.getExtensionClassLoader().loadClass(annotationName);
+        return stream(enrichers.value()).map(this::instantiateOrFail).collect(toList());
+      } catch (ClassNotFoundException e) {
+        throw new IllegalModelDefinitionException("@" + annotationName + "annotation can only be used for privileged extensions");
+      }
+    }
+    return emptyList();
   }
 
   private Class<?> getExtensionType(ExtensionLoadingContext context) {
@@ -126,11 +174,18 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
     if (isBlank(type)) {
       throw new IllegalArgumentException(format("Property '%s' has not been specified", TYPE_PROPERTY_NAME));
     }
-
     try {
       return loadClass(type, context.getExtensionClassLoader());
     } catch (ClassNotFoundException e) {
       throw new RuntimeException(format("Class '%s' cannot be loaded", type), e);
+    }
+  }
+
+  private <R> R instantiateOrFail(Class<R> clazz) {
+    try {
+      return ClassUtils.instantiateClass(clazz);
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Error instantiating class: [" + clazz + "].", e);
     }
   }
 }
