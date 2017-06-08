@@ -8,13 +8,14 @@ package org.mule.runtime.core.registry;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
+import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
+import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.transformer.simple.InputStreamToByteArray;
 import org.mule.runtime.core.transformer.AbstractTransformer;
-import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.FilterInputStream;
@@ -27,33 +28,33 @@ public class TransformerCachingTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testCacheUpdate() throws Exception {
     DataType sourceType = DataType.fromType(FilterInputStream.class);
-    Transformer trans = muleContext.getRegistry().lookupTransformer(sourceType, DataType.BYTE_ARRAY);
+    Transformer trans = muleContext.getRegistry().lookupTransformer(sourceType, BYTE_ARRAY);
     assertNotNull(trans);
-    assertTrue(trans instanceof ObjectToByteArray);
+    assertTrue(trans instanceof InputStreamToByteArray);
 
     Transformer trans2 = new FilterInputStreamToByteArray();
     muleContext.getRegistry().registerTransformer(trans2);
 
-    trans = muleContext.getRegistry().lookupTransformer(sourceType, DataType.BYTE_ARRAY);
+    trans = muleContext.getRegistry().lookupTransformer(sourceType, BYTE_ARRAY);
     assertNotNull(trans);
     assertTrue(trans instanceof FilterInputStreamToByteArray);
 
-    trans = muleContext.getRegistry().lookupTransformer(DataType.INPUT_STREAM, DataType.BYTE_ARRAY);
+    trans = muleContext.getRegistry().lookupTransformer(INPUT_STREAM, BYTE_ARRAY);
     assertNotNull(trans);
-    assertTrue(trans instanceof ObjectToByteArray);
+    assertTrue(trans instanceof InputStreamToByteArray);
 
     muleContext.getRegistry().unregisterTransformer(trans2.getName());
 
-    trans = muleContext.getRegistry().lookupTransformer(sourceType, DataType.BYTE_ARRAY);
+    trans = muleContext.getRegistry().lookupTransformer(sourceType, BYTE_ARRAY);
     assertNotNull(trans);
-    assertTrue(trans instanceof ObjectToByteArray);
+    assertTrue(trans instanceof InputStreamToByteArray);
   }
 
   public static class FilterInputStreamToByteArray extends AbstractTransformer implements DiscoverableTransformer {
 
     public FilterInputStreamToByteArray() {
       registerSourceType(DataType.fromType(FilterInputStream.class));
-      setReturnDataType(DataType.BYTE_ARRAY);
+      setReturnDataType(BYTE_ARRAY);
     }
 
     @Override

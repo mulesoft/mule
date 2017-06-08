@@ -11,6 +11,7 @@ import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
@@ -21,6 +22,7 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -42,6 +44,13 @@ public class PetStoreOperations {
       builder.append(IOUtils.toString(pollutedStream));
     }
     return builder.toString();
+  }
+
+  public String describeSerializedAnimal(@XmlHints(allowReferences = false) Serializable animal) {
+    if (animal instanceof byte[]) {
+      return new String((byte[]) animal);
+    }
+    return animal.toString();
   }
 
   public ExclusivePetBreeder getBreeder(@ParameterGroup(name = "Exclusive") ExclusivePetBreeder breeder) {
