@@ -37,8 +37,17 @@ public abstract class AbstractStreamingBuffer {
   protected final Lock readLock = readWriteLock.readLock();
   protected final Lock writeLock = readWriteLock.writeLock();
 
+  private boolean readLockAcquired = false;
+
   protected <T> T withReadLock(CheckedSupplier<T> supplier) {
-    return withLock(readLock, supplier);
+    return withLock(readLock, () -> {
+      readLockAcquired = true;
+      try {
+        return supplier.get();
+      } finally {
+        readLockAcquired = false;
+      }
+    });
   }
 
   protected <T> T withWriteLock(CheckedSupplier<T> supplier) {
@@ -46,7 +55,13 @@ public abstract class AbstractStreamingBuffer {
   }
 
   protected void releaseReadLock() {
-    safeUnlock(readLock);
+    if (readLockAcquired) {
+      try {
+        safeUnlock(readLock);
+      } finally {
+        readLockAcquired = false;
+      }
+    }
   }
 
   protected void checkNotClosed() {
