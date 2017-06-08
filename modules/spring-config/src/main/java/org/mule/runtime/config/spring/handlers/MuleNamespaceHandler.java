@@ -337,6 +337,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerMuleBeanDefinitionParser("enrich", new ChildDefinitionParser("enrichExpressionPair", EnrichExpressionPair.class));
 
     registerBeanDefinitionParser("async", new AsyncMessageProcessorsDefinitionParser());
+    // TODO MULE-12726 Remove TryProcessorFactoryBean
     registerBeanDefinitionParser("transactional",
                                  new ChildDefinitionParser("messageProcessor", TryProcessorFactoryBean.class));
     registerMuleBeanDefinitionParser("logger", new ChildDefinitionParser("messageProcessor", LoggerMessageProcessor.class));

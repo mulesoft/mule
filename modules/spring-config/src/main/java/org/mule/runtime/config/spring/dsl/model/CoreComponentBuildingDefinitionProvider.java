@@ -480,6 +480,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withObjectFactoryType(AsyncMessageProcessorsFactoryBean.class)
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build()).build());
+    // TODO MULE-12726 Remove TryProcessorFactoryBean
     componentBuildingDefinitions
         .add(baseDefinition.copy().withIdentifier(TRY).withTypeDefinition(fromType(MessageProcessorChain.class))
             .withObjectFactoryType(TryProcessorFactoryBean.class)

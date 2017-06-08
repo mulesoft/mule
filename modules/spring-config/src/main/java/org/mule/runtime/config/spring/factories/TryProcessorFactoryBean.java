@@ -7,21 +7,15 @@
 package org.mule.runtime.config.spring.factories;
 
 import static java.lang.String.format;
-import static java.util.Collections.singletonList;
 import static java.util.ServiceLoader.load;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transaction.TypedTransactionFactory;
-import org.mule.runtime.core.processor.TransactionalInterceptingMessageProcessor;
-import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChain;
-import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.processor.TryMessageProcessor;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.TransactionType;
 
@@ -36,6 +30,8 @@ import org.springframework.beans.factory.FactoryBean;
  * next {@code org.mule.runtime.core.api.processor.MessageProcessor} is invoked directly.
  *
  * @since 4.0
+ *
+ * TODO MULE-12726 Remove TryProcessorFactoryBean
  */
 public class TryProcessorFactoryBean extends AbstractAnnotatedObject implements FactoryBean {
 
@@ -55,32 +51,12 @@ public class TryProcessorFactoryBean extends AbstractAnnotatedObject implements 
 
   @Override
   public Object getObject() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    builder.setName("'transaction' child processor chain");
-    TransactionalInterceptingMessageProcessor txProcessor = new TransactionalInterceptingMessageProcessor();
+    TryMessageProcessor txProcessor = new TryMessageProcessor();
     txProcessor.setAnnotations(getAnnotations());
     txProcessor.setExceptionListener(this.exceptionListener);
     txProcessor.setTransactionConfig(createTransactionConfig(this.transactionalAction, this.transactionType));
-    builder.chain(txProcessor);
-    for (Object processor : messageProcessors) {
-      if (processor instanceof Processor) {
-        builder.chain((Processor) processor);
-      } else if (processor instanceof MessageProcessorBuilder) {
-        builder.chain((MessageProcessorBuilder) processor);
-      } else {
-        throw new IllegalArgumentException("MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
-      }
-      if (processor instanceof MessagingExceptionHandlerAware) {
-        ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(exceptionListener);
-      }
-    }
-    return new AbstractMessageProcessorChain(singletonList(builder.build())) {
-
-      @Override
-      public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
-        // Ignore. Instead exception listener configured on block is used.AsyncDelegateMessageProcessor.java
-      }
-    };
+    txProcessor.setMessageProcessors(messageProcessors);
+    return txProcessor;
   }
 
   protected MuleTransactionConfig createTransactionConfig(String action, TransactionType type) {

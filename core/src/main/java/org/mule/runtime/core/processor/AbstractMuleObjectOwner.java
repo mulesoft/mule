@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -23,10 +26,14 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 
 import java.util.List;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An object that owns Mule objects and delegates startup/shutdown events to them.
@@ -39,6 +46,7 @@ public abstract class AbstractMuleObjectOwner<T> extends AbstractAnnotatedObject
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;
   protected MessagingExceptionHandler messagingExceptionHandler;
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Override
   public void setMuleContext(MuleContext muleContext) {
@@ -82,35 +90,19 @@ public abstract class AbstractMuleObjectOwner<T> extends AbstractAnnotatedObject
 
   @Override
   public void dispose() {
-    for (T processor : getOwnedObjects()) {
-
-      if (processor instanceof Disposable) {
-        ((Disposable) processor).dispose();
-      }
-    }
+    disposeIfNeeded(getOwnedObjects(), logger);
   }
 
 
   @Override
   public void start() throws MuleException {
-
-    for (T processor : getOwnedObjects()) {
-      if (processor instanceof Startable) {
-        ((Startable) processor).start();
-      }
-    }
+    startIfNeeded(getOwnedObjects());
   }
 
 
   @Override
   public void stop() throws MuleException {
-
-    for (T processor : getOwnedObjects()) {
-      if (processor instanceof Stoppable) {
-        ((Stoppable) processor).stop();
-      }
-
-    }
+    stopIfNeeded(getOwnedObjects());
   }
 
   protected abstract List<T> getOwnedObjects();
