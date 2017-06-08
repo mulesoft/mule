@@ -10,6 +10,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 
 /**
  * Constants for the Extensions Framework
@@ -24,9 +26,14 @@ public class ExtensionProperties {
   public static final String CONNECTION_PARAM = PROPERTY_PREFIX + "CONNECTION_PARAM";
 
   /**
-   * The key of an execution context variable on which the connection to be used was set
+   * The key of an execution context variable on which a {@link SourceCallbackContext} was set
    */
   public static final String SOURCE_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "SOURCE_CALLBACK_CONTEXT_PARAM";
+
+  /**
+   * The key of an execution context variable on which a {@link SourceCompletionCallback} was set
+   */
+  public static final String SOURCE_COMPLETION_CALLBACK_PARAM = PROPERTY_PREFIX + "SOURCE_COMPLETION_CALLBACK_PARAM";
 
   /**
    * The key of an execution context variable which holds the {@link CompletionCallback} that a non blocking
@@ -65,6 +72,7 @@ public class ExtensionProperties {
    * The name of the tab in which advanced parameters should appear
    */
   public static final String ADVANCED_TAB_NAME = "Advanced";
+
 
   public static final String DEFAULT_CONNECTION_PROVIDER_NAME = "connection";
 

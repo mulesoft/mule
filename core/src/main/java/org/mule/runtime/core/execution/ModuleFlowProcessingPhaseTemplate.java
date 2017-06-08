@@ -14,10 +14,10 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.MessageSourceResponseParametersProcessor;
 
-import org.reactivestreams.Publisher;
-
 import java.util.Map;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Template methods for {@link MessageSource} specific behavior during flow execution.
@@ -56,9 +56,9 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
    * @param errorResponseParametersFunction function that generates the error parameters to be sent in the case of a failure.
    * @param responseCompletionCallback callback to be used for notifying the result of the operation
    */
-  void sendResponseToClient(Event flowExecutionResponse, Map<String, Object> parameters,
-                            Function<Event, Map<String, Object>> errorResponseParametersFunction,
-                            ResponseCompletionCallback responseCompletionCallback);
+  Publisher<Void> sendResponseToClient(Event flowExecutionResponse, Map<String, Object> parameters,
+                                       Function<Event, Map<String, Object>> errorResponseParametersFunction,
+                                       ResponseCompletionCallback responseCompletionCallback);
 
 
   /**
@@ -66,8 +66,8 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
    * @param parameters the resolved set of parameters required to send the failure response.
    * @param responseCompletionCallback callback to be used for notifying the result of the operation
    */
-  void sendFailureResponseToClient(MessagingException exception, Map<String, Object> parameters,
-                                   ResponseCompletionCallback responseCompletionCallback);
+  Publisher<Void> sendFailureResponseToClient(MessagingException exception, Map<String, Object> parameters,
+                                              ResponseCompletionCallback responseCompletionCallback);
 
   /**
    * @param either that communicates the result of the flow execution.

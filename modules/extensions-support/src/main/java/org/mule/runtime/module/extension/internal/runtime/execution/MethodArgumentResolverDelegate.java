@@ -27,6 +27,7 @@ import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
@@ -44,6 +45,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGrou
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SecurityContextHandlerArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SourceCallbackContextArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.SourceCompletionCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SourceResultArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelperArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueArgumentResolver;
@@ -71,6 +73,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private static final ArgumentResolver<Error> ERROR_ARGUMENT_RESOLVER = new ErrorArgumentResolver();
   private static final ArgumentResolver<CompletionCallback> NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER =
       new CompletionCallbackArgumentResolver();
+  private static final ArgumentResolver<SourceCompletionCallback> ASYNC_SOURCE_COMPLETION_CALLBACK_ARGUMENT_RESOLVER =
+      new SourceCompletionCallbackArgumentResolver();
   private static final ArgumentResolver<AuthenticationHandler> SECURITY_CONTEXT_HANDLER =
       new SecurityContextHandlerArgumentResolver();
   private static final ArgumentResolver<FlowListener> FLOW_LISTENER_ARGUMENT_RESOLVER = new FlowListenerArgumentResolver();
@@ -145,6 +149,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = STREAMING_HELPER_ARGUMENT_RESOLVER;
       } else if (SourceResult.class.equals(parameterType)) {
         argumentResolver = SOURCE_RESULT_ARGUMENT_RESOLVER;
+      } else if (SourceCompletionCallback.class.equals(parameterType)) {
+        argumentResolver = ASYNC_SOURCE_COMPLETION_CALLBACK_ARGUMENT_RESOLVER;
       } else {
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
       }

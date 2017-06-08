@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodsAnnotatedWith;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
@@ -73,8 +74,18 @@ final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements S
   }
 
   private Optional<MethodElement> getMethodAnnotatedWith(Class<? extends Annotation> annotationType) {
-    Collection<Method> methods = getMethodsAnnotatedWith(aClass, annotationType);
-    if (methods.isEmpty()) {
+    Class<?> searchClass = aClass;
+    Collection<Method> methods = null;
+    while (!Object.class.equals(searchClass)) {
+      methods = getMethodsAnnotatedWith(searchClass, annotationType, false);
+      if (methods.isEmpty()) {
+        searchClass = searchClass.getSuperclass();
+      } else {
+        break;
+      }
+    }
+
+    if (isEmpty(methods)) {
       return empty();
     } else if (methods.size() > 1) {
       throw new IllegalSourceModelDefinitionException(

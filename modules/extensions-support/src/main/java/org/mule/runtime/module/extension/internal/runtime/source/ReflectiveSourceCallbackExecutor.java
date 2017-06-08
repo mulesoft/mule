@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOURCE_CALLBACK_CONTEXT_PARAM;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOURCE_COMPLETION_CALLBACK_PARAM;
+import static reactor.core.publisher.Mono.create;
+import static reactor.core.publisher.Mono.empty;
+import static reactor.core.publisher.Mono.error;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -18,6 +23,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
@@ -29,6 +35,9 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Implementation of {@link SourceCallbackExecutor} which uses reflection to execute the callback through a {@link Method}
@@ -43,6 +52,7 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
   private final CursorProviderFactory cursorProviderFactory;
   private final StreamingManager streamingManager;
   private final MuleContext muleContext;
+  private final boolean async;
   private final ReflectiveMethodComponentExecutor<SourceModel> executor;
 
   /**
@@ -76,18 +86,38 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
     this.muleContext = muleContext;
 
     executor = new ReflectiveMethodComponentExecutor<>(getAllGroups(sourceModel, method, sourceCallbackModel), method, source);
+    async = Stream.of(method.getParameterTypes()).anyMatch(p -> SourceCompletionCallback.class.equals(p));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Object execute(Event event, Map<String, Object> parameters, SourceCallbackContext context) throws Exception {
-    return executor.execute(createExecutionContext(event, parameters, context));
+  public Publisher<Void> execute(Event event, Map<String, Object> parameters, SourceCallbackContext context) {
+    if (async) {
+      return create(sink -> {
+        final ExecutionContext<SourceModel> executionContext =
+            createExecutionContext(event, parameters, context, new ReactorSourceCompletionCallback(sink));
+        try {
+          executor.execute(executionContext);
+        } catch (Throwable t) {
+          sink.error(wrapFatal(t));
+        }
+      });
+    }
+
+    try {
+      executor.execute(createExecutionContext(event, parameters, context, null));
+      return empty();
+    } catch (Throwable t) {
+      return error(wrapFatal(t));
+    }
   }
 
-  private ExecutionContext<SourceModel> createExecutionContext(Event event, Map<String, Object> parameters,
-                                                               SourceCallbackContext callbackContext) {
+  private ExecutionContext<SourceModel> createExecutionContext(Event event,
+                                                               Map<String, Object> parameters,
+                                                               SourceCallbackContext callbackContext,
+                                                               SourceCompletionCallback sourceCompletionCallback) {
     ExecutionContextAdapter<SourceModel> executionContext = new DefaultExecutionContext<>(extensionModel,
                                                                                           configurationInstance,
                                                                                           parameters,
@@ -98,6 +128,10 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
                                                                                           muleContext);
 
     executionContext.setVariable(SOURCE_CALLBACK_CONTEXT_PARAM, callbackContext);
+    if (sourceCompletionCallback != null) {
+      executionContext.setVariable(SOURCE_COMPLETION_CALLBACK_PARAM, sourceCompletionCallback);
+    }
+
     return executionContext;
   }
 

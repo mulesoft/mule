@@ -454,6 +454,73 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "name": "service",
+                  "description": "",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                      "order": 1
+                    }
+                  }
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2
+                  },
+                  "name": "operation",
+                  "description": "",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                      "order": 2
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Web Service Configuration",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Binary",
                     "annotations": {
                       "typeId": "java.io.InputStream"
@@ -522,143 +589,11 @@
                       "typeId": "java.util.Map"
                     },
                     "open": {
-                      "type": "Object",
+                      "type": "Binary",
                       "annotations": {
-                        "typeId": "org.mule.runtime.extension.api.soap.SoapAttachment",
-                        "classInformation": {
-                          "hasDefaultConstructor": true,
-                          "isInterface": false,
-                          "isInstantiable": true,
-                          "isAbstract": false,
-                          "isFinal": false,
-                          "implementedInterfaces": [],
-                          "parent": "",
-                          "genericTypes": []
-                        },
-                        "typeAlias": {
-                          "value": "SoapAttachment"
-                        }
-                      },
-                      "fields": [
-                        {
-                          "key": {
-                            "name": "content"
-                          },
-                          "model": {
-                            "type": "Binary",
-                            "annotations": {
-                              "typeId": "java.io.InputStream"
-                            }
-                          },
-                          "annotations": {
-                            "visibility": "READ_ONLY"
-                          }
-                        },
-                        {
-                          "key": {
-                            "name": "contentType"
-                          },
-                          "model": {
-                            "type": "Object",
-                            "annotations": {
-                              "typeId": "org.mule.runtime.api.metadata.MediaType",
-                              "classInformation": {
-                                "hasDefaultConstructor": false,
-                                "isInterface": false,
-                                "isInstantiable": false,
-                                "isAbstract": false,
-                                "isFinal": true,
-                                "implementedInterfaces": [
-                                  "java.io.Serializable"
-                                ],
-                                "parent": "",
-                                "genericTypes": []
-                              },
-                              "typeAlias": {
-                                "value": "MediaType"
-                              }
-                            },
-                            "fields": [
-                              {
-                                "key": {
-                                  "name": "charset"
-                                },
-                                "model": {
-                                  "type": "Object",
-                                  "annotations": {
-                                    "typeId": "java.util.Optional",
-                                    "classInformation": {
-                                      "hasDefaultConstructor": false,
-                                      "isInterface": false,
-                                      "isInstantiable": false,
-                                      "isAbstract": false,
-                                      "isFinal": true,
-                                      "implementedInterfaces": [],
-                                      "parent": "",
-                                      "genericTypes": [
-                                        "java.nio.charset.Charset"
-                                      ]
-                                    },
-                                    "typeAlias": {
-                                      "value": "Optional"
-                                    }
-                                  },
-                                  "fields": [
-                                    {
-                                      "key": {
-                                        "name": "present"
-                                      },
-                                      "model": {
-                                        "type": "Boolean",
-                                        "annotations": {
-                                          "typeId": "boolean"
-                                        }
-                                      },
-                                      "annotations": {
-                                        "visibility": "READ_ONLY"
-                                      }
-                                    }
-                                  ]
-                                },
-                                "annotations": {
-                                  "visibility": "READ_ONLY"
-                                }
-                              },
-                              {
-                                "key": {
-                                  "name": "primaryType"
-                                },
-                                "model": {
-                                  "type": "String",
-                                  "annotations": {
-                                    "typeId": "java.lang.String"
-                                  }
-                                },
-                                "annotations": {
-                                  "visibility": "READ_ONLY"
-                                }
-                              },
-                              {
-                                "key": {
-                                  "name": "subType"
-                                },
-                                "model": {
-                                  "type": "String",
-                                  "annotations": {
-                                    "typeId": "java.lang.String"
-                                  }
-                                },
-                                "annotations": {
-                                  "visibility": "READ_ONLY"
-                                }
-                              }
-                            ]
-                          },
-                          "annotations": {
-                            "visibility": "READ_ONLY"
-                          }
-                        }
-                      ]
+                        "typeId": "java.io.InputStream",
+                        "org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation": {}
+                      }
                     },
                     "fields": []
                   },
@@ -757,73 +692,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 1
-                  },
-                  "name": "service",
-                  "description": "",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
-                      "order": 1
-                    }
-                  }
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 2
-                  },
-                  "name": "operation",
-                  "description": "",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
-                      "order": 2
-                    }
-                  }
-                }
-              ],
-              "exclusiveParametersModels": [],
-              "showInDsl": false,
-              "name": "WebServiceConfiguration",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "parameters": [
-                {
-                  "type": {
-                    "format": "java",
                     "type": "String",
                     "annotations": {
                       "typeId": "java.lang.String"
@@ -914,7 +782,7 @@
                   }
                 ]
               },
-              "parameterName": "WebServiceConfiguration"
+              "parameterName": "Web Service Configuration"
             }
           },
           "kind": "operation"
@@ -1811,6 +1679,73 @@
             {
               "type": {
                 "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "name": "service",
+              "description": "",
+              "modelProperties": {
+                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                  "order": 1
+                }
+              }
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "name": "operation",
+              "description": "",
+              "modelProperties": {
+                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                  "order": 2
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Web Service Configuration",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
                 "type": "Binary",
                 "annotations": {
                   "typeId": "java.io.InputStream"
@@ -1879,143 +1814,11 @@
                   "typeId": "java.util.Map"
                 },
                 "open": {
-                  "type": "Object",
+                  "type": "Binary",
                   "annotations": {
-                    "typeId": "org.mule.runtime.extension.api.soap.SoapAttachment",
-                    "classInformation": {
-                      "hasDefaultConstructor": true,
-                      "isInterface": false,
-                      "isInstantiable": true,
-                      "isAbstract": false,
-                      "isFinal": false,
-                      "implementedInterfaces": [],
-                      "parent": "",
-                      "genericTypes": []
-                    },
-                    "typeAlias": {
-                      "value": "SoapAttachment"
-                    }
-                  },
-                  "fields": [
-                    {
-                      "key": {
-                        "name": "content"
-                      },
-                      "model": {
-                        "type": "Binary",
-                        "annotations": {
-                          "typeId": "java.io.InputStream"
-                        }
-                      },
-                      "annotations": {
-                        "visibility": "READ_ONLY"
-                      }
-                    },
-                    {
-                      "key": {
-                        "name": "contentType"
-                      },
-                      "model": {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "org.mule.runtime.api.metadata.MediaType",
-                          "classInformation": {
-                            "hasDefaultConstructor": false,
-                            "isInterface": false,
-                            "isInstantiable": false,
-                            "isAbstract": false,
-                            "isFinal": true,
-                            "implementedInterfaces": [
-                              "java.io.Serializable"
-                            ],
-                            "parent": "",
-                            "genericTypes": []
-                          },
-                          "typeAlias": {
-                            "value": "MediaType"
-                          }
-                        },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "charset"
-                            },
-                            "model": {
-                              "type": "Object",
-                              "annotations": {
-                                "typeId": "java.util.Optional",
-                                "classInformation": {
-                                  "hasDefaultConstructor": false,
-                                  "isInterface": false,
-                                  "isInstantiable": false,
-                                  "isAbstract": false,
-                                  "isFinal": true,
-                                  "implementedInterfaces": [],
-                                  "parent": "",
-                                  "genericTypes": [
-                                    "java.nio.charset.Charset"
-                                  ]
-                                },
-                                "typeAlias": {
-                                  "value": "Optional"
-                                }
-                              },
-                              "fields": [
-                                {
-                                  "key": {
-                                    "name": "present"
-                                  },
-                                  "model": {
-                                    "type": "Boolean",
-                                    "annotations": {
-                                      "typeId": "boolean"
-                                    }
-                                  },
-                                  "annotations": {
-                                    "visibility": "READ_ONLY"
-                                  }
-                                }
-                              ]
-                            },
-                            "annotations": {
-                              "visibility": "READ_ONLY"
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "primaryType"
-                            },
-                            "model": {
-                              "type": "String",
-                              "annotations": {
-                                "typeId": "java.lang.String"
-                              }
-                            },
-                            "annotations": {
-                              "visibility": "READ_ONLY"
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "subType"
-                            },
-                            "model": {
-                              "type": "String",
-                              "annotations": {
-                                "typeId": "java.lang.String"
-                              }
-                            },
-                            "annotations": {
-                              "visibility": "READ_ONLY"
-                            }
-                          }
-                        ]
-                      },
-                      "annotations": {
-                        "visibility": "READ_ONLY"
-                      }
-                    }
-                  ]
+                    "typeId": "java.io.InputStream",
+                    "org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation": {}
+                  }
                 },
                 "fields": []
               },
@@ -2114,73 +1917,6 @@
             {
               "type": {
                 "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "name": "service",
-              "description": "",
-              "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
-                  "order": 1
-                }
-              }
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2
-              },
-              "name": "operation",
-              "description": "",
-              "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
-                  "order": 2
-                }
-              }
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "showInDsl": false,
-          "name": "WebServiceConfiguration",
-          "description": "",
-          "modelProperties": {}
-        },
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
                 "type": "String",
                 "annotations": {
                   "typeId": "java.lang.String"
@@ -2271,7 +2007,7 @@
               }
             ]
           },
-          "parameterName": "WebServiceConfiguration"
+          "parameterName": "Web Service Configuration"
         }
       },
       "kind": "operation"

@@ -54,8 +54,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
-import org.apache.commons.collections.CollectionUtils;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -65,6 +63,9 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.reactivestreams.Publisher;
+
 /**
  * An adapter for {@link Source} which acts as a bridge with {@link ExtensionMessageSource}. It also propagates lifecycle and
  * performs injection of both, dependencies and parameters
@@ -73,7 +74,6 @@ import javax.inject.Inject;
  */
 public final class SourceAdapter implements Startable, Stoppable, Initialisable, FlowConstructAware {
 
-  private static final String SOURCE_RESULT = "sourceResult";
   private final ExtensionModel extensionModel;
   private final SourceModel sourceModel;
   private final Source source;
@@ -176,13 +176,13 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
     }
 
     @Override
-    public void onCompletion(Event event, Map<String, Object> parameters) throws Exception {
-      onSuccessExecutor.execute(event, parameters, context);
+    public Publisher<Void> onCompletion(Event event, Map<String, Object> parameters) {
+      return onSuccessExecutor.execute(event, parameters, context);
     }
 
     @Override
-    public void onFailure(MessagingException exception, Map<String, Object> parameters) throws Exception {
-      onErrorExecutor.execute(exception.getEvent(), parameters, context);
+    public Publisher<Void> onFailure(MessagingException exception, Map<String, Object> parameters) {
+      return onErrorExecutor.execute(exception.getEvent(), parameters, context);
     }
 
     @Override
@@ -191,6 +191,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
       onTerminateExecutor.execute(event, emptyMap(), context);
     }
 
+    @Override
     public Map<String, Object> createResponseParameters(Event event) throws MessagingException {
       try {
         ResolverSetResult parameters = SourceAdapter.this.successCallbackParameters.resolve(from(event, configurationInstance));
@@ -200,6 +201,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable,
       }
     }
 
+    @Override
     public Map<String, Object> createFailureResponseParameters(Event event) throws MessagingException {
       try {
         ResolverSetResult parameters = SourceAdapter.this.errorCallbackParameters.resolve(from(event, configurationInstance));

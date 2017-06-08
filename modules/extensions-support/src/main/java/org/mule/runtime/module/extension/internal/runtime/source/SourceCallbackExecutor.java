@@ -12,6 +12,8 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import java.util.Map;
 
+import org.reactivestreams.Publisher;
+
 /**
  * Invokes a {@link Source} callback
  *
@@ -23,11 +25,11 @@ interface SourceCallbackExecutor {
   /**
    * Executes the callback
    *
-   * @param event the result {@link Event}
+   * @param event      the result {@link Event}
    * @param parameters
-   * @param context a {@link SourceCallbackContext} @return the callback's result
-   * @throws Exception if anything goes wrong
+   * @param context    a {@link SourceCallbackContext} @return the callback's result
+   * @return a Publisher which completes either with no value or with an error
    */
-  Object execute(Event event, Map<String, Object> parameters, SourceCallbackContext context) throws Exception;
+  Publisher<Void> execute(Event event, Map<String, Object> parameters, SourceCallbackContext context);
 
 }

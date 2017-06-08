@@ -7,8 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 
@@ -23,11 +21,9 @@ import reactor.core.publisher.MonoSink;
 final class ReactorCompletionCallback implements CompletionCallback<Object, Attributes> {
 
   private final MonoSink<Object> sink;
-  private final Event event;
 
-  ReactorCompletionCallback(MonoSink<Object> sink, Event event) {
+  ReactorCompletionCallback(MonoSink<Object> sink) {
     this.sink = sink;
-    this.event = event;
   }
 
   @Override

@@ -26,7 +26,9 @@ import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutio
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.util.message.MessageUtils.toMessageCollection;
+import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -51,18 +53,19 @@ import org.mule.runtime.core.policy.PolicyManager;
 import org.mule.runtime.core.policy.SourcePolicy;
 import org.mule.runtime.core.policy.SuccessSourcePolicyResult;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.api.util.func.CheckedConsumer;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import reactor.core.publisher.MonoProcessor;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.MonoProcessor;
 
 /**
  * This phase routes the message through the flow.
@@ -121,11 +124,11 @@ public class ModuleFlowProcessingPhase
       final MessagingExceptionHandler exceptionHandler = messageProcessContext.getFlowConstruct().getExceptionListener();
       MessageSource messageSource = messageProcessContext.getMessageSource();
       ComponentLocation sourceLocation = messageSource.getLocation();
-      Consumer<MessagingException> errorConsumer =
-          getErrorConsumer(messageSource, template.getFailedExecutionResponseParametersFunction(),
-                           messageProcessContext, template, phaseResultNotifier);
-      Consumer<Either<Event, MessagingException>> terminateConsumer =
-          getTerminateConsumer(messageSource, template, phaseResultNotifier);
+      Function<MessagingException, Publisher<Void>> errorHandler =
+          onError(messageSource, template.getFailedExecutionResponseParametersFunction(), messageProcessContext, template,
+                  phaseResultNotifier);
+
+      Consumer<Either<Event, MessagingException>> terminateConsumer = getTerminateConsumer(messageSource, template);
 
       MonoProcessor<Void> responseCompletion = MonoProcessor.create();
 
@@ -134,36 +137,24 @@ public class ModuleFlowProcessingPhase
       // TODO MULE-11167 Policies should be non blocking
       if (!enableSourcePolicies) {
         just(templateEvent)
-            .doOnNext(request -> {
-              fireNotification(messageProcessContext.getMessageSource(), request,
-                               messageProcessContext.getFlowConstruct(),
-                               MESSAGE_RECEIVED);
-            })
-            .then(request -> from(template.routeEventAsync(request)))
-            .doOnSuccess(getSuccessConsumer(messageSource, templateEvent, messageProcessContext, phaseResultNotifier, template,
-                                            terminateConsumer))
-            .doOnError(MessagingException.class, me -> {
-              if (me.getCause() instanceof SourceErrorException
-                  && sourceResponseErrorTypeMatcher.match(((SourceErrorException) me.getCause()).getErrorType())) {
-                try {
-                  handleSourceError(exceptionHandler, errorConsumer, (SourceErrorException) me.getCause());
-                  onTerminate(terminateConsumer, left(me.getEvent()));
-                } catch (Exception e) {
-                  onTerminate(terminateConsumer, right(e));
-                }
-              } else {
-                try {
-                  errorConsumer.accept(me);
-                  onTerminate(terminateConsumer, right(me));
-                } catch (Exception e) {
-                  onTerminate(terminateConsumer, right(e));
-                }
-              }
-            })
+            .doOnNext(request -> fireNotification(messageProcessContext.getMessageSource(), request,
+                                                  messageProcessContext.getFlowConstruct(),
+                                                  MESSAGE_RECEIVED))
+            // switchIfEmpty in case the flow was filtered
+            .then(request -> from(template.routeEventAsync(request)).switchIfEmpty(fromCallable(() -> emptyEvent(templateEvent))))
+            .then(onSuccess(messageSource, templateEvent, messageProcessContext, phaseResultNotifier, template,
+                            terminateConsumer))
+            .onErrorMap(MessagingException.class, me -> me.getCause() instanceof SourceErrorException ? me.getCause() : me)
+            .onErrorResume(SourceErrorException.class,
+                           see -> onSourceException(exceptionHandler, errorHandler, terminateConsumer, see))
+            .onErrorResume(MessagingException.class, me -> from(errorHandler.apply(me))
+                .doOnSuccess(v -> onTerminate(terminateConsumer, right(me)))
+                .doOnError(e -> onTerminate(terminateConsumer, right(e))))
             .doAfterTerminate((event, throwable) -> responseCompletion.onComplete())
             .subscribe();
       } else {
-        Processor nextOperation = createFlowExecutionProcessor(messageSource, exceptionHandler, messageProcessContext, template);
+        Processor nextOperation =
+            createFlowExecutionProcessor(messageSource, exceptionHandler, messageProcessContext, template);
         SourcePolicy policy = policyManager.createSourcePolicyInstance(sourceLocation, templateEvent, nextOperation, template);
 
         try {
@@ -174,13 +165,18 @@ public class ModuleFlowProcessingPhase
                   .builder(messagingException.getCause()).errorType(sourceResponseGenerateErrorType).build())
                   .getErrorType();
 
-              errorConsumer.accept(messagingException);
-
-              if (sourceResponseErrorTypeMatcher.match(errorType)) {
-                onTerminate(terminateConsumer, left(messagingException.getEvent()));
-              } else {
-                throw new SourceErrorException(messagingException.getEvent(), errorType, messagingException);
-              }
+              from(errorHandler.apply(messagingException))
+                  .doOnSuccess(v -> {
+                    if (sourceResponseErrorTypeMatcher.match(errorType)) {
+                      onTerminate(terminateConsumer, left(messagingException.getEvent()));
+                    } else {
+                      onTerminate(terminateConsumer,
+                                  right(new SourceErrorException(messagingException.getEvent(), errorType, messagingException)
+                                      .toMessagingException()));
+                    }
+                  })
+                  .doOnError(SourceErrorException.class, see -> onTerminate(terminateConsumer, right(see.toMessagingException())))
+                  .subscribe();
             } catch (SourceErrorException see) {
               onTerminate(terminateConsumer, right(see.toMessagingException()));
             }
@@ -192,21 +188,23 @@ public class ModuleFlowProcessingPhase
 
             // TODO MULE-11141 - This is the case of a filtered flow. This will eventually go away.
             if (flowExecutionResponse == null) {
-              flowExecutionResponse = builder(templateEvent).message(of(null)).build();
+              flowExecutionResponse = emptyEvent(templateEvent);
             }
 
             Map<String, Object> responseParameters = successSourcePolicyResult.getResponseParameters();
 
-            try {
-              template.sendResponseToClient(flowExecutionResponse, responseParameters,
-                                            failureEvent -> successSourcePolicyResult.createErrorResponseParameters(failureEvent),
-                                            createResponseCompletationCallback(phaseResultNotifier));
-            } catch (SourceErrorException see) {
-              errorConsumer.accept(see.toMessagingException());
-              onTerminate(terminateConsumer, right(see));
-            } finally {
-              onTerminate(terminateConsumer, left(flowExecutionResponse));
-            }
+            Event finalResponse = flowExecutionResponse;
+            from(template.sendResponseToClient(flowExecutionResponse, responseParameters,
+                                               failureEvent -> successSourcePolicyResult
+                                                   .createErrorResponseParameters(failureEvent),
+                                               createResponseCompletationCallback(phaseResultNotifier)))
+                                                   .onErrorResume(SourceErrorException.class,
+                                                                  see -> from(errorHandler.apply(see.toMessagingException()))
+                                                                      .doOnSuccess(v -> onTerminate(terminateConsumer,
+                                                                                                    right(see))))
+                                                   .doAfterTerminate((v, e) -> onTerminate(terminateConsumer,
+                                                                                           left(finalResponse)))
+                                                   .subscribe();
           };
 
           policy.process(templateEvent).apply(onFailureFunction, onSuccessFunction);
@@ -219,11 +217,24 @@ public class ModuleFlowProcessingPhase
     }
   }
 
-  private void handleSourceError(final MessagingExceptionHandler exceptionHandler, Consumer<MessagingException> errorConsumer,
-                                 SourceErrorException see) {
+  private Mono<Void> onSourceException(MessagingExceptionHandler exceptionHandler,
+                                       Function<MessagingException, Publisher<Void>> errorHandler,
+                                       Consumer<Either<Event, MessagingException>> terminateConsumer,
+                                       SourceErrorException see) {
+    if (sourceResponseErrorTypeMatcher.match(see.getErrorType())) {
+      return from(handleSourceError(exceptionHandler, errorHandler, see))
+          .doOnSuccess(v -> onTerminate(terminateConsumer, left(see.getEvent())))
+          .doOnError(e -> onTerminate(terminateConsumer, right(e)));
+    }
+    return error(see);
+  }
+
+  private Publisher<Void> handleSourceError(final MessagingExceptionHandler exceptionHandler,
+                                            Function<MessagingException, Publisher<Void>> errorConsumer,
+                                            SourceErrorException see) {
     MessagingException messagingException = see.toMessagingException();
     exceptionHandler.handleException(messagingException, messagingException.getEvent());
-    errorConsumer.accept(messagingException);
+    return errorConsumer.apply(messagingException);
   }
 
   private Event createEvent(ModuleFlowProcessingPhaseTemplate template, MessageProcessContext messageProcessContext,
@@ -242,7 +253,8 @@ public class ModuleFlowProcessingPhase
 
       if (resultValue instanceof Collection && adapter.isCollection()) {
         message = toMessage(Result.<Collection<Message>, Attributes>builder()
-            .output(toMessageCollection((Collection<Result>) resultValue, adapter.getCursorProviderFactory(), templateEvent))
+            .output(toMessageCollection((Collection<Result>) resultValue, adapter.getCursorProviderFactory(),
+                                        templateEvent))
             .attributes(NULL_ATTRIBUTES)
             .mediaType(result.getMediaType().orElse(ANY))
             .build());
@@ -255,11 +267,11 @@ public class ModuleFlowProcessingPhase
     return templateEvent;
   }
 
-  private CheckedConsumer<MessagingException> getErrorConsumer(MessageSource messageSource,
-                                                               Function<Event, Map<String, Object>> errorParametersFunction,
-                                                               MessageProcessContext messageProcessContext,
-                                                               ModuleFlowProcessingPhaseTemplate template,
-                                                               PhaseResultNotifier phaseResultNotifier) {
+  private CheckedFunction<MessagingException, Publisher<Void>> onError(MessageSource messageSource,
+                                                                       Function<Event, Map<String, Object>> errorParametersFunction,
+                                                                       MessageProcessContext messageProcessContext,
+                                                                       ModuleFlowProcessingPhaseTemplate template,
+                                                                       PhaseResultNotifier phaseResultNotifier) {
     return messagingException -> {
       Event errorEvent = createErrorEvent(messagingException.getEvent(), messageSource, messagingException,
                                           muleContext.getErrorTypeLocator());
@@ -272,18 +284,17 @@ public class ModuleFlowProcessingPhase
         parameters = errorParametersFunction.apply(messagingException.getEvent());
       } catch (Exception e) {
         phaseResultNotifier.phaseFailure(e);
-        throw new SourceErrorException(errorEvent, sourceErrorResponseGenerateErrorType, e, messagingException);
+        return error(new SourceErrorException(errorEvent, sourceErrorResponseGenerateErrorType, e, messagingException));
       }
 
-      template.sendFailureResponseToClient(messagingException, parameters,
-                                           createSendFailureResponseCompletationCallback(phaseResultNotifier,
-                                                                                         sourceErrorResponseSendErrorType));
+      return template.sendFailureResponseToClient(messagingException, parameters,
+                                                  createSendFailureResponseCompletationCallback(phaseResultNotifier,
+                                                                                                sourceErrorResponseSendErrorType));
     };
   }
 
   private Consumer<Either<Event, MessagingException>> getTerminateConsumer(MessageSource messageSource,
-                                                                           ModuleFlowProcessingPhaseTemplate template,
-                                                                           PhaseResultNotifier phaseResultNotifier) {
+                                                                           ModuleFlowProcessingPhaseTemplate template) {
     return eventOrException -> {
       template.sendAfterTerminateResponseToClient(eventOrException.mapRight(messagingException -> {
         messagingException.setProcessedEvent(createErrorEvent(messagingException.getEvent(), messageSource, messagingException,
@@ -293,32 +304,38 @@ public class ModuleFlowProcessingPhase
     };
   }
 
-  private Consumer<Event> getSuccessConsumer(MessageSource messageSource, Event request,
-                                             MessageProcessContext messageProcessContext,
-                                             PhaseResultNotifier phaseResultNotifier,
-                                             ModuleFlowProcessingPhaseTemplate template,
-                                             Consumer<Either<Event, MessagingException>> terminateConsumer) {
+  private Function<Event, Mono<Void>> onSuccess(MessageSource messageSource, Event request,
+                                                MessageProcessContext messageProcessContext,
+                                                PhaseResultNotifier phaseResultNotifier,
+                                                ModuleFlowProcessingPhaseTemplate template,
+                                                Consumer<Either<Event, MessagingException>> terminateConsumer) {
     return response -> {
 
       fireNotification(messageSource, response, messageProcessContext.getFlowConstruct(), MESSAGE_RESPONSE);
 
       // TODO MULE-11141 - This is the case of a filtered flow. This will eventually go away.
       if (response == null) {
-        response = builder(request).message(of(null)).build();
+        response = emptyEvent(request);
       }
 
       Map<String, Object> responseParameters;
       try {
         responseParameters = template.getSuccessfulExecutionResponseParametersFunction().apply(response);
       } catch (Exception e) {
-        throw new SourceErrorException(response, sourceResponseGenerateErrorType, e);
+        return error(new SourceErrorException(response, sourceResponseGenerateErrorType, e));
       }
 
-      template.sendResponseToClient(response, responseParameters, template.getFailedExecutionResponseParametersFunction(),
-                                    createResponseCompletationCallback(phaseResultNotifier));
+      Event finalResponse = response;
 
-      onTerminate(terminateConsumer, left(response));
+      return from(template.sendResponseToClient(response, responseParameters,
+                                                template.getFailedExecutionResponseParametersFunction(),
+                                                createResponseCompletationCallback(phaseResultNotifier)))
+                                                    .doOnSuccess(v -> onTerminate(terminateConsumer, left(finalResponse)));
     };
+  }
+
+  private Event emptyEvent(Event request) {
+    return builder(request).message(of(null)).build();
   }
 
   private Processor createFlowExecutionProcessor(MessageSource messageSource, MessagingExceptionHandler exceptionHandler,
@@ -390,11 +407,11 @@ public class ModuleFlowProcessingPhase
 
   /**
    * This method will not throw any {@link Exception}.
-   * 
+   *
    * @param terminateConsumer the action to perform on the transformed result.
-   * @param result the outcome of trying to send the response of the source through the source. In the case of error, only
-   *        {@link MessagingException} or {@link SourceErrorException} are valid values on the {@code right} side of this
-   *        parameter.
+   * @param result            the outcome of trying to send the response of the source through the source. In the case of error, only
+   *                          {@link MessagingException} or {@link SourceErrorException} are valid values on the {@code right} side of this
+   *                          parameter.
    */
   private void onTerminate(Consumer<Either<Event, MessagingException>> terminateConsumer, Either<Event, Throwable> result) {
     safely(() -> terminateConsumer.accept(result.mapRight(throwable -> {

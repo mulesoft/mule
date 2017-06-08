@@ -11,6 +11,9 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -106,10 +109,18 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
 
     if (value instanceof ValueResolver) {
       return resolveValue((ValueResolver<?>) value, context);
-    }
-
-    if (value instanceof CursorProvider) {
-      value = ((CursorProvider) value).openCursor();
+    } else if (value instanceof CursorProvider) {
+      return ((CursorProvider) value).openCursor();
+    } else if (value instanceof TypedValue) {
+      TypedValue typedValue = (TypedValue) value;
+      Object objectValue = typedValue.getValue();
+      if (objectValue instanceof CursorProvider) {
+        Cursor cursor = ((CursorProvider) objectValue).openCursor();
+        return new TypedValue<>(cursor, DataType.builder()
+            .type(cursor.getClass())
+            .mediaType(typedValue.getDataType().getMediaType())
+            .build());
+      }
     }
 
     return value;

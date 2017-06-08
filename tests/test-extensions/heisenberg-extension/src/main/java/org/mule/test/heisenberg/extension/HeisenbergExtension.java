@@ -59,7 +59,7 @@ import javax.inject.Inject;
 @Extensible(alias = "heisenberg-empire")
 @OnException(HeisenbergConnectionExceptionEnricher.class)
 @ConnectionProviders(HeisenbergConnectionProvider.class)
-@Sources({HeisenbergSource.class, DEARadioSource.class})
+@Sources({HeisenbergSource.class, DEARadioSource.class, AsyncHeisenbergSource.class})
 @Export(classes = {HeisenbergExtension.class, HeisenbergException.class})
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Ricin.class})
 @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})

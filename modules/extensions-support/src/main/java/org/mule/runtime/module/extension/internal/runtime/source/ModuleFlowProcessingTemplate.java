@@ -7,39 +7,36 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.core.api.functional.Either.right;
+import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.execution.MessageProcessContext;
-import org.mule.runtime.core.execution.ModuleFlowProcessingPhaseTemplate;
-import org.mule.runtime.core.execution.ResponseCompletionCallback;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.core.api.util.func.CheckedRunnable;
-
-import org.reactivestreams.Publisher;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.execution.ModuleFlowProcessingPhaseTemplate;
+import org.mule.runtime.core.execution.ResponseCompletionCallback;
 
 import java.util.Map;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTemplate {
 
   private final Message message;
   private final Processor messageProcessor;
   private final SourceCompletionHandler completionHandler;
-  private final MessageProcessContext messageProcessorContext;
 
   ModuleFlowProcessingTemplate(Message message,
                                Processor messageProcessor,
-                               SourceCompletionHandler completionHandler, MessageProcessContext messageProcessContext) {
+                               SourceCompletionHandler completionHandler) {
     this.message = message;
     this.messageProcessor = messageProcessor;
     this.completionHandler = completionHandler;
-    this.messageProcessorContext = messageProcessContext;
   }
 
   @Override
@@ -68,17 +65,20 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   }
 
   @Override
-  public void sendResponseToClient(Event event, Map<String, Object> parameters,
-                                   Function<Event, Map<String, Object>> errorResponseParametersFunction,
-                                   ResponseCompletionCallback responseCompletionCallback) {
-    runAndNotify(() -> completionHandler.onCompletion(event, parameters), event, responseCompletionCallback);
+  public Publisher<Void> sendResponseToClient(Event event, Map<String, Object> parameters,
+                                              Function<Event, Map<String, Object>> errorResponseParametersFunction,
+                                              ResponseCompletionCallback responseCompletionCallback) {
+    return from(completionHandler.onCompletion(event, parameters)).transform(notifyCompletion(event, responseCompletionCallback));
   }
 
   @Override
-  public void sendFailureResponseToClient(MessagingException messagingException,
-                                          Map<String, Object> parameters, ResponseCompletionCallback responseCompletionCallback) {
-    runAndNotify(() -> completionHandler.onFailure(messagingException, parameters), messagingException.getEvent(),
-                 responseCompletionCallback);
+  public Publisher<Void> sendFailureResponseToClient(MessagingException messagingException,
+                                                     Map<String, Object> parameters,
+                                                     ResponseCompletionCallback responseCompletionCallback) {
+    return from(completionHandler.onFailure(messagingException, parameters)).transform(notifyCompletion(
+                                                                                                        messagingException
+                                                                                                            .getEvent(),
+                                                                                                        responseCompletionCallback));
   }
 
   @Override
@@ -88,12 +88,10 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
                      .onTerminate(right(messagingException)));
   }
 
-  private void runAndNotify(CheckedRunnable runnable, Event event, ResponseCompletionCallback responseCompletionCallback) {
-    try {
-      runnable.run();
-      responseCompletionCallback.responseSentSuccessfully();
-    } catch (Exception e) {
-      responseCompletionCallback.responseSentWithFailure(new MessagingException(event, e), event);
-    }
+  private Function<Publisher<Void>, Publisher<Void>> notifyCompletion(Event event,
+                                                                      ResponseCompletionCallback responseCompletionCallback) {
+    return publisher -> from(publisher)
+        .doOnSuccess(v -> responseCompletionCallback.responseSentSuccessfully())
+        .doOnError(e -> responseCompletionCallback.responseSentWithFailure(new MessagingException(event, e), event));
   }
 }

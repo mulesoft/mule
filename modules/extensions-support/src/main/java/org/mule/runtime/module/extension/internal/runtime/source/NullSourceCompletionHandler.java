@@ -13,6 +13,9 @@ import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.Map;
 
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
+
 /**
  * {@code SourceCompletionHandler} that does nothing.
  *
@@ -21,13 +24,13 @@ import java.util.Map;
 public class NullSourceCompletionHandler implements SourceCompletionHandler {
 
   @Override
-  public void onCompletion(Event event, Map<String, Object> parameters) {
-    // Nothing to do.
+  public Publisher<Void> onCompletion(Event event, Map<String, Object> parameters) {
+    return Mono.empty();
   }
 
   @Override
-  public void onFailure(MessagingException exception, Map<String, Object> parameters) {
-    // Nothing to do.
+  public Publisher<Void> onFailure(MessagingException exception, Map<String, Object> parameters) {
+    return Mono.empty();
   }
 
   @Override
@@ -44,5 +47,4 @@ public class NullSourceCompletionHandler implements SourceCompletionHandler {
   public Map<String, Object> createFailureResponseParameters(Event event) {
     return emptyMap();
   }
-
 }
