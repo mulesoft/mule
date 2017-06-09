@@ -1,0 +1,24 @@
+{
+  "extensionModelLoaderDescriptor": {
+    "id": "crafted",
+    "attributes": {
+      "type": "org.mule.test.crafted.extension.TestExtensionLoadingDelegate",
+      "version": "4.0.0-SNAPSHOT"
+    }
+  },
+  "name": "crafted-extension",
+  "minMuleVersion": "4.0.0",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "maven",
+    "attributes": {
+      "exportedPackages": [
+      ],
+      "exportedResources": [
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "maven",
+    "attributes": {}
+  }
+}
