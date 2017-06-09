@@ -32,6 +32,15 @@ import java.util.function.Supplier;
  * on dedicated {@link SchedulerService#cpuIntensiveScheduler()} and {@link SchedulerService#ioScheduler()} ()} schedulers.
  * <p/>
  * This processing strategy is not suitable for transactional flows and will fail if used with an active transaction.
+ * <p/>
+ * NOTE: This processing strategy currently has a major issue with functional consistency given that the OVERLOAD error that is
+ * returned by the Flow when using this strategy when an IO Scheduler has no free threads can occur at any point in the Flow
+ * rather than just at the start. The implication of this behaviour is that:
+ * <ul>
+ * <li>As an OVERLOAD situation can occur at any point in the Flow potentially this can result in partly-processed requests.</li>
+ * <li>If a source or client retries a request that previously resulted in OVERLOAD then part of the Flow may be processed twice
+ * for the same message.</li>
+ * </ul>
  *
  * @since 4.0
  */

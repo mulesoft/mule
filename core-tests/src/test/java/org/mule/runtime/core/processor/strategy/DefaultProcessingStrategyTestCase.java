@@ -22,6 +22,7 @@ import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFac
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -29,7 +30,7 @@ import ru.yandex.qatools.allure.annotations.Stories;
 @Features(PROCESSING_STRATEGIES)
 @Stories(DEFAULT)
 @Description("Default (used when no processing strategy is configured)")
-public class DefaultProcessingStrategyTestCase extends ProactorProcessingStrategyTestCase {
+public class DefaultProcessingStrategyTestCase extends WorkQueueProcessingStrategyTestCase {
 
   public DefaultProcessingStrategyTestCase(Mode mode) {
     super(mode);
@@ -37,14 +38,13 @@ public class DefaultProcessingStrategyTestCase extends ProactorProcessingStrateg
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new DefaultFlowProcessingStrategy(() -> cpuLight,
-                                             () -> blocking,
-                                             () -> cpuIntensive);
+    return new DefaultFlowProcessingStrategy(() -> blocking);
   }
 
+  @Test
   @Override
   @Description("Unlike with the MultiReactorProcessingStrategy, the DefaultFlowProcessingStrategy does not fail if a transaction "
-      + "is active, but rather executes these events synchonrously in the caller thread transparently.")
+      + "is active, but rather executes these events synchronously in the caller thread transparently.")
   public void tx() throws Exception {
     flow.setMessageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor));
     flow.initialise();
