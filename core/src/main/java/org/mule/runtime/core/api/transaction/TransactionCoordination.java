@@ -79,6 +79,12 @@ public final class TransactionCoordination {
   public void bindTransaction(final Transaction transaction) throws TransactionException {
     Transaction oldTx = transactions.get();
 
+    // TODO(pablo.kraan): MULE-12609 - this condition must be removed and test for this class must be fixed
+    // special handling for transaction collection
+    if (oldTx != null && !(oldTx instanceof DelegateTransaction)) {
+      throw new IllegalTransactionStateException(CoreMessages.transactionAlreadyBound());
+    }
+
     if (oldTx != null && oldTx instanceof DelegateTransaction) {
       DelegateTransaction delegateTransaction = (DelegateTransaction) oldTx;
       if (!delegateTransaction.supportsInnerTransaction(transaction)) {
