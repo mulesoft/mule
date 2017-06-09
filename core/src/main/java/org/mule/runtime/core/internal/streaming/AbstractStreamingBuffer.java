@@ -7,11 +7,11 @@
 package org.mule.runtime.core.internal.streaming;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.internal.util.ConcurrencyUtils.safeUnlock;
 import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.streaming.Cursor;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
@@ -37,16 +37,18 @@ public abstract class AbstractStreamingBuffer {
   protected final Lock readLock = readWriteLock.readLock();
   protected final Lock writeLock = readWriteLock.writeLock();
 
-  protected <T> T withReadLock(CheckedSupplier<T> supplier) {
-    return withLock(readLock, supplier);
+  protected <T> T withReadLock(CheckedFunction<LockReleaser, T> function) {
+    final LockReleaser releaser = new LockReleaser(readLock);
+    readLock.lock();
+    try {
+      return function.apply(releaser);
+    } finally {
+      releaser.release();
+    }
   }
 
   protected <T> T withWriteLock(CheckedSupplier<T> supplier) {
     return withLock(writeLock, supplier);
-  }
-
-  protected void releaseReadLock() {
-    safeUnlock(readLock);
   }
 
   protected void checkNotClosed() {
@@ -55,5 +57,25 @@ public abstract class AbstractStreamingBuffer {
 
   protected void closeSafely(CheckedRunnable task) {
     safely(task, e -> LOGGER.debug("Found exception closing buffer", e));
+  }
+
+  public final class LockReleaser {
+
+    private final Lock lock;
+    private boolean acquired = true;
+
+    private LockReleaser(Lock lock) {
+      this.lock = lock;
+    }
+
+    public void release() {
+      if (acquired) {
+        try {
+          lock.unlock();
+        } finally {
+          acquired = false;
+        }
+      }
+    }
   }
 }

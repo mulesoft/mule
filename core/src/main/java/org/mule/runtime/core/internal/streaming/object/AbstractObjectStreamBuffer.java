@@ -54,13 +54,13 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
     if (maxPosition != null && maxPosition.compareTo(position) < 0) {
       throw new NoSuchElementException();
     }
-    return withReadLock(() -> {
+    return withReadLock(releaser -> {
       Optional<Bucket<T>> bucket = getPresentBucket(position);
       if (bucket.isPresent()) {
         return forwarding(bucket);
       }
 
-      releaseReadLock();
+      releaser.release();
       return fetch(position);
     });
   }
@@ -78,7 +78,7 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
 
     Position position = toPosition(i);
 
-    return withReadLock(() -> {
+    return withReadLock(releaser -> {
       if (maxPosition != null) {
         return position.compareTo(maxPosition) < 1;
       }
@@ -87,7 +87,7 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
         return true;
       }
 
-      releaseReadLock();
+      releaser.release();
       try {
         return fetch(position).isPresent();
       } catch (NoSuchElementException e) {
@@ -175,16 +175,16 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
 
     @Override
     public Optional<T> get(int index) {
-      return withReadLock(() -> {
+      return withReadLock(releaser -> {
         Optional<T> item = delegate.get(index);
         if (item.isPresent()) {
           return item;
         }
 
         Position position = new Position(delegate.getIndex(), index);
-        releaseReadLock();
+        releaser.release();
         delegate = (Bucket<T>) fetch(position).orElseThrow(NoSuchElementException::new);
-        return withReadLock(() -> delegate.get(index));
+        return withReadLock(r2 -> delegate.get(index));
       });
     }
 
