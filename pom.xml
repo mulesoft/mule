@@ -196,6 +196,7 @@
         <jodaTimeVersion>2.9.1</jodaTimeVersion>
         <jschVersion>0.1.54</jschVersion>
         <junitVersion>4.12</junitVersion>
+        <jythonVersion>2.7.1b3</jythonVersion>
         <log4jVersion>2.8.2</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
         <maven.buildnumber.plugin.version>1.1</maven.buildnumber.plugin.version>
