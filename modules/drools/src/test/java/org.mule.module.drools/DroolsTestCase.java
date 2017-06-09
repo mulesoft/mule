@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mule.module.bpm.MessageService;
 import org.mule.module.bpm.Rules;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 
 import static org.hamcrest.CoreMatchers.is;
@@ -19,7 +20,8 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class DroolsTestCase {
+public class DroolsTestCase extends AbstractMuleTestCase
+{
 
     private final Drools drools = new Drools();
     private final Rules rules = mock(Rules.class);

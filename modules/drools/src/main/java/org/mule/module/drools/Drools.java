@@ -6,6 +6,8 @@
  */
 package org.mule.module.drools;
 
+import static org.drools.conf.AssertBehaviorOption.EQUALITY;
+
 import org.drools.conf.AssertBehaviorOption;
 import org.mule.api.config.ConfigurationException;
 import org.mule.config.i18n.CoreMessages;
@@ -67,7 +69,7 @@ public class Drools implements RulesEngine
         KnowledgeBaseConfiguration conf = 
             KnowledgeBaseFactory.newKnowledgeBaseConfiguration(null, Thread.currentThread().getContextClassLoader());
 
-        conf.setOption(AssertBehaviorOption.EQUALITY);
+        conf.setOption(EQUALITY);
 
         if (rules.getConfiguration() != null)
         {
