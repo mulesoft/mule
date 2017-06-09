@@ -63,6 +63,7 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
 
@@ -170,10 +171,12 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
     Class<?> extensionType = getExtensionType(context);
     try {
       // TODO: MULE-12744. If this call throws an exception it means that the extension cannot access the privileged API.
-      Class annotation = context.getExtensionClassLoader().loadClass(DeclarationEnrichers.class.getName());
+      ClassLoader extensionClassLoader = context.getExtensionClassLoader();
+      Class annotation = extensionClassLoader.loadClass(DeclarationEnrichers.class.getName());
       DeclarationEnrichers enrichers = extensionType.getAnnotation((Class<DeclarationEnrichers>) annotation);
       if (enrichers != null) {
-        return stream(enrichers.value()).map(this::instantiateOrFail).collect(toList());
+        return withContextClassLoader(extensionClassLoader,
+                                      () -> stream(enrichers.value()).map(this::instantiateOrFail).collect(toList()));
       }
     } catch (ClassNotFoundException e) {
       // Do nothing
