@@ -118,6 +118,10 @@
                     <artifactId>cxf-rt-ws-security</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.opensaml</groupId>
+                    <artifactId>opensaml</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>commons-lang</groupId>
                     <artifactId>commons-lang</artifactId>
                 </exclusion>
