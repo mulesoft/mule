@@ -88,6 +88,8 @@ public class GrizzlyHttpClient implements HttpClient
 
     private static final int MAX_CONNECTION_LIFETIME = 30 * 60 * 1000;
 
+    public static String GRIZZLY_MEMORY_MANAGER_SYSTEM_PROPERTY = "org.glassfish.grizzly.DEFAULT_MEMORY_MANAGER";
+
     public static final String CUSTOM_MAX_HTTP_PACKET_HEADER_SIZE = SYSTEM_PROPERTY_PREFIX + "http.client.headerSectionSize";
 
     private static final Logger logger = LoggerFactory.getLogger(GrizzlyHttpClient.class);
@@ -242,6 +244,11 @@ public class GrizzlyHttpClient implements HttpClient
         CompositeTransportCustomizer compositeTransportCustomizer = new CompositeTransportCustomizer();
         compositeTransportCustomizer.addTransportCustomizer(new IOStrategyTransportCustomizer(threadNamePrefix, maxWorkerCoreSize, workerCoreSize, maxKernelCoreSize, kernelCoreSize, selectorRunnerCoreSize));
         compositeTransportCustomizer.addTransportCustomizer(new LoggerTransportCustomizer());
+
+        if (getProperty(GRIZZLY_MEMORY_MANAGER_SYSTEM_PROPERTY) == null)
+        {
+            compositeTransportCustomizer.addTransportCustomizer(new MemoryManagerTransportCustomizer());
+        }
 
         if (clientSocketProperties != null)
         {
