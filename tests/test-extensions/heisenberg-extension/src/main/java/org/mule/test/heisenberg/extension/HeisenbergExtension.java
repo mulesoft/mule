@@ -39,6 +39,7 @@ import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
 import org.mule.test.heisenberg.extension.model.CarDealer;
 import org.mule.test.heisenberg.extension.model.CarWash;
+import org.mule.test.heisenberg.extension.model.HankSchrader;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
@@ -80,6 +81,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   public static final String RICIN_PACKS_SUMMARY = "A set of ricin packs";
   public static final String PERSONAL_INFORMATION_GROUP_NAME = "Personal Information";
   public static final String INLINE_BARBER_PREFERENCES = "Inline Barber Preferences";
+  public static final String BROTHER_IN_LAW = "Brother in law";
   public static final String PARAMETER_OVERRIDED_DISPLAY_NAME = "Parameter Custom Display Name";
   public static final String PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME = "weaponValueMap";
   public static final String LAB_ADDRESS_EXAMPLE = "308 Negra Arroyo Lane, Albuquerque, New Mexico, 87104";
@@ -179,6 +181,9 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
 
   @ParameterGroup(name = INLINE_BARBER_PREFERENCES, showInDsl = true)
   private BarberPreferences barberPreferences;
+
+  @ParameterGroup(name = BROTHER_IN_LAW, showInDsl = true)
+  private HankSchrader brotherInLaw;
 
   @Override
   public void initialise() throws InitialisationException {

@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 import static java.lang.String.format;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.springframework.util.ClassUtils.isPrimitiveWrapper;
+import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
@@ -56,6 +58,15 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
                                                                                           parameter.getName(),
                                                                                           getType(objectType).getName(),
                                                                                           String.class.getName()))));
+        }
+      }
+
+      @Override
+      public void visitBoolean(BooleanType booleanType) {
+        if (isPrimitiveWrapper(getType(booleanType))) {
+          problemsReporter
+              .addError(new Problem(parameter, format("Parameter '%s' is of type '%s'. Use primitive type boolean instead.",
+                                                      parameter.getName(), Boolean.class.getName())));
         }
       }
     });

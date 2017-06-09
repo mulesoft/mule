@@ -80,4 +80,16 @@ public class ParameterTypeModelValidatorTestCase extends AbstractMuleTestCase {
     when(parameter.getType()).thenReturn(TYPE_LOADER.load(rawMap));
     validate(extensionModel, validator);
   }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void boxedBoolean() {
+    when(parameter.getType()).thenReturn(TYPE_LOADER.load(Boolean.class));
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void primitiveBoolean() {
+    when(parameter.getType()).thenReturn(TYPE_LOADER.load(boolean.class));
+    validate(extensionModel, validator);
+  }
 }

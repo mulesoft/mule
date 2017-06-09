@@ -2707,8 +2707,7 @@
       "fields": [
         {
           "key": {
-            "name": "isLocked",
-            "required": "true"
+            "name": "isLocked"
           },
           "model": {
             "type": "Boolean",
@@ -2720,6 +2719,7 @@
             "parameterPurpose": {
               "role": "BEHAVIOUR"
             },
+            "default": "false",
             "expressionSupport": {
               "value": "SUPPORTED"
             }
