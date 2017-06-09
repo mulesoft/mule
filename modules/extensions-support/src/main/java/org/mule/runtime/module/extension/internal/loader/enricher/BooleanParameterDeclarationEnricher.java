@@ -15,12 +15,16 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.util.DeclarationWalker;
+import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 
 /**
  * {@link DeclarationEnricher} implementation that walks through all the {@link BooleanType} parameters and sets them as optional.
  * It also enriches those parameters with a default value of "false" if they don't have one.
+ *
+ * If the parameter was annotated with {@link ConfigOverride}, no default value will be set because it will
+ * interfere with {@link ConfigOverride}'s purpose.
  *
  * @since 4.0
  */
@@ -39,7 +43,7 @@ public class BooleanParameterDeclarationEnricher extends AbstractAnnotatedDeclar
           @Override
           public void visitBoolean(BooleanType booleanType) {
             declaration.setRequired(false);
-            if (declaration.getDefaultValue() == null) {
+            if (declaration.getDefaultValue() == null && !declaration.isConfigOverride()) {
               declaration.setDefaultValue(valueOf(FALSE));
             }
           }

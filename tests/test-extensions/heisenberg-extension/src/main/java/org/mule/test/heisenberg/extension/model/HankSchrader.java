@@ -18,7 +18,6 @@ public class HankSchrader {
   private boolean worksAtDEA;
 
   @Parameter
-  @Optional // TODO:MULE-12736 Remove annotation
   private boolean lovesMinerals;
 
   public boolean isWorksAtDEA() {
