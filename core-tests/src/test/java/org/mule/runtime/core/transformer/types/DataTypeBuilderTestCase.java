@@ -23,9 +23,10 @@ import static org.mule.runtime.api.el.BindingContext.builder;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.message.Message;
@@ -112,19 +113,35 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void buildTypedCollection() {
-    final DataType dataType = DataType.builder().collectionType(List.class).itemType(String.class).build();
+    final DataType dataType = DataType.builder()
+        .collectionType(List.class)
+        .itemType(String.class)
+        .itemMediaType(APPLICATION_JSON)
+        .build();
     assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
     assertThat(dataType.getType(), is(equalTo(List.class)));
-    assertThat(((DefaultCollectionDataType) dataType).getItemDataType(), is(STRING));
+    DataType itemDataType = ((DefaultCollectionDataType) dataType).getItemDataType();
+    assertThat(itemDataType.getType(), equalTo(String.class));
+    assertThat(itemDataType.getMediaType(), is(APPLICATION_JSON));
   }
 
   @Test
   public void buildTypedMap() {
-    final DataType dataType = DataType.builder().mapType(HashMap.class).keyType(Number.class).valueType(String.class).build();
+    final DataType dataType = DataType.builder()
+        .mapType(HashMap.class)
+        .keyType(Number.class)
+        .keyMediaType(APPLICATION_JAVA)
+        .valueType(String.class)
+        .valueMediaType(APPLICATION_JSON)
+        .build();
     assertThat(dataType, instanceOf(DefaultMapDataType.class));
     assertThat(dataType.getType(), is(equalTo(HashMap.class)));
-    assertThat(((DefaultMapDataType) dataType).getKeyDataType(), is(NUMBER));
-    assertThat(((DefaultMapDataType) dataType).getValueDataType(), is(STRING));
+    DataType keyDataType = ((DefaultMapDataType) dataType).getKeyDataType();
+    assertThat(keyDataType.getType(), equalTo(Number.class));
+    assertThat(keyDataType.getMediaType(), is(APPLICATION_JAVA));
+    DataType valueDataType = ((DefaultMapDataType) dataType).getValueDataType();
+    assertThat(valueDataType.getType(), equalTo(String.class));
+    assertThat(valueDataType.getMediaType(), is(APPLICATION_JSON));
   }
 
   @Test
