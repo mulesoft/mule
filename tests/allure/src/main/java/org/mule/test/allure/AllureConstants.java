@@ -335,6 +335,17 @@ public interface AllureConstants {
 
   }
 
+  interface TransactionFeature {
+
+    String TRANSACTION = "Transaction";
+
+    interface LocalStory {
+
+      String LOCAL_TRANSACTION = "Local Transaction";
+    }
+
+  }
+
   interface MuleDsl {
 
     String MULE_DSL = "Mule DSL";
