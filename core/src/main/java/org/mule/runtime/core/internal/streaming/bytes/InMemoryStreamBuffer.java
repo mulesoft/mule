@@ -59,7 +59,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
   }
 
   private ByteBuffer doGet(long position, int length, boolean consumeStreamIfNecessary) {
-    return withReadLock(() -> {
+    return withReadLock(releaser -> {
 
       ByteBuffer presentRead = getFromCurrentData(position, length);
       if (presentRead != null) {
@@ -67,7 +67,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
       }
 
       if (consumeStreamIfNecessary) {
-        releaseReadLock();
+        releaser.release();
         return withWriteLock(() -> {
 
           ByteBuffer refetch;
