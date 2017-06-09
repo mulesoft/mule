@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/heisenberg" attributeFormDefault="unqualified" elementFormDefault="qualified">
     <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
     <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
@@ -449,23 +451,23 @@
                                 </xs:complexContent>
                             </xs:complexType>
                         </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="brotherinlaw">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension base="mule:abstractExtensionType">
-                    <xs:sequence></xs:sequence>
-                    <xs:attribute type="mule:expressionBoolean" use="optional" default="true" name="worksAtDEA"></xs:attribute>
-                    <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="lovesMinerals"></xs:attribute>
-                  </xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="brother-in-law">
+                          <xs:complexType>
+                            <xs:complexContent>
+                              <xs:extension base="mule:abstractExtensionType">
+                                <xs:sequence></xs:sequence>
+                                <xs:attribute type="mule:expressionBoolean" use="optional" default="true" name="worksAtDEA"></xs:attribute>
+                                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="lovesMinerals"></xs:attribute>
+                              </xs:extension>
+                            </xs:complexContent>
+                          </xs:complexType>
+                        </xs:element>
                     </xs:sequence>
                     <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="familyInformations"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="enemies"></xs:attribute>
                     <xs:attribute type="mule:expressionList" use="optional" name="monthlyIncomes"></xs:attribute>
-          <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="cancer"></xs:attribute>
+                    <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="cancer"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="recipe"></xs:attribute>
                     <xs:attribute type="mule:expressionMap" use="optional" name="deathsBySeasons"></xs:attribute>
                     <xs:attribute type="mule:expressionDecimal" use="required" name="money"></xs:attribute>
@@ -663,7 +665,7 @@
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
                 <xs:attribute type="mule:expressionString" use="required" name="importer"></xs:attribute>
-                <xs:attribute type="mule:expressionBoolean" use="required" name="isStolen"></xs:attribute>
+                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="isStolen"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

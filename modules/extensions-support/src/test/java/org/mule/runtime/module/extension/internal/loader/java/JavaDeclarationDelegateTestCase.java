@@ -417,8 +417,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
                     null);
     assertParameter(parameters, "wildCards", "", arrayOf(List.class, objectTypeBuilder(Object.class)), false, SUPPORTED, null);
     assertParameter(parameters, "worksAtDEA", "", toMetadataType(boolean.class), false, SUPPORTED, valueOf(TRUE));
-    // TODO:MULE-12736 change parameter optionality
-    assertParameter(parameters, "lovesMinerals", "", toMetadataType(boolean.class), false, SUPPORTED, null);
+    assertParameter(parameters, "lovesMinerals", "", toMetadataType(boolean.class), true, SUPPORTED, null);
 
     assertParameter(parameters, "monthlyIncomes", "", arrayOf(List.class, TYPE_BUILDER.numberType().id(Long.class.getName())),
                     true, SUPPORTED, null);

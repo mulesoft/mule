@@ -12693,8 +12693,7 @@
         },
         {
           "key": {
-            "name": "cancer",
-            "required": "true"
+            "name": "cancer"
           },
           "model": {
             "type": "Boolean",
@@ -12706,6 +12705,7 @@
             "parameterPurpose": {
               "role": "BEHAVIOUR"
             },
+            "default": "false",
             "expressionSupport": {
               "value": "SUPPORTED"
             }
@@ -14011,6 +14011,7 @@
                   "parameterPurpose": {
                     "role": "BEHAVIOUR"
                   },
+                  "default": "false",
                   "expressionSupport": {
                     "value": "SUPPORTED"
                   }
@@ -14113,6 +14114,7 @@
                   "parameterPurpose": {
                     "role": "BEHAVIOUR"
                   },
+                  "default": "false",
                   "expressionSupport": {
                     "value": "SUPPORTED"
                   }
@@ -14697,6 +14699,7 @@
             "parameterPurpose": {
               "role": "BEHAVIOUR"
             },
+            "default": "false",
             "expressionSupport": {
               "value": "SUPPORTED"
             }
@@ -16223,8 +16226,7 @@
         },
         {
           "key": {
-            "name": "isStolen",
-            "required": "true"
+            "name": "isStolen"
           },
           "model": {
             "type": "Boolean",
@@ -16236,6 +16238,7 @@
             "parameterPurpose": {
               "role": "BEHAVIOUR"
             },
+            "default": "false",
             "expressionSupport": {
               "value": "SUPPORTED"
             }
