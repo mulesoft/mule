@@ -4,9 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util.xmlsecurity;
+package org.mule.runtime.core.api.util.xmlsecurity;
 
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+
+import org.mule.runtime.core.internal.util.xmlsecurity.DefaultXMLSecureFactories;
+import org.mule.runtime.core.internal.util.xmlsecurity.XMLSecureFactoriesCache;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;

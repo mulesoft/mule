@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.NetworkUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.internal.util.xmlsecurity.XMLSecureFactories;
+import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.File;
 import java.io.IOException;

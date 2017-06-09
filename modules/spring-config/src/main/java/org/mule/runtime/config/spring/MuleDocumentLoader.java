@@ -10,7 +10,7 @@ import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
 import org.mule.runtime.config.spring.parsers.DefaultXmlMetadataAnnotations;
 import org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations;
-import org.mule.runtime.core.internal.util.xmlsecurity.XMLSecureFactories;
+import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

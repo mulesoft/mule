@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.transaction;
+package org.mule.runtime.core.api.transaction;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
@@ -18,10 +18,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.xa.IllegalTransactionStateException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

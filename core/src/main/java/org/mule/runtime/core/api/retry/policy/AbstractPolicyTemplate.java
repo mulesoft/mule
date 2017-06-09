@@ -12,7 +12,6 @@ import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.internal.retry.DefaultRetryContext;
-import org.mule.runtime.core.internal.retry.notifiers.ConnectNotifier;
 
 import java.io.InterruptedIOException;
 import java.util.Map;
