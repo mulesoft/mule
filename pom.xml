@@ -258,7 +258,7 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <maven.surefire.plugin.version>2.19.1</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
-        <mule.module.maven.plugin.version>1.0-SNAPSHOT</mule.module.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.0.0-BETA-SNAPSHOT</mule.module.maven.plugin.version>
         <mule.extensions.maven.plugin.version>1.0.0-BETA-SNAPSHOT</mule.extensions.maven.plugin.version>
         <mule.app.plugins.maven.plugin.version>1.0.0-BETA-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
