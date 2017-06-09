@@ -113,6 +113,7 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
     }
 
     private ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
+      // MULE-12749 Implement async retry and back-pressure for IO scheduling in ProactorStreamProcessingStrategy
       return publisher -> from(publisher)
           .flatMap(event -> just(event).transform(processor)
               .publishOn(fromExecutorService(decorateScheduler(getCpuLightScheduler())))

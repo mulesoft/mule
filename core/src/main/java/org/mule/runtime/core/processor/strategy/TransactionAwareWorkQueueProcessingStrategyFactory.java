@@ -30,18 +30,19 @@ import java.util.function.Supplier;
  * Creates default processing strategy with same behavior as {@link WorkQueueProcessingStrategyFactory} apart from the fact it
  * will process synchronously without error when a transaction is active.
  */
-public class DefaultFlowProcessingStrategyFactory extends WorkQueueProcessingStrategyFactory {
+public class TransactionAwareWorkQueueProcessingStrategyFactory extends WorkQueueProcessingStrategyFactory
+    implements TransactionAwareProcessingStrategyFactory {
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return new DefaultFlowProcessingStrategy(() -> muleContext.getSchedulerService()
+    return new TransactionAwareWorkQueueProcessingStrategy(() -> muleContext.getSchedulerService()
         .ioScheduler(muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + BLOCKING.name())
             .withMaxConcurrentTasks(getMaxConcurrency())));
   }
 
-  static class DefaultFlowProcessingStrategy extends WorkQueueProcessingStrategy {
+  static class TransactionAwareWorkQueueProcessingStrategy extends WorkQueueProcessingStrategy {
 
-    protected DefaultFlowProcessingStrategy(Supplier<Scheduler> ioSchedulerSupplier) {
+    protected TransactionAwareWorkQueueProcessingStrategy(Supplier<Scheduler> ioSchedulerSupplier) {
       super(ioSchedulerSupplier);
     }
 
