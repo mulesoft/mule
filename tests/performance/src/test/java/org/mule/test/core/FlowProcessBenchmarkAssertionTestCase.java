@@ -24,7 +24,8 @@ public class FlowProcessBenchmarkAssertionTestCase extends AbstractBenchmarkAsse
   public void processStreamOf1000FlowDefault() {
     runAndAssertBenchmark(FlowNullProcessorBenchmark.class, "processSourceStream", 1,
                           singletonMap(PROCESSING_STRATEGY_PARAM,
-                                       new String[] {TransactionAwareWorkQueueProcessingStrategyFactory.class.getCanonicalName()}),
+                                       new String[] {
+                                           TransactionAwareWorkQueueProcessingStrategyFactory.class.getCanonicalName()}),
                           9, MILLISECONDS, 7800000);
   }
 
