@@ -24,8 +24,8 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 import java.util.HashMap;

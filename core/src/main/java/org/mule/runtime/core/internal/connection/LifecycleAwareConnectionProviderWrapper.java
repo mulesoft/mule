@@ -16,8 +16,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.core.api.retry.RetryPolicy;
-import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.policy.RetryPolicy;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 
 import java.util.Optional;

@@ -27,7 +27,7 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSI
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROCESSING_STRATEGY_FACTORY_ATTRIBUTE;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYPE_OBJECT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_ELEMENT;
-import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
+import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
@@ -118,7 +118,7 @@ import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryNotifier;
-import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -162,7 +162,7 @@ import org.mule.runtime.core.processor.simple.AddPropertyProcessor;
 import org.mule.runtime.core.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.runtime.core.processor.simple.RemovePropertyProcessor;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
-import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
+import org.mule.runtime.core.internal.retry.notifiers.ConnectNotifier;
 import org.mule.runtime.core.routing.AggregationStrategy;
 import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.FirstSuccessful;
@@ -988,7 +988,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                                                   .withTypeDefinition(fromConfigurationAttribute("class"))
                                                                                   .withIdentifier("custom-transformer")
                                                                                   .build());
-    transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(getBeanBuilderTransformerConfigurationfactory(),
+    transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(getBeanBuilderTransformerConfigurationFactory(),
                                                                           BeanBuilderTransformer.class,
                                                                           newBuilder()
                                                                               .withKey("beanClass")
@@ -1009,7 +1009,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                                                   .withIdentifier("bean-builder-transformer")
                                                                                   .build());
 
-    transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(getExpressionTransformerConfigurationfactory(),
+    transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(getExpressionTransformerConfigurationFactory(),
                                                                           ExpressionTransformer.class,
                                                                           newBuilder()
                                                                               .withKey("returnSourceIfNull")
@@ -1139,8 +1139,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     };
   }
 
-  private ConfigurableInstanceFactory getExpressionTransformerConfigurationfactory() {
-    return getAbstractTransformerConfigurationfactory(parameters -> {
+  private ConfigurableInstanceFactory getExpressionTransformerConfigurationFactory() {
+    return getAbstractTransformerConfigurationFactory(parameters -> {
       ExpressionTransformer expressionTransformer = new ExpressionTransformer();
       Boolean returnSourceIfNull = (Boolean) parameters.get("returnSourceIfNull");
       if (returnSourceIfNull != null) {
@@ -1150,8 +1150,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     });
   }
 
-  private ConfigurableInstanceFactory getBeanBuilderTransformerConfigurationfactory() {
-    return getAbstractTransformerConfigurationfactory(parameters -> {
+  private ConfigurableInstanceFactory getBeanBuilderTransformerConfigurationFactory() {
+    return getAbstractTransformerConfigurationFactory(parameters -> {
       BeanBuilderTransformer beanBuilderTransformer = new BeanBuilderTransformer();
       beanBuilderTransformer.setBeanClass((Class<?>) parameters.get("beanClass"));
       beanBuilderTransformer.setBeanFactory((ObjectFactory) parameters.get("beanFactory"));
@@ -1159,7 +1159,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     });
   }
 
-  private ConfigurableInstanceFactory getAbstractTransformerConfigurationfactory(Function<Map<String, Object>, AbstractExpressionTransformer> abstractExpressionTransformerFactory) {
+  private ConfigurableInstanceFactory getAbstractTransformerConfigurationFactory(Function<Map<String, Object>, AbstractExpressionTransformer> abstractExpressionTransformerFactory) {
     return parameters -> {
       List<ExpressionArgument> arguments = (List<ExpressionArgument>) parameters.get("arguments");
       String expression = (String) parameters.get("expression");

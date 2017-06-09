@@ -4,19 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.retry.policies;
+package org.mule.runtime.core.api.retry.policy;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryNotifier;
-import org.mule.runtime.core.api.retry.RetryPolicy;
-import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.retry.DefaultRetryContext;
-import org.mule.runtime.core.retry.PolicyStatus;
-import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
-import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
+import org.mule.runtime.core.internal.retry.DefaultRetryContext;
+import org.mule.runtime.core.internal.retry.notifiers.ConnectNotifier;
 
 import java.io.InterruptedIOException;
 import java.util.Map;

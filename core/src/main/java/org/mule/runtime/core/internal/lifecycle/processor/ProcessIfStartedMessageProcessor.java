@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.lifecycle.processor;
+package org.mule.runtime.core.internal.lifecycle.processor;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.NameableObject;

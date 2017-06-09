@@ -44,7 +44,7 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;

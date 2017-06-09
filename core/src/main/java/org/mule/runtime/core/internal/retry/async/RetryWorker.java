@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.retry.async;
+package org.mule.runtime.core.internal.retry.async;
 
 import org.mule.runtime.core.api.retry.RetryCallback;
-import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 
 import java.util.concurrent.Executor;

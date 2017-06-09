@@ -10,8 +10,8 @@ import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.retry.RetryPolicy;
-import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.policy.RetryPolicy;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 
 /**
  * Interface for {@link ConnectionManager} implementations which expands its contract with non API functionality

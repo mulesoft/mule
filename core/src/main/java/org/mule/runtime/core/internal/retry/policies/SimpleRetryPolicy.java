@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.retry.policies;
+package org.mule.runtime.core.internal.retry.policies;
 
 import static java.time.Duration.ofMillis;
 import static reactor.core.publisher.Flux.from;
@@ -12,8 +12,9 @@ import static reactor.core.publisher.Flux.range;
 import static reactor.core.publisher.Mono.delay;
 import static reactor.core.publisher.Mono.error;
 
-import org.mule.runtime.core.api.retry.RetryPolicy;
-import org.mule.runtime.core.retry.PolicyStatus;
+import org.mule.runtime.core.api.retry.policy.RetryPolicy;
+import org.mule.runtime.core.api.retry.policy.PolicyStatus;
+import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;

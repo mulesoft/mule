@@ -4,9 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.retry;
-
-import org.mule.runtime.core.retry.PolicyStatus;
+package org.mule.runtime.core.api.retry.policy;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;

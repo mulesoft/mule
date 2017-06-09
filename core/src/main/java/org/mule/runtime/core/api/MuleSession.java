@@ -8,7 +8,6 @@ package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.runtime.core.message.SessionHandler;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -19,10 +18,8 @@ import java.util.Set;
  * has a unique id, session scope properties and an optional security context.
  * <p>
  * In order for the session to be propagated from one Flow or Service to the next a transports that support message properties
- * needs to be used. A {@link SessionHandler} is used to store the session in an outbound message property and then retrieve it
- * from an inbound property using a specific strategy.
- *
- * @see SessionHandler
+ * needs to be used.
+ * 
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated

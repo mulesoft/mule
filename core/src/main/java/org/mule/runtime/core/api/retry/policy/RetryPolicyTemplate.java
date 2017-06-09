@@ -4,8 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.retry;
+package org.mule.runtime.core.api.retry.policy;
 
+
+import org.mule.runtime.core.api.retry.RetryCallback;
+import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.RetryNotifier;
 
 import java.util.Map;
 import java.util.concurrent.Executor;

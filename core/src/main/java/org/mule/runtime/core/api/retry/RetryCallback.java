@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.retry;
 
+import org.mule.runtime.core.api.retry.policy.RetryPolicy;
+
 /**
  * This is the main Retry SPI. The code inside the {@link #doWork} method is what will actually get <u>retried</u> according to
  * the {@link RetryPolicy} that has been configured. Note that retries can be wrapped in a transaction to ensure the work is

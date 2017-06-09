@@ -4,9 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.retry.policies;
+package org.mule.runtime.core.internal.retry.policies;
 
-import org.mule.runtime.core.api.retry.RetryPolicy;
+import org.mule.runtime.core.api.retry.policy.RetryPolicy;
+import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 
 /**
  * This policy is the same as {@link SimpleRetryPolicyTemplate} but will retry an infinite amount of times.
