@@ -592,7 +592,7 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:expressionBoolean" use="required" name="usePhoneNumber"></xs:attribute>
+                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="usePhoneNumber"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="phoneNumber"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="encoding"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
