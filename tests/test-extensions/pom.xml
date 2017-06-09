@@ -28,6 +28,7 @@
         <module>implicit-exclusive-config-extension</module>
         <module>multi-implicit-config-extension</module>
         <module>test-oauth-extension</module>
+        <module>test-crafted-extension</module>
         <module>typed-value-extension</module>
         <module>parameter-resolver-extension</module>
         <module>mule-soap-extension</module>
