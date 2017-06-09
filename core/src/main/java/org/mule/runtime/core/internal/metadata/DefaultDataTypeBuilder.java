@@ -411,7 +411,7 @@ public class DefaultDataTypeBuilder
   public DataTypeMapTypeBuilder valueMediaType(MediaType valueMediaType) {
     validateAlreadyBuilt();
 
-    itemTypeBuilder.mediaType(valueMediaType);
+    valueTypeBuilder.mediaType(valueMediaType);
     return this;
   }
 

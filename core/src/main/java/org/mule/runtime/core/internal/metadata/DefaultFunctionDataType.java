@@ -9,14 +9,13 @@ package org.mule.runtime.core.internal.metadata;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-
-import java.util.List;
-import java.util.Optional;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionDataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.MediaType;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Basic implementation of {@link FunctionDataType}.
@@ -24,6 +23,8 @@ import org.mule.runtime.api.metadata.MediaType;
  * @since 4.0
  */
 public class DefaultFunctionDataType extends SimpleDataType implements FunctionDataType {
+
+  private static final long serialVersionUID = 5452095230956829108L;
 
   private List<FunctionParameter> parameters;
   private Optional<DataType> returnType;
