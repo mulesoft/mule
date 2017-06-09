@@ -9,6 +9,7 @@ package org.mule.module.launcher;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mule.module.launcher.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
+import static org.mockito.ArgumentCaptor.forClass;
 
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
@@ -88,6 +90,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.mockito.verification.VerificationMode;
@@ -2484,8 +2487,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
 
-        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
-        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2FileBuilder.getId());
+        assertApplicationDeploymentSuccessMultipleArtifacts(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId(), dummyDomainApp2FileBuilder.getId());
         assertDeploymentFailure(applicationDeploymentListener, dummyDomainApp3FileBuilder.getId());
 
         reset(domainDeploymentListener);
@@ -2864,6 +2866,37 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         assertDeploymentSuccess(listener, artifactName);
         assertStatus(artifactName, ApplicationStatus.STARTED);
+    }
+    
+    private void assertApplicationDeploymentSuccessMultipleArtifacts(DeploymentListener listener, String... artifactNames)
+    {
+        assertDeploymentSuccessMultipleArtifacts(listener, artifactNames);
+        for (String artifactName : artifactNames)
+        {
+            assertStatus(artifactName, ApplicationStatus.STARTED);
+        }
+    }
+
+    private void assertDeploymentSuccessMultipleArtifacts(final DeploymentListener listener, final String... artifactNames)
+    {
+        Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
+        prober.check(new JUnitProbe()
+        {
+            @Override
+            protected boolean test() throws Exception
+            {
+                ArgumentCaptor<String> arguments = forClass(String.class);
+                verify(listener, times(artifactNames.length)).onDeploymentSuccess(arguments.capture());
+                assertThat(arguments.getAllValues(), containsInAnyOrder(artifactNames));
+                return true;
+            }
+
+            @Override
+            public String describeFailure()
+            {
+                return "Failed to deploy one of the following applications: " + artifactNames + System.lineSeparator() + super.describeFailure();
+            }
+        });
     }
 
     private void assertDeploymentSuccess(final DeploymentListener listener, final String artifactName)
