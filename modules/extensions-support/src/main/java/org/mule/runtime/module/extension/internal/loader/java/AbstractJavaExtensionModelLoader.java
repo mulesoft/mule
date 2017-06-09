@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
@@ -45,6 +44,11 @@ import org.mule.runtime.module.extension.internal.loader.validation.ParameterTyp
 =======
 import org.mule.runtime.module.extension.internal.loader.enricher.*;
 import org.mule.runtime.module.extension.internal.loader.validation.*;
+<<<<<<< HEAD
+>>>>>>> MULE-11803: Allow privileged extensions to enrich their ExtensionModel
+=======
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 >>>>>>> MULE-11803: Allow privileged extensions to enrich their ExtensionModel
 
 import java.util.Collection;
@@ -64,25 +68,31 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
 
   public static final String TYPE_PROPERTY_NAME = "type";
   public static final String VERSION = "version";
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractJavaExtensionModelLoader.class);
 
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(
-    new ConfigurationModelValidator(),
-    new ConnectionProviderModelValidator(),
-    new ExportedTypesModelValidator(),
-    new JavaSubtypesModelValidator(),
-    new MetadataComponentModelValidator(),
-    new NullSafeModelValidator(),
-    new OperationReturnTypeModelValidator(),
-    new OperationParametersTypeModelValidator(),
-    new ParameterGroupModelValidator(),
-    new ParameterTypeModelValidator(),
-    new OAuthConnectionProviderModelValidator()));
+                                                                                         new ConfigurationModelValidator(),
+                                                                                         new ConnectionProviderModelValidator(),
+                                                                                         new ExportedTypesModelValidator(),
+                                                                                         new JavaSubtypesModelValidator(),
+                                                                                         new MetadataComponentModelValidator(),
+                                                                                         new NullSafeModelValidator(),
+                                                                                         new OperationReturnTypeModelValidator(),
+                                                                                         new OperationParametersTypeModelValidator(),
+                                                                                         new ParameterGroupModelValidator(),
+                                                                                         new ParameterTypeModelValidator(),
+                                                                                         new OAuthConnectionProviderModelValidator()));
 
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
+<<<<<<< HEAD
 <<<<<<< HEAD
                                                                                                new ClassLoaderDeclarationEnricher(),
                                                                                                new JavaXmlDeclarationEnricher(),
                                                                                                new BooleanParameterDeclarationEnricher(),
+=======
+                                                                                               new ClassLoaderDeclarationEnricher(),
+                                                                                               new JavaXmlDeclarationEnricher(),
+>>>>>>> MULE-11803: Allow privileged extensions to enrich their ExtensionModel
                                                                                                new ConfigNameDeclarationEnricher(),
                                                                                                new ConnectionDeclarationEnricher(),
                                                                                                new ErrorsDeclarationEnricher(),
@@ -97,6 +107,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new SubTypesDeclarationEnricher(),
                                                                                                new ExtensionDescriptionsEnricher(),
                                                                                                new ParameterLayoutOrderDeclarationEnricher()));
+<<<<<<< HEAD
 =======
     new ClassLoaderDeclarationEnricher(),
     new JavaXmlDeclarationEnricher(),
@@ -114,6 +125,8 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
     new SubTypesDeclarationEnricher(),
     new ExtensionDescriptionsEnricher(),
     new ParameterLayoutOrderDeclarationEnricher()));
+>>>>>>> MULE-11803: Allow privileged extensions to enrich their ExtensionModel
+=======
 >>>>>>> MULE-11803: Allow privileged extensions to enrich their ExtensionModel
 
   private final String id;
@@ -149,22 +162,21 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
   protected void declareExtension(ExtensionLoadingContext context) {
     Class<?> extensionType = getExtensionType(context);
     String version =
-      context.<String>getParameter(VERSION).orElseThrow(() -> new IllegalArgumentException("version not specified"));
+        context.<String>getParameter(VERSION).orElseThrow(() -> new IllegalArgumentException("version not specified"));
     delegateFactory.apply(extensionType, version).declare(context);
   }
 
   private Collection<DeclarationEnricher> getPrivilegedDeclarationEnrichers(ExtensionLoadingContext context) {
     Class<?> extensionType = getExtensionType(context);
-    String annotationName = DeclarationEnrichers.class.getName();
-    DeclarationEnrichers enrichers = extensionType.getAnnotation(DeclarationEnrichers.class);
-    if (enrichers != null) {
-      try {
-        // TODO: MULE-12744. If this call throws an exception it means that the extension cannot access the privileged API.
-        context.getExtensionClassLoader().loadClass(annotationName);
+    try {
+      // TODO: MULE-12744. If this call throws an exception it means that the extension cannot access the privileged API.
+      Class annotation = context.getExtensionClassLoader().loadClass(DeclarationEnrichers.class.getName());
+      DeclarationEnrichers enrichers = extensionType.getAnnotation((Class<DeclarationEnrichers>) annotation);
+      if (enrichers != null) {
         return stream(enrichers.value()).map(this::instantiateOrFail).collect(toList());
-      } catch (ClassNotFoundException e) {
-        throw new IllegalModelDefinitionException("@" + annotationName + "annotation can only be used for privileged extensions");
       }
+    } catch (ClassNotFoundException e) {
+      // Do nothing
     }
     return emptyList();
   }
