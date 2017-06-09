@@ -2487,7 +2487,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
 
-        assertApplicationDeploymentSuccessMulltipleArtifacts(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId(), dummyDomainApp2FileBuilder.getId());
+        assertApplicationDeploymentSuccessMultipleArtifacts(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId(), dummyDomainApp2FileBuilder.getId());
         assertDeploymentFailure(applicationDeploymentListener, dummyDomainApp3FileBuilder.getId());
 
         reset(domainDeploymentListener);
@@ -2868,16 +2868,16 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertStatus(artifactName, ApplicationStatus.STARTED);
     }
     
-    private void assertApplicationDeploymentSuccessMulltipleArtifacts(DeploymentListener listener, String... artifactNames)
+    private void assertApplicationDeploymentSuccessMultipleArtifacts(DeploymentListener listener, String... artifactNames)
     {
-        assertDeploytmentSuccessMultipleArtifacts(listener, artifactNames);
+        assertDeploymentSuccessMultipleArtifacts(listener, artifactNames);
         for (String artifactName : artifactNames)
         {
             assertStatus(artifactName, ApplicationStatus.STARTED);
         }
     }
 
-    private void assertDeploytmentSuccessMultipleArtifacts(final DeploymentListener listener, final String... artifactNames)
+    private void assertDeploymentSuccessMultipleArtifacts(final DeploymentListener listener, final String... artifactNames)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         prober.check(new JUnitProbe()
