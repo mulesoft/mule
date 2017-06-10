@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.util;
 
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 
 public class ProcessingStrategyUtils {
 
@@ -17,7 +17,7 @@ public class ProcessingStrategyUtils {
 
   public static ProcessingStrategyFactory parseProcessingStrategy(String processingStrategy) {
     if (DEFAULT_PROCESSING_STRATEGY.equals(processingStrategy)) {
-      return new DefaultFlowProcessingStrategyFactory();
+      return new TransactionAwareWorkQueueProcessingStrategyFactory();
     } else if (SYNC_PROCESSING_STRATEGY.equals(processingStrategy)) {
       return new BlockingProcessingStrategyFactory();
     }

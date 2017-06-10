@@ -8,8 +8,6 @@ package org.mule.runtime.core.processor.strategy;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.transaction.TransactionCoordination.isTransactionActive;
 import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
@@ -29,39 +27,30 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * Creates default processing strategy with same behavior as {@link ProactorProcessingStrategyFactory} apart from the fact it will
- * process synchronously without error when a transaction is active.
+ * Creates default processing strategy with same behavior as {@link WorkQueueProcessingStrategyFactory} apart from the fact it
+ * will process synchronously without error when a transaction is active.
  */
-public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStrategyFactory {
+public class TransactionAwareWorkQueueProcessingStrategyFactory extends WorkQueueProcessingStrategyFactory
+    implements TransactionAwareProcessingStrategyFactory {
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    return new DefaultFlowProcessingStrategy(() -> muleContext.getSchedulerService()
-        .cpuLightScheduler(muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + CPU_LITE.name())
-            .withMaxConcurrentTasks(getMaxConcurrency())),
-                                             () -> muleContext.getSchedulerService()
-                                                 .ioScheduler(muleContext.getSchedulerBaseConfig()
-                                                     .withName(schedulersNamePrefix + "." + BLOCKING.name())
-                                                     .withMaxConcurrentTasks(getMaxConcurrency())),
-                                             () -> muleContext.getSchedulerService()
-                                                 .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
-                                                     .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())
-                                                     .withMaxConcurrentTasks(getMaxConcurrency())));
+    return new TransactionAwareWorkQueueProcessingStrategy(() -> muleContext.getSchedulerService()
+        .ioScheduler(muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + BLOCKING.name())
+            .withMaxConcurrentTasks(getMaxConcurrency())));
   }
 
-  static class DefaultFlowProcessingStrategy extends ProactorProcessingStrategy {
+  static class TransactionAwareWorkQueueProcessingStrategy extends WorkQueueProcessingStrategy {
 
-    protected DefaultFlowProcessingStrategy(Supplier<Scheduler> cpuLightSchedulerSupplier,
-                                            Supplier<Scheduler> blockingSchedulerSupplier,
-                                            Supplier<Scheduler> cpuIntensiveSchedulerSupplier) {
-      super(cpuLightSchedulerSupplier, blockingSchedulerSupplier, cpuIntensiveSchedulerSupplier);
+    protected TransactionAwareWorkQueueProcessingStrategy(Supplier<Scheduler> ioSchedulerSupplier) {
+      super(ioSchedulerSupplier);
     }
 
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
-      Sink proactorSink = super.createSink(flowConstruct, pipeline);
+      Sink workQueueSink = super.createSink(flowConstruct, pipeline);
       Sink syncSink = BLOCKING_PROCESSING_STRATEGY_INSTANCE.createSink(flowConstruct, pipeline);
-      return new DelegateSink(syncSink, proactorSink);
+      return new DelegateSink(syncSink, workQueueSink);
     }
 
     @Override
@@ -79,11 +68,11 @@ public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStra
     final static class DelegateSink implements Sink, Disposable {
 
       private final Sink syncSink;
-      private final Sink proactorSink;
+      private final Sink workQueueSink;
 
-      public DelegateSink(Sink syncSink, Sink proactorSink) {
+      public DelegateSink(Sink syncSink, Sink workQueueSink) {
         this.syncSink = syncSink;
-        this.proactorSink = proactorSink;
+        this.workQueueSink = workQueueSink;
       }
 
       @Override
@@ -91,14 +80,14 @@ public class DefaultFlowProcessingStrategyFactory extends ProactorProcessingStra
         if (isTransactionActive()) {
           syncSink.accept(event);
         } else {
-          proactorSink.accept(event);
+          workQueueSink.accept(event);
         }
       }
 
       @Override
       public void dispose() {
         disposeIfNeeded(syncSink, NOP_LOGGER);
-        disposeIfNeeded(proactorSink, NOP_LOGGER);
+        disposeIfNeeded(workQueueSink, NOP_LOGGER);
       }
     }
   }

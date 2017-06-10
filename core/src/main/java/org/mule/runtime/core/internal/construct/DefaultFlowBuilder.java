@@ -34,7 +34,7 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
 
 import java.util.List;
@@ -284,11 +284,11 @@ public class DefaultFlowBuilder implements Builder {
     /**
      * {@inheritDoc}
      *
-     * @return a {@link DefaultFlowProcessingStrategyFactory}
+     * @return a {@link ProcessingStrategyFactory}
      */
     @Override
     protected ProcessingStrategyFactory createDefaultProcessingStrategyFactory() {
-      return new DefaultFlowProcessingStrategyFactory();
+      return new TransactionAwareWorkQueueProcessingStrategyFactory();
     }
 
     @Override

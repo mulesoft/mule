@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -82,7 +82,7 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   @Test
   public void createDefaultProcessingStrategyIfNoneSpecified() throws Exception {
     flow.initialise();
-    assertThat(flow.getProcessingStrategyFactory(), is(instanceOf(DefaultFlowProcessingStrategyFactory.class)));
+    assertThat(flow.getProcessingStrategyFactory(), is(instanceOf(TransactionAwareWorkQueueProcessingStrategyFactory.class)));
   }
 
   private void createFlow() {

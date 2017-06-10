@@ -32,42 +32,46 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class DefaultStreamProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory {
+public class TransactionAwareProactorStreamProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory
+    implements TransactionAwareProcessingStrategyFactory {
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     if (getMaxConcurrency() == 1) {
       return new ReactorProcessingStrategyFactory().create(muleContext, schedulersNamePrefix);
     } else {
-      return new RingBufferDefaultProcessingStrategy(() -> muleContext.getSchedulerService()
+      return new TransactionAwareProactorStreamProcessingStrategy(() -> muleContext.getSchedulerService()
           .customScheduler(muleContext.getSchedulerBaseConfig()
               .withName(schedulersNamePrefix + RING_BUFFER_SCHEDULER_NAME_SUFFIX)
               .withMaxConcurrentTasks(getSubscriberCount() + 1)),
-                                                     getBufferSize(),
-                                                     getSubscriberCount(),
-                                                     getWaitStrategy(), () -> muleContext.getSchedulerService()
-                                                         .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
-                                                             .withName(schedulersNamePrefix + "." + CPU_LITE.name())),
-                                                     () -> muleContext.getSchedulerService()
-                                                         .ioScheduler(muleContext.getSchedulerBaseConfig()
-                                                             .withName(schedulersNamePrefix + "." + BLOCKING.name())),
-                                                     () -> muleContext.getSchedulerService()
-                                                         .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
-                                                             .withName(schedulersNamePrefix + "." + CPU_INTENSIVE.name())),
-                                                     getMaxConcurrency());
+                                                                  getBufferSize(),
+                                                                  getSubscriberCount(),
+                                                                  getWaitStrategy(), () -> muleContext.getSchedulerService()
+                                                                      .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
+                                                                          .withName(schedulersNamePrefix + "."
+                                                                              + CPU_LITE.name())),
+                                                                  () -> muleContext.getSchedulerService()
+                                                                      .ioScheduler(muleContext.getSchedulerBaseConfig()
+                                                                          .withName(schedulersNamePrefix + "."
+                                                                              + BLOCKING.name())),
+                                                                  () -> muleContext.getSchedulerService()
+                                                                      .cpuIntensiveScheduler(muleContext.getSchedulerBaseConfig()
+                                                                          .withName(schedulersNamePrefix + "."
+                                                                              + CPU_INTENSIVE.name())),
+                                                                  getMaxConcurrency());
     }
   }
 
-  static class RingBufferDefaultProcessingStrategy extends ProactorStreamProcessingStrategy {
+  static class TransactionAwareProactorStreamProcessingStrategy extends ProactorStreamProcessingStrategy {
 
-    public RingBufferDefaultProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
-                                               int bufferSize,
-                                               int subscriberCount,
-                                               String waitStrategy,
-                                               Supplier<Scheduler> cpuLightSchedulerSupplier,
-                                               Supplier<Scheduler> blockingSchedulerSupplier,
-                                               Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
-                                               int maxConcurrency)
+    public TransactionAwareProactorStreamProcessingStrategy(Supplier<Scheduler> ringBufferSchedulerSupplier,
+                                                            int bufferSize,
+                                                            int subscriberCount,
+                                                            String waitStrategy,
+                                                            Supplier<Scheduler> cpuLightSchedulerSupplier,
+                                                            Supplier<Scheduler> blockingSchedulerSupplier,
+                                                            Supplier<Scheduler> cpuIntensiveSchedulerSupplier,
+                                                            int maxConcurrency)
 
     {
       super(ringBufferSchedulerSupplier, bufferSize, subscriberCount, waitStrategy, cpuLightSchedulerSupplier,
@@ -78,7 +82,8 @@ public class DefaultStreamProcessingStrategyFactory extends ReactorStreamProcess
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
       Sink proactorSink = super.createSink(flowConstruct, pipeline);
       Sink syncSink = BLOCKING_PROCESSING_STRATEGY_INSTANCE.createSink(flowConstruct, pipeline);
-      return new DefaultFlowProcessingStrategyFactory.DefaultFlowProcessingStrategy.DelegateSink(syncSink, proactorSink);
+      return new TransactionAwareWorkQueueProcessingStrategyFactory.TransactionAwareWorkQueueProcessingStrategy.DelegateSink(syncSink,
+                                                                                                                             proactorSink);
     }
 
     @Override
