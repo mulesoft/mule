@@ -35,7 +35,6 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
 
   public static final String TYPE_PROPERTY_NAME = "type";
   public static final String VERSION = "version";
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractJavaExtensionModelLoader.class);
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(
                                                                                          new ConfigurationModelValidator(),
                                                                                          new ConnectionProviderModelValidator(),
