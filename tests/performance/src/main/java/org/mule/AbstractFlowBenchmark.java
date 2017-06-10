@@ -90,7 +90,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
       "org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory",
-      "org.mule.runtime.core.processor.strategy.DefaultStreamProcessingStrategyFactory",
+      "org.mule.runtime.core.processor.strategy.TransactionAwareProactorStreamProcessingStrategyFactory",
       "org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFactory",
       // Skipping due MULE-12662.
       // "org.mule.runtime.core.processor.strategy.WorkQueueStreamProcessingStrategyFactory",

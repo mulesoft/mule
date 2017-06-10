@@ -44,7 +44,7 @@ import org.mule.runtime.core.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.TransactionAwareProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.source.ClusterizableMessageSourceWrapper;
 import org.mule.runtime.core.streaming.StreamingManager;
@@ -321,7 +321,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    */
   protected boolean useBlockingCodePath() {
     return isTransactionActive()
-        && (processingStrategy.isSynchronous() || processingStrategyFactory instanceof DefaultFlowProcessingStrategyFactory);
+        && (processingStrategy.isSynchronous() || processingStrategyFactory instanceof TransactionAwareProcessingStrategyFactory);
   }
 
   @Override

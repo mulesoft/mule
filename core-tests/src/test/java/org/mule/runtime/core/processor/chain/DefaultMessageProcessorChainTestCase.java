@@ -60,9 +60,10 @@ import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.strategy.BlockingProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.DefaultFlowProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.ProactorStreamProcessingStrategyFactory;
+import org.mule.runtime.core.processor.strategy.ProactorStreamProcessingStrategyTestCase;
+import org.mule.runtime.core.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.DirectProcessingStrategyFactory;
-import org.mule.runtime.core.processor.strategy.ProactorProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.ReactorProcessingStrategyFactory;
 import org.mule.runtime.core.processor.strategy.WorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.routing.ChoiceRouter;
@@ -102,15 +103,15 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
     return asList(new Object[][] {
-        {new DefaultFlowProcessingStrategyFactory(), BLOCKING},
+        {new TransactionAwareWorkQueueProcessingStrategyFactory(), BLOCKING},
         {new ReactorProcessingStrategyFactory(), BLOCKING},
-        {new ProactorProcessingStrategyFactory(), BLOCKING},
+        {new ProactorStreamProcessingStrategyFactory(), BLOCKING},
         {new WorkQueueProcessingStrategyFactory(), BLOCKING},
         {new BlockingProcessingStrategyFactory(), BLOCKING},
         {new DirectProcessingStrategyFactory(), BLOCKING},
-        {new DefaultFlowProcessingStrategyFactory(), NON_BLOCKING},
+        {new TransactionAwareWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
         {new ReactorProcessingStrategyFactory(), NON_BLOCKING},
-        {new ProactorProcessingStrategyFactory(), NON_BLOCKING},
+        {new ProactorStreamProcessingStrategyFactory(), NON_BLOCKING},
         {new WorkQueueProcessingStrategyFactory(), NON_BLOCKING},
         {new BlockingProcessingStrategyFactory(), NON_BLOCKING},
         {new DirectProcessingStrategyFactory(), NON_BLOCKING}});

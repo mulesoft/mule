@@ -6,24 +6,32 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
 import static org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
 import static org.mule.runtime.core.processor.strategy.ReactorStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.strategy.ProactorStreamProcessingStrategyFactory.ProactorStreamProcessingStrategy;
+import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
@@ -32,7 +40,7 @@ import ru.yandex.qatools.allure.annotations.Stories;
 
 @Features(PROCESSING_STRATEGIES)
 @Stories(PROACTOR)
-public class ProactorStreamProcessingStrategyTestCase extends ProactorProcessingStrategyTestCase {
+public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   public ProactorStreamProcessingStrategyTestCase(Mode mode) {
     super(mode);
@@ -50,8 +58,147 @@ public class ProactorStreamProcessingStrategyTestCase extends ProactorProcessing
                                                 4);
   }
 
-  @Test
   @Override
+  @Description("With the ProactorProcessingStrategy, when all processor are CPU_LIGHT then they are all exectured in a single "
+      + " cpu light thread.")
+  public void singleCpuLight() throws Exception {
+    super.singleCpuLight();
+    assertThat(threads, hasSize(equalTo(1)));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Override
+  @Description("When ProactorProcessingStrategy is configured, two concurrent requests may be processed by two different "
+      + " cpu light threads. MULE-11132 is needed for true reactor behaviour.")
+  public void singleCpuLightConcurrent() throws Exception {
+    super.singleCpuLightConcurrent();
+    assertThat(threads, hasSize(between(1, 2)));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), between(1l, 2l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Override
+  @Description("With the ProactorProcessingStrategy, when all processor are CPU_LIGHT then they are all exectured in a single "
+      + " cpu light thread.")
+  public void multipleCpuLight() throws Exception {
+    super.multipleCpuLight();
+    assertThat(threads, hasSize(equalTo(1)));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Override
+  @Description("With the ProactorProcessingStrategy, a BLOCKING message processor is scheduled on a IO thread.")
+  public void singleBlocking() throws Exception {
+    super.singleBlocking();
+    assertThat(threads, hasSize(equalTo(1)));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Override
+  @Description("With the ProactorProcessingStrategy, each BLOCKING message processor is scheduled on a IO thread. These may, or "
+      + "may not, be the same thread.")
+  public void multipleBlocking() throws Exception {
+    super.multipleBlocking();
+    assertThat(threads, hasSize(between(1, 3)));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), between(1l, 3l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Override
+  @Description("With the ProactorProcessingStrategy, a CPU_INTENSIVE message processor is scheduled on a CPU intensive thread.")
+  public void singleCpuIntensive() throws Exception {
+    super.singleCpuIntensive();
+    assertThat(threads, hasSize(equalTo(1)));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(1l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Override
+  @Description("With the ProactorProcessingStrategy, each CPU_INTENSIVE message processor is scheduled on a CPU Intensive thread."
+      + " These may, or may not, be the same thread.")
+  public void multipleCpuIntensive() throws Exception {
+    super.multipleCpuIntensive();
+    assertThat(threads, hasSize(between(1, 3)));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), between(1l, 3l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Override
+  @Description("With the ProactorProcessingStrategy, when there is a mix of processor processing types, each processor is "
+      + "scheduled on the correct scheduler.")
+  public void mix() throws Exception {
+    super.mix();
+    assertThat(threads, hasSize(equalTo(3)));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(1l));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Override
+  @Description("With the ProactorProcessingStrategy, when there is a mix of processor processing types, each processor is "
+      + "scheduled on the correct scheduler.")
+  public void mix2() throws Exception {
+    super.mix2();
+    assertThat(threads, hasSize(between(3, 7)));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), between(1l, 2l));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), between(1l, 2l));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), between(1l, 3l));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Override
+  @Description("When the ProactorProcessingStrategy is configured and a transaction is active processing fails with an error")
+  public void tx() throws Exception {
+    flow.setMessageProcessors(asList(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor));
+    flow.initialise();
+    flow.start();
+
+    TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
+
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(DefaultMuleException.class));
+    expectedException.expectCause(hasMessage(equalTo(TRANSACTIONAL_ERROR_MESSAGE)));
+    process(flow, testEvent());
+  }
+
+  @Override
+  @Description("When the ReactorProcessingStrategy is configured and a transaction is active processing fails with an error")
+  public void asyncCpuLight() throws Exception {
+    super.asyncCpuLight();
+    assertThat(threads, hasSize(between(1, 2)));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), between(1l, 2l));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+  }
+
+  @Override
+  @Description("Concurrent stream with concurrency of 8 only uses two CPU_LIGHT threads.")
+  public void concurrentStream() throws Exception {
+    super.concurrentStream();
+    assertThat(threads, hasSize(2));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(2l));
+  }
+
+  @Test
   @Description("If IO pool is busy OVERLOAD error is thrown")
   public void blockingRejectedExecution() throws Exception {
     flow.setProcessingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
@@ -70,7 +217,6 @@ public class ProactorStreamProcessingStrategyTestCase extends ProactorProcessing
   }
 
   @Test
-  @Override
   @Description("If CPU INTENSIVE pool is busy OVERLOAD error is thrown")
   public void cpuIntensiveRejectedExecution() throws Exception {
     flow.setProcessingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
@@ -89,7 +235,6 @@ public class ProactorStreamProcessingStrategyTestCase extends ProactorProcessing
   }
 
   @Test
-  @Override
   @Description("If max concurrency is 1, only 1 thread is used for CPU_LITE processors and further requests blocks. When " +
       "maxConcurrency < subscribers processing is done on ring-buffer thread.")
   public void singleCpuLightConcurrentMaxConcurrency1() throws Exception {
@@ -112,7 +257,6 @@ public class ProactorStreamProcessingStrategyTestCase extends ProactorProcessing
   }
 
   @Test
-  @Override
   @Description("If max concurrency is 1, only 1 thread is used for BLOCKING processors and further requests blocks. When " +
       "maxConcurrency < subscribers processing is done on ring-buffer thread.")
   public void singleBlockingConcurrentMaxConcurrency1() throws Exception {

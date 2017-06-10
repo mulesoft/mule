@@ -6,26 +6,39 @@
  */
 package org.mule.tck.processor;
 
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 
-import java.util.concurrent.Executor;
+import org.reactivestreams.Publisher;
 
 /**
- * Test non-blocking {@link Processor} implementation that simply uses a {@link Executor} to invoke the
- * {@link org.mule.runtime.core.api.connector.ReplyToHandler} in another thread.
+ * Test async non-blocking {@link Processor} implementation that will return control to the Flow in a custom {@link Scheduler}
+ * thread in the same way as, for example, a HTTP requester would.
  */
-public class TestNonBlockingProcessor implements Processor {
+public class TestNonBlockingProcessor implements Processor, Initialisable, Disposable, MuleContextAware {
+
+  private static int MAX_THREADS = 8;
+  private MuleContext muleContext;
+  private Scheduler customScheduler;
 
   /**
    * Force the proactor to change the thread.
    */
   @Override
   public ProcessingType getProcessingType() {
-    return CPU_INTENSIVE;
+    return CPU_LITE_ASYNC;
   }
 
   @Override
@@ -33,4 +46,23 @@ public class TestNonBlockingProcessor implements Processor {
     return event;
   }
 
+  @Override
+  public Publisher<Event> apply(Publisher<Event> publisher) {
+    return from(publisher).publishOn(fromExecutorService(customScheduler));
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    customScheduler = muleContext.getSchedulerService().customScheduler(config().withMaxConcurrentTasks(MAX_THREADS));
+  }
+
+  @Override
+  public void dispose() {
+    customScheduler.stop();
+  }
+
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 }
