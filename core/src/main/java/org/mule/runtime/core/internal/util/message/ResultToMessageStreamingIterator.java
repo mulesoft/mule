@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.message;
 
+import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
@@ -41,7 +42,7 @@ final class ResultToMessageStreamingIterator implements StreamingIterator<Messag
 
   @Override
   public Message next() {
-    return MessageUtils.toMessage(delegate.next(), cursorProviderFactory, event);
+    return toMessage(delegate.next(), cursorProviderFactory, event);
   }
 
   @Override
@@ -51,7 +52,7 @@ final class ResultToMessageStreamingIterator implements StreamingIterator<Messag
 
   @Override
   public void forEachRemaining(Consumer<? super Message> action) {
-    delegate.forEachRemaining(result -> action.accept(MessageUtils.toMessage(result, cursorProviderFactory, event)));
+    delegate.forEachRemaining(result -> action.accept(toMessage(result, cursorProviderFactory, event)));
   }
 
   @Override

@@ -76,7 +76,7 @@ public class ResultsToMessageCollection implements Collection<Message> {
 
   private <T> T[] transformArray(T[] array) {
     return (T[]) Stream.of(array)
-        .map(result -> MessageUtils.toMessage((Result) result, cursorProviderFactory, event))
+        .map(result -> toMessage((Result) result, cursorProviderFactory, event))
         .toArray(Object[]::new);
   }
 
@@ -113,7 +113,7 @@ public class ResultsToMessageCollection implements Collection<Message> {
 
   @Override
   public boolean removeIf(Predicate<? super Message> filter) {
-    return delegate.removeIf(result -> filter.test(MessageUtils.toMessage(result)));
+    return delegate.removeIf(result -> filter.test(toMessage(result)));
   }
 
   @Override
@@ -138,18 +138,18 @@ public class ResultsToMessageCollection implements Collection<Message> {
 
   @Override
   public Spliterator<Message> spliterator() {
-    return delegate.stream().map(result -> MessageUtils.toMessage(result, cursorProviderFactory, event)).collect(toList())
+    return delegate.stream().map(result -> toMessage(result, cursorProviderFactory, event)).collect(toList())
         .spliterator();
   }
 
   @Override
   public Stream<Message> stream() {
-    return delegate.stream().map(result -> MessageUtils.toMessage(result, cursorProviderFactory, event));
+    return delegate.stream().map(result -> toMessage(result, cursorProviderFactory, event));
   }
 
   @Override
   public Stream<Message> parallelStream() {
-    return delegate.parallelStream().map(result -> MessageUtils.toMessage(result, cursorProviderFactory, event));
+    return delegate.parallelStream().map(result -> toMessage(result, cursorProviderFactory, event));
   }
 
   @Override

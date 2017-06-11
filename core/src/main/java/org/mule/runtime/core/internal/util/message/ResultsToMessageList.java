@@ -67,25 +67,25 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
 
   @Override
   public void sort(Comparator<? super Message> c) {
-    delegate.sort((o1, o2) -> c.compare(MessageUtils.toMessage(o1, cursorProviderFactory, event),
-                                        MessageUtils.toMessage(o2, cursorProviderFactory, event)));
+    delegate.sort((o1, o2) -> c.compare(toMessage(o1, cursorProviderFactory, event),
+                                        toMessage(o2, cursorProviderFactory, event)));
   }
 
   @Override
   public Message get(int index) {
-    return MessageUtils.toMessage(delegate.get(index), cursorProviderFactory, event);
+    return toMessage(delegate.get(index), cursorProviderFactory, event);
   }
 
   @Override
   public Message set(int index, Message message) {
     Result previous = delegate.set(index, Result.builder(message).build());
-    return previous != null ? MessageUtils.toMessage(previous, cursorProviderFactory, event) : null;
+    return previous != null ? toMessage(previous, cursorProviderFactory, event) : null;
   }
 
   @Override
   public Message remove(int index) {
     Result previous = delegate.remove(index);
-    return previous != null ? MessageUtils.toMessage(previous, cursorProviderFactory, event) : null;
+    return previous != null ? toMessage(previous, cursorProviderFactory, event) : null;
   }
 
   @Override

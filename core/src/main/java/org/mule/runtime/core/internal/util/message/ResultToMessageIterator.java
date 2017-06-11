@@ -46,7 +46,7 @@ final class ResultToMessageIterator implements Iterator<Message> {
 
   @Override
   public Message next() {
-    return MessageUtils.toMessage(delegate.next(), cursorProviderFactory, event);
+    return toMessage(delegate.next(), cursorProviderFactory, event);
   }
 
   @Override
@@ -56,6 +56,6 @@ final class ResultToMessageIterator implements Iterator<Message> {
 
   @Override
   public void forEachRemaining(Consumer<? super Message> action) {
-    delegate.forEachRemaining(result -> action.accept(MessageUtils.toMessage(result, cursorProviderFactory, event)));
+    delegate.forEachRemaining(result -> action.accept(toMessage(result, cursorProviderFactory, event)));
   }
 }

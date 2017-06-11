@@ -45,7 +45,7 @@ final class ResultToMessageListIterator implements ListIterator<Message> {
 
   @Override
   public Message next() {
-    return MessageUtils.toMessage(delegate.next(), cursorProviderFactory, event);
+    return toMessage(delegate.next(), cursorProviderFactory, event);
   }
 
   @Override
@@ -55,7 +55,7 @@ final class ResultToMessageListIterator implements ListIterator<Message> {
 
   @Override
   public Message previous() {
-    return MessageUtils.toMessage(delegate.previous(), cursorProviderFactory, event);
+    return toMessage(delegate.previous(), cursorProviderFactory, event);
   }
 
   @Override
@@ -84,6 +84,6 @@ final class ResultToMessageListIterator implements ListIterator<Message> {
   }
 
   public void forEachRemaining(Consumer<? super Message> action) {
-    delegate.forEachRemaining(result -> action.accept(MessageUtils.toMessage(result, cursorProviderFactory, event)));
+    delegate.forEachRemaining(result -> action.accept(toMessage(result, cursorProviderFactory, event)));
   }
 }
