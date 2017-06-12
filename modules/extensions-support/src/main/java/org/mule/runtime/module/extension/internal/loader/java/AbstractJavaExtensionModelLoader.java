@@ -14,8 +14,6 @@ import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.module.extension.internal.loader.enricher.*;
 import org.mule.runtime.module.extension.internal.loader.validation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
@@ -51,6 +49,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
   private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
                                                                                                new ClassLoaderDeclarationEnricher(),
                                                                                                new JavaXmlDeclarationEnricher(),
+                                                                                               new BooleanParameterDeclarationEnricher(),
                                                                                                new ConfigNameDeclarationEnricher(),
                                                                                                new ConnectionDeclarationEnricher(),
                                                                                                new ErrorsDeclarationEnricher(),
