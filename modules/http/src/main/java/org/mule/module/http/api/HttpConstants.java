@@ -67,6 +67,11 @@ public abstract class HttpConstants
         public static final String HTTP_REASON_PROPERTY = HTTP_PREFIX + "reason";
     }
 
+    public static final class HttpProperties
+    {
+        public static String GRIZZLY_MEMORY_MANAGER_SYSTEM_PROPERTY = "org.glassfish.grizzly.DEFAULT_MEMORY_MANAGER";
+    }
+
     public static final String ALL_INTERFACES_IP = "0.0.0.0";
 
     public enum HttpStatus
