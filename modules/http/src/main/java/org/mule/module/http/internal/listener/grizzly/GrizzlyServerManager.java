@@ -10,6 +10,7 @@ import static java.lang.Integer.valueOf;
 import static java.lang.System.getProperty;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.module.http.api.HttpConstants.HttpProperties.GRIZZLY_MEMORY_MANAGER_SYSTEM_PROPERTY;
 import static org.mule.module.http.internal.HttpMessageLogger.LoggerType.LISTENER;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.WorkManagerSource;
@@ -33,6 +34,7 @@ import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
 import org.glassfish.grizzly.http.HttpServerFilter;
 import org.glassfish.grizzly.http.KeepAlive;
+import org.glassfish.grizzly.memory.HeapMemoryManager;
 import org.glassfish.grizzly.nio.RoundRobinConnectionDistributor;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransportBuilder;
@@ -98,6 +100,11 @@ public class GrizzlyServerManager implements HttpServerManager
 
         // Set filterchain as a Transport Processor
         transport.setProcessor(serverFilterChainBuilder.build());
+
+        if (getProperty(GRIZZLY_MEMORY_MANAGER_SYSTEM_PROPERTY) == null)
+        {
+            transport.setMemoryManager(new HeapMemoryManager());
+        }
 
         idleTimeoutExecutorService = Executors.newCachedThreadPool(new NamedThreadFactory(threadNamePrefix + IDLE_TIMEOUT_THREADS_PREFIX_NAME));
         idleTimeoutDelayedExecutor = new DelayedExecutor(idleTimeoutExecutorService);
