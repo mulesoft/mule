@@ -13,6 +13,7 @@ import static java.lang.System.getProperty;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.module.http.api.HttpConstants.HttpProperties.GRIZZLY_MEMORY_MANAGER_SYSTEM_PROPERTY;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_ID;
@@ -213,6 +214,11 @@ public class GrizzlyHttpClient implements HttpClient
         CompositeTransportCustomizer compositeTransportCustomizer = new CompositeTransportCustomizer();
         compositeTransportCustomizer.addTransportCustomizer(new IOStrategyTransportCustomizer(threadNamePrefix, maxWorkerCoreSize, workerCoreSize, maxKernelCoreSize, kernelCoreSize, selectorRunnerCoreSize));
         compositeTransportCustomizer.addTransportCustomizer(new LoggerTransportCustomizer());
+
+        if (getProperty(GRIZZLY_MEMORY_MANAGER_SYSTEM_PROPERTY) == null)
+        {
+            compositeTransportCustomizer.addTransportCustomizer(new MemoryManagerTransportCustomizer());
+        }
 
         if (clientSocketProperties != null)
         {
