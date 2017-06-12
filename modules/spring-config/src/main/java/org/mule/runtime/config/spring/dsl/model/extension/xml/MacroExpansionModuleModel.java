@@ -16,6 +16,7 @@ import static org.mule.runtime.core.processor.chain.ModuleOperationMessageProces
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+import org.apache.commons.lang.StringUtils;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -412,6 +413,7 @@ public class MacroExpansionModuleModel {
       operationReplacementModel.addCustomAttribute(entry.getKey(), entry.getValue());
     }
     for (Map.Entry<String, String> entry : modelToCopy.getParameters().entrySet()) {
+      validateConfigRefAttribute(modelToCopy, configRefName, entry.getValue());
       String value = calculateAttributeValue(configRefName, moduleGlobalElementsNames, entry.getValue());
       final String optimizedValue = literalsParameters.getOrDefault(value, value);
       operationReplacementModel.addParameter(entry.getKey(), optimizedValue, false);
@@ -434,6 +436,14 @@ public class MacroExpansionModuleModel {
       child.setParent(componentModel);
     }
     return componentModel;
+  }
+
+  //TODO MULE-12526: once implemented, remove this validation as it will be done through XSD (config-ref must be mandatory in each operation for Smart Connectors)
+  private void validateConfigRefAttribute(ComponentModel modelToCopy, String configRefName, String originalValue) {
+    if (MODULE_OPERATION_CONFIG_REF.equals(configRefName) && StringUtils.isBlank(originalValue)) {
+      throw new IllegalArgumentException(format("The operation '%s' is missing the '%s' attribute",
+                                                modelToCopy.getIdentifier().getName(), MODULE_OPERATION_CONFIG_REF));
+    }
   }
 
   //TODO MULE-9849: until there's no clear way to check against the ComponentModel using the org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor.onReferenceSimpleParameter(), we workaround the issue by checking every <module/>'s global element's name.
