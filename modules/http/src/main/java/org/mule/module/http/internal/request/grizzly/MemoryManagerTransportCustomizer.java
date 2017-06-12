@@ -16,9 +16,9 @@ public class MemoryManagerTransportCustomizer implements TransportCustomizer
 {
 
     @Override
-    public void customize(TCPNIOTransport tcpnioTransport, FilterChainBuilder filterChainBuilder)
+    public void customize(TCPNIOTransport transport, FilterChainBuilder filterChainBuilder)
     {
-        tcpnioTransport.setMemoryManager(new HeapMemoryManager());
+        transport.setMemoryManager(new HeapMemoryManager());
     }
 
 }
