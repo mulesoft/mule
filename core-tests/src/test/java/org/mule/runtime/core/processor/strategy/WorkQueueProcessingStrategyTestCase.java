@@ -188,7 +188,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   @Description("If IO pool is busy OVERLOAD error is thrown")
   public void rejectedExecution() throws Exception {
     flow.setProcessingStrategyFactory((context,
-                                       prefix) -> new WorkQueueProcessingStrategy(() -> new RejectingScheduler()));
+                                       prefix) -> new WorkQueueProcessingStrategy(() -> new RejectingScheduler(blocking)));
     flow.setMessageProcessors(singletonList(blockingProcessor));
     flow.initialise();
     flow.start();

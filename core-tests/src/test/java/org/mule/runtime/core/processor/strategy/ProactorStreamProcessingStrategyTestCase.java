@@ -16,6 +16,10 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
@@ -25,6 +29,7 @@ import static org.mule.runtime.core.processor.strategy.ReactorStreamProcessingSt
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -34,6 +39,7 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 import ru.yandex.qatools.allure.annotations.Description;
 import ru.yandex.qatools.allure.annotations.Features;
 import ru.yandex.qatools.allure.annotations.Stories;
@@ -201,37 +207,55 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Test
   @Description("If IO pool is busy OVERLOAD error is thrown")
   public void blockingRejectedExecution() throws Exception {
+    Scheduler blockingSchedulerSpy = spy(blocking);
+    Scheduler rejectingSchedulerSpy = spy(new RejectingScheduler(blockingSchedulerSpy));
+
     flow.setProcessingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
                                                                                                 DEFAULT_BUFFER_SIZE,
                                                                                                 DEFAULT_SUBSCRIBER_COUNT,
                                                                                                 DEFAULT_WAIT_STRATEGY,
                                                                                                 () -> cpuLight,
-                                                                                                () -> new RejectingScheduler(),
+                                                                                                () -> rejectingSchedulerSpy,
                                                                                                 () -> cpuIntensive,
                                                                                                 4));
     flow.setMessageProcessors(singletonList(blockingProcessor));
     flow.initialise();
     flow.start();
-    expectRejected();
     process(flow, testEvent());
+    verify(rejectingSchedulerSpy, times(11)).submit(any(Runnable.class));
+    verify(blockingSchedulerSpy, times(1)).submit(any(Runnable.class));
+    assertThat(threads, hasSize(1));
+    assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Test
   @Description("If CPU INTENSIVE pool is busy OVERLOAD error is thrown")
   public void cpuIntensiveRejectedExecution() throws Exception {
+    Scheduler cpuIntensiveSchedulerSpy = spy(cpuIntensive);
+    Scheduler rejectingSchedulerSpy = spy(new RejectingScheduler(cpuIntensiveSchedulerSpy));
+
     flow.setProcessingStrategyFactory((context, prefix) -> new ProactorStreamProcessingStrategy(() -> ringBuffer,
                                                                                                 DEFAULT_BUFFER_SIZE,
                                                                                                 DEFAULT_SUBSCRIBER_COUNT,
                                                                                                 DEFAULT_WAIT_STRATEGY,
                                                                                                 () -> cpuLight,
                                                                                                 () -> blocking,
-                                                                                                () -> new RejectingScheduler(),
+                                                                                                () -> rejectingSchedulerSpy,
                                                                                                 4));
     flow.setMessageProcessors(singletonList(cpuIntensiveProcessor));
     flow.initialise();
     flow.start();
-    expectRejected();
     process(flow, testEvent());
+    verify(rejectingSchedulerSpy, times(11)).submit(any(Runnable.class));
+    verify(cpuIntensiveSchedulerSpy, times(1)).submit(any(Runnable.class));
+    assertThat(threads, hasSize(1));
+    assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(1l));
+    assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
+    assertThat(threads, not(hasItem(startsWith(IO))));
+    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Test
