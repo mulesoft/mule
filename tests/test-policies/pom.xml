@@ -21,7 +21,6 @@
     <build>
         <plugins>
             <plugin>
-                <!-- This is built this way because by building only the plugin, this is not usable from unit tests -->
                 <groupId>org.mule.runtime.plugins</groupId>
                 <artifactId>mule-app-plugins-maven-plugin</artifactId>
                 <extensions>true</extensions>
