@@ -13,6 +13,7 @@ import static java.lang.System.getProperty;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.module.http.api.HttpConstants.HttpProperties.GRIZZLY_MEMORY_MANAGER_SYSTEM_PROPERTY;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_ID;
@@ -87,8 +88,6 @@ public class GrizzlyHttpClient implements HttpClient
 {
 
     private static final int MAX_CONNECTION_LIFETIME = 30 * 60 * 1000;
-
-    public static String GRIZZLY_MEMORY_MANAGER_SYSTEM_PROPERTY = "org.glassfish.grizzly.DEFAULT_MEMORY_MANAGER";
 
     public static final String CUSTOM_MAX_HTTP_PACKET_HEADER_SIZE = SYSTEM_PROPERTY_PREFIX + "http.client.headerSectionSize";
 
