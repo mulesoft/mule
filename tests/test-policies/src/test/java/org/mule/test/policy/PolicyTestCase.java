@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -35,8 +35,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
-//TODO MULE-12760 Make this test extend MuleArtifactFunctionalTestCase
-public class PolicyTestCase extends FunctionalTestCase {
+public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
 
   private static final String POLICY_ID = "policyId";
 

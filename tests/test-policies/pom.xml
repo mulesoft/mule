@@ -8,25 +8,14 @@
         <artifactId>mule-tests</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
-    <groupId>org.mule.tests.plugin</groupId>
     <artifactId>mule-module-test-policy</artifactId>
-    <packaging>mule-plugin</packaging>
+    <packaging>jar</packaging>
     <name>Test Policies for Mule</name>
     <description>Provides policies to use on tests</description>
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.mule.runtime.plugins</groupId>
-                <artifactId>mule-app-plugins-maven-plugin</artifactId>
-                <extensions>true</extensions>
-            </plugin>
-        </plugins>
-    </build>
 
     <dependencies>
         <dependency>
