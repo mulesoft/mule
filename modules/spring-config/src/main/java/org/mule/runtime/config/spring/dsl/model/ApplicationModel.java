@@ -421,7 +421,13 @@ public class ApplicationModel {
           globalProperties.put(configLine.getConfigAttributes().get("name").getValue(),
                                configLine.getConfigAttributes().get("value").getValue());
         } else if (PROPERTY_PLACEHOLDER_ELEMENT.equals(configLine.getIdentifier())) {
-          String locationValue = configLine.getConfigAttributes().get("location").getValue();
+          String locationValue;
+          try {
+            locationValue = configLine.getConfigAttributes().get("location").getValue();
+          } catch (NullPointerException e) {
+            throw new MuleRuntimeException(createStaticMessage("location attribute not defined in " + configFile.getFilename()
+                + ":" + configLine.getLineNumber()));
+          }
           locationValue = propertyPlaceholderHelper.replacePlaceholders(locationValue, getProperties());
           locationValue = locationValue.replace("classpath:/", "");
           locations.add(locationValue);
@@ -435,6 +441,8 @@ public class ApplicationModel {
           currentThread().getContextClassLoader().getResourceAsStream(propertyFileLocation)) {
         properties.load(propertiesFileInputStream);
         springProperties.putAll(properties);
+      } catch (NullPointerException e) {
+        throw new MuleRuntimeException(createStaticMessage("properties file " + propertyFileLocation + " does not exist"));
       } catch (IOException e) {
         throw new MuleRuntimeException(e);
       }
