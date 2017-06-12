@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.processor.strategy;
 
+import static java.time.Duration.ofMillis;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+import static reactor.core.publisher.Mono.delay;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -21,7 +24,10 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
+import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Supplier;
+
+import org.slf4j.Logger;
 
 /**
  * Creates {@link ReactorProcessingStrategyFactory.ReactorProcessingStrategy} instance that implements the proactor pattern by
@@ -62,6 +68,9 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
   }
 
   static class ProactorStreamProcessingStrategy extends ReactorStreamProcessingStrategy {
+
+    private static Logger LOGGER = getLogger(ProactorStreamProcessingStrategy.class);
+    private static int SCHEDULER_BUSY_RETRY_INTERVAL_MS = 10;
 
     private Supplier<Scheduler> blockingSchedulerSupplier;
     private Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
@@ -113,11 +122,17 @@ public class ProactorStreamProcessingStrategyFactory extends ReactorStreamProces
     }
 
     private ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
-      // TODO MULE-12749 Implement async retry and back-pressure for IO scheduling in ProactorStreamProcessingStrategy
       return publisher -> from(publisher)
           .flatMap(event -> just(event).transform(processor)
               .publishOn(fromExecutorService(decorateScheduler(getCpuLightScheduler())))
-              .subscribeOn(fromExecutorService(decorateScheduler(scheduler))), maxConcurrency);
+              .subscribeOn(fromExecutorService(decorateScheduler(scheduler)))
+              .doOnError(RejectedExecutionException.class, throwable -> LOGGER.trace("Shared scheduler " + scheduler.getName()
+                  + " is busy.  Scheduling of the current event will be retried after " + SCHEDULER_BUSY_RETRY_INTERVAL_MS
+                  + "ms."))
+              .retryWhen(errors -> errors
+                  .flatMap(error -> delay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS),
+                                          fromExecutorService(getCpuLightScheduler())))),
+                   maxConcurrency);
     }
 
   }

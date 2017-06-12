@@ -520,15 +520,27 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   }
 
+  /**
+   * Scheduler that rejects tasks {@link #REJECTION_COUNT} times and then delegates to delegate scheduler.
+   */
   static class RejectingScheduler extends TestScheduler {
 
-    public RejectingScheduler() {
+    static int REJECTION_COUNT = 10;
+    private int rejections;
+    private Scheduler delegate;
+
+    public RejectingScheduler(Scheduler delegate) {
       super(1, "prefix");
+      this.delegate = delegate;
     }
 
     @Override
     public Future<?> submit(Runnable task) {
-      throw new RejectedExecutionException();
+      if (rejections++ < REJECTION_COUNT) {
+        throw new RejectedExecutionException();
+      } else {
+        return delegate.submit(task);
+      }
     }
   }
 

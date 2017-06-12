@@ -195,7 +195,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   @Description("If CPU LITE pool is busy OVERLOAD error is thrown")
   public void cpuLightRejectedExecution() throws Exception {
     flow.setProcessingStrategyFactory((context,
-                                       prefix) -> new ReactorProcessingStrategy(() -> new RejectingScheduler()));
+                                       prefix) -> new ReactorProcessingStrategy(() -> new RejectingScheduler(blocking)));
     flow.setMessageProcessors(singletonList(blockingProcessor));
     flow.initialise();
     flow.start();
