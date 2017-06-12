@@ -8,10 +8,12 @@
 package org.mule.module.drools;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mule.module.bpm.MessageService;
 import org.mule.module.bpm.Rules;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 
 import static org.hamcrest.CoreMatchers.is;
@@ -19,9 +21,12 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.module.drools.Drools.equalityAssertBehavior;
 
 public class DroolsTestCase extends AbstractMuleTestCase
 {
+    @Rule
+    public SystemProperty equalityAssertBehaviorSystemProperty = new SystemProperty(equalityAssertBehavior, "true");
 
     private final Drools drools = new Drools();
     private final Rules rules = mock(Rules.class);
