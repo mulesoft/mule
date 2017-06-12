@@ -14,7 +14,7 @@ import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.functional.api.exceptions.FunctionalTestException;
+import org.mule.functional.api.exception.FunctionalTestException;
 import org.mule.functional.api.notification.FunctionalTestNotification;
 import org.mule.functional.api.notification.FunctionalTestNotificationListener;
 import org.mule.runtime.api.exception.MuleException;
@@ -174,11 +174,9 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
   }
 
   /**
-   * The service method that implements the test component logic. This method can be called publically through either
-   * {@link #onCall(org.mule.runtime.core.api.MuleEventContext)} or {@link #onReceive(Object)}
+   * The service method that implements the test component logic.
    *
-   * @param data The message payload
-   * @param context the current {@link org.mule.runtime.core.api.MuleEventContext}
+   * @param event the current {@link EventC}
    * @return a new message payload according to the configuration of the component
    * @throws Exception if there is a general failure or if {@link #isThrowException()} is true.
    */
@@ -189,7 +187,7 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
 
     final Message message = event.getMessage();
     if (logger.isInfoEnabled()) {
-      String msg = getBoilerPlate("Message Received in service: "
+      String msg = getBoilerPlate("Message Received in flow: "
           + flowConstruct.getName() + ". Content is: "
           + truncate(message.getPayload().getValue().toString(), 100, true), '*', 80);
 

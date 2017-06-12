@@ -47,8 +47,7 @@ public class FunctionalTestNotification extends CustomNotification {
   public FunctionalTestNotification(Event event, FlowConstruct flowConstruct, Object replyMessage, int action)
       throws TransformerException {
     super(event.getMessage().getPayload().getValue(), action);
-    // TODO(pablo.kraan): MULE-12104: flow construct should not be null. Remove the workaround when fixed
-    resourceIdentifier = flowConstruct == null ? "UNKNOWN" : flowConstruct.getName();
+    resourceIdentifier = flowConstruct.getName();
     this.replyMessage = replyMessage;
     this.event = event;
   }

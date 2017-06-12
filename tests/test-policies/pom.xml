@@ -8,6 +8,7 @@
         <artifactId>mule-tests</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
+    <groupId>org.mule.tests.plugin</groupId>
     <artifactId>mule-module-test-policy</artifactId>
     <packaging>mule-plugin</packaging>
     <name>Test Policies for Mule</name>

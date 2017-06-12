@@ -6,8 +6,8 @@
  */
 package org.mule.test.tck;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -90,8 +90,8 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     asp.setExpression(TRUE_EXPRESSION);
     asp.start();
     asp.process(mockEvent);
-    assertFalse(asp.expressionFailed());
-    assertFalse(asp.countFailOrNullEvent());
+    assertThat(asp.expressionFailed(), is(false));
+    assertThat(asp.countFailOrNullEvent(), is(false));
   }
 
   @Test
@@ -101,8 +101,8 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     asp.setExpression(FALSE_EXPRESSION);
     asp.start();
     asp.process(mockEvent);
-    assertTrue(asp.expressionFailed());
-    assertFalse(asp.countFailOrNullEvent());
+    assertThat(asp.expressionFailed(), is(true));
+    assertThat(asp.countFailOrNullEvent(), is(false));
   }
 
   @Test
@@ -111,8 +111,8 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     asp.setFlowConstruct(flowConstruct);
     asp.setExpression(TRUE_EXPRESSION);
     asp.start();
-    assertFalse(asp.expressionFailed());
-    assertTrue(asp.countFailOrNullEvent());
+    assertThat(asp.expressionFailed(), is(false));
+    assertThat(asp.countFailOrNullEvent(), is(true));
   }
 
   @Test
@@ -124,8 +124,8 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     asp.process(mockEvent);
     asp.process(mockEvent);
     asp.process(mockEvent);
-    assertFalse(asp.expressionFailed());
-    assertFalse(asp.countFailOrNullEvent());
+    assertThat(asp.expressionFailed(), is(false));
+    assertThat(asp.countFailOrNullEvent(), is(false));
   }
 
   @Test
@@ -140,8 +140,8 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     asp.process(mockEvent);
     asp.setExpression(TRUE_EXPRESSION);
     asp.process(mockEvent);
-    assertTrue(asp.expressionFailed());
-    assertFalse(asp.countFailOrNullEvent());
+    assertThat(asp.expressionFailed(), is(true));
+    assertThat(asp.countFailOrNullEvent(), is(false));
   }
 
   @Test
@@ -154,8 +154,8 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     for (int i = 0; i < 6; i++) {
       asp.process(mockEvent);
     }
-    assertFalse(asp.expressionFailed());
-    assertTrue(asp.countFailOrNullEvent());
+    assertThat(asp.expressionFailed(), is(false));
+    assertThat(asp.countFailOrNullEvent(), is(true));
   }
 
   @Test
@@ -168,8 +168,8 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     for (int i = 0; i < 4; i++) {
       asp.process(mockEvent);
     }
-    assertFalse(asp.expressionFailed());
-    assertTrue(asp.countFailOrNullEvent());
+    assertThat(asp.expressionFailed(), is(false));
+    assertThat(asp.countFailOrNullEvent(), is(true));
   }
 
   @Test
@@ -182,8 +182,8 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     for (int i = 0; i < 5; i++) {
       asp.process(mockEvent);
     }
-    assertFalse(asp.expressionFailed());
-    assertFalse(asp.countFailOrNullEvent());
+    assertThat(asp.expressionFailed(), is(false));
+    assertThat(asp.countFailOrNullEvent(), is(false));
   }
 
   @Test
@@ -194,8 +194,8 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     asp.setCount(5);
     asp.start();
     asp.process(null);
-    assertFalse(asp.expressionFailed());
-    assertTrue(asp.countFailOrNullEvent());
+    assertThat(asp.expressionFailed(), is(false));
+    assertThat(asp.countFailOrNullEvent(), is(true));
   }
 
   protected AssertionMessageProcessor createAssertionMessageProcessor() {

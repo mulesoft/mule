@@ -32,7 +32,7 @@ public class ValidateResponse extends AbstractTransformer {
     if (response != null && response.contains("success")) {
       return response;
     } else {
-      throw new TransformerException(createStaticMessage("Invalid response from service: " + response));
+      throw new TransformerException(createStaticMessage("Invalid response from flow: " + response));
     }
   }
 }
