@@ -71,7 +71,6 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("returnData", fromChildConfiguration(Object.class).build())
         .withSetterParameterDefinition("throwException", fromSimpleParameter("throwException").build())
         .withSetterParameterDefinition("logMessageDetails", fromSimpleParameter("logMessageDetails").build())
-        .withSetterParameterDefinition("doInboundTransform", fromSimpleParameter("doInboundTransform").build())
         .withSetterParameterDefinition("exceptionToThrow", fromSimpleParameter("exceptionToThrow").build())
         .withSetterParameterDefinition("exceptionText", fromSimpleParameter("exceptionText").build())
         .withSetterParameterDefinition("enableMessageHistory", fromSimpleParameter("enableMessageHistory").build())

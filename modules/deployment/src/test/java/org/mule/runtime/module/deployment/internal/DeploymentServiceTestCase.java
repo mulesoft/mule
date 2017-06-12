@@ -86,8 +86,8 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase.TestPolicyComponent.invocationCount;
-import static org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase.TestPolicyComponent.policyParametrization;
+import static org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase.TestPolicyProcessor.invocationCount;
+import static org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
@@ -107,19 +107,16 @@ import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.policy.PolicyParametrization;
 import org.mule.runtime.core.policy.PolicyPointcut;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
-import org.mule.runtime.core.api.util.FileUtils;
-import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -4129,25 +4126,20 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
    * <p/>
    * Static state must be reset before each test is executed
    */
-  public static class TestPolicyComponent implements org.mule.runtime.core.api.lifecycle.Callable {
+  public static class TestPolicyProcessor implements org.mule.runtime.core.api.processor.Processor {
 
     public static volatile int invocationCount;
     public static volatile String policyParametrization = "";
 
-    public Object execute(Object payload) {
-      invocationCount++;
-      return payload;
-    }
-
     @Override
-    public Object onCall(MuleEventContext eventContext) throws Exception {
+    public Event process(Event event) throws MuleException {
       invocationCount++;
       String variableName = "policyParameter";
-      if (eventContext.getEvent().getVariableNames().contains(variableName)) {
-        policyParametrization += eventContext.getEvent().getVariable(variableName).getValue();
+      if (event.getVariableNames().contains(variableName)) {
+        policyParametrization += event.getVariable(variableName).getValue();
       }
 
-      return eventContext.getMessage().getPayload();
+      return event;
     }
   }
 

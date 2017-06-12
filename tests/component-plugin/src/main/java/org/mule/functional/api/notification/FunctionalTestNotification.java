@@ -17,8 +17,8 @@ import org.mule.runtime.core.context.notification.CustomNotification;
  * can register a {@link FunctionalTestNotificationListener} with Mule to receive these notifications and make assertions about
  * the number of messages received or the content of the message.
  * <p/>
- * This Notification contains the current MuleEventContext and reply message. The resource Identifier for this event is the
- * service name that received the message. This means you can register to listen to Notifications from a selected
+ * This Notification contains the current {@link Event}, {@link FlowConstruct} and reply message. The resource Identifier for this
+ * event is the service name that received the message. This means you can register to listen to Notifications from a selected
  * {@link FunctionalTestComponent}. i.e. <code>
  * muleContext.registerListener(this, "*JmsTestCompoennt");
  * </code>

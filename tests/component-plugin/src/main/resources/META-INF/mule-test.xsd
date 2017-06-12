@@ -70,13 +70,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="doInboundTransform" type="xsd:boolean">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether the message will be transformed using the transformer(s) set on the inbound endpoint before it gets processed. The default is true.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="exceptionToThrow" type="mule:substitutableName">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -108,7 +101,7 @@
                 <xsd:attribute name="appendString" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A string value that will be appeneded to every message payload that passes through the component. Note that by setting this property you implicitly select that the message payload will be converted to a string and that a string payload will be returned. The inbound transformer (if any) will get applied first, but if that does not return a string, {{MuleEventContext.getMessageAsString()}} will be called directly after.
+                            A string value that will be appeneded to every message payload that passes through the component. Note that by setting this property you implicitly select that the message payload will be converted to a string and that a string payload will be returned.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

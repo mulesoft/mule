@@ -13,7 +13,7 @@
         <test-policy:operation>
             <hello:print-message config-ref="default"/>
 
-            <component class="org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase$TestPolicyComponent" />
+            <custom-processor class="org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase$TestPolicyProcessor" />
 
             <test-policy:execute-next/>
         </test-policy:operation>

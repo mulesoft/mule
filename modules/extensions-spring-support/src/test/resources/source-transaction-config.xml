@@ -21,50 +21,50 @@
 
     <flow name="sourceStartsALocalTxAndGetsCommitted" initialState="stopped">
         <tx:transactional-source config-ref="localTx1" transactionalAction="ALWAYS_BEGIN"/>
-        <component class="org.mule.test.transactional.connection.MessageStorage"/>
+        <custom-processor class="org.mule.test.transactional.connection.MessageStorage"/>
     </flow>
 
     <flow name="sourceStartsALocalTxAndGetsRollBacked" initialState="stopped">
         <tx:transactional-source config-ref="localTx1" transactionalAction="ALWAYS_BEGIN"/>
-        <component class="org.mule.test.transactional.connection.MessageStorage"/>
+        <custom-processor class="org.mule.test.transactional.connection.MessageStorage"/>
         <tx:fail/>
     </flow>
 
     <flow name="sourceStartsALocalTxAndOperationsCanJointIt" initialState="stopped">
         <tx:transactional-source config-ref="localTx1" transactionalAction="ALWAYS_BEGIN"/>
-        <component class="org.mule.test.transactional.connection.MessageStorage"/>
+        <custom-processor class="org.mule.test.transactional.connection.MessageStorage"/>
 
         <tx:verify-same-connection config-ref="localTx1"/>
-        <component class="org.mule.test.transactional.connection.MessageStorage"/>
+        <custom-processor class="org.mule.test.transactional.connection.MessageStorage"/>
     </flow>
 
     <flow name="sourceStartsALocalTxAndOperationsWithDifferentConnectionCanTJoinIt" initialState="stopped">
         <tx:transactional-source config-ref="localTx1" transactionalAction="ALWAYS_BEGIN"/>
-        <component class="org.mule.test.transactional.connection.MessageStorage"/>
+        <custom-processor class="org.mule.test.transactional.connection.MessageStorage"/>
         <try>
             <tx:verify-same-connection config-ref="localTx2"/>
         </try>
         <error-handler>
             <on-error-propagate>
-                <component class="org.mule.test.transactional.connection.MessageStorage"/>
+                <custom-processor class="org.mule.test.transactional.connection.MessageStorage"/>
             </on-error-propagate>
         </error-handler>
     </flow>
 
     <flow name="nonTxSourceDoesntBeginTx" initialState="stopped">
         <tx:transactional-source config-ref="localTx1"/>
-        <component class="org.mule.test.transactional.connection.MessageStorage"/>
+        <custom-processor class="org.mule.test.transactional.connection.MessageStorage"/>
     </flow>
 
     <flow name="nonTxSourceWithNonTxOperation" initialState="stopped">
         <tx:transactional-source config-ref="localTx2"/>
-        <component class="org.mule.test.transactional.connection.MessageStorage"/>
+        <custom-processor class="org.mule.test.transactional.connection.MessageStorage"/>
         <tx:verify-no-transaction config-ref="localTx2"/>
     </flow>
 
     <flow name="nonTxSourceWithTxInside" initialState="stopped">
         <tx:transactional-source config-ref="localTx2"/>
-        <component class="org.mule.test.transactional.connection.MessageStorage"/>
+        <custom-processor class="org.mule.test.transactional.connection.MessageStorage"/>
 
         <try transactionalAction="ALWAYS_BEGIN">
             <tx:verify-transaction-begun config-ref="localTx2"/>

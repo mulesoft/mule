@@ -6,29 +6,28 @@
  */
 package org.mule.test.transactional.connection;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class MessageStorage implements Callable {
+public class MessageStorage implements Processor {
 
   public static Queue<TestTransactionalConnection> messages = new ConcurrentLinkedQueue<>();
 
   public static Throwable exception;
 
   @Override
-  public Object onCall(MuleEventContext eventContext) throws Exception {
-    eventContext.getEvent().getError().ifPresent(theError -> exception = theError.getCause());
-    TypedValue<Object> payload = eventContext.getMessage().getPayload();
+  public Event process(Event event) throws MuleException {
+    event.getError().ifPresent(theError -> exception = theError.getCause());
+    TypedValue<Object> payload = event.getMessage().getPayload();
     if (payload.getValue() != null) {
       messages.add((TestTransactionalConnection) payload.getValue());
-      return payload.getValue();
-    } else {
-      return null;
     }
+    return event;
   }
 
   public static void clean() {

@@ -68,7 +68,6 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
   private String exceptionText = "";
   private boolean enableMessageHistory = true;
   private boolean enableNotifications = true;
-  private boolean doInboundTransform = true;
   private String appendString;
   private long waitTime = 0;
   private boolean logMessageDetails = false;
@@ -390,14 +389,6 @@ public class FunctionalTestComponent extends AbstractAnnotatedObject
 
   public void setWaitTime(long waitTime) {
     this.waitTime = waitTime;
-  }
-
-  public boolean isDoInboundTransform() {
-    return doInboundTransform;
-  }
-
-  public void setDoInboundTransform(boolean doInboundTransform) {
-    this.doInboundTransform = doInboundTransform;
   }
 
   public boolean isLogMessageDetails() {
