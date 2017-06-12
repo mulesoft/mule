@@ -103,13 +103,6 @@ public final class HttpTransactionContext {
                         new GracefulCloseEvent(HttpTransactionContext.this), null);
             } else if (CloseType.REMOTELY.equals(type)) {
                 abort(AsyncHttpProviderUtils.REMOTELY_CLOSED_EXCEPTION);
-            } else {
-                try {
-                    closeable.assertOpen();
-                } catch (IOException ioe) {
-                    // unwrap the exception as it was wrapped by assertOpen.
-                    abort(ioe.getCause());
-                }
             }
         }
     };
