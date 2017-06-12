@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 
 import java.util.concurrent.ExecutionException;
 

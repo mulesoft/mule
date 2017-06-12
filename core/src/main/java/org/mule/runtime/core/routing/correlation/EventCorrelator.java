@@ -39,8 +39,8 @@ import org.mule.runtime.core.context.notification.RoutingNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.EventGroup;
 import org.mule.runtime.core.api.util.StringMessageUtils;
-import org.mule.runtime.core.util.monitor.Expirable;
-import org.mule.runtime.core.util.monitor.ExpiryMonitor;
+import org.mule.runtime.core.api.util.monitor.Expirable;
+import org.mule.runtime.core.api.util.monitor.ExpiryMonitor;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;

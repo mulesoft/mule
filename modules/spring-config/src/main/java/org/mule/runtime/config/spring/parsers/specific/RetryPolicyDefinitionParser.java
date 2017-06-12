@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RET
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
 import org.mule.runtime.config.spring.parsers.generic.OptionalChildDefinitionParser;
-import org.mule.runtime.core.retry.async.AsynchronousRetryTemplate;
+import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -83,8 +83,8 @@ public class RetryPolicyDefinitionParser extends OptionalChildDefinitionParser {
    * into this equivalent config, because of the attribute asynchronous="true":
    * <p>
    * <test:connector name="testConnector8"> <spring:property name="retryPolicyTemplate">
-   * <spring:bean class="org.mule.runtime.core.retry.async.AsynchronousRetryTemplate"> <spring:constructor-arg>
-   * <spring:bean name="delegate" class="org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate">
+   * <spring:bean class="org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate"> <spring:constructor-arg>
+   * <spring:bean name="delegate" class="org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate">
    * <spring:property name="count" value="5"/> <spring:property name="frequency" value="1000"/> </spring:bean>
    * </spring:constructor-arg> </spring:bean> </spring:property> </test:connector>
    */

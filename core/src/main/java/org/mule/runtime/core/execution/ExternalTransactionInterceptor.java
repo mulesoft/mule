@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransaction
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 
 class ExternalTransactionInterceptor<T> implements ExecutionInterceptor<T> {
 

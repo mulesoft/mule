@@ -10,8 +10,8 @@ import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.transaction.IllegalTransactionStateException;
-import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.api.transaction.xa.IllegalTransactionStateException;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 
 class ValidateTransactionalStateInterceptor<T> implements ExecutionInterceptor<T> {
 

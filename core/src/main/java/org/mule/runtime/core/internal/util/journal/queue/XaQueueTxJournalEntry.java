@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.util.journal.queue;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.util.journal.JournalEntry;
-import org.mule.runtime.core.util.xa.MuleXid;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

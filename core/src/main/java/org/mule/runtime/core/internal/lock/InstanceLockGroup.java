@@ -25,7 +25,7 @@ public class InstanceLockGroup implements LockGroup {
 
   public InstanceLockGroup(LockProvider lockProvider) {
     this.lockProvider = lockProvider;
-    this.locks = new HashMap<String, LockEntry>();
+    this.locks = new HashMap<>();
   }
 
   @Override

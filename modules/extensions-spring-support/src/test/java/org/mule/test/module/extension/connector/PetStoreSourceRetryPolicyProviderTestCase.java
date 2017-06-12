@@ -13,7 +13,7 @@ import static org.mule.test.petstore.extension.FailingPetStoreSource.connectionE
 import static org.mule.test.petstore.extension.FailingPetStoreSource.executor;
 
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;

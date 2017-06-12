@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring.parsers.specific;
 
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.runtime.core.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 
 public class TransactionConfigDefinitionParser extends ChildDefinitionParser {
 

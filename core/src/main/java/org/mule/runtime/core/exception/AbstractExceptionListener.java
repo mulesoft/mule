@@ -31,7 +31,7 @@ import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
-import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

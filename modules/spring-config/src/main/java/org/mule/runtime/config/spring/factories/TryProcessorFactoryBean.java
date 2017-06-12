@@ -16,8 +16,8 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transaction.TypedTransactionFactory;
 import org.mule.runtime.core.processor.TryMessageProcessor;
-import org.mule.runtime.core.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.transaction.TransactionType;
+import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.api.transaction.TransactionType;
 
 import java.util.Iterator;
 import java.util.List;

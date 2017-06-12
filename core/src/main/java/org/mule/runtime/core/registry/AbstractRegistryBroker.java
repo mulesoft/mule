@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.registry.RegistryBroker;
 import org.mule.runtime.core.api.registry.RegistryProvider;
-import org.mule.runtime.core.lifecycle.RegistryBrokerLifecycleManager;
+import org.mule.runtime.core.internal.lifecycle.RegistryBrokerLifecycleManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +33,7 @@ import java.util.Set;
 @Deprecated
 public abstract class AbstractRegistryBroker implements RegistryBroker, RegistryProvider {
 
-  protected RegistryBrokerLifecycleManager lifecycleManager;
+  private RegistryBrokerLifecycleManager lifecycleManager;
 
 
   public AbstractRegistryBroker(MuleContext muleContext) {

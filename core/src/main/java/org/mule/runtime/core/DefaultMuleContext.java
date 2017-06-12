@@ -46,11 +46,11 @@ import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.unwrap;
-
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -70,7 +70,6 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.connector.SchedulerController;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
@@ -94,6 +93,8 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
+import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.util.queue.Queue;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.config.ClusterConfiguration;
@@ -104,14 +105,13 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.internal.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.internal.config.DefaultCustomizationService;
 import org.mule.runtime.core.internal.connector.DefaultSchedulerController;
+import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.util.JdkVersionUtils;
 import org.mule.runtime.core.internal.util.splash.ApplicationShutdownSplashScreen;
@@ -119,13 +119,10 @@ import org.mule.runtime.core.internal.util.splash.ApplicationStartupSplashScreen
 import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ServerStartupSplashScreen;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
-import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
-import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.api.util.concurrent.Latch;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -139,7 +136,6 @@ import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContext {
@@ -187,7 +183,7 @@ public class DefaultMuleContext implements MuleContext {
   /**
    * LifecycleManager for the MuleContext. Note: this is NOT the same lifecycle manager as the one in the Registry.
    */
-  protected MuleContextLifecycleManager lifecycleManager;
+  private MuleContextLifecycleManager lifecycleManager;
 
   protected ServerNotificationManager notificationManager;
 
@@ -276,34 +272,8 @@ public class DefaultMuleContext implements MuleContext {
     Hooks.onNextDropped(event -> logger.error("EVENT DROPPED UNEXPECTEDLY" + event));
   }
 
-  /**
-   * @deprecated Use empty constructor instead and use setter for dependencies.
-   */
-  @Deprecated
-  public DefaultMuleContext(MuleConfiguration config, MuleContextLifecycleManager lifecycleManager,
-                            ServerNotificationManager notificationManager) {
-    this.config = config;
-    ((MuleContextAware) config).setMuleContext(this);
-    this.lifecycleManager = lifecycleManager;
-    this.notificationManager = notificationManager;
-    this.notificationManager.setMuleContext(this);
-    registryBroker = createRegistryBroker();
-    muleRegistryHelper = createRegistryHelper(registryBroker);
-    localMuleClient = new DefaultLocalMuleClient(this);
-    exceptionListener = new DefaultSystemExceptionStrategy();
-    transformationService = new TransformationService(this);
-  }
-
   public DefaultMuleContext() {
     transformationService = new TransformationService(this);
-  }
-
-  protected DefaultRegistryBroker createRegistryBroker() {
-    return new DefaultRegistryBroker(this);
-  }
-
-  protected MuleRegistry createRegistryHelper(DefaultRegistryBroker registry) {
-    return new MuleRegistryHelper(registry, this);
   }
 
   @Override
@@ -974,8 +944,13 @@ public class DefaultMuleContext implements MuleContext {
     this.notificationManager = notificationManager;
   }
 
-  public void setLifecycleManager(MuleContextLifecycleManager lifecyleManager) {
-    this.lifecycleManager = lifecyleManager;
+  public void setLifecycleManager(LifecycleManager lifecycleManager) {
+    // TODO(pablo.kraan): MULE-12609 - using LifecycleManager to avoid exposing MuleContextLifecycleManager
+    if (!(lifecycleManager instanceof MuleContextLifecycleManager)) {
+      I18nMessage msg = createStaticMessage("lifecycle manager for MuleContext must be a MuleContextLifecycleManager");
+      throw new MuleRuntimeException(msg);
+    }
+    this.lifecycleManager = (MuleContextLifecycleManager) lifecycleManager;
   }
 
   public void setRegistryBroker(DefaultRegistryBroker registryBroker) {

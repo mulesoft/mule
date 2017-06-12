@@ -26,8 +26,8 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.lifecycle.DefaultLifecycleManager;
-import org.mule.runtime.core.lifecycle.SimpleLifecycleManager;
+import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
+import org.mule.runtime.core.api.lifecycle.SimpleLifecycleManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 

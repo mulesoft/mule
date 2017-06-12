@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.connection;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 
 /**
  * A {@link ConnectionProviderWrapper} which includes a {@link RetryPolicyTemplate}

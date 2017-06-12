@@ -33,7 +33,7 @@ import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.routing.ValidationException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 
 import java.io.IOException;
 import java.util.concurrent.RejectedExecutionException;

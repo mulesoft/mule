@@ -15,8 +15,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.core.api.util.concurrent.Latch;
-import org.mule.runtime.core.util.queue.AbstractQueueManager;
-import org.mule.runtime.core.util.queue.DefaultQueueConfiguration;
+import org.mule.runtime.core.api.util.queue.AbstractQueueManager;
+import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 import org.mule.runtime.core.api.util.queue.Queue;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.api.util.queue.QueueSession;

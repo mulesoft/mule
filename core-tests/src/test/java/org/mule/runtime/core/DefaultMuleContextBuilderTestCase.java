@@ -41,7 +41,7 @@ import org.mule.runtime.core.context.notification.RoutingNotification;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.context.notification.TransactionNotification;
-import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
+import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Map;

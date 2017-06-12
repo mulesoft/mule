@@ -17,7 +17,7 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.lifecycle.SimpleLifecycleManager;
+import org.mule.runtime.core.api.lifecycle.SimpleLifecycleManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

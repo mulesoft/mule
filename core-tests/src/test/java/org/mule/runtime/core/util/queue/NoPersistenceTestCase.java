@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.util.queue;
 
+import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
+import org.mule.runtime.core.api.util.queue.TransactionalQueueManager;
 import org.mule.tck.core.util.queue.AbstractTransactionQueueManagerTestCase;
 
 public class NoPersistenceTestCase extends AbstractTransactionQueueManagerTestCase {
