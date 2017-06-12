@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/test"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            targetNamespace="http://www.mulesoft.org/schema/mule/test"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"/>
+
+    <xsd:element name="component" type="testComponentType" substitutionGroup="mule:abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                A component that can be used for testing message flows. It is a configurable component. The return data for the component can be set so that users can simulate a call to a real service. This component can also track invocation history and fire notifications when messages are received.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="testComponentType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractComponentType">
+                <xsd:sequence>
+                    <xsd:element name="return-data" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Defines the data to return from the service once it has been invoked. The return data can be located in a file, which you specify using the {{file}} attribute (specify a resource on the classpath or on disk), or the return data can be embeddded directly in the XML.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType mixed="true">
+                            <xsd:attribute name="file" type="xsd:string">
+                                <xsd:annotation>
+                                    <xsd:documentation>
+                                        The location of a file to load. The file can point to a resource on the classpath or on disk.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                        </xsd:complexType>
+                    </xsd:element>
+
+                    <xsd:element name="callback" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A user-defined callback that is invoked when the test component is invoked. This can be useful for capturing information such as message counts. Use the {{class}} attribute to specify the callback class name, which must be an object that implements {{org.mule.tck.functional.EventCallback}}.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:attribute name="class" type="xsd:string" use="required">
+                                <xsd:annotation>
+                                    <xsd:documentation>
+                                        A class name of an object that implements {{org.mule.tck.functional.EventCallback}}.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="throwException" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether the component should throw an exception before any processing takes place.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="logMessageDetails" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to output all message details to the log.  This includes all headers and the full payload.  The information will be loogged at INFO level.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="doInboundTransform" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether the message will be transformed using the transformer(s) set on the inbound endpoint before it gets processed. The default is true.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="exceptionToThrow" type="mule:substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A fully qualified classname of the exception object to throw. Used in conjunction with {{throwException}}. If this is not specified, a {{FunctionalTestException}} will be thrown by default.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="exceptionText" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The text of the exception that is thrown. Used in conjunction with {{throwException}}. If this is not specified, an empty message will be used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="enableMessageHistory" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Every message that is received by the test component is stored and can be retrieved. If you do not want this information stored, such as if you are running millions of messages through the component, you can disable this feature to avoid a potential out of memory error.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="enableNotifications" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to fire a {{FunctionalTestNotification}} when a message is received by the component. Test cases can register to receive these notifications and make assertions on the current message.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="appendString" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A string value that will be appeneded to every message payload that passes through the component. Note that by setting this property you implicitly select that the message payload will be converted to a string and that a string payload will be returned. The inbound transformer (if any) will get applied first, but if that does not return a string, {{MuleEventContext.getMessageAsString()}} will be called directly after.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="waitTime" type="mule:substitutableLong">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The time in milliseconds to wait before returning a result. All processing happens in the component before the wait begins.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="id" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of this component
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="invocation-counter" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                This component keeps track of the number of times it is executed.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractMessageProcessorType">
+                    <xsd:attribute name="name" use="required" type="xsd:string"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="assert" substitutionGroup="mule:abstract-message-processor" type="assertType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Assertion processor used to assert an expression, invocation count and thread.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="assertType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageProcessorType">
+                <xsd:attribute name="expression" />
+                <xsd:attribute name="message"/>
+                <xsd:attribute name="count" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="assert-intercepting" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Assertion processor used to assert an expression, invocation count and thread of request and response.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="assertType">
+                    <xsd:attribute name="responseExpression" />
+                    <xsd:attribute name="responseCount" type="xsd:string"/>
+                    <xsd:attribute name="responseSameTask" type="xsd:string" default="true"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="non-blocking-processor" substitutionGroup="mule:abstract-message-processor">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="mule:abstractMessageProcessorType"/>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="queue" type="queueType" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A stores received events in a in-memory queue. Events can be consumed using mule client requests
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="queueType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:element name="content" type="xsd:string" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Content to be sent to the queue. By default it will be the payload content
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="name"/>
+                <xsd:attribute name="contentJavaType">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Content type to use to transform the content parameter into a java type.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="skeleton-source" type="skeletonSourceType" substitutionGroup="mule:abstract-message-source">
+        <xsd:annotation>
+            <xsd:documentation>
+                Mock message source that provides access to the Processor set by the owner Flow.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="skeletonSourceType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageSourceType">
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="shared-source" type="sharedSourceType" substitutionGroup="mule:abstract-message-source">
+        <xsd:annotation>
+            <xsd:documentation>
+                Mock message source that links to a shared-config.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="sharedSourceType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageSourceType">
+                <xsd:attribute name="config-ref" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to the configuration element for this source.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="throw" type="throwType" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Mock message source that links to a shared-config.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="throwType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageProcessorType">
+                <xsd:attribute name="exception" type="mule:substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A fully qualified classname of the exception object to throw. Must be a TypedException unless an error is provided as well.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="error" type="mule:errorIdentifierType" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The error to throw. If provided, the exception will be used as cause for a TypedException.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="shared-config" type="sharedConfigType" substitutionGroup="mule:abstract-shared-extension">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configuration element that can be put at a domain level
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="sharedConfigType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:attribute name="name" type="mule:substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the configuration in the registry, so that it can be referenced by the request message processor.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>

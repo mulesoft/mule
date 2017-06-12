@@ -7,7 +7,6 @@
         <version>4.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-tests-functional</artifactId>
-    <packaging>jar</packaging>
     <name>Mule Functional Test Framework (TCK)</name>
     <description>Mule functional test framework (TCK)</description>
 
@@ -17,46 +16,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-connector-basic</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-transport-file</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-model</artifactId>
-            <version>${aetherProviderVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-aether-provider</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- Needed for SpringXmlConfigurationBuilder and TestNamespaceHandler -->
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-dsl-api</artifactId>
         </dependency>
 
         <dependency>
@@ -102,6 +69,12 @@
             <artifactId>mule-tests-runner</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.tests.plugin</groupId>
+            <artifactId>mule-tests-component-plugin</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
 
         <!-- needed for org.springframework.beans.factory.FactoryBean interface -->
         <dependency>
@@ -123,33 +96,6 @@
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ftpserver</groupId>
-            <artifactId>ftpserver-core</artifactId>
-            <version>${testFtpServerVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ftpserver</groupId>
-            <artifactId>ftplet-api</artifactId>
-            <version>${testFtpServerVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.sshd</groupId>
-            <artifactId>sshd-core</artifactId>
-            <version>${sshCoreVersion}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>${bouncycastleVersion}</version>
         </dependency>
         <dependency>
             <groupId>commons-dbutils</groupId>

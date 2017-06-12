@@ -42,7 +42,6 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-maven-client-impl</artifactId>
-            <version>${muleMavenClientImpl}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>

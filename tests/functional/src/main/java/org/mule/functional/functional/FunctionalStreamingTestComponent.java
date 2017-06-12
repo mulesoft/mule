@@ -6,13 +6,22 @@
  */
 package org.mule.functional.functional;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.IOUtils.ifInputStream;
+import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
+
+import org.mule.functional.api.component.EventCallback;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.api.util.StringMessageUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,14 +34,13 @@ import org.slf4j.LoggerFactory;
  * A service that can be used by streaming functional tests. This service accepts an EventCallback that can be used to assert the
  * state of the current event. To access the service when embedded in an (XML) model, make sure that the descriptor sets the
  * singleton attribute true - see uses in TCP and FTP.
- *
+ * <p>
  * Note that although this implements the full StreamingService interface, nothing is written to the output stream - this is
  * intended as a final sink.
  *
  * @see EventCallback
  */
-
-public class FunctionalStreamingTestComponent implements Callable, MuleContextAware {
+public abstract class FunctionalStreamingTestComponent implements Processor, MuleContextAware, FlowConstructAware {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -45,6 +53,7 @@ public class FunctionalStreamingTestComponent implements Callable, MuleContextAw
   private String summary = null;
   private long targetSize = -1;
 
+  private FlowConstruct flowConstruct;
   private MuleContext muleContext;
 
   public FunctionalStreamingTestComponent() {
@@ -66,58 +75,59 @@ public class FunctionalStreamingTestComponent implements Callable, MuleContextAw
   }
 
   @Override
-  public Object onCall(MuleEventContext context) throws Exception {
-    return ifInputStream(context.getMessage().getPayload().getValue(), in -> {
-      try {
-        logger.debug("arrived at " + toString());
-        byte[] startData = new byte[STREAM_SAMPLE_SIZE];
-        long startDataSize = 0;
-        byte[] endData = new byte[STREAM_SAMPLE_SIZE]; // ring buffer
-        long endDataSize = 0;
-        long endRingPointer = 0;
-        long streamLength = 0;
-        byte[] buffer = new byte[STREAM_BUFFER_SIZE];
+  public Event process(Event event) throws MuleException {
+    return Event.builder(event)
+        .message(Message.builder(event.getMessage()).payload(ifInputStream(event.getMessage().getPayload().getValue(), in -> {
+          try {
+            logger.debug("arrived at " + toString());
+            byte[] startData = new byte[STREAM_SAMPLE_SIZE];
+            long startDataSize = 0;
+            byte[] endData = new byte[STREAM_SAMPLE_SIZE]; // ring buffer
+            long endDataSize = 0;
+            long endRingPointer = 0;
+            long streamLength = 0;
+            byte[] buffer = new byte[STREAM_BUFFER_SIZE];
 
-        // throw data on the floor, but keep a record of size, start and end values
-        long bytesRead = 0;
+            // throw data on the floor, but keep a record of size, start and end values
+            long bytesRead = 0;
 
-        while (bytesRead >= 0) {
-          bytesRead = read(in, buffer);
-          if (bytesRead > 0) {
+            while (bytesRead >= 0) {
+              bytesRead = read(in, buffer);
+              if (bytesRead > 0) {
+                if (logger.isDebugEnabled()) {
+                  logger.debug("read " + bytesRead + " bytes");
+                }
+
+                streamLength += bytesRead;
+                long startOfEndBytes = 0;
+                for (long i = 0; startDataSize < STREAM_SAMPLE_SIZE && i < bytesRead; ++i) {
+                  startData[(int) startDataSize++] = buffer[(int) i];
+                  ++startOfEndBytes; // skip data included in startData
+                }
+                startOfEndBytes = Math.max(startOfEndBytes, bytesRead - STREAM_SAMPLE_SIZE);
+                for (long i = startOfEndBytes; i < bytesRead; ++i) {
+                  ++endDataSize;
+                  endData[(int) (endRingPointer++ % STREAM_SAMPLE_SIZE)] = buffer[(int) i];
+                }
+                if (streamLength >= targetSize) {
+                  doCallback(startData, startDataSize, endData, endDataSize, endRingPointer, streamLength, event);
+                }
+              }
+            }
+
+            in.close();
+          } catch (Exception e) {
+            in.close();
+
+            e.printStackTrace();
             if (logger.isDebugEnabled()) {
-              logger.debug("read " + bytesRead + " bytes");
+              logger.debug("Error on test component", e);
             }
-
-            streamLength += bytesRead;
-            long startOfEndBytes = 0;
-            for (long i = 0; startDataSize < STREAM_SAMPLE_SIZE && i < bytesRead; ++i) {
-              startData[(int) startDataSize++] = buffer[(int) i];
-              ++startOfEndBytes; // skip data included in startData
-            }
-            startOfEndBytes = Math.max(startOfEndBytes, bytesRead - STREAM_SAMPLE_SIZE);
-            for (long i = startOfEndBytes; i < bytesRead; ++i) {
-              ++endDataSize;
-              endData[(int) (endRingPointer++ % STREAM_SAMPLE_SIZE)] = buffer[(int) i];
-            }
-            if (streamLength >= targetSize) {
-              doCallback(startData, startDataSize, endData, endDataSize, endRingPointer, streamLength, context);
-            }
+            throw e;
           }
-        }
 
-        in.close();
-      } catch (Exception e) {
-        in.close();
-
-        e.printStackTrace();
-        if (logger.isDebugEnabled()) {
-          logger.debug("Error on test component", e);
-        }
-        throw e;
-      }
-
-      return null;
-    });
+          return null;
+        })).build()).build();
   }
 
   protected int read(InputStream in, byte[] buffer) throws IOException {
@@ -125,7 +135,7 @@ public class FunctionalStreamingTestComponent implements Callable, MuleContextAw
   }
 
   private void doCallback(byte[] startData, long startDataSize, byte[] endData, long endDataSize, long endRingPointer,
-                          long streamLength, MuleEventContext context)
+                          long streamLength, Event event)
       throws Exception {
     // make a nice summary of the data
     StringBuilder result = new StringBuilder("Received stream");
@@ -148,13 +158,13 @@ public class FunctionalStreamingTestComponent implements Callable, MuleContextAw
 
     summary = result.toString();
 
-    String msg = StringMessageUtils.getBoilerPlate("Message Received in service: " + context.getFlowConstruct().getName() + ". "
-        + summary + "\n callback: " + eventCallback, '*', 80);
+    String msg = getBoilerPlate("Message Received in service: " + flowConstruct.getName() + ". " + summary
+        + "\n callback: " + eventCallback, '*', 80);
 
     logger.info(msg);
 
     if (eventCallback != null) {
-      eventCallback.eventReceived(context, this, muleContext);
+      eventCallback.eventReceived(event, this, muleContext);
     }
   }
 
@@ -166,5 +176,33 @@ public class FunctionalStreamingTestComponent implements Callable, MuleContextAw
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+  }
+
+  /**
+   * @return the first {@link FunctionalStreamingTestComponent} instance from a flow with the provided name.
+   */
+  public static FunctionalStreamingTestComponent getFromFlow(MuleContext muleContext, String flowName) throws Exception {
+    final FlowConstruct flowConstruct = muleContext.getRegistry().lookupObject(flowName);
+
+    if (flowConstruct != null) {
+      if (flowConstruct instanceof Pipeline) {
+        Pipeline flow = (Pipeline) flowConstruct;
+        // Retrieve the first component
+        for (Processor processor : flow.getMessageProcessors()) {
+          if (processor instanceof FunctionalStreamingTestComponent) {
+            return (FunctionalStreamingTestComponent) processor;
+          }
+        }
+      }
+
+      throw new RegistrationException(createStaticMessage("Can't get component from flow construct " + flowConstruct.getName()));
+    } else {
+      throw new RegistrationException(createStaticMessage("Flow " + flowName + " not found in Registry"));
+    }
   }
 }

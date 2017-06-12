@@ -1,0 +1,459 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.functional.api.component;
+
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.functional.api.notification.FunctionalTestNotification.EVENT_RECEIVED;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
+import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
+import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
+import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.functional.api.exception.FunctionalTestException;
+import org.mule.functional.api.notification.FunctionalTestNotification;
+import org.mule.functional.api.notification.FunctionalTestNotificationListener;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.message.Message.Builder;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.exception.MessagingException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+
+/**
+ * <code>FunctionalTestComponent</code> is a service that can be used by functional tests. This service accepts an EventCallback
+ * that can be used to assert the state of the current event.
+ * <p/>
+ * Also, this service fires {@link FunctionalTestNotification} via Mule for every message received. Tests can register with Mule
+ * to receive these events by implementing {@link FunctionalTestNotificationListener}.
+ *
+ * @see FunctionalTestNotification
+ * @see FunctionalTestNotificationListener
+ */
+public class FunctionalTestComponent extends AbstractAnnotatedObject
+    implements Processor, Lifecycle, MuleContextAware, FlowConstructAware {
+
+  private static final Logger logger = getLogger(FunctionalTestComponent.class);
+
+  public static final int STREAM_SAMPLE_SIZE = 4;
+  public static final int STREAM_BUFFER_SIZE = 4096;
+
+  private EventCallback eventCallback;
+  private Object returnData = null;
+  private boolean throwException = false;
+  private Class<? extends Throwable> exceptionToThrow;
+  private String exceptionText = "";
+  private boolean enableMessageHistory = true;
+  private boolean enableNotifications = true;
+  private boolean doInboundTransform = true;
+  private String appendString;
+  private long waitTime = 0;
+  private boolean logMessageDetails = false;
+  private String id = "<none>";
+  private MuleContext muleContext;
+  private FlowConstruct flowConstruct;
+  private static List<LifecycleCallback> lifecycleCallbacks = new ArrayList<>();
+
+
+  /**
+   * Keeps a list of any messages received on this service. Note that only references to the messages (objects) are stored, so any
+   * subsequent changes to the objects will change the history.
+   */
+  private List<Event> messageHistory;
+
+
+  @Override
+  public void initialise() {
+    if (enableMessageHistory) {
+      messageHistory = new CopyOnWriteArrayList<>();
+    }
+    for (LifecycleCallback callback : lifecycleCallbacks) {
+      callback.onTransition(id, Initialisable.PHASE_NAME);
+    }
+  }
+
+  @Override
+  public void start() throws MuleException {
+    for (LifecycleCallback callback : lifecycleCallbacks) {
+      callback.onTransition(id, Startable.PHASE_NAME);
+    }
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    for (LifecycleCallback callback : lifecycleCallbacks) {
+      callback.onTransition(id, Stoppable.PHASE_NAME);
+    }
+  }
+
+  @Override
+  public void dispose() {
+    for (LifecycleCallback callback : lifecycleCallbacks) {
+      callback.onTransition(id, Disposable.PHASE_NAME);
+    }
+  }
+
+  @Override
+  public Event process(Event event) throws MuleException {
+    try {
+      if (isThrowException()) {
+        throwException();
+      }
+      return doProcess(event);
+    } catch (Throwable t) {
+      throw new MessagingException(event, t, this);
+    }
+  }
+
+  /**
+   * Always throws a {@link FunctionalTestException}. This methodis only called if {@link #isThrowException()} is true.
+   *
+   * @throws FunctionalTestException or the exception specified in 'exceptionType
+   */
+  protected void throwException() throws Exception {
+    if (getExceptionToThrow() != null) {
+      if (StringUtils.isNotBlank(exceptionText)) {
+        Throwable exception = instantiateClass(getExceptionToThrow(), new Object[] {exceptionText});
+        throw (Exception) exception;
+      } else {
+        throw (Exception) getExceptionToThrow().newInstance();
+      }
+    } else {
+      if (StringUtils.isNotBlank(exceptionText)) {
+        throw new FunctionalTestException(exceptionText);
+      } else {
+        throw new FunctionalTestException();
+      }
+    }
+  }
+
+  /**
+   * Will append the value of {@link #getAppendString()} to the contents of the message. This has a side affect that the inbound
+   * message will be converted to a string and the return payload will be a string. Note that the value of
+   * {@link #getAppendString()} can contain expressions.
+   *
+   * @param contents the string vlaue of the current message payload
+   * @param event the current event
+   * @return a concatenated string of the current payload and the appendString
+   */
+  protected String append(String contents, Event event) {
+    return contents + muleContext.getExpressionManager().parse(appendString, event, flowConstruct);
+  }
+
+  /**
+   * The service method that implements the test component logic.
+   *
+   * @param event the current {@link EventC}
+   * @return a new message payload according to the configuration of the component
+   * @throws Exception if there is a general failure or if {@link #isThrowException()} is true.
+   */
+  protected Event doProcess(Event event) throws Exception {
+    if (enableMessageHistory) {
+      messageHistory.add(event);
+    }
+
+    final Message message = event.getMessage();
+    if (logger.isInfoEnabled()) {
+      String msg = getBoilerPlate("Message Received in flow: "
+          + flowConstruct.getName() + ". Content is: "
+          + truncate(message.getPayload().getValue().toString(), 100, true), '*', 80);
+
+      logger.info(msg);
+    }
+
+    if (isLogMessageDetails() && logger.isInfoEnabled()) {
+      StringBuilder sb = new StringBuilder();
+
+      sb.append("Full Message: ").append(LINE_SEPARATOR);
+      sb.append(message.getPayload().getValue().toString()).append(LINE_SEPARATOR);
+      sb.append(message.toString());
+      logger.info(sb.toString());
+    }
+
+    if (eventCallback != null) {
+      eventCallback.eventReceived(event, this, muleContext);
+    }
+
+    Builder replyBuilder = Message.builder(message);
+    if (returnData != null) {
+      if (returnData instanceof String && muleContext.getExpressionManager().isExpression(returnData.toString())) {
+        replyBuilder =
+            replyBuilder.payload(muleContext.getExpressionManager().parse(returnData.toString(), event, flowConstruct));
+      } else {
+        replyBuilder = replyBuilder.payload(returnData);
+      }
+    } else {
+      if (appendString != null) {
+        replyBuilder = replyBuilder.payload(append(event.getMessageAsString(muleContext), event));
+      }
+    }
+    Event replyMessage = Event.builder(event).message(replyBuilder.build()).build();
+
+    if (isEnableNotifications()) {
+      muleContext.fireNotification(new FunctionalTestNotification(event, flowConstruct, replyMessage, EVENT_RECEIVED));
+    }
+
+    // Time to wait before returning
+    if (waitTime > 0) {
+      try {
+        Thread.sleep(waitTime);
+      } catch (InterruptedException e) {
+        logger.info("FunctionalTestComponent waitTime was interrupted");
+      }
+    }
+    return replyMessage;
+  }
+
+  /**
+   * An event callback is called when a message is received by the service. An MuleEvent callback isn't strictly required but it
+   * is usfal for performing assertions on the current message being received. Note that the FunctionalTestComponent should be
+   * made a singleton when using MuleEvent callbacks
+   * <p/>
+   * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this will deleiver a
+   * {@link FunctionalTestNotification} for every message received by this service
+   *
+   * @return the callback to call when a message is received
+   * @see FunctionalTestNotification
+   * @see FunctionalTestNotificationListener
+   */
+  public EventCallback getEventCallback() {
+    return eventCallback;
+  }
+
+  /**
+   * An event callback is called when a message is received by the service. An MuleEvent callback isn't strictly required but it
+   * is usfal for performing assertions on the current message being received. Note that the FunctionalTestComponent should be
+   * made a singleton when using MuleEvent callbacks
+   * <p/>
+   * Another option is to register a {@link FunctionalTestNotificationListener} with Mule and this will deleiver a
+   * {@link FunctionalTestNotification} for every message received by this service
+   *
+   * @param eventCallback the callback to call when a message is received
+   * @see FunctionalTestNotification
+   * @see FunctionalTestNotificationListener
+   */
+  public void setEventCallback(EventCallback eventCallback) {
+    this.eventCallback = eventCallback;
+  }
+
+  /**
+   * Often you will may want to return a fixed message payload to simulate and external system call. This can be done using the
+   * 'returnData' property. Note that you can return complex objects by using the <container-property> element in the Xml
+   * configuration.
+   *
+   * @return the message payload to always return from this service instance
+   */
+  public Object getReturnData() {
+    return returnData;
+  }
+
+  /**
+   * Often you will may want to return a fixed message payload to simulate and external system call. This can be done using the
+   * 'returnData' property. Note that you can return complex objects by using the <container-property> element in the Xml
+   * configuration.
+   *
+   * @param returnData the message payload to always return from this service instance
+   */
+  public void setReturnData(Object returnData) {
+    this.returnData = returnData;
+  }
+
+  /**
+   * Sometimes you will want the service to always throw an exception, if this is the case you can set the 'throwException'
+   * property to true.
+   *
+   * @return throwException true if an exception should always be thrown from this instance. If the {@link #getReturnData()}
+   *         property is set and is of type java.lang.Exception, that exception will be thrown.
+   */
+  public boolean isThrowException() {
+    return throwException;
+  }
+
+  /**
+   * Sometimes you will want the service to always throw an exception, if this is the case you can set the 'throwException'
+   * property to true.
+   *
+   * @param throwException true if an exception should always be thrown from this instance. If the {@link #getReturnData()}
+   *        property is set and is of type java.lang.Exception, that exception will be thrown.
+   */
+  public void setThrowException(boolean throwException) {
+    this.throwException = throwException;
+  }
+
+  public boolean isEnableMessageHistory() {
+    return enableMessageHistory;
+  }
+
+  public void setEnableMessageHistory(boolean enableMessageHistory) {
+    this.enableMessageHistory = enableMessageHistory;
+  }
+
+  /**
+   * If enableMessageHistory = true, returns the number of messages received by this service.
+   * 
+   * @return -1 if no message history, otherwise the history size
+   */
+  public int getReceivedMessagesCount() {
+    if (messageHistory != null) {
+      return messageHistory.size();
+    } else {
+      return -1;
+    }
+  }
+
+  /**
+   * If enableMessageHistory = true, returns a message received by the service in chronological order. For example,
+   * getReceivedMessage(1) returns the first message received by the service, getReceivedMessage(2) returns the second message
+   * received by the service, etc.
+   */
+  public Event getReceivedMessage(int number) {
+    Event message = null;
+    if (messageHistory != null) {
+      if (number <= messageHistory.size()) {
+        message = messageHistory.get(number - 1);
+      }
+    }
+    return message;
+  }
+
+  /**
+   * If enableMessageHistory = true, returns the last message received by the service in chronological order.
+   */
+  public Event getLastReceivedMessage() {
+    if (messageHistory != null) {
+      return messageHistory.get(messageHistory.size() - 1);
+    } else {
+      return null;
+    }
+  }
+
+  public String getAppendString() {
+    return appendString;
+  }
+
+  public void setAppendString(String appendString) {
+    this.appendString = appendString;
+  }
+
+  public boolean isEnableNotifications() {
+    return enableNotifications;
+  }
+
+  public void setEnableNotifications(boolean enableNotifications) {
+    this.enableNotifications = enableNotifications;
+  }
+
+  public Class<? extends Throwable> getExceptionToThrow() {
+    return exceptionToThrow;
+  }
+
+  public void setExceptionToThrow(Class<? extends Throwable> exceptionToThrow) {
+    this.exceptionToThrow = exceptionToThrow;
+  }
+
+  public long getWaitTime() {
+    return waitTime;
+  }
+
+  public void setWaitTime(long waitTime) {
+    this.waitTime = waitTime;
+  }
+
+  public boolean isDoInboundTransform() {
+    return doInboundTransform;
+  }
+
+  public void setDoInboundTransform(boolean doInboundTransform) {
+    this.doInboundTransform = doInboundTransform;
+  }
+
+  public boolean isLogMessageDetails() {
+    return logMessageDetails;
+  }
+
+  public void setLogMessageDetails(boolean logMessageDetails) {
+    this.logMessageDetails = logMessageDetails;
+  }
+
+  public String getExceptionText() {
+    return exceptionText;
+  }
+
+  public void setExceptionText(String text) {
+    exceptionText = text;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public static void addLifecycleCallback(LifecycleCallback callback) {
+    lifecycleCallbacks.add(callback);
+  }
+
+  public static void removeLifecycleCallback(LifecycleCallback callback) {
+    lifecycleCallbacks.remove(callback);
+  }
+
+  public interface LifecycleCallback {
+
+    void onTransition(String name, String newPhase);
+  }
+
+  /**
+   * @return the first {@code test:component} from a flow with the provided name.
+   */
+  public static FunctionalTestComponent getFromFlow(MuleContext muleContext, String flowName) throws Exception {
+    final FlowConstruct flowConstruct = muleContext.getRegistry().lookupObject(flowName);
+
+    if (flowConstruct != null) {
+      if (flowConstruct instanceof Pipeline) {
+        Pipeline flow = (Pipeline) flowConstruct;
+        // Retrieve the first component
+        for (Processor processor : flow.getMessageProcessors()) {
+          if (processor instanceof FunctionalTestComponent) {
+            return (FunctionalTestComponent) processor;
+          }
+        }
+      }
+
+      throw new RegistrationException(createStaticMessage("Can't get component from flow construct " + flowConstruct.getName()));
+    } else {
+      throw new RegistrationException(createStaticMessage("Flow " + flowName + " not found in Registry"));
+    }
+  }
+
+}
