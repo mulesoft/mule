@@ -28,7 +28,6 @@ import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.tck.MuleTestUtils.TestCallback;
 import static org.junit.runners.Parameterized.Parameters;
 
-
 @RunWith(Parameterized. class)
 public class DroolsAssertBehaviorTestCase extends AbstractMuleTestCase
 {
