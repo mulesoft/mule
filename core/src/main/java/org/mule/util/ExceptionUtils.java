@@ -14,7 +14,7 @@ import java.util.ListIterator;
 /**
  * Mule exception utilities.
  */
-public class ExceptionUtils extends org.apache.commons.lang.exception.ExceptionUtils
+public class ExceptionUtils extends org.apache.commons.lang3.exception.ExceptionUtils
 {
     /**
      * This method returns true if the throwable contains a {@link Throwable} that
