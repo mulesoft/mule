@@ -7,16 +7,16 @@
 
 package org.mule.module.drools;
 
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mule.module.bpm.MessageService;
 import org.mule.module.bpm.Rules;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
 
+import java.util.Arrays;
+import java.util.Collection;
 
-import static java.lang.System.clearProperty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
@@ -24,45 +24,49 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.module.drools.Drools.USE_EQUALITY_ASSERT_BEHAVIOR;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import static org.mule.tck.MuleTestUtils.TestCallback;
+import static org.junit.runners.Parameterized.Parameters;
 
+
+@RunWith(Parameterized. class)
 public class DroolsAssertBehaviorTestCase extends AbstractMuleTestCase
 {
-    @Rule
-    public SystemProperty equalityAssertBehaviorSystemProperty = new SystemProperty(USE_EQUALITY_ASSERT_BEHAVIOR, "true");
 
-    private final Drools drools = new Drools();
-    private final Rules rules = mock(Rules.class);
-    private final MessageService messageService = mock(MessageService.class, RETURNS_DEEP_STUBS);
+    private final static Drools drools = new Drools();
+    private final static Rules rules = mock(Rules.class);
+    private final static MessageService messageService = mock(MessageService.class, RETURNS_DEEP_STUBS);
+    private final String propertyValue ;
+    private final TestCallback testCallback ;
 
-    @Before
-    public void setUp() throws Exception
+    public DroolsAssertBehaviorTestCase(String propertyValue, TestCallback testCallback) {
+        this.propertyValue = propertyValue;
+        this.testCallback = testCallback;
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
+        return Arrays.asList(new Object[][]{
+                {"false", identityBehaviourCallback},
+                {"true", equalityBehaviourCallback}
+        });
+    }
+
+    private static void setUp () throws Exception {
         when(rules.getResource()).thenReturn("rulesFile.drl");
         drools.setMessageService(messageService);
+        DroolsSessionData sessionData = (DroolsSessionData) drools.createSession(rules);
+        when(rules.getSessionData()).thenReturn(sessionData);
     }
 
     @Test
-    public void testEqualityAssertBehaviour() throws Exception
+    public void testAssertBehaviour() throws Exception
     {
-        DroolsSessionData sessionData = (DroolsSessionData) drools.createSession(rules);
-        when(rules.getSessionData()).thenReturn(sessionData);
-        Object handle1 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
-        Object handle2 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
-        assertThat(handle1, is(handle2));
+        testWithSystemProperty(USE_EQUALITY_ASSERT_BEHAVIOR, propertyValue, testCallback);
     }
 
-    @Test
-    public void testIdentityAssertBehaviour() throws Exception
-    {
-        clearProperty(USE_EQUALITY_ASSERT_BEHAVIOR);
-        DroolsSessionData sessionData = (DroolsSessionData) drools.createSession(rules);
-        when(rules.getSessionData()).thenReturn(sessionData);
-        Object handle1 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
-        Object handle2 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
-        assertThat(handle1, not(is(handle2)));
-    }
-
-    public class TestFact {
+    public static class TestFact {
         private final String id;
         private String description;
 
@@ -103,4 +107,24 @@ public class DroolsAssertBehaviorTestCase extends AbstractMuleTestCase
             this.description = description;
         }
     }
+
+    static TestCallback identityBehaviourCallback =  new TestCallback(){
+        @Override
+        public void run() throws Exception {
+            setUp();
+            Object handle1 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
+            Object handle2 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
+            assertThat(handle1, is(not(handle2)));
+        }
+    };
+
+    static TestCallback equalityBehaviourCallback =  new TestCallback(){
+        @Override
+        public void run() throws Exception {
+            setUp();
+            Object handle1 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
+            Object handle2 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
+            assertThat(handle1, is(handle2));
+        }
+    };
 }
