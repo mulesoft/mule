@@ -77,7 +77,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends AbstractProc
         catch (Exception e)
         {
             processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR,
-                                                     String.format("%s\n%s", e.getMessage(), ExceptionUtils.getFullStackTrace(e)));
+                                                     String.format("%s\n%s", e.getMessage(), ExceptionUtils.getStackTrace(e)));
             throw e;
         }
     }

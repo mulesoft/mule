@@ -18,7 +18,7 @@ import org.mule.extension.validation.api.ExceptionFactory;
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationResult;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.Test;
 
 public class ValidationExceptionTestCase extends ValidationTestCase

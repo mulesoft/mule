@@ -228,6 +228,7 @@
 /mule-standalone-${productVersion}/lib/opt/commons-io-2.4.jar
 /mule-standalone-${productVersion}/lib/opt/commons-jxpath-1.3.jar
 /mule-standalone-${productVersion}/lib/opt/commons-lang-2.4.jar
+/mule-standalone-${productVersion}/lib/opt/commons-lang3-3.6.jar
 /mule-standalone-${productVersion}/lib/opt/commons-net-3.5.jar
 /mule-standalone-${productVersion}/lib/opt/commons-pool-1.6.jar
 /mule-standalone-${productVersion}/lib/opt/commons-validator-1.4.0.jar
