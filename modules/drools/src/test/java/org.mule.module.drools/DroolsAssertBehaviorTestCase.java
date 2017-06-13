@@ -7,6 +7,7 @@
 
 package org.mule.module.drools;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -52,11 +53,10 @@ public class DroolsAssertBehaviorTestCase extends AbstractMuleTestCase
         });
     }
 
-    private static void setUp () throws Exception {
+    @BeforeClass
+    public static void setUp () throws Exception {
         when(rules.getResource()).thenReturn("rulesFile.drl");
         drools.setMessageService(messageService);
-        DroolsSessionData sessionData = (DroolsSessionData) drools.createSession(rules);
-        when(rules.getSessionData()).thenReturn(sessionData);
     }
 
     @Test
@@ -110,7 +110,7 @@ public class DroolsAssertBehaviorTestCase extends AbstractMuleTestCase
     static TestCallback identityBehaviourCallback =  new TestCallback(){
         @Override
         public void run() throws Exception {
-            setUp();
+            createSession();
             Object handle1 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
             Object handle2 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
             assertThat(handle1, is(not(handle2)));
@@ -120,10 +120,16 @@ public class DroolsAssertBehaviorTestCase extends AbstractMuleTestCase
     static TestCallback equalityBehaviourCallback =  new TestCallback(){
         @Override
         public void run() throws Exception {
-            setUp();
+            createSession();
             Object handle1 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
             Object handle2 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
             assertThat(handle1, is(handle2));
         }
     };
+
+    private static void createSession () throws Exception
+    {
+        DroolsSessionData sessionData = (DroolsSessionData) drools.createSession(rules);
+        when(rules.getSessionData()).thenReturn(sessionData);
+    }
 }
