@@ -6,6 +6,10 @@
  */
 package org.mule.module.drools;
 
+import static java.lang.Boolean.getBoolean;
+import static org.drools.conf.AssertBehaviorOption.EQUALITY;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+
 import org.mule.api.config.ConfigurationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -36,6 +40,9 @@ import org.slf4j.LoggerFactory;
 
 public class Drools implements RulesEngine
 {
+
+    public static final String USE_EQUALITY_ASSERT_BEHAVIOR = SYSTEM_PROPERTY_PREFIX  + "drools.useEqualityAssert";
+
     /** An optional logical name for the Rules Engine. */
     private String name;
 
@@ -65,6 +72,12 @@ public class Drools implements RulesEngine
 
         KnowledgeBaseConfiguration conf = 
             KnowledgeBaseFactory.newKnowledgeBaseConfiguration(null, Thread.currentThread().getContextClassLoader());
+
+        if (useEqualityAssertBehavior())
+        {
+            conf.setOption(EQUALITY);
+        }
+
         if (rules.getConfiguration() != null)
         {
             conf.setOption((KnowledgeBaseOption) rules.getConfiguration());
@@ -177,6 +190,11 @@ public class Drools implements RulesEngine
     public String getName()
     {
         return name;
+    }
+
+    private boolean useEqualityAssertBehavior ()
+    {
+        return getBoolean(USE_EQUALITY_ASSERT_BEHAVIOR);
     }
 }
 
