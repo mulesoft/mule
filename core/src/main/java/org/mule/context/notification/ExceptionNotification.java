@@ -6,7 +6,7 @@
  */
 package org.mule.context.notification;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.mule.api.context.notification.ServerNotification;
 
 /**
