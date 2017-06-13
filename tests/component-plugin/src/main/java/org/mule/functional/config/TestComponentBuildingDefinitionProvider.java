@@ -18,7 +18,7 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
 import org.mule.functional.api.component.AssertionMessageProcessor;
 import org.mule.functional.api.component.EventCallback;
-import org.mule.functional.api.component.FunctionalTestComponent;
+import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.functional.api.component.InvocationCountMessageProcessor;
 import org.mule.functional.api.component.ResponseAssertionMessageProcessor;
 import org.mule.functional.api.component.SharedConfig;
@@ -81,8 +81,8 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build());
 
     componentBuildingDefinitions.add(baseComponentDefinition.copy()
-        .withIdentifier("component")
-        .withTypeDefinition(fromType(FunctionalTestComponent.class))
+        .withIdentifier("processor")
+        .withTypeDefinition(fromType(FunctionalTestProcessor.class))
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.copy()

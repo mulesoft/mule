@@ -11,10 +11,10 @@ import org.mule.runtime.core.api.MuleContext;
 
 /**
  * The scope of the MuleEvent Callback is to be able to get a the message currently being processed by the
- * {@link FunctionalTestComponent} and make assertions on the message payload, headers or attachments or to make changes required
+ * {@link FunctionalTestProcessor} and make assertions on the message payload, headers or attachments or to make changes required
  * for the test.
  *
- * @see FunctionalTestComponent
+ * @see FunctionalTestProcessor
  */
 public interface EventCallback {
 
