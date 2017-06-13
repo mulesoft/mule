@@ -10,12 +10,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.instanceOf;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpException;
@@ -83,6 +88,40 @@ public class SftpClientTestCase extends AbstractMuleTestCase
     }
 
     @Test
+    public void causedBySizeShouldBeAnSftpException() throws Exception
+    {
+        SftpException expectedCause = new SftpException(1, destDir);
+        SftpClient client = createSftpClientWithExceptionOnStat(expectedCause);
+        try
+        {
+            client.getSize("file.txt");
+            fail("IOException expected.");
+        }
+        catch (IOException e)
+        {
+            assertThat(e.getCause(), is(instanceOf(SftpException.class)));
+            assertEquals(e.getCause(), expectedCause);
+        }        
+    }
+    
+    @Test
+    public void causedByWhenStoreShouldBeAnSftpException() throws Exception
+    {
+        SftpException expectedCause = new SftpException(1, destDir);
+        SftpClient client = createSftpClientWithExceptionOnStoreFile(expectedCause);
+        try
+        {
+            client.storeFile("file.txt", "file.txt");
+            fail("IOException expected.");
+        }
+        catch (IOException e)
+        {
+            assertThat(e.getCause(), is(instanceOf(SftpException.class)));
+            assertEquals(e.getCause(), expectedCause);
+        }        
+    }
+    
+    @Test
     public void causedByShouldBeAnSftpException() throws Exception
     {
         SftpException expectedCause = new SftpException(1, destDir);
@@ -94,21 +133,44 @@ public class SftpClientTestCase extends AbstractMuleTestCase
         }
         catch (IOException e)
         {
+            assertThat(e.getCause(), is(instanceOf(SftpException.class)));
             assertEquals(e.getCause(), expectedCause);
         }
     }
 
-    private SftpClient createSftpClientWithException(SftpException exceptionToThrow) throws NoSuchFieldException, SftpException, IllegalAccessException
+    private SftpClient createClient(SftpException exceptionToThrow, ChannelSftp mockChannel) throws NoSuchFieldException, SftpException, IllegalAccessException
     {
         SftpClient client = new SftpClient("local");
         Field channelField = client.getClass().getDeclaredField("channelSftp");
         channelField.setAccessible(true);
 
+        channelField.set(client, mockChannel);
+        
+        return client;
+    }
+
+    private SftpClient createSftpClientWithExceptionOnStat(SftpException exceptionToThrow) throws NoSuchFieldException, SftpException, IllegalAccessException
+    {
+        ChannelSftp mockChannel = mock(ChannelSftp.class);
+        when(mockChannel.stat(anyString())).thenThrow(exceptionToThrow);
+
+        return createClient(exceptionToThrow, mockChannel);
+    }
+    
+    private SftpClient createSftpClientWithExceptionOnStoreFile(SftpException exceptionToThrow) throws NoSuchFieldException, SftpException, IllegalAccessException
+    {
+        ChannelSftp mockChannel = mock(ChannelSftp.class);
+        doThrow(exceptionToThrow).when(mockChannel).put(anyString(), anyString(), anyInt());
+
+        return createClient(exceptionToThrow, mockChannel);
+    }
+
+    private SftpClient createSftpClientWithException(SftpException exceptionToThrow) throws NoSuchFieldException, SftpException, IllegalAccessException
+    {
         ChannelSftp mockChannel = mock(ChannelSftp.class);
         when(mockChannel.ls(anyString())).thenThrow(exceptionToThrow);
-        channelField.set(client, mockChannel);
 
-        return client;
+        return createClient(exceptionToThrow, mockChannel);
     }
 
     private SftpClient getSftpClientSpy() throws IOException
