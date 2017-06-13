@@ -16,17 +16,19 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 
+import static java.lang.System.clearProperty;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.module.drools.Drools.equalityAssertBehavior;
+import static org.mule.module.drools.Drools.USE_EQUALITY_ASSERT_BEHAVIOR;
 
-public class DroolsTestCase extends AbstractMuleTestCase
+public class DroolsAssertBehaviorTestCase extends AbstractMuleTestCase
 {
     @Rule
-    public SystemProperty equalityAssertBehaviorSystemProperty = new SystemProperty(equalityAssertBehavior, "true");
+    public SystemProperty equalityAssertBehaviorSystemProperty = new SystemProperty(USE_EQUALITY_ASSERT_BEHAVIOR, "true");
 
     private final Drools drools = new Drools();
     private final Rules rules = mock(Rules.class);
@@ -37,16 +39,27 @@ public class DroolsTestCase extends AbstractMuleTestCase
     {
         when(rules.getResource()).thenReturn("rulesFile.drl");
         drools.setMessageService(messageService);
-        DroolsSessionData sessionData = (DroolsSessionData) drools.createSession(rules);
-        when(rules.getSessionData()).thenReturn(sessionData);
     }
 
     @Test
-    public void testMemoryLeakCausedBySaveDuplicatedObjects() throws Exception
+    public void testEqualityAssertBehaviour() throws Exception
     {
+        DroolsSessionData sessionData = (DroolsSessionData) drools.createSession(rules);
+        when(rules.getSessionData()).thenReturn(sessionData);
         Object handle1 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
         Object handle2 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
         assertThat(handle1, is(handle2));
+    }
+
+    @Test
+    public void testIdentityAssertBehaviour() throws Exception
+    {
+        clearProperty(USE_EQUALITY_ASSERT_BEHAVIOR);
+        DroolsSessionData sessionData = (DroolsSessionData) drools.createSession(rules);
+        when(rules.getSessionData()).thenReturn(sessionData);
+        Object handle1 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
+        Object handle2 = drools.assertFact(rules, new TestFact("idTest", "descriptionTest"));
+        assertThat(handle1, not(is(handle2)));
     }
 
     public class TestFact {

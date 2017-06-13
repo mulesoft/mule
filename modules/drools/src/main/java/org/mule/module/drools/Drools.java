@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 public class Drools implements RulesEngine
 {
 
-    public static final String equalityAssertBehavior= SYSTEM_PROPERTY_PREFIX  + "droolsEqualityAssertBehavior";
+    public static final String USE_EQUALITY_ASSERT_BEHAVIOR = SYSTEM_PROPERTY_PREFIX  + "drools.useEqualityAssert";
 
     /** An optional logical name for the Rules Engine. */
     private String name;
@@ -73,7 +73,7 @@ public class Drools implements RulesEngine
         KnowledgeBaseConfiguration conf = 
             KnowledgeBaseFactory.newKnowledgeBaseConfiguration(null, Thread.currentThread().getContextClassLoader());
 
-        if (isEqualityAssertBehavior())
+        if (useEqualityAssertBehavior())
         {
             conf.setOption(EQUALITY);
         }
@@ -192,9 +192,9 @@ public class Drools implements RulesEngine
         return name;
     }
 
-    private boolean isEqualityAssertBehavior ()
+    private boolean useEqualityAssertBehavior ()
     {
-        return getBoolean(equalityAssertBehavior);
+        return getBoolean(USE_EQUALITY_ASSERT_BEHAVIOR);
     }
 }
 

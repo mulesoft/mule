@@ -1,6 +1,6 @@
 
 package mule;
-import org.mule.module.drools.DroolsTestCase.TestFact;
+import org.mule.module.drools.DroolsAssertBehaviorTestCase.TestFact;
 global org.mule.module.bpm.MessageService mule;
 
 
