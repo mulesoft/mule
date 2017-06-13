@@ -1,0 +1,14 @@
+
+package mule;
+import org.mule.module.drools.DroolsAssertBehaviorTestCase.TestFact;
+global org.mule.module.bpm.MessageService mule;
+
+
+rule "TestRule"
+    dialect "mvel"
+    when
+        t : TestFact( description == "test")
+    then
+        t.setDescription("Test rule passed.")
+end
+
