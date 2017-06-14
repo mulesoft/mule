@@ -108,7 +108,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       return event.getMessage().getPayload();
     } else {
       BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
-      return sanitizeAndEvaluate(sanitized, exp -> expressionExecutor.evaluate(exp, contextBuilder.build()));
+      return evaluate(sanitized, exp -> expressionExecutor.evaluate(exp, contextBuilder.build()));
     }
   }
 
@@ -146,7 +146,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     } else {
       BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
       addFlowBindings(flowConstruct, contextBuilder);
-      return sanitizeAndEvaluate(sanitized, exp -> expressionExecutor.evaluate(exp, contextBuilder.build()));
+      return evaluate(sanitized, exp -> expressionExecutor.evaluate(exp, contextBuilder.build()));
     }
   }
 
@@ -192,8 +192,12 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
    * @return the result of the evaluation
    */
   private <T> T sanitizeAndEvaluate(String expression, Function<String, T> evaluation) {
+    return evaluate(sanitize(expression), evaluation);
+  }
+
+  private <T> T evaluate(String expression, Function<String, T> evaluation) {
     try {
-      return evaluation.apply(sanitize(expression));
+      return evaluation.apply(expression);
     } catch (ExpressionExecutionException e) {
       throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
     }

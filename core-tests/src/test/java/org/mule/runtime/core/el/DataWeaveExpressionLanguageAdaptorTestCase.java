@@ -16,11 +16,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -308,12 +304,11 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     BindingContext bindingContext = BindingContext.builder().build();
     MuleContext muleContext = mock(MuleContext.class);
     DefaultExpressionLanguageFactoryService languageFactory = mock(DefaultExpressionLanguageFactoryService.class);
-    ExpressionLanguage expressionLanguage = mock(ExpressionLanguage.class);
-    when(expressionLanguage.evaluate("payload", bindingContext)).thenThrow(new RuntimeException("It should not be called"));
+    ExpressionLanguage expressionLanguage = spy(ExpressionLanguage.class);
     when(languageFactory.create()).thenReturn(expressionLanguage);
     Event event = testEvent();
     new DataWeaveExpressionLanguageAdaptor(muleContext, languageFactory).evaluate("#[payload]", event, bindingContext);
-
+    verify(expressionLanguage, never()).evaluate(eq("payload"), any(BindingContext.class));
   }
 
   private Event getEventWithError(Optional<Error> error) {
