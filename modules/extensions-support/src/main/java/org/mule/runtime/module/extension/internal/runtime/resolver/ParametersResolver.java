@@ -199,11 +199,6 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
 
       if (resolver != null) {
         resolverSet.add(parameterName, resolver);
-      } else if (p.isRequired()) {
-        throw new IllegalStateException(format("Parameter '%s' from the %s '%s' is required but is not set",
-                                               parameterName,
-                                               getComponentModelTypeName(model),
-                                               getModelName(model)));
       }
     });
 
