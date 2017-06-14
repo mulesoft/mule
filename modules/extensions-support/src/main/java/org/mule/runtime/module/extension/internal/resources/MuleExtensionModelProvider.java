@@ -19,14 +19,12 @@ import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
  */
 public class MuleExtensionModelProvider {
 
-  public static final String MULE_EXTENSION_NAME = "Mule Core";
   private static final String MODEL_JSON = "META-INF/mule-extension-model.json";
-  private static final String JSON = IOUtils.toString(MuleExtensionModelProvider.class.getClassLoader()
-      .getResourceAsStream(MODEL_JSON));
   private static final ExtensionModel EXTENSION_MODEL =
       withContextClassLoader(ExtensionTypeAnnotationsRegistry.class.getClassLoader(),
-                             () -> new ExtensionModelJsonSerializer(false).deserialize(JSON));
-
+                             () -> new ExtensionModelJsonSerializer(false)
+                                 .deserialize(IOUtils.toString(MuleExtensionModelProvider.class.getClassLoader()
+                                     .getResourceAsStream(MODEL_JSON))));
 
   /**
    * @return the {@link ExtensionModel} definition for Mule's Runtime
@@ -34,5 +32,4 @@ public class MuleExtensionModelProvider {
   public static ExtensionModel getExtensionModel() {
     return EXTENSION_MODEL;
   }
-
 }
