@@ -6,21 +6,24 @@
  */
 package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 
-import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
-import org.mule.runtime.extension.api.soap.SoapServiceProvider;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
+import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.soap.api.SoapService;
 
+import javax.inject.Inject;
 import java.util.List;
 
-import javax.inject.Inject;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 
 /**
  * {@link ConnectionProvider} implementation that handles {@link ForwardingSoapClient} connections,
@@ -33,7 +36,8 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class ForwardingSoapClientConnectionProvider implements PoolingConnectionProvider<ForwardingSoapClient> {
+public class ForwardingSoapClientConnectionProvider
+    implements PoolingConnectionProvider<ForwardingSoapClient>, Initialisable, Disposable {
 
   @Inject
   private SoapService soapService;
@@ -81,5 +85,19 @@ public class ForwardingSoapClientConnectionProvider implements PoolingConnection
   @Override
   public ConnectionValidationResult validate(ForwardingSoapClient connection) {
     return success();
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (transportProvider instanceof Initialisable) {
+      ((Initialisable) transportProvider).initialise();
+    }
+  }
+
+  @Override
+  public void dispose() {
+    if (transportProvider instanceof Disposable) {
+      ((Disposable) transportProvider).dispose();
+    }
   }
 }

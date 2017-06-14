@@ -6,20 +6,26 @@
  */
 package org.mule.runtime.module.extension.soap.internal.runtime.connection.transport;
 
-import static java.util.Objects.isNull;
-import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.soap.HttpMessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.http.api.client.HttpClient;
+import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.soap.api.message.dispatcher.DefaultHttpMessageDispatcher;
 import org.mule.runtime.soap.api.message.dispatcher.HttpConfigBasedMessageDispatcher;
 
 import javax.inject.Inject;
+
+import static java.util.Objects.isNull;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 
 /**
  * Default implementation of {@link HttpMessageDispatcherProvider} sends a soap message over http using a default configuration or
@@ -27,22 +33,24 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class DefaultHttpMessageDispatcherProvider implements HttpMessageDispatcherProvider {
+public class DefaultHttpMessageDispatcherProvider implements HttpMessageDispatcherProvider, Initialisable, Disposable {
 
   @Inject
   private HttpService httpService;
 
   @Inject
-  private ExtensionsClient client;
+  private ExtensionsClient extensionsClient;
 
   @Parameter
   @Optional
   private String configRef;
 
+  private HttpClient httpClient;
+
   @Override
   public MessageDispatcher connect() throws ConnectionException {
-    return isNull(configRef) ? new DefaultHttpMessageDispatcher(httpService)
-        : new HttpConfigBasedMessageDispatcher(configRef, client);
+    return isNull(configRef) ? new DefaultHttpMessageDispatcher(httpClient)
+        : new HttpConfigBasedMessageDispatcher(configRef, extensionsClient);
   }
 
   @Override
@@ -55,4 +63,17 @@ public class DefaultHttpMessageDispatcherProvider implements HttpMessageDispatch
     return success();
   }
 
+
+  @Override
+  public void dispose() {
+    httpClient.stop();
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    httpClient = httpService.getClientFactory().create(new HttpClientConfiguration.Builder()
+        .setName("wsc-dispatcher")
+        .build());
+    httpClient.start();
+  }
 }
