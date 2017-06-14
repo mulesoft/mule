@@ -16,10 +16,14 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
@@ -36,7 +40,10 @@ import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PROPER
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.VARIABLES;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
+
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
+import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
@@ -45,6 +52,7 @@ import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.config.MuleManifest;
@@ -296,6 +304,18 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     TypedValue result = expressionLanguage.evaluate("flow.name", event, mockFlowConstruct, BindingContext.builder().build());
     assertThat(result.getDataType(), is(STRING));
     assertThat(result.getValue(), is(flowName));
+  }
+
+  @Test
+  public void payloadExpressionShouldNotBeEvaluate() throws MuleException {
+    BindingContext bindingContext = BindingContext.builder().build();
+    MuleContext muleContext = mock(MuleContext.class);
+    DefaultExpressionLanguageFactoryService languageFactory = mock(DefaultExpressionLanguageFactoryService.class);
+    ExpressionLanguage expressionLanguage = spy(ExpressionLanguage.class);
+    when(languageFactory.create()).thenReturn(expressionLanguage);
+    Event event = testEvent();
+    new DataWeaveExpressionLanguageAdaptor(muleContext, languageFactory).evaluate("#[payload]", event, bindingContext);
+    verify(expressionLanguage, never()).evaluate(eq("payload"), any(BindingContext.class));
   }
 
   private Event getEventWithError(Optional<Error> error) {

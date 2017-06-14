@@ -36,8 +36,6 @@ import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.MuleInstanceContext;
 import org.mule.runtime.core.el.context.ServerContext;
 
-import org.slf4j.Logger;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -64,15 +62,19 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   private ExpressionLanguage expressionExecutor;
   private MuleContext muleContext;
 
-  @Inject
-  public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext) {
+  public static DataWeaveExpressionLanguageAdaptor create(MuleContext muleContext) {
     try {
-      this.expressionExecutor = muleContext.getRegistry().lookupObject(DefaultExpressionLanguageFactoryService.class).create();
+      return new DataWeaveExpressionLanguageAdaptor(muleContext, muleContext.getRegistry()
+          .lookupObject(DefaultExpressionLanguageFactoryService.class));
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Unable to obtain expression executor."), e);
     }
-    this.muleContext = muleContext;
+  }
 
+  @Inject
+  public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, DefaultExpressionLanguageFactoryService service) {
+    this.expressionExecutor = service.create();
+    this.muleContext = muleContext;
     registerGlobalBindings();
   }
 
@@ -98,8 +100,17 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
   @Override
   public TypedValue evaluate(String expression, Event event, BindingContext context) {
-    BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
-    return sanitizeAndEvaluate(expression, exp -> expressionExecutor.evaluate(exp, contextBuilder.build()));
+    String sanitized = sanitize(expression);
+    if (isPayloadExpression(sanitized)) {
+      return event.getMessage().getPayload();
+    } else {
+      BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
+      return evaluate(sanitized, exp -> expressionExecutor.evaluate(exp, contextBuilder.build()));
+    }
+  }
+
+  private boolean isPayloadExpression(String sanitized) {
+    return sanitized.equals("payload");
   }
 
   @Override
@@ -126,9 +137,14 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   @Override
   public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
                              BindingContext context) {
-    BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
-    addFlowBindings(flowConstruct, contextBuilder);
-    return sanitizeAndEvaluate(expression, exp -> expressionExecutor.evaluate(exp, contextBuilder.build()));
+    String sanitized = sanitize(expression);
+    if (isPayloadExpression(sanitized)) {
+      return event.getMessage().getPayload();
+    } else {
+      BindingContext.Builder contextBuilder = bindingContextBuilderFor(event, context);
+      addFlowBindings(flowConstruct, contextBuilder);
+      return evaluate(sanitized, exp -> expressionExecutor.evaluate(exp, contextBuilder.build()));
+    }
   }
 
   @Override
@@ -169,12 +185,16 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
    *
    * @param expression the expression to sanitize before running
    * @param evaluation the function to evaluate the expression with
-   * @param <T> the type that the function returns
+   * @param <T>        the type that the function returns
    * @return the result of the evaluation
    */
   private <T> T sanitizeAndEvaluate(String expression, Function<String, T> evaluation) {
+    return evaluate(sanitize(expression), evaluation);
+  }
+
+  private <T> T evaluate(String expression, Function<String, T> evaluation) {
     try {
-      return evaluation.apply(sanitize(expression));
+      return evaluation.apply(expression);
     } catch (ExpressionExecutionException e) {
       throw new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression), e);
     }

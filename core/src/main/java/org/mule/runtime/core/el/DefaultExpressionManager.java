@@ -68,7 +68,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public DefaultExpressionManager(MuleContext muleContext, StreamingManager streamingManager) {
     this.muleContext = muleContext;
     this.streamingManager = streamingManager;
-    final DataWeaveExpressionLanguageAdaptor dwExpressionLanguage = new DataWeaveExpressionLanguageAdaptor(muleContext);
+    final DataWeaveExpressionLanguageAdaptor dwExpressionLanguage = DataWeaveExpressionLanguageAdaptor.create(muleContext);
     final MVELExpressionLanguage mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
     this.expressionLanguage = new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage);
     this.melDefault = ((ExpressionLanguageAdaptorHandler) expressionLanguage).isMelDefault();
