@@ -173,9 +173,9 @@ public class JmsMessageRequester extends AbstractMessageRequester
         {
             if (!cleanupListenerRegistered)
             {
-                connector.closeQuietly(consumer);
                 connector.closeSessionIfNoTransactionActive(session);
             }
+            connector.closeQuietly(consumer);
         }
     }
 
