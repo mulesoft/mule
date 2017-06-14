@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.streaming.object.InMemoryCursorIteratorProvider;
 import org.mule.runtime.core.internal.streaming.object.iterator.StreamingIterator;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.streaming.object.InMemoryCursorIteratorConfig;
 
 import java.util.Iterator;
@@ -24,7 +25,8 @@ public class InMemoryCursorIteratorProviderFactory extends AbstractCursorIterato
    *
    * @param config        the config for the generated providers
    */
-  public InMemoryCursorIteratorProviderFactory(InMemoryCursorIteratorConfig config) {
+  public InMemoryCursorIteratorProviderFactory(InMemoryCursorIteratorConfig config, StreamingManager streamingManager) {
+    super(streamingManager);
     this.config = config;
   }
 

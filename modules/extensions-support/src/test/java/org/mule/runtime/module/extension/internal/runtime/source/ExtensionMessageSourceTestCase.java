@@ -58,19 +58,20 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.execution.ExceptionCallback;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
 import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
-import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
-import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
@@ -89,6 +90,10 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
+import java.io.IOException;
+
+import javax.resource.spi.work.Work;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -100,10 +105,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.io.IOException;
-
-import javax.resource.spi.work.Work;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase {
@@ -188,6 +189,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   private SourceAdapter sourceAdapter;
   private SourceCallback sourceCallback;
   private ExtensionMessageSource messageSource;
+  private StreamingManager streamingManager = spy(new DefaultStreamingManager());
 
   @Before
   public void before() throws Exception {
@@ -196,7 +198,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     when(result.getMediaType()).thenReturn(of(ANY));
     when(result.getAttributes()).thenReturn(of(mock(Attributes.class)));
 
-    muleContext.getRegistry().registerObject(OBJECT_STREAMING_MANAGER, new DefaultStreamingManager());
+    muleContext.getRegistry().registerObject(OBJECT_STREAMING_MANAGER, streamingManager);
 
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
 
@@ -511,7 +513,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
                              sourceModel,
                              source,
                              of(configurationInstance),
-                             new NullCursorStreamProviderFactory(new SimpleByteBufferManager()),
+                             new NullCursorStreamProviderFactory(new SimpleByteBufferManager(), streamingManager),
                              sourceCallbackFactory,
                              null, callbackParameters, null,
                              callbackParameters);

@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.streaming.object;
 
 import org.mule.runtime.core.internal.streaming.object.factory.InMemoryCursorIteratorProviderFactory;
 import org.mule.runtime.core.internal.streaming.object.factory.NullCursorIteratorProviderFactory;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.streaming.object.InMemoryCursorIteratorConfig;
 import org.mule.runtime.core.streaming.object.ObjectStreamingManager;
@@ -19,12 +20,18 @@ import org.mule.runtime.core.streaming.object.ObjectStreamingManager;
  */
 public class DefaultObjectStreamingManager implements ObjectStreamingManager {
 
+  protected final StreamingManager streamingManager;
+
+  public DefaultObjectStreamingManager(StreamingManager streamingManager) {
+    this.streamingManager = streamingManager;
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
   public CursorIteratorProviderFactory getInMemoryCursorProviderFactory(InMemoryCursorIteratorConfig config) {
-    return new InMemoryCursorIteratorProviderFactory(config);
+    return new InMemoryCursorIteratorProviderFactory(config, streamingManager);
   }
 
   /**
@@ -32,7 +39,7 @@ public class DefaultObjectStreamingManager implements ObjectStreamingManager {
    */
   @Override
   public CursorIteratorProviderFactory getNullCursorProviderFactory() {
-    return new NullCursorIteratorProviderFactory();
+    return new NullCursorIteratorProviderFactory(streamingManager);
   }
 
   /**

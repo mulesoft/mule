@@ -7,10 +7,15 @@
 package org.mule.runtime.core.internal.streaming.object.factory;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.streaming.StreamingManager;
 
 import java.util.Iterator;
 
 public class NullCursorIteratorProviderFactory extends AbstractCursorIteratorProviderFactory {
+
+  public NullCursorIteratorProviderFactory(StreamingManager streamingManager) {
+    super(streamingManager);
+  }
 
   @Override
   protected Object resolve(Iterator iterator, Event event) {

@@ -18,6 +18,7 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
@@ -56,14 +57,15 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.policy.OperationExecutionFunction;
 import org.mule.runtime.core.policy.OperationPolicy;
 import org.mule.runtime.core.policy.PolicyManager;
-import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
@@ -177,10 +179,12 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   protected OperationPolicy mockOperationPolicy;
 
+  protected StreamingManager streamingManager = spy(new DefaultStreamingManager());
+
   @Before
   public void before() throws Exception {
-    muleContext.getRegistry().registerObject(OBJECT_STREAMING_MANAGER, new DefaultStreamingManager());
-    cursorStreamProviderFactory = getDefaultCursorStreamProviderFactory(muleContext);
+    muleContext.getRegistry().registerObject(OBJECT_STREAMING_MANAGER, streamingManager);
+    cursorStreamProviderFactory = spy(getDefaultCursorStreamProviderFactory(muleContext));
     event = configureEvent();
     when(context.getInjector().inject(any())).thenAnswer(invocationOnMock -> {
       final Object subject = invocationOnMock.getArguments()[0];
@@ -291,8 +295,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   protected Event configureEvent() throws Exception {
     when(message.getPayload())
-        .thenReturn(new TypedValue<Object>(TEST_PAYLOAD,
-                                           DataType.builder().mediaType(MediaType.create("*", "*", defaultCharset())).build()));
+        .thenReturn(new TypedValue<>(TEST_PAYLOAD,
+                                     DataType.builder().mediaType(MediaType.create("*", "*", defaultCharset())).build()));
     return eventBuilder().message(message).build();
   }
 

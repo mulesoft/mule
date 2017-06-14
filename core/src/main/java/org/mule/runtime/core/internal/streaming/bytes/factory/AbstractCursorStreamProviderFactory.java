@@ -7,9 +7,11 @@
 package org.mule.runtime.core.internal.streaming.bytes.factory;
 
 import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.bytes.ByteBufferManager;
+import org.mule.runtime.core.streaming.StreamingManager;
 import org.mule.runtime.core.streaming.bytes.CursorStreamProviderFactory;
 
 import java.io.InputStream;
@@ -26,14 +28,16 @@ import java.io.InputStream;
 public abstract class AbstractCursorStreamProviderFactory implements CursorStreamProviderFactory {
 
   private final ByteBufferManager bufferManager;
+  private final StreamingManager streamingManager;
 
   /**
    * Creates a new instance
    *
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    */
-  protected AbstractCursorStreamProviderFactory(ByteBufferManager bufferManager) {
+  protected AbstractCursorStreamProviderFactory(ByteBufferManager bufferManager, StreamingManager streamingManager) {
     this.bufferManager = bufferManager;
+    this.streamingManager = streamingManager;
   }
 
   /**
@@ -42,10 +46,15 @@ public abstract class AbstractCursorStreamProviderFactory implements CursorStrea
   @Override
   public final Object of(Event event, InputStream inputStream) {
     if (inputStream instanceof CursorStream) {
-      return ((CursorStream) inputStream).getProvider();
+      return streamingManager.manage(((CursorStream) inputStream).getProvider(), event);
     }
 
-    return resolve(inputStream, event);
+    Object value = resolve(inputStream, event);
+    if (value instanceof CursorStreamProvider) {
+      value = streamingManager.manage((CursorStreamProvider) value, event);
+    }
+
+    return value;
   }
 
   /**
