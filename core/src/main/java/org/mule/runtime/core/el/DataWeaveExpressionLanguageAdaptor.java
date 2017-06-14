@@ -113,7 +113,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   private boolean isPayloadExpression(String sanitized) {
-    return Objects.equals(sanitized, "payload");
+    return sanitized.equals("payload");
   }
 
   @Override
