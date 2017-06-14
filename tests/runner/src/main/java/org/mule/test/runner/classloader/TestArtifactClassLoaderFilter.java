@@ -9,8 +9,8 @@ package org.mule.test.runner.classloader;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.function.Function.identity;
-import static org.apache.commons.lang.ClassUtils.getPackageName;
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang3.ClassUtils.getPackageName;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.util.StringMessageUtils.DEFAULT_MESSAGE_WIDTH;

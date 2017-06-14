@@ -73,7 +73,7 @@ public abstract class AbstractObjectFactory extends AbstractAnnotatedObject impl
 
   protected Class<?> setupObjectClassFromObjectClassName() {
     try {
-      Class<?> klass = org.apache.commons.lang.ClassUtils.getClass(objectClassName);
+      Class<?> klass = org.apache.commons.lang3.ClassUtils.getClass(objectClassName);
       objectClass = klass;
       return klass;
     } catch (ClassNotFoundException e) {

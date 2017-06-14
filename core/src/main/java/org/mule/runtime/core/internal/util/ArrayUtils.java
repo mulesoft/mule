@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 // @ThreadSafe
-public class ArrayUtils extends org.apache.commons.lang.ArrayUtils {
+public class ArrayUtils extends org.apache.commons.lang3.ArrayUtils {
 
   /**
    * Like {@link #toString(Object)} but considers at most <code>maxElements</code> values; overflow is indicated by an appended

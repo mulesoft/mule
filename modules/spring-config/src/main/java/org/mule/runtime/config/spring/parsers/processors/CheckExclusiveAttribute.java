@@ -41,7 +41,7 @@ public class CheckExclusiveAttribute implements PreProcessor {
       if (!config.isIgnored(alias)) {
         if (attribute.equals(alias)) {
           found = true;
-        } else if (org.apache.commons.lang.StringUtils.equals(element.getNamespaceURI(), attribute.getNamespaceURI())) {
+        } else if (org.apache.commons.lang3.StringUtils.equals(element.getNamespaceURI(), attribute.getNamespaceURI())) {
           foundAttributes.add(alias);
         }
       }

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.config.bootstrap;
 
-import static org.apache.commons.lang.exception.ExceptionUtils.getCause;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getCause;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.ALL;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.api.exception.MuleException;

@@ -8,7 +8,7 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.POLICY;

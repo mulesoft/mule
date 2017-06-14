@@ -11,7 +11,7 @@ import static java.nio.file.Paths.get;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.DELETE_ON_CLOSE;
 import static java.nio.file.StandardOpenOption.WRITE;
-import static org.apache.commons.lang.SystemUtils.PATH_SEPARATOR;
+import static org.apache.commons.lang3.SystemUtils.PATH_SEPARATOR;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

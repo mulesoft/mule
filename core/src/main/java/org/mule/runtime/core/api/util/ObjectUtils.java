@@ -17,7 +17,7 @@ public class ObjectUtils {
   protected static final Logger logger = LoggerFactory.getLogger(ObjectUtils.class);
 
   /**
-   * Like {@link org.apache.commons.lang.ObjectUtils#identityToString(Object)} but without the object's full package name.
+   * Like {@link org.apache.commons.lang3.ObjectUtils#identityToString(Object)} but without the object's full package name.
    *
    * @param obj the object for which the identity description is to be generated
    * @return the object's identity description in the form of "ClassName@IdentityCode" or "null" if the argument was null.

@@ -10,13 +10,14 @@ import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -63,7 +64,7 @@ public class ExceptionUtils {
    * @return the index into the throwable chain, false if no match or null input
    */
   public static boolean containsType(Throwable throwable, Class<?> type) {
-    return org.apache.commons.lang.exception.ExceptionUtils.indexOfType(throwable, type) > -1;
+    return org.apache.commons.lang3.exception.ExceptionUtils.indexOfType(throwable, type) > -1;
   }
 
   /**
@@ -79,7 +80,7 @@ public class ExceptionUtils {
     if (throwable == null || type == null) {
       return null;
     }
-    List<Throwable> throwableList = org.apache.commons.lang.exception.ExceptionUtils.getThrowableList(throwable);
+    List<Throwable> throwableList = org.apache.commons.lang3.exception.ExceptionUtils.getThrowableList(throwable);
     ListIterator<Throwable> listIterator = throwableList.listIterator(throwableList.size());
     while (listIterator.hasPrevious()) {
       Throwable candidate = listIterator.previous();
@@ -91,8 +92,9 @@ public class ExceptionUtils {
   }
 
   /**
-   * Similar to {@link org.apache.commons.lang.exception.ExceptionUtils#getFullStackTrace(Throwable)} but removing the exception and causes messages. This is useful to determine
-   * if two exceptions have matching stack traces regardless of the messages which may contain invokation specific data
+   * Similar to {@link org.apache.commons.lang3.exception.ExceptionUtils#getStackTrace(Throwable)} but removing the exception and
+   * causes messages. This is useful to determine if two exceptions have matching stack traces regardless of the messages which
+   * may contain invokation specific data
    *
    * @param throwable the throwable to inspect, may be <code>null</code>
    * @return the stack trace as a string, with the messages stripped out. Empty string if throwable was <code>null</code>
@@ -100,7 +102,7 @@ public class ExceptionUtils {
   public static String getFullStackTraceWithoutMessages(Throwable throwable) {
     StringBuilder builder = new StringBuilder();
 
-    for (String frame : org.apache.commons.lang.exception.ExceptionUtils.getStackFrames(throwable)) {
+    for (String frame : org.apache.commons.lang3.exception.ExceptionUtils.getStackFrames(throwable)) {
       builder.append(frame.replaceAll(":\\s+([\\w\\s]*.*)", "").trim()).append(LINE_SEPARATOR);
     }
 
@@ -149,7 +151,7 @@ public class ExceptionUtils {
       return empty();
     }
 
-    return (Optional<T>) stream(org.apache.commons.lang.exception.ExceptionUtils.getThrowables(throwable))
+    return (Optional<T>) stream(org.apache.commons.lang3.exception.ExceptionUtils.getThrowables(throwable))
         .filter(throwableType::isInstance).findFirst();
   }
 

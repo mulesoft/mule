@@ -41,7 +41,7 @@ import java.util.Map;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

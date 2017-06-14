@@ -18,7 +18,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;

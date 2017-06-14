@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.resources;
 
 import static javax.tools.StandardLocation.SOURCE_OUTPUT;
-import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

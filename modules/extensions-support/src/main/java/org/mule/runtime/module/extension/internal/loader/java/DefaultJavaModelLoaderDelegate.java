@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.apache.commons.lang.ArrayUtils.EMPTY_CLASS_ARRAY;
+import static org.apache.commons.lang3.ArrayUtils.EMPTY_CLASS_ARRAY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;

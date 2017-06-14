@@ -8,8 +8,11 @@ package org.mule.runtime.core.context;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -17,7 +20,6 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.builders.AutoConfigurationBuilder;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
@@ -28,7 +30,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -225,9 +226,9 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
         try {
           muleContext.dispose();
         } catch (Exception e1) {
-          logger.warn("Can not dispose context. " + ExceptionUtils.getMessage(e1));
+          logger.warn("Can not dispose context. " + getMessage(e1));
           if (logger.isDebugEnabled()) {
-            logger.debug("Can not dispose context. " + ExceptionUtils.getFullStackTrace(e1));
+            logger.debug("Can not dispose context. " + getStackTrace(e1));
           }
         }
       }

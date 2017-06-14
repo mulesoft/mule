@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
-import static org.apache.commons.lang.ArrayUtils.isEmpty;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;

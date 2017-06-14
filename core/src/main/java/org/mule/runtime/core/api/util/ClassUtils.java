@@ -7,8 +7,8 @@
 package org.mule.runtime.core.api.util;
 
 import static org.apache.commons.collections.MapUtils.getObject;
-import static org.apache.commons.lang.ClassUtils.primitiveToWrapper;
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang3.ClassUtils.primitiveToWrapper;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ExceptionUtils.tryExpecting;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -340,7 +340,7 @@ public class ClassUtils {
    */
   public static Class<?> initializeClass(Class<?> clazz) {
     try {
-      return org.apache.commons.lang.ClassUtils.getClass(clazz.getName(), true);
+      return org.apache.commons.lang3.ClassUtils.getClass(clazz.getName(), true);
     } catch (ClassNotFoundException e) {
       IllegalStateException ise = new IllegalStateException();
       ise.initCause(e);

@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Implementation of {@link ValueResolver} which accesses the mule registry and returns the value associated with {@link #key}.

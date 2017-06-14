@@ -13,6 +13,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
@@ -25,7 +26,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -116,7 +117,7 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
 
       @Override
       public QueueStore getQueue(String queueName) {
-        throw new NotImplementedException();
+        throw new NotImplementedException("This is test code");
       }
 
       @Override

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
-import static org.apache.commons.lang.exception.ExceptionUtils.getRootCause;
-import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.DOMAIN;

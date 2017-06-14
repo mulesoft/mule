@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.util;
 
-import static org.apache.commons.lang.StringUtils.countMatches;
-import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

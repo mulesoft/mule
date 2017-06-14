@@ -8,7 +8,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.apache.commons.io.FilenameUtils.getBaseName;
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;

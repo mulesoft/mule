@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.el.context;
 
-import static org.apache.commons.lang.SystemUtils.FILE_SEPARATOR;
-import static org.apache.commons.lang.SystemUtils.JAVA_IO_TMPDIR;
-import static org.apache.commons.lang.SystemUtils.JAVA_VENDOR;
-import static org.apache.commons.lang.SystemUtils.JAVA_VERSION;
-import static org.apache.commons.lang.SystemUtils.OS_ARCH;
-import static org.apache.commons.lang.SystemUtils.OS_NAME;
-import static org.apache.commons.lang.SystemUtils.OS_VERSION;
-import static org.apache.commons.lang.SystemUtils.USER_DIR;
-import static org.apache.commons.lang.SystemUtils.USER_HOME;
-import static org.apache.commons.lang.SystemUtils.USER_NAME;
+import static org.apache.commons.lang3.SystemUtils.FILE_SEPARATOR;
+import static org.apache.commons.lang3.SystemUtils.JAVA_IO_TMPDIR;
+import static org.apache.commons.lang3.SystemUtils.JAVA_VENDOR;
+import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
+import static org.apache.commons.lang3.SystemUtils.OS_ARCH;
+import static org.apache.commons.lang3.SystemUtils.OS_NAME;
+import static org.apache.commons.lang3.SystemUtils.OS_VERSION;
+import static org.apache.commons.lang3.SystemUtils.USER_DIR;
+import static org.apache.commons.lang3.SystemUtils.USER_HOME;
+import static org.apache.commons.lang3.SystemUtils.USER_NAME;
 import org.mule.runtime.core.api.util.NetworkUtils;
 
 import java.net.UnknownHostException;

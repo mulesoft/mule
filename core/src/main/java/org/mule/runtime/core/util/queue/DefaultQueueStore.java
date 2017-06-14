@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.util.queue.QueueStoreDelegate;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 
 /**
  * Internal queue implementation that will execute operations directly to the queue storage. Stores information about a Queue

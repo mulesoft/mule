@@ -41,8 +41,8 @@ public class HtmlTablePrinter extends AbstractTablePrinter {
       println("<tr class=\"" + ((i % 2 == 0) ? "darkline" : "clearline") + "\">");
       for (int j = 0; j < table.length; j++) {
         if (j == 0) {
-          if (org.apache.commons.lang.StringUtils.equals(table[1][i], "-")) {
-            if (org.apache.commons.lang.StringUtils.equals(table[j][i], "By Provider")) {
+          if (org.apache.commons.lang3.StringUtils.equals(table[1][i], "-")) {
+            if (org.apache.commons.lang3.StringUtils.equals(table[j][i], "By Provider")) {
               println("<td class=\"statisticsrow\"><div class=\"tablesubheader\">" + table[j][i] + "</div></td>");
             } else {
               println("<td class=\"statisticsrow\"><div class=\"tableheader\">" + table[j][i] + "</div></td>");
@@ -57,12 +57,12 @@ public class HtmlTablePrinter extends AbstractTablePrinter {
             println("<td class=\"statisticsrow\">" + getProviderStatsHtml(table[j][i]) + "</td>");
           } else {
             println("<td class=\"statisticsrow\">"
-                + ((org.apache.commons.lang.StringUtils.equals(table[j][i], "-")) ? "" : table[j][i]) + "</td>");
+                + ((org.apache.commons.lang3.StringUtils.equals(table[j][i], "-")) ? "" : table[j][i]) + "</td>");
           }
         }
       }
       println("</tr>");
-      if (org.apache.commons.lang.StringUtils.equals(table[0][i], "By Provider")) {
+      if (org.apache.commons.lang3.StringUtils.equals(table[0][i], "By Provider")) {
         providerStats = true;
       } else {
         providerStats = false;

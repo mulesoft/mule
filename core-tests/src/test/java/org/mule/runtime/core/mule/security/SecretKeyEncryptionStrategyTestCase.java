@@ -13,7 +13,7 @@ import org.mule.runtime.core.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.security.SecretKeyFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 
 public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase {

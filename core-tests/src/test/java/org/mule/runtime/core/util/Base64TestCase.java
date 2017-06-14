@@ -17,7 +17,7 @@ import org.mule.runtime.core.internal.transformer.compression.GZIPCompressorInpu
 import java.io.ByteArrayInputStream;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 
 @SmallTest

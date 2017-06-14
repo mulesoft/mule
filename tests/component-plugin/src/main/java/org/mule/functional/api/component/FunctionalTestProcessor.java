@@ -6,7 +6,7 @@
  */
 package org.mule.functional.api.component;
 
-import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.mule.functional.api.notification.FunctionalTestNotification.EVENT_RECEIVED;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
-import static org.apache.commons.lang.SystemUtils.getUserDir;
+import static org.apache.commons.lang3.SystemUtils.getUserDir;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.mule.runtime.core.api.util.FileUtils;

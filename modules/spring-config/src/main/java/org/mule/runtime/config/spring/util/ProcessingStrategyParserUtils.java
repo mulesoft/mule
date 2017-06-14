@@ -12,7 +12,7 @@ import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.parseP
 
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;

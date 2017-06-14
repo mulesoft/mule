@@ -6,7 +6,7 @@
  */
 package org.mule.tck.probe;
 
-import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +57,7 @@ public abstract class JUnitProbe implements Probe {
     }
 
     if (throwable != null) {
-      return getFullStackTrace(throwable);
+      return getStackTrace(throwable);
     }
 
     return "Condition not met";

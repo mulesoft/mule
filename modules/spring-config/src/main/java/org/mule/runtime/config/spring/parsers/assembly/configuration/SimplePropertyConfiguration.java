@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.parsers.assembly.configuration;
 
-import static org.apache.commons.lang.StringUtils.chomp;
+import static org.apache.commons.lang3.StringUtils.chomp;
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 
 import java.util.ArrayList;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.api.metadata.DataType;

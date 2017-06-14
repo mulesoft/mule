@@ -8,7 +8,7 @@
 package org.mule.runtime.core.policy;
 
 import static java.util.Collections.unmodifiableMap;
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import java.io.File;

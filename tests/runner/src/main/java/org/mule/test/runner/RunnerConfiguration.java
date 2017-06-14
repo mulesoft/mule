@@ -8,13 +8,13 @@
 package org.mule.test.runner;
 
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFromHierarchy;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 /**
  * Configuration for {@link ArtifactClassLoaderRunner}.

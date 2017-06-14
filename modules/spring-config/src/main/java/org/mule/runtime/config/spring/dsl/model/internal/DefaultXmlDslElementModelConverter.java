@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring.dsl.model.internal;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.stream.Stream.of;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.spring.dsl.declaration.DefaultXmlArtifactDeclarationLoader.TRANSFORM_IDENTIFIER;

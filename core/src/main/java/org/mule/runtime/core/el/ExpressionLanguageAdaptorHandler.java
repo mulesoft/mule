@@ -9,7 +9,7 @@ package org.mule.runtime.core.el;
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static java.util.regex.Pattern.compile;
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
 import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;

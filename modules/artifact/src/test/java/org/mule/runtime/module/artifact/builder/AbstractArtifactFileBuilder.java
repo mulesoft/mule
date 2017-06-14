@@ -11,7 +11,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Optional.empty;
 import static org.apache.commons.io.FileUtils.write;
 import static org.apache.commons.io.FilenameUtils.getName;
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;

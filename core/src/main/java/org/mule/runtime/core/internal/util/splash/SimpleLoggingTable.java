@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.util.splash;
 
-import static org.apache.commons.lang.StringUtils.center;
-import static org.apache.commons.lang.StringUtils.rightPad;
-import static org.apache.commons.lang.StringUtils.substring;
+import static org.apache.commons.lang3.StringUtils.center;
+import static org.apache.commons.lang3.StringUtils.rightPad;
+import static org.apache.commons.lang3.StringUtils.substring;
 
 import org.mule.runtime.core.api.util.StringUtils;
 

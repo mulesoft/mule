@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;

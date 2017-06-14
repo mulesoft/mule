@@ -8,7 +8,7 @@
 package org.mule.runtime.module.artifact.util;
 
 import static org.apache.commons.io.FileUtils.listFiles;
-import static org.apache.commons.lang.ClassUtils.getPackageName;
+import static org.apache.commons.lang3.ClassUtils.getPackageName;
 
 import java.io.File;
 import java.io.FileInputStream;

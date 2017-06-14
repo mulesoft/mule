@@ -7,7 +7,7 @@
 package org.mule.runtime.core.el;
 
 import static java.util.Optional.empty;
-import static org.apache.commons.lang.SystemUtils.FILE_SEPARATOR;
+import static org.apache.commons.lang3.SystemUtils.FILE_SEPARATOR;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;

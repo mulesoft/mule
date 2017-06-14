@@ -8,7 +8,7 @@ package org.mule.runtime.core.el.mvel;
 
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toMap;
-import static org.apache.commons.lang.StringUtils.replace;
+import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;

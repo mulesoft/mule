@@ -132,7 +132,7 @@ public class XMLPrinter extends AbstractTablePrinter {
       println("<Service name=\"" + table[i][0] + "\">", indentLevel);
       indentLevel++;
       for (int j = 1; j < table[i].length; j++) {
-        if (org.apache.commons.lang.StringUtils.equals(table[0][j], "Router")) {
+        if (org.apache.commons.lang3.StringUtils.equals(table[0][j], "Router")) {
           if (!router) {
             println("<Router type=\"" + table[i][++j] + "\">", indentLevel);
             indentLevel++;
@@ -142,8 +142,8 @@ public class XMLPrinter extends AbstractTablePrinter {
             println("</Router>", indentLevel);
             router = false;
           }
-        } else if (org.apache.commons.lang.StringUtils.equals(table[0][j], "Providers")) {
-          if (isEmpty(table[i][j + 1]) && org.apache.commons.lang.StringUtils.equals(table[0][j + 2], "Providers")) {
+        } else if (org.apache.commons.lang3.StringUtils.equals(table[0][j], "Providers")) {
+          if (isEmpty(table[i][j + 1]) && org.apache.commons.lang3.StringUtils.equals(table[0][j + 2], "Providers")) {
             println("<Providers/>", indentLevel);
             j += 2;
           } else {

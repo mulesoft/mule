@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Test;
 
 public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContextTestCase {

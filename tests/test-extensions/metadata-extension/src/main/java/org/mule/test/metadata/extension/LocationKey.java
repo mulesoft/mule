@@ -6,7 +6,7 @@
  */
 package org.mule.test.metadata.extension;
 
-import static org.apache.commons.lang.builder.EqualsBuilder.reflectionEquals;
+import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
 
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static org.apache.commons.lang.math.NumberUtils.toInt;
+import static org.apache.commons.lang3.math.NumberUtils.toInt;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;

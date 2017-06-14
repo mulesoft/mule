@@ -148,7 +148,7 @@ public class DefaultBeanAssembler implements BeanAssembler {
    */
   public final boolean isAnnotationsPropertyAvailable(String beanClassName) {
     try {
-      return AnnotatedObject.class.isAssignableFrom(org.apache.commons.lang.ClassUtils.getClass(beanClassName));
+      return AnnotatedObject.class.isAssignableFrom(org.apache.commons.lang3.ClassUtils.getClass(beanClassName));
     } catch (Exception e) {
       return false;
     }
@@ -474,7 +474,7 @@ public class DefaultBeanAssembler implements BeanAssembler {
       // BeanWrapperImpl instantiates an instance, which we don't want.
       // if there really is no better way, i guess it should go in
       // class or bean utils.
-      Class clazz = org.apache.commons.lang.ClassUtils.getClass(className);
+      Class clazz = org.apache.commons.lang3.ClassUtils.getClass(className);
       Method[] methods = clazz.getMethods();
       String setter = "set" + newName;
       for (int i = 0; i < methods.length; ++i) {

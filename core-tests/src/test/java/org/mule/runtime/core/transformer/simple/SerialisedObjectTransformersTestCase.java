@@ -10,7 +10,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 
-import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.lang3.SerializationUtils;
 
 public class SerialisedObjectTransformersTestCase extends AbstractTransformerTestCase {
 

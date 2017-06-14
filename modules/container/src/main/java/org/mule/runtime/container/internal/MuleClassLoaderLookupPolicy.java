@@ -7,7 +7,7 @@
 
 package org.mule.runtime.container.internal;
 
-import static org.apache.commons.lang.ClassUtils.getPackageName;
+import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;

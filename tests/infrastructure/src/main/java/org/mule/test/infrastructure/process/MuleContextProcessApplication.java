@@ -89,7 +89,7 @@ public class MuleContextProcessApplication {
       for (String coreExtensionClassName : coreExtensionsAsString) {
         try {
           muleCoreExtensions
-              .add((MuleCoreExtension) org.apache.commons.lang.ClassUtils.getClass(coreExtensionClassName).newInstance());
+              .add((MuleCoreExtension) org.apache.commons.lang3.ClassUtils.getClass(coreExtensionClassName).newInstance());
         } catch (Exception e) {
           throw new RuntimeException(e);
         }
