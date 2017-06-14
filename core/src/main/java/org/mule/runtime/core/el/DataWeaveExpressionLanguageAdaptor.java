@@ -36,12 +36,10 @@ import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.MuleInstanceContext;
 import org.mule.runtime.core.el.context.ServerContext;
 
-import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 
 import javax.inject.Inject;
