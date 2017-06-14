@@ -36,7 +36,6 @@ import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.MuleInstanceContext;
 import org.mule.runtime.core.el.context.ServerContext;
 
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
