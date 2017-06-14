@@ -249,7 +249,7 @@
 /mule-standalone-${productVersion}/lib/opt/cxf-tools-common-2.7.18.jar
 /mule-standalone-${productVersion}/lib/opt/cxf-wstx-msv-validation-2.7.18.jar
 /mule-standalone-${productVersion}/lib/opt/dom4j-1.6.1.jar
-/mule-standalone-${productVersion}/lib/opt/drools-api-5.2.1.Final.jar
+/mule-standalone-${productVersion}/lib/opt/knowledge-api-5.2.1.Final.jar
 /mule-standalone-${productVersion}/lib/opt/drools-compiler-5.2.1.Final.jar
 /mule-standalone-${productVersion}/lib/opt/drools-core-5.2.1.Final.jar
 /mule-standalone-${productVersion}/lib/opt/ecj-4.3.1.jar
