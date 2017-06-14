@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.contributor;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 
 import org.mule.runtime.api.meta.ExpressionSupport;

@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.routing;
 
-import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.api.i18n.I18nMessage;

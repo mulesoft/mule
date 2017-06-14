@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.util;
 
-import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
+import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
@@ -110,7 +110,7 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
 
     Exception e = new RuntimeException(mainMessage, new RuntimeException(causeMessage));
     String withoutMessage = getFullStackTraceWithoutMessages(e);
-    String fullStackTrace = getFullStackTrace(e);
+    String fullStackTrace = getStackTrace(e);
 
     String[] linesWithoutMessage = withoutMessage.split(LINE_SEPARATOR);
     String[] lines = fullStackTrace.split(LINE_SEPARATOR);

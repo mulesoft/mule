@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.module.deployment.api.DeploymentListener;

@@ -16,8 +16,8 @@ import java.util.Map;
 /**
  * This encoder contains methods that convert characters to Character entities as defined by
  * http://www.w3.org/TR/REC-html40/sgml/entities.html. More precisely it combines the functionality of
- * {@link org.apache.commons.lang.StringEscapeUtils#escapeXml(String)} and
- * {@link org.apache.commons.lang.StringEscapeUtils#escapeHtml(String)} into a single pass.
+ * {@link org.apache.commons.lang3.StringEscapeUtils#escapeXml(String)} and
+ * {@link org.apache.commons.lang3.StringEscapeUtils#escapeHtml(String)} into a single pass.
  */
 // @ThreadSafe
 public final class XMLEntityCodec {

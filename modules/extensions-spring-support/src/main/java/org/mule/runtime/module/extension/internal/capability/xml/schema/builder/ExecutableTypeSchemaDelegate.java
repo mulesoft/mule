@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
-import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;

@@ -15,7 +15,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 
 import org.apache.commons.io.input.ClassLoaderObjectInputStream;
-import org.apache.commons.lang.SerializationException;
+import org.apache.commons.lang3.SerializationException;
 
 public class SerializationUtils {
 
@@ -52,7 +52,7 @@ public class SerializationUtils {
    * @param cl classloader which can load custom classes from the stream
    * @return the deserialized object
    * @throws IllegalArgumentException if <code>inputStream</code> is <code>null</code>
-   * @throws org.apache.commons.lang.SerializationException (runtime) if the serialization fails
+   * @throws org.apache.commons.lang3.SerializationException (runtime) if the serialization fails
    */
   public static Object deserialize(InputStream inputStream, ClassLoader cl, MuleContext muleContext) {
     if (inputStream == null) {

@@ -11,7 +11,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.listFiles;
-import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;

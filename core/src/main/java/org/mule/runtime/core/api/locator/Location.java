@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.locator;
 
 import static java.lang.Integer.parseInt;
-import static org.apache.commons.lang.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.locator.Location.LocationImpl.PARTS_SEPARATOR;

@@ -32,7 +32,7 @@ public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase
   public void registeringOptionalTransaction() throws Exception {
     createTestRegistryBootstrap(APP);
     muleContext.getTransactionFactoryManager()
-        .getTransactionFactoryFor(org.apache.commons.lang.ClassUtils.getClass(TEST_TRANSACTION_FACTORY_CLASS));
+        .getTransactionFactoryFor(org.apache.commons.lang3.ClassUtils.getClass(TEST_TRANSACTION_FACTORY_CLASS));
   }
 
   @Test

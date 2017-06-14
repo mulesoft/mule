@@ -9,11 +9,12 @@ package org.mule.runtime.module.extension.internal.resources;
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -22,9 +23,6 @@ import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
-
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +39,9 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 
 
 /**
@@ -89,7 +90,7 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
 
       return false;
     } catch (Exception e) {
-      processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, format("%s\n%s", e.getMessage(), getFullStackTrace(e)));
+      processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, format("%s\n%s", e.getMessage(), getStackTrace(e)));
       throw e;
     }
   }

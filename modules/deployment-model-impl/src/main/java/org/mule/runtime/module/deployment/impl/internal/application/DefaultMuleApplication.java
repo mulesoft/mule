@@ -7,8 +7,8 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang.exception.ExceptionUtils.getRootCause;
-import static org.apache.commons.lang.exception.ExceptionUtils.getRootCauseMessage;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;

@@ -8,7 +8,7 @@ package org.mule.runtime.core.exception;
 
 import static java.text.MessageFormat.format;
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.context.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
 

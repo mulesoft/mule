@@ -26,7 +26,7 @@ import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.io.FileUtils.touch;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
-import static org.apache.commons.lang.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;

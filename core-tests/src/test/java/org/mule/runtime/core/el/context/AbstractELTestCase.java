@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.el.context;
 
-import static org.apache.commons.lang.exception.ExceptionUtils.getRootCause;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mule.tck.MuleTestUtils.getTestFlow;

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.processor.util;
 
 
-import static org.apache.commons.lang.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.countMatches;
 
 import java.util.ArrayList;
 import java.util.Arrays;

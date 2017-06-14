@@ -12,7 +12,7 @@ import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang.StringUtils.split;
+import static org.apache.commons.lang3.StringUtils.split;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_ACTIVE;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_IDLE;

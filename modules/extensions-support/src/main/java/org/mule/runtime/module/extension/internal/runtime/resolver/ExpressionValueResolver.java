@@ -18,7 +18,7 @@ import java.util.function.BiConsumer;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A {@link ValueResolver} which evaluates a MEL expressions

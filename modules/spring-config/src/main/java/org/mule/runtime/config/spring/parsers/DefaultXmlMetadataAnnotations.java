@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.parsers;
 
-import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 
 import java.util.Map;
 import java.util.Map.Entry;

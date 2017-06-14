@@ -7,7 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static java.lang.Boolean.TRUE;
-import static org.apache.commons.lang.BooleanUtils.toBoolean;
+import static org.apache.commons.lang3.BooleanUtils.toBoolean;
 import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
 import static org.mule.runtime.module.deployment.impl.internal.application.PropertiesDescriptorParser.PROPERTY_REDEPLOYMENT_ENABLED;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;

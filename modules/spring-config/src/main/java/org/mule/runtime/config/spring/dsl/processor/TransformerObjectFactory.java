@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.dsl.processor;
 
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -85,7 +85,7 @@ public class TransformerObjectFactory extends AbstractAnnotatedObjectFactory<Tra
     Class<?> returnType = Object.class;
     if (returnClass != null) {
       try {
-        returnType = org.apache.commons.lang.ClassUtils.getClass(returnClass);
+        returnType = org.apache.commons.lang3.ClassUtils.getClass(returnClass);
       } catch (ClassNotFoundException e) {
         throw new MuleRuntimeException(e);
       }

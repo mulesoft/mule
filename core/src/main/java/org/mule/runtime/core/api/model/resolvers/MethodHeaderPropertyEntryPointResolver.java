@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.lang.reflect.Method;
 
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 
 /**
  * This resolver will look for a {@link org.mule.runtime.core.api.config.MuleProperties#MULE_METHOD_PROPERTY} property on the

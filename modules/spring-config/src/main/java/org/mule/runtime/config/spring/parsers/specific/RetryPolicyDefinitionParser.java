@@ -14,7 +14,7 @@ import static org.w3c.dom.TypeInfo.DERIVATION_EXTENSION;
 import org.mule.runtime.config.spring.parsers.generic.OptionalChildDefinitionParser;
 import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;

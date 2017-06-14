@@ -56,7 +56,7 @@ import java.util.function.Supplier;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
@@ -279,7 +279,7 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
       if (currentDefinition instanceof AbstractBeanDefinition) {
         return of(((AbstractBeanDefinition) currentDefinition).getBeanClass());
       }
-      return of(org.apache.commons.lang.ClassUtils.getClass(currentDefinition.getBeanClassName()));
+      return of(org.apache.commons.lang3.ClassUtils.getClass(currentDefinition.getBeanClassName()));
     } catch (Exception e) {
       return empty();
     }
@@ -303,17 +303,17 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
     {
       if (finalChild != null) {
         try {
-          Class<?> type = org.apache.commons.lang.ClassUtils.getClass(finalChild.getBeanClassName());
+          Class<?> type = org.apache.commons.lang3.ClassUtils.getClass(finalChild.getBeanClassName());
           if (FactoryBean.class.isAssignableFrom(type)) {
             try {
               // When the FactoryBean implementation implements the FactoryBean directly.
-              type = (Class<?>) ((ParameterizedType) org.apache.commons.lang.ClassUtils.getClass(finalChild.getBeanClassName())
+              type = (Class<?>) ((ParameterizedType) org.apache.commons.lang3.ClassUtils.getClass(finalChild.getBeanClassName())
                   .getGenericInterfaces()[0])
                       .getActualTypeArguments()[0];
             } catch (Exception e2) {
               try {
                 // When the FactoryBean implementation extends a Class that implements FactoryBean.
-                type = (Class<?>) ((ParameterizedType) org.apache.commons.lang.ClassUtils.getClass(finalChild.getBeanClassName())
+                type = (Class<?>) ((ParameterizedType) org.apache.commons.lang3.ClassUtils.getClass(finalChild.getBeanClassName())
                     .getGenericSuperclass())
                         .getActualTypeArguments()[0];
               } catch (Exception e3) {

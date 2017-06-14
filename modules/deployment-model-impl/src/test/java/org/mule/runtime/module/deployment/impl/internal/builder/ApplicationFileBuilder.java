@@ -13,7 +13,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.io.FilenameUtils.getName;
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppSharedLibsFolderPath;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_ARTIFACT_PROPERTIES_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;

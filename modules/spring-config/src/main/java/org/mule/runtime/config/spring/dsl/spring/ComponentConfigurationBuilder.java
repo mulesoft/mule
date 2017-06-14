@@ -90,7 +90,7 @@ class ComponentConfigurationBuilder {
           try {
             String beanClassName = cdm.getBeanDefinition().getBeanClassName();
             if (beanClassName != null) {
-              beanDefinitionType = org.apache.commons.lang.ClassUtils.getClass(beanClassName);
+              beanDefinitionType = org.apache.commons.lang3.ClassUtils.getClass(beanClassName);
             } else {
               // Happens in case of spring:property
               beanDefinitionType = Object.class;

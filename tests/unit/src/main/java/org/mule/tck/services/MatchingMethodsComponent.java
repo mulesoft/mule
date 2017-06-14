@@ -6,7 +6,7 @@
  */
 package org.mule.tck.services;
 
-import static org.apache.commons.lang.StringUtils.reverse;
+import static org.apache.commons.lang3.StringUtils.reverse;
 
 import java.rmi.Remote;
 

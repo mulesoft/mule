@@ -7,8 +7,8 @@
 package org.mule.functional.junit4;
 
 import static com.google.common.collect.ImmutableList.copyOf;
-import static org.apache.commons.lang.ArrayUtils.isEmpty;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.springframework.util.ReflectionUtils.findMethod;

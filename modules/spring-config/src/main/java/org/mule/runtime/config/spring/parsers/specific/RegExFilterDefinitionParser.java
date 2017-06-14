@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.parsers.specific;
 
-import static org.apache.commons.lang.StringUtils.split;
+import static org.apache.commons.lang3.StringUtils.split;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.runtime.core.routing.filters.RegExFilter;
 

@@ -96,7 +96,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
   private BeanDefinitionPostProcessor resolvePostProcessor() {
     for (ClassLoader classLoader : resolveContextArtifactPluginClassLoaders()) {
       try {
-        return (BeanDefinitionPostProcessor) org.apache.commons.lang.ClassUtils
+        return (BeanDefinitionPostProcessor) org.apache.commons.lang3.ClassUtils
             .getClass(classLoader, TRANSPORT_BEAN_DEFINITION_POST_PROCESSOR_CLASS)
             .newInstance();
       } catch (Exception e) {
@@ -295,7 +295,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
         return originalBeanDefinition;
       }
       try {
-        beanClass = org.apache.commons.lang.ClassUtils.getClass(originalBeanDefinition.getBeanClassName());
+        beanClass = org.apache.commons.lang3.ClassUtils.getClass(originalBeanDefinition.getBeanClassName());
       } catch (ClassNotFoundException e) {
         throw new RuntimeException(e);
       }

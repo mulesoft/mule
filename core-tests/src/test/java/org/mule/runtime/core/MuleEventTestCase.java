@@ -194,7 +194,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     Event before = testEvent();
 
     Event after =
-        (Event) SerializationUtils.deserialize(org.apache.commons.lang.SerializationUtils.serialize(before), muleContext);
+        (Event) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before), muleContext);
 
     after.getContext().success(result);
 
@@ -214,7 +214,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     Event before = eventBuilder().message(of(null)).flow(flow).build();
     String beforeId = before.getContext().getId();
 
-    byte[] bytes = org.apache.commons.lang.SerializationUtils.serialize(before);
+    byte[] bytes = org.apache.commons.lang3.SerializationUtils.serialize(before);
     before = null;
     System.gc();
 
@@ -228,7 +228,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     Event before = eventBuilder().message(of(null)).flow(getTestFlow(muleContext)).build();
 
     Event after =
-        (Event) SerializationUtils.deserialize(org.apache.commons.lang.SerializationUtils.serialize(before), muleContext);
+        (Event) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before), muleContext);
 
     after.getContext().success(result);
 

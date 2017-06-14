@@ -7,7 +7,7 @@
 
 package org.mule.test.runner.utils;
 
-import static org.apache.commons.lang.ClassUtils.getAllInterfaces;
+import static org.apache.commons.lang3.ClassUtils.getAllInterfaces;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

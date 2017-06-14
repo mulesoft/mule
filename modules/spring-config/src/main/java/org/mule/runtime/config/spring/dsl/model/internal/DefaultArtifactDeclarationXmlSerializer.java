@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.dsl.model.internal;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-import static org.apache.commons.lang.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_SCHEMA_LOCATION;

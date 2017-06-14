@@ -7,9 +7,9 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 import static com.google.common.collect.ImmutableList.copyOf;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.builder.EqualsBuilder.reflectionEquals;
-import static org.apache.commons.lang.builder.HashCodeBuilder.reflectionHashCode;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
+import static org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.NamedObject;

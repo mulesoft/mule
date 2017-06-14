@@ -153,7 +153,7 @@
         <commonsDbUtilsVersion>1.2</commonsDbUtilsVersion>
         <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
         <commonsIoVersion>2.4</commonsIoVersion>
-        <commonsLangVersion>2.4</commonsLangVersion>
+        <commonsLangVersion>3.6</commonsLangVersion>
         <commonsNetVersion>3.5</commonsNetVersion>
         <commonsPoolVersion>1.6</commonsPoolVersion>
         <cxfVersion>2.7.18</cxfVersion>
@@ -280,7 +280,6 @@
         <dependency>
             <groupId>com.googlecode.multithreadedtc</groupId>
             <artifactId>multithreadedtc</artifactId>
-            <version>${multithreadedtcVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -898,8 +897,8 @@
                 <version>${commonsPoolVersion}</version>
             </dependency>
             <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
                 <version>${commonsLangVersion}</version>
             </dependency>
             <dependency>
@@ -916,10 +915,6 @@
                     <exclusion>
                         <groupId>commons-logging</groupId>
                         <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-lang</groupId>
-                        <artifactId>commons-lang</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

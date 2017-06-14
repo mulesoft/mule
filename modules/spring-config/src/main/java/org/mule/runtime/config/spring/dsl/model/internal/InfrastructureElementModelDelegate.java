@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring.dsl.model.internal;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.ExtensionConstants.INFRASTRUCTURE_PARAMETER_NAMES;

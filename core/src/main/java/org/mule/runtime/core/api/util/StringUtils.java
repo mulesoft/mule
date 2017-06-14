@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.CharUtils;
+import org.apache.commons.lang3.CharUtils;
 
 /**
  * <code>StringUtils</code> contains useful methods for manipulating Strings.
@@ -31,7 +31,7 @@ public class StringUtils {
   private static final String HEX_CHARACTERS_UC = HEX_CHARACTERS.toUpperCase();
 
   /**
-   * Like {@link org.apache.commons.lang.StringUtils#split(String, String)}, but additionally trims whitespace from the result
+   * Like {@link org.apache.commons.lang3.StringUtils#split(String, String)}, but additionally trims whitespace from the result
    * tokens.
    */
   public static String[] splitAndTrim(String string, String delim) {
@@ -43,12 +43,12 @@ public class StringUtils {
       return ArrayUtils.EMPTY_STRING_ARRAY;
     }
 
-    String[] rawTokens = org.apache.commons.lang.StringUtils.split(string, delim);
+    String[] rawTokens = org.apache.commons.lang3.StringUtils.split(string, delim);
     List<String> tokens = new ArrayList<String>();
     if (rawTokens != null) {
       for (int i = 0; i < rawTokens.length; i++) {
         String token = StringUtils.trim(rawTokens[i]);
-        if (org.apache.commons.lang.StringUtils.isNotEmpty(token)) {
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(token)) {
           tokens.add(token);
         }
       }
@@ -85,10 +85,10 @@ public class StringUtils {
   }
 
   /**
-   * Like {@link org.apache.commons.lang.StringUtils#repeat(String, int)} but with a single character as argument.
+   * Like {@link org.apache.commons.lang3.StringUtils#repeat(String, int)} but with a single character as argument.
    */
   public static String repeat(char c, int len) {
-    return org.apache.commons.lang.StringUtils.repeat(CharUtils.toString(c), len);
+    return org.apache.commons.lang3.StringUtils.repeat(CharUtils.toString(c), len);
   }
 
   /**
@@ -158,14 +158,14 @@ public class StringUtils {
   }
 
   public static boolean isEmpty(String str) {
-    return org.apache.commons.lang.StringUtils.isEmpty(str);
+    return org.apache.commons.lang3.StringUtils.isEmpty(str);
   }
 
   public static boolean isBlank(String str) {
-    return org.apache.commons.lang.StringUtils.isBlank(str);
+    return org.apache.commons.lang3.StringUtils.isBlank(str);
   }
 
   public static String trim(String str) {
-    return org.apache.commons.lang.StringUtils.trim(str);
+    return org.apache.commons.lang3.StringUtils.trim(str);
   }
 }

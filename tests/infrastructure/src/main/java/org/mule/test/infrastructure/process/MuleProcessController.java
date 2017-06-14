@@ -7,7 +7,7 @@
 
 package org.mule.test.infrastructure.process;
 
-import static org.apache.commons.lang.SystemUtils.IS_OS_WINDOWS;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 
 import java.io.File;
 

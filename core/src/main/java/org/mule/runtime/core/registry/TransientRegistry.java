@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.registry;
 
-import static org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace;
-import static org.apache.commons.lang.exception.ExceptionUtils.getMessage;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -22,9 +23,9 @@ import org.mule.runtime.core.api.registry.PreInitProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.LegacyConnector;
+import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.registry.map.RegistryMap;
-import org.mule.runtime.core.api.util.StringUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -83,7 +84,7 @@ public class TransientRegistry extends AbstractRegistry {
       } catch (Exception e) {
         logger.warn("Can not dispose object. " + getMessage(e));
         if (logger.isDebugEnabled()) {
-          logger.debug("Can not dispose object. " + getFullStackTrace(e));
+          logger.debug("Can not dispose object. " + getStackTrace(e));
         }
       }
     }

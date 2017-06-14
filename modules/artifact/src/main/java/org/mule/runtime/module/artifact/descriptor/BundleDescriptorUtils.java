@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.artifact.descriptor;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.eclipse.aether.util.version.GenericVersionScheme;

@@ -10,7 +10,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;

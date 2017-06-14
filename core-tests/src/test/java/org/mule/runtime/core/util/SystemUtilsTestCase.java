@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
-import static org.apache.commons.lang.SystemUtils.IS_OS_WINDOWS;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

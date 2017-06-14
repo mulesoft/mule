@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring;
 
-import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
 import org.mule.runtime.config.spring.parsers.DefaultXmlMetadataAnnotations;
 import org.mule.runtime.config.spring.parsers.XmlMetadataAnnotations;

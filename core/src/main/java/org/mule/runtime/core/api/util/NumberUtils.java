@@ -30,7 +30,7 @@ public class NumberUtils {
   }
 
   private static int toInt(String str) {
-    return org.apache.commons.lang.math.NumberUtils.toInt(str, INTEGER_ERROR);
+    return org.apache.commons.lang3.math.NumberUtils.toInt(str, INTEGER_ERROR);
   }
 
   /*

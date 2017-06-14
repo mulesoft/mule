@@ -45,7 +45,7 @@ public class JavaExternalSerializerProtocol extends AbstractSerializationProtoco
 
   private void doSerialize(Object object, OutputStream out) {
     validateForSerialization(object);
-    org.apache.commons.lang.SerializationUtils.serialize((Serializable) object, out);
+    org.apache.commons.lang3.SerializationUtils.serialize((Serializable) object, out);
   }
 
   /**
@@ -56,11 +56,11 @@ public class JavaExternalSerializerProtocol extends AbstractSerializationProtoco
     //TODO: MULE-11939
     if (object instanceof CursorStreamProvider) {
       try (CursorStream cursor = ((CursorStreamProvider) object).openCursor()) {
-        return org.apache.commons.lang.SerializationUtils.serialize(toByteArray(cursor));
+        return org.apache.commons.lang3.SerializationUtils.serialize(toByteArray(cursor));
       }
     }
     validateForSerialization(object);
-    return org.apache.commons.lang.SerializationUtils.serialize((Serializable) object);
+    return org.apache.commons.lang3.SerializationUtils.serialize((Serializable) object);
   }
 
   /**

@@ -40,7 +40,7 @@ public class PropertyEditorTextToValueTransformerTestCase extends AbstractTransf
     ClassNotFoundException exception = null;
     for (String className : classNames) {
       try {
-        return (PropertyEditor) org.apache.commons.lang.ClassUtils.getClass(className).newInstance();
+        return (PropertyEditor) org.apache.commons.lang3.ClassUtils.getClass(className).newInstance();
       } catch (ClassNotFoundException e) {
         exception = e;
       }

@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static org.apache.commons.lang.StringUtils.INDEX_NOT_FOUND;
-import static org.apache.commons.lang.StringUtils.indexOf;
-import static org.apache.commons.lang.StringUtils.substring;
-import static org.apache.commons.lang.SystemUtils.JAVA_VM_VENDOR;
+import static org.apache.commons.lang3.StringUtils.INDEX_NOT_FOUND;
+import static org.apache.commons.lang3.StringUtils.indexOf;
+import static org.apache.commons.lang3.StringUtils.substring;
+import static org.apache.commons.lang3.SystemUtils.JAVA_VM_VENDOR;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;

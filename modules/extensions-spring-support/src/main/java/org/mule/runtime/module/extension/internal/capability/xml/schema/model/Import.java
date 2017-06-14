@@ -101,8 +101,8 @@ public class Import extends Annotated {
     }
 
     Import anImport = (Import) o;
-    return org.apache.commons.lang.StringUtils.equals(getNamespace(), anImport.getNamespace())
-        && org.apache.commons.lang.StringUtils.equals(getSchemaLocation(), anImport.getSchemaLocation());
+    return org.apache.commons.lang3.StringUtils.equals(getNamespace(), anImport.getNamespace())
+        && org.apache.commons.lang3.StringUtils.equals(getSchemaLocation(), anImport.getSchemaLocation());
 
   }
 

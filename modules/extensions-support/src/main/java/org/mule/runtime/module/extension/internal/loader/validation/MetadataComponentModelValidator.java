@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;

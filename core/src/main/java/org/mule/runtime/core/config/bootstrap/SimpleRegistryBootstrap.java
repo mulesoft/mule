@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.config.bootstrap;
 
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 
 import org.mule.runtime.api.exception.MuleException;

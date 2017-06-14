@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.config.builders;
 
-import static org.apache.commons.lang.StringUtils.substringAfterLast;
+import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 import static org.mule.runtime.core.api.util.ClassUtils.getResource;
 import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
 

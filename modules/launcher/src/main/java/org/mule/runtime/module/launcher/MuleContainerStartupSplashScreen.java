@@ -8,7 +8,7 @@ package org.mule.runtime.module.launcher;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.sort;
-import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getUserLibFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;

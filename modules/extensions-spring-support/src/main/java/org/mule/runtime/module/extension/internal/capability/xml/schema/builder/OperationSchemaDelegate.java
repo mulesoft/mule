@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
-import static org.apache.commons.lang.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_OPERATOR;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_OPERATOR_TYPE;
 import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.TYPE_SUFFIX;

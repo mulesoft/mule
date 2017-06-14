@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring.dsl.declaration;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.api.app.declaration.fluent.ElementDeclarer.newFlow;

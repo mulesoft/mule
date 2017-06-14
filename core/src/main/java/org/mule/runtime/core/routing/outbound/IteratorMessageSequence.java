@@ -11,7 +11,7 @@ import org.mule.runtime.core.routing.MessageSequence;
 
 import java.util.Iterator;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 /**
  * A {@link MessageSequence} that delegates its {@link #hasNext()} and {@link #next()} methods to an {@link Iterator}, and has no

@@ -8,7 +8,7 @@ package org.mule.runtime.config.builders;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
-import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;

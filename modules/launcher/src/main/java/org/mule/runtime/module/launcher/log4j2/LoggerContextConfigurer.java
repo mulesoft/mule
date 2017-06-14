@@ -23,7 +23,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.zip.Deflater;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Layout;

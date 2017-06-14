@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
-import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
