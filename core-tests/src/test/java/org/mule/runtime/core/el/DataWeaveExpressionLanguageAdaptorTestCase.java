@@ -36,7 +36,11 @@ import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.PROPER
 import static org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor.VARIABLES;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
+
+import org.mockito.Mockito;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
+import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Error;
@@ -45,6 +49,7 @@ import org.mule.runtime.api.message.NullAttributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.config.MuleManifest;
@@ -296,6 +301,19 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     TypedValue result = expressionLanguage.evaluate("flow.name", event, mockFlowConstruct, BindingContext.builder().build());
     assertThat(result.getDataType(), is(STRING));
     assertThat(result.getValue(), is(flowName));
+  }
+
+  @Test
+  public void payloadExpressionShouldNotBeEvaluate() throws MuleException {
+    BindingContext bindingContext = BindingContext.builder().build();
+    MuleContext muleContext = mock(MuleContext.class);
+    DefaultExpressionLanguageFactoryService languageFactory = mock(DefaultExpressionLanguageFactoryService.class);
+    ExpressionLanguage expressionLanguage = mock(ExpressionLanguage.class);
+    when(expressionLanguage.evaluate("payload", bindingContext)).thenThrow(new RuntimeException("It should not be called"));
+    when(languageFactory.create()).thenReturn(expressionLanguage);
+    Event event = testEvent();
+    new DataWeaveExpressionLanguageAdaptor(muleContext, languageFactory).evaluate("#[payload]", event, bindingContext);
+
   }
 
   private Event getEventWithError(Optional<Error> error) {

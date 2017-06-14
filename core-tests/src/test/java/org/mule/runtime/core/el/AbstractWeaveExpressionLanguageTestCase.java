@@ -23,7 +23,7 @@ public abstract class AbstractWeaveExpressionLanguageTestCase extends AbstractMu
 
   @Before
   public void setUp() {
-    expressionLanguage = new DataWeaveExpressionLanguageAdaptor(muleContext);
+    expressionLanguage = DataWeaveExpressionLanguageAdaptor.create(muleContext);
   }
 
   @Override
