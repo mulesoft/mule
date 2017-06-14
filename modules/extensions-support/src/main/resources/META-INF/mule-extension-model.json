@@ -3072,7 +3072,7 @@
             },
             "annotations": {
               "visibility": "WRITE_ONLY",
-              "default": "1000l"
+              "default": "1000"
             }
           },
           {
@@ -3114,7 +3114,7 @@
             },
             "annotations": {
               "visibility": "WRITE_ONLY",
-              "default": "0l"
+              "default": "0"
             }
           }
         ]
