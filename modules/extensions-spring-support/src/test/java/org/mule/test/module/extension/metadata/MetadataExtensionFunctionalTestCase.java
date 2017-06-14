@@ -58,6 +58,7 @@ import java.util.function.BiConsumer;
 import org.junit.Before;
 import org.junit.runners.Parameterized;
 
+//TODO MULE-12809: Make MetadataTestCase use LazyMetadataService
 @RunnerDelegateTo(Parameterized.class)
 public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentModel> extends AbstractExtensionFunctionalTestCase {
 
