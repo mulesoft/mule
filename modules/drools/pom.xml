@@ -13,7 +13,7 @@
     <description>Classes which allow Mule to integrate with Drools via the BPM Module.</description>
 
     <properties>
-        <droolsVersion>5.0.1</droolsVersion>
+        <droolsVersion>5.2.1.Final</droolsVersion>
     </properties>
 
     <dependencies>
