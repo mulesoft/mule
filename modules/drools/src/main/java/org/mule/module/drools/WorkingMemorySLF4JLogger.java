@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import org.drools.WorkingMemoryEventManager;
+import org.drools.WorkingMemory;
 import org.drools.audit.WorkingMemoryLogger;
 import org.drools.audit.event.LogEvent;
 import org.drools.event.KnowledgeRuntimeEventManager;
@@ -34,7 +34,7 @@ public class WorkingMemorySLF4JLogger extends WorkingMemoryLogger implements Kno
         super.writeExternal(out);
     }
 
-    public WorkingMemorySLF4JLogger(WorkingMemoryEventManager workingMemory, Logger logger)
+    public WorkingMemorySLF4JLogger(WorkingMemory workingMemory, Logger logger)
     {
         super(workingMemory);
         this.logger = logger;
